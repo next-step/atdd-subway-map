@@ -58,12 +58,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", "5");
 
-        RestAssured.given().
+        RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
                 post("/lines").
                 then().
+                log().all().
                 extract();
 
         // when
@@ -76,7 +77,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 then().
                 log().all().
                 extract();
-
 
         // then
         // 지하철_노선_생성_실패됨
@@ -118,7 +118,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         // 지하철_노선_목록_응답됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         // 지하철_노선_목록_포함됨
     }
 
