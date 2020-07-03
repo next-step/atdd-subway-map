@@ -65,13 +65,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = this.requestReadLines();
 
         // then
         // 지하철_노선_목록_응답됨
@@ -91,14 +85,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_조회_요청
         String uri = createResponse.header("Location");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get(uri).
-                then().
-                log().all().
-                extract();
+        Long id = Long.parseLong(uri.split("/lines/")[1]);
+        ExtractableResponse<Response> response = this.requestReadLine(id);
 
         // then
         // 지하철_노선_응답됨
@@ -154,6 +142,26 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 body(params).
                 when().
                 post("/lines").
+                then().
+                log().all().
+                extract();
+    }
+
+    private ExtractableResponse<Response> requestReadLines() {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines").
+                then().
+                log().all().
+                extract();
+    }
+
+    private ExtractableResponse<Response> requestReadLine(Long id) {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines/" + id).
                 then().
                 log().all().
                 extract();
