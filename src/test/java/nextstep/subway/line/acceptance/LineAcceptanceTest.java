@@ -176,12 +176,38 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", "5");
+
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                post("/lines").
+                then().
+                log().all().
+                extract();
 
         // when
         // 지하철_노선_수정_요청
+        String uri = createResponse.header("Location");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                put(uri).
+                then().
+                log().all().
+                extract();
 
         // then
         // 지하철_노선_수정됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
