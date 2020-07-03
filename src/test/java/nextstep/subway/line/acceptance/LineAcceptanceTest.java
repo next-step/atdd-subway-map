@@ -19,27 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        Map<String, String> params = new HashMap<>();ㅇ
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = this.requestCreateLine("신분당선", "bg-red-600",
+                LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // then
         // 지하철_노선_생성됨
@@ -80,21 +66,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> createResponse = this.requestCreateLine("신분당선", "bg-red-600",
+                LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
         // 지하철_노선_조회_요청
@@ -138,5 +111,30 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         // 지하철_노선_삭제됨
+    }
+
+    private ExtractableResponse<Response> requestCreateLine(String name, String color,
+                                                            LocalTime startTime, LocalTime endTime, int intervalTime) {
+        final Map<String, String> params = this.createLineRequestParams(name, color, startTime, endTime, intervalTime);
+
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                post("/lines").
+                then().
+                log().all().
+                extract();
+    }
+
+    private Map<String, String> createLineRequestParams(String name, String color,
+                                                        LocalTime startTime, LocalTime endTime, int intervalTime) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", String.valueOf(intervalTime));
+        return params;
     }
 }
