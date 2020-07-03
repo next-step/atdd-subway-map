@@ -131,12 +131,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createResponse = this.requestCreateLine("신분당선", "bg-red-600",
+                LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
         // 지하철_노선_제거_요청
+        String uri = createResponse.header("Location");
+        Long id = Long.parseLong(uri.split("/lines/")[1]);
+        ExtractableResponse<Response> response = this.requestDeleteLine(id);
 
         // then
         // 지하철_노선_삭제됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> requestCreateLine(String name, String color,
@@ -162,6 +168,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 body(params).
                 when().
                 put("/lines/" + id).
+                then().
+                log().all().
+                extract();
+    }
+
+    private ExtractableResponse<Response> requestDeleteLine(Long id) {
+        return RestAssured.given().log().all().
+                when().
+                delete("/lines/" + id).
                 then().
                 log().all().
                 extract();
