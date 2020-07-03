@@ -76,6 +76,29 @@ public class LineAcceptanceStep {
                 extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, Map<String, String> params) {
+        String uri = response.header("Location");
+
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                put(uri).
+                then().
+                log().all().
+                extract();
+    }
+
+    public static  Map<String, String> sendParams(String name, String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", "5");
+        return params;
+    }
+
     public static void 지하철_노선_생성됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
@@ -92,6 +115,10 @@ public class LineAcceptanceStep {
     public static void 지하철_노선_응답됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.as(LineResponse.class)).isNotNull();
+    }
+
+    public static void 지하철_노선_수정됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
 
