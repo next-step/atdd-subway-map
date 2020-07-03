@@ -64,6 +64,18 @@ public class LineAcceptanceStep {
                 extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> response) {
+        String uri = response.header("Location");
+
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get(uri).
+                then().
+                log().all().
+                extract();
+    }
+
     public static void 지하철_노선_생성됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
@@ -75,6 +87,11 @@ public class LineAcceptanceStep {
 
     public static void 지하철_노선_목록_응답됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    public static void 지하철_노선_응답됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.as(LineResponse.class)).isNotNull();
     }
 
 
