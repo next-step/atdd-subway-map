@@ -54,6 +54,16 @@ public class LineAcceptanceStep {
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines").
+                then().
+                log().all().
+                extract();
+    }
+
     public static void 지하철_노선_생성됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
@@ -62,5 +72,10 @@ public class LineAcceptanceStep {
     public static void 지하철_노선_생성_실패됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    public static void 지하철_노선_목록_응답됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
 
 }

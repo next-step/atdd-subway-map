@@ -58,58 +58,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
-
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "1호선");
-        params2.put("color", "bg-blue-600");
-        params2.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params2.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params2.put("intervalTime", "5");
-
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params2).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse2 = 지하철_노선_등록되어_있음("1호선", "bg-blue-600");
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_목록_응답됨(response);
         지하철_노선_목록_포함됨(response, Arrays.asList(createResponse1, createResponse2));
     }
 
-    public static void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
 
     @DisplayName("지하철 노선을 조회한다.")
     @Test
