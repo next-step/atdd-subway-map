@@ -19,12 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();ㅇ
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");
         params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
