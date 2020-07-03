@@ -51,7 +51,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_목록_포함됨(response, Arrays.asList(createResponse1, createResponse2));
     }
 
-
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine() {

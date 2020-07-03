@@ -58,7 +58,7 @@ public class LineAcceptanceStep {
         return RestAssured.given().log().all().
                 accept(MediaType.APPLICATION_JSON_VALUE).
                 when().
-                get("/lines").
+                get(URL).
                 then().
                 log().all().
                 extract();
@@ -136,6 +136,4 @@ public class LineAcceptanceStep {
     public static void 지하철_노선_수정됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
-
-
 }
