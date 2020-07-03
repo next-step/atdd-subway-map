@@ -20,6 +20,10 @@ public class LineAcceptanceStep {
 
     private static final String URL = "/lines";
 
+    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
+        return 지하철_노선_생성_요청(name, color);
+    }
+
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
@@ -54,4 +58,9 @@ public class LineAcceptanceStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
+
+    public static void 지하철_노선_생성_실패됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 }
