@@ -89,7 +89,18 @@ public class LineAcceptanceStep {
                 extract();
     }
 
-    public static  Map<String, String> sendParams(String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_제거_요청(ExtractableResponse<Response> response) {
+        String uri = response.header("Location");
+
+        return RestAssured.given().log().all().
+                when().
+                delete(uri).
+                then().
+                log().all().
+                extract();
+    }
+
+    public static Map<String, String> sendParams(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -111,6 +122,11 @@ public class LineAcceptanceStep {
     public static void 지하철_노선_목록_응답됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
+
+    public static void 지하철_노선_삭제됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
 
     public static void 지하철_노선_응답됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
