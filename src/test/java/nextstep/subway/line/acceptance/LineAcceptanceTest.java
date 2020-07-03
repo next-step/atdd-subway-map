@@ -85,7 +85,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_조회_요청
         String uri = createResponse.header("Location");
-        Long id = Long.parseLong(uri.split("/lines/")[1]);
+        Long id = this.extractIdFromUri(uri);
         ExtractableResponse<Response> response = this.requestReadLine(id);
 
         // then
@@ -105,7 +105,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_수정_요청
         String uri = createResponse.header("Location");
-        Long id = Long.parseLong(uri.split("/lines/")[1]);
+        Long id = this.extractIdFromUri(uri);
         ExtractableResponse<Response> response = this.requestUpdateLine(id, "1호선", "bg-blue-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
@@ -125,7 +125,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_제거_요청
         String uri = createResponse.header("Location");
-        Long id = Long.parseLong(uri.split("/lines/")[1]);
+        Long id = this.extractIdFromUri(uri);
         ExtractableResponse<Response> response = this.requestDeleteLine(id);
 
         // then
@@ -199,5 +199,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", String.valueOf(intervalTime));
         return params;
+    }
+
+    private Long extractIdFromUri(String uri) {
+        return Long.parseLong(uri.split("/lines/")[1]);
     }
 }
