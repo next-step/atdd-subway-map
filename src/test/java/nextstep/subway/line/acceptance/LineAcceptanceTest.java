@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,9 +13,13 @@ import org.springframework.http.MediaType;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_목록_포함됨;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -93,6 +98,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
+
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
@@ -103,7 +109,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", "5");
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all().
+        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
@@ -112,24 +118,41 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 log().all().
                 extract();
 
-        // when
-        // 지하철_노선_목록_조회_요청
-        String uri = createResponse.header("Location");
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "1호선");
+        params2.put("color", "bg-blue-600");
+        params2.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
+        params2.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
+        params2.put("intervalTime", "5");
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
+        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params2).
                 when().
-                get(uri).
+                post("/lines").
                 then().
                 log().all().
                 extract();
 
+        // when
+        // 지하철_노선_목록_조회_요청
+        ExtractableResponse<Response> response = RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines").
+                then().
+                log().all().
+                extract();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(LineResponse.class)).isNotNull();
+        지하철_노선_목록_포함됨(response, Arrays.asList(createResponse1, createResponse2));
+    }
+
+    public static void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선을 조회한다.")
