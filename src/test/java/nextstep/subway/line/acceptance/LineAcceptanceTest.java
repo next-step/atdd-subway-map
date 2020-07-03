@@ -38,12 +38,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine2() {
         // given
         // 지하철_노선_등록되어_있음
+        String name = "신분당선";
+        this.requestCreateLine(name, "bg-red-600",
+                LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
         // 지하철_노선_생성_요청
+        ExtractableResponse<Response> response = this.requestCreateLine(name, "bg-red-600",
+                LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // then
         // 지하철_노선_생성_실패됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT); // FIXME it returns 400
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
