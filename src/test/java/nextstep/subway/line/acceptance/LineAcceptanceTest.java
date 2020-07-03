@@ -31,7 +31,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // then
-        // 지하철_노선_생성됨
         지하철_노선_생성됨(response);
     }
 
@@ -39,15 +38,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine2() {
         // given
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
 
         // when
-        // 지하철_노선_생성_요청
         ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // then
-        // 지하철_노선_생성_실패됨
         지하철_노선_생성_실패됨(createResponse2);
     }
 
@@ -56,18 +52,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
 
         // given
-        // 지하철_노선_등록되어_있음
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
         ExtractableResponse<Response> createResponse2 = 지하철_노선_등록되어_있음("1호선", "bg-blue-600");
 
         // when
-        // 지하철_노선_목록_조회_요청
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        // 지하철_노선_목록_응답됨
-        // 지하철_노선_목록_포함됨
         지하철_노선_목록_응답됨(response);
         지하철_노선_목록_포함됨(response, Arrays.asList(createResponse1, createResponse2));
     }
@@ -90,11 +81,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
 
         // when
-        // 지하철_노선_수정_요청
         ExtractableResponse<Response> createResponse2 = 지하철_노선_수정_요청(createResponse1, sendParams("1호선", "bg-blue-600"));
 
         // then
@@ -105,7 +94,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
 
         // when
