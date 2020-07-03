@@ -55,7 +55,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_생성_요청
-
         // then
         // 지하철_노선_생성_실패됨
     }
