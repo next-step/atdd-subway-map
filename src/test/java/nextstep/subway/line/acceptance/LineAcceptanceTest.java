@@ -49,7 +49,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         // 지하철_노선_생성_실패됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT); // FIXME it returns 400
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()); // FIXME it returns 400
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
