@@ -117,17 +117,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_수정_요청
         String uri = createResponse.header("Location");
-        final Map<String, String> updateLineRequestParams = this.createLineRequestParams("1호선", "bg-blue-600",
+        Long id = Long.parseLong(uri.split("/lines/")[1]);
+        ExtractableResponse<Response> response = this.requestUpdateLine(id, "1호선", "bg-blue-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(updateLineRequestParams).
-                when().
-                put(uri).
-                then().
-                log().all().
-                extract();
 
         // then
         // 지하철_노선_수정됨
@@ -149,7 +141,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> requestCreateLine(String name, String color,
                                                             LocalTime startTime, LocalTime endTime, int intervalTime) {
-        final Map<String, String> params = this.createLineRequestParams(name, color, startTime, endTime, intervalTime);
+        Map<String, String> params = this.lineRequestParams(name, color, startTime, endTime, intervalTime);
 
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -161,8 +153,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 extract();
     }
 
-    private Map<String, String> createLineRequestParams(String name, String color,
-                                                        LocalTime startTime, LocalTime endTime, int intervalTime) {
+    private ExtractableResponse<Response> requestUpdateLine(Long id, String name, String color,
+                                                            LocalTime startTime, LocalTime endTime, int intervalTime) {
+        Map<String, String> params = this.lineRequestParams(name, color, startTime, endTime, intervalTime);
+
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                put("/lines/" + id).
+                then().
+                log().all().
+                extract();
+    }
+
+    private Map<String, String> lineRequestParams(String name, String color,
+                                                  LocalTime startTime, LocalTime endTime, int intervalTime) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
