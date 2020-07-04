@@ -103,12 +103,21 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        Map<String, String> params = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "5");
+
+        ExtractableResponse<Response> createResponse = createLineRequest(params);
 
         // when
         // 지하철_노선_수정_요청
+        String uri = createResponse.header("Location");
+        Long id = extractLineId(uri);
+
+        Map<String, String> updateParams = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "10");
+        ExtractableResponse<Response> updateResponse = updateLineRequest(updateParams, id);
 
         // then
         // 지하철_노선_수정됨
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
