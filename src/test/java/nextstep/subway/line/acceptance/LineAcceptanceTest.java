@@ -81,33 +81,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
+        Map<String, String> params = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "5");
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> createResponse = createLineRequest(params);
 
         // when
         // 지하철_노선_조회_요청
         String uri = createResponse.header("Location");
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get(uri).
-                then().
-                log().all().
-                extract();
+        Long id = extractLineId(uri);
+        ExtractableResponse<Response> response = readLineRequest(id);
 
         // then
         // 지하철_노선_응답됨
@@ -164,6 +147,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
+    private ExtractableResponse<Response> updateLineRequest(Map<String, String> params, Long id) {
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                put("/lines/" + id).
+                then().
+                log().all().
+                extract();
+    }
+
     private ExtractableResponse<Response> readLinesRequest() {
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -172,5 +166,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 then().
                 log().all().
                 extract();
+    }
+
+    private ExtractableResponse<Response> readLineRequest(Long id) {
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines/" + id).
+                then().
+                log().all().
+                extract();
+    }
+
+    private ExtractableResponse<Response> deleteLineRequest(Long id) {
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                delete("/lines/" + id).
+                then().
+                log().all().
+                extract();
+    }
+
+    private Long extractLineId(String uri) {
+        return Long.valueOf(uri.split("/lines/")[1]);
     }
 }
