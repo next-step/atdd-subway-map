@@ -24,12 +24,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
+        Map<String, String> params = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "5");
 
         ExtractableResponse<Response> response = RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -51,12 +46,31 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine2() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "5");
+
+        RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                post("/lines").
+                then().
+                log().all().
+                extract();
 
         // when
         // 지하철_노선_생성_요청
+        ExtractableResponse<Response> response = RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                post("/lines").
+                then().
+                log().all().
+                extract();
+
         // then
         // 지하철_노선_생성_실패됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -137,5 +151,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         // 지하철_노선_삭제됨
+    }
+
+    private Map<String, String> createLineRequestParams(String name, String color, LocalTime startTime, LocalTime endTime, String intervalTime) {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("name", name);
+        params.put("color", color);
+        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", intervalTime);
+
+        return params;
     }
 }
