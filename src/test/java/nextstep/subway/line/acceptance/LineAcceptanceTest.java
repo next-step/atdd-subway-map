@@ -72,14 +72,24 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         // 지하철_노선_등록되어_있음
-        // 지하철_노선_등록되어_있음
+        createLine("name1");
+        createLine("name2");
 
         // when
         // 지하철_노선_목록_조회_요청
+        ExtractableResponse<Response> response = RestAssured.given().log().all().
+                when().
+                get("/lines").
+                then().
+                log().all()
+                .extract();
 
         // then
         // 지하철_노선_목록_응답됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         // 지하철_노선_목록_포함됨
+        assertThat(response.body().jsonPath().getList("$").size()).isEqualTo(2);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
