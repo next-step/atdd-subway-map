@@ -125,12 +125,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
+        Map<String, String> params = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "5");
+
+        ExtractableResponse<Response> createResponse = createLineRequest(params);
 
         // when
         // 지하철_노선_제거_요청
+        String uri = createResponse.header("Location");
+        Long id = extractLineId(uri);
+
+        ExtractableResponse<Response> deleteResponse = deleteLineRequest(id);
 
         // then
         // 지하철_노선_삭제됨
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private Map<String, String> createLineRequestParams(String name, String color, LocalTime startTime, LocalTime endTime, String intervalTime) {
