@@ -87,10 +87,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_조회_요청
-        String uri = createResponse.header("Location");
+        Long lineId = createResponse.as(LineResponse.class).getId();
 
-        Long id = extractLineId(uri);
-        ExtractableResponse<Response> response = readLineRequest(id);
+        ExtractableResponse<Response> response = readLineRequest(lineId);
 
         // then
         // 지하철_노선_응답됨
@@ -109,11 +108,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_수정_요청
-        String uri = createResponse.header("Location");
-        Long id = extractLineId(uri);
+        Long lineId = createResponse.as(LineResponse.class).getId();
 
         Map<String, String> updateParams = createLineRequestParams("신분당선", "bg-red-600", LocalTime.of(05, 30),  LocalTime.of(23, 30), "10");
-        ExtractableResponse<Response> updateResponse = updateLineRequest(updateParams, id);
+        ExtractableResponse<Response> updateResponse = updateLineRequest(updateParams, lineId);
 
         // then
         // 지하철_노선_수정됨
@@ -131,10 +129,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_제거_요청
-        String uri = createResponse.header("Location");
-        Long id = extractLineId(uri);
+        Long lineId = createResponse.as(LineResponse.class).getId();
 
-        ExtractableResponse<Response> deleteResponse = deleteLineRequest(id);
+        ExtractableResponse<Response> deleteResponse = deleteLineRequest(lineId);
 
         // then
         // 지하철_노선_삭제됨
@@ -164,12 +161,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    private ExtractableResponse<Response> updateLineRequest(Map<String, String> params, Long id) {
+    private ExtractableResponse<Response> updateLineRequest(Map<String, String> params, Long lineId) {
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
-                put("/lines/" + id).
+                put("/lines/{lineId}", lineId).
                 then().
                 log().all().
                 extract();
@@ -185,27 +182,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 extract();
     }
 
-    private ExtractableResponse<Response> readLineRequest(Long id) {
+    private ExtractableResponse<Response> readLineRequest(Long lineId) {
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 when().
-                get("/lines/" + id).
+                get("/lines/{lineId}", lineId).
                 then().
                 log().all().
                 extract();
     }
 
-    private ExtractableResponse<Response> deleteLineRequest(Long id) {
+    private ExtractableResponse<Response> deleteLineRequest(Long lineId) {
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 when().
-                delete("/lines/" + id).
+                delete("/lines/{lineId}", lineId).
                 then().
                 log().all().
                 extract();
-    }
-
-    private Long extractLineId(String uri) {
-        return Long.valueOf(uri.split("/lines/")[1]);
     }
 }
