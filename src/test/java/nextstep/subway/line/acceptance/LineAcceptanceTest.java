@@ -12,7 +12,9 @@ import org.springframework.http.MediaType;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,6 +121,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        final List<LineResponse> responseList = response.as(ArrayList.class);
+        assertThat(responseList).isNotNull()
+                .hasSize(1)
+                .anyMatch(lineResponse -> params.get("name").equals(lineResponse.getName()));
+
     }
 
     @DisplayName("지하철 노선을 조회한다.")
