@@ -2,6 +2,7 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,27 +43,24 @@ public class LineService {
     public LineResponse findLineById(Long id) {
         final Line line = lineRepository.findById(id)
                 .orElseThrow(RuntimeException::new);
-
-        final List<Long> lineStationIds = line.getLineStations().stream()
-                .map(it -> it.getStationId())
-                .collect(Collectors.toList());
-
-        final List<Station> stations = this.stationRepository.findAllById(lineStationIds);
-
-        final List<LineStationResponse> lineStationResponses = line.getLineStations().stream()
-                .map(lineStation -> {
-                    final Station station = stations.stream()
-                            .filter(s -> s.getId().equals(lineStation.getStationId()))
-                            .findFirst()
-                            .orElseThrow(RuntimeException::new);
-
-                    return LineStationResponse.of(lineStation, station);
-                })
-                .collect(Collectors.toList());
+        List<LineStationResponse> lineStationResponses = this.toLineStationResponses(line.getLineStations());
 
         return lineRepository.findById(id)
                 .map(it -> LineResponse.of(it, lineStationResponses))
                 .orElseThrow(RuntimeException::new);
+    }
+
+    private List<LineStationResponse> toLineStationResponses(List<LineStation> lineStations) {
+        final List<Long> lineStationIds = lineStations.stream()
+                .map(it -> it.getStationId())
+                .collect(Collectors.toList());
+
+        final Map<Long, Station> stations = this.stationRepository.findAllById(lineStationIds).stream()
+                .collect(Collectors.toMap(it -> it.getId(), it -> it));
+
+        return lineStations.stream()
+                .map(lineStation -> LineStationResponse.of(lineStation, stations.get(lineStation.getStationId())))
+                .collect(Collectors.toList());
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
