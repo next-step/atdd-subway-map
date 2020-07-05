@@ -122,10 +122,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        final List<LineResponse> responseList = response.as(ArrayList.class);
-        assertThat(responseList).isNotNull()
-                .hasSize(1)
-                .anyMatch(lineResponse -> params.get("name").equals(lineResponse.getName()));
+        assertThat(response.as(ArrayList.class)).isNotNull()
+                .hasSize(1);
 
     }
 
