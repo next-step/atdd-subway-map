@@ -17,32 +17,47 @@ public class LineStations {
         this.lineStations = new ArrayList<>();
     }
 
-    public void add(LineStation station) {
+    public void add(LineStation newLineStation) {
         if (this.lineStations.isEmpty()) {
-            this.lineStations.add(station);
+            this.append(newLineStation);
             return;
         }
 
-        if (station.getPreStationId() == null) {
-            throw new RuntimeException();
+        if (Objects.isNull(newLineStation.getPreStationId())) {
+            this.prepend(newLineStation);
+            return;
         }
 
-        final int loop = this.lineStations.size();
-        for (int i = 0; i < loop; i++) {
+        final int lineStationsSize = this.lineStations.size();
+        for (int i = 0; i < lineStationsSize; i++) {
             final LineStation lineStation = this.lineStations.get(i);
 
-            if (Objects.equals(lineStation.getStationId(), station.getPreStationId())) {
-                if ((i + 1) != this.lineStations.size()) {
-                    final LineStation next = this.lineStations.get(i + 1);
-                    next.changePreStation(station.getStationId());
-                }
-
-                this.lineStations.add(i + 1, station);
+            if (lineStation.isPreStationOf(newLineStation)) {
+                this.insert(i + 1, newLineStation);
                 return;
             }
         }
 
         throw new RuntimeException();
+    }
+
+    private void append(LineStation lineStation) {
+        this.lineStations.add(lineStation);
+    }
+
+    private void prepend(LineStation lineStation) {
+        final LineStation firstStation = this.lineStations.get(0);
+        firstStation.changePreStation(lineStation);
+        this.lineStations.add(0, lineStation);
+    }
+
+    private void insert(int index, LineStation lineStation) {
+        if (index != this.lineStations.size()) {
+            final LineStation next = this.lineStations.get(index);
+            next.changePreStation(lineStation);
+        }
+
+        this.lineStations.add(index, lineStation);
     }
 
     public List<LineStation> getLineStations() {

@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import javax.persistence.Embeddable;
+import java.util.Objects;
 
 @Embeddable
 public class LineStation {
@@ -19,8 +20,12 @@ public class LineStation {
         this.duration = duration;
     }
 
-    public void changePreStation(final Long stationId) {
-        this.preStationId = stationId;
+    public boolean isPreStationOf(LineStation other) {
+        return Objects.equals(this.stationId, other.preStationId);
+    }
+
+    public void changePreStation(final LineStation preLineStation) {
+        this.preStationId = preLineStation.getStationId();
     }
 
     public Long getPreStationId() {
