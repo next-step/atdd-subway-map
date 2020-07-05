@@ -47,7 +47,7 @@ public class LineStationService {
         return lineStations.stream()
                 .map(lineStation -> new LineStationResponse(
                         StationResponse.of(lineStation.getStation()),
-                        Optional.ofNullable(lineStation.getFormerStation()).map(Station::getId).orElse(null),
+                        Optional.ofNullable(lineStation.getPreStation()).map(Station::getId).orElse(null),
                         lineStation.getDistance(),
                         lineStation.getDuration()
                 ))
@@ -56,10 +56,18 @@ public class LineStationService {
 
     private LineStation toLineStation(LineStationRequest lineStationRequest) {
         final Station station = stationRepository
-                .findById(Long.parseLong(lineStationRequest.getStationId()))
+                .findById(lineStationRequest.getStationId())
                 .orElseThrow(RuntimeException::new);
+
+        final Long preStationId = lineStationRequest.getPreStationId();
+        Station preStation = null;
+        if (preStationId != null) {
+            stationRepository
+                    .findById(preStationId)
+                    .orElseThrow(RuntimeException::new);
+        }
         return new LineStation(
-                station, null,
+                station, preStation,
                 Integer.parseInt(lineStationRequest.getDuration()),
                 Integer.parseInt(lineStationRequest.getDistance())
         );

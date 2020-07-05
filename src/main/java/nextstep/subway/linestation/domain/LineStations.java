@@ -17,7 +17,7 @@ public class LineStations {
 
     public List<LineStation> getStationsInOrder() {
         Optional<LineStation> preLineStation = lineStations.stream()
-                .filter(it -> it.getFormerStation() == null)
+                .filter(it -> it.getPreStation() == null)
                 .findFirst();
 
         final List<LineStation> result = new ArrayList<>();
@@ -25,7 +25,7 @@ public class LineStations {
             final LineStation formerStation = preLineStation.get();
             result.add(formerStation);
             preLineStation = lineStations.stream()
-                    .filter(it -> it.getFormerStation() == formerStation.getStation())
+                    .filter(it -> it.getPreStation() == formerStation.getStation())
                     .findFirst();
         }
         return result;
@@ -35,7 +35,7 @@ public class LineStations {
         checkValidation(lineStation);
 
         lineStations.stream()
-                .filter(it -> it.getFormerStation() == lineStation.getFormerStation())
+                .filter(it -> it.getPreStation() == lineStation.getPreStation())
                 .findFirst()
                 .ifPresent(it -> it.updatePreStationTo(lineStation.getStation()));
 
@@ -59,9 +59,9 @@ public class LineStations {
                 .orElseThrow(RuntimeException::new);
 
         lineStations.stream()
-                .filter(it -> it.getFormerStation().equals(station))
+                .filter(it -> it.getPreStation().equals(station))
                 .findFirst()
-                .ifPresent(it -> it.updatePreStationTo(lineStation.getFormerStation()));
+                .ifPresent(it -> it.updatePreStationTo(lineStation.getPreStation()));
 
         lineStations.remove(lineStation);
     }

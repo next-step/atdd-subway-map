@@ -1,47 +1,47 @@
 package nextstep.subway.linestation.dto;
 
 public class LineStationRequest {
-    private String preStationId;
-    private String stationId;
+    private Long preStationId;
+    private Long stationId;
     private String distance;
     private String duration;
 
     public LineStationRequest() {
     }
 
-    public LineStationRequest(String preStationId, String stationId, String distance, String duration) {
+    public LineStationRequest(Long preStationId, Long stationId, String distance, String duration) {
         this.preStationId = preStationId;
         this.stationId = stationId;
         this.distance = distance;
         this.duration = duration;
     }
 
-    public String getPreStationId() {
+    public Long getPreStationId() {
         return preStationId;
     }
 
-    public String getStationId() {
+    public void setPreStationId(Long preStationId) {
+        this.preStationId = preStationId;
+    }
+
+    public Long getStationId() {
         return stationId;
+    }
+
+    public void setStationId(Long stationId) {
+        this.stationId = stationId;
     }
 
     public String getDistance() {
         return distance;
     }
 
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setPreStationId(String preStationId) {
-        this.preStationId = preStationId;
-    }
-
-    public void setStationId(String stationId) {
-        this.stationId = stationId;
-    }
-
     public void setDistance(String distance) {
         this.distance = distance;
+    }
+
+    public String getDuration() {
+        return duration;
     }
 
     public void setDuration(String duration) {

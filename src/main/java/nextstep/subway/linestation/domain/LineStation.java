@@ -18,8 +18,8 @@ public class LineStation extends BaseEntity {
     private Station station;
 
     @OneToOne
-    @JoinColumn(name = "former_station_id")
-    private Station formerStation;
+    @JoinColumn(name = "pre_station_id")
+    private Station preStation;
 
     @Column(nullable = false)
     private Integer duration;
@@ -30,9 +30,9 @@ public class LineStation extends BaseEntity {
     public LineStation() {
     }
 
-    public LineStation(Station station, Station formerStation, Integer duration, Integer distance) {
+    public LineStation(Station station, Station preStation, Integer duration, Integer distance) {
         this.station = station;
-        this.formerStation = formerStation;
+        this.preStation = preStation;
         this.duration = duration;
         this.distance = distance;
     }
@@ -42,15 +42,15 @@ public class LineStation extends BaseEntity {
     }
 
     public void updatePreStationTo(Station station) {
-        this.formerStation = station;
+        this.preStation = station;
     }
 
     public Station getStation() {
         return station;
     }
 
-    public Station getFormerStation() {
-        return formerStation;
+    public Station getPreStation() {
+        return preStation;
     }
 
     public Integer getDuration() {
@@ -68,14 +68,14 @@ public class LineStation extends BaseEntity {
         LineStation that = (LineStation) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(station, that.station) &&
-                Objects.equals(formerStation, that.formerStation) &&
+                Objects.equals(preStation, that.preStation) &&
                 Objects.equals(duration, that.duration) &&
                 Objects.equals(distance, that.distance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, station, formerStation, duration, distance);
+        return Objects.hash(id, station, preStation, duration, distance);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class LineStation extends BaseEntity {
         return "LineStation{" +
                 "id=" + id +
                 ", station=" + station +
-                ", formerStation=" + formerStation +
+                ", formerStation=" + preStation +
                 ", duration=" + duration +
                 ", distance=" + distance +
                 '}';
