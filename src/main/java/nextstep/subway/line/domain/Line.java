@@ -4,7 +4,6 @@ import nextstep.subway.config.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -41,10 +40,6 @@ public class Line extends BaseEntity {
 
     public void addLineStation(LineStation lineStation) {
         lineStations.add(lineStation);
-    }
-
-    public List<LineStation> getStationInOrder() {
-        return lineStations.getStationsInOrder();
     }
 
     public Long getId() {
