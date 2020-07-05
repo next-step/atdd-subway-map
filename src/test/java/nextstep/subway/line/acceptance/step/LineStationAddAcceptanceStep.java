@@ -17,15 +17,27 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineStationAddAcceptanceStep {
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록되어_있음(ExtractableResponse<Response> createLineResponse,
+                                                                     ExtractableResponse<Response> createPreStationResponse,
+                                                                     ExtractableResponse<Response> createStationResponse,
+                                                                     Integer distance, Integer duration) {
+        return 지하철_노선에_지하철역_등록_요청(createLineResponse, createPreStationResponse, createStationResponse, distance, duration);
+    }
+
     public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> createLineResponse,
                                                                    ExtractableResponse<Response> createPreStationResponse,
                                                                    ExtractableResponse<Response> createStationResponse,
                                                                    Integer distance, Integer duration) {
-        Long lineId = createLineResponse.as(LineResponse.class).getId();
         Long preStationId = Objects.nonNull(createPreStationResponse) ?
                 createPreStationResponse.as(StationResponse.class).getId() : null;
         Long stationId = createStationResponse.as(StationResponse.class).getId();
+        return 지하철_노선에_지하철역_등록_요청(createLineResponse, preStationId, stationId, distance, duration);
+    }
 
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> createLineResponse,
+                                                                   Long preStationId, Long stationId,
+                                                                   Integer distance, Integer duration) {
+        Long lineId = createLineResponse.as(LineResponse.class).getId();
         Map<String, String> params = 지하철_노선에_지하철역_등록_요청값(preStationId, stationId, distance, duration);
 
         return RestAssured.given().log().all().
@@ -59,6 +71,14 @@ public class LineStationAddAcceptanceStep {
                 .collect(Collectors.toList());
 
         assertThat(lineStationIds).containsExactlyElementsOf(stationIds);
+    }
+
+    public static void 지하철_노선에_지하철역_등록_중복_등록으로_실패됨(ExtractableResponse<Response> addLineStationResponse) {
+        assertThat(addLineStationResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    public static void 지하철_노선에_지하철역_등록_존재하지않아_실패됨(ExtractableResponse<Response> addLineStationResponse) {
+        assertThat(addLineStationResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private static Map<String, String> 지하철_노선에_지하철역_등록_요청값(Long preStationId, Long stationId, Integer distance, Integer duration) {
