@@ -16,6 +16,8 @@ public class Line extends BaseEntity {
     private LocalTime startTime;
     private LocalTime endTime;
     private int intervalTime;
+    @Embedded
+    private LineStations lineStations = new LineStations();
 
     public Line() {
     }
@@ -34,6 +36,10 @@ public class Line extends BaseEntity {
         this.endTime = line.getEndTime();
         this.intervalTime = line.getIntervalTime();
         this.color = line.getColor();
+    }
+
+    public void addLineStation(LineStation lineStation) {
+        lineStations.add(lineStation);
     }
 
     public Long getId() {
