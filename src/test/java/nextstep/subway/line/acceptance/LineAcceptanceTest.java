@@ -17,7 +17,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        // 지하철_노선_생성_요청
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600", LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // then
@@ -28,7 +27,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine2() {
         // given
-        // 지하철_노선_등록되어_있음
         String name = "신분당선";
         지하철_노선_등록되어_있음(name, "bg-red-600", LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
@@ -72,7 +70,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음("신분당선", "bg-red-600", LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
@@ -87,7 +84,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음("신분당선", "bg-red-600", LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
