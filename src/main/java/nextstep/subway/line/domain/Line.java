@@ -4,6 +4,7 @@ import nextstep.subway.config.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.*;
 
 @Entity
 public class Line extends BaseEntity {
@@ -17,7 +18,11 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
-    public Line() {
+    @ElementCollection
+    @OrderColumn
+    private List<LineStation> lineStations;
+
+    protected Line() {
     }
 
     public Line(String name, String color, LocalTime startTime, LocalTime endTime, int intervalTime) {
@@ -26,6 +31,7 @@ public class Line extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.intervalTime = intervalTime;
+        this.lineStations = new ArrayList<>();
     }
 
     public void update(Line line) {
@@ -34,6 +40,34 @@ public class Line extends BaseEntity {
         this.endTime = line.getEndTime();
         this.intervalTime = line.getIntervalTime();
         this.color = line.getColor();
+    }
+
+    public void addStation(LineStation station) {
+        if (this.lineStations.isEmpty()) {
+            this.lineStations.add(station);
+            return;
+        }
+
+        if (station.getPreStationId() == null) {
+            throw new RuntimeException();
+        }
+
+        final int loop = this.lineStations.size();
+        for (int i = 0; i < loop; i++) {
+            final LineStation lineStation = this.lineStations.get(i);
+
+            if (Objects.equals(lineStation.getStationId(), station.getPreStationId())) {
+                if ((i + 1) != this.lineStations.size()) {
+                    final LineStation next = this.lineStations.get(i + 1);
+                    next.changePreStation(station.getStationId());
+                }
+
+                this.lineStations.add(i + 1, station);
+                return;
+            }
+        }
+
+        throw new RuntimeException();
     }
 
     public Long getId() {
@@ -58,5 +92,9 @@ public class Line extends BaseEntity {
 
     public int getIntervalTime() {
         return intervalTime;
+    }
+
+    public List<LineStation> getLineStations() {
+        return Collections.unmodifiableList(lineStations);
     }
 }
