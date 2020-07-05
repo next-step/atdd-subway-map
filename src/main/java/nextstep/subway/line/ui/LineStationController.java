@@ -20,7 +20,7 @@ public class LineStationController {
     @PostMapping
     public ResponseEntity<LineStationResponse> addStation(@PathVariable Long id,
                                                           @RequestBody LineStationRequest lineStationRequest) {
-        LineStationResponse response = this.lineStationService.addStation(id, lineStationRequest);
+        LineStationResponse response = this.lineStationService.addLineStation(id, lineStationRequest);
         return ResponseEntity.created(URI.create("/lines/" + id + "/stations")).body(response);
     }
 }

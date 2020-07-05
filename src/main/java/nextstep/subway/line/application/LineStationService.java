@@ -24,17 +24,10 @@ public class LineStationService {
         this.stationRepository = stationRepository;
     }
 
-    public LineStationResponse addStation(Long lineId, LineStationRequest lineStationRequest) {
-        checkAreStationsExist(lineStationRequest);
-
-        Line line = this.lineRepository.findById(lineId)
-                .orElseThrow(EntityNotFoundException::new);
-        LineStation lineStation = lineStationRequest.toLineStation();
-        line.addStation(lineStation);
-
-        final Station station = this.stationRepository.findById(lineStation.getStationId())
-                .orElseThrow(EntityNotFoundException::new);
-        return LineStationResponse.of(lineStation, station);
+    public LineStationResponse addLineStation(Long lineId, LineStationRequest lineStationRequest) {
+        this.checkAreStationsExist(lineStationRequest);
+        LineStation lineStation = this.addLineStationToLine(lineId, lineStationRequest);
+        return this.toLineStationResponse(lineStation);
     }
 
     private void checkAreStationsExist(LineStationRequest lineStationRequest) {
@@ -49,5 +42,19 @@ public class LineStationService {
         if (!this.stationRepository.existsById(lineStationRequest.getPreStationId())) {
             throw new EntityNotFoundException();
         }
+    }
+
+    private LineStation addLineStationToLine(Long lineId, LineStationRequest lineStationRequest) {
+        Line line = this.lineRepository.findById(lineId)
+                .orElseThrow(EntityNotFoundException::new);
+        LineStation lineStation = lineStationRequest.toLineStation();
+        line.addStation(lineStation);
+        return lineStation;
+    }
+
+    private LineStationResponse toLineStationResponse(LineStation lineStation) {
+        Station station = this.stationRepository.findById(lineStation.getStationId())
+                .orElseThrow(EntityNotFoundException::new);
+        return LineStationResponse.of(lineStation, station);
     }
 }
