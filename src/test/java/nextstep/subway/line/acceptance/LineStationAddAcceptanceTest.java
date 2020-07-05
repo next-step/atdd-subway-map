@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.지하철_노선에_지하철역_등록_요청;
+import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.지하철_노선에_지하철역_등록됨;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,24 +37,14 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선에_지하철역_등록됨(response);
     }
+
+
 
     @DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
     @Test
