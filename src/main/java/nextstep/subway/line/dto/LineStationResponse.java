@@ -1,5 +1,8 @@
 package nextstep.subway.line.dto;
 
+import com.google.common.collect.Lists;
+import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.station.dto.StationResponse;
 
 public class LineStationResponse {
@@ -17,6 +20,7 @@ public class LineStationResponse {
         this.distance = distance;
         this.duration = duration;
     }
+
 
     public StationResponse getStation() {
         return station;
