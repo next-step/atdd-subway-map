@@ -15,10 +15,6 @@ public class LineStations {
     @JoinColumn(name = "line_id", foreignKey = @ForeignKey(name = "fk_line_station_to_line"))
     private List<LineStation> lineStations = Lists.newArrayList();
 
-    public List<LineStation> getLineStations() {
-        return lineStations;
-    }
-
     public List<LineStation> getStationsInOrder() {
         Optional<LineStation> preLineStation = lineStations.stream()
                 .filter(it -> it.getFormerStation() == null)

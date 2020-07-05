@@ -67,4 +67,8 @@ public class Line extends BaseEntity {
     public void registerStation(LineStation lineStation) {
         lineStations.add(lineStation);
     }
+
+    public LineStations getLineStations() {
+        return lineStations;
+    }
 }

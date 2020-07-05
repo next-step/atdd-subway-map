@@ -22,15 +22,15 @@ public class LineStation extends BaseEntity {
     private Station formerStation;
 
     @Column(nullable = false)
-    private Long duration;
+    private Integer duration;
 
     @Column(nullable = false)
-    private Long distance;
+    private Integer distance;
 
     public LineStation() {
     }
 
-    public LineStation(Station station, Station formerStation, Long duration, Long distance) {
+    public LineStation(Station station, Station formerStation, Integer duration, Integer distance) {
         this.station = station;
         this.formerStation = formerStation;
         this.duration = duration;
@@ -51,6 +51,14 @@ public class LineStation extends BaseEntity {
 
     public Station getFormerStation() {
         return formerStation;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public Integer getDistance() {
+        return distance;
     }
 
     @Override
