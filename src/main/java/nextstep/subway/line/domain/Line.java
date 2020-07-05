@@ -19,7 +19,7 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LineStation> lineStations = new ArrayList<>();
 
     public Line() {
@@ -63,6 +63,10 @@ public class Line extends BaseEntity {
 
     public int getIntervalTime() {
         return intervalTime;
+    }
+
+    public List<LineStation> getLineStations() {
+        return lineStations;
     }
 
     public void addStation(Long preStationId, Long stationId, Integer distance, Integer duration) {

@@ -40,4 +40,24 @@ public class LineStation extends BaseEntity {
             throw new IllegalArgumentException("must be greater than " + ZERO);
         }
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getPrevStationId() {
+        return prevStationId;
+    }
+
+    public Long getStationId() {
+        return stationId;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }

@@ -2,8 +2,14 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.LineStationCreateRequest;
+import nextstep.subway.line.dto.LineStationResponse;
+import nextstep.subway.line.exception.NotFoundException;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +19,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final StationRepository stationRepository;
+    private final LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(StationRepository stationRepository, LineRepository lineRepository) {
+        this.stationRepository = stationRepository;
         this.lineRepository = lineRepository;
     }
 
@@ -28,15 +36,21 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(line -> LineResponse.of(line))
+                .map(line -> LineResponse.of(line, mapToLineStationResponse(line)))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         return lineRepository.findById(id)
-                .map(it -> LineResponse.of(it))
+                .map(it -> LineResponse.of(it, mapToLineStationResponse(it)))
                 .orElseThrow(RuntimeException::new);
+    }
+
+    private List<LineStationResponse> mapToLineStationResponse(Line it) {
+        return it.getLineStations().stream()
+                .map(lineStation -> LineStationResponse.of(findStationById(lineStation.getStationId()), lineStation))
+                .collect(Collectors.toList());
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
@@ -46,5 +60,17 @@ public class LineService {
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public void createLineStation(Long lineId, LineStationCreateRequest createRequest) {
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(NotFoundException::new);
+
+        line.addStation(createRequest.getPreStationId(), createRequest.getStationId(), createRequest.getDistance(), createRequest.getDuration());
+    }
+
+
+    private Station findStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 }
