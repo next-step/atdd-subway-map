@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
+import nextstep.subway.linestation.domain.LineStations;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -16,6 +17,8 @@ public class Line extends BaseEntity {
     private LocalTime startTime;
     private LocalTime endTime;
     private int intervalTime;
+    @Embedded
+    private LineStations lineStations = new LineStations();
 
     public Line() {
     }

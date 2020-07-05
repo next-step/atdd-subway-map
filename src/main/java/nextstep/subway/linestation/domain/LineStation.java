@@ -4,6 +4,7 @@ import nextstep.subway.config.BaseEntity;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class LineStation extends BaseEntity {
@@ -25,4 +26,33 @@ public class LineStation extends BaseEntity {
 
     @Column(nullable = false)
     private Long distance;
+
+    public boolean isSame(LineStation other) {
+        return this.equals(other);
+    }
+
+    public void updatePreStationTo(Station station) {
+        this.formerStation = station;
+    }
+
+    public Station getStation() {
+        return station;
+    }
+
+    public Station getFormerStation() {
+        return formerStation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineStation that = (LineStation) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, station, formerStation, duration, distance);
+    }
 }
