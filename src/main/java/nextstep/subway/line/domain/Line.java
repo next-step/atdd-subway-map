@@ -18,9 +18,8 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
-    @ElementCollection
-    @OrderColumn
-    private List<LineStation> lineStations;
+    @Embedded
+    private LineStations lineStations;
 
     protected Line() {
     }
@@ -31,7 +30,7 @@ public class Line extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.intervalTime = intervalTime;
-        this.lineStations = new ArrayList<>();
+        this.lineStations = new LineStations();
     }
 
     public void update(Line line) {
@@ -42,32 +41,8 @@ public class Line extends BaseEntity {
         this.color = line.getColor();
     }
 
-    public void addStation(LineStation station) {
-        if (this.lineStations.isEmpty()) {
-            this.lineStations.add(station);
-            return;
-        }
-
-        if (station.getPreStationId() == null) {
-            throw new RuntimeException();
-        }
-
-        final int loop = this.lineStations.size();
-        for (int i = 0; i < loop; i++) {
-            final LineStation lineStation = this.lineStations.get(i);
-
-            if (Objects.equals(lineStation.getStationId(), station.getPreStationId())) {
-                if ((i + 1) != this.lineStations.size()) {
-                    final LineStation next = this.lineStations.get(i + 1);
-                    next.changePreStation(station.getStationId());
-                }
-
-                this.lineStations.add(i + 1, station);
-                return;
-            }
-        }
-
-        throw new RuntimeException();
+    public void addStation(LineStation lineStation) {
+       this.lineStations.add(lineStation);
     }
 
     public Long getId() {
@@ -95,6 +70,6 @@ public class Line extends BaseEntity {
     }
 
     public List<LineStation> getLineStations() {
-        return Collections.unmodifiableList(lineStations);
+        return this.lineStations.getLineStations();
     }
 }
