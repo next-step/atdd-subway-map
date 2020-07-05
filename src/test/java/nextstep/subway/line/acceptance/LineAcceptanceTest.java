@@ -25,6 +25,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         // 지하철_노선_생성_요청
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청();
+
+        // then
+        // 지하철_노선_생성됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청() {
         final Map<String, String> params = buildCreateLineRequestParam(
                 "신분당선",
                 "bg-red-600",
@@ -33,7 +42,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 "5"
         );
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
+        return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
@@ -41,11 +50,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 then().
                 log().all().
                 extract();
-
-        // then
-        // 지하철_노선_생성됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
     }
 
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
@@ -55,23 +59,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_등록되어_있음
         createLine();
 
-        final Map<String, String> params = buildCreateLineRequestParam(
-                "신분당선",
-                "bg-red-600",
-                LocalTime.of(05, 30),
-                LocalTime.of(23, 30),
-                "5"
-        );
-
-        // when
-        // 지하철_노선_생성_요청
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when()
-                .post("/lines")
-                .then()
-                .log().all().extract();
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청();
 
         // then
         // 지하철_노선_생성_실패됨
@@ -106,22 +94,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = buildCreateLineRequestParam(
-                "신분당선",
-                "bg-red-600",
-                LocalTime.of(05, 30),
-                LocalTime.of(23, 30),
-                "5"
-        );
-
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청();
 
         // when
         // 지하철_노선_조회_요청
