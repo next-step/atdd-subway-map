@@ -16,13 +16,6 @@ public class LineStations {
     }
 
     public void add(LineStation lineStation) {
-        checkValidation(lineStation);
-
-        lineStations.stream()
-                .filter(it -> it.getPreStationId() == lineStation.getPreStationId())
-                .findFirst()
-                .ifPresent(it -> it.updatePreStationTo(lineStation.getStationId()));
-
         lineStations.add(lineStation);
     }
 

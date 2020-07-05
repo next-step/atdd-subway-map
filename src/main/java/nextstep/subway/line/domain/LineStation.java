@@ -44,8 +44,4 @@ public class LineStation {
     public Integer getDuration() {
         return duration;
     }
-
-    public void updatePreStationTo(Long newPreStationId) {
-        this.preStationId = newPreStationId;
-    }
 }
