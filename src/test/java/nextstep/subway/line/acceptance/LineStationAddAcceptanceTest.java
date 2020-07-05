@@ -23,7 +23,7 @@ import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지�
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
-public class LineStationAddAcceptanceTest  {
+public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 역을 등록한다.")
     @Test
     void addLineStation() {
@@ -211,10 +211,10 @@ public class LineStationAddAcceptanceTest  {
         // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
         Map<String, String> params2 = new HashMap<>();
-        params.put("preStationId", stationId1 + "");
-        params.put("stationId", stationId2 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
+        params2.put("preStationId", stationId1 + "");
+        params2.put("stationId", stationId2 + "");
+        params2.put("distance", "4");
+        params2.put("duration", "2");
 
         RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -228,10 +228,10 @@ public class LineStationAddAcceptanceTest  {
         // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
         Map<String, String> params3 = new HashMap<>();
-        params.put("preStationId", stationId1 + "");
-        params.put("stationId", stationId3 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
+        params3.put("preStationId", stationId1 + "");
+        params3.put("stationId", stationId3 + "");
+        params3.put("distance", "4");
+        params3.put("duration", "2");
 
         RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
