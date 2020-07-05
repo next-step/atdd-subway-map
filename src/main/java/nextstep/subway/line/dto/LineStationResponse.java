@@ -1,5 +1,7 @@
 package nextstep.subway.line.dto;
 
+import nextstep.subway.line.domain.LineStation;
+import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
 
 public class LineStationResponse {
@@ -7,6 +9,11 @@ public class LineStationResponse {
     private Long preStationId;
     private Integer distance;
     private Integer duration;
+
+    public static LineStationResponse of(LineStation lineStation, Station station) {
+        return new LineStationResponse(StationResponse.of(station),
+                lineStation.getPreStationId(), lineStation.getDistance(), lineStation.getDuration());
+    }
 
     public LineStationResponse() {
     }
