@@ -19,7 +19,6 @@ public class AcceptanceTest {
     public void setUp() {
         if (RestAssured.port == RestAssured.UNDEFINED_PORT) {
             RestAssured.port = port;
-            databaseCleanup.afterPropertiesSet();
         }
 
         databaseCleanup.execute();
