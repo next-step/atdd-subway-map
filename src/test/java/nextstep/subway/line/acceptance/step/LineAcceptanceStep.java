@@ -94,7 +94,7 @@ public class LineAcceptanceStep {
     }
 
     public static void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()); // FIXME it responses 400
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     public static void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
