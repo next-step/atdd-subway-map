@@ -34,15 +34,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
-
         // when
         // 지하철_노선_생성_요청
         final ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-blue-600",
