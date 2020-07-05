@@ -32,6 +32,22 @@ public class LineStationRequest {
         return duration;
     }
 
+    public void setPreStationId(String preStationId) {
+        this.preStationId = preStationId;
+    }
+
+    public void setStationId(String stationId) {
+        this.stationId = stationId;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
     @Override
     public String toString() {
         return "LineStationRequest{" +
