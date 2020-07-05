@@ -38,15 +38,6 @@ public class LineStationAddAcceptanceStep {
                 extract();
     }
 
-    public static Map<String, String> 지하철_노선에_지하철역_등록_요청값(Long preStationId, Long stationId, Integer distance, Integer duration) {
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", (Objects.nonNull(preStationId) ? String.valueOf(preStationId) : null));
-        params.put("stationId", String.valueOf(stationId));
-        params.put("distance", String.valueOf(distance));
-        params.put("duration",String.valueOf(duration));
-        return params;
-    }
-
     public static void 지하철_노선에_지하철역_등록됨(ExtractableResponse<Response> addLineStationResponse) {
         assertThat(addLineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
@@ -68,5 +59,14 @@ public class LineStationAddAcceptanceStep {
                 .collect(Collectors.toList());
 
         assertThat(lineStationIds).containsExactlyElementsOf(stationIds);
+    }
+
+    private static Map<String, String> 지하철_노선에_지하철역_등록_요청값(Long preStationId, Long stationId, Integer distance, Integer duration) {
+        Map<String, String> params = new HashMap<>();
+        params.put("preStationId", (Objects.nonNull(preStationId) ? String.valueOf(preStationId) : null));
+        params.put("stationId", String.valueOf(stationId));
+        params.put("distance", String.valueOf(distance));
+        params.put("duration",String.valueOf(duration));
+        return params;
     }
 }
