@@ -19,6 +19,23 @@ public class LineStations {
         lineStations.add(lineStation);
     }
 
+    public List<LineStation> getStationsInOrder() {
+        // 출발지점 찾기
+        Optional<LineStation> preLineStation = lineStations.stream()
+                .filter(it -> it.getPreStationId() == null)
+                .findFirst();
+
+        List<LineStation> result = new ArrayList<>();
+        while (preLineStation.isPresent()) {
+            LineStation preStationId = preLineStation.get();
+            result.add(preStationId);
+            preLineStation = lineStations.stream()
+                    .filter(it -> it.getPreStationId() == preStationId.getStationId())
+                    .findFirst();
+        }
+        return result;
+    }
+
     private void checkValidation(LineStation lineStation) {
         if (lineStation.getStationId() == null) {
             throw new RuntimeException();
