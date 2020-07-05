@@ -27,6 +27,16 @@ public class LineStation extends BaseEntity {
     @Column(nullable = false)
     private Long distance;
 
+    public LineStation() {
+    }
+
+    public LineStation(Station station, Station formerStation, Long duration, Long distance) {
+        this.station = station;
+        this.formerStation = formerStation;
+        this.duration = duration;
+        this.distance = distance;
+    }
+
     public boolean isSame(LineStation other) {
         return this.equals(other);
     }

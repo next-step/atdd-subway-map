@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
+import nextstep.subway.linestation.domain.LineStation;
 import nextstep.subway.linestation.domain.LineStations;
 
 import javax.persistence.*;
@@ -61,5 +62,9 @@ public class Line extends BaseEntity {
 
     public int getIntervalTime() {
         return intervalTime;
+    }
+
+    public void registerStation(LineStation lineStation) {
+        lineStations.add(lineStation);
     }
 }
