@@ -57,7 +57,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine2() {
         // given
         // 지하철_노선_등록되어_있음
-        createLine();
+        지하철_노선_생성_요청();
 
         final ExtractableResponse<Response> response = 지하철_노선_생성_요청();
 
@@ -72,7 +72,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        createLine();
+        지하철_노선_생성_요청();
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -119,7 +119,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        createLine();
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청();
 
         // when
         // 지하철_노선_수정_요청
