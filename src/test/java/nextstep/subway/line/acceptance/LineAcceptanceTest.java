@@ -171,12 +171,43 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", "5");
+
+        RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                post("/lines").
+                then().
+                log().all().
+                extract();
 
         // when
         // 지하철_노선_수정_요청
+        Map<String, String> updateParams = new HashMap<>();
+        params.put("name", "분당선");
+        params.put("color", "bg-blue-600");
+        params.put("startTime", LocalTime.of(06, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(22, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", "6");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                put("/lines/{id}", 1).
+                then().
+                log().all().
+                extract();
 
         // then
         // 지하철_노선_수정됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
