@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-public class LineStationAddController {
+public class LineStationController {
 
     private final LineStationService lineStationService;
 
-    public LineStationAddController(LineStationService lineStationService) {
+    public LineStationController(LineStationService lineStationService) {
         this.lineStationService = lineStationService;
     }
 
