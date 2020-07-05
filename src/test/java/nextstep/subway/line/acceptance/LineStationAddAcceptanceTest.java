@@ -23,7 +23,7 @@ import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지�
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
-public class LineStationAddAcceptanceTest extends AcceptanceTest {
+public class LineStationAddAcceptanceTest  {
     @DisplayName("지하철 노선에 역을 등록한다.")
     @Test
     void addLineStation() {
@@ -94,6 +94,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(lineResponse).isNotNull();
         assertThat(lineResponse.getStations()).hasSize(1);
     }
+
 
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
     @Test

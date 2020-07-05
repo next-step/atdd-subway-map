@@ -83,7 +83,7 @@ public class LineStation extends BaseEntity {
         return "LineStation{" +
                 "id=" + id +
                 ", station=" + station +
-                ", formerStation=" + preStation +
+                ", preStation=" + preStation +
                 ", duration=" + duration +
                 ", distance=" + distance +
                 '}';

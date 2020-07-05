@@ -62,7 +62,7 @@ public class LineStationService {
         final Long preStationId = lineStationRequest.getPreStationId();
         Station preStation = null;
         if (preStationId != null) {
-            stationRepository
+            preStation = stationRepository
                     .findById(preStationId)
                     .orElseThrow(RuntimeException::new);
         }
