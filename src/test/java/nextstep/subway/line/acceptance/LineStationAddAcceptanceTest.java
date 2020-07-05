@@ -34,10 +34,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         // when
-        // 지하철_노선에_지하철역_등록_요청
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, stationId);
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse);
 
         // then
         지하철_노선에_지하철역_등록됨(response);

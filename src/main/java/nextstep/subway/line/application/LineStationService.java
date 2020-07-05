@@ -22,7 +22,8 @@ public class LineStationService {
         Optional<Line> findLine = lineRepository.findById(lineStationRequest.getStationId());
 
         if (findLine.isPresent()) {
-            LineStation lineStation = new LineStation(lineStationRequest.getStationId(), lineStationRequest.getPreStationId(), lineStationRequest.getDistance(), lineStationRequest.getDuration());
+            LineStation lineStation = new LineStation(lineStationRequest.getStationId(), lineStationRequest.getPreStationId(),
+                    lineStationRequest.getDistance(), lineStationRequest.getDuration());
             findLine.get().appendStation(lineStation);
         }
 
