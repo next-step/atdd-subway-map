@@ -40,7 +40,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, stationId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         지하철_노선에_지하철역_등록됨(response);
     }
 
