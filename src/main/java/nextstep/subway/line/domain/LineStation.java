@@ -1,15 +1,9 @@
 package nextstep.subway.line.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-@Entity
-
+@Embeddable
 public class LineStation{
-
-    @Id @GeneratedValue
-    private Long id;
     private Long preStationId;
     private Long stationId;
     private Integer distance;
@@ -23,10 +17,6 @@ public class LineStation{
         this.preStationId = preStationId;
         this.distance = distance;
         this.duration = duration;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public Long getPreStationId() {

@@ -1,9 +1,12 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
+import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -17,6 +20,9 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
+    @ElementCollection
+    private List<LineStation> lineStations;
+
     public Line() {
     }
 
@@ -26,6 +32,7 @@ public class Line extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.intervalTime = intervalTime;
+        this.lineStations = new ArrayList<>();
     }
 
     public void update(Line line) {
@@ -34,6 +41,10 @@ public class Line extends BaseEntity {
         this.endTime = line.getEndTime();
         this.intervalTime = line.getIntervalTime();
         this.color = line.getColor();
+    }
+
+    public void appendStation(LineStation lineStation) {
+        lineStations.add(lineStation);
     }
 
     public Long getId() {

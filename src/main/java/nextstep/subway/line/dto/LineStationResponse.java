@@ -1,8 +1,5 @@
 package nextstep.subway.line.dto;
 
-import com.google.common.collect.Lists;
-import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.station.dto.StationResponse;
 
 public class LineStationResponse {

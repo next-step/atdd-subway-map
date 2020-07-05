@@ -1,5 +1,6 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.line.application.LineStationService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineRequest;
@@ -14,10 +15,15 @@ import java.net.URI;
 @RestController
 @RequestMapping("/lines")
 public class LineStationController {
+    private final LineStationService lineStationService;
 
-    @PostMapping("/{lineId}")
+    public LineStationController(LineStationService lineStationService) {
+        this.lineStationService = lineStationService;
+    }
+
+    @PostMapping("/{lineId}/stations")
     public ResponseEntity appendStation(@PathVariable Long lineId, @RequestBody LineStationRequest lineStationRequest) {
-        //LineStation lineStation = lineService.appendStation(lineStationRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/stations")).body("");
+        lineStationService.appendStation(lineStationRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/stations")).body("{}");
     }
 }
