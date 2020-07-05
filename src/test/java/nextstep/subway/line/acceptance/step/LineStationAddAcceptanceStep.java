@@ -19,6 +19,13 @@ public class LineStationAddAcceptanceStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
+    public static void 지하철_노선_상세정보_응답됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        LineResponse lineResponse = response.as(LineResponse.class);
+        assertThat(lineResponse).isNotNull();
+        assertThat(lineResponse.getStations()).hasSize(1);
+    }
+
     public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> lineResponse, ExtractableResponse<Response> stationResponse) {
         Long lineId = lineResponse.as(LineResponse.class).getId();
         Long stationId = stationResponse.as(StationResponse.class).getId();
@@ -34,6 +41,16 @@ public class LineStationAddAcceptanceStep {
                 body(params).
                 when().
                 post("/lines/{lineId}/stations", lineId).
+                then().
+                log().all().
+                extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long lineId) {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines/{lineId}", lineId).
                 then().
                 log().all().
                 extract();
