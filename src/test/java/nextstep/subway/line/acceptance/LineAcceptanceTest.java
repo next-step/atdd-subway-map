@@ -13,11 +13,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -27,8 +26,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        Map<String, String> createLineRequestParams = getLineRequestParameterMap("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        ExtractableResponse<Response> response = 지하철_노선을_생성한다(createLineRequestParams);
+        ExtractableResponse<Response> response = 지하철_노선을_생성한다("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
 
         // then
         // 지하철_노선_생성됨
@@ -41,11 +39,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine2() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> createLineRequestParam = getLineRequestParameterMap("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        지하철_노선을_생성한다(createLineRequestParam);
+        지하철_노선을_생성한다("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
 
-        Map<String, String> createDuplicateLineRequestParam = getLineRequestParameterMap("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        ExtractableResponse<Response> response = 지하철_노선을_생성한다(createDuplicateLineRequestParam);
+        ExtractableResponse<Response> response = 지하철_노선을_생성한다("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
 
         // then
         // 지하철_노선_생성_실패됨
@@ -61,11 +57,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         String newLineName1 = "신분당선";
         String newLineName2 = "공항철도";
 
-        Map<String, String> newLineRequestParam1 = getLineRequestParameterMap(newLineName1, "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        Map<String, String> newLineRequestParam2 = getLineRequestParameterMap(newLineName2, "bg-red-500", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-
-        지하철_노선을_생성한다(newLineRequestParam1);
-        지하철_노선을_생성한다(newLineRequestParam2);
+        지하철_노선을_생성한다(newLineName1, "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
+        지하철_노선을_생성한다(newLineName2, "bg-red-500", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -92,8 +85,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> createLineRequestParam = getLineRequestParameterMap("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        ExtractableResponse<Response> createResponse = 지하철_노선을_생성한다(createLineRequestParam);
+        ExtractableResponse<Response> createResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
 
         // when
         // 지하철_노선_조회_요청
@@ -112,8 +104,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> createLineRequestParams = getLineRequestParameterMap("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        ExtractableResponse<Response> createResponse = 지하철_노선을_생성한다(createLineRequestParams);
+        ExtractableResponse<Response> createResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
 
         String existLineLocation = createResponse.header(HttpHeaders.LOCATION);
         String newLineName = "공항철도";
@@ -121,14 +112,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_수정_요청
-        ExtractableResponse<Response> updateResponse = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(updateLineRequestParams)
-                .when()
-                .put(existLineLocation)
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> updateResponse = 지하철_노선을_수정한다(existLineLocation, updateLineRequestParams);
+
 
         // then
         // 지하철_노선_수정됨
@@ -144,8 +129,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> createLineRequestParams = getLineRequestParameterMap("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        ExtractableResponse<Response> createResponse = 지하철_노선을_생성한다(createLineRequestParams);
+        ExtractableResponse<Response> createResponse = 지하철_노선을_생성한다("신분당선", "bg-red-600", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         String existLineLocation = createResponse.header(HttpHeaders.LOCATION);
 
         // when
@@ -166,26 +150,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private Map<String, String> getLineRequestParameterMap(String lines, String color, LocalTime startTime, LocalTime endTime, int interval) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lines);
-        params.put("color", color);
-        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", String.valueOf(interval));
-        return params;
-    }
 
-    private ExtractableResponse<Response> 지하철_노선을_생성한다(Map<String, String> createLineRequestParameter) {
-        return RestAssured.given().log().all().
-                contentType(ContentType.JSON).
-                body(createLineRequestParameter).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
-    }
 
     private ExtractableResponse<Response> 지하철_노선을_조회한다(String uri) {
         return RestAssured.given().log().all().
