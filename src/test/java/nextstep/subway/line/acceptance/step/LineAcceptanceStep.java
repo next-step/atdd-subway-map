@@ -114,13 +114,10 @@ public class LineAcceptanceStep {
 
     public static void 지하철_노선_목록_포함됨(ExtractableResponse<Response> response,
                                      List<ExtractableResponse<Response>> createResponses) {
-        // FIXME
         final List<Long> expectedLineIds = createResponses.stream()
                 .map(it -> Long.parseLong(it.header("Location").split("/lines/")[1]))
                 .collect(toList());
 
-//        createResponses.stream()
-//                .mapToInt(it -> it.)
         final List<Long> actualLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(it -> it.getId())
                 .collect(toList());
