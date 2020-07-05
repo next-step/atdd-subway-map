@@ -66,11 +66,26 @@ public class LineStation extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LineStation that = (LineStation) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(id, that.id) &&
+                Objects.equals(station, that.station) &&
+                Objects.equals(formerStation, that.formerStation) &&
+                Objects.equals(duration, that.duration) &&
+                Objects.equals(distance, that.distance);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, station, formerStation, duration, distance);
+    }
+
+    @Override
+    public String toString() {
+        return "LineStation{" +
+                "id=" + id +
+                ", station=" + station +
+                ", formerStation=" + formerStation +
+                ", duration=" + duration +
+                ", distance=" + distance +
+                '}';
     }
 }

@@ -33,4 +33,14 @@ public class LineStationResponse {
     public Integer getDuration() {
         return duration;
     }
+
+    @Override
+    public String toString() {
+        return "LineStationResponse{" +
+                "station=" + station +
+                ", preStationId=" + preStationId +
+                ", distance=" + distance +
+                ", duration=" + duration +
+                '}';
+    }
 }
