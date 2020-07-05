@@ -1,6 +1,9 @@
 package nextstep.subway.line.domain;
 
-import javax.persistence.*;
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.OrderColumn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +21,10 @@ public class LineStations {
     }
 
     public void add(LineStation newLineStation) {
+        if (this.containsLineStation(newLineStation.getStationId())) {
+            throw new IllegalStateException();
+        }
+
         if (this.lineStations.isEmpty()) {
             this.append(newLineStation);
             return;
@@ -39,6 +46,11 @@ public class LineStations {
         }
 
         throw new RuntimeException();
+    }
+
+    private boolean containsLineStation(Long stationId) {
+        return this.lineStations.stream()
+                .anyMatch(it -> Objects.equals(it.getStationId(), stationId));
     }
 
     private void append(LineStation lineStation) {

@@ -88,24 +88,13 @@ public class LineAcceptanceStep {
                 extract();
     }
 
-    public static Map<String, String> 지하철_노선_요청값(String name, String color,
-                                                 LocalTime startTime, LocalTime endTime, int intervalTime) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", String.valueOf(intervalTime));
-        return params;
-    }
-
     public static void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
 
     public static void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()); // FIXME it responses 400
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     public static void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
@@ -133,7 +122,19 @@ public class LineAcceptanceStep {
     public static void 지하철_노선_수정됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
+
     public static void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static Map<String, String> 지하철_노선_요청값(String name, String color,
+                                                 LocalTime startTime, LocalTime endTime, int intervalTime) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", String.valueOf(intervalTime));
+        return params;
     }
 }
