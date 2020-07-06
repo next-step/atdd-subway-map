@@ -3,7 +3,6 @@ package nextstep.subway.line.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
-import nextstep.subway.line.domain.LineStationRepository;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import nextstep.subway.station.domain.Station;
@@ -19,12 +18,10 @@ public class LineStationService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final LineStationRepository lineStationRepository;
 
-    public LineStationService(LineRepository lineRepository, StationRepository stationRepository, LineStationRepository lineStationRepository) {
+    public LineStationService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.lineStationRepository = lineStationRepository;
     }
 
     public List<LineStationResponse> findAll(Long lineId) {
