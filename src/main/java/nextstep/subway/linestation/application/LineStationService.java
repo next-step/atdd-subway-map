@@ -45,7 +45,7 @@ public class LineStationService {
         final Line line = lineRepository
                 .findById(lineId)
                 .orElseThrow(RuntimeException::new);
-        return toLineStationResponse(line.getLineStations().getStationsInOrder());
+        return toLineStationResponse(line.getStationsInOrder());
     }
 
     private List<LineStationResponse> toLineStationResponse(List<LineStation> lineStations) {

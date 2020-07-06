@@ -6,6 +6,7 @@ import nextstep.subway.linestation.domain.LineStations;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -68,7 +69,7 @@ public class Line extends BaseEntity {
         lineStations.add(lineStation);
     }
 
-    public LineStations getLineStations() {
-        return lineStations;
+    public List<LineStation> getStationsInOrder() {
+        return lineStations.getStationsInOrder();
     }
 }
