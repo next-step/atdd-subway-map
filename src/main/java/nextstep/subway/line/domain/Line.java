@@ -20,6 +20,7 @@ public class Line extends BaseEntity {
     private int intervalTime;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "fk_line_id")
     private List<LineStation> lineStations = new ArrayList<>();
 
     public Line() {
