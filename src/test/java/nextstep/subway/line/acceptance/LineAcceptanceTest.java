@@ -16,12 +16,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        // 지하철_노선_생성_요청
         final ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // then
-        // 지하철_노선_생성됨
         지하철_노선_생성됨(response);
     }
 
@@ -30,17 +28,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine2() {
         // given
-        // 지하철_노선_등록되어_있음
         지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        // 지하철_노선_생성_요청
         final ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-blue-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 6);
 
         // then
-        // 지하철_노선_생성_실패됨
         지하철_노선_생성_실패됨(response);
     }
 
@@ -49,8 +44,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        // 지하철_노선_등록되어_있음
-        // 지하철_노선_등록되어_있음
         지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
         지하철_노선_생성_요청("분당선", "bg-yellow-600",
@@ -58,12 +51,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
 
         // when
-        // 지하철_노선_목록_조회_요청
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        // 지하철_노선_목록_응답됨
-        // 지하철_노선_목록_포함됨
         지하철_노선_목록_응답됨(response);
         지하철_노선_목록_포함됨(response, 2);
 
@@ -74,16 +64,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        // 지하철_노선_등록되어_있음
         final ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(createResponse);
 
         // then
-        // 지하철_노선_응답됨
         지하철_노선_응답됨(response);
     }
 
@@ -91,18 +78,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        // 지하철_노선_수정_요청
-
         ExtractableResponse<Response> response = 지하철_노선_수정_요청(createResponse, "분당선", "bg-blue-600",
                 LocalTime.of(06, 30), LocalTime.of(22, 30), 6);
 
         // then
-        // 지하철_노선_수정됨
         지하철_노선_수정됨(response);
     }
 
@@ -111,16 +94,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        // 지하철_노선_제거_요청
         final ExtractableResponse<Response> response = 지하철_노선_삭제_요청(createResponse);
 
         // then
-        // 지하철_노선_삭제됨
         지하철_노선_삭제됨(response);
     }
 
