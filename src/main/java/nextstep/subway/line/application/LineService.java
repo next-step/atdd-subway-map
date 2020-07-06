@@ -2,8 +2,13 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.LineStationResponse;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +18,12 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public Line saveLine(LineRequest request) {
@@ -34,9 +41,16 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
-        return lineRepository.findById(id)
-                .map(it -> LineResponse.of(it))
-                .orElseThrow(RuntimeException::new);
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        List<LineStation> lineStations = line.getLineStations();
+
+        // List<LineStationResponse> 생성
+        List<LineStationResponse> lineStationResponses = lineStations.stream()
+                        .map(it -> LineStationResponse.of(StationResponse.of(stationRepository.findById(it.getStationId()).get()), it))
+                        .collect(Collectors.toList());
+
+        // Line reponse 생성
+        return LineResponse.of(line, lineStationResponses);
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {

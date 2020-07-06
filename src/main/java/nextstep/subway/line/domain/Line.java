@@ -5,6 +5,7 @@ import nextstep.subway.line.dto.LineStationRequest;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -65,5 +66,9 @@ public class Line extends BaseEntity {
 
     public int getIntervalTime() {
         return intervalTime;
+    }
+
+    public List<LineStation> getLineStations() {
+        return lineStations.getLineStation();
     }
 }

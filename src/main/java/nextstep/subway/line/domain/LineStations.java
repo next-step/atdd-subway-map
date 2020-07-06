@@ -13,4 +13,8 @@ public class LineStations {
     public void add(LineStation lineStation) {
         this.lineStation.add(lineStation);
     }
+
+    public List<LineStation> getLineStation() {
+        return lineStation;
+    }
 }
