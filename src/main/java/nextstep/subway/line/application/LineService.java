@@ -65,6 +65,7 @@ public class LineService {
     }
 
     private Station findStationById(Long id) {
-        return stationRepository.findById(id).orElseThrow(NotFoundException::new);
+        return stationRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
     }
 }

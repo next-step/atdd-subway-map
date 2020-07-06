@@ -12,7 +12,6 @@ public class LineStations {
     @JoinColumn(name = "fk_line_id")
     private List<LineStation> lineStations = new ArrayList<>();
 
-
     public List<LineStation> getLineStationsInOrder() {
         if (CollectionUtils.isEmpty(lineStations)) {
             return Collections.unmodifiableList(Collections.emptyList());

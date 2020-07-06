@@ -56,7 +56,7 @@ public class LineStation extends BaseEntity {
 
     public boolean isSamePreStationId(LineStation lineStation) {
         if (preStationId == null) {
-            return lineStation == null;
+            return lineStation.getPreStationId() == null;
         }
         return this.preStationId.equals(lineStation.getPreStationId());
     }
