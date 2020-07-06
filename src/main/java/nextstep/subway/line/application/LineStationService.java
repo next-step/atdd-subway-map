@@ -1,6 +1,5 @@
 package nextstep.subway.line.application;
 
-import nextstep.subway.line.application.exceptions.LineStationAlreadyExist;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
@@ -41,21 +40,17 @@ public class LineStationService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalStateException("not found line : " + lineId));
 
-        LineStation lineStation = createNewLineStation(line, createLineStationRequest);
+        LineStation lineStation = createNewLineStation(createLineStationRequest);
 
         line.registerLineStation(lineStation);
 
         return LineStationResponse.of(lineStation);
     }
 
-    private LineStation createNewLineStation(Line line, LineStationRequest createLineStationRequest) {
+    private LineStation createNewLineStation(LineStationRequest createLineStationRequest) {
         Long stationId = createLineStationRequest.getStationId();
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalStateException("not found station : " + stationId));
-
-        if (line.checkExistStation(station)) {
-            throw new LineStationAlreadyExist("line station already exists : " + stationId);
-        }
 
         Station preStation = null;
         Long preStationId = createLineStationRequest.getPreStationId();

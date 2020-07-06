@@ -1,7 +1,7 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineStationService;
-import nextstep.subway.line.application.exceptions.LineStationAlreadyExist;
+import nextstep.subway.line.domain.exceptions.LineStationAlreadyExist;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import org.springframework.http.HttpStatus;
