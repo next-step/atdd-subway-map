@@ -24,6 +24,11 @@ public class LineStationResponse {
         this.duration = duration;
     }
 
+    public static LineStationResponse of(LineStation lineStation) {
+        StationResponse stationResponse = StationResponse.of(lineStation.getStation());
+        return LineStationResponse.of(lineStation, stationResponse);
+    }
+
     public static LineStationResponse of(LineStation lineStation, StationResponse stationResponse) {
         Long preStationId = null;
         Station preLineStation = lineStation.getPreStation();

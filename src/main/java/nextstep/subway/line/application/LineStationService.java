@@ -44,7 +44,7 @@ public class LineStationService {
 
         line.registerLineStation(lineStation);
 
-        return toLineStationsResponse(lineStation);
+        return LineStationResponse.of(lineStation);
     }
 
     private LineStation createNewLineStation(LineStationRequest createLineStationRequest) {
@@ -60,10 +60,5 @@ public class LineStationService {
         }
 
         return LineStation.createLineStation(station, preStation, createLineStationRequest.getDistance(), createLineStationRequest.getDuration());
-    }
-
-    private LineStationResponse toLineStationsResponse(LineStation lineStation) {
-        StationResponse stationResponse = StationResponse.of(lineStation.getStation());
-        return LineStationResponse.of(lineStation, stationResponse);
     }
 }
