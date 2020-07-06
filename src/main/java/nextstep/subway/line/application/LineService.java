@@ -58,8 +58,8 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private List<LineStationResponse> mapToLineStationResponse(Line it) {
-        return it.getLineStations().stream()
+    private List<LineStationResponse> mapToLineStationResponse(Line line) {
+        return line.getLineStations().stream()
                 .map(lineStation -> LineStationResponse.of(findStationById(lineStation.getStationId()), lineStation))
                 .collect(Collectors.toList());
     }
