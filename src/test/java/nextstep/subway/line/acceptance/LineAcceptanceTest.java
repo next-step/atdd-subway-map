@@ -16,7 +16,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600",
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // then
@@ -32,7 +32,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-blue-600",
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-blue-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 6);
 
         // then
@@ -64,7 +64,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        final ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음("신분당선", "bg-red-600",
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
@@ -78,7 +78,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600",
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
@@ -94,11 +94,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600",
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_삭제_요청(createResponse);
+        ExtractableResponse<Response> response = 지하철_노선_삭제_요청(createResponse);
 
         // then
         지하철_노선_삭제됨(response);

@@ -26,7 +26,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
 
         // then
         지하철_노선에_지하철역_등록됨(response);
@@ -43,7 +43,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdLineResponse);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdLineResponse);
 
         // then
         지하철_노선_상세정보_응답됨(response, 1);
@@ -60,18 +60,18 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
 
         // when
-        final Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        final Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
+        Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
+        Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
 
         지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse1, "");
         지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse2, String.valueOf(stationId1));
-        final ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse3, String.valueOf(stationId2));
+        ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse3, String.valueOf(stationId2));
 
         // then
         지하철_노선에_지하철역_등록됨(lineStationResponse);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineStationResponse);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineStationResponse);
 
         지하철_노선_상세정보_응답됨(response, 3);
         등록된_지하철_역이_주어진_위치에_위치됨(response, Lists.newArrayList(1L, 2L, 3L));
@@ -87,17 +87,17 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
 
         // when
-        final Long stationId1 = createdStationResponse1.as(LineResponse.class).getId();
+        Long stationId1 = createdStationResponse1.as(LineResponse.class).getId();
 
         지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse1, "");
         지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse2, String.valueOf(stationId1));
-        final ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse3, String.valueOf(stationId1));
+        ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse3, String.valueOf(stationId1));
 
         // then
         지하철_노선에_지하철역_등록됨(lineStationResponse);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineStationResponse);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineStationResponse);
 
         지하철_노선_상세정보_응답됨(response, 3);
         등록된_지하철_역이_주어진_위치에_위치됨(response, Lists.newArrayList(1L, 3L, 2L));
