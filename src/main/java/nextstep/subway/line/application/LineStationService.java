@@ -1,6 +1,7 @@
 package nextstep.subway.line.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
@@ -10,6 +11,7 @@ import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.LineStationCreateRequest;
 
 @Service
+@Transactional
 public class LineStationService {
 	private final LineRepository lineRepository;
 	private final StationRepository stationRepository;
