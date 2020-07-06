@@ -41,4 +41,15 @@ public class LineStation {
     public Integer getDuration() {
         return duration;
     }
+
+    public boolean equalsPreStationId(Long preStationId) {
+        if (this.preStationId != null) {
+            return this.preStationId.longValue() == preStationId.longValue();
+        }
+        return false;
+    }
+
+    public void updatePreStationId(Long preStationId) {
+        this.preStationId = preStationId;
+    }
 }

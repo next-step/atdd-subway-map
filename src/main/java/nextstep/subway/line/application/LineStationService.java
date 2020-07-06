@@ -20,7 +20,7 @@ public class LineStationService {
     }
 
     public void addLineStation(Long lineId, LineStationRequest lineStationRequest) {
-        Line line = lineRepository.findById(lineId).get();
+        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
 
         line.addLineStation(lineStationRequest);
     }

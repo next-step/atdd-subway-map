@@ -6,7 +6,6 @@ import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
-import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,7 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        List<LineStation> lineStations = line.getLineStations();
+        List<LineStation> lineStations = line.getOrderedLineStations();
 
         // List<LineStationResponse> 생성
         List<LineStationResponse> lineStationResponses = lineStations.stream()
