@@ -1,9 +1,11 @@
 package nextstep.subway.linestation.ui;
 
 import nextstep.subway.linestation.application.LineStationService;
+import nextstep.subway.linestation.application.exception.StationNotFoundException;
 import nextstep.subway.linestation.dto.LineStationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,5 +28,10 @@ public class LineStationController {
         log.debug("request body: {}", lineStationRequest);
         lineStationService.registerStationToLine(lineId, lineStationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class, StationNotFoundException.class})
+    public ResponseEntity<?> handleIllegalArgsException(RuntimeException e) {
+        return ResponseEntity.badRequest().build();
     }
 }
