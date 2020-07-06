@@ -2,6 +2,7 @@ package nextstep.subway.line.dto;
 
 import com.google.common.collect.Lists;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.LineStations;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

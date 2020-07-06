@@ -3,6 +3,7 @@ package nextstep.subway.station.domain;
 import nextstep.subway.config.BaseEntity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Station extends BaseEntity {
@@ -25,5 +26,10 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSame(Station otherStation) {
+        if (this.equals(otherStation)) return true;
+        return this.id.equals(otherStation.id);
     }
 }

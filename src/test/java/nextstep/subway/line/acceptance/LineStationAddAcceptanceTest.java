@@ -1,6 +1,5 @@
 package nextstep.subway.line.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -10,15 +9,13 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.*;
+import static nextstep.subway.line.acceptance.step.LineStationAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,20 +32,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역을_등록한다(lineId, stationId, null);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -63,30 +47,11 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        지하철_노선에_지하철역을_등록한다(lineId, stationId, null);
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 지하철_노선을_조회한다(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -108,67 +73,22 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId1 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        ExtractableResponse<Response> lineStationResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역을_등록한다(lineId, stationId1, null);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-        Map<String, String> params2 = new HashMap<>();
-        params.put("preStationId", stationId1 + "");
-        params.put("stationId", stationId2 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params2).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        지하철_노선에_지하철역을_등록한다(lineId, stationId2, stationId1);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-        Map<String, String> params3 = new HashMap<>();
-        params.put("preStationId", stationId2 + "");
-        params.put("stationId", stationId3 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params3).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        지하철_노선에_지하철역을_등록한다(lineId, stationId3, stationId2);
 
         // then
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 지하철_노선을_조회한다(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
@@ -178,6 +98,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
                 .collect(Collectors.toList());
         assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 2L, 3L));
     }
+
+
 
     @DisplayName("지하철 노선에 여러개의 역을 순서없이 등록한다.")
     @Test
@@ -192,67 +114,22 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId1 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        ExtractableResponse<Response> lineStationResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역을_등록한다(lineId, stationId1, null);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-        Map<String, String> params2 = new HashMap<>();
-        params.put("preStationId", stationId1 + "");
-        params.put("stationId", stationId2 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params2).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        지하철_노선에_지하철역을_등록한다(lineId, stationId2, stationId1);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-        Map<String, String> params3 = new HashMap<>();
-        params.put("preStationId", stationId1 + "");
-        params.put("stationId", stationId3 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params3).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        지하철_노선에_지하철역을_등록한다(lineId, stationId3, stationId1);
 
         // then
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 지하철_노선을_조회한다(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
@@ -263,21 +140,9 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 3L, 2L));
     }
 
-    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("startTime", LocalTime.of(5, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
 
-        return RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
+
+    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
+        return 지하철_노선을_생성한다(name, color, LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
     }
 }
