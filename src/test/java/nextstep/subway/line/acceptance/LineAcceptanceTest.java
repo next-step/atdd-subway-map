@@ -26,8 +26,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        Map<String, String> params = 지하철_노선_생성();
-        ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        ExtractableResponse<Response> response = 지하철노선_조회(지하철_노선_생성());
 
         // then
         // 지하철_노선_생성됨
@@ -42,13 +41,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine2() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 지하철_노선_생성();
-        ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        ExtractableResponse<Response> response = 지하철노선_조회(지하철_노선_생성());
 
         // when
         // 지하철_노선_생성_요청
-        params = 지하철_노선_생성();
-        response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        response = 지하철노선_조회(지하철_노선_생성());
 
         // then
         // 지하철_노선_생성_실패됨
@@ -63,10 +60,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
         Map<String, String> params = 지하철_노선_생성();
+        ExtractableResponse<Response> response = 지하철노선_조회(params);
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = 지하철노선_목록조회(new RestAssuredResponseImpl(), params);
+        response = 지하철노선_목록조회(params);
 
         // then
         // 지하철_노선_목록_응답됨
@@ -82,14 +80,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 지하철_노선_생성();
-        ExtractableResponse<Response> createResponse = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        ExtractableResponse<Response> createResponse = 지하철노선_조회(지하철_노선_생성());
 
         // when
         // 지하철_노선_조회_요청
         System.out.println("========== 지하철_노선_조회_요청 ==========");
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = uri로_지하철노선_조회(new RestAssuredResponseImpl(), params, uri);
+        ExtractableResponse<Response> response = uri로_지하철노선_조회( createResponse.header("Location") );
 
         // then
         // 지하철_노선_응답됨
@@ -105,20 +101,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         Map<String, String> params = 지하철_노선_생성();
-        ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        ExtractableResponse<Response> response = 지하철노선_조회(params);
 
         // when
         // 지하철_노선_수정_요청
         System.out.println("========== 지하철_노선_수정_요청 ==========");
-        params = 신분당선_IntervalTime수정( params, "999" );
-        response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        response = 지하철노선_조회(신분당선_IntervalTime수정( "999" ));
 
         // then
         // 지하철_노선_수정됨
-        String uri = response.header("Location");
-        response = uri로_지하철노선_조회(new RestAssuredResponseImpl(), params, uri);
-
         System.out.println("========== 지하철_노선_수정됨 ==========");
+        response = uri로_지하철노선_조회(response.header("Location"));
+
+        System.out.println("========== isEqualTo ==========");
         assertThat(response.statusCode()).isEqualTo(200);
         System.out.println("========== isNotNull ==========");
         assertThat(response.as(LineResponse.class)).isNotNull();
@@ -130,13 +125,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         Map<String, String> params = 지하철_노선_생성();
-        ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        ExtractableResponse<Response> response = 지하철노선_조회(params);
 
         // when
         // 지하철_노선_제거_요청
         System.out.println("========== 지하철_노선_제거_요청 ==========");
-        params = 지하철노선_제거( params );
-        response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        response = 지하철노선_조회(지하철노선_제거( params ));
 
         // then
         // 지하철_노선_삭제됨
@@ -152,20 +146,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
      *  수정 :
      */
     private Map<String, String> 지하철_노선_생성() {
-        System.out.println("========== 지하철_노선_생성 START ==========");
         final Map<String, String> params = new HashMap<String, String>();
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");
         params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", "5");
-        System.out.println("========== 지하철_노선_생성 END ==========");
         return params;
     }
 
-    private ExtractableResponse<Response> 지하철노선_조회(ExtractableResponse<Response> response, Map<String, String> params) {
-        System.out.println("========== 지하철노선_조회 START ==========");
-        response = RestAssured.given().log().all().
+    private ExtractableResponse<Response> 지하철노선_조회( Map<String, String> params) {
+        final ExtractableResponse<Response> response = RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
@@ -173,13 +164,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 then().
                 log().all().
                 extract();
-        System.out.println("========== 지하철노선_조회 END ==========");
         return response;    // 201 Created
     }
 
-    private ExtractableResponse<Response> 지하철노선_목록조회(ExtractableResponse<Response> response, Map<String, String> params) {
-        System.out.println("========== 지하철노선_목록조회 START ==========");
-        response = RestAssured.given().log().all().
+    private ExtractableResponse<Response> 지하철노선_목록조회(Map<String, String> params) {
+        final ExtractableResponse<Response> response = RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
@@ -187,51 +176,43 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 then().
                 log().all().
                 extract();
-        System.out.println("========== 지하철노선_목록조회 END ==========");
         return response;    // 200 Created
     }
 
-    private ExtractableResponse<Response> uri로_지하철노선_조회(ExtractableResponse<Response> response, Map<String, String> params, String uri) {
-        System.out.println("========== uri로_지하철노선_조회 START ==========");
-        response = RestAssured.given().log().all().
+    private ExtractableResponse<Response> uri로_지하철노선_조회(String uri) {
+        final ExtractableResponse<Response> response = RestAssured.given().log().all().
                 accept(MediaType.APPLICATION_JSON_VALUE).
                 when().
                 get(uri).
                 then().
                 log().all().
                 extract();
-        System.out.println("========== uri로_지하철노선_조회 END ==========");
         return response;    // 200 Created
     }
 
-    private Map<String, String> 신분당선_IntervalTime수정(Map<String, String> params, String newIntervalTime) {
-        System.out.println("========== 신분당선_IntervalTime수정 START ==========");
+    private Map<String, String> 신분당선_IntervalTime수정(String newIntervalTime) {
+        final Map<String, String> params = new HashMap<String, String>();
         params.put("name", "수정된_신분당선");
         params.put("color", "bg-red-600");
         params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", newIntervalTime);
-        System.out.println("========== 신분당선_IntervalTime수정 END ==========");
         return params;
     }
 
-    private ExtractableResponse<Response> uri로_지하철노선_수정(ExtractableResponse<Response> response, Map<String, String> params, String uri) {
-        System.out.println("========== uri로_지하철노선_수정 START ==========");
-        response = RestAssured.given().log().all().
+    private ExtractableResponse<Response> uri로_지하철노선_수정(String uri) {
+        final ExtractableResponse<Response> response = RestAssured.given().log().all().
                 accept(MediaType.APPLICATION_JSON_VALUE).
                 when().
                 get(uri).
                 then().
                 log().all().
                 extract();
-        System.out.println("========== uri로_지하철노선_수정 END ==========");
         return response;    // 200 Created
     }
 
     private Map<String, String> 지하철노선_제거(Map<String, String> params) {
-        System.out.println("========== 지하철노선_제거 START ==========");
         params.clear();
-        System.out.println("========== 지하철노선_제거 END ==========");
         return params;
     }
 }
