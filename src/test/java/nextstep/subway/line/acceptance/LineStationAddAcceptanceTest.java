@@ -27,16 +27,12 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // given
         ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
+        final Long 노선_번호 = createdLineResponse.as(LineResponse.class).getId();
+        final String 강남역_번호 = createdStationResponse.as(StationResponse.class).getId() + "";
 
         // when
         final ExtractableResponse<Response> response =
-                지하철_노선에_지하철역_등록_요청(
-                        createdLineResponse.as(LineResponse.class).getId(),
-                        "",
-                        createdStationResponse.as(StationResponse.class).getId() + "",
-                        "4",
-                        "2"
-                );
+                지하철_노선에_지하철역_등록_요청(노선_번호, "", 강남역_번호, "4", "2");
 
         // then
         지하철_노선에_지하철역_등록됨(response);
@@ -48,18 +44,13 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // given
         ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
+        final Long 노선_번호 = createdLineResponse.as(LineResponse.class).getId();
+        final String 강남역_번호 = createdStationResponse.as(StationResponse.class).getId() + "";
 
-        지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                "",
-                createdStationResponse.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
+        지하철_노선에_지하철역_등록_요청(노선_번호, "", 강남역_번호, "4", "2");
 
         // when
-        // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(createdLineResponse.as(LineResponse.class).getId());
+        ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(노선_번호);
 
         // then
         지하철_노선_상세정보_응답됨(response, 1);
@@ -73,37 +64,22 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
+        final Long 노선_번호 = createdLineResponse.as(LineResponse.class).getId();
+        final String 강남역_번호 = createdStationResponse1.as(StationResponse.class).getId() + "";
+        final String 역삼역_번호 = createdStationResponse2.as(StationResponse.class).getId() + "";
+        final String 선릉역_번호 = createdStationResponse3.as(StationResponse.class).getId() + "";
 
         // when
-        ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                "",
-                createdStationResponse1.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
-
-        지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                createdStationResponse1.as(StationResponse.class).getId() + "",
-                createdStationResponse2.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
-
-        지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                createdStationResponse2.as(StationResponse.class).getId() + "",
-                createdStationResponse3.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
+        ExtractableResponse<Response> lineStationResponse =
+                지하철_노선에_지하철역_등록_요청(노선_번호, "", 강남역_번호, "4", "2");
+        지하철_노선에_지하철역_등록_요청(노선_번호, 강남역_번호, 역삼역_번호, "4", "2");
+        지하철_노선에_지하철역_등록_요청(노선_번호, 역삼역_번호, 선릉역_번호, "4", "2");
 
         // then
         지하철_노선에_지하철역_등록됨(lineStationResponse);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(createdLineResponse.as(LineResponse.class).getId());
+        final ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(노선_번호);
         지하철_노선_상세정보_응답됨(response, 3);
         지하철_노선_등록_순서_검사(response, 1L, 2L, 3L);
     }
@@ -116,37 +92,22 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
+        final Long 노선_번호 = createdLineResponse.as(LineResponse.class).getId();
+        final String 강남역_번호 = createdStationResponse1.as(StationResponse.class).getId() + "";
+        final String 역삼역_번호 = createdStationResponse2.as(StationResponse.class).getId() + "";
+        final String 선릉역_번호 = createdStationResponse3.as(StationResponse.class).getId() + "";
 
         // when
-        final ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                "",
-                createdStationResponse1.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
-
-        지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                createdStationResponse1.as(StationResponse.class).getId() + "",
-                createdStationResponse2.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
-
-        지하철_노선에_지하철역_등록_요청(
-                createdLineResponse.as(LineResponse.class).getId(),
-                createdStationResponse2.as(StationResponse.class).getId() + "",
-                createdStationResponse3.as(StationResponse.class).getId() + "",
-                "4",
-                "2"
-        );
+        final ExtractableResponse<Response> lineStationResponse =
+                지하철_노선에_지하철역_등록_요청(노선_번호, "", 강남역_번호, "4", "2");
+        지하철_노선에_지하철역_등록_요청(노선_번호, 강남역_번호, 역삼역_번호, "4", "2");
+        지하철_노선에_지하철역_등록_요청(노선_번호, 역삼역_번호, 선릉역_번호, "4", "2");
 
         // then
         지하철_노선에_지하철역_등록됨(lineStationResponse);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(createdLineResponse.as(LineResponse.class).getId());
+        final ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(노선_번호);
 
         지하철_노선_상세정보_응답됨(response, 3);
         지하철_노선_등록_순서_검사(response, 1L, 2L, 3L);
