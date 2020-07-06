@@ -51,18 +51,4 @@ public class LineStations {
             throw new RuntimeException();
         }
     }
-
-    public void removeByStationId(Station station) {
-        LineStation lineStation = lineStations.stream()
-                .filter(it -> it.getStation().equals(station))
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
-
-        lineStations.stream()
-                .filter(it -> it.getPreStation().equals(station))
-                .findFirst()
-                .ifPresent(it -> it.updatePreStationTo(lineStation.getPreStation()));
-
-        lineStations.remove(lineStation);
-    }
 }
