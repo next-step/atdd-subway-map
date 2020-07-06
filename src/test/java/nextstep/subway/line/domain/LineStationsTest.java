@@ -30,18 +30,17 @@ public class LineStationsTest {
 
         //when
         lineStations.add(new LineStation(null, 1L, 5, 5));
-        lineStations.add(new LineStation(2L, 2L, 5, 5));
-        lineStations.add(new LineStation(2L, 3L, 5, 5));
-        lineStations.add(new LineStation(2L, 4L, 5, 5));
+        lineStations.add(new LineStation(1L, 2L, 5, 5));
+        lineStations.add(new LineStation(1L, 3L, 5, 5));
         final List<LineStation> lineStationsInOrder = lineStations.getLineStationsInOrder();
 
         //then
-        assertThat(lineStationsInOrder).hasSize(4);
+        assertThat(lineStationsInOrder).hasSize(3);
         final List<Long> stationIdsInOrder = lineStationsInOrder.stream()
                 .map(LineStation::getStationId)
                 .collect(Collectors.toList());
         assertThat(stationIdsInOrder)
-                .containsExactly(1L, 2L, 4L, 3L);
+                .containsExactly(1L, 3L, 2L);
     }
 
     @Test
