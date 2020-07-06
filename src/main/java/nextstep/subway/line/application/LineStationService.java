@@ -41,19 +41,19 @@ public class LineStationService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalStateException("not found line : " + lineId));
 
-        LineStation lineStation = createNewLineStation(createLineStationRequest);
+        LineStation lineStation = createNewLineStation(line, createLineStationRequest);
 
         line.registerLineStation(lineStation);
 
         return LineStationResponse.of(lineStation);
     }
 
-    private LineStation createNewLineStation(LineStationRequest createLineStationRequest) {
+    private LineStation createNewLineStation(Line line, LineStationRequest createLineStationRequest) {
         Long stationId = createLineStationRequest.getStationId();
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalStateException("not found station : " + stationId));
 
-        if (lineStationRepository.findByStation(station).isPresent()) {
+        if (line.checkExistStation(station)) {
             throw new LineStationAlreadyExist("line station already exists : " + stationId);
         }
 

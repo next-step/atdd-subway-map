@@ -49,6 +49,11 @@ public class LineStations {
         return orderedLineStations;
     }
 
+    boolean hasStation(Station station) {
+        return this.lineStations.stream()
+                .anyMatch(lineStation -> lineStation.getStation() == station);
+    }
+
     public void registerLineStation(LineStation lineStation) {
         lineStations.forEach(it -> {
             Station prevPreStation = it.getPreStation();
