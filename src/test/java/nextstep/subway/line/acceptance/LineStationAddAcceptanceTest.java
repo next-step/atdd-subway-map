@@ -1,6 +1,7 @@
 package nextstep.subway.line.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -28,11 +29,14 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStation() {
         // given
+        System.out.println("========== 지하철_노선_등록되어_있음 ==========");
         ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        System.out.println("========== 지하철역_등록되어_있음 ==========");
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         // when
         // 지하철_노선에_지하철역_등록_요청
+        System.out.println("========== 지하철_노선에_지하철역_등록_요청 ==========");
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
         Map<String, String> params = new HashMap<>();
@@ -41,16 +45,20 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         params.put("distance", "4");
         params.put("duration", "2");
 
+
+        System.out.println("========== response ==========");
         ExtractableResponse<Response> response = RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(params).
                 when().
                 post("/lines/{lineId}/stations", lineId).
+                //post("/lines").
                 then().
                 log().all().
                 extract();
 
         // then
+        System.out.println("========== isEqualTo ==========");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 

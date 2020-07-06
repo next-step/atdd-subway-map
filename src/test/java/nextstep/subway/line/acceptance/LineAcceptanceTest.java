@@ -43,18 +43,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // when
         // 지하철_노선_생성_요청
-        boolean flg_중복체크 = true;
-        if (params != null && "신분당선".equals(params.get("name"))) flg_중복체크 = false;
-        else params = 신분당선_추가( params );
-        ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
+        params = 신분당선_추가( new HashMap<>() );
+        response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // then
         // 지하철_노선_생성_실패됨
         System.out.println("========== 지하철_노선_생성_실패됨 ==========");
-        if (flg_중복체크 == false) assertThat(response.statusCode()).isEqualTo(400);
+        assertThat(response.statusCode()).isEqualTo(400);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
