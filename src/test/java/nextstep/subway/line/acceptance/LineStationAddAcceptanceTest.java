@@ -9,6 +9,9 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalTime;
+
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_등록되어_있음;
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_조회_요청;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
@@ -19,7 +22,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStation() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         // when
@@ -34,7 +37,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineWithStations() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
@@ -51,7 +54,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStationInOrder() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
@@ -78,7 +81,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStationInAnyOrder() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN", LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
