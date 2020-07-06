@@ -7,6 +7,7 @@ import nextstep.subway.line.domain.Line;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class LineResponse {
@@ -40,6 +41,17 @@ public class LineResponse {
     }
 
     public static LineResponse of(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStartTime(), line.getEndTime(), line.getIntervalTime(), Lists.newArrayList(), line.getCreatedDate(), line.getModifiedDate());
+        return new LineResponse(
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            line.getStartTime(),
+            line.getEndTime(),
+            line.getIntervalTime(),
+            line.getLineStations().getLineStations().stream()
+                .map(LineStationResponse::ofLineStation)
+                .collect(Collectors.toList()),
+            line.getCreatedDate(),
+            line.getModifiedDate());
     }
 }
