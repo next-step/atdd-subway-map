@@ -103,5 +103,18 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         등록된_지하철_역이_주어진_위치에_위치됨(response, Lists.newArrayList(1L, 3L, 2L));
     }
 
+    @DisplayName("이미 등록되어 있던 역을 등록한다.")
+    @Test
+    void addExistsLineStation() {
+        //given
+        지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
+
+        //when
+        ExtractableResponse<Response> duplicateCreateResponse = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
+
+        //then
+        지하철_노선에_지하철역_등록_실패됨(duplicateCreateResponse);
+    }
+
 
 }

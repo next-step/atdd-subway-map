@@ -55,4 +55,8 @@ public class LineStationAddAcceptanceStep {
                 log().all().
                 extract();
     }
+
+    public static void 지하철_노선에_지하철역_등록_실패됨(ExtractableResponse<Response> duplicateCreateResponse) {
+        assertThat(duplicateCreateResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
