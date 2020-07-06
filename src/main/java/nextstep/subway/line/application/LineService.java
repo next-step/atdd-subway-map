@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -48,7 +49,9 @@ public class LineService {
                 .map(it -> it.getStationId())
                 .collect(Collectors.toList());
 
-        List<Station> stations = stationRepository.findAllById(stationIds);
+        Map<Long, Station> stations = stationRepository.findAllById(stationIds).stream()
+                .collect(Collectors.toMap(it -> it.getId(), Function.identity()));
+
         List<LineStationResponse> lineStationResponses = toLineStationResponse(line, stations);
 
         return LineResponse.of(line, lineStationResponses);
@@ -63,16 +66,9 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public List<LineStationResponse> toLineStationResponse(Line line, List<Station> stations) {
+    public List<LineStationResponse> toLineStationResponse(Line line, Map<Long, Station> stations) {
         return line.getOrderLineStations().stream()
-                .map(it -> {
-                    Station station = stations.stream()
-                            .filter(s -> s.getId() == it.getStationId())
-                            .findFirst()
-                            .orElseThrow(RuntimeException::new);
-
-                    return LineStationResponse.of(it, station);
-                })
+                .map(it -> LineStationResponse.of(it, StationResponse.of(stations.get(it.getStationId()))))
                 .collect(Collectors.toList());
     }
 }
