@@ -18,10 +18,6 @@ public class LineStations {
     protected LineStations() {
     }
 
-    public List<LineStation> getLineStations() {
-        return lineStations;
-    }
-
     public List<LineStation> getLineStationsInOrder() {
         Optional<LineStation> firstLineStationOptional = lineStations.stream()
                 .filter(lineStation -> lineStation.getPreStation() == null)
