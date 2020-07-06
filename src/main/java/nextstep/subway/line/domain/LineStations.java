@@ -1,5 +1,7 @@
 package nextstep.subway.line.domain;
 
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -12,6 +14,9 @@ public class LineStations {
 
 
     public List<LineStation> getLineStationsInOrder() {
+        if (CollectionUtils.isEmpty(lineStations)) {
+            return Collections.unmodifiableList(Collections.emptyList());
+        }
         final LinkedList<LineStation> orderedLineStations = new LinkedList<>();
         final LineStation startStation = findStartStation();
 
