@@ -26,7 +26,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        Map<String, String> params = 신분당선_추가();
         ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // then
@@ -42,12 +42,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine2() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        Map<String, String> params = 신분당선_추가();
         ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // when
         // 지하철_노선_생성_요청
-        params = 신분당선_추가( new HashMap<>() );
+        params = 신분당선_추가();
         response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // then
@@ -62,7 +62,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        Map<String, String> params = 신분당선_추가();
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -82,7 +82,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        Map<String, String> params = 신분당선_추가();
         ExtractableResponse<Response> createResponse = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // when
@@ -104,7 +104,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        Map<String, String> params = 신분당선_추가();
         ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // when
@@ -129,7 +129,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        Map<String, String> params = 신분당선_추가( new HashMap<>() );
+        Map<String, String> params = 신분당선_추가();
         ExtractableResponse<Response> response = 지하철노선_조회(new RestAssuredResponseImpl(), params);
 
         // when
@@ -151,8 +151,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
      *  실패 : response 400
      *  수정 :
      */
-    private Map<String, String> 신분당선_추가(Map<String, String> params) {
+    private Map<String, String> 신분당선_추가() {
         System.out.println("========== 신분당선_추가 START ==========");
+        final Map<String, String> params = new HashMap<String, String>();
         params.put("name", "신분당선");
         params.put("color", "bg-red-600");
         params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
