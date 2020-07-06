@@ -36,6 +36,7 @@ public class LineStationService {
 		LineStation lineStation = LineStation.builder()
 			.line(line)
 			.station(station)
+			.preStationId(dto.getPreStationId())
 			.distance(dto.getDistance())
 			.duration(dto.getDuration())
 			.build();

@@ -1,5 +1,7 @@
 package nextstep.subway.line.domain;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,10 +50,14 @@ public class LineStation {
 	}
 
 	public boolean comparePreStationId(LineStation lineStation) {
-		return station.getId().equals(lineStation.getPreStationId());
+		if (Objects.isNull(preStationId)) {
+			return false;
+		}
+		return preStationId.equals(lineStation.getPreStationId());
 	}
 
-	public void updatePreStationTo(LineStation lineStation) {
-		preStationId = lineStation.getId();
+	public Long updatePreStationTo(LineStation lineStation) {
+		preStationId = lineStation.getStationId();
+		return preStationId;
 	}
 }
