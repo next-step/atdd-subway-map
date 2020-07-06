@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import nextstep.subway.line.application.LineStationService;
-import nextstep.subway.station.dto.LineStationCreateRequestDto;
+import nextstep.subway.station.dto.LineStationCreateRequest;
 
 @RestController
 @RequestMapping("/lines")
@@ -21,7 +21,7 @@ public class LineStationController {
 	}
 
 	@PostMapping("/{lineId}/stations")
-	public ResponseEntity<Void> createLineStation(@PathVariable Long lineId, @RequestBody LineStationCreateRequestDto dto) {
+	public ResponseEntity<Void> createLineStation(@PathVariable Long lineId, @RequestBody LineStationCreateRequest dto) {
 		dto.setLineId(lineId);
 		lineStationService.registerLineStation(dto);
 		return new ResponseEntity<>(HttpStatus.CREATED);

@@ -7,7 +7,7 @@ import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
-import nextstep.subway.station.dto.LineStationCreateRequestDto;
+import nextstep.subway.station.dto.LineStationCreateRequest;
 
 @Service
 public class LineStationService {
@@ -28,7 +28,7 @@ public class LineStationService {
 		return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("no station found."));
 	}
 
-	public void registerLineStation(LineStationCreateRequestDto dto) {
+	public void registerLineStation(LineStationCreateRequest dto) {
 		Line line = findLineById(dto.getLineId());
 		Station station = findStationById(dto.getStationId());
 		LineStation lineStation = LineStation.builder()
