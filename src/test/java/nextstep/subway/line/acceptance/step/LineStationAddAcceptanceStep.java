@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -26,15 +25,12 @@ public class LineStationAddAcceptanceStep {
         assertThat(lineResponse.getStations()).hasSize(1);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> lineResponse, ExtractableResponse<Response> stationResponse) {
-        Long lineId = lineResponse.as(LineResponse.class).getId();
-        Long stationId = stationResponse.as(StationResponse.class).getId();
-
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(Long lineId, Long preStationId, Long stationId, Integer distance, Integer duration) {
         Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
+        params.put("preStationId", preStationId == null ? null : String.valueOf(preStationId));
+        params.put("stationId", String.valueOf(stationId));
+        params.put("distance", String.valueOf(distance));
+        params.put("duration",String.valueOf(duration));
 
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).

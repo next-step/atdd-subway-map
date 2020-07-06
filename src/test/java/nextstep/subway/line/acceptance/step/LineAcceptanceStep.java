@@ -20,23 +20,25 @@ public class LineAcceptanceStep {
 
     private static final String URL = "/lines";
 
-    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
-        return 지하철_노선_생성_요청(name, color);
-    }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color,
+                                                               LocalTime startTime, LocalTime endTime, int intervalTime) {
+        return 지하철_노선_생성_요청(name, color, startTime, endTime, intervalTime);
+    }
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color,
+                                                             LocalTime startTime, LocalTime endTime, int intervalTime) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
+        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", String.valueOf(intervalTime));
 
         return RestAssured.given().log().all().
-                body(params).
                 contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
                 when().
-                post(URL).
+                post("/lines").
                 then().
                 log().all().
                 extract();
@@ -76,8 +78,15 @@ public class LineAcceptanceStep {
                 extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, String name, String color,
+                                                             LocalTime startTime, LocalTime endTime, int intervalTime) {
         String uri = response.header("Location");
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("startTime", startTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", endTime.format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", String.valueOf(intervalTime));
 
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -98,16 +107,6 @@ public class LineAcceptanceStep {
                 then().
                 log().all().
                 extract();
-    }
-
-    public static Map<String, String> sendParams(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-        return params;
     }
 
     public static void 지하철_노선_생성됨(ExtractableResponse response) {

@@ -1,13 +1,11 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
-import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Entity
@@ -45,20 +43,21 @@ public class Line extends BaseEntity {
         this.color = line.getColor();
     }
 
-    public void appendStation(LineStation lineStation) {
+    public List<LineStation> appendStation(LineStation lineStation) {
         if (lineStation.getStationId() == null) {
             throw new RuntimeException();
         }
 
         for (int i = 0; i < lineStations.size(); i++) {
             LineStation findLineStation = lineStations.get(i);
-            updatePrestation(lineStation, findLineStation);
+            updatePreStation(lineStation, findLineStation);
         }
 
-        this.lineStations.add(lineStation);
+        lineStations.add(lineStation);
+        return new ArrayList<>(lineStations);
     }
 
-    private void updatePrestation(LineStation lineStation, LineStation findLineStation) {
+    private void updatePreStation(LineStation lineStation, LineStation findLineStation) {
         if (findLineStation.getPreStationId() == lineStation.getPreStationId()) {
             findLineStation.updatePreStation(lineStation.getStationId());
         }

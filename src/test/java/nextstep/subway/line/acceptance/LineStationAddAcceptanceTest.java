@@ -13,12 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_등록되어_있음;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,11 +29,15 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStation() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN",
+                LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse);
+        Long lineId = createdLineResponse.as(LineResponse.class).getId();
+        Long stationId = createdStationResponse.as(StationResponse.class).getId();
+
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId, 5, 5);
 
         // then
         지하철_노선에_지하철역_등록됨(response);
@@ -45,13 +49,14 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineWithStations() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN",
+                LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
+
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
-
-        지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse);
+        지하철_노선에_지하철역_등록_요청(lineId, null, stationId, 5, 5);
 
         // when
         // 지하철_노선_조회_요청
@@ -62,12 +67,12 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     }
 
 
-
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
     @Test
     void addLineStationInOrder() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN",
+                LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
@@ -94,10 +99,10 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
         Map<String, String> params2 = new HashMap<>();
-        params.put("preStationId", stationId1 + "");
-        params.put("stationId", stationId2 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
+        params2.put("preStationId", stationId1 + "");
+        params2.put("stationId", stationId2 + "");
+        params2.put("distance", "4");
+        params2.put("duration", "2");
 
         RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -111,10 +116,10 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
         Map<String, String> params3 = new HashMap<>();
-        params.put("preStationId", stationId2 + "");
-        params.put("stationId", stationId3 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
+        params3.put("preStationId", stationId2 + "");
+        params3.put("stationId", stationId3 + "");
+        params3.put("distance", "4");
+        params3.put("duration", "2");
 
         RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -151,7 +156,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStationInAnyOrder() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN",
+                LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
@@ -231,21 +237,4 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 3L, 2L));
     }
 
-    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("startTime", LocalTime.of(5, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        return RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
-    }
 }
