@@ -35,7 +35,7 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         return lineRepository.findById(id)
-                .map(it -> LineResponse.of(it))
+                .map(LineResponse::of)
                 .orElseThrow(RuntimeException::new);
     }
 

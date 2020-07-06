@@ -1,11 +1,16 @@
 package nextstep.subway.line.domain;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nextstep.subway.config.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
+@NoArgsConstructor
+@Getter
 public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,8 +22,8 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
-    public Line() {
-    }
+    @Embedded
+    private LineStations lineStations = new LineStations();
 
     public Line(String name, String color, LocalTime startTime, LocalTime endTime, int intervalTime) {
         this.name = name;
@@ -36,27 +41,7 @@ public class Line extends BaseEntity {
         this.color = line.getColor();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public int getIntervalTime() {
-        return intervalTime;
+    public LineStation addLineStation(LineStation lineStation) {
+        return lineStations.add(lineStation);
     }
 }
