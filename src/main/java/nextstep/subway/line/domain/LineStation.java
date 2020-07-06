@@ -1,11 +1,13 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
+import nextstep.subway.exception.FieldValidationException;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class LineStation extends BaseEntity {
@@ -23,10 +25,32 @@ public class LineStation extends BaseEntity {
     }
 
     public LineStation(Long preStationId, Long stationId, Integer duration, Integer distance) {
+        validateParameters(preStationId, stationId, duration, distance);
         this.preStationId = preStationId;
         this.stationId = stationId;
         this.duration = duration;
         this.distance = distance;
+    }
+
+    private void validateParameters(Long preStationId, Long stationId, Integer duration, Integer distance) {
+        Objects.requireNonNull(duration);
+        Objects.requireNonNull(distance);
+
+        if (preStationId != null && preStationId <= 0) {
+            throw new FieldValidationException("preStationId는 0보다 커야 합니다.");
+        }
+
+        if (stationId != null && stationId <= 0) {
+            throw new FieldValidationException("stationId는 0보다 커야 합니다.");
+        }
+
+        if (duration <= 0) {
+            throw new FieldValidationException("duration은 0보다 커야 합니다.");
+        }
+
+        if (distance <= 0) {
+            throw new FieldValidationException("distance는 0보다 커야 합니다.");
+        }
     }
 
 
