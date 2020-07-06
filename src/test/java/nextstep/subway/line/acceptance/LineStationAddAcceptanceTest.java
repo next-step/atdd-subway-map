@@ -99,6 +99,32 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선_등록_순서_검사(response, 1L, 2L, 3L);
     }
 
+    @DisplayName("이미 등록되어 있던 역을 등록한다.")
+    @Test
+    void addExistingLineStation() {
+
+        // given
+        지하철_노선에_지하철역_등록_요청(이호선, "", 강남역, "4", "2");
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(이호선, "", 강남역, "4", "2");
+
+        // then
+        지하철_노선에_지하철역_등록_실패됨(response);
+    }
+
+    @DisplayName("존재하지 않는 역을 등록한다.")
+    @Test
+    void addStationThatDoesNotExist() {
+        지하철_노선에_지하철역_등록_요청(이호선, "", 강남역, "4", "2");
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(이호선, "", "30", "4", "2");
+
+        // then
+        지하철_노선에_지하철역_등록_실패됨(response);
+    }
+
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
