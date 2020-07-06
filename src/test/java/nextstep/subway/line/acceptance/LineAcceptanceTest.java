@@ -1,7 +1,5 @@
 package nextstep.subway.line.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -21,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
@@ -62,13 +61,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> getLinesRequest = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> getLinesRequest = 지하철_노선_목록을_조회한다();
 
         // then
         // 지하철_노선_목록_응답됨
@@ -114,7 +107,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_수정_요청
         ExtractableResponse<Response> updateResponse = 지하철_노선을_수정한다(existLineLocation, updateLineRequestParams);
 
-
         // then
         // 지하철_노선_수정됨
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -134,31 +126,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when()
-                .delete(existLineLocation)
-                .then()
-                .log()
-                .all()
-                .extract();
+        ExtractableResponse<Response> deleteResponse = 지하철_노선을_제거한다(existLineLocation);
 
         // then
         // 지하철_노선_삭제됨
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         ExtractableResponse<Response> getLineResponse = 지하철_노선을_조회한다(existLineLocation);
         assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-
-
-    private ExtractableResponse<Response> 지하철_노선을_조회한다(String uri) {
-        return RestAssured.given().log().all().
-                accept(ContentType.JSON).
-                when().
-                get(uri).
-                then().
-                log().all().
-                extract();
     }
 }
