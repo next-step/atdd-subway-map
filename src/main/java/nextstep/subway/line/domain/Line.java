@@ -7,6 +7,8 @@ import javax.persistence.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 public class Line extends BaseEntity {
@@ -44,7 +46,22 @@ public class Line extends BaseEntity {
     }
 
     public void appendStation(LineStation lineStation) {
-        lineStations.add(lineStation);
+        if (lineStation.getStationId() == null) {
+            throw new RuntimeException();
+        }
+
+        for (int i = 0; i < lineStations.size(); i++) {
+            LineStation findLineStation = lineStations.get(i);
+            updatePrestation(lineStation, findLineStation);
+        }
+
+        this.lineStations.add(lineStation);
+    }
+
+    private void updatePrestation(LineStation lineStation, LineStation findLineStation) {
+        if (findLineStation.getPreStationId() == lineStation.getPreStationId()) {
+            findLineStation.updatePreStation(lineStation.getStationId());
+        }
     }
 
     public Long getId() {
@@ -69,5 +86,22 @@ public class Line extends BaseEntity {
 
     public int getIntervalTime() {
         return intervalTime;
+    }
+
+    public List<LineStation> getOrderLineStations() {
+
+        Optional<LineStation> preLineStation = lineStations.stream()
+                .filter(it -> it.getPreStationId() == null)
+                .findFirst();
+
+        List<LineStation> result = new ArrayList<>();
+        while (preLineStation.isPresent()) {
+            LineStation preStationId = preLineStation.get();
+            result.add(preStationId);
+            preLineStation = lineStations.stream()
+                    .filter(it -> it.getPreStationId() == preStationId.getStationId())
+                    .findFirst();
+        }
+        return new ArrayList<>(result);
     }
 }

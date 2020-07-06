@@ -1,9 +1,11 @@
 package nextstep.subway.line.application;
 
+import javassist.NotFoundException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineStationRequest;
+import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +20,14 @@ public class LineStationService {
         this.lineRepository = lineRepository;
     }
 
-    public void appendStation(LineStationRequest lineStationRequest) {
+    public LineStation appendStation(LineStationRequest lineStationRequest) {
         Optional<Line> findLine = lineRepository.findById(lineStationRequest.getStationId());
 
         if (findLine.isPresent()) {
-            LineStation lineStation = new LineStation(lineStationRequest.getStationId(), lineStationRequest.getPreStationId(),
-                    lineStationRequest.getDistance(), lineStationRequest.getDuration());
+            LineStation lineStation = lineStationRequest.toLineStation();
             findLine.get().appendStation(lineStation);
+            return lineStation;
         }
-
+        throw new RuntimeException("지하철 노선을 찾을 수 없습니다.");
     }
 }

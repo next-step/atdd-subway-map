@@ -19,8 +19,16 @@ public class LineStation{
         this.duration = duration;
     }
 
+    public void updatePreStation(Long stationId) {
+        this.preStationId = stationId;
+    }
+
     public Long getPreStationId() {
         return preStationId;
+    }
+
+    public void changePreStation(final Long stationId) {
+        this.preStationId = stationId;
     }
 
     public Long getStationId() {
@@ -34,4 +42,6 @@ public class LineStation{
     public Integer getDuration() {
         return duration;
     }
+
+
 }
