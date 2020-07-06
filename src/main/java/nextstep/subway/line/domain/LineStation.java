@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Objects;
 
 @Entity
 public class LineStation extends BaseEntity {
@@ -14,7 +13,7 @@ public class LineStation extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long prevStationId;
+    private Long preStationId;
     private Long stationId;
     private Integer duration;
     private Integer distance;
@@ -23,30 +22,20 @@ public class LineStation extends BaseEntity {
 
     }
 
-    public LineStation(Long prevStationId, Long stationId, Integer duration, Integer distance) {
-        validateParams(prevStationId, stationId, duration, distance);
-        this.prevStationId = prevStationId;
+    public LineStation(Long preStationId, Long stationId, Integer duration, Integer distance) {
+        this.preStationId = preStationId;
         this.stationId = stationId;
         this.duration = duration;
         this.distance = distance;
     }
 
-    private void validateParams(Long prevStationId, Long stationId, Integer duration, Integer distance) {
-        Objects.requireNonNull(stationId);
-        Objects.requireNonNull(duration);
-        Objects.requireNonNull(distance);
-
-        if (stationId <= ZERO || duration <= ZERO || distance <= ZERO) {
-            throw new IllegalArgumentException("must be greater than " + ZERO);
-        }
-    }
 
     public Long getId() {
         return id;
     }
 
-    public Long getPrevStationId() {
-        return prevStationId;
+    public Long getPreStationId() {
+        return preStationId;
     }
 
     public Long getStationId() {
@@ -59,5 +48,24 @@ public class LineStation extends BaseEntity {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public void updatePreStationId(Long preStationId) {
+        this.preStationId = preStationId;
+    }
+
+    public boolean isSamePreStationId(LineStation lineStation) {
+        if (preStationId == null) {
+            return lineStation == null;
+        }
+        return this.preStationId.equals(lineStation.getPreStationId());
+    }
+
+    public boolean isStartStation() {
+        return this.preStationId == null;
+    }
+
+    public boolean isPreStation(LineStation station) {
+        return station.getStationId().equals(this.preStationId);
     }
 }

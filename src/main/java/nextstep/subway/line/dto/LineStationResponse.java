@@ -21,7 +21,7 @@ public class LineStationResponse {
     }
 
     public static LineStationResponse of(Station station, LineStation lineStation) {
-        return new LineStationResponse(StationResponse.of(station), lineStation.getPrevStationId(), lineStation.getDistance(), lineStation.getDuration());
+        return new LineStationResponse(StationResponse.of(station), lineStation.getPreStationId(), lineStation.getDistance(), lineStation.getDuration());
     }
 
     public StationResponse getStation() {

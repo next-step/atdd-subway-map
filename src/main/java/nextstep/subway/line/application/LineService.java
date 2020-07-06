@@ -43,15 +43,10 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
+        findAllLines();
         return lineRepository.findById(id)
                 .map(it -> LineResponse.of(it, mapToLineStationResponse(it)))
                 .orElseThrow(RuntimeException::new);
-    }
-
-    private List<LineStationResponse> mapToLineStationResponse(Line it) {
-        return it.getLineStations().stream()
-                .map(lineStation -> LineStationResponse.of(findStationById(lineStation.getStationId()), lineStation))
-                .collect(Collectors.toList());
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
@@ -63,7 +58,11 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-
+    private List<LineStationResponse> mapToLineStationResponse(Line it) {
+        return it.getLineStations().stream()
+                .map(lineStation -> LineStationResponse.of(findStationById(lineStation.getStationId()), lineStation))
+                .collect(Collectors.toList());
+    }
 
     private Station findStationById(Long id) {
         return stationRepository.findById(id).orElseThrow(NotFoundException::new);

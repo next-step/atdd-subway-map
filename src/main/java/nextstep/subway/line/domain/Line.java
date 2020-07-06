@@ -4,7 +4,6 @@ import nextstep.subway.config.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,9 +18,7 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "fk_line_id")
-    private List<LineStation> lineStations = new ArrayList<>();
+    private LineStations lineStations = new LineStations();
 
     public Line() {
     }
@@ -67,11 +64,11 @@ public class Line extends BaseEntity {
     }
 
     public List<LineStation> getLineStations() {
-        return lineStations;
+        return lineStations.getLineStationsInOrder();
     }
 
     public void addStation(Long preStationId, Long stationId, Integer distance, Integer duration) {
         final LineStation newLineStation = new LineStation(preStationId, stationId, distance, duration);
-        this.lineStations.add(newLineStation);
+        lineStations.add(newLineStation);
     }
 }
