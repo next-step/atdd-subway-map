@@ -27,10 +27,6 @@ public class LineStation{
         return preStationId;
     }
 
-    public void changePreStation(final Long stationId) {
-        this.preStationId = stationId;
-    }
-
     public Long getStationId() {
         return stationId;
     }
