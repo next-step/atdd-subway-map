@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private static Logger log = LoggerFactory.getLogger(LineService.class);
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
 
@@ -64,12 +63,6 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public void createLineStation(Long lineId, LineStationCreateRequest createRequest) {
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(NotFoundException::new);
-
-        line.addStation(createRequest.getPreStationId(), createRequest.getStationId(), createRequest.getDistance(), createRequest.getDuration());
-    }
 
 
     private Station findStationById(Long id) {

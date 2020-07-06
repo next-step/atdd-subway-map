@@ -49,11 +49,6 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{lineId}/stations")
-    public ResponseEntity createLineStation(@PathVariable("lineId") Long lineId, @RequestBody LineStationCreateRequest createRequest) {
-        lineService.createLineStation(lineId, createRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/stations")).build();
-    }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handleIllegalArgsException(DataIntegrityViolationException e) {
