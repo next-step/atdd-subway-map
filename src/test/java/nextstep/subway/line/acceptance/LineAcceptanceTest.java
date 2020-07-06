@@ -210,7 +210,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 extract();
         return response;    // 200 Created
     }
-
+ 
     private Map<String, String> 지하철노선_제거(Map<String, String> params) {
         params.clear();
         return params;
