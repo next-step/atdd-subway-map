@@ -54,19 +54,19 @@ public class LineStationAddAcceptanceStep {
         assertThat(addLineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    public static void 지하철_노선_상세정보_조회_시_역_정보_포함됨(ExtractableResponse<Response> lineReadResponse,
-                                                 List<ExtractableResponse<Response>> stationCreateResponses) {
-        LineResponse lineResponse = lineReadResponse.as(LineResponse.class);
-        assertThat(lineResponse.getStations()).hasSize(stationCreateResponses.size());
+    public static void 지하철_노선_상세정보_조회_시_역_정보_포함됨(ExtractableResponse<Response> getLineResponse,
+                                                 List<ExtractableResponse<Response>> createStationResponses) {
+        LineResponse lineResponse = getLineResponse.as(LineResponse.class);
+        assertThat(lineResponse.getStations()).hasSize(createStationResponses.size());
     }
 
-    public static void 지하철_노선에_지하철역_순서대로_등록됨(ExtractableResponse<Response> lineReadResponse,
-                                             List<ExtractableResponse<Response>> stationCreateResponses) {
-        List<Long> lineStationIds = lineReadResponse.as(LineResponse.class).getStations().stream()
+    public static void 지하철_노선에_지하철역_순서대로_등록됨(ExtractableResponse<Response> getLineResponse,
+                                             List<ExtractableResponse<Response>> createStationResponses) {
+        List<Long> lineStationIds = getLineResponse.as(LineResponse.class).getStations().stream()
                 .map(it -> it.getStation().getId())
                 .collect(Collectors.toList());
 
-        List<Long> stationIds = stationCreateResponses.stream()
+        List<Long> stationIds = createStationResponses.stream()
                 .map(response -> response.as(StationResponse.class).getId())
                 .collect(Collectors.toList());
 
