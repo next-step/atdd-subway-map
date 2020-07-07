@@ -24,7 +24,7 @@ public class LineStation {
         return Objects.equals(this.stationId, other.preStationId);
     }
 
-    public void changePreStation(final LineStation preLineStation) {
+    public void changePreStation(LineStation preLineStation) {
         this.preStationId = preLineStation.getStationId();
     }
 

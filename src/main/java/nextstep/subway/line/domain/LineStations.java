@@ -32,9 +32,9 @@ public class LineStations {
             return;
         }
 
-        final int lineStationsSize = this.lineStations.size();
+        int lineStationsSize = this.lineStations.size();
         for (int i = 0; i < lineStationsSize; i++) {
-            final LineStation lineStation = this.lineStations.get(i);
+            LineStation lineStation = this.lineStations.get(i);
 
             if (lineStation.isPreStationOf(newLineStation)) {
                 this.insert(i + 1, newLineStation);
@@ -55,14 +55,14 @@ public class LineStations {
     }
 
     private void prepend(LineStation lineStation) {
-        final LineStation firstStation = this.lineStations.get(0);
+        LineStation firstStation = this.lineStations.get(0);
         firstStation.changePreStation(lineStation);
         this.lineStations.add(0, lineStation);
     }
 
     private void insert(int index, LineStation lineStation) {
         if (index != this.lineStations.size()) {
-            final LineStation next = this.lineStations.get(index);
+            LineStation next = this.lineStations.get(index);
             next.changePreStation(lineStation);
         }
 

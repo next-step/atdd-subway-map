@@ -45,7 +45,7 @@ public class Line extends BaseEntity {
        this.lineStations.add(lineStation);
     }
 
-    public void removeStation(final Long stationId) {
+    public void removeStation(Long stationId) {
         this.lineStations.removeStation(stationId);
     }
 

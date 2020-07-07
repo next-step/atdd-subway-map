@@ -60,13 +60,13 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
     @Test
     void removeMiddleLineStation() {
         // when
-        final ExtractableResponse<Response> removeLineStationResponse = 지하철_노선_지하철역_제외_요청(createLineResponse, addLineStationResponses.get(1));
+        ExtractableResponse<Response> removeLineStationResponse = 지하철_노선_지하철역_제외_요청(createLineResponse, addLineStationResponses.get(1));
 
         // then
         지하철_노선에_지하철역_제외됨(removeLineStationResponse);
 
         // when
-        final ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(createLineResponse);
+        ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(createLineResponse);
 
         // then
         지하철_노선에_지하철역_제외_확인됨(getLineResponse, addLineStationResponses.get(1));
@@ -78,7 +78,7 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
     @Test
     void removeNotAddedLineStation() {
         // when
-        final ExtractableResponse<Response> removeLineStationResponse = 지하철_노선_지하철역_제외_요청(createLineResponse, -1L);
+        ExtractableResponse<Response> removeLineStationResponse = 지하철_노선_지하철역_제외_요청(createLineResponse, -1L);
 
         // then
         지하철_노선에_지하철역_제외_실패됨(removeLineStationResponse);
