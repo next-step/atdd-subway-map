@@ -16,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -24,9 +23,9 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
+import nextstep.subway.station.acceptance.step.StationAcceptanceStep;
 import nextstep.subway.station.dto.StationResponse;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
@@ -34,35 +33,23 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
 	private ExtractableResponse<Response> createdLineResponse;
 	private ExtractableResponse<Response> createdStationResponse;
+	private Long lineId;
+	private Long stationId;
 
 	@BeforeEach
 	public void setUp() {
 		createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
 		createdStationResponse = 지하철역_등록되어_있음("강남역");
+		lineId = createdLineResponse.as(LineResponse.class).getId();
+		stationId = createdStationResponse.as(StationResponse.class).getId();
 	}
-
 
 	@DisplayName("지하철 노선에 역을 등록한다.")
 	@Test
 	void addLineStation() {
 		// when
 		// 지하철_노선에_지하철역_등록_요청
-		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long stationId = createdStationResponse.as(StationResponse.class).getId();
-		Map<String, String> params = new HashMap<>();
-		params.put("preStationId", "");
-		params.put("stationId", stationId + "");
-		params.put("distance", "4");
-		params.put("duration", "2");
-
-		ExtractableResponse<Response> response = RestAssured.given().log().all().
-			contentType(MediaType.APPLICATION_JSON_VALUE).
-			body(params).
-			when().
-			post("/lines/{lineId}/stations", lineId).
-			then().
-			log().all().
-			extract();
+		ExtractableResponse<Response> response = 노선에_지하철역_첫번째_등록(stationId, lineId);
 
 		// then
 		// 지하철 노선에 지하철역 등록됨
@@ -72,20 +59,13 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 	@DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
 	@Test
 	void getLineWithStations() {
+		// given
 		// 지하철_노선에_지하철역_등록되어_있음
-		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long stationId = createdStationResponse.as(StationResponse.class).getId();
 		노선에_지하철역_첫번째_등록(stationId, lineId);
 
 		// when
 		// 지하철_노선_상세정보_조회_요청
-		ExtractableResponse<Response> response = RestAssured.given().log().all().
-			accept(MediaType.APPLICATION_JSON_VALUE).
-			when().
-			get("/lines/{lineId}", lineId).
-			then().
-			log().all().
-			extract();
+		ExtractableResponse<Response> response = 노선정보_확인_요청(lineId);
 
 		// then
 		// 지하철 노선 상세정보 응답됨
@@ -104,56 +84,22 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
 		// when
 		// 지하철_노선에_지하철역_등록_요청
-		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long stationId1 = createdStationResponse.as(StationResponse.class).getId();
-		ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_첫번째_등록(stationId1, lineId);
+		ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_첫번째_등록(stationId, lineId);
 
 		// 지하철_노선에_지하철역_등록_요청
 		Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-		Map<String, String> params2 = new HashMap<>();
-		params2.put("preStationId", stationId1 + "");
-		params2.put("stationId", stationId2 + "");
-		params2.put("distance", "4");
-		params2.put("duration", "2");
-
-		RestAssured.given().log().all().
-			contentType(MediaType.APPLICATION_JSON_VALUE).
-			body(params2).
-			when().
-			post("/lines/{lineId}/stations", lineId).
-			then().
-			log().all().
-			extract();
+		노선에_지하철역_추가로_등록(stationId, stationId2, lineId);
 
 		// 지하철_노선에_지하철역_등록_요청
 		Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-		Map<String, String> params3 = new HashMap<>();
-		params3.put("preStationId", stationId2 + "");
-		params3.put("stationId", stationId3 + "");
-		params3.put("distance", "4");
-		params3.put("duration", "2");
-
-		RestAssured.given().log().all().
-			contentType(MediaType.APPLICATION_JSON_VALUE).
-			body(params3).
-			when().
-			post("/lines/{lineId}/stations", lineId).
-			then().
-			log().all().
-			extract();
+		노선에_지하철역_추가로_등록(stationId2, stationId3, lineId);
 
 		// then
 		assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// when
 		// 지하철_노선_조회_요청
-		ExtractableResponse<Response> response = RestAssured.given().log().all().
-			accept(MediaType.APPLICATION_JSON_VALUE).
-			when().
-			get("/lines/{lineId}", lineId).
-			then().
-			log().all().
-			extract();
+		ExtractableResponse<Response> response = 노선정보_확인_요청(lineId);
 
 		LineResponse lineResponse = response.as(LineResponse.class);
 		assertThat(lineResponse).isNotNull();
@@ -170,30 +116,13 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		// given
 		// 지하철 노선에 지하철역이 등록되어 있다.
 		ExtractableResponse<Response> createdStationResponseLast = 지하철역_등록되어_있음("역삼역");
-
-		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long givenStationId = createdStationResponse.as(StationResponse.class).getId();
 		Long lastStationId = createdStationResponseLast.as(StationResponse.class).getId();
 
-		노선에_지하철역_첫번째_등록(givenStationId, lineId);
+		노선에_지하철역_첫번째_등록(stationId, lineId);
 
 		// when
 		// 지하철 노선의 마지막에 지하철역을 등록 요청한다.
-		Map<String, String> params = new HashMap<>();
-		params.put("preStationId", givenStationId + "");
-		params.put("stationId", lastStationId + "");
-		params.put("distance", "4");
-		params.put("duration", "2");
-
-		ExtractableResponse<Response> lineStationRegisterRequest = RestAssured.given().log().all()
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.body(params)
-			.when()
-			.post("/lines/{lineId}/stations", lineId)
-			.then()
-			.log()
-			.all()
-			.extract();
+		ExtractableResponse<Response> lineStationRegisterRequest = 노선에_지하철역_추가로_등록(stationId, lastStationId, lineId);
 
 		// then
 		// 지하철 노선에 지하철역 등록됨
@@ -201,14 +130,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
 		// when
 		// 지하철 노선 상세정보 조회를 요청한다.
-		ExtractableResponse<Response> lineInformationResponse = RestAssured.given().log().all()
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when()
-			.get("/lines/{lineId}", lineId)
-			.then()
-			.log()
-			.all()
-			.extract();
+		ExtractableResponse<Response> lineInformationResponse = 노선정보_확인_요청(lineId);
 
 		// then
 		// 지하철 노선 상세정보가 응답된다.
@@ -219,7 +141,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		// and
 		// 등록된 지하철역이 마지막에 위치된다.
 		assertThat(lineResponse.getStations()
-			.get(0).getStation().getId()).isEqualTo(givenStationId);
+			.get(0).getStation().getId()).isEqualTo(stationId);
 		assertThat(lineResponse.getStations()
 			.get(1).getStation().getId()).isEqualTo(lastStationId);
 	}
@@ -234,18 +156,16 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> secondStationRegisterRequest = 지하철역_등록되어_있음("역삼역");
 		ExtractableResponse<Response> lastStationRegisterRequest = 지하철역_등록되어_있음("선릉역");
 
-		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long firstStationId = createdStationResponse.as(StationResponse.class).getId();
 		Long secondStationId = secondStationRegisterRequest.as(StationResponse.class).getId();
 		Long lastStationId = lastStationRegisterRequest.as(StationResponse.class).getId();
 
-		노선에_지하철역_첫번째_등록(firstStationId, lineId);
-		노선에_지하철역_추가로_등록(firstStationId, lastStationId, lineId);
+		노선에_지하철역_첫번째_등록(stationId, lineId);
+		노선에_지하철역_추가로_등록(stationId, lastStationId, lineId);
 
 		// when
 		// 지하철 노선의 중간에 지하철역 등록을 요청한다.
 		ExtractableResponse<Response> secondLineStationRegisterRequest =
-			노선에_지하철역_추가로_등록(firstStationId, secondStationId, lineId);
+			노선에_지하철역_추가로_등록(stationId, secondStationId, lineId);
 
 		// then
 		// 지하철 노선에 지하철역이 등록된다.
@@ -272,12 +192,38 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 	@DisplayName("이미 특정 호선에 등록되어 있는 역을 중복으로 등록하는 경우 오류를 반환한다.")
 	@Test
 	void 이미_등록되어_있는_역을_등록할_수_없다() {
-		//
+		// given
+		// 지하철 노선에 지하철역 등록되어 있음
+		ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
+		Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
+		노선에_지하철역_추가로_등록(stationId, stationId2, lineId);
+
+		// when
+		// 지하철 노선에 이미 등록되어 있는 지하철역을 등록함
+		ExtractableResponse<Response> stationDuplicateRegister =
+			노선에_지하철역_추가로_등록(stationId, stationId2, lineId);
+
+		// then
+		// 지하철 노선에 지하철역 등록이 실패됨
+		assertThat(stationDuplicateRegister.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
-	@DisplayName("특정 호선에 등록하고자 하는 역이 실제로 존재하는 역이지 안흐면 오류를 반환한다.")
+	@DisplayName("특정 호선에 등록하고자 하는 역이 실제로 존재하는 역이지 않으면 오류를 반환한다.")
+	@Test
 	void 존재하지_않는_역을_등록한다() {
-		//
+		// given
+		// 지하철 노선에 지하철역이 등록되어 있음
+		노선에_지하철역_첫번째_등록(stationId, lineId);
+
+		// when
+		// 지하철 노선에 존재하지 않는 지하철역 등록 요청
+		Long unregisteredStationId = 2L;
+		ExtractableResponse<Response> unregisteredStationRequest =
+			노선에_지하철역_추가로_등록(stationId, unregisteredStationId, lineId);
+
+		// then
+		// 지하철 노선에 지하철역 등록이 실패됨
+		assertThat(unregisteredStationRequest.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
 	private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
@@ -291,6 +237,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		return RestAssured.given().log().all().
 			contentType(MediaType.APPLICATION_JSON_VALUE).
 			body(params).
+			port(port).
 			when().
 			post("/lines").
 			then().
