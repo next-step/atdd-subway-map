@@ -1,4 +1,4 @@
-package nextstep.subway.line.domain;
+package nextstep.subway.line.application;
 
 public class LineNotFoundException extends RuntimeException {
 

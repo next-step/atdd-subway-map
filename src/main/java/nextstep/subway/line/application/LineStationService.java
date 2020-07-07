@@ -1,13 +1,12 @@
 package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.LineNotFoundException;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.domain.StationNotFoundException;
+import nextstep.subway.station.application.StationNotFoundException;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
