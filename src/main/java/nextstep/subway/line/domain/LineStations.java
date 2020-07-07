@@ -70,10 +70,18 @@ public class LineStations {
     }
 
     public void removeStation(Long stationId) {
-        LineStation lineStation = this.lineStations.stream()
-                .filter(station -> Objects.equals(station.getStationId(), stationId))
-                .findFirst()
-                .orElseThrow(EntityNotFoundException::new);
+        LineStation lineStation = getLineStation(stationId);
+        removeStationAndRearrangeStations(lineStation);
+    }
+
+    private LineStation getLineStation(Long stationId) {
+        return this.lineStations.stream()
+                    .filter(station -> Objects.equals(station.getStationId(), stationId))
+                    .findFirst()
+                    .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private void removeStationAndRearrangeStations(LineStation lineStation) {
         int index = this.lineStations.indexOf(lineStation);
         this.lineStations.remove(index);
 
