@@ -26,4 +26,19 @@ public class LineStation extends BaseEntity {
         this.duration = duration;
     }
 
+    public Long getStationId() {
+        return stationId;
+    }
+
+    public Long getPreStationId() {
+        return preStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
 }

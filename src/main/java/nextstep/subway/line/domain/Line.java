@@ -61,6 +61,10 @@ public class Line extends BaseEntity {
         return intervalTime;
     }
 
+    public LineStations getLineStations() {
+        return lineStations;
+    }
+
     public void addStation(LineStation lineStation) {
         lineStations.add(lineStation);
     }

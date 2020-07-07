@@ -6,6 +6,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Embeddable
 public class LineStations {
@@ -16,5 +17,9 @@ public class LineStations {
 
     public void add(LineStation lineStation) {
         lineStations.add(lineStation);
+    }
+
+    public Stream<LineStation> stream() {
+        return lineStations.stream();
     }
 }
