@@ -2,6 +2,7 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,8 @@ public class LineStationService {
     public void addLineStation(Long lineId, LineStationRequest lineStationRequest) {
         Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
 
-        line.addLineStation(lineStationRequest);
+        LineStation lineStation = new LineStation(lineStationRequest.getStationId(), lineStationRequest.getPreStationId(), lineStationRequest.getDistance(), lineStationRequest.getDuration());
+        line.addLineStation(lineStation);
     }
 
 }

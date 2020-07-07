@@ -33,8 +33,8 @@ public class Line extends BaseEntity {
         this.intervalTime = intervalTime;
     }
 
-    public void addLineStation(LineStationRequest lineStationRequest) {
-        lineStations.add(new LineStation(lineStationRequest.getStationId(), lineStationRequest.getPreStationId(), lineStationRequest.getDistance(), lineStationRequest.getDuration()));
+    public void addLineStation(LineStation lineStation) {
+        lineStations.add(lineStation);
     }
     public void update(Line line) {
         this.name = line.getName();
