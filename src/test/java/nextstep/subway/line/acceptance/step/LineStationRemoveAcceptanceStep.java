@@ -55,4 +55,13 @@ public class LineStationRemoveAcceptanceStep {
 
         assertThat(stationIds).containsExactly(expectedIdsInOrder);
     }
+
+    public static ExtractableResponse<Response> 지하철_노선에_등록되지_않은_역_제외_요청(ExtractableResponse<Response> lineResponse, ExtractableResponse<Response> stationResponse) {
+        return 지하철_노선의_지하철역_제외_요청(lineResponse, stationResponse);
+    }
+
+
+    public static void 지하철_노선에_지하철역_제외_실패됨(ExtractableResponse<Response> deleteResponse) {
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
