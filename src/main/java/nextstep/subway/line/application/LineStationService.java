@@ -1,9 +1,9 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.exception.NotFoundException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineStationCreateRequest;
-import nextstep.subway.line.exception.NotFoundException;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,7 @@ public class LineStationService {
                 .map(stationRepository::existsById)
                 .filter(isExists -> isExists)
                 .findAny()
-                .orElseThrow(() -> new NotFoundException("can not found station"));
+                .orElseThrow(() -> new NotFoundException("지하철역이 존재하지 않습니다."));
     }
 
     private Line findLineById(Long lineId) {

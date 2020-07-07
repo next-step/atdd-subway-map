@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.exception.AlreadyExistsException;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
@@ -40,13 +41,10 @@ public class LineStations {
     }
 
     public void removeByStationId(Long stationId) {
-        final Optional<LineStation> optionalFilteredLineStation = lineStations.stream()
+        final LineStation filteredLineStation = lineStations.stream()
                 .filter(lineStation -> lineStation.isStationIdEquals(stationId))
-                .findAny();
-        if (!optionalFilteredLineStation.isPresent()) {
-            return;
-        }
-        final LineStation filteredLineStation = optionalFilteredLineStation.get();
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 지하철역은 등록 제외가 불가능합니다."));
 
         lineStations.remove(filteredLineStation);
         relocateRemainsAfterRemove(stationId, filteredLineStation);
