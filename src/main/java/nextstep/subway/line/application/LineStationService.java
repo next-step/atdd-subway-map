@@ -1,16 +1,13 @@
 package nextstep.subway.line.application;
 
-import javassist.NotFoundException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineNotFoundException;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineStationRequest;
-import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -28,7 +25,7 @@ public class LineStationService {
 
         if (findLine.isPresent()) {
             LineStation lineStation = lineStationRequest.toLineStation();
-            findLine.get().appendStation(lineStation);
+            findLine.get().addLineStation(lineStation);
             return lineStation;
         }
         throw new LineNotFoundException(LINE_NOT_FOUND);

@@ -20,8 +20,8 @@ public class Line extends BaseEntity {
     private LocalTime endTime;
     private int intervalTime;
 
-    @ElementCollection
-    private List<LineStation> lineStations;
+    @Embedded
+    private LineStations lineStations = new LineStations();
 
     public Line() {
     }
@@ -32,7 +32,6 @@ public class Line extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.intervalTime = intervalTime;
-        this.lineStations = new ArrayList<>();
     }
 
     public void update(Line line) {
@@ -43,24 +42,8 @@ public class Line extends BaseEntity {
         this.color = line.getColor();
     }
 
-    public List<LineStation> appendStation(LineStation lineStation) {
-        if (lineStation.getStationId() == null) {
-            throw new RuntimeException();
-        }
-
-        for (int i = 0; i < lineStations.size(); i++) {
-            LineStation findLineStation = lineStations.get(i);
-            updatePreStation(lineStation, findLineStation);
-        }
-
-        lineStations.add(lineStation);
-        return new ArrayList<>(lineStations);
-    }
-
-    private void updatePreStation(LineStation lineStation, LineStation findLineStation) {
-        if (findLineStation.getPreStationId() == lineStation.getPreStationId()) {
-            findLineStation.updatePreStation(lineStation.getStationId());
-        }
+    public void addLineStation(LineStation lineStation) {
+        lineStations.appendStation(lineStation);
     }
 
     public Long getId() {
@@ -88,19 +71,6 @@ public class Line extends BaseEntity {
     }
 
     public List<LineStation> getOrderLineStations() {
-
-        Optional<LineStation> preLineStation = lineStations.stream()
-                .filter(it -> it.getPreStationId() == null)
-                .findFirst();
-
-        List<LineStation> result = new ArrayList<>();
-        while (preLineStation.isPresent()) {
-            LineStation preStationId = preLineStation.get();
-            result.add(preStationId);
-            preLineStation = lineStations.stream()
-                    .filter(it -> it.getPreStationId() == preStationId.getStationId())
-                    .findFirst();
-        }
-        return new ArrayList<>(result);
+        return lineStations.getOrderLineStations();
     }
 }
