@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,16 +32,19 @@ import nextstep.subway.station.dto.StationResponse;
 @DisplayName("지하철 노선에 역 등록 관련 기능")
 public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
-	@Autowired
-	private LineRepository lineRepository;
+	private ExtractableResponse<Response> createdLineResponse;
+	private ExtractableResponse<Response> createdStationResponse;
+
+	@BeforeEach
+	public void setUp() {
+		createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+		createdStationResponse = 지하철역_등록되어_있음("강남역");
+	}
+
 
 	@DisplayName("지하철 노선에 역을 등록한다.")
 	@Test
 	void addLineStation() {
-		// given
-		ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-		ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
-
 		// when
 		// 지하철_노선에_지하철역_등록_요청
 		Long lineId = createdLineResponse.as(LineResponse.class).getId();
@@ -63,15 +67,11 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		// then
 		// 지하철 노선에 지하철역 등록됨
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(lineRepository.findById(lineId).get().getLineStations().getLineStations()).isNotEmpty();
 	}
 
 	@DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
 	@Test
 	void getLineWithStations() {
-		// given
-		ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-		ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 		// 지하철_노선에_지하철역_등록되어_있음
 		Long lineId = createdLineResponse.as(LineResponse.class).getId();
 		Long stationId = createdStationResponse.as(StationResponse.class).getId();
@@ -99,15 +99,13 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 	@Test
 	void addLineStationInOrder() {
 		// given
-		ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-		ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
 		ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
 		ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
 
 		// when
 		// 지하철_노선에_지하철역_등록_요청
 		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
+		Long stationId1 = createdStationResponse.as(StationResponse.class).getId();
 		ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_첫번째_등록(stationId1, lineId);
 
 		// 지하철_노선에_지하철역_등록_요청
@@ -171,12 +169,10 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 	void 지하철_노선_마지막에_역을_등록한다() {
 		// given
 		// 지하철 노선에 지하철역이 등록되어 있다.
-		ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-		ExtractableResponse<Response> createdStationResponseGiven = 지하철역_등록되어_있음("강남역");
 		ExtractableResponse<Response> createdStationResponseLast = 지하철역_등록되어_있음("역삼역");
 
 		Long lineId = createdLineResponse.as(LineResponse.class).getId();
-		Long givenStationId = createdStationResponseGiven.as(StationResponse.class).getId();
+		Long givenStationId = createdStationResponse.as(StationResponse.class).getId();
 		Long lastStationId = createdStationResponseLast.as(StationResponse.class).getId();
 
 		노선에_지하철역_첫번째_등록(givenStationId, lineId);
@@ -235,13 +231,11 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		// given
 		// 지하철 노선에 지하철역이 등록되어 있다.
 		// 노선에 첫 번째로 지하철역을 등록한다.
-		ExtractableResponse<Response> lineRegisterRequest = 지하철_노선_등록되어_있음("2호선", "GREEN");
-		ExtractableResponse<Response> firstStationRegisterRequest = 지하철역_등록되어_있음("강남역");
 		ExtractableResponse<Response> secondStationRegisterRequest = 지하철역_등록되어_있음("역삼역");
 		ExtractableResponse<Response> lastStationRegisterRequest = 지하철역_등록되어_있음("선릉역");
 
-		Long lineId = lineRegisterRequest.as(LineResponse.class).getId();
-		Long firstStationId = firstStationRegisterRequest.as(StationResponse.class).getId();
+		Long lineId = createdLineResponse.as(LineResponse.class).getId();
+		Long firstStationId = createdStationResponse.as(StationResponse.class).getId();
 		Long secondStationId = secondStationRegisterRequest.as(StationResponse.class).getId();
 		Long lastStationId = lastStationRegisterRequest.as(StationResponse.class).getId();
 
@@ -273,6 +267,17 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 			.filter(station -> station.getStation().getName().equals(stationName))
 			.mapToLong(LineStationResponse::getPreStationId))
 			.containsExactly(preStationId);
+	}
+
+	@DisplayName("이미 특정 호선에 등록되어 있는 역을 중복으로 등록하는 경우 오류를 반환한다.")
+	@Test
+	void 이미_등록되어_있는_역을_등록할_수_없다() {
+		//
+	}
+
+	@DisplayName("특정 호선에 등록하고자 하는 역이 실제로 존재하는 역이지 안흐면 오류를 반환한다.")
+	void 존재하지_않는_역을_등록한다() {
+		//
 	}
 
 	private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
