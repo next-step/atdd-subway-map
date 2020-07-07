@@ -44,7 +44,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineWithStations() {
         //given
-        지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, "");
+        지하철_노선에_지하철역_등록_되어있음(createdLineResponse, createdStationResponse, "");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdLineResponse);
