@@ -3,12 +3,10 @@ package nextstep.subway.line.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
-import nextstep.subway.line.domain.LineStations;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
-import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +28,7 @@ public class LineStationService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalStateException("not found line : " + lineId));
 
-        LineStations lineStations = line.getLineStations();
-        return LineStationResponse.from(lineStations);
+        return LineStationResponse.from(line.getLineStationsInOrder());
     }
 
     @Transactional
@@ -44,7 +41,7 @@ public class LineStationService {
 
         line.registerLineStation(lineStation);
 
-        return toLineStationsResponse(lineStation);
+        return LineStationResponse.of(lineStation);
     }
 
     private LineStation createNewLineStation(LineStationRequest createLineStationRequest) {
@@ -60,10 +57,5 @@ public class LineStationService {
         }
 
         return LineStation.createLineStation(station, preStation, createLineStationRequest.getDistance(), createLineStationRequest.getDuration());
-    }
-
-    private LineStationResponse toLineStationsResponse(LineStation lineStation) {
-        StationResponse stationResponse = StationResponse.of(lineStation.getStation());
-        return LineStationResponse.of(lineStation, stationResponse);
     }
 }

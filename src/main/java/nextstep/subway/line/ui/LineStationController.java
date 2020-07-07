@@ -1,11 +1,10 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineStationService;
-import nextstep.subway.line.domain.LineStation;
+import nextstep.subway.line.domain.exceptions.LineStationAlreadyExist;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
-import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.dto.StationResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -32,7 +31,12 @@ public class LineStationController {
     @PostMapping
     public ResponseEntity<LineStationResponse> createLineStation(@PathVariable Long lineId, @RequestBody LineStationRequest createLineStationRequest) {
 
-        LineStationResponse newLineStationResponse = lineStationService.addLineStation(lineId, createLineStationRequest);
+        LineStationResponse newLineStationResponse;
+        try {
+            newLineStationResponse = lineStationService.addLineStation(lineId, createLineStationRequest);
+        } catch (LineStationAlreadyExist e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

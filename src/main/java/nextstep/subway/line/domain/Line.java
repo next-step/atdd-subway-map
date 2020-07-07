@@ -1,9 +1,12 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
+import nextstep.subway.line.domain.exceptions.LineStationAlreadyExist;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -67,7 +70,7 @@ public class Line extends BaseEntity {
         this.lineStations.registerLineStation(lineStation);
     }
 
-    public LineStations getLineStations() {
-        return this.lineStations;
+    public List<LineStation> getLineStationsInOrder() {
+        return this.lineStations.getLineStationsInOrder();
     }
 }

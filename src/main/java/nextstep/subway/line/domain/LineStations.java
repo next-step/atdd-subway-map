@@ -1,5 +1,6 @@
 package nextstep.subway.line.domain;
 
+import nextstep.subway.line.domain.exceptions.LineStationAlreadyExist;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -16,10 +17,6 @@ public class LineStations {
     private final List<LineStation> lineStations = new ArrayList<>();
 
     protected LineStations() {
-    }
-
-    public List<LineStation> getLineStations() {
-        return lineStations;
     }
 
     public List<LineStation> getLineStationsInOrder() {
@@ -53,7 +50,16 @@ public class LineStations {
         return orderedLineStations;
     }
 
+    boolean hasStation(Station station) {
+        return this.lineStations.stream()
+                .anyMatch(lineStation -> lineStation.getStation() == station);
+    }
+
     public void registerLineStation(LineStation lineStation) {
+        if (this.checkExistStation(lineStation.getStation())) {
+            throw new LineStationAlreadyExist("line station already exists : " + lineStation.getStation().getId());
+        }
+
         lineStations.forEach(it -> {
             Station prevPreStation = it.getPreStation();
             Station newPreStation = lineStation.getPreStation();
@@ -64,5 +70,9 @@ public class LineStations {
         });
 
         this.lineStations.add(lineStation);
+    }
+
+    public boolean checkExistStation(Station station) {
+        return this.hasStation(station);
     }
 }

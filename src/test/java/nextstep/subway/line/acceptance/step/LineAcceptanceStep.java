@@ -46,6 +46,36 @@ public class LineAcceptanceStep {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_목록을_조회한다() {
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선을_조회한다(String uri) {
+        return RestAssured.given().log().all().
+                accept(ContentType.JSON).
+                when().
+                get(uri).
+                then().
+                log().all().
+                extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선을_제거한다(String existLineLocation) {
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete(existLineLocation)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
     public static Map<String, String> getLineRequestParameterMap(String lines, String color, LocalTime startTime, LocalTime endTime, int interval) {
         Map<String, String> params = new HashMap<>();
         params.put("name", lines);

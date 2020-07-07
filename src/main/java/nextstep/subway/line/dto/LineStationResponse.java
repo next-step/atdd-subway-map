@@ -1,7 +1,6 @@
 package nextstep.subway.line.dto;
 
 import nextstep.subway.line.domain.LineStation;
-import nextstep.subway.line.domain.LineStations;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
 
@@ -24,6 +23,11 @@ public class LineStationResponse {
         this.duration = duration;
     }
 
+    public static LineStationResponse of(LineStation lineStation) {
+        StationResponse stationResponse = StationResponse.of(lineStation.getStation());
+        return LineStationResponse.of(lineStation, stationResponse);
+    }
+
     public static LineStationResponse of(LineStation lineStation, StationResponse stationResponse) {
         Long preStationId = null;
         Station preLineStation = lineStation.getPreStation();
@@ -33,8 +37,8 @@ public class LineStationResponse {
         return new LineStationResponse(stationResponse, preStationId, lineStation.getDistance(), lineStation.getDuration());
     }
 
-    public static List<LineStationResponse> from(LineStations lineStations) {
-        return lineStations.getLineStationsInOrder().stream()
+    public static List<LineStationResponse> from(List<LineStation> lineStations) {
+        return lineStations.stream()
                 .map(lineStation -> {
                     Station station = lineStation.getStation();
                     return LineStationResponse.of(lineStation, StationResponse.of(station));

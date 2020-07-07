@@ -2,7 +2,6 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
-import nextstep.subway.line.domain.LineStations;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
@@ -38,8 +37,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(RuntimeException::new);
 
-        LineStations lineStations = line.getLineStations();
-        return LineResponse.of(line, LineStationResponse.from(lineStations));
+        return LineResponse.of(line, LineStationResponse.from(line.getLineStationsInOrder()));
     }
 
     @Transactional
