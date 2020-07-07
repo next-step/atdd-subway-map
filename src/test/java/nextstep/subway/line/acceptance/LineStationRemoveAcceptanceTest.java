@@ -40,9 +40,9 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선에 등록된 마지막 지하철역을 제외한다.")
     @Test
-    void removeLineStation() {
+    void removeLineStationAtLast() {
         //when
-        ExtractableResponse<Response> deleteResponse = 지하철_노선의_마지막에_지하철역_제외_요청(lineResponse, stationResponse3);
+        ExtractableResponse<Response> deleteResponse = 지하철_노선의_지하철역_제외_요청(lineResponse, stationResponse3);
 
         //then
         지하철_노선에_지하철역_제외됨(deleteResponse);
@@ -51,6 +51,21 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> lineDetailResponse = 지하철_노선_상세정보_조회_요청(lineResponse);
         지하철_노선에_지하철역_제외_확인됨(lineDetailResponse, stationResponse3, 2);
         지하철_노선에_지하철역_순서_정렬됨(lineDetailResponse, Lists.newArrayList(stationResponse1, stationResponse2));
+    }
+
+    @DisplayName("지하철 노선에 등록된 중간 지하철역을 제외한다.")
+    @Test
+    void removeLineStationAtMiddle() {
+        //when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선의_지하철역_제외_요청(lineResponse, stationResponse2);
+
+        //then
+        지하철_노선에_지하철역_제외됨(deleteResponse);
+
+        //when
+        ExtractableResponse<Response> lineDetailResponse = 지하철_노선_상세정보_조회_요청(lineResponse);
+        지하철_노선에_지하철역_제외_확인됨(lineDetailResponse, stationResponse2, 2);
+        지하철_노선에_지하철역_순서_정렬됨(lineDetailResponse, Lists.newArrayList(stationResponse1, stationResponse3));
     }
 
 }

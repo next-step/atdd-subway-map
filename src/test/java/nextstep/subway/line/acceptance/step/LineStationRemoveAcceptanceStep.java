@@ -18,7 +18,7 @@ public class LineStationRemoveAcceptanceStep {
 
     public static final String DELIMITER = "/";
 
-    public static ExtractableResponse<Response> 지하철_노선의_마지막에_지하철역_제외_요청(ExtractableResponse<Response> lineResponse, ExtractableResponse<Response> stationResponse) {
+    public static ExtractableResponse<Response> 지하철_노선의_지하철역_제외_요청(ExtractableResponse<Response> lineResponse, ExtractableResponse<Response> stationResponse) {
         String lineLocation = lineResponse.header(HttpHeaders.LOCATION);
         String stationLocation = stationResponse.header(HttpHeaders.LOCATION);
 
