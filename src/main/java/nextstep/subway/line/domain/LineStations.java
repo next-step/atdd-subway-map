@@ -51,7 +51,7 @@ public class LineStations {
                     .filter(it -> it.getPreStationId() == preStationId.getStationId())
                     .findFirst();
         }
-        return new ArrayList<>(result);
+        return result;
     }
 
 }
