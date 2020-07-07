@@ -15,7 +15,7 @@ public class LineStations {
     @JoinColumn(name = "line_id", foreignKey = @ForeignKey(name = "fk_line_station_to_line"))
     private List<LineStation> lineStations = new ArrayList<>();
 
-    public List<LineStation> appendStation(LineStation lineStation) {
+    public void appendStation(LineStation lineStation) {
         if (lineStation.getStationId() == null) {
             throw new RuntimeException();
         }
@@ -30,7 +30,6 @@ public class LineStations {
         }
 
         lineStations.add(lineStation);
-        return new ArrayList<>(lineStations);
     }
 
     private void updatePreStation(LineStation lineStation, LineStation findLineStation) {
