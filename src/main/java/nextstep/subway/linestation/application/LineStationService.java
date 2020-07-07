@@ -3,6 +3,7 @@ package nextstep.subway.linestation.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineStationResponse;
+import nextstep.subway.linestation.application.exception.StationNotFoundException;
 import nextstep.subway.linestation.domain.LineStation;
 import nextstep.subway.linestation.dto.LineStationRequest;
 import nextstep.subway.station.domain.Station;
@@ -31,6 +32,10 @@ public class LineStationService {
         final Line line = lineRepository
                 .findById(lineId)
                 .orElseThrow(RuntimeException::new);
+
+        final Long stationId = lineStationRequest.getStationId();
+        stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
+
         final LineStation lineStation = toLineStation(lineStationRequest);
         line.registerStation(lineStation);
     }
@@ -40,7 +45,7 @@ public class LineStationService {
         final Line line = lineRepository
                 .findById(lineId)
                 .orElseThrow(RuntimeException::new);
-        return toLineStationResponse(line.getLineStations().getStationsInOrder());
+        return toLineStationResponse(line.getStationsInOrder());
     }
 
     private List<LineStationResponse> toLineStationResponse(List<LineStation> lineStations) {
