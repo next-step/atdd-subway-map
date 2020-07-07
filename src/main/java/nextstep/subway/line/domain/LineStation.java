@@ -99,4 +99,15 @@ public class LineStation extends BaseEntity {
     public boolean isPreStation(LineStation station) {
         return station.getStationId().equals(this.preStationId);
     }
+
+    public boolean isStationIdEquals(Long stationId) {
+        return this.stationId.equals(stationId);
+    }
+
+    public boolean isPreStation(Long stationId) {
+        if (preStationId == null) {
+            return stationId == null;
+        }
+        return this.preStationId.equals(stationId);
+    }
 }
