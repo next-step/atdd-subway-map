@@ -53,13 +53,11 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
                 LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
-        // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
         지하철_노선에_지하철역_등록_요청(lineId, null, stationId, 4, 2);
 
         // when
-        // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
 
         // then
@@ -82,7 +80,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
         ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
 
-        // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
         지하철_노선에_지하철역_등록_요청(lineId, stationId1, stationId2, 4, 2);
 
@@ -125,7 +122,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
         지하철_노선에_지하철역_등록_요청(lineId, stationId1, stationId2, 4, 2);
 
-        // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
 
         지하철_노선에_지하철역_등록_요청(lineId, stationId1, stationId3, 4, 2);
@@ -134,7 +130,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
