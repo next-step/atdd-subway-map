@@ -40,6 +40,10 @@ public class LineStationAddAcceptanceStep {
     public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> createdLineResponse, ExtractableResponse<Response> createdStationResponse, String preStationId) {
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
+        return 지하철_노선에_지하철역_등록_요청(lineId, stationId, preStationId);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(Long lineId, Long stationId, String preStationId) {
         Map<String, String> params2 = new HashMap<>();
         params2.put("preStationId", preStationId);
         params2.put("stationId", String.valueOf(stationId));
@@ -56,7 +60,11 @@ public class LineStationAddAcceptanceStep {
                 extract();
     }
 
-    public static void 지하철_노선에_지하철역_등록_실패됨(ExtractableResponse<Response> duplicateCreateResponse) {
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_되어있음(ExtractableResponse<Response> createdLineResponse, ExtractableResponse<Response> createdStationResponse, String preStationId) {
+        return 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, preStationId);
+    }
+
+        public static void 지하철_노선에_지하철역_등록_실패됨(ExtractableResponse<Response> duplicateCreateResponse) {
         assertThat(duplicateCreateResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
