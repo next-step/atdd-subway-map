@@ -39,6 +39,6 @@ public class LineStationService {
             return LineStationResponse.of(lineStation, StationResponse.of(station));
 
         }
-        throw new LineNotFoundException(LINE_NOT_FOUND);
+        throw new LineNotFoundException();
     }
 }
