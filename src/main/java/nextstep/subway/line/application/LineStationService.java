@@ -30,6 +30,12 @@ public class LineStationService {
         return this.toLineStationResponse(lineStation);
     }
 
+    public void removeLineStation(Long lineId, Long stationId) {
+        Line line = this.lineRepository.findById(lineId)
+                .orElseThrow(EntityNotFoundException::new);
+        line.removeStation(stationId);
+    }
+
     private void checkAreStationsExist(LineStationRequest lineStationRequest) {
         if (!this.stationRepository.existsById(lineStationRequest.getStationId())) {
             throw new EntityNotFoundException();

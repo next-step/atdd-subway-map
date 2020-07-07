@@ -1,9 +1,6 @@
 package nextstep.subway.line.domain;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.OrderColumn;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,6 +67,21 @@ public class LineStations {
         }
 
         this.lineStations.add(index, lineStation);
+    }
+
+    public void removeStation(Long stationId) {
+        LineStation lineStation = this.lineStations.stream()
+                .filter(station -> Objects.equals(station.getStationId(), stationId))
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
+        int index = this.lineStations.indexOf(lineStation);
+        this.lineStations.remove(index);
+
+        if (index != this.lineStations.size()) {
+            LineStation previousLineStation = this.lineStations.get(index - 1);
+            LineStation nextLineStation = this.lineStations.get(index);
+            nextLineStation.changePreStation(previousLineStation);
+        }
     }
 
     public List<LineStation> getLineStations() {
