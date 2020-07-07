@@ -25,7 +25,6 @@ import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
-import nextstep.subway.station.acceptance.step.StationAcceptanceStep;
 import nextstep.subway.station.dto.StationResponse;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
@@ -237,7 +236,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 		return RestAssured.given().log().all().
 			contentType(MediaType.APPLICATION_JSON_VALUE).
 			body(params).
-			port(port).
 			when().
 			post("/lines").
 			then().
