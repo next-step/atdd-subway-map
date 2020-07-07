@@ -24,10 +24,14 @@ public class LineStationService {
 
     public void createLineStation(Long lineId, LineStationCreateRequest createRequest) {
         validateStationExists(createRequest.getStationId(), createRequest.getPreStationId());
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(NotFoundException::new);
+        final Line line = findLineById(lineId);
 
         line.addStation(createRequest.getPreStationId(), createRequest.getStationId(), createRequest.getDistance(), createRequest.getDuration());
+    }
+
+    public void removeStation(Long lineId, Long stationId) {
+        final Line line = findLineById(lineId);
+        line.removeStationByStationId(stationId);
     }
 
     private void validateStationExists(Long stationId, Long preStationId) {
@@ -39,4 +43,8 @@ public class LineStationService {
                 .orElseThrow(() -> new NotFoundException("can not found station"));
     }
 
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(NotFoundException::new);
+    }
 }

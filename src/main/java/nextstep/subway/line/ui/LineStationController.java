@@ -23,4 +23,10 @@ public class LineStationController {
         return ResponseEntity.created(URI.create("/lines/" + lineId.toString())).build();
     }
 
+    @DeleteMapping("/{lineId}/stations/{stationId}")
+    public ResponseEntity createLineStation(@PathVariable("lineId") Long lineId, @PathVariable("stationId") Long stationId) {
+        lineStationService.removeStation(lineId, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -72,4 +72,8 @@ public class LineStations {
                 .findAny()
                 .ifPresent(lineStation -> lineStation.updatePreStationId(newLineStation.getStationId()));
     }
+
+    public void removeByStationId(Long stationId) {
+        this.lineStations.removeIf(lineStation -> lineStation.getStationId().equals(stationId));
+    }
 }
