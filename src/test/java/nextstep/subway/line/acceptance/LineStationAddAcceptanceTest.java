@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalTime;
 
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_등록되어_있음;
-import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_조회_요청;
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_상세정보_조회_요청;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 
@@ -47,7 +47,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역_등록_되어있음(createdLineResponse, createdStationResponse, "");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdLineResponse);
+        ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(createdLineResponse);
 
         // then
         지하철_노선_상세정보_응답됨(response, 1);
@@ -73,7 +73,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역_등록됨(lineStationResponse);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineStationResponse);
+        ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(lineStationResponse);
 
         지하철_노선_상세정보_응답됨(response, 3);
         등록된_지하철_역이_주어진_위치에_위치됨(response, Lists.newArrayList(1L, 2L, 3L));
@@ -97,7 +97,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역_등록됨(lineStationResponse);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineStationResponse);
+        ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(lineStationResponse);
 
         지하철_노선_상세정보_응답됨(response, 3);
         등록된_지하철_역이_주어진_위치에_위치됨(response, Lists.newArrayList(1L, 3L, 2L));

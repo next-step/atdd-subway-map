@@ -48,7 +48,7 @@ public class LineAcceptanceStep {
                 extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> createResponse) {
+    public static ExtractableResponse<Response> 지하철_노선_상세정보_조회_요청(ExtractableResponse<Response> createResponse) {
         String uri = createResponse.header(HttpHeaders.LOCATION);
 
         return RestAssured.given().log().all().
