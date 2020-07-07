@@ -16,6 +16,7 @@ public class Line extends BaseEntity {
     private LocalTime startTime;
     private LocalTime endTime;
     private int intervalTime;
+    private LineStations lineStations;
 
     public Line() {
     }
