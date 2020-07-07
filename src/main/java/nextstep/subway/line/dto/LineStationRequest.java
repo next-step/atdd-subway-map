@@ -1,5 +1,7 @@
 package nextstep.subway.line.dto;
 
+import nextstep.subway.line.domain.LineStation;
+
 public class LineStationRequest {
 
     private Long preStationId;
@@ -14,19 +16,7 @@ public class LineStationRequest {
         this.duration = duration;
     }
 
-    public Long getPreStationId() {
-        return preStationId;
-    }
-
-    public Long getStationId() {
-        return stationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    public Integer getDuration() {
-        return duration;
+    public LineStation toLineStation() {
+        return new LineStation(stationId, preStationId, distance, duration);
     }
 }

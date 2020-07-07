@@ -2,10 +2,7 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class LineStation extends BaseEntity {
@@ -14,6 +11,7 @@ public class LineStation extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long stationId;
     private Long preStationId;
     private Integer distance;
