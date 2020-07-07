@@ -53,13 +53,13 @@ public class LineService {
     }
 
     private List<Long> getStationIds(Line line) {
-        return line.getLineStations().stream()
+        return line.getLineStations().getContent().stream()
                     .map(LineStation::getStationId)
                     .collect(Collectors.toList());
     }
 
     private List<LineStationResponse> getLineStationResponses(Line line, Map<Long, StationResponse> stationResponses) {
-        return line.getLineStations().stream()
+        return line.getLineStations().getContentInOrder().stream()
                 .map(lineStation -> LineStationResponse.of(stationResponses.get(lineStation.getStationId()), lineStation))
                 .collect(Collectors.toList());
     }

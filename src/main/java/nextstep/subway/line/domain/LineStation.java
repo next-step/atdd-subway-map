@@ -41,4 +41,16 @@ public class LineStation extends BaseEntity {
     public Integer getDuration() {
         return duration;
     }
+
+    public boolean isSamePreStation(Long preStationId) {
+        if (this.preStationId == null || preStationId == null) {
+            return false;
+        }
+
+        return this.preStationId.equals(preStationId);
+    }
+
+    public void relocateAfter(Long preStationId) {
+        this.preStationId = preStationId;
+    }
 }
