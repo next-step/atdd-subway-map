@@ -33,14 +33,15 @@ public class LineStation extends BaseEntity {
     }
 
     private void validateParameters(Long preStationId, Long stationId, Integer duration, Integer distance) {
-        Objects.requireNonNull(duration);
-        Objects.requireNonNull(distance);
+        validateNull(stationId);
+        validateNull(duration);
+        validateNull(distance);
 
         if (preStationId != null && preStationId <= 0) {
             throw new FieldValidationException("preStationId는 0보다 커야 합니다.");
         }
 
-        if (stationId != null && stationId <= 0) {
+        if (stationId <= 0) {
             throw new FieldValidationException("stationId는 0보다 커야 합니다.");
         }
 
@@ -50,6 +51,12 @@ public class LineStation extends BaseEntity {
 
         if (distance <= 0) {
             throw new FieldValidationException("distance는 0보다 커야 합니다.");
+        }
+    }
+
+    private void validateNull(Object param) {
+        if (Objects.isNull(param)) {
+            throw new FieldValidationException(param.getClass().toString() + "는 NULL일 수 없습니다.");
         }
     }
 

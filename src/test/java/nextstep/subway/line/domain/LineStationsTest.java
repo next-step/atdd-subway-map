@@ -13,7 +13,7 @@ public class LineStationsTest {
 
     @Test
     @DisplayName("기본 생성자로 생성한다")
-    void testCreate() {
+    void create() {
         //when
         LineStations lineStations = new LineStations();
 
@@ -23,7 +23,7 @@ public class LineStationsTest {
 
     @Test
     @DisplayName("이전 지하철역이 같은 객체가 들어오면, 기존의 지하철역은 뒤로 밀려나고, 새로 들어온 지하철역이 그 자리를 잇는다")
-    void testConnect() {
+    void addMiddle() {
         //given
         final LineStations lineStations = new LineStations();
 
@@ -45,7 +45,7 @@ public class LineStationsTest {
 
     @Test
     @DisplayName("preStation 이 NULL인 지하철역이 중복되서 등록되면, 기존의 지하철역은 뒤로 밀려나고, 새로 들어온 지하철역이 그 자리를 잇는다")
-    void testConnectForStartStation() {
+    void addFirst() {
         //given
         final LineStations lineStations = new LineStations();
 

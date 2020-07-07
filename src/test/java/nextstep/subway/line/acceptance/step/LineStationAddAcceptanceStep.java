@@ -8,8 +8,6 @@ import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,27 +37,13 @@ public class LineStationAddAcceptanceStep {
         assertThat(lineResponse.getStations()).hasSize(expectedSize);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("startTime", LocalTime.of(5, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        return RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
-    }
-
     public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> createdLineResponse, ExtractableResponse<Response> createdStationResponse, String preStationId) {
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
+        return 지하철_노선에_지하철역_등록_요청(lineId, stationId, preStationId);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(Long lineId, Long stationId, String preStationId) {
         Map<String, String> params2 = new HashMap<>();
         params2.put("preStationId", preStationId);
         params2.put("stationId", String.valueOf(stationId));
@@ -74,5 +58,13 @@ public class LineStationAddAcceptanceStep {
                 then().
                 log().all().
                 extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_되어있음(ExtractableResponse<Response> createdLineResponse, ExtractableResponse<Response> createdStationResponse, String preStationId) {
+        return 지하철_노선에_지하철역_등록_요청(createdLineResponse, createdStationResponse, preStationId);
+    }
+
+        public static void 지하철_노선에_지하철역_등록_실패됨(ExtractableResponse<Response> duplicateCreateResponse) {
+        assertThat(duplicateCreateResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
