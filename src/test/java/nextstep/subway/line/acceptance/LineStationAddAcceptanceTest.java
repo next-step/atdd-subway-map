@@ -30,7 +30,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     private Long stationId2;
     private Long stationId3;
 
-
     @BeforeEach
     public void setUp() {
         super.setUp();
@@ -62,7 +61,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역_등록됨(response);
     }
 
-
     @DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
     @Test
     void getLineWithStations() {
@@ -89,16 +87,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성됨(lineStationResponse);
 
         // when
-        // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
-
-        LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(3);
-        List<Long> stationIds = lineResponse.getStations().stream()
-                .map(it -> it.getStation().getId())
-                .collect(Collectors.toList());
-        assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 2L, 3L));
+        등록된_지하철역이_정렬되어_위치됨(response, Lists.newArrayList(1L, 2L, 3L));
     }
 
     @DisplayName("지하철 노선에 여러개의 역을 순서없이 등록한다.")
