@@ -6,12 +6,14 @@ import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
+import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,9 +45,20 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
         List<LineStation> lineStations = line.getOrderedLineStations();
 
+        List<Long> stationIds = lineStations.stream()
+                .map(it -> it.getStationId())
+                .collect(Collectors.toList());
+
+        List<Station> stations = stationRepository.findAllById(stationIds);
+
         // List<LineStationResponse> 생성
         List<LineStationResponse> lineStationResponses = lineStations.stream()
-                        .map(it -> LineStationResponse.of(StationResponse.of(stationRepository.findById(it.getStationId()).get()), it))
+                        .map(it -> {
+                            Optional<Station> station = stations.stream()
+                                    .filter(st-> st.getId() == it.getStationId())
+                                    .findFirst();
+                            return LineStationResponse.of(StationResponse.of(station.get()), it);
+                        })
                         .collect(Collectors.toList());
 
         // Line reponse 생성
