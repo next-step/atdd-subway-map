@@ -1,5 +1,6 @@
 package nextstep.subway.line.dto;
 
+import nextstep.subway.line.domain.LineStation;
 import nextstep.subway.station.dto.StationResponse;
 
 public class LineStationResponse {
@@ -16,6 +17,10 @@ public class LineStationResponse {
         this.preStationId = preStationId;
         this.distance = distance;
         this.duration = duration;
+    }
+
+    public static LineStationResponse of(StationResponse stationResponse, LineStation lineStation) {
+        return new LineStationResponse(stationResponse, lineStation.getPreStationId(), lineStation.getDistance(), lineStation.getDuration());
     }
 
     public StationResponse getStation() {
