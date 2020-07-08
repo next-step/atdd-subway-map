@@ -4,11 +4,14 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
+import org.assertj.core.util.Lists;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +19,10 @@ public class LineStationAddAcceptanceStep {
 
     public static void 지하철_노선에_지하철역_등록됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    public static void 지하철_노선에_지하철역_등록_실패됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     public static void 지하철_노선_상세정보_응답됨(ExtractableResponse response) {
@@ -50,5 +57,15 @@ public class LineStationAddAcceptanceStep {
                 then().
                 log().all().
                 extract();
+    }
+
+    public static void 등록된_지하철역이_정렬되어_위치됨 (ExtractableResponse<Response> response, List<Long> expectedStationIds) {
+        LineResponse lineResponse = response.as(LineResponse.class);
+        assertThat(lineResponse).isNotNull();
+        assertThat(lineResponse.getStations()).hasSize(expectedStationIds.size());
+        List<Long> stationIds = lineResponse.getStations().stream()
+                .map(it -> it.getStation().getId())
+                .collect(Collectors.toList());
+        assertThat(stationIds).containsExactlyElementsOf(expectedStationIds);
     }
 }

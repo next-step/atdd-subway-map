@@ -3,6 +3,9 @@ package nextstep.subway.line.domain;
 
 
 
+import nextstep.subway.station.application.StationDuplicateException;
+import nextstep.subway.station.application.StationNotFoundException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +20,11 @@ public class LineStations {
 
     public void appendStation(LineStation lineStation) {
         if (lineStation.getStationId() == null) {
-            throw new RuntimeException();
+            throw new StationNotFoundException();
         }
 
         if (lineStations.stream().anyMatch(it -> it.isSame(lineStation))) {
-            throw new RuntimeException();
+            throw new StationDuplicateException();
         }
 
         for (int i = 0; i < lineStations.size(); i++) {
@@ -51,7 +54,7 @@ public class LineStations {
                     .filter(it -> it.getPreStationId() == preStationId.getStationId())
                     .findFirst();
         }
-        return new ArrayList<>(result);
+        return result;
     }
 
 }
