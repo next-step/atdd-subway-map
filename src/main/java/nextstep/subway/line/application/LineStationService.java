@@ -3,6 +3,7 @@ package nextstep.subway.line.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import nextstep.subway.exception.NotRegisteredException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
@@ -23,11 +24,11 @@ public class LineStationService {
 	}
 
 	private Line findLineById(Long lineId) {
-		return lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException("no line found."));
+		return lineRepository.findById(lineId).orElseThrow(() -> new NotRegisteredException("no line found."));
 	}
 
 	private Station findStationById(Long stationId) {
-		return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("no station found."));
+		return stationRepository.findById(stationId).orElseThrow(() -> new NotRegisteredException("no station found."));
 	}
 
 	public void registerLineStation(LineStationCreateRequest dto) {

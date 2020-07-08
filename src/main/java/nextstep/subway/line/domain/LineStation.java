@@ -60,4 +60,12 @@ public class LineStation {
 		preStationId = lineStation.getStationId();
 		return preStationId;
 	}
+
+	public String lineStationName() {
+		return station.getName();
+	}
+
+	public boolean compareStationIdentityWithStationName(LineStation lineStation) {
+		return lineStationName().equals(lineStation.lineStationName());
+	}
 }
