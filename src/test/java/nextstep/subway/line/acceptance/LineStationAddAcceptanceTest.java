@@ -139,6 +139,34 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 3L, 2L));
     }
 
+    @DisplayName("이미 등록되어 있던 역을 등록한다.")
+    @Test
+    void addDuplicateStationInLine() {
+        // when
+        // 지하철_노선_이미_등록되어있는_지하철역_등록_요청
+        Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
+        ExtractableResponse<Response> lineStationResponse = createLineStation(params, lineId);
+
+        // then
+        // 지하철 노선에 지하철역 등록 실패됨
+        assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(lineStationResponse.body()).asString().contains("DuplicateStationLineException");
+    }
+
+    @DisplayName("존재하지 않는 역을 등록한다.")
+    @Test
+    void addNonExistStationInLine() {
+        // when
+        // 지하철_노선_존재하지_않는_지하철역_등록_요청
+        Map<String, String> params = createLineStationRequestParams(null, 4L, "4", "2");
+        ExtractableResponse<Response> lineStationResponse = createLineStation(params, lineId);
+
+        // then
+        // 지하철 노선에 지하철역 등록 실패됨
+        assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(lineStationResponse.body()).asString().contains("NonExistStationException");
+    }
+
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
