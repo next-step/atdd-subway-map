@@ -33,25 +33,19 @@ public class LineStationRemoveAcceptanceStep {
     }
 
     public static void 지하철_노선에_지하철역_제외_확인됨(ExtractableResponse<Response> lineDetailResponse, ExtractableResponse<Response> stationResponse, int expectedSize) {
-        List<Long> stationIds = lineDetailResponse.as(LineResponse.class).getStations().stream()
-                .map(LineStationResponse::getStation)
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
-        Long stationId = Long.parseLong(stationResponse.header(HttpHeaders.LOCATION).split(DELIMITER)[2]);
+        List<Long> stationIds = parseStationIds(lineDetailResponse);
+        Long stationId = Long.parseLong(parseStationId(stationResponse));
 
         assertThat(stationIds).hasSize(expectedSize)
                 .doesNotContain(stationId);
     }
 
     public static void 지하철_노선에_지하철역_순서_정렬됨(ExtractableResponse<Response> lineDetailResponse, List<ExtractableResponse<Response>> stationResponses) {
-        List<Long> stationIds = lineDetailResponse.as(LineResponse.class).getStations().stream()
-                .map(LineStationResponse::getStation)
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+        List<Long> stationIds = parseStationIds(lineDetailResponse);
         Long[] expectedIdsInOrder = stationResponses.stream()
-                .map(response -> response.header(HttpHeaders.LOCATION).split(DELIMITER)[2])
+                .map(response -> parseStationId(response))
                 .map(Long::parseLong)
-                .toArray(size -> new Long[size]);
+                .toArray(Long[]::new);
 
         assertThat(stationIds).containsExactly(expectedIdsInOrder);
     }
@@ -63,5 +57,16 @@ public class LineStationRemoveAcceptanceStep {
 
     public static void 지하철_노선에_지하철역_제외_실패됨(ExtractableResponse<Response> deleteResponse) {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private static List<Long> parseStationIds(ExtractableResponse<Response> lineDetailResponse) {
+        return lineDetailResponse.as(LineResponse.class).getStations().stream()
+                .map(LineStationResponse::getStation)
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+    }
+
+    private static String parseStationId(ExtractableResponse<Response> stationResponse) {
+        return stationResponse.header(HttpHeaders.LOCATION).split(DELIMITER)[2];
     }
 }
