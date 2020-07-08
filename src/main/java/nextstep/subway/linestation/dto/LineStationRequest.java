@@ -1,5 +1,8 @@
 package nextstep.subway.linestation.dto;
 
+import nextstep.subway.linestation.domain.LineStation;
+import nextstep.subway.station.domain.Station;
+
 public class LineStationRequest {
     private Long preStationId;
     private Long stationId;
@@ -56,5 +59,9 @@ public class LineStationRequest {
                 ", distance='" + distance + '\'' +
                 ", duration='" + duration + '\'' +
                 '}';
+    }
+
+    public LineStation toLineStation(Station station, Station preStation) {
+        return new LineStation(station, preStation, Integer.parseInt(duration), Integer.parseInt(distance));
     }
 }

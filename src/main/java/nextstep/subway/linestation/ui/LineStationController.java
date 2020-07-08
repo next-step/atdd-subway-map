@@ -24,6 +24,12 @@ public class LineStationController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/{stationId}")
+    public ResponseEntity<?> removeStationFromLine(@PathVariable long lineId, @PathVariable long stationId) {
+        lineStationService.removeStationFromLine(lineId, stationId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @ExceptionHandler({DataIntegrityViolationException.class, StationNotFoundException.class})
     public ResponseEntity<?> handleIllegalArgsException(RuntimeException e) {
         return ResponseEntity.badRequest().build();

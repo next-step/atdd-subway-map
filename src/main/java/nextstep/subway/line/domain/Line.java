@@ -3,6 +3,7 @@ package nextstep.subway.line.domain;
 import nextstep.subway.config.BaseEntity;
 import nextstep.subway.linestation.domain.LineStation;
 import nextstep.subway.linestation.domain.LineStations;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -67,6 +68,10 @@ public class Line extends BaseEntity {
 
     public void registerStation(LineStation lineStation) {
         lineStations.add(lineStation);
+    }
+
+    public void removeStation(Station station) {
+        lineStations.removeStationFromLine(station);
     }
 
     public List<LineStation> getStationsInOrder() {

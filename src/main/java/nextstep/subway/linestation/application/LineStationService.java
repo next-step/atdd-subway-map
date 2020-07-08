@@ -34,7 +34,10 @@ public class LineStationService {
                 .orElseThrow(RuntimeException::new);
 
         final Long stationId = lineStationRequest.getStationId();
-        stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
+        final boolean exist = stationRepository.existsById(stationId);
+        if (!exist) {
+            throw new StationNotFoundException("No such station on database!");
+        }
 
         final LineStation lineStation = toLineStation(lineStationRequest);
         line.registerStation(lineStation);
@@ -46,6 +49,19 @@ public class LineStationService {
                 .findById(lineId)
                 .orElseThrow(RuntimeException::new);
         return toLineStationResponse(line.getStationsInOrder());
+    }
+
+    @Transactional
+    public void removeStationFromLine(long lineId, long stationId) {
+        final Line line = lineRepository
+                .findById(lineId)
+                .orElseThrow(RuntimeException::new);
+
+        final Station station = stationRepository
+                .findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
+
+        line.removeStation(station);
     }
 
     private List<LineStationResponse> toLineStationResponse(List<LineStation> lineStations) {
@@ -71,10 +87,7 @@ public class LineStationService {
                     .findById(preStationId)
                     .orElseThrow(RuntimeException::new);
         }
-        return new LineStation(
-                station, preStation,
-                Integer.parseInt(lineStationRequest.getDuration()),
-                Integer.parseInt(lineStationRequest.getDistance())
-        );
+
+        return lineStationRequest.toLineStation(station, preStation);
     }
 }
