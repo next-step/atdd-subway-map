@@ -3,6 +3,8 @@ package nextstep.subway.line.domain;
 
 
 
+import nextstep.subway.station.application.StationDuplicateException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class LineStations {
         }
 
         if (lineStations.stream().anyMatch(it -> it.isSame(lineStation))) {
-            throw new RuntimeException();
+            throw new StationDuplicateException();
         }
 
         for (int i = 0; i < lineStations.size(); i++) {

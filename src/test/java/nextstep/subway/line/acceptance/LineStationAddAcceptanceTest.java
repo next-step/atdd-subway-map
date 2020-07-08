@@ -112,8 +112,9 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        지하철_노선에_지하철역_등록_실패됨(response);
     }
 
 }
