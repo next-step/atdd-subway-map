@@ -34,7 +34,10 @@ public class LineStationService {
                 .orElseThrow(RuntimeException::new);
 
         final Long stationId = lineStationRequest.getStationId();
-        stationRepository.findById(stationId).orElseThrow(StationNotFoundException::new);
+        final boolean exist = stationRepository.existsById(stationId);
+        if (!exist) {
+            throw new StationNotFoundException("No such station on database!");
+        }
 
         final LineStation lineStation = toLineStation(lineStationRequest);
         line.registerStation(lineStation);
