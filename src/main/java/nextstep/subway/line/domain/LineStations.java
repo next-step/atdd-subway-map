@@ -1,9 +1,6 @@
 package nextstep.subway.line.domain;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.OrderColumn;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,9 +32,9 @@ public class LineStations {
             return;
         }
 
-        final int lineStationsSize = this.lineStations.size();
+        int lineStationsSize = this.lineStations.size();
         for (int i = 0; i < lineStationsSize; i++) {
-            final LineStation lineStation = this.lineStations.get(i);
+            LineStation lineStation = this.lineStations.get(i);
 
             if (lineStation.isPreStationOf(newLineStation)) {
                 this.insert(i + 1, newLineStation);
@@ -58,18 +55,41 @@ public class LineStations {
     }
 
     private void prepend(LineStation lineStation) {
-        final LineStation firstStation = this.lineStations.get(0);
+        LineStation firstStation = this.lineStations.get(0);
         firstStation.changePreStation(lineStation);
         this.lineStations.add(0, lineStation);
     }
 
     private void insert(int index, LineStation lineStation) {
         if (index != this.lineStations.size()) {
-            final LineStation next = this.lineStations.get(index);
+            LineStation next = this.lineStations.get(index);
             next.changePreStation(lineStation);
         }
 
         this.lineStations.add(index, lineStation);
+    }
+
+    public void removeStation(Long stationId) {
+        LineStation lineStation = getLineStation(stationId);
+        removeStationAndRearrangeStations(lineStation);
+    }
+
+    private LineStation getLineStation(Long stationId) {
+        return this.lineStations.stream()
+                    .filter(station -> Objects.equals(station.getStationId(), stationId))
+                    .findFirst()
+                    .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private void removeStationAndRearrangeStations(LineStation lineStation) {
+        int index = this.lineStations.indexOf(lineStation);
+        this.lineStations.remove(index);
+
+        if (index != this.lineStations.size()) {
+            LineStation previousLineStation = this.lineStations.get(index - 1);
+            LineStation nextLineStation = this.lineStations.get(index);
+            nextLineStation.changePreStation(previousLineStation);
+        }
     }
 
     public List<LineStation> getLineStations() {
