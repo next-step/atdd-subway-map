@@ -68,7 +68,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 LocalTime.of(05, 30), LocalTime.of(23, 30), 5);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(createResponse);
+        ExtractableResponse<Response> response = 지하철_노선_상세정보_조회_요청(createResponse);
 
         // then
         지하철_노선_응답됨(response);

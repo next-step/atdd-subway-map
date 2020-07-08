@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.exception.AlreadyExistsException;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ public class LineStations {
 
     public void add(LineStation newLineStation) {
         validate(newLineStation);
-        relocateExists(newLineStation);
+        relocateRemainsAfterAdd(newLineStation);
 
         lineStations.add(newLineStation);
     }
@@ -26,12 +27,10 @@ public class LineStations {
         }
 
         final LinkedList<LineStation> orderedLineStations = new LinkedList<>();
-
         orderedLineStations.addFirst(findStartStation());
 
         while (orderedLineStations.size() != lineStations.size()) {
             final Optional<LineStation> nextStation = findNextStation(orderedLineStations);
-
             if (!nextStation.isPresent()) {
                 break;
             }
@@ -39,6 +38,23 @@ public class LineStations {
         }
 
         return Collections.unmodifiableList(orderedLineStations);
+    }
+
+    public void removeByStationId(Long stationId) {
+        final LineStation filteredLineStation = lineStations.stream()
+                .filter(lineStation -> lineStation.isStationIdEquals(stationId))
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 지하철역은 등록 제외가 불가능합니다."));
+
+        lineStations.remove(filteredLineStation);
+        relocateRemainsAfterRemove(stationId, filteredLineStation);
+    }
+
+    private void relocateRemainsAfterRemove(Long stationId, LineStation filteredLineStation) {
+        lineStations.stream()
+                .filter(lineStation -> lineStation.isPreStation(stationId))
+                .findAny()
+                .ifPresent(lineStation -> lineStation.updatePreStationId(filteredLineStation.getPreStationId()));
     }
 
     private void validate(LineStation newLineStation) {
@@ -66,7 +82,7 @@ public class LineStations {
                 .orElseThrow(IllegalStateException::new);
     }
 
-    private void relocateExists(LineStation newLineStation) {
+    private void relocateRemainsAfterAdd(LineStation newLineStation) {
         lineStations.stream()
                 .filter(newLineStation::isSamePreStationId)
                 .findAny()

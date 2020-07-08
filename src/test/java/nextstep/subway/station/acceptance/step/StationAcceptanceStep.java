@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.station.dto.StationResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -43,7 +44,7 @@ public class StationAcceptanceStep {
     }
 
     public static ExtractableResponse<Response> 지하철역_제거_요청(ExtractableResponse<Response> response) {
-        String uri = response.header("Location");
+        String uri = response.header(HttpHeaders.LOCATION);
 
         return RestAssured.given().log().all().
                 when().
@@ -55,7 +56,7 @@ public class StationAcceptanceStep {
 
     public static void 지하철역_생성됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
     }
 
     public static void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
@@ -72,7 +73,7 @@ public class StationAcceptanceStep {
 
     public static void 지하철역_목록_포함됨(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> createdResponses) {
         List<Long> expectedLineIds = createdResponses.stream()
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+                .map(it -> Long.parseLong(it.header(HttpHeaders.LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
 
         List<Long> resultLineIds = response.jsonPath().getList(".", StationResponse.class).stream()

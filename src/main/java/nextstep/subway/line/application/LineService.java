@@ -1,16 +1,13 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.exception.NotFoundException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.dto.LineStationCreateRequest;
 import nextstep.subway.line.dto.LineStationResponse;
-import nextstep.subway.line.exception.NotFoundException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

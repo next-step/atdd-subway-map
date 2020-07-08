@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -47,8 +48,8 @@ public class LineAcceptanceStep {
                 extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header("Location");
+    public static ExtractableResponse<Response> 지하철_노선_상세정보_조회_요청(ExtractableResponse<Response> createResponse) {
+        String uri = createResponse.header(HttpHeaders.LOCATION);
 
         return RestAssured.given().log().all().
                 accept(MediaType.APPLICATION_JSON_VALUE).
@@ -60,8 +61,8 @@ public class LineAcceptanceStep {
     }
 
     public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> createResponse, String name, String color,
-                                                       LocalTime startTime, LocalTime endTime, int intervalTime) {
-        final String uri = createResponse.header("Location");
+                                                             LocalTime startTime, LocalTime endTime, int intervalTime) {
+        final String uri = createResponse.header(HttpHeaders.LOCATION);
 
         Map<String, String> updateParams = new HashMap<>();
         updateParams.put("name", name);
@@ -81,7 +82,7 @@ public class LineAcceptanceStep {
     }
 
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(ExtractableResponse<Response> createResponse) {
-        final String uri = createResponse.header("Location");
+        final String uri = createResponse.header(HttpHeaders.LOCATION);
 
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -94,7 +95,7 @@ public class LineAcceptanceStep {
 
     public static void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
     }
 
     public static void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
@@ -115,7 +116,7 @@ public class LineAcceptanceStep {
         assertThat(response.as(LineResponse.class)).isNotNull();
     }
 
-    public static void 지하철_노선_수정됨( ExtractableResponse<Response> afterUpdateResponse) {
+    public static void 지하철_노선_수정됨(ExtractableResponse<Response> afterUpdateResponse) {
         assertThat(afterUpdateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 

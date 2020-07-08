@@ -71,4 +71,8 @@ public class Line extends BaseEntity {
         final LineStation newLineStation = new LineStation(preStationId, stationId, distance, duration);
         lineStations.add(newLineStation);
     }
+
+    public void removeStationByStationId(Long stationId) {
+        lineStations.removeByStationId(stationId);
+    }
 }
