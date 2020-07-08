@@ -35,20 +35,9 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        Map<String, String> params = createLineStationRequestParams(null, stationId, "4", "2");
+        ExtractableResponse<Response> response = createLineStation(params, lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -63,30 +52,13 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
 
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        Map<String, String> params = createLineStationRequestParams(null, stationId, "4", "2");
+        createLineStation(params, lineId);
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = readLinesStation(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -108,67 +80,26 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId1 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
 
-        ExtractableResponse<Response> lineStationResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
+        ExtractableResponse<Response> lineStationResponse = createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("preStationId", stationId1 + "");
-        params2.put("stationId", stationId2 + "");
-        params2.put("distance", "4");
-        params2.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params2).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        params = createLineStationRequestParams(stationId1, stationId2, "4", "2");
+        createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-        Map<String, String> params3 = new HashMap<>();
-        params3.put("preStationId", stationId2 + "");
-        params3.put("stationId", stationId3 + "");
-        params3.put("distance", "4");
-        params3.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params3).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        params = createLineStationRequestParams(stationId2, stationId3, "4", "2");
+        createLineStation(params, lineId);
 
         // then
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = readLinesStation(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
@@ -192,67 +123,27 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
         Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        Map<String, String> params = new HashMap<>();
-        params.put("preStationId", "");
-        params.put("stationId", stationId1 + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
 
-        ExtractableResponse<Response> lineStationResponse = RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
+        ExtractableResponse<Response> lineStationResponse = createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("preStationId", stationId1 + "");
-        params2.put("stationId", stationId2 + "");
-        params2.put("distance", "4");
-        params2.put("duration", "2");
 
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params2).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        params = createLineStationRequestParams(stationId1, stationId2, "4", "2");
+        createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
         Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-        Map<String, String> params3 = new HashMap<>();
-        params3.put("preStationId", stationId1 + "");
-        params3.put("stationId", stationId3 + "");
-        params3.put("distance", "4");
-        params3.put("duration", "2");
-
-        RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params3).
-                when().
-                post("/lines/{lineId}/stations", lineId).
-                then().
-                log().all().
-                extract();
+        params = createLineStationRequestParams(stationId1, stationId3, "4", "2");
+        createLineStation(params, lineId);
 
         // then
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = readLinesStation(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
@@ -276,6 +167,38 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
                 body(params).
                 when().
                 post("/lines").
+                then().
+                log().all().
+                extract();
+    }
+
+    private Map<String, String> createLineStationRequestParams(Long preStationId, Long stationId, String distance, String duration) {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("preStationId", preStationId + "");
+        params.put("stationId", stationId + "");
+        params.put("distance", "4");
+        params.put("duration", "2");
+
+        return params;
+    }
+
+    private ExtractableResponse<Response> createLineStation(Map<String, String> params, Long lineId) {
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                post("/lines/{lineId}/stations", lineId).
+                then().
+                log().all().
+                extract();
+    }
+
+    private ExtractableResponse<Response> readLinesStation(Long lineId) {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines/{lineId}", lineId).
                 then().
                 log().all().
                 extract();
