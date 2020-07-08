@@ -7,6 +7,7 @@ import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.station.dto.StationResponse;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -24,19 +25,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
 public class LineStationAddAcceptanceTest extends AcceptanceTest {
+    Long lineId;
+    Long stationId1;
+    Long stationId2;
+    Long stationId3;
+
+    @BeforeEach
+    void setup() {
+        super.setUp();
+
+        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
+        ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
+        ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
+
+        lineId = createdLineResponse.as(LineResponse.class).getId();
+        stationId1 = createdStationResponse1.as(StationResponse.class).getId();
+        stationId2 = createdStationResponse2.as(StationResponse.class).getId();
+        stationId3 = createdStationResponse3.as(StationResponse.class).getId();
+    }
+
     @DisplayName("지하철 노선에 역을 등록한다.")
     @Test
     void addLineStation() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-        ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
-
         // when
         // 지하철_노선에_지하철역_등록_요청
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId = createdStationResponse.as(StationResponse.class).getId();
-
-        Map<String, String> params = createLineStationRequestParams(null, stationId, "4", "2");
+        Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
         ExtractableResponse<Response> response = createLineStation(params, lineId);
 
         // then
@@ -46,14 +60,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
     @Test
     void getLineWithStations() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-        ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
         // 지하철_노선에_지하철역_등록_요청
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId = createdStationResponse.as(StationResponse.class).getId();
-
-        Map<String, String> params = createLineStationRequestParams(null, stationId, "4", "2");
+        Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
         createLineStation(params, lineId);
 
         // when
@@ -70,27 +78,16 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
     @Test
     void addLineStationInOrder() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-        ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
-        ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
-        ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
-
         // when
         // 지하철_노선에_지하철역_등록_요청
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-
         Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
         ExtractableResponse<Response> lineStationResponse = createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
-        Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
         params = createLineStationRequestParams(stationId1, stationId2, "4", "2");
         createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
-        Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
         params = createLineStationRequestParams(stationId2, stationId3, "4", "2");
         createLineStation(params, lineId);
 
@@ -113,28 +110,16 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 여러개의 역을 순서없이 등록한다.")
     @Test
     void addLineStationInAnyOrder() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
-        ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
-        ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
-        ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
-
         // when
         // 지하철_노선에_지하철역_등록_요청
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-
         Map<String, String> params = createLineStationRequestParams(null, stationId1, "4", "2");
         ExtractableResponse<Response> lineStationResponse = createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
-        Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-
         params = createLineStationRequestParams(stationId1, stationId2, "4", "2");
         createLineStation(params, lineId);
 
         // 지하철_노선에_지하철역_등록_요청
-        Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
         params = createLineStationRequestParams(stationId1, stationId3, "4", "2");
         createLineStation(params, lineId);
 
