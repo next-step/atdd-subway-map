@@ -109,9 +109,17 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     void addDuplicateStation() {
         // when
         지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
 
         // then
-        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
+        지하철_노선에_지하철역_등록_실패됨(response);
+    }
+
+    @DisplayName("존재하지 않는 역을 등록한다.")
+    @Test
+    void addNonExistStation() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, null, 4, 2);
 
         // then
         지하철_노선에_지하철역_등록_실패됨(response);
