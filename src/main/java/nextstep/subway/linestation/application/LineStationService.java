@@ -48,6 +48,19 @@ public class LineStationService {
         return toLineStationResponse(line.getStationsInOrder());
     }
 
+    @Transactional
+    public void removeStationFromLine(long lineId, long stationId) {
+        final Line line = lineRepository
+                .findById(lineId)
+                .orElseThrow(RuntimeException::new);
+
+        final Station station = stationRepository
+                .findById(stationId)
+                .orElseThrow(StationNotFoundException::new);
+
+        line.removeStation(station);
+    }
+
     private List<LineStationResponse> toLineStationResponse(List<LineStation> lineStations) {
         return lineStations.stream()
                 .map(lineStation -> new LineStationResponse(

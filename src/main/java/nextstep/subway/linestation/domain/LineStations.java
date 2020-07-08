@@ -1,6 +1,7 @@
 package nextstep.subway.linestation.domain;
 
 import com.google.common.collect.Lists;
+import nextstep.subway.linestation.application.exception.StationNotFoundException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -29,6 +30,20 @@ public class LineStations {
                     .findFirst();
         }
         return result;
+    }
+
+    public void removeStationFromLine(Station stationToRemove) {
+        final LineStation lineStationToRemove = lineStations.stream()
+                .filter(it -> it.getStation().equals(stationToRemove))
+                .findFirst()
+                .orElseThrow(StationNotFoundException::new);
+
+        lineStations.stream()
+                .filter(it -> stationToRemove.equals(it.getPreStation()))
+                .findFirst()
+                .ifPresent(it -> it.updatePreStationTo(lineStationToRemove.getPreStation()));
+
+        lineStations.remove(lineStationToRemove);
     }
 
     public void add(LineStation lineStation) {

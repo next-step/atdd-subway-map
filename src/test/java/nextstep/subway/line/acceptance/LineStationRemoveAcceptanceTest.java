@@ -78,7 +78,7 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에서 등록되지 않는 역을 제외한다.")
     @Test
     void removeUnregisteredStationOnLine() {
-        
+
         // when
         final ExtractableResponse<Response> deleteResponse = 지하철_노선_상_지하철역_제외_요청(이호선, 안국역);
         지하철_노선에_지하철역_제외_실패됨(deleteResponse);
