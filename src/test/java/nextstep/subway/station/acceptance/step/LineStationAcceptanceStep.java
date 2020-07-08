@@ -18,6 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineStationAcceptanceStep {
 
     public static ExtractableResponse<Response>
+    지하철_노선에_지하철역_등록_요청(Long lineId, Long preStationId, Long stationId, Long distance, Long duration) {
+        return 지하철_노선에_지하철역_등록_요청(
+                lineId, String.valueOf(preStationId), String.valueOf(stationId), String.valueOf(distance), String.valueOf(duration)
+        );
+    }
+
+    public static ExtractableResponse<Response>
     지하철_노선에_지하철역_등록_요청(Long lineId, String preStationId, String stationId, String distance, String duration) {
         final Map<String, String> parameter = registerStationToLineParameter(preStationId, stationId, distance, duration);
         return RestAssured.given().log().all().
@@ -40,6 +47,16 @@ public class LineStationAcceptanceStep {
                 extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_상_지하철역_제외_요청(Long lineId, Long stationId) {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                delete("/lines/{lineId}/stations/{stationId}", lineId, stationId).
+                then().
+                log().all().
+                extract();
+    }
+
     public static void 지하철_노선에_지하철역_등록됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
@@ -48,11 +65,26 @@ public class LineStationAcceptanceStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    public static void 지하철_노선에_지하철역_제외됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_노선에_지하철역_제외_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     public static void 지하철_노선_상세정보_응답됨(ExtractableResponse<Response> response, int countOfLine) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
         assertThat(lineResponse.getStations()).hasSize(countOfLine);
+    }
+
+    public static void 지하철_노선에_지하철역_제외_확인됨(ExtractableResponse<Response> response, Long removedStationId) {
+        List<Long> stationIds = response.as(LineResponse.class).getStations().stream()
+                .map(it -> it.getStation().getId())
+                .collect(Collectors.toList());
+        assertThat(stationIds).doesNotContain(removedStationId);
     }
 
     public static void 지하철_노선_등록_순서_검사(ExtractableResponse<Response> response, Long... orders) {
