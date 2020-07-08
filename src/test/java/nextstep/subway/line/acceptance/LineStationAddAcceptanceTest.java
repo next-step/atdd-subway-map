@@ -9,6 +9,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalTime;
 
@@ -16,6 +17,7 @@ import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_생성됨;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
 public class LineStationAddAcceptanceTest extends AcceptanceTest {
@@ -99,6 +101,19 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
         등록된_지하철역이_정렬되어_위치됨(response, Lists.newArrayList(1L, 3L, 2L));
+    }
+
+
+    @DisplayName("이미 등록되어 있던 역을 등록한다.")
+    @Test
+    void addDuplicateStation() {
+        // when
+        지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
+
+        // then
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
 }
