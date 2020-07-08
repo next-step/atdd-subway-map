@@ -11,11 +11,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalTime;
-
-import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선을_생성한다;
+import static nextstep.subway.common.step.CommonAcceptanceStep.API_응답코드_검사;
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선을_조회한다;
-import static nextstep.subway.line.acceptance.step.LineStationAcceptanceStep.지하철_노선에_지하철역을_등록한다;
+import static nextstep.subway.line.acceptance.step.LineStationAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,7 +44,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_지하철역을_등록한다(lineId, stationId, null);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        API_응답코드_검사(response.statusCode(), HttpStatus.CREATED);
     }
 
     @DisplayName("이미 등록되어 있던 역을 등록한다.")
@@ -59,7 +57,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> duplicateLineStationResponse = 지하철_노선에_지하철역을_등록한다(lineId, stationResponse.getId(), null);
 
         // then
-        assertThat(duplicateLineStationResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        API_응답코드_검사(duplicateLineStationResponse.statusCode(), HttpStatus.CONFLICT);
     }
 
 
@@ -72,7 +70,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> invalidStationResponse = 지하철_노선에_지하철역을_등록한다(lineId, invalidStationId, null);
 
         // then
-        assertThat(invalidStationResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        API_응답코드_검사(invalidStationResponse.statusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
@@ -91,8 +89,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(1);
+        지하철_노선을_조회하는_요청이_성공(lineResponse);
+        지하철_노선의_갯수가_n개이다(lineResponse, 1);
     }
 
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
@@ -113,17 +111,17 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역을_등록한다(lineId, stationId3, stationId2);
 
         // then
-        assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        API_응답코드_검사(lineStationResponse.statusCode(), HttpStatus.CREATED);
 
         // when
         // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 지하철_노선을_조회한다(lineId);
 
+        // then
         LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(3);
-        assertThat(lineResponse.getStations()).extracting(it -> it.getStation().getId())
-                .containsExactlyElementsOf(Lists.newArrayList(1L, 2L, 3L));
+        지하철_노선을_조회하는_요청이_성공(lineResponse);
+        지하철_노선의_갯수가_n개이다(lineResponse, 3);
+        지하철_노선이_정렬되어있다(lineResponse, Lists.newArrayList(1L, 2L, 3L));
     }
 
 
@@ -146,20 +144,15 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역을_등록한다(lineId, stationId3, stationId1);
 
         // then
-        assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        API_응답코드_검사(lineStationResponse.statusCode(), HttpStatus.CREATED);
 
         // when
         // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 지하철_노선을_조회한다(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(3);
-        assertThat(lineResponse.getStations()).extracting(it -> it.getStation().getId())
-                .containsExactlyElementsOf(Lists.newArrayList(1L, 3L, 2L));
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
-        return 지하철_노선을_생성한다(name, color, LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
+        지하철_노선을_조회하는_요청이_성공(lineResponse);
+        지하철_노선의_갯수가_n개이다(lineResponse, 3);
+        지하철_노선이_정렬되어있다(lineResponse, Lists.newArrayList(1L, 3L, 2L));
     }
 }
