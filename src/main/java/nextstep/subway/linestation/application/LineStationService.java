@@ -87,10 +87,7 @@ public class LineStationService {
                     .findById(preStationId)
                     .orElseThrow(RuntimeException::new);
         }
-        return new LineStation(
-                station, preStation,
-                Integer.parseInt(lineStationRequest.getDuration()),
-                Integer.parseInt(lineStationRequest.getDistance())
-        );
+
+        return lineStationRequest.toLineStation(station, preStation);
     }
 }
