@@ -37,6 +37,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
 	@BeforeEach
 	public void setUp() {
+		super.setUp();
 		createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
 		createdStationResponse = 지하철역_등록되어_있음("강남역");
 		lineId = createdLineResponse.as(LineResponse.class).getId();
