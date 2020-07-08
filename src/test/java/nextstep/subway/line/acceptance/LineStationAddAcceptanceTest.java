@@ -55,16 +55,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 역을 등록한다.")
     @Test
     void addLineStation() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN",
-                LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
-        ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
-
         // when
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId = createdStationResponse.as(StationResponse.class).getId();
-
-        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId, 4, 2);
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
 
         // then
         지하철_노선에_지하철역_등록됨(response);
@@ -88,12 +80,10 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
     @Test
     void addLineStationInOrder() {
-
         // when
         ExtractableResponse<Response> lineStationResponse = 지하철_노선에_지하철역_등록_요청(lineId, null, stationId1, 4, 2);
         지하철_노선에_지하철역_등록_요청(lineId, stationId1, stationId2, 4, 2);
         지하철_노선에_지하철역_등록_요청(lineId, stationId2, stationId3, 4, 2);
-
 
         // then
         지하철_노선_생성됨(lineStationResponse);
