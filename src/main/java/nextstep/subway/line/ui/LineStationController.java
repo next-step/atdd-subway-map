@@ -1,7 +1,7 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineStationService;
-import nextstep.subway.line.domain.exceptions.LineStationAlreadyExistException;
+import nextstep.subway.line.domain.exceptions.AlreadyExistLineStationException;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import org.springframework.http.HttpStatus;
@@ -43,7 +43,15 @@ public class LineStationController {
         return ResponseEntity.created(location).body(newLineStationResponse);
     }
 
-    @ExceptionHandler(LineStationAlreadyExistException.class)
+    @DeleteMapping(path = "/{stationId}")
+    public ResponseEntity excludeStation(@PathVariable Long lineId, @PathVariable Long stationId) {
+        lineStationService.excludeLineStation(lineId, stationId);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    @ExceptionHandler(AlreadyExistLineStationException.class)
     public final ResponseEntity handleException() {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }

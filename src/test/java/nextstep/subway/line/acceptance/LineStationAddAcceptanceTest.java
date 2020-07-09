@@ -234,7 +234,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         LineResponse existLine = getLineResponse.as(LineResponse.class);
 
         지하철_노선의_역_갯수가_n개이다(existLine, 2);
-        지하철_노선에_역이_포함되지_않는다(existLine, stationId3);
+        지하철_노선에_역이_포함되지_않는다(existLine, stationId2);
 
         // 지하철 노선에 지하철역 순서 정렬됨
         지하철_노선이_정렬되어있다(existLine, Lists.newArrayList(1L, 3L));

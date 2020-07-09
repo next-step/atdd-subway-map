@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
-import nextstep.subway.line.domain.exceptions.LineStationAlreadyExistException;
+import nextstep.subway.line.domain.exceptions.AlreadyExistLineStationException;
+import nextstep.subway.line.domain.exceptions.NotRegisteredLineStationException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -57,7 +58,7 @@ public class LineStations {
 
     public void registerLineStation(LineStation lineStation) {
         if (this.hasStation(lineStation.getStation())) {
-            throw new LineStationAlreadyExistException("line station already exists : " + lineStation.getStation().getId());
+            throw new AlreadyExistLineStationException("line station already exists : " + lineStation.getStation().getId());
         }
 
         lineStations.forEach(it -> {
@@ -70,5 +71,28 @@ public class LineStations {
         });
 
         this.lineStations.add(lineStation);
+    }
+
+    public void excludeLineStation(Station station) {
+        if (this.lineStations.size() <= 1) {
+            this.lineStations.clear();
+        }
+
+        LineStation excludeTarget = this.lineStations.stream()
+                .filter(lineStation -> station.equals(lineStation.getStation()))
+                .findFirst()
+                .orElseThrow(() -> new NotRegisteredLineStationException("not registered line station : " + station.getId()));
+
+        Station preStation = excludeTarget.getPreStation();
+
+        if (preStation != null) {
+            Optional<LineStation> nextLineStationOptional = this.lineStations.stream()
+                    .filter(lineStation -> excludeTarget.getStation().equals(lineStation.getPreStation()))
+                    .findFirst();
+
+            nextLineStationOptional.ifPresent(lineStation -> lineStation.changePreStation(preStation));
+        }
+
+        this.lineStations.remove(excludeTarget);
     }
 }
