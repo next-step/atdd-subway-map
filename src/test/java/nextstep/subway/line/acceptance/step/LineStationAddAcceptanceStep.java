@@ -37,8 +37,12 @@ public class LineStationAddAcceptanceStep {
                 extract();
     }
 
-    public static void 노선에_목록_등록됨(ExtractableResponse<Response> response) {
+    public static void 노선에_지하철역_등록됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    public static void 노선에_지하철역_등록_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     public static void 노선에_지하철역_포함됨(ExtractableResponse<Response> response, int expectedStationSize) {

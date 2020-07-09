@@ -42,7 +42,20 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, station1Id);
 
         // then
-        노선에_목록_등록됨(response);
+        노선에_지하철역_등록됨(response);
+    }
+
+    @DisplayName("이미 등록되어 있던 역을 등록하면 등록에 실패한다.")
+    @Test
+    void addLineStationAlreadyExist() {
+        // given
+        노선에_지하철역_등록되어_있음(lineId, station1Id);
+
+        // when
+        ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, station1Id);
+
+        // then
+        노선에_지하철역_등록_실패됨(response);
     }
 
     @DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
@@ -68,7 +81,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         노선에_지하철역_등록_요청(lineId, station2Id, station3Id);
 
         // then
-        노선에_목록_등록됨(lineStationResponse);
+        노선에_지하철역_등록됨(lineStationResponse);
 
         // when
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
@@ -87,7 +100,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         노선에_지하철역_등록_요청(lineId, station1Id, station3Id);
 
         // then
-        노선에_목록_등록됨(lineStationResponse);
+        노선에_지하철역_등록됨(lineStationResponse);
 
         // when
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
