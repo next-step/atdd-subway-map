@@ -39,7 +39,15 @@ public class LineStationRemoveAcceptanceStep {
 			.collect(Collectors.toList());
 	}
 
-	public static boolean 지하철_노선에_삭제된_역이_이전번호로_존재하지_않음(ExtractableResponse<Response> response) {
-		return true;
+	public static boolean 지하철_노선에_삭제된_역이_이전번호로_존재하지_않음(ExtractableResponse<Response> lineResponse,
+		Long deletedLineStationId) {
+		return lineResponse.as(LineResponse.class).getStations().stream()
+			.noneMatch(station -> {
+				Long preStationId = station.getPreStationId();
+				if (preStationId == null) {
+					return true;
+				}
+				return preStationId.equals(deletedLineStationId);
+			});
 	}
 }
