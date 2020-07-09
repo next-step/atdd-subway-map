@@ -17,7 +17,7 @@ public class LineStationErrorAdvice {
     public void handlerStationDuplicate() {}
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(StationNotFoundException.class)
     public void handlerNotExistStation() {}
 }

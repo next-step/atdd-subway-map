@@ -120,7 +120,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(lineId, null, null, 4, 2);
 
         // then
-        지하철_노선에_지하철역_등록_실패됨(response);
+        지하철_노선에_존재하지않는역_등록_실패됨(response);
     }
 
 }

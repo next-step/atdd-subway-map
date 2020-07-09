@@ -25,6 +25,10 @@ public class LineStationAddAcceptanceStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
+    public static void 지하철_노선에_존재하지않는역_등록_실패됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     public static void 지하철_노선에_지하철역_제외됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }

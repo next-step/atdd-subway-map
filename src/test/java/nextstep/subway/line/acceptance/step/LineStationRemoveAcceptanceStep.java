@@ -32,6 +32,6 @@ public class LineStationRemoveAcceptanceStep {
     }
 
     public static void 지하철_노선에_지하철역_제외_실패됨(ExtractableResponse response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }
