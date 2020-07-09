@@ -3,13 +3,10 @@ package nextstep.subway.line.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -21,9 +18,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_생성_요청("신분당선");
 
         // then
-        // 지하철_노선_생성됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        노선_생성됨(response);
     }
 
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
@@ -36,8 +31,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_생성_요청("name1");
 
         // then
-        // 지하철_노선_생성_실패됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        노선_생성_실패됨(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -51,11 +45,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_목록_조회_요청();
 
         // then
-        // 지하철_노선_목록_응답됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // 지하철_노선_목록_포함됨
-        assertThat(response.body().jsonPath().getList("$").size()).isEqualTo(2);
+        노선_목록_응답됨(response);
+        노선_목록_포함됨(response, 2);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -69,8 +60,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_조회_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(LineResponse.class)).isNotNull();
+        노선_응답됨(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -84,8 +74,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_수정_요청(uri);
 
         // then
-        // 지하철_노선_수정됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        노선_수정됨(response);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -99,7 +88,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_제거_요청(uri);
 
         // then
-        // 지하철_노선_삭제됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        노선_삭제됨(response);
     }
 }
