@@ -26,10 +26,6 @@ public class LineStation {
 	private Long id;
 
 	@OneToOne
-	@JoinColumn(name = "line_id")
-	private Line line;
-
-	@OneToOne
 	@JoinColumn(name = "station_id")
 	private Station station;
 	private Long preStationId;
@@ -37,8 +33,7 @@ public class LineStation {
 	private int duration;
 
 	@Builder
-	public LineStation(Line line, Station station, Long preStationId, int distance, int duration) {
-		this.line = line;
+	public LineStation(Station station, Long preStationId, int distance, int duration) {
 		this.station = station;
 		this.preStationId = preStationId;
 		this.distance = distance;
