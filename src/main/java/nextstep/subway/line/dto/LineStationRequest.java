@@ -19,4 +19,8 @@ public class LineStationRequest {
     public LineStation toLineStation() {
         return new LineStation(stationId, preStationId, distance, duration);
     }
+
+    public Long getStationId() {
+        return stationId;
+    }
 }

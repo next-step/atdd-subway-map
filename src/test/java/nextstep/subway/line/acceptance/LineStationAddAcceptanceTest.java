@@ -47,12 +47,22 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("이미 등록되어 있던 역을 등록하면 등록에 실패한다.")
     @Test
-    void addLineStationAlreadyExist() {
+    void addLineStationAlreadyAdded() {
         // given
         노선에_지하철역_등록되어_있음(lineId, station1Id);
 
         // when
         ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, station1Id);
+
+        // then
+        노선에_지하철역_등록_실패됨(response);
+    }
+
+    @DisplayName("존재하지 않는 역을 등록하면 등록에 실패한다.")
+    @Test
+    void addLineStationNotExist() {
+        // when
+        ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, 999L);
 
         // then
         노선에_지하철역_등록_실패됨(response);
