@@ -31,6 +31,11 @@ public class LineStationService {
 		return stationRepository.findById(stationId).orElseThrow(() -> new NotRegisteredException("no station found."));
 	}
 
+	private LineStation findLineStationByLineIdAndStationId(Long lineId, Long lineStationId) {
+		Line line = lineRepository.findById(lineId).orElseThrow(() -> new NotRegisteredException("no line found."));
+		return line.findLineStationByLineStationId(lineStationId);
+	}
+
 	public void registerLineStation(LineStationCreateRequest dto) {
 		Line line = findLineById(dto.getLineId());
 		Station station = findStationById(dto.getStationId());
@@ -42,5 +47,11 @@ public class LineStationService {
 			.duration(dto.getDuration())
 			.build();
 		line.addLineStation(lineStation);
+	}
+
+	public void unregisterLineStation(Long lineId, Long stationId) {
+		Line line = findLineById(lineId);
+		LineStation lineStation = findLineStationByLineIdAndStationId(lineId, stationId);
+		line.unregisterLineStation(lineStation);
 	}
 }
