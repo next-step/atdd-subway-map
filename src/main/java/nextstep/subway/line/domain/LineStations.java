@@ -26,12 +26,12 @@ public class LineStations {
 
         for (int i = 0; i < lineStations.size(); i++) {
             LineStation findLineStation = lineStations.get(i);
-            UpdatePreStationByAppend(findLineStation, lineStation);
+            updatePreStationByAppend(findLineStation, lineStation);
         }
         lineStations.add(lineStation);
     }
 
-    private void UpdatePreStationByAppend(LineStation findLineStation, LineStation lineStation) {
+    private void updatePreStationByAppend(LineStation findLineStation, LineStation lineStation) {
         if (findLineStation != null && findLineStation.getPreStationId() == lineStation.getPreStationId()) {
             findLineStation.updatePreStation(lineStation.getStationId());
         }
@@ -41,16 +41,16 @@ public class LineStations {
         LineStation lineStation = lineStations.stream()
                 .filter(it -> it.getStationId() == stationId)
                 .findFirst()
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(StationNotFoundException::new);
 
         for (int i = 0; i < lineStations.size(); i++) {
             LineStation findLineStation = lineStations.get(i);
-            UpdatePreStationByRemove(findLineStation, lineStation);
+            updatePreStationByRemove(findLineStation, lineStation);
         }
         lineStations.remove(lineStation);
     }
 
-    private void UpdatePreStationByRemove(LineStation findLineStation, LineStation lineStation) {
+    private void updatePreStationByRemove(LineStation findLineStation, LineStation lineStation) {
         if (findLineStation != null && findLineStation.getPreStationId() == lineStation.getStationId()) {
             findLineStation.updatePreStation(lineStation.getPreStationId());
         }

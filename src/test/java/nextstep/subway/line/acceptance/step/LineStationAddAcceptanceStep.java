@@ -73,23 +73,6 @@ public class LineStationAddAcceptanceStep {
         assertThat(stationIds).containsExactlyElementsOf(expectedStationIds);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선에_지하철역_제거_요청(Long lineId, Long stationId) {
-        return RestAssured.given().log().all().
-                when().
-                delete("/lines/{lineId}/stations/{stationId}", lineId, stationId).
-                then().
-                log().all().
-                extract();
-    }
 
-    public static void 지하철_노선에_지하철역_제외_확인됨(ExtractableResponse<Response> response, Long stationId) {
-        LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        List<Long> stationIds = response.as(LineResponse.class).getStations().stream()
-                .map(it -> it.getStation().getId())
-                .collect(Collectors.toList());
-
-        assertThat(stationIds).doesNotContain(stationId);
-    }
 
 }
