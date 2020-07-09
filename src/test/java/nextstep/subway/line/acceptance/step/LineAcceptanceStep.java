@@ -47,4 +47,40 @@ public class LineAcceptanceStep {
                 log().all().
                 extract();
     }
+
+    public static ExtractableResponse<Response> 노선_목록_조회_요청() {
+        return RestAssured.given().log().all().
+                when().
+                get("/lines").
+                then().
+                log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 노선_수정_요청(String uri) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "name2");
+        params.put("color", "bg-red-602");
+        params.put("startTime", LocalTime.of(02, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(22, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", "2");
+
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(params).
+                when().
+                put(uri).
+                then().
+                log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 노선_제거_요청(String uri) {
+        return RestAssured.given().log().all().
+                when().
+                delete(uri).
+                then().
+                log().all()
+                .extract();
+    }
 }

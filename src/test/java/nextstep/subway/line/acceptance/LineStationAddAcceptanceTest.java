@@ -119,7 +119,6 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
