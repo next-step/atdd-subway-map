@@ -79,19 +79,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 노선_등록되어_있음("신분당선");
 
         // when
-        // 지하철_노선_조회_요청
         String uri = createResponse.header("Location");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get(uri).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 노선_조회_요청(uri);
 
         // then
-        // 지하철_노선_응답됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.as(LineResponse.class)).isNotNull();
     }

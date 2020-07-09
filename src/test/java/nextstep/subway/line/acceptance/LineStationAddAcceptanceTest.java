@@ -1,6 +1,5 @@
 package nextstep.subway.line.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -10,12 +9,12 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_등록되어_있음;
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_조회_요청;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.노선에_지하철역_등록_요청;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.노선에_지하철역_등록되어_있음;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
@@ -51,14 +50,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         노선에_지하철역_등록되어_있음(lineId, stationId);
 
         // when
-        // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -91,15 +83,9 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
+        // then
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
         assertThat(lineResponse.getStations()).hasSize(3);
@@ -134,13 +120,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                accept(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                get("/lines/{lineId}", lineId).
-                then().
-                log().all().
-                extract();
+        ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse).isNotNull();
