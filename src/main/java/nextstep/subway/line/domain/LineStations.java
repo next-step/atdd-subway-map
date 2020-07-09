@@ -26,16 +26,33 @@ public class LineStations {
 
         for (int i = 0; i < lineStations.size(); i++) {
             LineStation findLineStation = lineStations.get(i);
-            updatePreStation(lineStation, findLineStation);
+            UpdatePreStationByAppend(findLineStation, lineStation);
         }
-
         lineStations.add(lineStation);
     }
 
-    private void updatePreStation(LineStation lineStation, LineStation findLineStation) {
-        if (lineStation.getPreStationId() != null &&
-                findLineStation.getPreStationId() == lineStation.getPreStationId()) {
+    private void UpdatePreStationByAppend(LineStation findLineStation, LineStation lineStation) {
+        if (findLineStation != null && findLineStation.getPreStationId() == lineStation.getPreStationId()) {
             findLineStation.updatePreStation(lineStation.getStationId());
+        }
+    }
+
+    public void removeStation(Long stationId) {
+        LineStation lineStation = lineStations.stream()
+                .filter(it -> it.getStationId() == stationId)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+
+        for (int i = 0; i < lineStations.size(); i++) {
+            LineStation findLineStation = lineStations.get(i);
+            UpdatePreStationByRemove(findLineStation, lineStation);
+        }
+        lineStations.remove(lineStation);
+    }
+
+    private void UpdatePreStationByRemove(LineStation findLineStation, LineStation lineStation) {
+        if (findLineStation != null && findLineStation.getPreStationId() == lineStation.getStationId()) {
+            findLineStation.updatePreStation(lineStation.getPreStationId());
         }
     }
 
@@ -53,19 +70,5 @@ public class LineStations {
                     .findFirst();
         }
         return result;
-    }
-
-    public void removeStation(Long stationId) {
-        LineStation targetLineStation = lineStations.stream()
-                .filter(it -> it.getStationId() == stationId)
-                .findFirst()
-                .orElseThrow(StationNotFoundException::new);
-
-        for (int i = 0; i < lineStations.size(); i++) {
-            LineStation findLineStation = lineStations.get(i);
-            updatePreStation(targetLineStation, findLineStation);
-        }
-
-        lineStations.remove(targetLineStation);
     }
 }

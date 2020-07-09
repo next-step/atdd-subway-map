@@ -11,12 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
-import java.util.Arrays;
 
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_등록되어_있음;
-import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.지하철_노선_생성됨;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.*;
-import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.*;
+import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 
 @DisplayName("지하철 노선에서 역 제외 기능")
 public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
@@ -66,5 +64,21 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
         // then
         지하철_노선에_지하철역_제외_확인됨(response, stationId3);
         등록된_지하철역이_정렬되어_위치됨(response, Lists.newArrayList(1L, 2L));
+    }
+
+    @DisplayName("지하철 노선에 등록된 중간 지하철역을 제외한다.")
+    @Test
+    void removeAnyAddedStation() {
+        // when
+        ExtractableResponse<Response> deletedStationResponse = 지하철_노선에_지하철역_제거_요청(lineId, stationId2);
+        // then
+        지하철_노선에_지하철역_제외됨(deletedStationResponse);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
+
+        // then
+        지하철_노선에_지하철역_제외_확인됨(response, stationId2);
+        등록된_지하철역이_정렬되어_위치됨(response, Lists.newArrayList(1L, 3L));
     }
 }
