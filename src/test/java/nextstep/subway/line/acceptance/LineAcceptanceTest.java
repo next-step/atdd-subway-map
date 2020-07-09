@@ -15,35 +15,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-
-    private ExtractableResponse<Response> createLine(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", "bg-red-600");
-        params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        return RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all()
-                .extract();
-    }
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response = createLine("신분당선");
+        ExtractableResponse<Response> response = 노선_생성_요청("신분당선");
 
         // then
         // 지하철_노선_생성됨
@@ -55,12 +38,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine2() {
         // given
-        // 지하철_노선_등록되어_있음
-        createLine("name1");
+        노선_등록되어_있음("name1");
 
         // when
-        // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response = createLine("name1");
+        ExtractableResponse<Response> response = 노선_생성_요청("name1");
 
         // then
         // 지하철_노선_생성_실패됨
@@ -71,9 +52,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        // 지하철_노선_등록되어_있음
-        createLine("name1");
-        createLine("name2");
+        노선_등록되어_있음("name1");
+        노선_등록되어_있음("name2");
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -96,8 +76,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse = createLine("신분당선");
+        ExtractableResponse<Response> createResponse = 노선_등록되어_있음("신분당선");
 
         // when
         // 지하철_노선_조회_요청
@@ -121,8 +100,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse = createLine("name1");
+        ExtractableResponse<Response> createResponse = 노선_등록되어_있음("name1");
 
         // when
         // 지하철_노선_수정_요청
@@ -153,8 +131,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse = createLine("name1");
+        ExtractableResponse<Response> createResponse = 노선_등록되어_있음("name1");
 
         // when
         // 지하철_노선_제거_요청

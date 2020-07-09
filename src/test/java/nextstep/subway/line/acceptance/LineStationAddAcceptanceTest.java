@@ -12,13 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_등록되어_있음;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +27,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStation() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
 
         // when
@@ -58,7 +57,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineWithStations() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
         ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
         // 지하철_노선에_지하철역_등록_요청
         Long lineId = createdLineResponse.as(LineResponse.class).getId();
@@ -99,7 +98,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStationInOrder() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
@@ -183,7 +182,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void addLineStationInAnyOrder() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 지하철_노선_등록되어_있음("2호선", "GREEN");
+        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
         ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
         ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
         ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
@@ -261,23 +260,5 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
                 .map(it -> it.getStation().getId())
                 .collect(Collectors.toList());
         assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 3L, 2L));
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("startTime", LocalTime.of(5, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
-        params.put("intervalTime", "5");
-
-        return RestAssured.given().log().all().
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(params).
-                when().
-                post("/lines").
-                then().
-                log().all().
-                extract();
     }
 }
