@@ -1,11 +1,7 @@
 package nextstep.subway.line.domain;
 
-
-
-
 import nextstep.subway.station.application.StationDuplicateException;
 import nextstep.subway.station.application.StationNotFoundException;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
