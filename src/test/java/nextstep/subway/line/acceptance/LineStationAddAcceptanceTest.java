@@ -6,6 +6,7 @@ import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.station.dto.StationResponse;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,17 +16,30 @@ import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지�
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
 public class LineStationAddAcceptanceTest extends AcceptanceTest {
+
+    private Long lineId;
+    private Long station1Id;
+    private Long station2Id;
+    private Long station3Id;
+
+    @BeforeEach
+    void setup() {
+        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
+        ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
+        ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
+        ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
+
+        lineId = createdLineResponse.as(LineResponse.class).getId();
+        station1Id = createdStationResponse1.as(StationResponse.class).getId();
+        station2Id = createdStationResponse2.as(StationResponse.class).getId();
+        station3Id = createdStationResponse3.as(StationResponse.class).getId();
+    }
+
     @DisplayName("지하철 노선에 역을 등록한다.")
     @Test
     void addLineStation() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
-        ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
-
         // when
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, stationId);
+        ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, station1Id);
 
         // then
         노선에_목록_등록됨(response);
@@ -35,12 +49,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineWithStations() {
         // given
-        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
-        ExtractableResponse<Response> createdStationResponse = 지하철역_등록되어_있음("강남역");
-
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId = createdStationResponse.as(StationResponse.class).getId();
-        노선에_지하철역_등록되어_있음(lineId, stationId);
+        노선에_지하철역_등록되어_있음(lineId, station1Id);
 
         // when
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
@@ -53,22 +62,10 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
     @Test
     void addLineStationInOrder() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
-        ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
-        ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
-        ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
-
         // when
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_등록_요청(lineId, null, stationId1);
-
-        Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-        노선에_지하철역_등록_요청(lineId, stationId1, stationId2);
-
-        Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-        노선에_지하철역_등록_요청(lineId, stationId2, stationId3);
+        ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_등록_요청(lineId, null, station1Id);
+        노선에_지하철역_등록_요청(lineId, station1Id, station2Id);
+        노선에_지하철역_등록_요청(lineId, station2Id, station3Id);
 
         // then
         노선에_목록_등록됨(lineStationResponse);
@@ -84,22 +81,10 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 여러개의 역을 순서없이 등록한다.")
     @Test
     void addLineStationInAnyOrder() {
-        // given
-        ExtractableResponse<Response> createdLineResponse = 노선_등록되어_있음("2호선");
-        ExtractableResponse<Response> createdStationResponse1 = 지하철역_등록되어_있음("강남역");
-        ExtractableResponse<Response> createdStationResponse2 = 지하철역_등록되어_있음("역삼역");
-        ExtractableResponse<Response> createdStationResponse3 = 지하철역_등록되어_있음("선릉역");
-
         // when
-        Long lineId = createdLineResponse.as(LineResponse.class).getId();
-        Long stationId1 = createdStationResponse1.as(StationResponse.class).getId();
-        ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_등록_요청(lineId, null, stationId1);
-
-        Long stationId2 = createdStationResponse2.as(StationResponse.class).getId();
-        노선에_지하철역_등록_요청(lineId, stationId1, stationId2);
-
-        Long stationId3 = createdStationResponse3.as(StationResponse.class).getId();
-        노선에_지하철역_등록_요청(lineId, stationId1, stationId3);
+        ExtractableResponse<Response> lineStationResponse = 노선에_지하철역_등록_요청(lineId, null, station1Id);
+        노선에_지하철역_등록_요청(lineId, station1Id, station2Id);
+        노선에_지하철역_등록_요청(lineId, station1Id, station3Id);
 
         // then
         노선에_목록_등록됨(lineStationResponse);
