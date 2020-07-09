@@ -40,7 +40,6 @@ public class LineStationService {
 		Line line = findLineById(dto.getLineId());
 		Station station = findStationById(dto.getStationId());
 		LineStation lineStation = LineStation.builder()
-			.line(line)
 			.station(station)
 			.preStationId(dto.getPreStationId())
 			.distance(dto.getDistance())
