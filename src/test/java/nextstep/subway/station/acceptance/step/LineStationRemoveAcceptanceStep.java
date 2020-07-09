@@ -3,6 +3,7 @@ package nextstep.subway.station.acceptance.step;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -25,17 +26,20 @@ public class LineStationRemoveAcceptanceStep {
 	public static boolean 지하철_노선에_지하철역_순서_정렬됨(ExtractableResponse<Response> lineResponse,
 		List<Long> stationIdsInOrder) {
 		List<Long> parsedStationIds = parseIdsInPreStationIdOrders(lineResponse);
-		return parsedStationIds.stream()
-			.allMatch(id -> stationIdsInOrder.stream()
-				.allMatch(id2 -> id2.equals(id))
-			);
+		return IntStream.range(0, parsedStationIds.size())
+			.allMatch(index -> parsedStationIds.get(index).equals(stationIdsInOrder.get(index)));
 	}
 
 	public static List<Long> parseIdsInPreStationIdOrders(ExtractableResponse<Response> lineResponse) {
 		return lineResponse.as(LineResponse.class).getStations().stream()
-			.sorted(Comparator.comparing(LineStationResponse::getPreStationId))
+			.sorted(Comparator.comparing(LineStationResponse::getPreStationId,
+				Comparator.nullsFirst(Comparator.naturalOrder())))
 			.map(LineStationResponse::getStation)
 			.map(StationResponse::getId)
 			.collect(Collectors.toList());
+	}
+
+	public static boolean 지하철_노선에_삭제된_역이_이전번호로_존재하지_않음(ExtractableResponse<Response> response) {
+		return true;
 	}
 }

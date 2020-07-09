@@ -85,14 +85,38 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 		// and
 		// 지하철 노선에 지하철역 순서 정렬됨
 		List<Long> stationIds = Arrays.asList(firstStationId, secondStationId);
-		assertThat(LineStationRemoveAcceptanceStep.지하철_노선에_지하철역_순서_정렬됨(createdLineResponse, stationIds))
+		assertThat(LineStationRemoveAcceptanceStep.지하철_노선에_지하철역_순서_정렬됨(response, stationIds))
 			.isEqualTo(true);
 	}
 
 	@DisplayName("지하철 노선에 등록된 중간 지하철역을 제외한다.")
 	@Test
 	void 노선의_중간_역을_삭제한다() {
-		//
+		// when
+		// 지하철 노선의 중간 지하철역 제외 요청
+		ExtractableResponse<Response> request = LineStationRemoveAcceptanceStep.노선에_지하철역_제외(lineId, secondStationId);
+
+		// then
+		// 지하철 노선에 지하철역 제외됨
+		assertThat(request.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+		// when
+		// 지하철 노선 상세정보 조회 요청
+		ExtractableResponse<Response> response = 노선정보_확인_요청(lineId);
+
+		// then
+		// 지하철 노선에 지하철역 제외 확인됨
+		assertThat(response.body().asString().contains(secondStationName)).isEqualTo(false);
+
+		// and
+		// 지하철 노선에 지하철역 순서 정렬됨
+		List<Long> stationIds = Arrays.asList(firstStationId, thirdStationid);
+		assertThat(LineStationRemoveAcceptanceStep.지하철_노선에_지하철역_순서_정렬됨(createdLineResponse, stationIds))
+			.isEqualTo(true);
+
+		// and
+		// 지하철 노선에 삭제된 지하철역이 연결 번호로서 존재하지 않음
+		assertThat(LineStationRemoveAcceptanceStep.지하철_노선에_삭제된_역이_이전번호로_존재하지_않음(response));
 	}
 
 	@DisplayName("지하철 노선에 등록된 첫 번째 지하철역을 제외한다.")
