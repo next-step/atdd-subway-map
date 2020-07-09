@@ -12,14 +12,17 @@ public class LineStations {
     List<LineStation> lineStations = new ArrayList<>();
 
     public void add(LineStation lineStation) {
-        // 역 중간에 등록
-        // 같은 preStationId 역이 존재하면 기존 존재하는 preStationId에 새로 입력 된 stationId로 변경
+        // 역 중간 등록 시 재배열
+        reorderWhenBetweenStations(lineStation);
+
+        this.lineStations.add(lineStation);
+    }
+
+    private void reorderWhenBetweenStations(LineStation lineStation) {
         this.lineStations.stream()
                 .filter(it -> it.equalsPreStationId(lineStation.getPreStationId()))
                 .findFirst()
                 .ifPresent(it -> it.updatePreStationId(lineStation.getStationId()));
-
-        this.lineStations.add(lineStation);
     }
 
     public List<LineStation> getLineStations() {
