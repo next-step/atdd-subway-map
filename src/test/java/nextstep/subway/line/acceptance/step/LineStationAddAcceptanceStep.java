@@ -76,7 +76,4 @@ public class LineStationAddAcceptanceStep {
                 .collect(Collectors.toList());
         assertThat(stationIds).containsExactlyElementsOf(expectedStationIds);
     }
-
-
-
 }
