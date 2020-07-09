@@ -1,6 +1,7 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineStationService;
+import nextstep.subway.line.dto.LineStationDeleteRequest;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import org.springframework.http.ResponseEntity;
@@ -21,5 +22,12 @@ public class LineStationController {
     public ResponseEntity appendStation(@PathVariable Long lineId, @RequestBody LineStationRequest lineStationRequest) {
         LineStationResponse lineStationResponse = lineStationService.appendStation(lineId, lineStationRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/stations")).body(lineStationResponse);
+    }
+
+    @DeleteMapping("/{lineId}/stations/{stationId}")
+    public ResponseEntity deleteStation(@PathVariable Long lineId, @PathVariable Long stationId) {
+        lineStationService.removeStation(lineId, stationId);
+
+        return ResponseEntity.noContent().build();
     }
 }

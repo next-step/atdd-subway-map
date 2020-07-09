@@ -25,6 +25,10 @@ public class LineStationAddAcceptanceStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
+    public static void 지하철_노선에_지하철역_제외됨(ExtractableResponse response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
     public static void 지하철_노선_상세정보_응답됨(ExtractableResponse response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse lineResponse = response.as(LineResponse.class);
@@ -68,4 +72,24 @@ public class LineStationAddAcceptanceStep {
                 .collect(Collectors.toList());
         assertThat(stationIds).containsExactlyElementsOf(expectedStationIds);
     }
+
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_제거_요청(Long lineId, Long stationId) {
+        return RestAssured.given().log().all().
+                when().
+                delete("/lines/{lineId}/stations/{stationId}", lineId, stationId).
+                then().
+                log().all().
+                extract();
+    }
+
+    public static void 지하철_노선에_지하철역_제외_확인됨(ExtractableResponse<Response> response, Long stationId) {
+        LineResponse lineResponse = response.as(LineResponse.class);
+        assertThat(lineResponse).isNotNull();
+        List<Long> stationIds = response.as(LineResponse.class).getStations().stream()
+                .map(it -> it.getStation().getId())
+                .collect(Collectors.toList());
+
+        assertThat(stationIds).doesNotContain(stationId);
+    }
+
 }

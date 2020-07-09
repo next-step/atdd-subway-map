@@ -2,6 +2,7 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.station.application.StationDuplicateException;
 import nextstep.subway.station.application.StationNotFoundException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,8 @@ public class LineStations {
     }
 
     private void updatePreStation(LineStation lineStation, LineStation findLineStation) {
-        if (findLineStation.getPreStationId() == lineStation.getPreStationId()) {
+        if (lineStation.getPreStationId() != null &&
+                findLineStation.getPreStationId() == lineStation.getPreStationId()) {
             findLineStation.updatePreStation(lineStation.getStationId());
         }
     }
@@ -53,4 +55,17 @@ public class LineStations {
         return result;
     }
 
+    public void removeStation(Long stationId) {
+        LineStation targetLineStation = lineStations.stream()
+                .filter(it -> it.getStationId() == stationId)
+                .findFirst()
+                .orElseThrow(StationNotFoundException::new);
+
+        for (int i = 0; i < lineStations.size(); i++) {
+            LineStation findLineStation = lineStations.get(i);
+            updatePreStation(targetLineStation, findLineStation);
+        }
+
+        lineStations.remove(targetLineStation);
+    }
 }

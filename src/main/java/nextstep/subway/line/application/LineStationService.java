@@ -3,6 +3,7 @@ package nextstep.subway.line.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
+import nextstep.subway.line.dto.LineStationDeleteRequest;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import nextstep.subway.station.application.StationNotFoundException;
@@ -32,5 +33,12 @@ public class LineStationService {
         Station station = stationRepository.findById(lineStation.getStationId())
                 .orElseThrow(StationNotFoundException::new);
         return LineStationResponse.of(lineStation, StationResponse.of(station));
+    }
+
+    public void removeStation(Long lineId, Long stationId) {
+        Line findLine = lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
+
+        findLine.removeStation(stationId);
     }
 }
