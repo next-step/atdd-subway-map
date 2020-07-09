@@ -1,11 +1,12 @@
 package nextstep.subway.line.acceptance.step;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
-import org.assertj.core.api.ListAssert;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.MediaType;
 
 import java.time.LocalTime;
@@ -40,12 +41,28 @@ public class LineStationAcceptanceStep {
                 .containsExactlyElementsOf(orderedStationList);
     }
 
-    public static ListAssert<LineStationResponse> 지하철_노선의_갯수가_n개이다(LineResponse lineResponse, int n) {
-        return assertThat(lineResponse.getStations()).hasSize(n);
+    public static void 지하철_노선의_역_갯수가_n개이다(LineResponse lineResponse, int n) {
+        assertThat(lineResponse.getStations()).hasSize(n);
     }
 
     public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
         return 지하철_노선을_생성한다(name, color, LocalTime.of(5, 30), LocalTime.of(23, 30), 5);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역을_제외한다(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .delete("/lines/{lineId}/stations/{stationId}", lineId, stationId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    public static void 지하철_노선에_역이_포함되지_않는다(LineResponse lineResponse, Long stationId3) {
+        assertThat(lineResponse.getStations())
+                .extracting(LineStationResponse::getStation).extracting(StationResponse::getId)
+                .doesNotContain(stationId3);
     }
 
     private static Map<String, String> getLineStationRequestParameterMap(Long preStationId, Long stationId) {
