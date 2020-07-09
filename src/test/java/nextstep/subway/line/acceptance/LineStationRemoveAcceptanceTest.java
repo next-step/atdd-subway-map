@@ -1,18 +1,21 @@
 package nextstep.subway.line.acceptance;
 
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.*;
+import static org.assertj.core.api.Assertions.*;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.acceptance.step.LineStationRemoveAcceptanceStep;
 import nextstep.subway.station.dto.StationResponse;
 
 public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
@@ -32,6 +35,10 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 	private Long secondStationId;
 	private Long thirdStationid;
 
+	private String firstStationName;
+	private String secondStationName;
+	private String thirdStationName;
+
 	@BeforeEach
 	public void setUp() {
 		super.setUp();
@@ -46,6 +53,10 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 		secondStationId = secondStationResponse.as(StationResponse.class).getId();
 		thirdStationid = thirdStationResponse.as(StationResponse.class).getId();
 
+		firstStationName = firstStationResponse.as(StationResponse.class).getName();
+		secondStationName = secondStationResponse.as(StationResponse.class).getName();
+		thirdStationName = thirdStationResponse.as(StationResponse.class).getName();
+
 		firstLineStationResponse = 노선에_지하철역_첫번째_등록(firstStationId, lineId);
 		secondLineStationResponse = 노선에_지하철역_추가로_등록(firstStationId, secondStationId, lineId);
 		thirdLineStationResponse = 노선에_지하철역_추가로_등록(secondStationId, thirdStationid, lineId);
@@ -56,19 +67,26 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 	void 노선의_마지막_역을_삭제한다() {
 		// when
 		// 지하철 노선의 마지막에 지하철역 제외 요청
+		ExtractableResponse<Response> request = LineStationRemoveAcceptanceStep.노선에_지하철역_제외(lineId, thirdStationid);
 
 		// then
 		// 지하철 노선에 지하철역 제외됨
 		// TODO: 컨트롤러 단에서는 200 반환이 되는 것으로만 믿으면 충분한지 궁금하다.
+		assertThat(request.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 		// when
 		// 지하철 노선 상세정보 조회 요청
+		ExtractableResponse<Response> response = 노선정보_확인_요청(lineId);
 
 		// then
 		// 지하철 노선에 지하철역 제외 확인됨
+		assertThat(response.body().asString().contains(thirdStationName)).isEqualTo(false);
 
 		// and
 		// 지하철 노선에 지하철역 순서 정렬됨
+		List<Long> stationIds = Arrays.asList(firstStationId, secondStationId);
+		assertThat(LineStationRemoveAcceptanceStep.지하철_노선에_지하철역_순서_정렬됨(createdLineResponse, stationIds))
+			.isEqualTo(true);
 	}
 
 	@DisplayName("지하철 노선에 등록된 중간 지하철역을 제외한다.")
