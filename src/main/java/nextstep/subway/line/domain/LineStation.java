@@ -66,7 +66,7 @@ public class LineStation {
 	}
 
 	public boolean compareStationIdentityWithStationName(LineStation lineStation) {
-		return lineStationName().equals(lineStation.lineStationName());
+		return station.compareStationIdentityWithStationName(lineStation);
 	}
 
 	public boolean compareLineStationIdentityWithLineStationId(Long lineStationId) {
