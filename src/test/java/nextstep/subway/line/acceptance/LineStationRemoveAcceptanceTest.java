@@ -25,6 +25,7 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 	private ExtractableResponse<Response> firstStationResponse;
 	private ExtractableResponse<Response> secondStationResponse;
 	private ExtractableResponse<Response> thirdStationResponse;
+	private ExtractableResponse<Response> fourthStationResponse;
 
 	private ExtractableResponse<Response> firstLineStationResponse;
 	private ExtractableResponse<Response> secondLineStationResponse;
@@ -34,6 +35,7 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 	private Long firstStationId;
 	private Long secondStationId;
 	private Long thirdStationid;
+	private Long fourthStationId;
 
 	private String firstStationName;
 	private String secondStationName;
@@ -47,11 +49,13 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 		firstStationResponse = 지하철역_등록되어_있음("강남역");
 		secondStationResponse = 지하철역_등록되어_있음("역삼역");
 		thirdStationResponse = 지하철역_등록되어_있음("선릉역");
+		fourthStationResponse = 지하철역_등록되어_있음("삼성역");
 
 		lineId = createdLineResponse.as(LineResponse.class).getId();
 		firstStationId = firstStationResponse.as(StationResponse.class).getId();
 		secondStationId = secondStationResponse.as(StationResponse.class).getId();
 		thirdStationid = thirdStationResponse.as(StationResponse.class).getId();
+		fourthStationId = fourthStationResponse.as(StationResponse.class).getId();
 
 		firstStationName = firstStationResponse.as(StationResponse.class).getName();
 		secondStationName = secondStationResponse.as(StationResponse.class).getName();
@@ -152,6 +156,12 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
 	@DisplayName("지하철 노선에 등록되지 않은 역을 삭제하려고 할 경우 예외를 반환한다.")
 	@Test
 	void 노선에_없는_역을_삭제하려고_하면_오류를_반환한다() {
-		//
+		// when
+		// 지하철 노선에 등록되지 않은 역 제외 요청
+		ExtractableResponse<Response> request = LineStationRemoveAcceptanceStep.노선에_지하철역_제외(lineId, fourthStationId);
+
+		// then
+		// 지하철 노선에 지하철역 제외 실패됨
+		assertThat(request.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 }
