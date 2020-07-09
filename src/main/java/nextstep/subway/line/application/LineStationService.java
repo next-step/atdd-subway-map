@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class LineStationService {
 
-    private LineRepository lineRepository;
-    private StationService stationService;
+    private final LineRepository lineRepository;
+    private final StationService stationService;
 
     public LineStationService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
