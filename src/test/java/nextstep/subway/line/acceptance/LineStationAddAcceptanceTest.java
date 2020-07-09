@@ -8,17 +8,10 @@ import nextstep.subway.station.dto.StationResponse;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_등록되어_있음;
-import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_조회_요청;
-import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.노선에_지하철역_등록_요청;
-import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.노선에_지하철역_등록되어_있음;
+import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.*;
+import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
 public class LineStationAddAcceptanceTest extends AcceptanceTest {
@@ -35,7 +28,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선에_지하철역_등록_요청(lineId, null, stationId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        노선에_목록_등록됨(response);
     }
 
     @DisplayName("지하철 노선 상세정보 조회 시 역 정보가 포함된다.")
@@ -53,10 +46,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(1);
+        노선_응답됨(response);
+        노선에_지하철역_포함됨(response, 1);
     }
 
     @DisplayName("지하철 노선에 여러개의 역을 순서대로 등록한다.")
@@ -80,19 +71,14 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         노선에_지하철역_등록_요청(lineId, stationId2, stationId3);
 
         // then
-        assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        노선에_목록_등록됨(lineStationResponse);
 
         // when
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
         // then
-        LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(3);
-        List<Long> stationIds = lineResponse.getStations().stream()
-                .map(it -> it.getStation().getId())
-                .collect(Collectors.toList());
-        assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 2L, 3L));
+        노선_응답됨(response);
+        노선의_지하철역들의_순서가_예상과_일치함(response, Lists.newArrayList(1L, 2L, 3L));
     }
 
     @DisplayName("지하철 노선에 여러개의 역을 순서없이 등록한다.")
@@ -116,17 +102,13 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         노선에_지하철역_등록_요청(lineId, stationId1, stationId3);
 
         // then
-        assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        노선에_목록_등록됨(lineStationResponse);
 
         // when
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
 
-        LineResponse lineResponse = response.as(LineResponse.class);
-        assertThat(lineResponse).isNotNull();
-        assertThat(lineResponse.getStations()).hasSize(3);
-        List<Long> stationIds = lineResponse.getStations().stream()
-                .map(it -> it.getStation().getId())
-                .collect(Collectors.toList());
-        assertThat(stationIds).containsExactlyElementsOf(Lists.newArrayList(1L, 3L, 2L));
+        // then
+        노선_응답됨(response);
+        노선의_지하철역들의_순서가_예상과_일치함(response, Lists.newArrayList(1L, 3L, 2L));
     }
 }
