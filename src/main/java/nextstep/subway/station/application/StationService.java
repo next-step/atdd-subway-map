@@ -1,5 +1,6 @@
 package nextstep.subway.station.application;
 
+import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,7 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
-    public StationResponse findById(Long id) {
-        return stationRepository.findById(id)
-                .map(StationResponse::of)
-                .orElseThrow(() -> new IllegalArgumentException("id에 해당하는 지하철역이 없습니다:" + id));
+    public Optional<Station> findById(Long id) {
+        return stationRepository.findById(id);
     }
 }

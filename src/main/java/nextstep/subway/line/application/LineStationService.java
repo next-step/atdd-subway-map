@@ -23,11 +23,12 @@ public class LineStationService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("id에 해당하는 라인이 없습니다:" + lineId));
 
-        validateStationExist(lineStationRequest);
+        validateStationExist(lineStationRequest.getStationId());
         line.addStation(lineStationRequest.toLineStation());
     }
 
-    private void validateStationExist(LineStationRequest lineStationRequest) {
-        stationService.findById(lineStationRequest.getStationId());
+    private void validateStationExist(Long stationId) {
+        stationService.findById(stationId)
+            .orElseThrow(() -> new IllegalArgumentException("id에 해당하는 지하철역이 없습니다:" + stationId));
     }
 }
