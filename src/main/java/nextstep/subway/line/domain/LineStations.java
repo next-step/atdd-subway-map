@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
-import nextstep.subway.line.domain.exceptions.LineStationAlreadyExist;
+import nextstep.subway.line.domain.exceptions.AlreadyExistLineStationException;
+import nextstep.subway.line.domain.exceptions.NotRegisteredLineStationException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -50,14 +51,14 @@ public class LineStations {
         return orderedLineStations;
     }
 
-    boolean hasStation(Station station) {
+    private boolean hasStation(Station station) {
         return this.lineStations.stream()
                 .anyMatch(lineStation -> lineStation.getStation() == station);
     }
 
     public void registerLineStation(LineStation lineStation) {
-        if (this.checkExistStation(lineStation.getStation())) {
-            throw new LineStationAlreadyExist("line station already exists : " + lineStation.getStation().getId());
+        if (this.hasStation(lineStation.getStation())) {
+            throw new AlreadyExistLineStationException("line station already exists : " + lineStation.getStation().getId());
         }
 
         lineStations.forEach(it -> {
@@ -72,7 +73,26 @@ public class LineStations {
         this.lineStations.add(lineStation);
     }
 
-    public boolean checkExistStation(Station station) {
-        return this.hasStation(station);
+    public void excludeLineStation(Station station) {
+        if (this.lineStations.size() <= 1) {
+            this.lineStations.clear();
+        }
+
+        LineStation excludeTarget = this.lineStations.stream()
+                .filter(lineStation -> station.equals(lineStation.getStation()))
+                .findFirst()
+                .orElseThrow(() -> new NotRegisteredLineStationException("not registered line station : " + station.getId()));
+
+        Station preStation = excludeTarget.getPreStation();
+
+        if (preStation != null) {
+            Optional<LineStation> nextLineStationOptional = this.lineStations.stream()
+                    .filter(lineStation -> excludeTarget.getStation().equals(lineStation.getPreStation()))
+                    .findFirst();
+
+            nextLineStationOptional.ifPresent(lineStation -> lineStation.changePreStation(preStation));
+        }
+
+        this.lineStations.remove(excludeTarget);
     }
 }

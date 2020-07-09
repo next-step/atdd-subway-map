@@ -3,6 +3,7 @@ package nextstep.subway.line.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.LineStation;
+import nextstep.subway.line.domain.exceptions.NotRegisteredLineStationException;
 import nextstep.subway.line.dto.LineStationRequest;
 import nextstep.subway.line.dto.LineStationResponse;
 import nextstep.subway.station.domain.Station;
@@ -57,5 +58,16 @@ public class LineStationService {
         }
 
         return LineStation.createLineStation(station, preStation, createLineStationRequest.getDistance(), createLineStationRequest.getDuration());
+    }
+
+    @Transactional
+    public void excludeLineStation(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalStateException("not found line : " + lineId));
+
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalStateException("not found line : " + lineId));
+
+        line.excludeLineStation(station);
     }
 }
