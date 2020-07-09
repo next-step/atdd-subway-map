@@ -68,4 +68,12 @@ public class LineStation {
 	public boolean compareStationIdentityWithStationName(LineStation lineStation) {
 		return lineStationName().equals(lineStation.lineStationName());
 	}
+
+	public boolean compareLineStationIdentityWithLineStationId(Long lineStationId) {
+		return this.id.equals(lineStationId);
+	}
+
+	public void movePreStationOneCountBack() {
+		this.preStationId = this.preStationId - 1;
+	}
 }

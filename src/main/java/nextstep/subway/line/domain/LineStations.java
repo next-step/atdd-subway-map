@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.exception.AlreadyRegisteredException;
+import nextstep.subway.exception.NotRegisteredException;
 
 @Embeddable
 @Getter
@@ -40,5 +41,29 @@ public class LineStations {
 			.ifPresent(station -> {
 				throw new AlreadyRegisteredException("this station is already registered. you can't add this again.");
 			});
+	}
+
+	public LineStation remove(LineStation lineStation) {
+		lineStations.remove(lineStation);
+		return lineStation;
+	}
+
+	public LineStation findLineStationByLineStationId(Long lineStationId) {
+		return lineStations.stream()
+			.filter(lineStation -> lineStation.compareLineStationIdentityWithLineStationId(lineStationId))
+			.findFirst()
+			.orElseThrow(() -> new NotRegisteredException("nothing found in line with matched station."));
+	}
+
+	public int findLineStationIndexByLineStation(LineStation lineStation) {
+		return lineStations.indexOf(lineStation);
+	}
+
+	public void adjustPreStationIdOfPriorToUnregisteredLineStation(int lineStationIndex) {
+		try {
+			LineStation lineStation = lineStations.get(lineStationIndex);
+			lineStation.movePreStationOneCountBack();
+		} catch (Exception ignored) {
+		}
 	}
 }

@@ -1,12 +1,18 @@
 package nextstep.subway.line.domain;
 
+import java.time.LocalTime;
+
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.config.BaseEntity;
-
-import javax.persistence.*;
-import java.time.LocalTime;
-import java.util.List;
+import nextstep.subway.exception.NotRegisteredException;
 
 @Entity
 @NoArgsConstructor
@@ -43,5 +49,25 @@ public class Line extends BaseEntity {
 
     public LineStation addLineStation(LineStation lineStation) {
         return lineStations.add(lineStation);
+    }
+
+    public LineStation unregisterLineStation(LineStation lineStation) {
+        adjustPreStationIdOfPriorToUnregisteredLineStation(lineStation);
+        try {
+            lineStations.remove(lineStation);
+        } catch (Exception e) {
+            throw new NotRegisteredException("this station is not registered to the given line id.");
+        }
+        return lineStation;
+    }
+
+    public LineStation findLineStationByLineStationId(Long lineStationId) {
+        return lineStations.findLineStationByLineStationId(lineStationId);
+    }
+
+    private void adjustPreStationIdOfPriorToUnregisteredLineStation(LineStation lineStation) {
+        int lineStationIndex = lineStations.findLineStationIndexByLineStation(lineStation);
+        int nextIndexOfLineStation = lineStationIndex + 1;
+        lineStations.adjustPreStationIdOfPriorToUnregisteredLineStation(nextIndexOfLineStation);
     }
 }
