@@ -33,4 +33,11 @@ public class LineStationService {
                 .orElseThrow(StationNotFoundException::new);
         return LineStationResponse.of(lineStation, StationResponse.of(station));
     }
+
+    public void removeStation(Long lineId, Long stationId) {
+        Line findLine = lineRepository.findById(lineId)
+                .orElseThrow(LineNotFoundException::new);
+
+        findLine.removeStation(stationId);
+    }
 }

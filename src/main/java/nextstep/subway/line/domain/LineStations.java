@@ -1,8 +1,5 @@
 package nextstep.subway.line.domain;
 
-
-
-
 import nextstep.subway.station.application.StationDuplicateException;
 import nextstep.subway.station.application.StationNotFoundException;
 
@@ -29,15 +26,33 @@ public class LineStations {
 
         for (int i = 0; i < lineStations.size(); i++) {
             LineStation findLineStation = lineStations.get(i);
-            updatePreStation(lineStation, findLineStation);
+            updatePreStationByAppend(findLineStation, lineStation);
         }
-
         lineStations.add(lineStation);
     }
 
-    private void updatePreStation(LineStation lineStation, LineStation findLineStation) {
-        if (findLineStation.getPreStationId() == lineStation.getPreStationId()) {
+    private void updatePreStationByAppend(LineStation findLineStation, LineStation lineStation) {
+        if (findLineStation != null && findLineStation.getPreStationId() == lineStation.getPreStationId()) {
             findLineStation.updatePreStation(lineStation.getStationId());
+        }
+    }
+
+    public void removeStation(Long stationId) {
+        LineStation lineStation = lineStations.stream()
+                .filter(it -> it.getStationId() == stationId)
+                .findFirst()
+                .orElseThrow(StationNotFoundException::new);
+
+        for (int i = 0; i < lineStations.size(); i++) {
+            LineStation findLineStation = lineStations.get(i);
+            updatePreStationByRemove(findLineStation, lineStation);
+        }
+        lineStations.remove(lineStation);
+    }
+
+    private void updatePreStationByRemove(LineStation findLineStation, LineStation lineStation) {
+        if (findLineStation != null && findLineStation.getPreStationId() == lineStation.getStationId()) {
+            findLineStation.updatePreStation(lineStation.getPreStationId());
         }
     }
 
@@ -56,5 +71,4 @@ public class LineStations {
         }
         return result;
     }
-
 }

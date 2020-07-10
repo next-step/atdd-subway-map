@@ -14,15 +14,10 @@ public class LineStationErrorAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(StationDuplicateException.class)
-    public String handlerStationDuplicate() {
-        return "{}";
-    }
+    public void handlerStationDuplicate() {}
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(StationNotFoundException.class)
-    public String handlerNotExistStation() {
-        return "{}";
-    }
-
+    public void handlerNotExistStation() {}
 }

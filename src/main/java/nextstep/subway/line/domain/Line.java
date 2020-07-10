@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.config.BaseEntity;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -42,6 +43,10 @@ public class Line extends BaseEntity {
 
     public void addLineStation(LineStation lineStation) {
         lineStations.appendStation(lineStation);
+    }
+
+    public void removeStation(Long stationId) {
+        lineStations.removeStation(stationId);
     }
 
     public Long getId() {

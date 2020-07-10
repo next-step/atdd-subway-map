@@ -22,4 +22,11 @@ public class LineStationController {
         LineStationResponse lineStationResponse = lineStationService.appendStation(lineId, lineStationRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/stations")).body(lineStationResponse);
     }
+
+    @DeleteMapping("/{lineId}/stations/{stationId}")
+    public ResponseEntity deleteStation(@PathVariable Long lineId, @PathVariable Long stationId) {
+        lineStationService.removeStation(lineId, stationId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
