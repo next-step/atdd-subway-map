@@ -59,10 +59,11 @@ public class LineStations {
 		return lineStations.indexOf(lineStation);
 	}
 
-	public void adjustPreStationIdOfPriorToUnregisteredLineStation(int lineStationIndex) {
+	public void adjustPreStationIdOfPriorToUnregisteredLineStation(LineStation lineStation) {
+		int nextIndexOfLineStation = findLineStationIndexByLineStation(lineStation) + 1;
 		try {
-			LineStation lineStation = lineStations.get(lineStationIndex);
-			lineStation.movePreStationOneCountBack();
+			LineStation preLineStation = lineStations.get(nextIndexOfLineStation);
+			preLineStation.movePreStationOneCountBack();
 		} catch (Exception ignored) {
 		}
 	}

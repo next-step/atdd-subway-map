@@ -66,8 +66,6 @@ public class Line extends BaseEntity {
     }
 
     private void adjustPreStationIdOfPriorToUnregisteredLineStation(LineStation lineStation) {
-        int lineStationIndex = lineStations.findLineStationIndexByLineStation(lineStation);
-        int nextIndexOfLineStation = lineStationIndex + 1;
-        lineStations.adjustPreStationIdOfPriorToUnregisteredLineStation(nextIndexOfLineStation);
+        lineStations.adjustPreStationIdOfPriorToUnregisteredLineStation(lineStation);
     }
 }
