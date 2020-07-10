@@ -2,6 +2,7 @@ package nextstep.subway.line.ui;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,9 +22,16 @@ public class LineStationController {
 	}
 
 	@PostMapping("/{lineId}/stations")
-	public ResponseEntity<Void> createLineStation(@PathVariable Long lineId, @RequestBody LineStationCreateRequest dto) {
+	public ResponseEntity<Void> createLineStation(@PathVariable Long lineId,
+		@RequestBody LineStationCreateRequest dto) {
 		dto.setLineId(lineId);
 		lineStationService.registerLineStation(dto);
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@DeleteMapping("/{lineId}/stations/{stationId}")
+	public ResponseEntity<Void> unregisterLineStation(@PathVariable Long lineId, @PathVariable Long stationId) {
+		lineStationService.unregisterLineStation(lineId, stationId);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

@@ -7,6 +7,8 @@ import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,5 +82,70 @@ public class StationAcceptanceStep {
                 .collect(Collectors.toList());
 
         assertThat(resultLineIds).containsAll(expectedLineIds);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("startTime", LocalTime.of(5, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
+        params.put("intervalTime", "5");
+
+        return RestAssured.given().log().all().
+            contentType(MediaType.APPLICATION_JSON_VALUE).
+            body(params).
+            when().
+            post("/lines").
+            then().
+            log().all().
+            extract();
+    }
+
+    public static ExtractableResponse<Response> 노선에_지하철역_첫번째_등록(Long givenStationId, Long lineId) {
+        Map<String, String> givenParams = new HashMap<>();
+        givenParams.put("preStationId", "");
+        givenParams.put("stationId", givenStationId + "");
+        givenParams.put("distance", "4");
+        givenParams.put("duration", "2");
+
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(givenParams)
+            .when()
+            .post("/lines/{lineId}/stations", lineId)
+            .then()
+            .log()
+            .all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 노선에_지하철역_추가로_등록(Long preStationId, Long givenStationId, Long lineId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("preStationId", preStationId + "");
+        params.put("stationId", givenStationId + "");
+        params.put("distance", "4");
+        params.put("duration", "2");
+
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when()
+            .post("/lines/{lineId}/stations", lineId)
+            .then()
+            .log()
+            .all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 노선정보_확인_요청(Long lineId) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("/lines/{lineId}", lineId)
+            .then()
+            .log()
+            .all()
+            .extract();
     }
 }

@@ -31,16 +31,25 @@ public class LineStationService {
 		return stationRepository.findById(stationId).orElseThrow(() -> new NotRegisteredException("no station found."));
 	}
 
+	private LineStation findLineStationByLineIdAndStationId(Line line, Long lineStationId) {
+		return line.findLineStationByLineStationId(lineStationId);
+	}
+
 	public void registerLineStation(LineStationCreateRequest dto) {
 		Line line = findLineById(dto.getLineId());
 		Station station = findStationById(dto.getStationId());
 		LineStation lineStation = LineStation.builder()
-			.line(line)
 			.station(station)
 			.preStationId(dto.getPreStationId())
 			.distance(dto.getDistance())
 			.duration(dto.getDuration())
 			.build();
 		line.addLineStation(lineStation);
+	}
+
+	public void unregisterLineStation(Long lineId, Long stationId) {
+		Line line = findLineById(lineId);
+		LineStation lineStation = findLineStationByLineIdAndStationId(line, stationId);
+		line.unregisterLineStation(lineStation);
 	}
 }
