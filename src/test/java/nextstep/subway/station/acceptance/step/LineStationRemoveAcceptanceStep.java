@@ -1,13 +1,19 @@
 package nextstep.subway.station.acceptance.step;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBodyExtractionOptions;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.LineStationResponse;
 import nextstep.subway.station.dto.StationResponse;
@@ -49,5 +55,20 @@ public class LineStationRemoveAcceptanceStep {
 				}
 				return preStationId.equals(deletedLineStationId);
 			});
+	}
+
+	public static List<Long> JSON_응답을_파싱한다(ResponseBodyExtractionOptions body) {
+		JsonParser parser = new JsonParser();
+		JsonElement jsonElement = parser.parse(body.asString());
+		JsonObject preJsonArray = jsonElement.getAsJsonObject();
+		JsonArray jsonArray = (JsonArray)preJsonArray.get("stations");
+		List<Long> stationIds = new ArrayList<>();
+		for (int index = 0; index < jsonArray.size(); index++) {
+			JsonObject object = jsonArray.get(index).getAsJsonObject();
+			JsonObject station = object.get("station").getAsJsonObject();
+			Long stationId = station.get("id").getAsLong();
+			stationIds.add(stationId);
+		}
+		return stationIds;
 	}
 }
