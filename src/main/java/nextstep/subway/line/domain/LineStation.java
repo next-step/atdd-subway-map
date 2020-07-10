@@ -42,7 +42,11 @@ public class LineStation extends BaseEntity {
         return duration;
     }
 
-    public boolean isSamePreStation(Long preStationId) {
+    public boolean isEqualStation(Long stationId) {
+        return this.stationId.equals(stationId);
+    }
+
+    public boolean isEqualPreStation(Long preStationId) {
         if (this.preStationId == null || preStationId == null) {
             return false;
         }

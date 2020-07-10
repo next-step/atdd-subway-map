@@ -17,12 +17,23 @@ public class LineStations {
     private List<LineStation> lineStations = new ArrayList<>();
 
     public void add(LineStation lineStation) {
+        validateNotExist(lineStation);
+
         lineStations.stream()
-                .filter(it -> it.isSamePreStation(lineStation.getPreStationId()))
+                .filter(it -> it.isEqualPreStation(lineStation.getPreStationId()))
                 .findFirst()
                 .ifPresent(it -> it.relocateAfter(lineStation.getStationId()));
 
         lineStations.add(lineStation);
+    }
+
+    private void validateNotExist(LineStation lineStation) {
+        boolean isExist = lineStations.stream()
+                .anyMatch(l -> l.isEqualStation(lineStation.getStationId()));
+
+        if (isExist) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public List<LineStation> getContent() {
