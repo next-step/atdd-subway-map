@@ -14,8 +14,7 @@ import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_등
 import static nextstep.subway.line.acceptance.step.LineAcceptanceStep.노선_조회_요청;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.노선에_지하철역_등록되어_있음;
 import static nextstep.subway.line.acceptance.step.LineStationAddAcceptanceStep.노선의_지하철역들의_순서가_예상과_일치함;
-import static nextstep.subway.line.acceptance.step.LineStationRemoveAcceptanceStep.노선의_지하철역_제거_요청;
-import static nextstep.subway.line.acceptance.step.LineStationRemoveAcceptanceStep.노선의_지하철역_제거됨;
+import static nextstep.subway.line.acceptance.step.LineStationRemoveAcceptanceStep.*;
 import static nextstep.subway.station.acceptance.step.StationAcceptanceStep.지하철역_등록되어_있음;
 
 @DisplayName("지하철 노선에 역 제외 관련 기능")
@@ -75,5 +74,15 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 노선_조회_요청(lineId);
         노선의_지하철역들의_순서가_예상과_일치함(response, Lists.newArrayList(1L, 3L));
+    }
+
+    @DisplayName("노선에 등록되지 않은 역을 제거하면 실패한다.")
+    @Test
+    void removeNotAddedLineStation() {
+        // when
+        ExtractableResponse<Response> removeResponse = 노선의_지하철역_제거_요청(lineId, 999L);
+
+        // then
+        노선의_지하철역_제거_실패됨(removeResponse);
     }
 }

@@ -23,4 +23,8 @@ public class LineStationRemoveAcceptanceStep {
     public static void 노선의_지하철역_제거됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    public static void 노선의_지하철역_제거_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
