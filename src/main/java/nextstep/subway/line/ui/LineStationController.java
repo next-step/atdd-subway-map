@@ -20,12 +20,7 @@ public class LineStationController {
 
     @PostMapping("/lines/{lineId}/stations")
     public ResponseEntity addStation(@PathVariable Long lineId, @RequestBody LineStationRequest lineStationRequest) {
-        try {
-            lineStationService.addStation(lineId, lineStationRequest);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        lineStationService.addStation(lineId, lineStationRequest);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 }
