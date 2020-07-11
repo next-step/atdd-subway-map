@@ -36,6 +36,20 @@ public class LineStations {
         }
     }
 
+    public void remove(Long stationId) {
+        validateExist(stationId);
+        lineStations.removeIf(lineStation -> lineStation.isEqualStation(stationId));
+    }
+
+    private void validateExist(Long stationId) {
+        boolean isExist = lineStations.stream()
+                .anyMatch(l -> l.isEqualStation(stationId));
+
+        if (!isExist) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public List<LineStation> getContent() {
         return lineStations;
     }
