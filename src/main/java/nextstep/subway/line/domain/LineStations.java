@@ -37,17 +37,21 @@ public class LineStations {
     }
 
     public void remove(Long stationId) {
-        validateExist(stationId);
-        lineStations.removeIf(lineStation -> lineStation.isEqualStation(stationId));
+        LineStation lineStation = findStationById(stationId);
+
+        lineStations.stream()
+                .filter(it -> it.isEqualPreStation(stationId))
+                .findFirst()
+                .ifPresent(it -> it.relocateAfter(lineStation.getPreStationId()));
+
+        lineStations.remove(lineStation);
     }
 
-    private void validateExist(Long stationId) {
-        boolean isExist = lineStations.stream()
-                .anyMatch(l -> l.isEqualStation(stationId));
-
-        if (!isExist) {
-            throw new IllegalArgumentException();
-        }
+    private LineStation findStationById(Long stationId) {
+        return lineStations.stream()
+                .filter(it -> it.isEqualStation(stationId))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     public List<LineStation> getContent() {
