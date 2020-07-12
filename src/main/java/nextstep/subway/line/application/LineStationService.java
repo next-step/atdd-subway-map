@@ -20,11 +20,20 @@ public class LineStationService {
 
     @Transactional
     public void addStation(Long lineId, LineStationRequest lineStationRequest) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("id에 해당하는 라인이 없습니다:" + lineId));
-
+        Line line = findLine(lineId);
         validateStationExist(lineStationRequest.getStationId());
         line.addStation(lineStationRequest.toLineStation());
+    }
+
+    @Transactional
+    public void removeStation(Long lineId, Long stationId) {
+        Line line = findLine(lineId);
+        line.removeStation(stationId);
+    }
+
+    private Line findLine(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("id에 해당하는 라인이 없습니다:" + lineId));
     }
 
     private void validateStationExist(Long stationId) {
