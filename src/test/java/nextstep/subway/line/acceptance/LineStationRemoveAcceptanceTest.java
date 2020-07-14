@@ -67,4 +67,31 @@ public class LineStationRemoveAcceptanceTest extends AcceptanceTest {
         지하철_노선에_지하철역_제외_확인됨(response, stationId3);
         지하철_노선에_지하철역_순서_정렬됨(response, Arrays.asList(stationId1, stationId2));
     }
+
+    @DisplayName("지하철 노선에 등록된 중간 지하철역을 제외한다.")
+    @Test
+    void removeMiddleStationInLine() {
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선의_중간에_지하철역_제외_요청(lineId, stationId3);
+
+        // then
+        지하철_노선에_지하철역_제외됨(deleteResponse);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
+
+        // then
+        지하철_노선에_지하철역_제외_확인됨(response, stationId3);
+        지하철_노선에_지하철역_순서_정렬됨(response, Arrays.asList(stationId1, stationId2));
+    }
+
+    @DisplayName("지하철 노선에 등록되지 않은 역을 제외한다.")
+    @Test
+    void removeNonExistStationInLine() {
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선에_등록되지_않은_역_제외_요청(lineId, stationId3);
+
+        // then
+        지하철_노선에_지하철역_제외_실패됨(deleteResponse);
+    }
 }

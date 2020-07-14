@@ -133,4 +133,15 @@ public class LineStationAcceptanceStep {
     public static void 지하철_노선에_지하철역_순서_정렬됨(ExtractableResponse<Response> response, List<Long> asList) {
 
     }
+
+    public static ExtractableResponse<Response> 지하철_노선의_중간에_지하철역_제외_요청(Long lineId, Long stationId3) {
+        return null;
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에_등록되지_않은_역_제외_요청(Long lineId, Long stationId3) {
+        return null;
+    }
+
+    public static void 지하철_노선에_지하철역_제외_실패됨(ExtractableResponse<Response> deleteResponse) {
+    }
 }
