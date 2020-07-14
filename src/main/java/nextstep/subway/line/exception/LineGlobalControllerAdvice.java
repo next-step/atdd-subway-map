@@ -18,4 +18,10 @@ public class LineGlobalControllerAdvice {
     public String handleNonExistStationException() {
         return "존재하지 않는 역은 등록이 불가능 합니다.";
     }
+
+    @ExceptionHandler(RemoveNonExistStationInLineException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleRemoveNonExistStationException() {
+        return "노선에 존재하지 않는 역은 삭제가 불가능 합니다.";
+    }
 }

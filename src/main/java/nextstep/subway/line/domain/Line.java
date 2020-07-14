@@ -75,4 +75,8 @@ public class Line extends BaseEntity {
     public List<LineStation> getOrderedLineStations() {
         return lineStations.getOrderedLineStations();
     }
+
+    public void removeLineStation(Long stationId) {
+        lineStations.removeLineStation(stationId);
+    }
 }

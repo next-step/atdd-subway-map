@@ -50,4 +50,9 @@ public class LineStationService {
             });
     }
 
+    public void removeLineStation(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+
+        line.removeLineStation(stationId);
+    }
 }
