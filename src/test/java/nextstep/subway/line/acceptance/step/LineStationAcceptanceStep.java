@@ -118,30 +118,39 @@ public class LineStationAcceptanceStep {
                 extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선의_마지막에_지하철역_제외_요청(Long lineId, Long stationId3) {
-        return null;
-    }
-
-    public static void 지하철_노선에_지하철역_제외_확인됨(ExtractableResponse<Response> response, Long stationId3) {
-
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_제외_요청(Long lineId, Long stationId) {
+        return RestAssured.given().log().all().
+                when().
+                delete("/lines/{lineId}/stations/{stationId}", lineId, stationId).
+                then().
+                log().all().
+                extract();
     }
 
     public static void 지하철_노선에_지하철역_제외됨(ExtractableResponse<Response> deleteResponse) {
-
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static void 지하철_노선에_지하철역_순서_정렬됨(ExtractableResponse<Response> response, List<Long> asList) {
+    public static void 지하철_노선에_지하철역_제외_확인됨(ExtractableResponse<Response> response, Long stationId) {
+        LineResponse lineResponse = response.as(LineResponse.class);
 
+        Boolean isRemoved = lineResponse.getStations().stream()
+                .noneMatch(it -> it.getStation().getId() == stationId);
+
+        assertThat(isRemoved).isTrue();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선의_중간에_지하철역_제외_요청(Long lineId, Long stationId3) {
-        return null;
-    }
+    public static void 지하철_노선에_지하철역_순서_정렬됨(ExtractableResponse<Response> response, List<Long> orderedList) {
+        LineResponse line = response.as(LineResponse.class);
+        List<Long> stationIds = line.getStations().stream()
+                .map(it -> it.getStation().getId())
+                .collect(Collectors.toList());
 
-    public static ExtractableResponse<Response> 지하철_노선에_등록되지_않은_역_제외_요청(Long lineId, Long stationId3) {
-        return null;
+        assertThat(stationIds).containsExactlyElementsOf(orderedList);
     }
 
     public static void 지하철_노선에_지하철역_제외_실패됨(ExtractableResponse<Response> deleteResponse) {
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(deleteResponse.body().asString()).contains("노선에 존재하지 않는 역은 삭제가 불가능 합니다");
     }
 }
