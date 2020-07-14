@@ -57,7 +57,7 @@ public class LineService {
                             Optional<Station> station = stations.stream()
                                     .filter(st-> st.getId() == it.getStationId())
                                     .findFirst();
-                            return LineStationResponse.of(StationResponse.of(station.get()), it);
+                            return LineStationResponse.of(StationResponse.of(station.orElseThrow(RuntimeException::new)), it);
                         })
                         .collect(Collectors.toList());
 
