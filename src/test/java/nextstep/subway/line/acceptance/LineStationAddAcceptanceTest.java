@@ -155,7 +155,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철 노선에 지하철역 등록 실패됨
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(lineStationResponse.body().asString()).contains("DuplicateStationInLineException");
+        assertThat(lineStationResponse.body().asString()).contains("지하철 역이 해당 노선에 이미 등록되어 있습니다");
     }
 
     @DisplayName("존재하지 않는 역을 등록한다.")
@@ -169,7 +169,7 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철 노선에 지하철역 등록 실패됨
         assertThat(lineStationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(lineStationResponse.body().asString()).contains("NonExistStationInLineException");
+        assertThat(lineStationResponse.body().asString()).contains("존재하지 않는 역은 등록이 불가능 합니다.");
     }
 
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {

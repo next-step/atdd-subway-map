@@ -10,12 +10,12 @@ public class LineGlobalControllerAdvice {
     @ExceptionHandler(DuplicateStationInLineException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleDuplicateStationLineException() {
-        return "DuplicateStationInLineException";
+        return "지하철 역이 해당 노선에 이미 등록되어 있습니다.";
     }
 
     @ExceptionHandler(NonExistStationInLineException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleNonExistStationException() {
-        return "NonExistStationInLineException";
+        return "존재하지 않는 역은 등록이 불가능 합니다.";
     }
 }
