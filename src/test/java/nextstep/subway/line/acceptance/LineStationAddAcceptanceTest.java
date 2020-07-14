@@ -195,8 +195,8 @@ public class LineStationAddAcceptanceTest extends AcceptanceTest {
 
         params.put("preStationId", preStationId + "");
         params.put("stationId", stationId + "");
-        params.put("distance", "4");
-        params.put("duration", "2");
+        params.put("distance", distance);
+        params.put("duration", duration);
 
         return params;
     }
