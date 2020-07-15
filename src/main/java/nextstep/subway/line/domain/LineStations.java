@@ -1,5 +1,7 @@
 package nextstep.subway.line.domain;
 
+import nextstep.subway.line.exception.RemoveNonExistStationInLineException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,5 +49,19 @@ public class LineStations {
                     .findFirst();
         }
         return result;
+    }
+
+    public void removeLineStation(Long stationId) {
+        // linestation 중 stationId 가 같은 것을 가져옴
+        LineStation lineStation = lineStations.stream()
+                .filter(it -> it.getStationId() == stationId)
+                .findFirst()
+                .orElseThrow(RemoveNonExistStationInLineException::new);
+
+        lineStations.stream()
+                .filter(it -> it.getPreStationId() == stationId)
+                .findFirst()
+                .ifPresent(it -> it.updatePreStationId(lineStation.getPreStationId()));
+        lineStations.remove(lineStation);
     }
 }

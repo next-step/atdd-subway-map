@@ -20,4 +20,10 @@ public class LineStationController {
         lineStationService.addLineStation(lineId, lineStationRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/{lineId}/stations/{stationId}")
+    public ResponseEntity removeLineStation(@PathVariable Long lineId, @PathVariable Long stationId)  {
+        lineStationService.removeLineStation(lineId, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

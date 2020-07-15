@@ -35,7 +35,9 @@ public class LineStationService {
     }
 
     private void validateNonExistStation(Long stationId) {
-        stationRepository.findById(stationId).orElseThrow(NonExistStationInLineException::new);
+        if (!stationRepository.existsById(stationId)) {
+            throw new NonExistStationInLineException();
+        }
     }
 
     private void validateDuplicateStation(Line line, Long stationId) {
@@ -48,4 +50,9 @@ public class LineStationService {
             });
     }
 
+    public void removeLineStation(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+
+        line.removeLineStation(stationId);
+    }
 }
