@@ -1,9 +1,8 @@
 package nextstep.subway.line.domain;
 
-import nextstep.subway.config.BaseEntity;
+import nextstep.subway.common.BaseEntity;
 
 import javax.persistence.*;
-import java.time.LocalTime;
 
 @Entity
 public class Line extends BaseEntity {
@@ -13,26 +12,17 @@ public class Line extends BaseEntity {
     @Column(unique = true)
     private String name;
     private String color;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private int intervalTime;
 
     public Line() {
     }
 
-    public Line(String name, String color, LocalTime startTime, LocalTime endTime, int intervalTime) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.intervalTime = intervalTime;
     }
 
     public void update(Line line) {
         this.name = line.getName();
-        this.startTime = line.getStartTime();
-        this.endTime = line.getEndTime();
-        this.intervalTime = line.getIntervalTime();
         this.color = line.getColor();
     }
 
@@ -46,17 +36,5 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public int getIntervalTime() {
-        return intervalTime;
     }
 }
