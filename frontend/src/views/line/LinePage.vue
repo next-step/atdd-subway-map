@@ -7,24 +7,6 @@
         </v-card-title>
         <v-card-text class="relative px-0 pb-0 mb-6 line-list-container d-flex flex-column">
           <div class="relative">
-            <v-simple-table v-if="lineDetail" class="border top">
-              <template v-slot:default>
-                <tbody>
-                  <tr>
-                    <td>첫차 시간</td>
-                    <td>{{ lineDetail.startTime }}</td>
-                  </tr>
-                  <tr>
-                    <td>막차 시간</td>
-                    <td>{{ lineDetail.endTime }}</td>
-                  </tr>
-                  <tr>
-                    <td>간격</td>
-                    <td>{{ lineDetail.intervalTime }}</td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
             <LineCreateButton />
           </div>
           <v-divider />

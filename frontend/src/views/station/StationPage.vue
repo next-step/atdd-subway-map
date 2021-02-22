@@ -86,9 +86,9 @@ export default {
       try {
         await this.deleteStation(stationId)
         await this.fetchStations()
-        this.$refs.stationForm.resetValidation()
         this.showSnackbar(SNACKBAR_MESSAGES.COMMON.SUCCESS)
       } catch (e) {
+        console.log(e);
         this.showSnackbar(SNACKBAR_MESSAGES.COMMON.FAIL)
       }
     }

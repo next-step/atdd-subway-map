@@ -7,19 +7,9 @@
         제공되는 템플릿을 활용해 프로젝트를 완성해 보세요!
       </p>
       <ul class="text-blue-700">
-        <li class="inline-block p-1">
-          <router-link to="/stations">
-            <v-btn text>역 관리</v-btn>
-          </router-link>
-        </li>
-        <li class="inline-block p-1">
-          <router-link to="/lines">
-            <v-btn text>노선 관리</v-btn>
-          </router-link>
-        </li>
-        <li class="inline-block p-1">
-          <router-link to="/edges">
-            <v-btn text>구간 관리</v-btn>
+        <li v-for="navItem in navItems" :key="navItem._id" class="inline-block p-1">
+          <router-link :to="navItem.link">
+            <v-btn text>{{ navItem.text }}</v-btn>
           </router-link>
         </li>
       </ul>
@@ -29,7 +19,28 @@
 
 <script>
 export default {
-  name: 'MainPage'
+  name: 'MainPage',
+  data() {
+    return {
+      navItems: [
+        {
+          _id: '1',
+          link: '/stations',
+          text: '역 관리'
+        },
+        {
+          _id: '2',
+          link: '/lines',
+          text: '노선 관리'
+        },
+        {
+          _id: '3',
+          link: '/sections',
+          text: '구간 관리'
+        }
+      ]
+    }
+  }
 }
 </script>
 
