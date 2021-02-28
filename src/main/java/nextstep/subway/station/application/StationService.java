@@ -36,4 +36,12 @@ public class StationService {
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
+
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
 }
