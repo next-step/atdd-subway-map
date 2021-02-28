@@ -3,6 +3,7 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.MediaType;
 
 import java.util.Map;
@@ -29,6 +30,16 @@ public class LineSteps {
                 accept(MediaType.APPLICATION_JSON_VALUE).
                 when().
                 get("/lines").
+                then().
+                log().all().
+                extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(LineResponse response) {
+        return RestAssured.given().log().all().
+                accept(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                get("/lines/{lineId}", response.getId()).
                 then().
                 log().all().
                 extract();
