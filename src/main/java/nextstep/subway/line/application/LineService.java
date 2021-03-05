@@ -1,5 +1,6 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.exceptions.NotFoundLineException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
@@ -9,13 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -32,17 +32,21 @@ public class LineService {
     }
 
     public LineResponse readLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        Line line = findById(id);
         return LineResponse.of(line);
     }
 
     @Modifying
     public void updateLine(Long id, Line target) {
-        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        Line line = findById(id);
         line.update(target);
     }
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new NotFoundLineException(id));
     }
 }
