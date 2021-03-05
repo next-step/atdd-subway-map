@@ -58,12 +58,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
+        final ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성_요청(신분당선_생성());
 
         // when
         // 지하철_노선_조회_요청
+        final String string = 신분당선_응답.jsonPath().getString("id");
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(string);
 
         // then
         // 지하철_노선_응답됨
+        지하철_노선_응답됨(response);
+    }
+
+    @DisplayName("존재하지 않는 지하철 노선을 조회한다.")
+    @Test
+    void getLine_notExist() {
+        // when
+        // 지하철_노선_조회_요청
+        final String LINE_ID = "1";
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(LINE_ID);
+
+        // then
+        // 지하철_노선_조회_실패됨
+        지하철_노선_조회_실패됨(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -90,6 +107,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         // 지하철_노선_삭제됨
+    }
+
+    private void 지하철_노선_조회_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    private void 지하철_노선_응답됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회_요청(String lineId) {
+        return RestAssured
+            .given().log().all()
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines/"+lineId)
+            .then().log().all()
+            .extract();
     }
 
     private void 지하철_노선_목록_포함됨(
