@@ -26,7 +26,7 @@ public class LineServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"서울역:blue", "일산:yellow", "혜화:green"}, delimiter = ':')
+    @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
     public void findByIdTest(String stationName, String color) {
         //Given
         LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
@@ -46,7 +46,7 @@ public class LineServiceTest {
     @Test
     public void notFoundLineException() {
         assertThatThrownBy(() -> {
-                 Long id = lineService.saveLine(new LineRequest("대방역", "blue")).getId();
+                 Long id = lineService.saveLine(new LineRequest("6호선", "brown")).getId();
                  lineService.findById(id + 1);
         }).isInstanceOf(NotFoundLineException.class);
     }
