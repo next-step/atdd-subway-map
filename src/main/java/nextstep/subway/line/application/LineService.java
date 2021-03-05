@@ -34,4 +34,11 @@ public class LineService {
         return LineResponse.of(line);
 
     }
+
+    public LineResponse modifyLine(long id,LineRequest lineRequest) {
+        Line line  =  lineRepository.findById(id).orElseGet(()->null);
+        line.update(lineRequest.toLine());
+        lineRepository.save(line);
+        return LineResponse.of(line);
+    }
 }

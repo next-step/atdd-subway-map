@@ -104,13 +104,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE).body(params)
-            .when().put("/{id}",1)
+            .when().put("/lines/{id}",1)
             .then().log().all().extract();
 
         // then
         // 지하철_노선_수정됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(response.body()).isEqualTo(response.asString().contains("YELLOW"));
+        assertThat(response.body().asString()).contains("YELLOW");
     }
 
     @DisplayName("지하철 노선을 제거한다.")
