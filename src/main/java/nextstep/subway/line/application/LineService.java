@@ -23,7 +23,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
+        Line persistLine = lineRepository.save(request.toEntity());
         return LineResponse.of(persistLine);
     }
 
