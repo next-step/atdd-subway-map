@@ -1,5 +1,6 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.exception.ResourceNotFoundException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
@@ -31,5 +32,12 @@ public class LineService {
         return lines.stream()
                 .map(line -> LineResponse.of(line))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse findById(Long id) {
+        return lineRepository.findById(id)
+                .map(line -> LineResponse.of(line))
+                .orElseThrow(ResourceNotFoundException::new);
     }
 }
