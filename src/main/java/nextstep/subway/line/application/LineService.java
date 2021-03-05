@@ -30,15 +30,14 @@ public class LineService {
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(Line::toLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE))
-                .toLineResponse();
+        Line line = findLineById(id);
+        return LineResponse.of(line);
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
@@ -46,8 +45,7 @@ public class LineService {
 
         line.update(lineRequest.toEntity());
 
-        return lineRepository.save(line)
-                .toLineResponse();
+        return LineResponse.of(lineRepository.save(line));
     }
 
     public void deleteLine(Long id) {

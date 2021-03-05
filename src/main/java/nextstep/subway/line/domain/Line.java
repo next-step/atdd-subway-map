@@ -1,7 +1,6 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.line.dto.LineResponse;
 
 import javax.persistence.*;
 
@@ -43,7 +42,4 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public LineResponse toLineResponse() {
-        return LineResponse.of(this);
-    }
 }
