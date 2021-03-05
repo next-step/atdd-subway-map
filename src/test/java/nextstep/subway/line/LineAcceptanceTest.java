@@ -5,21 +5,27 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.support.ApiSupporter;
+import nextstep.subway.station.domain.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         //Given
-        Line line = new Line("서울역", "blue");
+        Line line = new Line("1호선", "blue");
 
         //When
         ExtractableResponse<Response> response = RestAssured
@@ -61,14 +67,52 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine() {
-        // given
-        // 지하철_노선_등록되어_있음
+        //Given
+        ExtractableResponse<Response> createdResponse = ApiSupporter.callCreatedApi("1호선", "blue");
+        LineResponse createdLine = createdResponse.jsonPath().getObject(".", LineResponse.class);
 
-        // when
-        // 지하철_노선_조회_요청
+        //When
+        String uri = createdResponse.header("Location");
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when()
+                    .get(uri)
+                .then().log().all()
+                .extract();
+        LineResponse expectedLine = createdResponse.jsonPath().getObject(".", LineResponse.class);
 
-        // then
-        // 지하철_노선_응답됨
+        //Then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(expectedLine.getId()).isEqualTo(createdLine.getId()),
+                () -> assertThat(expectedLine.getName()).isEqualTo(createdLine.getName()),
+                () -> assertThat(expectedLine.getColor()).isEqualTo(createdLine.getColor()),
+                () -> assertThat(expectedLine.getModifiedDate()).isEqualTo(createdLine.getModifiedDate()),
+                () -> assertThat(expectedLine.getCreatedDate()).isEqualTo(createdLine.getCreatedDate()),
+                () -> assertThat(response.jsonPath().getString("stations")).isNotNull()
+        );
+    }
+
+    @DisplayName("등록되지 않는 지하철 노선을 조회한다.")
+    @Test
+    void notFoundLine() {
+        //Given
+        ExtractableResponse<Response> createdResponse = ApiSupporter.callCreatedApi("1호선", "blue");
+        LineResponse createdLine = createdResponse.jsonPath().getObject(".", LineResponse.class);
+
+        //When
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines/"+createdLine.getId()+1)
+                .then().log().all()
+                .extract();
+
+        //Then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        );
+
     }
 
     @DisplayName("지하철 노선을 수정한다.")
