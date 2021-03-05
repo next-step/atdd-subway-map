@@ -49,4 +49,11 @@ public class LineService {
         Line persistLine = lineRepository.save(line);
         return LineResponse.of(persistLine);
     }
+
+    public void deleteById(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        lineRepository.delete(line);
+    }
 }
