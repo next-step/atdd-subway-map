@@ -61,19 +61,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     }
 
-    private void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response, HttpStatus status) {
-        Assertions.assertThat(response.statusCode()).isEqualTo(status.value());
-    }
-
     private List<Long> 지하철_노선_객체_리스트_반환(ExtractableResponse<Response> response) {
         return response.jsonPath().getList(".", Line.class).stream()
                 .map(Line::getId)
                 .collect(Collectors.toList());
     }
 
-
     private ListAssert<Long> 지하철_노선_목록_포함됨(List<Long> createdLineIds, List<Long> resultLineIds) {
         return Assertions.assertThat(resultLineIds).containsAll(createdLineIds);
+    }
+
+    private void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response, HttpStatus status) {
+        Assertions.assertThat(response.statusCode()).isEqualTo(status.value());
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -81,12 +80,30 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createdResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
+
+        Long createdId = 지하철_노선_아이디_추출(createdResponse1);
 
         // when
         // 지하철_노선_조회_요청
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdId);
 
         // then
         // 지하철_노선_응답됨
+        지하철_노선_응답됨(response, HttpStatus.OK);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
+        String path = String.format("/lines/%d", id);
+
+        return RestAssured
+                .given().log().all()
+                .when().get(path)
+                .then().log().all().extract();
+    }
+
+    private void 지하철_노선_응답됨(ExtractableResponse<Response> response, HttpStatus status) {
+        Assertions.assertThat(response.statusCode()).isEqualTo(status.value());
     }
 
     @DisplayName("지하철 노선을 수정한다.")
