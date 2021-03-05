@@ -75,8 +75,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        지하철_노선_생성("신분당선","RED");
-        지하철_노선_생성("2호선","GREEN");
+        //지하철_노선_생성("신분당선","RED");
+        //지하철_노선_생성("2호선","GREEN");
         // when
         // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = RestAssured
@@ -118,11 +118,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-
+        지하철_노선_생성("신분당선","RED");
         // when
         // 지하철_노선_제거_요청
+        ExtractableResponse<Response> removeResponse = RestAssured
+            .given().log().all()
+            .when().delete("/lines/{id}",1)
+            .then().log().all().extract();
 
         // then
         // 지하철_노선_삭제됨
+        assertThat(removeResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
     }
 }
