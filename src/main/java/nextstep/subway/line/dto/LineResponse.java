@@ -5,6 +5,7 @@ import nextstep.subway.line.domain.Line;
 import java.time.LocalDateTime;
 
 public class LineResponse {
+
     private Long id;
     private String name;
     private String color;

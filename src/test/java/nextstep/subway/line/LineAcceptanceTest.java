@@ -5,9 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends AcceptanceTest {
-    @DisplayName("지하철 노선을 생성한다.")
+class LineAcceptanceTest extends AcceptanceTest {
+
     @Test
+    @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
         // when
         // 지하철_노선_생성_요청
@@ -16,8 +17,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_생성됨
     }
 
-    @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
+    @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given
         // 지하철_노선_등록되어_있음
@@ -31,8 +32,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_목록_포함됨
     }
 
-    @DisplayName("지하철 노선을 조회한다.")
     @Test
+    @DisplayName("지하철 노선을 조회한다.")
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
@@ -44,8 +45,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_응답됨
     }
 
-    @DisplayName("지하철 노선을 수정한다.")
     @Test
+    @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
@@ -57,8 +58,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_수정됨
     }
 
-    @DisplayName("지하철 노선을 제거한다.")
     @Test
+    @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
