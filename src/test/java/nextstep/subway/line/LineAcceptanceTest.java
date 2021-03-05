@@ -1,19 +1,46 @@
 package nextstep.subway.line;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.domain.Line;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        // when
-        // 지하철_노선_생성_요청
+        //Given
+        Line line = new Line("서울역", "blue");
 
-        // then
-        // 지하철_노선_생성됨
+        //When
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(line)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        //Then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.header("Location")).isNotBlank(),
+                () -> assertThat(response.jsonPath().getString("id")).isNotNull(),
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(line.getName()),
+                () -> assertThat(response.jsonPath().getString("color")).isEqualTo(line.getColor()),
+                () -> assertThat(response.jsonPath().getString("createdDate")).isNotNull(),
+                () -> assertThat(response.jsonPath().getString("modifiedDate")).isNotNull()
+        );
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
