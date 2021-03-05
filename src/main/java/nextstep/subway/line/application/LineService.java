@@ -40,4 +40,13 @@ public class LineService {
                 .map(line -> LineResponse.of(line))
                 .orElseThrow(ResourceNotFoundException::new);
     }
+
+    public LineResponse updateById(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+        line.update(request.toLine());
+
+        Line persistLine = lineRepository.save(line);
+        return LineResponse.of(persistLine);
+    }
 }
