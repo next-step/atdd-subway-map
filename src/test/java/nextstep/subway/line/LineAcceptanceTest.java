@@ -112,18 +112,27 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getObject(".", LineResponse.class).getId()).isEqualTo(inputCount);
     }
 
-    private void 지하철_노선_목록_포함됨(ExtractableResponse<Response> createdResponse1,
-                               ExtractableResponse<Response> createdResponse2, ExtractableResponse<Response> response) {
-        List<Long> expectedLineIds = Arrays.asList(createdResponse1, createdResponse2)
-                .stream()
-                .map(r -> Long.parseLong(r.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath()
+    private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, int inputCount) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(response.jsonPath().getList(".", LineResponse.class)).hasSize(inputCount);
+    };
+
+    private void 지하철_노선_목록_포함됨(ExtractableResponse<Response> ... responses) {
+        List<Long> resultLineIds = responses[0].jsonPath()
                 .getList(".", LineResponse.class)
                 .stream()
                 .map(r -> r.getId())
                 .collect(Collectors.toList());
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+
+        List<Long> expectedLineIds = Arrays.asList(responses)
+                .stream()
+                .skip(1)
+                .map(r -> Long.parseLong(r.header("Location").split("/")[2]))
+                .collect(Collectors.toList());
+
+        resultLineIds.retainAll(expectedLineIds);
+        assertThat(resultLineIds).hasSize(expectedLineIds.size());
     }
 
     private ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> createdResponse) {
