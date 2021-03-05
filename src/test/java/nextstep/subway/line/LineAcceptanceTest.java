@@ -56,7 +56,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
 
         // 지하철_노선_등록되어_있음
-        LineRequest lineRequest2 = new LineRequest("2호선", "초록색");
+        LineRequest lineRequest2 = new LineRequest("1호선", "군청색");
         ExtractableResponse<Response> createdResponse2 = RestAssured.given().log().all()
                 .body(lineRequest2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
