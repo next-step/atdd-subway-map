@@ -157,12 +157,28 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createdResponse1 = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
+        Long createdId = 지하철_노선_아이디_추출(createdResponse1);
 
         // when
         // 지하철_노선_제거_요청
+        ExtractableResponse<Response> response = 지하철_노선_제거_요청(createdId);
 
         // then
         // 지하철_노선_삭제됨
+        지하철_노선_삭제됨(response);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_제거_요청(Long createdId) {
+        String path = String.format("/lines/%d", createdId);
+        return RestAssured
+                .given().log().all()
+                .when().delete(path)
+                .then().log().all().extract();
+    }
+
+    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
