@@ -66,9 +66,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_목록_응답됨
         assertThat(readLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         // 지하철_노선_목록_포함됨
-        List<Long> lines = readLinesResponse.jsonPath().getList(".", LineResponse.class).stream()
-                .map(LineResponse::getId)
-                .collect(Collectors.toList());
+        List<LineResponse> lines = readLinesResponse.jsonPath().getList(".", LineResponse.class);
+        assertThat(lines).hasSize(1);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
