@@ -7,6 +7,7 @@ import nextstep.subway.line.domain.Line;
 import org.springframework.http.MediaType;
 
 public class ApiSupporter {
+
     public static ExtractableResponse<Response> callCreatedApi(String stationName, String color) {
         Line line = new Line(stationName, color);
         return RestAssured
@@ -17,5 +18,14 @@ public class ApiSupporter {
                         .post("/lines")
                     .then()
                         .extract();
+    }
+
+    public static ExtractableResponse<Response> callFindApi(String path) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                    .get(path)
+                .then().log().all()
+                .extract();
     }
 }

@@ -30,6 +30,12 @@ public class LineController {
         return ResponseEntity.ok().body(line);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        lineService.update(id, lineRequest);
+        return ResponseEntity.ok().build();
+    }
+
     @ExceptionHandler(NotFoundLineException.class)
     public ResponseEntity notFoundLineExceptionHandler(NotFoundLineException e) {
         String errorMessage = e.getMessage();

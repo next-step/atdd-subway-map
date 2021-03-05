@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.support.ApiSupporter;
 import nextstep.subway.station.domain.Station;
@@ -118,14 +119,55 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
-        // given
-        // 지하철_노선_등록되어_있음
+        //Given
+        String station = "1호선";
+        String color = "blue";
 
-        // when
-        // 지하철_노선_수정_요청
+        ExtractableResponse<Response> createdResponse = ApiSupporter.callCreatedApi(station, color);
+        String uri = createdResponse.header("Location");
 
-        // then
-        // 지하철_노선_수정됨
+        //When
+        String updatePostFix = "-600";
+        LineRequest updateRequest = new LineRequest(station, color + updatePostFix);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                    .body(updateRequest)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().
+                    put(uri)
+                .then().log().all()
+                .extract();
+        LineResponse updatedResponse = ApiSupporter.callFindApi(uri).jsonPath().getObject(".", LineResponse.class);
+
+        //Then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(updatedResponse.getColor()).isEqualTo(color+updatePostFix)
+        );
+    }
+
+    @DisplayName("등록되지 않는 노선에 수정을 요청한다")
+    @Test
+    void notFoundUpdateLine() {
+        //Given
+        String station = "1호선";
+        String color = "blue";
+        LineResponse lineResponse = ApiSupporter.callCreatedApi(station, color).jsonPath().getObject(".", LineResponse.class);
+
+        //When
+        String updatePostFix = "-600";
+        LineRequest updateRequest = new LineRequest(station, color + updatePostFix);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(updateRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().
+                        put("/lines/"+lineResponse.getId()+1)
+                .then().log().all()
+                .extract();
+
+        //Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
