@@ -42,8 +42,7 @@ public class LineService {
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+        Line line = findLineById(id);
 
         line.update(lineRequest.toEntity());
 
@@ -52,9 +51,13 @@ public class LineService {
     }
 
     public void deleteLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+        Line line = findLineById(id);
 
         lineRepository.delete(line);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
     }
 }
