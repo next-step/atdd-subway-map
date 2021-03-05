@@ -32,4 +32,10 @@ public class LineService {
                 .map(line -> LineResponse.of(line))
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).get();
+        return LineResponse.of(line);
+    }
 }
