@@ -34,7 +34,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         ExtractableResponse<Response> createdResponse1 = 지하철_노선_등록되어_있음("2호선", "초록색");
 
-
         ExtractableResponse<Response> createdResponse2 = 지하철_노선_등록되어_있음("1호선", "군청색");
 
         // when
