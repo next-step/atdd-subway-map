@@ -46,8 +46,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성(response);
     }
 
-
-
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
@@ -126,7 +124,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private void 지하철_노선_목록_포함됨(ExtractableResponse<Response> response) {
-        List<LineResponse> lineResponses = response.jsonPath().getList("$.list", LineResponse.class);
+        List<LineResponse> lineResponses = response.jsonPath().getList(".", LineResponse.class);
         Assertions.assertThat(lineResponses).isNotEmpty();
     }
 
