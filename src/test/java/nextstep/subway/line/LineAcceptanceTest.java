@@ -42,6 +42,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성됨(response);
     }
 
+    @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 생성한다.")
+    @Test
+    void createLineWithDuplicateName() {
+        // given
+        지하철_노선_생성_요청(신분당선);
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
+
+        // then
+        지하철역_생성_실패됨(response);
+    }
+
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
@@ -240,5 +253,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         map.put("name", name);
         map.put("color", color);
         return map;
+    }
+
+    private void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
