@@ -142,12 +142,39 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-red-600");
+        params.put("name", "신분당선");
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> newParams = new HashMap<>();
+        newParams.put("color", "bg-blue-600");
+        newParams.put("name", "구분당선");
 
         // when
         // 지하철_노선_수정_요청
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(newParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
 
         // then
         // 지하철_노선_수정됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @Test

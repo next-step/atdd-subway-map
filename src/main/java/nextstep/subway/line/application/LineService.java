@@ -39,4 +39,9 @@ public class LineService {
                 .map(LineResponse::of)
                 .orElseThrow(() -> new LineNotFoundException(id));
     }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new LineNotFoundException(id));
+        line.update(lineRequest.toLine());
+    }
 }
