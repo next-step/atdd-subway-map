@@ -36,4 +36,16 @@ public class LineController {
         LineResponse line = lineService.findLine(lineId);
         return ResponseEntity.ok().body(line);
     }
+
+    @PatchMapping(value = "/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateLine(@PathVariable("lineId") Long lineId, @RequestBody LineRequest lineRequest) {
+        lineService.updateLine(lineId, lineRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateLine(@PathVariable("lineId") Long lineId) {
+        lineService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
 }

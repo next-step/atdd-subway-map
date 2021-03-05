@@ -34,6 +34,17 @@ public class LineService {
         Optional<Line> line = lineRepository.findById(lineId);
         return line.map(LineResponse::of)
                 .orElseThrow(() -> new IllegalArgumentException("Not found lineId"+lineId));
+    }
 
+    public void updateLine(final Long lineId, LineRequest lineRequest){
+        Line findLine = lineRepository.getOne(lineId);
+        findLine.update(lineRequest.toLine());
+    }
+
+    public void deleteLine(final Long lineId) {
+        Optional<Line> line = lineRepository.findById(lineId);
+        if(line.isPresent()){
+            lineRepository.delete(line.get());
+        }
     }
 }

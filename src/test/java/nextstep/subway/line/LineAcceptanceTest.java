@@ -100,12 +100,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(this.KANGNAM);
+        LineResponse registeredLine  = registerLineResponse.jsonPath().getObject("", LineResponse.class);
 
         // when
         // 지하철_노선_수정_요청
+        KANGNAM.put("color", "gold");
+        ExtractableResponse<Response> response  = this.updateLineHelper(registeredLine.getId(), this.KANGNAM);
 
         // then
         // 지하철_노선_수정됨
+        this.assertStatusCode(response, HttpStatus.OK);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -113,12 +118,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(this.KANGNAM);
+        LineResponse registeredLine  = registerLineResponse.jsonPath().getObject("", LineResponse.class);
 
         // when
         // 지하철_노선_제거_요청
+        ExtractableResponse<Response> response  = this.deleteLineHelper(registeredLine.getId());
 
         // then
         // 지하철_노선_삭제됨
+        this.assertStatusCode(response, HttpStatus.NO_CONTENT);
     }
 
     private ExtractableResponse<Response> registerLineHelper(final Map<String, String> line) {
@@ -162,12 +171,32 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(responseLines.getColor()).isEqualTo(expectedLine.get("color"));
     }
 
-
     private  ExtractableResponse<Response> findLineHelper(final LineResponse InputLine) {
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
                 when().
                 get("/lines/"+InputLine.getId()).
+                then().
+                log().all().
+                extract();
+    }
+
+    private  ExtractableResponse<Response> updateLineHelper(final Long lineId, final Map<String, String> line) {
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(line).
+                when().
+                patch("/lines/"+lineId).
+                then().
+                log().all().
+                extract();
+    }
+
+    private  ExtractableResponse<Response> deleteLineHelper(final Long lineId) {
+        return RestAssured.given().log().all().
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                delete("/lines/"+lineId).
                 then().
                 log().all().
                 extract();
