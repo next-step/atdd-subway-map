@@ -95,13 +95,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        // 지하철_노선_등록되어_있음 (지하철_노선_생성요청)
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청("1호선", "노랑색");
 
         // when
         // 지하철_노선_제거_요청
+        Long lineId = createdResponse.as(LineResponse.class).getId();
+        ExtractableResponse<Response> response = 지하철_노선_제거요청(lineId);
 
         // then
         // 지하철_노선_삭제됨
+        지하철_노선_삭제됨(response);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성요청(String name, String color) {
@@ -176,5 +180,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(updatedName).isEqualTo(name);
         assertThat(updatedColor).isEqualTo(color);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_제거요청(Long lineId) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{id}", lineId)
+                .then().log().all().extract();
+
+        return response;
+    }
+
+    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
