@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.exception.ResourceNotFoundException;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -118,14 +120,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return response;
     }
 
-    private void 지하철_노선목록_응답됨포함됨(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> lineResponses) {
+    private void 지하철_노선목록_응답됨포함됨(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> createdResponses) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());
 
-        List<Long> expectedLineIds = lineResponses.stream()
+        List<Long> expectedLineIds = createdResponses.stream()
                 .map(it -> it.as(LineResponse.class))
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());
@@ -139,7 +141,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
         return response;
     }
-
 
     private void 지하철_노선_응답됨포함됨(ExtractableResponse<Response> response, ExtractableResponse<Response> createdResponse) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
