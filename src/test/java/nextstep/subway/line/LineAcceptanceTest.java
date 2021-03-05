@@ -75,8 +75,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        //지하철_노선_생성("신분당선","RED");
-        //지하철_노선_생성("2호선","GREEN");
+        지하철_노선_생성("신분당선","RED");
+        지하철_노선_생성("2호선","GREEN");
         // when
         // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = RestAssured
