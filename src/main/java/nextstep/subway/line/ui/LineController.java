@@ -34,8 +34,8 @@ public class LineController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+    public ResponseEntity<List<LineResponse>> getLines() {
+        return ResponseEntity.ok().body(lineService.getLines());
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -27,7 +27,7 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineResponse> findAllLines() {
+    public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
