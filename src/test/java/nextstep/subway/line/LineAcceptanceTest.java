@@ -83,9 +83,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(String lineName, String lineColor) {
-        LineRequest lineRequest1 = new LineRequest(lineName, lineColor);
+        LineRequest lineRequest = new LineRequest(lineName, lineColor);
         return RestAssured.given().log().all()
-                .body(lineRequest1)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -137,9 +137,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 지하철_노선_수정_요청(String lineName, String lineColor,
                                                        ExtractableResponse<Response> createdResponse) {
+        LineRequest lineRequest = new LineRequest(lineName, lineColor);
         String uri = createdResponse.header("Location");
         return RestAssured.given().log().all()
-                .body(new LineRequest("2호선", "red"))
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(uri)
