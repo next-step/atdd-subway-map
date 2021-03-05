@@ -51,4 +51,10 @@ public class LineController {
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .body(lineResponse);
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+        lineService.deleteLine(id);
+        return ResponseEntity.noContent().build();
+    }
 }

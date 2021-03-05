@@ -50,4 +50,11 @@ public class LineService {
         return lineRepository.save(line)
                 .toLineResponse();
     }
+
+    public void deleteLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+
+        lineRepository.delete(line);
+    }
 }
