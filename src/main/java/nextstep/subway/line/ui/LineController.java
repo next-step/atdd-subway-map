@@ -1,6 +1,7 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,12 @@ public class LineController {
     public ResponseEntity showLine(@PathVariable Long id) {
         LineResponse line = lineService.readLine(id);
         return ResponseEntity.ok().body(line);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateLine(@PathVariable Long id, @RequestBody Line target) {
+        lineService.updateLine(id, target);
+        return ResponseEntity.ok().build();
     }
 
 }

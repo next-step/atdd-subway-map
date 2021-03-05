@@ -4,6 +4,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,5 +34,11 @@ public class LineService {
     public LineResponse readLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
         return LineResponse.of(line);
+    }
+
+    @Modifying
+    public void updateLine(Long id, Line target) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        line.update(target);
     }
 }
