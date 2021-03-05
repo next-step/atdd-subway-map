@@ -95,12 +95,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-
+        지하철_노선_생성("신분당선","RED");
+        Map<String,String> params = new HashMap<>();
+        params.put("name","신분당선");
+        params.put("color","YELLOW");
         // when
         // 지하철_노선_수정_요청
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE).body(params)
+            .when().put("/{id}",1)
+            .then().log().all().extract();
 
         // then
         // 지하철_노선_수정됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.ACCEPTED.value());
+        assertThat(response.body()).isEqualTo(response.asString().contains("YELLOW"));
     }
 
     @DisplayName("지하철 노선을 제거한다.")
