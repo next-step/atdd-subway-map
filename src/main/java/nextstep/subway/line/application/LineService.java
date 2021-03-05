@@ -23,7 +23,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toEntity());
+        Line persistLine = lineRepository.save(request.toLine());
         return LineResponse.of(persistLine);
     }
 
@@ -43,7 +43,7 @@ public class LineService {
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = findLineById(id);
 
-        line.update(lineRequest.toEntity());
+        line.update(lineRequest.toLine());
 
         return LineResponse.of(lineRepository.save(line));
     }

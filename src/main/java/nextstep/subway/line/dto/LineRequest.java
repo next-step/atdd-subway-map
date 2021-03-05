@@ -22,8 +22,8 @@ public class LineRequest {
         return color;
     }
 
-    public Line toEntity() {
-        return new Line(this.name, this.color);
+    public Line toLine() {
+        return new Line(name, color);
     }
 
 }
