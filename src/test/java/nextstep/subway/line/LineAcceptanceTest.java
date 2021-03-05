@@ -3,10 +3,10 @@ package nextstep.subway.line;
 import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -97,13 +97,25 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 신분당선_응답,
         ExtractableResponse<Response> 경춘선_응답) {
 
-        final List<Long> expectedLineIds = Stream.of(신분당선_응답, 경춘선_응답)
+        final List<ExtractableResponse<Response>> responses = Arrays.asList(신분당선_응답, 경춘선_응답);
+
+        final List<Long> expectedLineIds = responses.stream()
             .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
             .collect(toList());
-        final List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
+        final List<LineResponse> results = response.jsonPath().getList(".", LineResponse.class);
+        final List<Long> resultLineIds = results.stream()
             .map(LineResponse::getId)
             .collect(toList());
+
         assertThat(resultLineIds).containsAll(expectedLineIds);
+
+        final List<LineResponse> lines = responses.stream()
+            .map(it -> it.as(LineResponse.class))
+            .collect(toList());
+
+        assertThat(lines)
+            .usingRecursiveComparison()
+            .isEqualTo(results);
     }
 
     private void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
