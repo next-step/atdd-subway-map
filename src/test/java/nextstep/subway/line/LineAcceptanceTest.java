@@ -40,8 +40,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        지하철_노선_응답됨(response, HttpStatus.OK);
-        지하철_노선_목록_포함됨(createdResponse1, createdResponse2, response);
+        지하철_노선_목록_조회됨(response, 2);
+        지하철_노선_목록_포함됨(response, createdResponse1, createdResponse2);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -54,7 +54,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdResponse);
 
         // then
-        지하철_노선_응답됨(response, HttpStatus.OK);
+        지하철_노선_조회됨(response, 1);
     }
     @DisplayName("지하철 노선을 수정한다.")
     @Test
@@ -66,7 +66,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_수정_요청("2호선", "red", createdResponse);
 
         // then
-        지하철_노선_수정됨(response);
+        지하철_노선_수정됨(response, "2호선", "red");
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -94,7 +94,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
-        지하철_노선_응답됨(response, HttpStatus.CREATED);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -106,8 +106,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private void 지하철_노선_응답됨(ExtractableResponse<Response> response, HttpStatus status) {
-        assertThat(response.statusCode()).isEqualTo(status.value());
+    private void 지하철_노선_조회됨(ExtractableResponse<Response> response, int inputCount) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(response.jsonPath().getObject(".", LineResponse.class).getId()).isEqualTo(inputCount);
     }
 
     private void 지하철_노선_목록_포함됨(ExtractableResponse<Response> createdResponse1,
@@ -145,10 +147,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private void 지하철_노선_수정됨(ExtractableResponse<Response> response) {
-        지하철_노선_응답됨(response, HttpStatus.OK);
+    private void 지하철_노선_수정됨(ExtractableResponse<Response> response, String lineName, String lineColor) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
-        assertThat(lineResponse.getColor()).isEqualTo("red");
+        assertThat(lineResponse.getName()).isEqualTo(lineName);
+        assertThat(lineResponse.getColor()).isEqualTo(lineColor);
     }
 
     private ExtractableResponse<Response> 지하철_노선_제거_요청(ExtractableResponse<Response> createdResponse) {
@@ -161,6 +164,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
-        지하철_노선_응답됨(response, HttpStatus.NO_CONTENT);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
