@@ -122,12 +122,32 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        LineRequest originLine = new LineRequest("2호선", "green");
+        ExtractableResponse<Response> createdResponse = RestAssured.given().log().all()
+                .body(originLine)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
 
         // when
         // 지하철_노선_수정_요청
+        LineRequest changeLine = new LineRequest("2호선", "red");
+        String uri = createdResponse.header("Location");
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(changeLine)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
 
         // then
         // 지하철_노선_수정됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
+        assertThat(lineResponse.getColor()).isEqualTo(changeLine.getColor());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
