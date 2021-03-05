@@ -27,4 +27,10 @@ public class LineService {
                 .orElseThrow(() -> new NotFoundLineException(id));
         return LineResponse.of(line);
     }
+
+    public void update(Long id, LineRequest updateRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundLineException(id));
+        line.update(updateRequest.toLine());
+    }
 }

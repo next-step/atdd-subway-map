@@ -50,4 +50,20 @@ public class LineServiceTest {
                  lineService.findById(id + 1);
         }).isInstanceOf(NotFoundLineException.class);
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
+    public void updateLine(String stationName, String color) {
+        //Given
+        String postFixColor= "-600";
+        LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
+        LineRequest lineRequest = new LineRequest(stationName, color+postFixColor);
+
+        //When
+        lineService.update(createdResponse.getId(), lineRequest);
+        LineResponse updatedResponse = lineService.findById(createdResponse.getId());
+
+        //Then
+        assertThat(updatedResponse.getColor()).isEqualTo(color+postFixColor);
+    }
 }
