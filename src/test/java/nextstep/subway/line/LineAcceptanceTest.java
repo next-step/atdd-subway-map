@@ -1,8 +1,19 @@
 package nextstep.subway.line;
 
-import nextstep.subway.AcceptanceTest;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.AcceptanceTest;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -11,9 +22,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         // 지하철_노선_생성_요청
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선_생성());
 
         // then
         // 지하철_노선_생성됨
+        지하철_노선_생성됨(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -69,4 +82,28 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_삭제됨
     }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> map) {
+        return RestAssured
+            .given().log().all()
+            .body(map)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotNull();
+    }
+
+
+    private Map<String, String> 신분당선_생성() {
+        Map<String, String> map = new HashMap<>();
+        map.put("color", "bg-red-600");
+        map.put("name", "신분당선");
+        return map;
+    }
+
 }
