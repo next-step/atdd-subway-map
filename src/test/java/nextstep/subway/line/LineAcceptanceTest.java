@@ -57,13 +57,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        // 지하철_노선_등록되어_있음 (지하철_노선_생성요청)
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청("1호선", "노랑색");
 
         // when
         // 지하철_노선_조회_요청
+        Long lineId = createdResponse.as(LineResponse.class).getId();
+        ExtractableResponse<Response> response = 지하철_노선_조회요청(lineId);
 
         // then
-        // 지하철_노선_응답됨
+        // 지하철_노선_응답됨포함됨
+        지하철_노선_응답됨포함됨(response, createdResponse);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -127,5 +131,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .collect(Collectors.toList());
 
         assertThat(resultLineIds).containsAll(expectedLineIds);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회요청(Long lineId) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines/{id}", lineId)
+                .then().log().all().extract();
+        return response;
+    }
+
+
+    private void 지하철_노선_응답됨포함됨(ExtractableResponse<Response> response, ExtractableResponse<Response> createdResponse) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        Long resultLineId = response.as(LineResponse.class).getId();
+        Long expectedLineId = createdResponse.as(LineResponse.class).getId();
+
+        assertThat(resultLineId).isEqualTo(expectedLineId);
     }
 }
