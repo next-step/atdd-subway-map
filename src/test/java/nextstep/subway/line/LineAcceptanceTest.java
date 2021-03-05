@@ -28,8 +28,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(LINE_NAME_SHIN_BUN_DANG, LINE_COLOR_SHIN_BUN_DANG);
 
         // then - 지하철_노선_생성됨
-        assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(getUriLocation(createLineResponse)).isNotBlank();
+        지하철_노선_생성_확인(createLineResponse, HttpStatus.CREATED);
+    }
+
+    private void 지하철_노선_생성_확인(ExtractableResponse<Response> response, HttpStatus status) {
+        지하철_노선_생성_응답코드_확인(response, status);
+        지하철_노선_생성_리소스_위치_확인(response);
     }
 
     @Test
@@ -44,7 +48,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> readLinesResponse = 지하철_노선_목록_조회_요청();
 
         // then - 지하철_노선_목록_응답됨
-        assertThat(readLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_생성_응답코드_확인(readLinesResponse, HttpStatus.OK);
         // 지하철_노선_목록_포함됨
         List<LineResponse> lines = readLinesResponse.jsonPath().getList(".", LineResponse.class);
         assertThat(lines).hasSize(2);
@@ -62,7 +66,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> readLineResponse = 지하철_노선_조회_요청(uri);
 
         // then - 지하철_노선_응답됨
-        assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_생성_응답코드_확인(readLineResponse, HttpStatus.OK);
     }
 
     @Test
@@ -78,7 +82,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, updateRequestOfGuBundang);
 
         // then - 지하철_노선_수정됨
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_생성_응답코드_확인(updateResponse, HttpStatus.OK);
     }
 
     @Test
@@ -93,7 +97,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = 지하철_노선_제거_요청(uri);
 
         // then - 지하철_노선_삭제됨
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_노선_생성_응답코드_확인(deleteResponse, HttpStatus.NO_CONTENT);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
@@ -149,5 +153,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private String getUriLocation(ExtractableResponse<Response> createResponse) {
         return createResponse.header("Location");
+    }
+
+    private void 지하철_노선_생성_응답코드_확인(ExtractableResponse<Response> response, HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+    }
+
+    private void 지하철_노선_생성_리소스_위치_확인(ExtractableResponse<Response> createLineResponse) {
+        assertThat(getUriLocation(createLineResponse)).isNotBlank();
     }
 }
