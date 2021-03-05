@@ -36,4 +36,20 @@ public class LineService {
                     .map(LineResponse::of)
                     .orElse(null);
     }
+
+    public LineResponse updateLine(LineRequest request, long id) {
+        Line line = lineRepository.getOne(id);
+        line.update(request.toLine());
+
+        lineRepository.save(line);
+        return LineResponse.of(line);
+    }
+
+    public void removeLine(long id) {
+        Line line = lineRepository.findById(id)
+                                  .orElseThrow(NullPointerException::new);
+
+        lineRepository.delete(line);
+    }
+
 }

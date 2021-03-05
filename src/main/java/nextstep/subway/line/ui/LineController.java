@@ -35,4 +35,23 @@ public class LineController {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateLine(
+        @RequestBody LineRequest lineRequest,
+        @PathVariable long id
+    ) {
+        LineResponse line = lineService.updateLine(lineRequest, id);
+        return ResponseEntity.ok().body(line);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity removeLine(@PathVariable long id) {
+        try {
+            lineService.removeLine(id);
+            return ResponseEntity.noContent().build();
+        } catch (NullPointerException e) {
+            return ResponseEntity.badRequest().body("존재하지 않는 Line에 대한 요청입니다.");
+        }
+    }
 }

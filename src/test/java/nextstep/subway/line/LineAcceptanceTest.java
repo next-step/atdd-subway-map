@@ -60,10 +60,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        지하철_노선_생성_요청("4호선", "sky");
+        LineResponse line = 지하철_노선_생성_요청("4호선", "sky").as(LineResponse.class);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_수정_요청("4호선-수정", "sky-수정");
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(line.getId(), "4호선-수정", "sky-수정");
 
         // then
         지하철_노선_수정됨(response, "4호선-수정", "sky-수정");
@@ -145,7 +145,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Assertions.assertThat(line.getColor()).isEqualTo(expected.getColor());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(String name, String color) {
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(long id, String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -153,7 +153,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().put("/lines")
+            .when().put("/lines/{id}", id)
             .then().log().all().extract();
     }
 
