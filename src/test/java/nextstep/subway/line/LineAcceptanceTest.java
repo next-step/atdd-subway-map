@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    private ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
+    private ExtractableResponse<Response> requestCreateLine(String name, String color) {
         Map<String,String> params = new HashMap<>();
         params.put("name",name);
         params.put("color",color);
@@ -35,12 +35,44 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     }
 
+    private ExtractableResponse<Response> requestFindLines(){
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines")
+            .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> requestFindLine(long id){
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines/{id}",id)
+            .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> requestUpdateLine(Map params,long id){
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE).body(params)
+            .when().put("/lines/{id}",1)
+            .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> requestDeleteLine(long id) {
+        return RestAssured
+            .given().log().all()
+            .when().delete("/lines/{id}",id)
+            .then().log().all().extract();
+    }
+
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response  = 지하철_노선_생성("신분당선","RED");
+        ExtractableResponse<Response> response  = requestCreateLine("신분당선","RED");
         // then
         // 지하철_노선_생성됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,16 +84,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        지하철_노선_생성("신분당선","RED");
-        지하철_노선_생성("2호선","GREEN");
+        requestCreateLine("신분당선","RED");
+        requestCreateLine("2호선","GREEN");
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines")
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = requestFindLines();
 
         // then
         // 지하철_노선_목록_응답됨
@@ -75,15 +103,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        지하철_노선_생성("신분당선","RED");
-        지하철_노선_생성("2호선","GREEN");
+        requestCreateLine("신분당선","RED");
+
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines/{id}",1)
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = requestFindLine(1);
 
         // then
         // 지하철_노선_응답됨
@@ -95,17 +119,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        지하철_노선_생성("신분당선","RED");
+        requestCreateLine("신분당선","RED");
         Map<String,String> params = new HashMap<>();
         params.put("name","신분당선");
         params.put("color","YELLOW");
         // when
         // 지하철_노선_수정_요청
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE).body(params)
-            .when().put("/lines/{id}",1)
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = requestUpdateLine(params,1);
 
         // then
         // 지하철_노선_수정됨
@@ -118,17 +138,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        지하철_노선_생성("신분당선","RED");
+        requestCreateLine("신분당선","RED");
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> removeResponse = RestAssured
-            .given().log().all()
-            .when().delete("/lines/{id}",1)
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = requestDeleteLine(1);
 
         // then
         // 지하철_노선_삭제됨
-        assertThat(removeResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 }
