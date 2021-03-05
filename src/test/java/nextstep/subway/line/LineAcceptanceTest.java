@@ -94,7 +94,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // 지하철_노선_목록_포함됨
-        List<Long> expectedIds = Stream.of(createResponse1, createResponse1)
+        List<Long> expectedIds = Stream.of(createResponse1, createResponse2)
                 .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultIds = response.jsonPath().getList(".", LineResponse.class).stream()
@@ -166,7 +166,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .given().log().all()
                 .body(newParams)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(uri)
                 .then().log().all()
