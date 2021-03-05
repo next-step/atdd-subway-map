@@ -5,10 +5,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,14 +45,48 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         // 지하철_노선_등록되어_있음
+        LineRequest lineRequest1 = new LineRequest("2호선", "초록색");
+        ExtractableResponse<Response> createdResponse1 = RestAssured.given().log().all()
+                .body(lineRequest1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+
         // 지하철_노선_등록되어_있음
+        LineRequest lineRequest2 = new LineRequest("2호선", "초록색");
+        ExtractableResponse<Response> createdResponse2 = RestAssured.given().log().all()
+                .body(lineRequest2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
 
         // when
         // 지하철_노선_목록_조회_요청
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
 
         // then
         // 지하철_노선_목록_응답됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         // 지하철_노선_목록_포함됨
+        List<Long> expectedLineIds = Arrays.asList(createdResponse1, createdResponse2)
+                .stream()
+                .map(r -> Long.parseLong(r.header("Location").split("/")[2]))
+                .collect(Collectors.toList());
+        List<Long> resultLineIds = response.jsonPath()
+                .getList(".", LineResponse.class)
+                .stream()
+                .map(r -> r.getId())
+                .collect(Collectors.toList());
+        assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -58,6 +97,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_조회_요청
+        // /lines/1 이런식으로 직접 조회하는 것 말하는듯
 
         // then
         // 지하철_노선_응답됨
