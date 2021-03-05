@@ -19,22 +19,28 @@ import org.springframework.http.ResponseEntity;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-    @DisplayName("지하철 노선을 생성한다.")
-    @Test
-    void createLine() {
-        // when
-        // 지하철_노선_생성_요청
+
+    private ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
         Map<String,String> params = new HashMap<>();
-        params.put("name","신분당성");
-        params.put("color","RED");
-        ExtractableResponse<Response> response  = RestAssured.given().log().all()
-            .body(params).
-            contentType(MediaType.APPLICATION_JSON_VALUE)
+        params.put("name",name);
+        params.put("color",color);
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .post("/lines")
             .then()
             .log().all()
             .extract();
+
+    }
+
+    @DisplayName("지하철 노선을 생성한다.")
+    @Test
+    void createLine() {
+        // when
+        // 지하철_노선_생성_요청
+        ExtractableResponse<Response> response  = 지하철_노선_생성("신분당선","RED");
         // then
         // 지하철_노선_생성됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
