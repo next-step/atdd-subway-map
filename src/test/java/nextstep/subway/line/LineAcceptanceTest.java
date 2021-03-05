@@ -68,17 +68,21 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("지하철 노선을 수정한다.")
     @Test
+    @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
-        // given
-        // 지하철_노선_등록되어_있음
+        // given - 지하철_노선_등록되어_있음
+        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
 
-        // when
-        // 지하철_노선_수정_요청
 
-        // then
-        // 지하철_노선_수정됨
+        // when - 지하철_노선_수정_요청
+        Long id = createResponse.as(LineResponse.class).getId();
+        LineRequest updateRequestOfGuBundang = new LineRequest("구분당선", "bg-blue-600");
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, updateRequestOfGuBundang);
+
+        // then - 지하철_노선_수정됨
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -120,6 +124,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .get(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest updateRequestOfShinBundang) {
+        return RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .param("id", id)
+                .body(updateRequestOfShinBundang)
+                .when()
+                .put("/lines")
                 .then().log().all()
                 .extract();
     }
