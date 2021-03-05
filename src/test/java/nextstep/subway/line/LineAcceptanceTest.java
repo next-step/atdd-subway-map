@@ -18,14 +18,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+    private static final String LINE_NAME_SHIN_BUN_DANG = "신분당선";
+    private static final String LINE_COLOR_SHIN_BUN_DANG = "bg-red-600";
+
     @Test
     @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
-        // given - 지하철_노선_생성_요청
-        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
-
-        // when - 지하철_노선_생성_요청
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
+        // given & when - 지하철_노선_생성_요청
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(LINE_NAME_SHIN_BUN_DANG, LINE_COLOR_SHIN_BUN_DANG);
 
         // then - 지하철_노선_생성됨
         assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -36,10 +36,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given - 지하철_노선_등록되어_있음
-        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
-        지하철_노선_생성_요청(lineRequestOfShinBundang);
-        LineRequest lineRequestOf2Line = new LineRequest("2호선", "bg-green-600");
-        지하철_노선_생성_요청(lineRequestOf2Line);
+        지하철_노선_생성_요청(LINE_NAME_SHIN_BUN_DANG, LINE_COLOR_SHIN_BUN_DANG);
+        지하철_노선_생성_요청("2호선", "bg-green-600");
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -56,8 +54,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     void getLine() {
         // given - 지하철_노선_등록되어_있음
-        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(LINE_NAME_SHIN_BUN_DANG, LINE_COLOR_SHIN_BUN_DANG);
 
         String uri = getUriLocation(createResponse);
 
@@ -72,8 +69,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given - 지하철_노선_등록되어_있음
-        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(LINE_NAME_SHIN_BUN_DANG, LINE_COLOR_SHIN_BUN_DANG);
 
 
         // when - 지하철_노선_수정_요청
@@ -89,8 +85,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
         // given - 지하철_노선_등록되어_있음
-        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(LINE_NAME_SHIN_BUN_DANG, LINE_COLOR_SHIN_BUN_DANG);
 
         String uri = getUriLocation(createResponse);
 
@@ -101,10 +96,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
         return RestAssured
                 .given().log().all()
-                .body(lineRequest)
+                .body(new LineRequest(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .post("/lines")
@@ -131,10 +126,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest updateRequestOfShinBundang) {
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest updateLineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(updateRequestOfShinBundang)
+                .body(updateLineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
