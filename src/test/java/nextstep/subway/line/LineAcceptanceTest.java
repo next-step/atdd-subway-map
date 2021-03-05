@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,13 +22,22 @@ import nextstep.subway.line.dto.LineResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+
+    private Map<String, String> 신분당선;
+    private Map<String, String> 경춘선;
+
+    @BeforeEach
+    void before() {
+        신분당선 = 노선_생성("신분당선", "bg-red-600");
+        경춘선 = 노선_생성("경춘선", "bg-green-600");
+    }
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        final ExtractableResponse<Response> response =
-            지하철_노선_생성_요청(노선_생성("신분당선", "bg-red-600"));
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
         // 지하철_노선_생성됨
@@ -40,10 +50,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        final ExtractableResponse<Response> 신분당선_응답 =
-            지하철_노선_생성_요청(노선_생성("신분당선", "bg-red-600"));
-        final ExtractableResponse<Response> 경춘선_응답 =
-            지하철_노선_생성_요청(노선_생성("경춘선", "bg-green-600"));
+        final ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성_요청(신분당선);
+        final ExtractableResponse<Response> 경춘선_응답 = 지하철_노선_생성_요청(경춘선);
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -61,8 +69,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final ExtractableResponse<Response> 신분당선_응답 =
-            지하철_노선_생성_요청(노선_생성("신분당선", "bg-red-600"));
+        final ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성_요청(신분당선);
 
         // when
         // 지하철_노선_조회_요청
@@ -92,14 +99,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final ExtractableResponse<Response> 신분당선_응답 =
-            지하철_노선_생성_요청(노선_생성("신분당선", "bg-red-600"));
+        final ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성_요청(신분당선);
 
         // when
         // 지하철_노선_수정_요청
         final String lineId = 신분당선_응답.jsonPath().getString("id");
-        final ExtractableResponse<Response> response =
-            지하철_노선_수정_요청(노선_생성("경춘선", "bg-green-600"), lineId);
+        final ExtractableResponse<Response> response = 지하철_노선_수정_요청(경춘선, lineId);
 
         // then
         // 지하철_노선_수정됨
@@ -112,8 +117,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_수정_요청
         final String LINE_ID = "1";
-        final ExtractableResponse<Response> response =
-            지하철_노선_수정_요청(노선_생성("신분당선", "bg-red-600"), LINE_ID);
+        final ExtractableResponse<Response> response = 지하철_노선_수정_요청(신분당선, LINE_ID);
 
         // then
         // 지하철_노선_수정_실패됨
@@ -125,8 +129,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final ExtractableResponse<Response> 신분당선_응답 =
-            지하철_노선_생성_요청(노선_생성("신분당선", "bg-red-600"));
+        final ExtractableResponse<Response> 신분당선_응답 = 지하철_노선_생성_요청(신분당선);
 
         // when
         // 지하철_노선_제거_요청
