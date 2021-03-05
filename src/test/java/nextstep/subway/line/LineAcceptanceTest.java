@@ -131,6 +131,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .map(r -> Long.parseLong(r.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
 
+        assertThat(resultLineIds).containsAll(expectedLineIds);
         resultLineIds.retainAll(expectedLineIds);
         assertThat(resultLineIds).hasSize(expectedLineIds.size());
     }
