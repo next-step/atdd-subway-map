@@ -76,13 +76,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        // 지하철_노선_등록되어_있음 (지하철_노선_생성요청)
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청("1호선", "노랑색");
 
         // when
-        // 지하철_노선_수정_요청
+        // 지하철_노선_수정요청
+        Long lineId = createdResponse.as(LineResponse.class).getId();
+        String name = "3호선";
+        String color = "파랑색";
+        ExtractableResponse<Response> response = 지하철_노선_수정요청(lineId, name, color);
 
         // then
         // 지하철_노선_수정됨
+        지하철_노선_수정됨(response, name, color);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -149,5 +155,26 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long expectedLineId = createdResponse.as(LineResponse.class).getId();
 
         assertThat(resultLineId).isEqualTo(expectedLineId);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정요청(Long lineId, String name, String color) {
+        LineRequest request = new LineRequest(name, color);
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", lineId)
+                .then().log().all().extract();
+
+        return response;
+    }
+
+    private void 지하철_노선_수정됨(ExtractableResponse<Response> response, String name, String color) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        String updatedName = response.as(LineResponse.class).getName();
+        String updatedColor = response.as(LineResponse.class).getColor();
+
+        assertThat(updatedName).isEqualTo(name);
+        assertThat(updatedColor).isEqualTo(color);
     }
 }
