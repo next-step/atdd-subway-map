@@ -5,13 +5,17 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +26,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        // 지하철_노선_생성_요청
+        // 지하철_노선_생성요청
         ExtractableResponse<Response> response = 지하철_노선_생성요청("1호선", "노랑색");
 
         // then
@@ -34,15 +38,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        // 지하철_노선_등록되어_있음
-        // 지하철_노선_등록되어_있음
+        // 지하철_노선_등록되어_있음 (지하철_노선_생성요청)
+        // 지하철_노선_등록되어_있음 (지하철_노선_생성요청)
+        ExtractableResponse<Response> createdResponse1 = 지하철_노선_생성요청("1호선", "노랑색");
+        ExtractableResponse<Response> createdResponse2 = 지하철_노선_생성요청("2호선", "빨강색");
 
         // when
-        // 지하철_노선_목록_조회_요청
+        // 지하철_노선목록_조회요청
+        ExtractableResponse<Response> response = 지하철_노선목록_조회요청();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
+        지하철_노선목록_응답됨포함됨(response, Arrays.asList(createdResponse1, createdResponse2));
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -96,5 +104,28 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선목록_조회요청() {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract();
+        return response;
+    }
+
+    private void 지하철_노선목록_응답됨포함됨(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> lineResponses) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
+                .map(LineResponse::getId)
+                .collect(Collectors.toList());
+
+        List<Long> expectedLineIds = lineResponses.stream()
+                .map(it -> it.as(LineResponse.class))
+                .map(LineResponse::getId)
+                .collect(Collectors.toList());
+
+        assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 }
