@@ -23,7 +23,7 @@ public class LineRequest {
     }
 
     public Line toEntity() {
-        return Line.create(this.name, this.color);
+        return new Line(this.name, this.color);
     }
 
 }

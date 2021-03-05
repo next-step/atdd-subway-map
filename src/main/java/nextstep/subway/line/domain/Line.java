@@ -16,13 +16,9 @@ public class Line extends BaseEntity {
     public Line() {
     }
 
-    private Line(String name, String color) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-    }
-
-    public static Line create(String name, String color) {
-        return new Line(name, color);
     }
 
     public void update(Line line) {
