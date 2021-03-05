@@ -38,4 +38,10 @@ public class LineService {
         Line line = lineRepository.findById(id).get();
         return LineResponse.of(line);
     }
+
+    public LineResponse updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).get();
+        line.update(lineRequest.toLine());
+        return LineResponse.of(line);
+    }
 }
