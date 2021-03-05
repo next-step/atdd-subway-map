@@ -26,9 +26,15 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineResponse> getLines() {
+    public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(Line::toLineResponse)
                 .collect(Collectors.toList());
+    }
+
+    public LineResponse findLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."))
+                .toLineResponse();
     }
 }

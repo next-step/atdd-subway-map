@@ -26,7 +26,12 @@ public class LineController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> getLines() {
-        return ResponseEntity.ok().body(lineService.getLines());
+    public ResponseEntity<List<LineResponse>> findAllLines() {
+        return ResponseEntity.ok().body(lineService.findAllLines());
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LineResponse> findLine(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.findLine(id));
     }
 }
