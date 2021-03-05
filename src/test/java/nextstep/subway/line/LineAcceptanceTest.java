@@ -29,7 +29,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then - 지하철_노선_생성됨
         assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(createLineResponse.header("Location")).isNotBlank();
+        assertThat(getUriLocation(createLineResponse)).isNotBlank();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
 
-        String uri = createResponse.header("Location");
+        String uri = getUriLocation(createResponse);
 
         // when - 지하철_노선_조회_요청
         ExtractableResponse<Response> readLineResponse = 지하철_노선_조회_요청(uri);
@@ -85,17 +85,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("지하철 노선을 제거한다.")
     @Test
+    @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
-        // given
-        // 지하철_노선_등록되어_있음
+        // given - 지하철_노선_등록되어_있음
+        LineRequest lineRequestOfShinBundang = new LineRequest("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(lineRequestOfShinBundang);
 
-        // when
-        // 지하철_노선_제거_요청
+        String uri = getUriLocation(createResponse);
 
-        // then
-        // 지하철_노선_삭제됨
+        // when - 지하철_노선_제거_요청
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_제거_요청(uri);
+
+        // then - 지하철_노선_삭제됨
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
@@ -138,5 +141,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .put("/lines/" + id)
                 .then().log().all()
                 .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_제거_요청(String uri) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private String getUriLocation(ExtractableResponse<Response> createResponse) {
+        return createResponse.header("Location");
     }
 }
