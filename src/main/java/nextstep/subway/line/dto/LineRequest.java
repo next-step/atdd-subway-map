@@ -25,4 +25,9 @@ public class LineRequest {
     public Line toLine() {
         return Line.create(name, color);
     }
+
+    public Line toEntity() {
+        return Line.create(this.name, this.color);
+    }
+
 }

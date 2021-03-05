@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
 
+    private static final String INVALID_LINE_MESSAGE = "존재하지 않는 노선입니다.";
+
     private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -32,9 +34,20 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."))
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE))
+                .toLineResponse();
+    }
+
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+
+        line.update(lineRequest.toEntity());
+
+        return lineRepository.save(line)
                 .toLineResponse();
     }
 }

@@ -131,11 +131,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest updateRequestOfShinBundang) {
         return RestAssured
                 .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .param("id", id)
                 .body(updateRequestOfShinBundang)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put("/lines")
+                .put("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
