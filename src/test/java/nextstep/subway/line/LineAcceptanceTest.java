@@ -60,26 +60,26 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        지하철_노선_생성_요청("4호선", "sky");
 
         // when
-        // 지하철_노선_수정_요청
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청("4호선-수정", "sky-수정");
 
         // then
-        // 지하철_노선_수정됨
+        지하철_노선_수정됨(response, "4호선-수정", "sky-수정");
     }
 
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        LineResponse line = 지하철_노선_생성_요청("8호선", "pink").as(LineResponse.class);
 
         // when
-        // 지하철_노선_제거_요청
+        ExtractableResponse<Response> response = 지하철_노선_제거_요청(line.getId());
 
         // then
-        // 지하철_노선_삭제됨
+        지하철_노선_삭제됨(response);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
@@ -143,5 +143,40 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Assertions.assertThat(line.getId()).isEqualTo(expected.getId());
         Assertions.assertThat(line.getName()).isEqualTo(expected.getName());
         Assertions.assertThat(line.getColor()).isEqualTo(expected.getColor());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(String name, String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines")
+            .then().log().all().extract();
+    }
+
+    private void 지하철_노선_수정됨(
+        ExtractableResponse<Response> response,
+        String expectedName,
+        String expectedColor
+    ) {
+        LineResponse line = response.as(LineResponse.class);
+
+        Assertions.assertThat(line.getName()).isEqualTo(expectedName);
+        Assertions.assertThat(line.getColor()).isEqualTo(expectedColor);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_제거_요청(long id) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/lines/{id}", id)
+            .then().log().all().extract();
+    }
+
+    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
+        Assertions.assertThat(response.statusCode())
+                  .isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
