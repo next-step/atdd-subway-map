@@ -1,72 +1,191 @@
 package nextstep.subway.line;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends AcceptanceTest {
-    @DisplayName("지하철 노선을 생성한다.")
+class LineAcceptanceTest extends AcceptanceTest {
+
     @Test
+    @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
         // when
-        // 지하철_노선_생성_요청
+        ExtractableResponse<Response> response = requestCreateLineDx();
 
         // then
-        // 지하철_노선_생성됨
+        assertCreateLine(response);
     }
 
-    @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
+    @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given
-        // 지하철_노선_등록되어_있음
-        // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createResponse1 = requestCreateLineDx();
+        ExtractableResponse<Response> createResponse2 = requestCreateLine2();
 
         // when
-        // 지하철_노선_목록_조회_요청
+        ExtractableResponse<Response> response = requestGetLines();
 
         // then
-        // 지하철_노선_목록_응답됨
-        // 지하철_노선_목록_포함됨
+        assertGetLines(response);
+        assertIncludeLines(createResponse1, createResponse2, response);
     }
 
-    @DisplayName("지하철 노선을 조회한다.")
     @Test
+    @DisplayName("지하철 노선을 조회한다.")
     void getLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createResponse = requestCreateLineDx();
 
         // when
-        // 지하철_노선_조회_요청
+        ExtractableResponse<Response> response = requestGetLine(createResponse);
 
         // then
-        // 지하철_노선_응답됨
+        assertGetLine(response);
     }
 
-    @DisplayName("지하철 노선을 수정한다.")
     @Test
+    @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createResponse = requestCreateLineDx();
 
         // when
-        // 지하철_노선_수정_요청
+        ExtractableResponse<Response> response = requestUpdateLine(createResponse);
 
         // then
-        // 지하철_노선_수정됨
+        assertUpdateLine(response);
     }
 
-    @DisplayName("지하철 노선을 제거한다.")
     @Test
+    @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> createResponse = requestCreateLineDx();
 
         // when
-        // 지하철_노선_제거_요청
+        ExtractableResponse<Response> response = requestDeleteLine(createResponse);
 
         // then
-        // 지하철_노선_삭제됨
+        assertDeleteLine(response);
+    }
+
+    private ExtractableResponse<Response> requestCreateLineDx() {
+        Map<String, String> params = makeLineParams("bg-red-600", "신분당선");
+        return requestCreateLine(params);
+    }
+
+    private ExtractableResponse<Response> requestCreateLine2() {
+        Map<String, String> params = makeLineParams("bg-green-600", "2호선");
+        return requestCreateLine(params);
+    }
+
+    private ExtractableResponse<Response> requestCreateLine(Map<String, String> params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> requestGetLines() {
+        return RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> requestGetLine(ExtractableResponse<Response> createResponse) {
+        String uri = createResponse.header("Location");
+        return RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> createResponse) {
+        Map<String, String> newParams = makeLineParams("bg-blue-600", "구분당선");
+        String uri = createResponse.header("Location");
+        return RestAssured
+                .given().log().all()
+                .body(newParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> requestDeleteLine(ExtractableResponse<Response> createResponse) {
+        String uri = createResponse.header("Location");
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private void assertCreateLine(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void assertGetLines(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void assertIncludeLines(ExtractableResponse<Response> createResponse1, ExtractableResponse<Response> createResponse2, ExtractableResponse<Response> response) {
+        List<Long> expectedIds = Stream.of(createResponse1, createResponse2)
+                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+                .collect(Collectors.toList());
+        List<Long> resultIds = response.jsonPath().getList(".", LineResponse.class).stream()
+                .map(LineResponse::getId)
+                .collect(Collectors.toList());
+        assertThat(resultIds).containsAll(expectedIds);
+    }
+
+    private void assertGetLine(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void assertUpdateLine(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void assertDeleteLine(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private Map<String, String> makeLineParams(String color, String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("color", color);
+        params.put("name", name);
+        return params;
     }
 }
