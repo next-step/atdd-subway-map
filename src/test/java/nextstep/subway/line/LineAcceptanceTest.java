@@ -57,11 +57,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> 경강선 = 지하철_노선_생성요청("경강성", "blue");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회요청("/lines/1");
+        final ExtractableResponse<Response> response = 지하철_노선_조회요청("/lines/1");
 
         // then
         응답코드_확인(response, OK);
-        assertThat(response.body().jsonPath().getLong("id")).isEqualTo(경강선.body().jsonPath().getLong("id"));
+        assertThat(getLineId(response)).isEqualTo(getLineId(경강선));
     }
 
 
@@ -77,6 +77,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_수정됨
     }
+
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
@@ -90,19 +91,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_삭제됨
     }
 
-    private static Long getLineIdFromHeader(ExtractableResponse<Response> response) {
-        return Long.parseLong(response
-                .header(HttpHeaders.LOCATION)
-                .split("/")[2]) ;
-    }
-
-    private void 응답코드_확인(ExtractableResponse<Response> response, HttpStatus created) {
-        assertThat(response.statusCode()).isEqualTo(created.value());
+    private long getLineId(ExtractableResponse<Response> response) {
+        return response.body().jsonPath().getLong("id");
     }
 
     private List<Long> extractLineIds(ExtractableResponse<Response> ...lines) {
         return Arrays.stream(lines)
-                .map(LineAcceptanceTest::getLineIdFromHeader)
+                .map(this::getLineId)
                 .collect(Collectors.toList());
     }
 
@@ -136,5 +131,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .when()
                 .post("/lines")
                 .then().log().all().extract();
+    }
+
+    private void 응답코드_확인(ExtractableResponse<Response> response, HttpStatus created) {
+        assertThat(response.statusCode()).isEqualTo(created.value());
     }
 }
