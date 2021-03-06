@@ -1,5 +1,6 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.exception.SubwayNameDuplicateException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
@@ -19,8 +20,12 @@ public class LineController {
 
   @PostMapping
   public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-    LineResponse line = lineService.saveLine(lineRequest);
-    return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    try {
+      LineResponse line = lineService.saveLine(lineRequest);
+      return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    } catch (SubwayNameDuplicateException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
 
   @GetMapping

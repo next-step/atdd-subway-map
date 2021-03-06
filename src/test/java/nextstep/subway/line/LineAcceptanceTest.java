@@ -83,4 +83,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     // then
     지하철_노선_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
   }
+
+  @DisplayName("이미 등록된 이름으로 등록 요청 시 에러 응답")
+  @Test
+  void subwayExistNameException() {
+    //given
+    지하철_노선_생성요청("신분당선", "red");
+    // when
+    ExtractableResponse<Response> response = 지하철_노선_생성요청("신분당선", "red");
+    // then
+    지하철_노선_응답_확인(response.statusCode(), HttpStatus.BAD_REQUEST);
+  }
 }
