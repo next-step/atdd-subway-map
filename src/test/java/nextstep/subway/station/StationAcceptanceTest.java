@@ -47,26 +47,15 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성요청("강남역");
-
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성요청("역삼역");
+        ExtractableResponse<Response> createdResponse1 = 지하철역_생성요청("강남역");
+        ExtractableResponse<Response> createdResponse2 = 지하철역_생성요청("역삼역");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_조회요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedLineIds = Arrays.asList(createResponse1, createResponse2).stream()
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath().getList(".", StationResponse.class).stream()
-                .map(it -> it.getId())
-                .collect(Collectors.toList());
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+        지하철역_조회_응답됨(response);
+        지하철역_조회_포함됨(response, Arrays.asList(createdResponse1, createdResponse2));
     }
 
     @DisplayName("지하철역을 제거한다.")
@@ -103,5 +92,29 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
     private void 지하철역_생성실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private ExtractableResponse<Response> 지하철역_조회요청() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all().extract();
+    }
+
+    private void 지하철역_조회_응답됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void 지하철역_조회_포함됨(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> createdResponses) {
+        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        List<Long> expectedStationIds = createdResponses.stream()
+                .map(it -> it.as(StationResponse.class))
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        assertThat(resultStationIds).containsAll(expectedStationIds);
     }
 }
