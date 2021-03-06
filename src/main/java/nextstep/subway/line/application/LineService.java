@@ -1,5 +1,6 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.exceptions.AlreadyExistsEntityException;
 import nextstep.subway.exceptions.NotFoundLineException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+    public static final String LINE_EXCEPTION = "%s 노선";
     private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -22,6 +24,11 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        String requestName = request.getName();
+        if (lineRepository.existsByName(requestName)) {
+            throw new AlreadyExistsEntityException(String.format(LINE_EXCEPTION, requestName));
+        }
+
         Line persistLine = lineRepository.save(request.toLine());
         return LineResponse.of(persistLine);
     }
