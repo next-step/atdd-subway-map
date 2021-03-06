@@ -6,7 +6,8 @@ import nextstep.subway.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.line.LineRequestSteps.*;
+import static nextstep.subway.line.LineVerificationStep.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -57,7 +58,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // when 지하철 노선 수정 요청
-        Long id = 수정할_지하철_노선_ID(createResponse);
+        Long id = 수정할_지하철_노선_ID_가져오기(createResponse);
         ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, "구분당선", "bg-blue-600");
 
         // then
