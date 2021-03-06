@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
@@ -69,14 +70,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        final ExtractableResponse<Response> 경강선 = 지하철_노선_생성요청("경강성", "blue");
+        final LineRequest 신분당선 = new LineRequest("신분당선", "red");
 
         // when
-        // 지하철_노선_수정_요청
+        final ExtractableResponse<Response> response = 지하철_노선_수정요청(신분당선);
 
         // then
-        // 지하철_노선_수정됨
+        응답코드_확인(response, OK);
+        assertThat(getLineName(response)).isEqualTo(신분당선.getName());
     }
+
 
     @DisplayName("지하철 노선을 제거한다.")
     @Test
@@ -89,6 +93,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         // 지하철_노선_삭제됨
+    }
+    private String getLineName(ExtractableResponse<Response> response) {
+        return response.body().jsonPath().getString("name");
     }
 
     private long getLineId(ExtractableResponse<Response> response) {
@@ -130,6 +137,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
+                .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정요청(LineRequest request) {
+        return RestAssured
+                .given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/1")
                 .then().log().all().extract();
     }
 

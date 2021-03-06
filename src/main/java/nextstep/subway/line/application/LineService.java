@@ -8,11 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
 
@@ -33,8 +32,19 @@ public class LineService {
     }
 
     public LineResponse getLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElse(null);
+        final Line line = findLineById(id);
         return LineResponse.of(line);
+    }
+
+    @Transactional
+    public LineResponse updateLine(Long id, LineRequest request) {
+        final Line line = findLineById(id);
+        line.update(request.toLine());
+        return LineResponse.of(line);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElse(null);
     }
 }
