@@ -113,45 +113,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_삭제됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_제거_요청(Long createdId) {
-        String path = 서비스_호출_경로_생성(createdId);
-        return RestAssured
-                .given().log().all()
-                .when().delete(path)
-                .then().log().all().extract();
+    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @Test
+    void createStationWithDuplicateName() {
+        //given
+        지하철_노선_등록(신분당선);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_등록(신분당선);
+
+        // then
+        지하철역_생성_실패됨(response);
     }
-
-    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-
-    private ExtractableResponse<Response> 지하철_노선_등록(Map<String, String> params) {
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(서비스_호출_경로_생성(null))
-                .then().log().all().extract();
-    }
-
-    private List<Long> 지하철_노선_아이디_추출(ExtractableResponse<Response>... list) {
-        return Stream.of(list)
-                .map(this::지하철_노선_아이디_추출)
-                .collect(Collectors.toList());
-    }
-
-    private Long 지하철_노선_아이디_추출(ExtractableResponse<Response> response) {
-        return Long.parseLong(response.header("Location").split("/")[2]);
-    }
-
-    private String 서비스_호출_경로_생성(Long createdId) {
-        String path = "/lines";
-        if (Objects.nonNull(createdId)) {
-            return path + "/" + createdId;
-        }
-
-        return path;
-    }
-
 }
