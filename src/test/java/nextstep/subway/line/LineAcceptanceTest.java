@@ -25,7 +25,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        Map<String, String> params = createLineTwo();
+        Map<String, String> params = 노선_2호선();
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
@@ -39,11 +39,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicatedName() {
         // given
-        Map<String, String> params = createLineTwo();
-        지하철_노선_생성_요청(params);
+        지하철_노선_생성_요청(노선_2호선());
 
         // when
-        ExtractableResponse<Response> response =  지하철_노선_생성_요청(params);
+        ExtractableResponse<Response> response =  지하철_노선_생성_요청(노선_2호선());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -59,14 +58,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private Map<String, String> createLineTwo() {
+    private Map<String, String> 노선_2호선() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "2호선");
         params.put("color", "bg-green-600");
         return params;
     }
 
-    private Map<String, String> createLineOne() {
+    private Map<String, String> 노선_1호선() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "1호선");
         params.put("color", "bg-blue-600");
@@ -77,8 +76,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요청(createLineTwo());
-        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청(createLineOne());
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요청(노선_2호선());
+        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청(노선_1호선());
 
         // when
         ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
@@ -103,7 +102,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createLineTwo());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(노선_2호선());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
@@ -131,13 +130,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createLineTwo());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(노선_2호선());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
         ExtractableResponse<Response> modifyResponse = RestAssured.given().log().all()
             .when()
-            .body(createLineOne())
+            .body(노선_1호선())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .put("lines/" + createId)
             .then().log().all()
@@ -151,7 +150,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createLineTwo());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(노선_2호선());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
