@@ -21,15 +21,31 @@ import org.springframework.http.ResponseEntity;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+    private long extractLineId(ExtractableResponse<Response> lineCreateResponse) {
+        return lineCreateResponse.body().jsonPath().getLong("id");
+    }
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        long id = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        ExtractableResponse<Response> response = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
         // then
         // 지하철_노선_생성됨
-        assertThat(id).isNotEqualTo(0);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @DisplayName("이미 등록된 노선을 생성한다.")
+    @Test
+    void createLineWithDuplicateName() {
+        //given
+        LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        //when
+        ExtractableResponse<Response> response = LineRequestBuilder
+            .requestCreateLine("신분당선",LineColor.RED);
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -57,7 +73,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        long id =  LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        ExtractableResponse<Response> lineCreateResponse = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        long id = extractLineId(lineCreateResponse);
         // when
         // 지하철_노선_조회_요청
         ExtractableResponse<Response> response = LineRequestBuilder.requestFindLine(id);
@@ -72,8 +89,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        long id =  LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        ExtractableResponse<Response> lineCreateResponse =  LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
         Map<String,String> params = LineRequestBuilder.createLineRequestParams("신분당선",LineColor.YELLOW);
+        long id = extractLineId(lineCreateResponse);
         // when
         // 지하철_노선_수정_요청
         ExtractableResponse<Response> response = LineRequestBuilder
@@ -90,7 +108,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        long id =  LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        ExtractableResponse<Response> lineCreateResponse = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        long id = extractLineId(lineCreateResponse);
         // when
         // 지하철_노선_제거_요청
         ExtractableResponse<Response> response = LineRequestBuilder.requestDeleteLine(id);

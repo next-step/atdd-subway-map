@@ -19,7 +19,7 @@ public class LineRequestBuilder {
     return params;
   }
 
-  public static long requestCreateLine(String name, LineColor color) {
+  public static ExtractableResponse<Response> requestCreateLine(String name, LineColor color) {
     Map<String,String> params = createLineRequestParams(name,color);
 
     ExtractableResponse<Response> response =  RestAssured.given().log().all()
@@ -30,10 +30,9 @@ public class LineRequestBuilder {
         .then()
         .log().all()
         .extract();
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-    return response.body()
-        .jsonPath().getLong("id");
+
+    return response;
 
   }
 
