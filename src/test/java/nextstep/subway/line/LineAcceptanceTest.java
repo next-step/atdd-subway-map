@@ -7,7 +7,6 @@ import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,12 +18,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest extends AcceptanceTest {
+
+    private static final String PATH = "/lines";
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
@@ -70,7 +70,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        final ExtractableResponse<Response> 경강선 = 지하철_노선_생성요청("경강성", "blue");
+        지하철_노선_생성요청("경강성", "blue");
         final LineRequest 신분당선 = new LineRequest("신분당선", "red");
 
         // when
@@ -86,14 +86,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        지하철_노선_생성요청("경강성", "blue");
 
         // when
-        // 지하철_노선_제거_요청
+        final ExtractableResponse<Response> response = 지하철_노선_삭제요청();
 
         // then
-        // 지하철_노선_삭제됨
+        응답코드_확인(response, NO_CONTENT);
     }
+
     private String getLineName(ExtractableResponse<Response> response) {
         return response.body().jsonPath().getString("name");
     }
@@ -117,16 +118,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 지하철_노선_목록조회요청() {
+
         return RestAssured
                 .given().log().all()
-                .when().get("/lines")
+                .when().get(PATH)
                 .then().log().all().extract();
     }
 
     private ExtractableResponse<Response> 지하철_노선_조회요청(String s) {
         return RestAssured
                 .given().log().all()
-                .when().get(s)
+                .when().get(PATH)
                 .then().log().all().extract();
     }
 
@@ -136,7 +138,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .body(new Line(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines")
+                .post(PATH)
                 .then().log().all().extract();
     }
 
@@ -146,7 +148,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put("/lines/1")
+                .put(PATH + "/1")
+                .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_삭제요청() {
+        return RestAssured
+                .given().log().all()
+                .when().delete(PATH + "/1")
                 .then().log().all().extract();
     }
 

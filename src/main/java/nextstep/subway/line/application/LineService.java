@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class LineService {
     private LineRepository lineRepository;
 
@@ -24,6 +24,7 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         return lineRepository.findAll()
                 .stream()
@@ -31,20 +32,25 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
         final Line line = findLineById(id);
         return LineResponse.of(line);
     }
 
-    @Transactional
     public LineResponse updateLine(Long id, LineRequest request) {
         final Line line = findLineById(id);
         line.update(request.toLine());
         return LineResponse.of(line);
     }
 
+    public void deleteLine(Long id) {
+        lineRepository.delete(findLineById(id));
+    }
+
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
                 .orElse(null);
     }
+
 }
