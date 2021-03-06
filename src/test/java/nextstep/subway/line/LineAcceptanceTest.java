@@ -28,14 +28,28 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> params = createLineTwo();
 
         // when
-        ExtractableResponse<Response> response = createLineWithParameter(params);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    private ExtractableResponse<Response> createLineWithParameter(Map<String, String> params) {
+    @DisplayName("기존에 존재하는 노선 이름으로 노선을 생성한다.")
+    @Test
+    void createLineWithDuplicatedName() {
+        // given
+        Map<String, String> params = createLineTwo();
+        지하철_노선_생성_요청(params);
+
+        // when
+        ExtractableResponse<Response> response =  지하철_노선_생성_요청(params);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -45,7 +59,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    // fixtures
     private Map<String, String> createLineTwo() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "2호선");
@@ -64,8 +77,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = createLineWithParameter(createLineTwo());
-        ExtractableResponse<Response> createResponse2 = createLineWithParameter(createLineOne());
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요청(createLineTwo());
+        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청(createLineOne());
 
         // when
         ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
@@ -90,7 +103,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = createLineWithParameter(createLineTwo());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createLineTwo());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
@@ -118,7 +131,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = createLineWithParameter(createLineTwo());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createLineTwo());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
@@ -138,21 +151,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse = createLineWithParameter(createLineTwo());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createLineTwo());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
-        // 지하철_노선_제거_요청
-        ExtractableResponse<Response> deleteRespones = RestAssured.given().log().all()
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
                 .when()
                 .delete("lines/" + createId)
                 .then().log().all()
                 .extract();
 
         // then
-        // 지하철_노선_삭제됨
-        assertThat(deleteRespones.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 }

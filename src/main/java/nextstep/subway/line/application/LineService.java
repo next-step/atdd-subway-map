@@ -33,16 +33,18 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         Optional<Line> line = lineRepository.findById(id);
         return LineResponse.of(line.orElse(null));
     }
 
-    public boolean updateLine(Long id, LineRequest request) {
+    public void updateLine(Long id, LineRequest request) throws Exception {
         Optional<Line> line = lineRepository.findById(id);
-        if (!line.isPresent()) return false;
+        if (!line.isPresent()) {
+            throw new Exception("no line to update!");
+        }
         lineRepository.save(request.toLine());
-        return true;
     }
 
     public void deleteLine(Long id) {
