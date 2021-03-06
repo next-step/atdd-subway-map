@@ -1,19 +1,19 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.common.exception.ExistResourceException;
+import nextstep.subway.common.exception.NonExistResourceException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.exception.ExistLineException;
-import nextstep.subway.line.exception.NonExistLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nextstep.subway.common.ExceptionMessage.EXCEPTION_MESSAGE_EXIST_LINE_NAME;
-import static nextstep.subway.common.ExceptionMessage.EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME;
+import static nextstep.subway.common.exception.ExceptionMessage.EXCEPTION_MESSAGE_EXIST_LINE_NAME;
+import static nextstep.subway.common.exception.ExceptionMessage.EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME;
 
 @Service
 @Transactional
@@ -34,7 +34,7 @@ public class LineService {
 
     private void validateLineName(String lineName) {
         if (lineRepository.existsByName(lineName)) {
-            throw new ExistLineException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
+            throw new ExistResourceException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
         }
     }
 
@@ -67,6 +67,6 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new NonExistLineException(EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME));
+                .orElseThrow(() -> new NonExistResourceException(EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME));
     }
 }
