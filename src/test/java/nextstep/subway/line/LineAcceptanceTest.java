@@ -35,7 +35,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-
     private ExtractableResponse<Response> createLineWithParameter(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
@@ -99,11 +98,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> resultIds = getResponse.jsonPath().getList(".", LineResponse.class)
-                .stream()
-                .map(LineResponse::getId)
-                .collect(Collectors.toList());
-        assertThat(resultIds).contains(createId);
+        Long resultId = (getResponse.jsonPath().getObject(".", LineResponse.class)).getId();
+        assertThat(resultId).isEqualTo(createId);
     }
 
     private ExtractableResponse<Response> getLineById(Long id) {
@@ -122,20 +118,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse = createLineWithParameter(createLineTwo());
         Long createId = parseIdFromResponseHeader(createResponse);
 
         // when
-        // 지하철_노선_수정_요청
         ExtractableResponse<Response> modifyResponse = RestAssured.given().log().all()
             .when()
+            .body(createLineOne())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .put("lines/" + createId)
             .then().log().all()
             .extract();
 
         // then
-        // 지하철_노선_수정됨
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
