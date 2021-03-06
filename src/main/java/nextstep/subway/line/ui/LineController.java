@@ -3,7 +3,8 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.dto.StationResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,4 +47,15 @@ public class LineController {
         lineService.deleteOneLine(id);
         return ResponseEntity.noContent().build();
     }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<LineResponse> handleEmptyResultDataAccessException(DataIntegrityViolationException e) {
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<LineResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        return ResponseEntity.badRequest().build();
+    }
 }
+

@@ -5,13 +5,11 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,5 +135,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_삭제됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @Test
+    void createStationWithDuplicateName() {
+        // given
+        // 지하철_노선_등록되어_있음
+        ExtractableResponse<Response> responseOfLine1 = 지하철_노선_등록("수도권 전철 1호선", "#0052A4");
+        // 지하철_노선_생성_요청
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_등록("수도권 전철 1호선", "#0052A4");
+        // then
+        // 지하철역_생성_실패됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
