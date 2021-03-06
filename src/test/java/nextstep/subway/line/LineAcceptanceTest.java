@@ -38,13 +38,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     // when
     // 지하철_노선_목록_조회_요청
-    ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when()
-                    .get("/lines")
-                    .then()
-                    .log().all().extract();
+    ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
     // then
     // 지하철_노선_목록_응답됨
@@ -52,9 +46,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     // 지하철_노선_목록_포함됨
     List<LineResponse> lineRequestResponses = Arrays.asList(lineResponse1, lineResponse2);
-    List<LineResponse> lineResults = response.body().jsonPath().getList(".", LineResponse.class);
-
-    assertThat(lineRequestResponses).isEqualTo(lineResults);
+    지하철_노선_목록_응답_확인(response, lineRequestResponses);
   }
 
   @DisplayName("지하철 노선을 조회한다.")
@@ -68,10 +60,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     // 지하철_노선_조회_요청
     ExtractableResponse<Response> response =
             RestAssured.given().log().all()
-            .when()
-            .get("/lines/{id}", line.getId())
-            .then().log().all()
-            .extract();
+                    .when()
+                    .get("/lines/{id}", line.getId())
+                    .then().log().all()
+                    .extract();
 
     // then
     // 지하철_노선_응답됨
@@ -142,5 +134,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
             () -> assertEquals(line.getName(), lineResponse.getName()),
             () -> assertEquals(line.getColor(), lineResponse.getColor())
     );
+  }
+
+  private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+    return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("/lines")
+            .then()
+            .log().all().extract();
+  }
+
+  private void 지하철_노선_목록_응답_확인(ExtractableResponse<Response> response, List<LineResponse> line) {
+    List<LineResponse> lineResults = response.body().jsonPath().getList(".", LineResponse.class);
+    assertThat(lineResults).isEqualTo(line);
   }
 }
