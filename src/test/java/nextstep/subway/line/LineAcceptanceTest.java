@@ -54,14 +54,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        // 지하철_노선_등록되어_있음
+        final ExtractableResponse<Response> 경강선 = 지하철_노선_생성요청("경강성", "blue");
 
         // when
-        // 지하철_노선_조회_요청
+        ExtractableResponse<Response> response = 지하철_노선_조회요청("/lines/1");
 
         // then
-        // 지하철_노선_응답됨
+        응답코드_확인(response, OK);
+        assertThat(response.body().jsonPath().getLong("id")).isEqualTo(경강선.body().jsonPath().getLong("id"));
     }
+
 
     @DisplayName("지하철 노선을 수정한다.")
     @Test
@@ -75,7 +77,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_수정됨
     }
-
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
@@ -99,13 +100,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(created.value());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_목록조회요청() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all().extract();
-    }
-
     private List<Long> extractLineIds(ExtractableResponse<Response> ...lines) {
         return Arrays.stream(lines)
                 .map(LineAcceptanceTest::getLineIdFromHeader)
@@ -118,6 +112,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .stream()
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_목록조회요청() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회요청(String s) {
+        return RestAssured
+                .given().log().all()
+                .when().get(s)
+                .then().log().all().extract();
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성요청(String name, String color) {
