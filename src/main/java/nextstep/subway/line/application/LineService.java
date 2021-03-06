@@ -5,7 +5,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.exception.NoResourceException;
+import nextstep.subway.common.exception.NoResourceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +39,6 @@ public class LineService {
     public LineResponse modifyLine(long id,LineRequest lineRequest) {
         Line line  =  lineRepository.findById(id).orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
         line.update(lineRequest.toLine());
-        lineRepository.save(line);
         return LineResponse.of(line);
     }
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -20,62 +21,31 @@ import org.springframework.http.ResponseEntity;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    private ExtractableResponse<Response> requestCreateLine(String name, String color) {
-        Map<String,String> params = new HashMap<>();
-        params.put("name",name);
-        params.put("color",color);
-        return RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then()
-            .log().all()
-            .extract();
-
+    private long extractLineId(ExtractableResponse<Response> lineCreateResponse) {
+        return lineCreateResponse.body().jsonPath().getLong("id");
     }
-
-    private ExtractableResponse<Response> requestFindLines(){
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines")
-            .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> requestFindLine(long id){
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines/{id}",id)
-            .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> requestUpdateLine(Map params,long id){
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE).body(params)
-            .when().put("/lines/{id}",1)
-            .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> requestDeleteLine(long id) {
-        return RestAssured
-            .given().log().all()
-            .when().delete("/lines/{id}",id)
-            .then().log().all().extract();
-    }
-
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response  = requestCreateLine("신분당선","RED");
+        ExtractableResponse<Response> response = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
         // then
         // 지하철_노선_생성됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @DisplayName("이미 등록된 노선을 생성한다.")
+    @Test
+    void createLineWithDuplicateName() {
+        //given
+        LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        //when
+        ExtractableResponse<Response> response = LineRequestBuilder
+            .requestCreateLine("신분당선",LineColor.RED);
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -84,12 +54,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        requestCreateLine("신분당선","RED");
-        requestCreateLine("2호선","GREEN");
+        LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        LineRequestBuilder.requestCreateLine("2호선",LineColor.GREEN);
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = requestFindLines();
+        ExtractableResponse<Response> response = LineRequestBuilder.requestFindLines();
 
         // then
         // 지하철_노선_목록_응답됨
@@ -103,11 +73,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        requestCreateLine("신분당선","RED");
-
+        ExtractableResponse<Response> lineCreateResponse = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        long id = extractLineId(lineCreateResponse);
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = requestFindLine(1);
+        ExtractableResponse<Response> response = LineRequestBuilder.requestFindLine(id);
 
         // then
         // 지하철_노선_응답됨
@@ -119,18 +89,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        requestCreateLine("신분당선","RED");
-        Map<String,String> params = new HashMap<>();
-        params.put("name","신분당선");
-        params.put("color","YELLOW");
+        ExtractableResponse<Response> lineCreateResponse =  LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        Map<String,String> params = LineRequestBuilder.createLineRequestParams("신분당선",LineColor.YELLOW);
+        long id = extractLineId(lineCreateResponse);
         // when
         // 지하철_노선_수정_요청
-        ExtractableResponse<Response> response = requestUpdateLine(params,1);
+        ExtractableResponse<Response> response = LineRequestBuilder
+            .requestUpdateLine(params,id);
 
         // then
         // 지하철_노선_수정됨
         assertThat(response.statusCode()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(response.body().asString()).contains("YELLOW");
+        assertThat(response.as(LineResponse.class).getColor()).isEqualTo("YELLOW");
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -138,10 +108,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        requestCreateLine("신분당선","RED");
+        ExtractableResponse<Response> lineCreateResponse = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        long id = extractLineId(lineCreateResponse);
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> response = requestDeleteLine(1);
+        ExtractableResponse<Response> response = LineRequestBuilder.requestDeleteLine(id);
 
         // then
         // 지하철_노선_삭제됨
