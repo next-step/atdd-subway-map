@@ -26,7 +26,7 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
+    public List<StationResponse> getStations() {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
