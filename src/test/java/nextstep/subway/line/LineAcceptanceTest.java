@@ -23,6 +23,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    void createLineWithDuplicationName() {
+        // given - 존재할 지하철 노선 생성
+        지하철_노선_생성_요청("신분당선", "bg-red-600");
+
+        // when - 기존에 존재하는 지하철 노선 이름으로 지하철 노선 생성 요청
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "be-red-600");
+
+        // then - 지하철 노선 생성 실패
+        지하철_노선_생성_실패_됨(response);
+    }
+
+    @Test
     @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given - 조회될 지하철 노선 생성

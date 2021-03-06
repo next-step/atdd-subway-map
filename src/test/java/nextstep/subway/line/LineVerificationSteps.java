@@ -16,6 +16,10 @@ public class LineVerificationSteps {
         생성된_지하철_노선_URI_경로_존재_함(response);
     }
 
+    public static void 지하철_노선_생성_실패_됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     public static void 생성된_지하철_노선_URI_경로_존재_함(ExtractableResponse<Response> response) {
         assertThat(생성된_지하철_노선_URI_경로_확인(response)).isNotBlank();
     }
