@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
 
@@ -18,25 +18,32 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping
+
+    @GetMapping("/lines")
+    public ResponseEntity findAllLines(){
+        List<LineResponse> lineResponses = lineService.findAll();
+        return ResponseEntity.ok().body(lineResponses);
+    }
+
+    @PostMapping("/lines")
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/lines/{id}")
     public ResponseEntity getLine(@PathVariable Long id) {
         LineResponse line = lineService.findById(id);
         return ResponseEntity.ok().body(line);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/lines/{id}")
     public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         lineService.update(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/lines/{id}")
     public ResponseEntity deleteLine(@PathVariable Long id) {
         lineService.deleteById(id);
         return ResponseEntity.noContent().build();

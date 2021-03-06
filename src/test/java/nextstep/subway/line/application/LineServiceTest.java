@@ -9,6 +9,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -76,6 +80,24 @@ public class LineServiceTest {
             lineService.deleteById(createdResponse.getId());
             lineService.findById(createdResponse.getId());
         }).isInstanceOf(NotFoundLineException.class);
+    }
 
+    @Test
+    public void findAll() {
+        //Given
+        int size = 2;
+        List<LineResponse> created = createLines(size);
+
+        //When
+        List<LineResponse> lines = lineService.findAll();
+
+        //Then
+        assertThat(lines.size()).isEqualTo(created.size());
+    }
+
+    private List<LineResponse> createLines(int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> lineService.saveLine(new LineRequest(i+"호선", "blue")))
+                .collect(Collectors.toList());
     }
 }

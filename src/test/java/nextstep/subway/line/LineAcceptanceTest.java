@@ -8,13 +8,15 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.support.ApiSupporter;
-import nextstep.subway.station.domain.Station;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -53,16 +55,27 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
-        // given
-        // 지하철_노선_등록되어_있음
-        // 지하철_노선_등록되어_있음
+        //Given
+        Long createdId1 = ApiSupporter.callCreatedApi("1호선", "blue").jsonPath().getLong("id");
+        Long createdId2 = ApiSupporter.callCreatedApi("2호선", "green").jsonPath().getLong("id");
 
-        // when
-        // 지하철_노선_목록_조회_요청
+        //When
+        ExtractableResponse<Response> response = RestAssured
+                    .given().log().all()
+                    .when()
+                        .get("/lines")
+                    .then().log().all()
+                    .extract();
 
-        // then
-        // 지하철_노선_목록_응답됨
-        // 지하철_노선_목록_포함됨
+        List<Long> lineIds = response.jsonPath().getList(".", LineResponse.class).stream()
+                .map(it -> it.getId())
+                .collect(Collectors.toList());
+        List<Long> createdIds = Arrays.asList(createdId1, createdId2).stream().collect(Collectors.toList());
+
+
+        //Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(lineIds).containsAll(createdIds);
     }
 
     @DisplayName("지하철 노선을 조회한다.")

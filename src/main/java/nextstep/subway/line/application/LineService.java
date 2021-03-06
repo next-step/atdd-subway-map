@@ -8,6 +8,9 @@ import nextstep.subway.line.dto.LineResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class LineService {
@@ -38,5 +41,12 @@ public class LineService {
         lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
         lineRepository.deleteById(id);
+    }
+
+    public List<LineResponse> findAll() {
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream()
+                .map(line -> LineResponse.of(line))
+                .collect(Collectors.toList());
     }
 }
