@@ -37,9 +37,9 @@ public class LineService {
     }
 
     @Modifying
-    public void updateLine(Long id, Line target) {
+    public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findById(id);
-        line.update(target);
+        line.update(lineRequest.toLine());
     }
 
     public void deleteLine(Long id) {
