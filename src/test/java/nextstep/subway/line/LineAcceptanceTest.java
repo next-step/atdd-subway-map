@@ -20,22 +20,50 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+    private enum SubwayLine {
+
+        First("1호선", "노랑색"),
+        Second("2호선", "빨강색"),
+        Third("3호선", "파랑색");
+
+        public String name;
+        public String color;
+
+        SubwayLine(String name, String color) {
+            this.name = name;
+            this.color = color;
+        }
+    }
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
         // given & when
-        ExtractableResponse<Response> response = 지하철_노선_생성요청("1호선", "노랑색");
+        ExtractableResponse<Response> response = 지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
 
         // then
         지하철_노선_생성됨(response);
+    }
+
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 노선을 생성한다.")
+    @Test
+    void createStationWithDuplicateName() {
+        // given
+        지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
+
+        // then
+        지하철_노선_생성실패됨(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createdResponse1 = 지하철_노선_생성요청("1호선", "노랑색");
-        ExtractableResponse<Response> createdResponse2 = 지하철_노선_생성요청("2호선", "빨강색");
+        ExtractableResponse<Response> createdResponse1 = 지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
+        ExtractableResponse<Response> createdResponse2 = 지하철_노선_생성요청(SubwayLine.Second.name, SubwayLine.Second.color);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선목록_조회요청();
@@ -49,7 +77,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청("1호선", "노랑색");
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
 
         // when
         Long lineId = createdResponse.as(LineResponse.class).getId();
@@ -64,12 +92,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청("1호선", "노랑색");
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
 
         // when
         Long lineId = createdResponse.as(LineResponse.class).getId();
-        String name = "3호선";
-        String color = "파랑색";
+        String name = SubwayLine.Third.name;
+        String color = SubwayLine.Third.color;
         ExtractableResponse<Response> response = 지하철_노선_수정요청(lineId, name, color);
 
         // then
@@ -81,7 +109,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청("1호선", "노랑색");
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청(SubwayLine.First.name, SubwayLine.First.color);
 
         // when
         Long lineId = createdResponse.as(LineResponse.class).getId();
@@ -103,6 +131,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void 지하철_노선_생성실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ExtractableResponse<Response> 지하철_노선목록_조회요청() {
@@ -148,7 +180,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(resultLineId).isEqualTo(expectedLineId);
     }
 
-
     private ExtractableResponse<Response> 지하철_노선_수정요청(Long lineId, String name, String color) {
         LineRequest request = new LineRequest(name, color);
 
@@ -171,7 +202,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(updatedName).isEqualTo(name);
         assertThat(updatedColor).isEqualTo(color);
     }
-
 
     private ExtractableResponse<Response> 지하철_노선_제거요청(Long lineId) {
         ExtractableResponse<Response> response = RestAssured
