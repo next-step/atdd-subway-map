@@ -159,7 +159,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse =
                 지하철_노선_생성_요청("선릉", "green darken-1");
 
-
         Long id = Long.parseLong(
                 createResponse
                         .header("Location")
