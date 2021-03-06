@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +45,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 생성한다.")
     @Test
-    void createLineWithDuplicateName() {
+    void createLine_duplicateName() {
         // given
         지하철_노선_생성_요청(신분당선);
 
@@ -87,10 +88,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine_notExist() {
         //given
-        final String LINE_ID = "1";
+        final String lineId = "1";
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(LINE_ID);
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
 
         // then
         지하철_노선_조회_실패됨(response);
@@ -209,15 +210,31 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .map(LineResponse::getId)
             .collect(toList());
 
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+        assertThat(resultLineIds).containsExactlyElementsOf(expectedLineIds);
 
         final List<LineResponse> lines = responses.stream()
             .map(it -> it.as(LineResponse.class))
             .collect(toList());
 
-        assertThat(lines)
-            .usingRecursiveComparison()
-            .isEqualTo(results);
+        지하철_노선_동등비교(results, lines);
+    }
+
+    private void 지하철_노선_동등비교(List<LineResponse> results, List<LineResponse> lines) {
+        final List<String> lineNames = convertToList(lines, LineResponse::getName);
+        final List<String> resultNames = convertToList(results, LineResponse::getName);
+
+        assertThat(lineNames).containsExactlyElementsOf(resultNames);
+
+        final List<String> lineColors = convertToList(lines, LineResponse::getColor);
+        final List<String> resultColors = convertToList(results, LineResponse::getColor);
+
+        assertThat(lineColors).containsExactlyElementsOf(resultColors);
+    }
+
+    private <T, R> List<R> convertToList(List<T> lines, Function<T, R> function) {
+        return lines.stream()
+            .map(function)
+            .collect(toList());
     }
 
     private void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
