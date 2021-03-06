@@ -3,6 +3,7 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exceptions.ExistingLineException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +27,22 @@ public class LineController {
 
     @GetMapping("/{id}")
     public ResponseEntity findLine(@PathVariable long id) {
-        LineResponse line = lineService.findLine(id);
-        return ResponseEntity.ok().body(line);
+        try {
+            LineResponse line = lineService.findLine(id);
+            return ResponseEntity.ok().body(line);
+        } catch (NullPointerException e) {
+            return ResponseEntity.badRequest().body("존재하지 않는 Line에 대한 요청입니다.");
+        }
     }
 
     @PostMapping
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        try {
+            LineResponse line = lineService.saveLine(lineRequest);
+            return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        } catch (ExistingLineException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
