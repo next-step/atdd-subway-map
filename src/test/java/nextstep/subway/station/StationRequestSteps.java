@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import nextstep.subway.station.dto.StationRequest;
 import org.springframework.http.MediaType;
 
-public class StationSteps {
+public class StationRequestSteps {
 
     public static ExtractableResponse<Response> 지하철_역_생성_요청(String name) {
         return RestAssured

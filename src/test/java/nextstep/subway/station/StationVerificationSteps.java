@@ -26,7 +26,7 @@ public class StationVerificationSteps {
         return response.header("Location");
     }
 
-    public static void 지하철_역_생성_실패(ExtractableResponse<Response> response) {
+    public static void 지하철_역_생성_실패_됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 

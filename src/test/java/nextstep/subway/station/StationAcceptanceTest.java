@@ -6,7 +6,7 @@ import nextstep.subway.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.station.StationSteps.*;
+import static nextstep.subway.station.StationRequestSteps.*;
 import static nextstep.subway.station.StationVerificationSteps.*;
 
 @DisplayName("지하철역 관련 기능")
@@ -32,7 +32,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
 
         // then - 지하철 역 생성 실패
-        지하철_역_생성_실패(response);
+        지하철_역_생성_실패_됨(response);
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
