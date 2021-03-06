@@ -37,7 +37,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        StationRequestBuilder.createStationRequestParams("강남역");
+        StationRequestBuilder.requestCreateStation("강남역");
 
         // when
         ExtractableResponse<Response> response = StationRequestBuilder.requestCreateStation("강남역");
