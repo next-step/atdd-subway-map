@@ -39,7 +39,6 @@ public class LineService {
     public LineResponse modifyLine(long id,LineRequest lineRequest) {
         Line line  =  lineRepository.findById(id).orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
         line.update(lineRequest.toLine());
-        lineRepository.save(line);
         return LineResponse.of(line);
     }
 
