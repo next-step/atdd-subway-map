@@ -33,4 +33,10 @@ public class LineService {
                 .orElseThrow(() -> new NotFoundLineException(id));
         line.update(updateRequest.toLine());
     }
+
+    public void deleteById(Long id) {
+        lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundLineException(id));
+        lineRepository.deleteById(id);
+    }
 }

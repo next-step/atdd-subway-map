@@ -173,13 +173,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
-        // given
-        // 지하철_노선_등록되어_있음
+        //Given
+        String createdUri = ApiSupporter.callCreatedApi("1호선", "blue")
+                                        .header("Location");
 
-        // when
-        // 지하철_노선_제거_요청
+        //When
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when()
+                    .delete(createdUri)
+                .then().log().all()
+                .extract();
 
-        // then
-        // 지하철_노선_삭제됨
+        //Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

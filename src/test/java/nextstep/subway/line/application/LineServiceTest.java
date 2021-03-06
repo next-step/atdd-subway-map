@@ -66,4 +66,16 @@ public class LineServiceTest {
         //Then
         assertThat(updatedResponse.getColor()).isEqualTo(color+postFixColor);
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
+    public void deleteLine(String stationName, String color) {
+        assertThatThrownBy(() -> {
+            LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
+
+            lineService.deleteById(createdResponse.getId());
+            lineService.findById(createdResponse.getId());
+        }).isInstanceOf(NotFoundLineException.class);
+
+    }
 }
