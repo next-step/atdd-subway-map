@@ -4,17 +4,20 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.ExistLineException;
+import nextstep.subway.line.exception.NonExistLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.common.ExceptionMessage.EXCEPTION_MESSAGE_EXIST_LINE_NAME;
+import static nextstep.subway.common.ExceptionMessage.EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME;
+
 @Service
 @Transactional
 public class LineService {
-
-    private static final String INVALID_LINE_MESSAGE = "존재하지 않는 노선입니다.";
 
     private final LineRepository lineRepository;
 
@@ -23,8 +26,16 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        validateLineName(request.getName());
+
         Line persistLine = lineRepository.save(request.toLine());
         return LineResponse.of(persistLine);
+    }
+
+    private void validateLineName(String lineName) {
+        if (lineRepository.existsByName(lineName)) {
+            throw new ExistLineException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -56,6 +67,6 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+                .orElseThrow(() -> new NonExistLineException(EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME));
     }
 }
