@@ -179,15 +179,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+
     private ExtractableResponse<Response> 지하철_노선_등록(Map<String, String> params) {
-        return 지하철_노선_등록(params.get("name"), params.get("color"));
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_등록(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
         return RestAssured
                 .given().log().all()
                 .body(params)
