@@ -14,6 +14,8 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//테스트 간 격리를 위해 테이블(데이터) 초기화 역할을 하는 객체(JPA)
+
 @Service
 @ActiveProfiles("test")
 public class DatabaseCleanup implements InitializingBean {
