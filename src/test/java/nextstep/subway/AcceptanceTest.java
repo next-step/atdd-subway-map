@@ -1,6 +1,8 @@
 package nextstep.subway;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,10 @@ public class AcceptanceTest {
             RestAssured.port = port;
             databaseCleanup.afterPropertiesSet();
         }
-
         databaseCleanup.execute();
+    }
+
+    public Long parseIdFromResponseHeader(ExtractableResponse<Response> response) {
+        return Long.parseLong(response.header("Location").split("/")[2]);
     }
 }

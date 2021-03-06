@@ -122,10 +122,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private Long parseIdFromResponseHeader(ExtractableResponse<Response> response) {
-        return Long.parseLong(response.header("Location").split("/")[2]);
-    }
-
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
