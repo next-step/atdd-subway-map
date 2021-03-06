@@ -66,14 +66,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_제거요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철역_제거됨(response);
     }
 
     private ExtractableResponse<Response> 지하철역_생성요청(String name) {
@@ -116,5 +112,17 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .collect(Collectors.toList());
 
         assertThat(resultStationIds).containsAll(expectedStationIds);
+    }
+
+    private ExtractableResponse<Response> 지하철역_제거요청(String uri) {
+        return RestAssured
+                .given().log().all()
+                .when().delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private void 지하철역_제거됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
