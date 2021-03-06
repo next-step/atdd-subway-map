@@ -34,32 +34,32 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철_역_생성_실패(response);
     }
 
-    @DisplayName("지하철역을 조회한다.")
+    @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() {
         /// given - 조회될 지하철 역 생성
         ExtractableResponse<Response> createResponse1 = 지하철_역_생성_요청("강남역");
         ExtractableResponse<Response> createResponse2 = 지하철_역_생성_요청("역삼역");
 
-        // when - 지하철 역 조회
+        // when - 지하철 역 목록 조회 요청
         ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
 
         // then
-        지하철_역_목록_조회_응답_됨(response);
-        지하철_역_목록_결과에_포함되는_역_확인(createResponse1, createResponse2, response);
+        지하철_역_목록_조회_됨(response);
+        지하철_역_목록_조회_결과에_2개_역_포함_확인(createResponse1, createResponse2, response);
     }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-        // given - 제거할 지하철 역
+        // given - 제거할 지하철 역 생성
         ExtractableResponse<Response> createResponse = 지하철_역_생성_요청("강남역");
 
         // when
         String uri = 생성된_지하철_역_URI_경로_확인(createResponse);
-        ExtractableResponse<Response> response = 지하철_역_삭제_요청(uri);
+        ExtractableResponse<Response> response = 지하철_역_제거_요청(uri);
 
         // then
-        지하철_역_삭제_됨(response);
+        지하철_역_제거_됨(response);
     }
 }

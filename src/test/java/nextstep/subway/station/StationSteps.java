@@ -30,10 +30,10 @@ public class StationSteps {
 
     public static void 지하철_역_생성_됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        생선된_지하철_역_생성_리소스_생성_됨(response);
+        생선된_지하철_역_URI_경로_존재_함(response);
     }
 
-    public static void 생선된_지하철_역_생성_리소스_생성_됨(ExtractableResponse<Response> response) {
+    public static void 생선된_지하철_역_URI_경로_존재_함(ExtractableResponse<Response> response) {
         assertThat(생성된_지하철_역_URI_경로_확인(response)).isNotBlank();
     }
 
@@ -55,11 +55,11 @@ public class StationSteps {
                 .extract();
     }
 
-    public static void 지하철_역_목록_조회_응답_됨(ExtractableResponse<Response> response) {
+    public static void 지하철_역_목록_조회_됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 지하철_역_목록_결과에_포함되는_역_확인(ExtractableResponse<Response> createResponse1, ExtractableResponse<Response> createResponse2, ExtractableResponse<Response> response) {
+    public static void 지하철_역_목록_조회_결과에_2개_역_포함_확인(ExtractableResponse<Response> createResponse1, ExtractableResponse<Response> createResponse2, ExtractableResponse<Response> response) {
         List<Long> expectedLineIds = 지하철_역_예상_ID(createResponse1, createResponse2);
         List<Long> resultLineIds = 지하철_역_목록_조회_결과_ID(response);
         assertThat(resultLineIds).containsAll(expectedLineIds);
@@ -79,7 +79,7 @@ public class StationSteps {
                 .collect(Collectors.toList());
     }
 
-    public static ExtractableResponse<Response> 지하철_역_삭제_요청(String uri) {
+    public static ExtractableResponse<Response> 지하철_역_제거_요청(String uri) {
         return RestAssured
                 .given().log().all()
                 .when()
@@ -88,7 +88,7 @@ public class StationSteps {
                 .extract();
     }
 
-    public static void 지하철_역_삭제_됨(ExtractableResponse<Response> response) {
+    public static void 지하철_역_제거_됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
