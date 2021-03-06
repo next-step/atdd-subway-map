@@ -50,7 +50,7 @@ public class LineController {
     }
 
     @ExceptionHandler(AlreadyExistsEntityException.class)
-    public ResponseEntity handleIllegalArgsException(AlreadyExistsEntityException e) {
+    public ResponseEntity alreadyExistsEntityException(AlreadyExistsEntityException e) {
         return ResponseEntity.badRequest().build();
     }
 
