@@ -6,6 +6,8 @@ import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.StationAcceptanceTest;
+import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,14 +27,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private final String LINE_NAME_2 = "2호선";
     private final String COLOR_1 = "blue";
     private final String COLOR_2 = "green";
+    private long STATION_1;
+    private long STATION_2;
+    private final int DISTANCE = 10;
 
     private LineRequest firstRequest;
     private LineRequest secondRequest;
 
     @BeforeEach
     void before() {
-        firstRequest = new LineRequest(LINE_NAME_1, COLOR_1);
-        secondRequest = new LineRequest(LINE_NAME_2, COLOR_2);
+        STATION_1 = 지하철역_생성_요청("강남역");
+        STATION_2 = 지하철역_생성_요청("신촌역");
+        firstRequest = new LineRequest(LINE_NAME_1, COLOR_1, STATION_1, STATION_2, DISTANCE);
+        secondRequest = new LineRequest(LINE_NAME_2, COLOR_2, STATION_1, STATION_2, DISTANCE);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -116,7 +123,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> 노선_생성_요청(LineRequest params) {
+    public static ExtractableResponse<Response> 노선_생성_요청(LineRequest params) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -139,7 +146,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 노선_조회_요청(ExtractableResponse<Response> mockLine) {
+    public static ExtractableResponse<Response> 노선_조회_요청(ExtractableResponse<Response> mockLine) {
         String uri = mockLine.header("Location");
 
         return RestAssured
@@ -213,5 +220,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void 노선_삭제됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private long 지하철역_생성_요청(String name) {
+        return StationAcceptanceTest.지하철역_생성_요청(name).body().as(StationResponse.class).getId();
     }
 }
