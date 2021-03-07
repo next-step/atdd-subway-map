@@ -58,7 +58,7 @@ public class LineController {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity handleSQLIntegerityException() {
+    public ResponseEntity handleSQLIntegrityException() {
         return ResponseEntity.badRequest().build();
     }
 
