@@ -80,7 +80,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선을 조회한다.")
     @Test
-    void getLine() {
+    void findLineById() {
         //Given
         ExtractableResponse<Response> createdResponse = ApiSupporter.callCreatedApi("1호선", "blue");
         LineResponse createdLine = createdResponse.jsonPath().getObject(".", LineResponse.class);

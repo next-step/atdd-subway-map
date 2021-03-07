@@ -31,12 +31,12 @@ public class LineServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
-    public void findByIdTest(String stationName, String color) {
+    public void findLineById(String stationName, String color) {
         //Given
         LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
 
         //When
-        LineResponse response = lineService.findById(createdResponse.getId());
+        LineResponse response = lineService.findLineById(createdResponse.getId());
 
         //Then
         assertAll(
@@ -51,7 +51,7 @@ public class LineServiceTest {
     public void notFoundLineException() {
         assertThatThrownBy(() -> {
                  Long id = lineService.saveLine(new LineRequest("6호선", "brown")).getId();
-                 lineService.findById(id + 1);
+                 lineService.findLineById(id + 1);
         }).isInstanceOf(NotFoundLineException.class);
     }
 
@@ -64,8 +64,8 @@ public class LineServiceTest {
         LineRequest lineRequest = new LineRequest(stationName, color+postFixColor);
 
         //When
-        lineService.update(createdResponse.getId(), lineRequest);
-        LineResponse updatedResponse = lineService.findById(createdResponse.getId());
+        lineService.updateLine(createdResponse.getId(), lineRequest);
+        LineResponse updatedResponse = lineService.findLineById(createdResponse.getId());
 
         //Then
         assertThat(updatedResponse.getColor()).isEqualTo(color+postFixColor);
@@ -77,19 +77,19 @@ public class LineServiceTest {
         assertThatThrownBy(() -> {
             LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
 
-            lineService.deleteById(createdResponse.getId());
-            lineService.findById(createdResponse.getId());
+            lineService.deleteLineById(createdResponse.getId());
+            lineService.findLineById(createdResponse.getId());
         }).isInstanceOf(NotFoundLineException.class);
     }
 
     @Test
-    public void findAll() {
+    public void findAllLines() {
         //Given
         int size = 2;
         List<LineResponse> created = createLines(size);
 
         //When
-        List<LineResponse> lines = lineService.findAll();
+        List<LineResponse> lines = lineService.findAllLines();
 
         //Then
         assertThat(lines.size()).isEqualTo(created.size());

@@ -21,7 +21,7 @@ public class LineController {
 
     @GetMapping("/lines")
     public ResponseEntity findAllLines(){
-        List<LineResponse> lineResponses = lineService.findAll();
+        List<LineResponse> lineResponses = lineService.findAllLines();
         return ResponseEntity.ok().body(lineResponses);
     }
 
@@ -32,20 +32,20 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity getLine(@PathVariable Long id) {
-        LineResponse line = lineService.findById(id);
+    public ResponseEntity findLineById(@PathVariable Long id) {
+        LineResponse line = lineService.findLineById(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/lines/{id}")
     public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        lineService.update(id, lineRequest);
+        lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity deleteLine(@PathVariable Long id) {
-        lineService.deleteById(id);
+        lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
 
