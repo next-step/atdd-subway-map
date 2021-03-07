@@ -33,11 +33,20 @@ public class LineService {
     }
 
     public LineResponse getLine(Long lineId) {
+        return LineResponse.of(getLineEntity(lineId));
+    }
+
+    public void updateLine(Long lineId, LineRequest lineRequest) {
+        Line line = getLineEntity(lineId);
+        line.update(lineRequest.toLine());
+    }
+
+    private Line getLineEntity(Long lineId) {
         if (Objects.isNull(lineId)) {
             throw new IllegalArgumentException("지하철 노선 ID를 입력해주세요.");
         }
         return lineRepository.findById(lineId)
-                .map(LineResponse::of)
                 .orElseThrow(EntityNotFoundException::new);
     }
+
 }
