@@ -41,6 +41,11 @@ public class LineService {
         line.update(lineRequest.toLine());
     }
 
+    public void deleteLine(Long lineId) {
+        Line line = getLineEntity(lineId);
+        lineRepository.delete(line);
+    }
+
     private Line getLineEntity(Long lineId) {
         if (Objects.isNull(lineId)) {
             throw new IllegalArgumentException("지하철 노선 ID를 입력해주세요.");
@@ -48,5 +53,6 @@ public class LineService {
         return lineRepository.findById(lineId)
                 .orElseThrow(EntityNotFoundException::new);
     }
+
 
 }
