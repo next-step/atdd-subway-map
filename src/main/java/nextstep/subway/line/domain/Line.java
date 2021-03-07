@@ -3,6 +3,7 @@ package nextstep.subway.line.domain;
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.exceptions.AlreadyExistsEntityException;
 import nextstep.subway.exceptions.NotEqualsStationException;
+import nextstep.subway.exceptions.OnlyOneSectionException;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
@@ -14,6 +15,8 @@ import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
+    public static final String ONLY_DOWN_STATION_CAN_DELETED = "하행 종점역만 삭제가 가능합니다.";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -90,13 +93,11 @@ public class Line extends BaseEntity {
     }
 
     public void isValidSection(Section newSection) {
-        //1. 새로운 구간의 상행역(section.upStation)은 현재 등록되어있는 하행 종점역이여야 한다.
         Station downStation = getDownStation();
         if (!newSection.getUpStation().equals(downStation)) {
             throw new NotEqualsStationException();
         }
 
-        //2. 새로운 구간의 하행역(section.downStation)은 현재 등록되어 있는 역일 수 없다.
         if (isExistsDownStation(newSection.getDownStation())) {
             throw new AlreadyExistsEntityException();
         }
@@ -110,5 +111,23 @@ public class Line extends BaseEntity {
     private Boolean isExistsDownStation(Station station) {
         return sections.stream()
                 .anyMatch(section -> section.getUpStation().equals(station) || section.getDownStation().equals(station));
+    }
+
+    public void deleteLastSection(Long stationId) {
+        isValidDeleteSection(stationId);
+
+        sections.remove(getLastSection());
+    }
+
+    private void isValidDeleteSection(Long stationId) {
+        Section lastSection = getLastSection();
+
+        if (!lastSection.getDownStation().getId().equals(stationId)) {
+            throw new IllegalArgumentException(ONLY_DOWN_STATION_CAN_DELETED);
+        }
+
+        if (sections.size() == 1) {
+            throw new OnlyOneSectionException();
+        }
     }
 }

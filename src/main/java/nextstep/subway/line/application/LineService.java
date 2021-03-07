@@ -86,4 +86,10 @@ public class LineService {
 
         return line;
     }
+
+    @Modifying
+    public void deleteLineStation(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        line.deleteLastSection(stationId);
+    }
 }
