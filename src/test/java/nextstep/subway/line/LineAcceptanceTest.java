@@ -1,6 +1,7 @@
 package nextstep.subway.line;
 
 import static java.util.stream.Collectors.*;
+import static nextstep.subway.station.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
@@ -20,17 +21,28 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-
+    private StationResponse 강남역;
+    private StationResponse 양재역;
+    private StationResponse 가평역;
+    private StationResponse 춘천역;
     private Map<String, String> 신분당선;
     private Map<String, String> 경춘선;
 
     @BeforeEach
     void before() {
-        신분당선 = 노선_생성("신분당선", "bg-red-600");
-        경춘선 = 노선_생성("경춘선", "bg-green-600");
+        강남역 = 지하철역_생성_요청(지하철역_생성("강남역")).as(StationResponse.class);
+        양재역 = 지하철역_생성_요청(지하철역_생성("양재역")).as(StationResponse.class);
+        가평역 = 지하철역_생성_요청(지하철역_생성("가평역")).as(StationResponse.class);
+        춘천역 = 지하철역_생성_요청(지하철역_생성("춘천역")).as(StationResponse.class);
+
+        신분당선 = 노선_생성("신분당선", "bg-red-600",
+            String.valueOf(강남역.getId()), String.valueOf(양재역.getId()), "5");
+        경춘선 = 노선_생성("경춘선", "bg-green-600",
+            String.valueOf(가평역.getId()), String.valueOf(춘천역.getId()), "4");
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -265,10 +277,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private Map<String, String> 노선_생성(String name, String color) {
+    private Map<String, String> 노선_생성(
+        String name, String color, String upStationId,
+        String downStationId, String distance) {
         Map<String, String> map = new HashMap<>();
         map.put("name", name);
         map.put("color", color);
+        map.put("upStationId", upStationId);
+        map.put("downStationId", downStationId);
+        map.put("distance", distance);
         return map;
     }
 
