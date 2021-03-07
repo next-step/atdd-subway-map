@@ -20,11 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
+    private enum SubwayStation {
+
+        GangNam("강남역"),
+        Yeoksam("역삼역");
+
+        public String name;
+
+        SubwayStation(String name) {
+            this.name = name;
+        }
+    }
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         // given & when
-        ExtractableResponse<Response> response = 지하철역_생성요청("강남역");
+        ExtractableResponse<Response> response = 지하철역_생성요청(SubwayStation.GangNam.name);
 
         // then
         지하철역_생성됨(response);
@@ -34,10 +46,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        지하철역_생성요청("강남역");
+        지하철역_생성요청(SubwayStation.GangNam.name);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성요청("강남역");
+        ExtractableResponse<Response> response = 지하철역_생성요청(SubwayStation.GangNam.name);
 
         // then
         지하철역_생성실패됨(response);
@@ -47,8 +59,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createdResponse1 = 지하철역_생성요청("강남역");
-        ExtractableResponse<Response> createdResponse2 = 지하철역_생성요청("역삼역");
+        ExtractableResponse<Response> createdResponse1 = 지하철역_생성요청(SubwayStation.GangNam.name);
+        ExtractableResponse<Response> createdResponse2 = 지하철역_생성요청(SubwayStation.Yeoksam.name);
 
         // when
         ExtractableResponse<Response> response = 지하철역_조회요청();
@@ -62,7 +74,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성요청("강남역");
+        ExtractableResponse<Response> createResponse = 지하철역_생성요청(SubwayStation.GangNam.name);
 
         // when
         String uri = createResponse.header("Location");
