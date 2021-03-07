@@ -32,6 +32,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성됨(response);
     }
 
+    @DisplayName("기존에 존재하는 지하철 노선 생성시 생성 실패")
+    @Test
+    void validateReduplicationLine() {
+        //given
+        LineRequest lineRequest = 지하철_노선_등록되어_있음("2호선", "green");
+        지하철_노선_생성_요청(lineRequest);
+
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(lineRequest);
+
+        지하철_노선_생성_실패됨(response);
+    }
+
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
@@ -108,6 +120,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
