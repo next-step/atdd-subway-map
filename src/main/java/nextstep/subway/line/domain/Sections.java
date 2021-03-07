@@ -48,6 +48,13 @@ public class Sections {
         this.sections.add(section);
     }
 
+    public void removeSection(Station station) {
+        sizeValidate();
+        removeLastStationValidate(station);
+        sections.remove(sections.size() - 1);
+    }
+
+
     private void lastStationMatchValidate(Section section) {
         if (!findLastStation().equals(section.getUpStation())) {
             throw new IllegalArgumentException("추가하는 구간의 상행역이 잘못되었습니다.");
@@ -72,20 +79,16 @@ public class Sections {
         }
     }
 
-    public void removeSection(Station station) {
-        if (isSizeLessThanOne()) {
+    private void sizeValidate() {
+        if (this.sections.size() <= 1) {
             throw new RuntimeException("해당 라인에 구간이 1개 밖에 없습니다.");
         }
+    }
 
+    private void removeLastStationValidate(Station station) {
         if (!findLastStation().equals(station)) {
             throw new RuntimeException("해당 구간의 마지막 역이 아닙니다.");
         }
-
-        sections.remove(sections.size() - 1);
-    }
-
-    private boolean isSizeLessThanOne() {
-        return this.sections.size() <= 1;
     }
 
     private Station findLastStation() {
