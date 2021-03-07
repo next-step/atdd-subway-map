@@ -3,94 +3,78 @@ package nextstep.subway.station;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.station.StationSteps.*;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
-
-    private Map<String, String> createParams(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return params;
-    }
-
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = createParams("강남역");
-
         // when
-        ExtractableResponse<Response> response = postRequest("/stations", params);
+        ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        지하철_역_생성_성공(response);
+        생성된_지하철_역_uri_반환(response);
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
     @Test
     void createStationWithDuplicateName() {
         // given
-        Map<String, String> params = createParams("강남역");
-        postRequest("/stations", params);
+        지하철_역_생성_요청("강남역");
 
         // when
-        ExtractableResponse<Response> response = postRequest("/stations", params);
+
+        ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        지하철_역_생성_실패(response);
+    }
+
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void getStations() {
+        /// given
+        지하철_역_생성_요청("강남역");
+        지하철_역_생성_요청("역삼역");
+
+        // when
+        ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
+
+        // then
+        지하철_역_조회_성공(response);
+        지하철_역_목록_조회_결과_2건(response);
     }
 
     @DisplayName("지하철역을 조회한다.")
     @Test
-    void getStations() {
+    void getStation() {
         /// given
-        Map<String, String> params1 = createParams("강남역");
-        ExtractableResponse<Response> createResponse1 = postRequest("/stations",params1);
-
-
-        Map<String, String> params2 = createParams("역삼역");
-        ExtractableResponse<Response> createResponse2 = postRequest("/stations",params2);
+        ExtractableResponse<Response> createdLine = 지하철_역_생성_요청("강남역");
+        Long createdLineId = 생성된_지하철_역_ID_확인(createdLine);
 
         // when
-        ExtractableResponse<Response> response = getRequest("/stations");
+        ExtractableResponse<Response> response = 지하철_역_조회_요청(createdLineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedLineIds = Arrays.asList(createResponse1, createResponse2).stream()
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath().getList(".", StationResponse.class).stream()
-                .map(it -> it.getId())
-                .collect(Collectors.toList());
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+        지하철_역_조회_성공(response);
     }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = createParams("강남역");
-
-        ExtractableResponse<Response> createResponse = postRequest("stations", params);
+        ExtractableResponse<Response> createdLine = 지하철_역_생성_요청("강남역");
+        Long createdLineId = 생성된_지하철_역_ID_확인(createdLine);
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = deleteRequest(uri);
+        ExtractableResponse<Response> response = 지하철_역_삭제_요청(createdLineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_역_삭제_성공(response);
     }
 }
