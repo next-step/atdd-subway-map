@@ -10,7 +10,7 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(ExistResourceException.class)
     public ResponseEntity<Void> existResourceExceptionHandler(RuntimeException e) {
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.unprocessableEntity().build();
     }
 
     @ExceptionHandler(NonExistResourceException.class)
