@@ -2,6 +2,7 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.SectionRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
 
+    private SectionRepository sectionRepository;
+
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
@@ -30,15 +33,14 @@ public class LineService {
         } catch (DataIntegrityViolationException e){
             throw new DuplicateLineException("이미 등록한 라인 입니다.");
         }
-
     }
 
-    public List<LineResponse> getLines() {
+    public List<LineResponse> getAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> LineResponse.of(line)).collect(Collectors.toList());
     }
 
-    public LineResponse findLine(final Long lineId) {
+    public LineResponse getLineById(final Long lineId) {
         Optional<Line> line = lineRepository.findById(lineId);
         return line.map(LineResponse::of)
                 .orElseThrow(() -> new IllegalArgumentException("Not found lineId"+lineId));

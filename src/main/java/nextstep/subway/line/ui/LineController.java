@@ -29,13 +29,13 @@ public class LineController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        List<LineResponse> lines = lineService.getLines();
+        List<LineResponse> lines = lineService.getAllLines();
         return ResponseEntity.ok().body(lines);
     }
 
     @GetMapping(value = "/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> getLine(@PathVariable("lineId") Long lineId) {
-        LineResponse line = lineService.findLine(lineId);
+        LineResponse line = lineService.getLineById(lineId);
         return ResponseEntity.ok().body(line);
     }
 
