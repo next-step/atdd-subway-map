@@ -14,7 +14,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
+        ExtractableResponse<Response> response = 강남역_생성();
 
         // then
         지하철_역_생성_성공(response);
@@ -25,11 +25,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        지하철_역_생성_요청("강남역");
+        강남역_생성();
 
         // when
 
-        ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
+        ExtractableResponse<Response> response = 강남역_생성();
 
         // then
         지하철_역_생성_실패(response);
@@ -39,8 +39,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        지하철_역_생성_요청("강남역");
-        지하철_역_생성_요청("역삼역");
+        강남역_생성();
+        역삼역_생성();
 
         // when
         ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
@@ -54,7 +54,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStation() {
         /// given
-        ExtractableResponse<Response> createdLine = 지하철_역_생성_요청("강남역");
+        ExtractableResponse<Response> createdLine = 강남역_생성();
         Long createdLineId = 생성된_지하철_역_ID_확인(createdLine);
 
         // when
@@ -68,7 +68,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createdLine = 지하철_역_생성_요청("강남역");
+        ExtractableResponse<Response> createdLine = 강남역_생성();
         Long createdLineId = 생성된_지하철_역_ID_확인(createdLine);
 
         // when
