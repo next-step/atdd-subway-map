@@ -16,12 +16,12 @@ public class Line extends BaseEntity {
     public Line() {
     }
 
-    public Line(String name, String color) {
+    public Line(final String name, final String color) {
         this.name = name;
         this.color = color;
     }
 
-    public void update(Line line) {
+    public void update(final Line line) {
         this.name = line.getName();
         this.color = line.getColor();
     }
