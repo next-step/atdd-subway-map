@@ -5,6 +5,7 @@ import nextstep.subway.error.NotFoundException;
 import nextstep.subway.line.domain.*;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
 import org.springframework.stereotype.Service;
@@ -28,23 +29,22 @@ public class LineService {
         if (checkExistsName(request.getName())) {
             throw new NameExistsException(request.getName());
         }
-        return LineResponse.of(addSectionsAndCreateLine(request));
+        return LineResponse.of(createLine(request));
     }
 
-    private Line addSectionsAndCreateLine(LineRequest request) {
+    private Line createLine(LineRequest request) {
         Line persistLine = lineRepository.save(request.toLine());
-        Station upStation = stationService.findByStation(request.getUpStationId());
-        Station downStation = stationService.findByStation(request.getDownStationId());
+        addSection(persistLine, request.getUpStationId(),
+                                    request.getDownStationId(), request.getDistance());
 
-        Section section = Section.Builder.aSection()
-                .line(persistLine)
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(new Distance(request.getDistance()))
-                .build();
-
-        persistLine.getSections().addSection(section);
         return lineRepository.save(persistLine);
+    }
+
+    private void addSection(Line line, Long upStationId, Long downStationId, int distance) {
+        Station upStation = stationService.findByStation(upStationId);
+        Station downStation = stationService.findByStation(downStationId);
+
+        line.addSection(upStation, downStation, distance);
     }
 
     private boolean checkExistsName(String name) {
@@ -53,9 +53,7 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse getLine(Long lineId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new NotFoundException(lineId));
-        return LineResponse.of(line);
+        return LineResponse.of(findLine(lineId));
     }
 
     @Transactional(readOnly = true)
@@ -67,17 +65,36 @@ public class LineService {
     }
 
     public void updateLineById(LineRequest lineRequest, Long lineId) {
-        Line persistLine = lineRepository.findById(lineId)
-                .orElseThrow(() -> new NotFoundException(lineId));
+        Line persistLine = findLine(lineId);
 
         persistLine.update(lineRepository.save(lineRequest.toLine()));
         lineRepository.save(persistLine);
     }
 
     public void deleteLineById(Long lineId) {
-        Line persistLine = lineRepository.findById(lineId)
-                .orElseThrow(() -> new NotFoundException(lineId));
+        Line persistLine = findLine(lineId);
         lineRepository.delete(persistLine);
+    }
+
+    public LineResponse addSection(Long lineId, SectionRequest request) {
+        Line line = findLine(lineId);
+        addSection(line, request.getUpStationId(),
+                request.getDownStationId(), request.getDistance());
+
+        return LineResponse.of(lineRepository.save(line));
+    }
+
+    public LineResponse removeSection(Long lineId, Long stationId) {
+        Line line = findLine(lineId);
+        Station lastStation = stationService.findByStation(stationId);
+
+        line.removeSection(lastStation);
+        return LineResponse.of(lineRepository.save(line));
+    }
+
+    private Line findLine(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException(lineId));
     }
 
 }
