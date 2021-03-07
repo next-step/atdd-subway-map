@@ -70,8 +70,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_등록되어_있음("경강선", "deep-blue");
 
         // when
-        // 지하철_노선_조회_요청
-        // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청();
 
         // then
