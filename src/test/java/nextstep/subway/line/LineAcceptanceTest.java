@@ -104,12 +104,26 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> createResponse1 = createInstanceBeforeTest("2호선", "green");
-        Long createResponseId = Long.parseLong(createResponse1.header("Location").split("/")[2]);
+        String uri = createResponse1.header("Location");
 
         // when
-        ExtractableResponse<Response> response = deleteRequest("/lines/" + createResponseId);
+        ExtractableResponse<Response> response = deleteRequest(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("기존에 존재하는 노선 이름으로 노선을 생성한다.")
+    @Test
+    void createLineWithDuplicateName() {
+        // given
+        Map<String, String> params = createParams("2호선", "green");
+        postRequest("/lines", params);
+
+        // when
+        ExtractableResponse<Response> response = postRequest("/lines", params);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
