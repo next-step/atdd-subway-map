@@ -62,7 +62,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철역_목록_조회됨(response);
-        지하철역_목록_포함됨(response, createResponse1, createResponse2);
+        지하철역_목록_포함됨(response, Arrays.asList(createResponse1, createResponse2));
     }
 
     @DisplayName("지하철역을 제거한다.")
@@ -116,21 +116,20 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private void 지하철역_목록_포함됨(ExtractableResponse<Response> ... responses) {
-        List<Long> resultLineIds = responses[0].jsonPath().getList(".", StationResponse.class)
+    private void 지하철역_목록_포함됨(ExtractableResponse<Response> readAllLinesResponse,
+                             List<ExtractableResponse<Response>> createLineResponses) {
+        List<Long> resultLineIds = readAllLinesResponse.jsonPath().getList(".", StationResponse.class)
                 .stream()
                 .map(it -> it.getId())
                 .collect(Collectors.toList());
 
-        List<Long> expectedLineIds = Arrays.asList(responses)
+        List<Long> expectedLineIds = createLineResponses
                 .stream()
                 .skip(1)
                 .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
 
-        assertThat(resultLineIds).containsAll(expectedLineIds);
-        resultLineIds.retainAll(expectedLineIds);
-        assertThat(resultLineIds).hasSize(expectedLineIds.size());
+        assertThat(resultLineIds).containsExactlyInAnyOrderElementsOf(expectedLineIds);
     }
 
     private ExtractableResponse<Response> 지하철역_제거_요청(ExtractableResponse<Response> createResponse) {
