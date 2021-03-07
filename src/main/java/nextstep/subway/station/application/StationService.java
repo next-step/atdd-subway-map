@@ -26,8 +26,8 @@ public class StationService {
     public StationResponse saveStation(StationRequest stationRequest) {
         validateStationName(stationRequest.getName());
 
-        Station persistStation = stationRepository.save(stationRequest.toStation());
-        return StationResponse.of(persistStation);
+        Station savedStation = stationRepository.save(stationRequest.toStation());
+        return StationResponse.of(savedStation);
     }
 
     private void validateStationName(String stationName) {

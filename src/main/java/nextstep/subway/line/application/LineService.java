@@ -28,8 +28,8 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
         validateLineName(request.getName());
 
-        Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        Line savedLine = lineRepository.save(request.toLine());
+        return LineResponse.of(savedLine);
     }
 
     private void validateLineName(String lineName) {
@@ -55,8 +55,9 @@ public class LineService {
         Line line = findLineById(id);
 
         line.update(lineRequest.toLine());
+        Line updatedLine = lineRepository.save(line);
 
-        return LineResponse.of(lineRepository.save(line));
+        return LineResponse.of(updatedLine);
     }
 
     public void deleteLine(Long id) {
