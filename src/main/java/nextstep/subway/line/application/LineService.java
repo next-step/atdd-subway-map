@@ -1,5 +1,7 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.common.exception.ExistResourceException;
+import nextstep.subway.common.exception.NonExistResourceException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
@@ -14,7 +16,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
 
-    private static final String INVALID_LINE_MESSAGE = "존재하지 않는 노선입니다.";
+    private static final String EXCEPTION_MESSAGE_EXIST_LINE_NAME = "존재하는 지하철 노선 입니다.";
+    private static final String EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME = "존재하지 않는 지하철 노선입니다.";
 
     private final LineRepository lineRepository;
 
@@ -23,38 +26,48 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toEntity());
-        return LineResponse.of(persistLine);
+        validateLineName(request.getName());
+
+        Line savedLine = lineRepository.save(request.toLine());
+        return LineResponse.of(savedLine);
+    }
+
+    private void validateLineName(String lineName) {
+        if (lineRepository.existsByName(lineName)) {
+            throw new ExistResourceException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
+        }
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(Line::toLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE))
-                .toLineResponse();
+        Line line = findLineById(id);
+        return LineResponse.of(line);
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+        Line line = findLineById(id);
 
-        line.update(lineRequest.toEntity());
+        line.update(lineRequest.toLine());
+        Line updatedLine = lineRepository.save(line);
 
-        return lineRepository.save(line)
-                .toLineResponse();
+        return LineResponse.of(updatedLine);
     }
 
     public void deleteLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(INVALID_LINE_MESSAGE));
+        Line line = findLineById(id);
 
         lineRepository.delete(line);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NonExistResourceException(EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME));
     }
 }

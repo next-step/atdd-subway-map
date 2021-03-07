@@ -3,6 +3,7 @@ package nextstep.subway.line.dto;
 import nextstep.subway.line.domain.Line;
 
 public class LineRequest {
+
     private String name;
     private String color;
 
@@ -22,8 +23,8 @@ public class LineRequest {
         return color;
     }
 
-    public Line toEntity() {
-        return Line.create(this.name, this.color);
+    public Line toLine() {
+        return new Line(name, color);
     }
 
 }
