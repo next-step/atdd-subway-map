@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,10 +40,10 @@ public class LineService {
         return LineResponse.of(line.orElse(null));
     }
 
-    public void updateLine(Long id, LineRequest request) throws Exception {
+    public void updateLine(Long id, LineRequest request) {
         Optional<Line> line = lineRepository.findById(id);
         if (!line.isPresent()) {
-            throw new Exception("no line to update!");
+            throw new NoSuchElementException("no line to update!");
         }
         lineRepository.save(request.toLine());
     }

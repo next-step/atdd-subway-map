@@ -3,13 +3,14 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 public class LineController {
@@ -40,8 +41,8 @@ public class LineController {
         try {
             lineService.updateLine(id, lineRequest);
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return handleException(e);
+        } catch (NoSuchElementException e) {
+            return handleNoSuchElementException();
         }
     }
 
@@ -51,8 +52,13 @@ public class LineController {
        return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity handleException(Exception e) {
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity handleNoSuchElementException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity handleSQLIntegerityException() {
         return ResponseEntity.badRequest().build();
     }
 

@@ -26,7 +26,7 @@ public class AcceptanceTest {
         databaseCleanup.execute();
     }
 
-    public Long parseIdFromResponseHeader(ExtractableResponse<Response> response) {
+    public static Long parseIdFromResponseHeader(ExtractableResponse<Response> response) {
         return Long.parseLong(response.header("Location").split("/")[2]);
     }
 }
