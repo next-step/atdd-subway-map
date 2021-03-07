@@ -80,6 +80,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     }
 
     public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+
         StationRequest stationRequest = new StationRequest(name);
 
         return RestAssured
