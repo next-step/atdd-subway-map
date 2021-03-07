@@ -17,6 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
+    private static final String URI_LINES = "/lines";
+    private static final String HEADER_LOCATION = "Location";
+
     public static ExtractableResponse<Response> requestCreateLineDx() {
         Map<String, String> params = makeLineParams("bg-red-600", "신분당선");
         return requestCreateLine(params);
@@ -33,7 +36,7 @@ public class LineSteps {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines")
+                .post(URI_LINES)
                 .then().log().all()
                 .extract();
     }
@@ -42,13 +45,13 @@ public class LineSteps {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get("/lines")
+                .get(URI_LINES)
                 .then().log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> requestGetLine(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -59,7 +62,7 @@ public class LineSteps {
 
     public static ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> createResponse) {
         Map<String, String> params = makeLineParams("bg-blue-600", "구분당선");
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -70,7 +73,7 @@ public class LineSteps {
     }
 
     public static ExtractableResponse<Response> requestDeleteLine(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)
@@ -80,7 +83,7 @@ public class LineSteps {
 
     public static void assertCreateLine(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(HEADER_LOCATION)).isNotBlank();
     }
 
     public static void assertCreateLineFail(ExtractableResponse<Response> response) {
@@ -91,9 +94,10 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void assertIncludeLines(ExtractableResponse<Response> createResponse1, ExtractableResponse<Response> createResponse2, ExtractableResponse<Response> response) {
-        List<Long> expectedIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+    @SafeVarargs
+    public static void assertIncludeLines(ExtractableResponse<Response> response, ExtractableResponse<Response>... createResponses) {
+        List<Long> expectedIds = Stream.of(createResponses)
+                .map(it -> Long.parseLong(it.header(HEADER_LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)

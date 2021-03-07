@@ -59,7 +59,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertGetLines(response);
-        assertIncludeLines(createResponse1, createResponse2, response);
+        assertIncludeLines(response, createResponse1, createResponse2);
     }
 
     @Test

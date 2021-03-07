@@ -54,7 +54,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertGetStations(response);
-        assertIncludeStations(createResponse1, createResponse2, response);
+        assertIncludeStations(response, createResponse1, createResponse2);
     }
 
     @Test

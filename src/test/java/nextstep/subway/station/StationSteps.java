@@ -16,7 +16,10 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationSteps {
-    
+
+    private static final String URI_STATIONS = "/stations";
+    private static final String HEADER_LOCATION = "Location";
+
     public static ExtractableResponse<Response> requestCreateStationGangnam() {
         Map<String, String> params = makeStationParams("강남역");
         return requestCreateStation(params);
@@ -33,7 +36,7 @@ public class StationSteps {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/stations")
+                .post(URI_STATIONS)
                 .then().log().all()
                 .extract();
     }
@@ -42,13 +45,13 @@ public class StationSteps {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get("/stations")
+                .get(URI_STATIONS)
                 .then().log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> requestDeleteStation(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)
@@ -58,7 +61,7 @@ public class StationSteps {
 
     public static void assertCreateStation(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(HEADER_LOCATION)).isNotBlank();
     }
 
     public static void assertCreateStationFail(ExtractableResponse<Response> response) {
@@ -69,9 +72,10 @@ public class StationSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void assertIncludeStations(ExtractableResponse<Response> createResponse1, ExtractableResponse<Response> createResponse2, ExtractableResponse<Response> response) {
-        List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+    @SafeVarargs
+    public static void assertIncludeStations(ExtractableResponse<Response> response, ExtractableResponse<Response>... createResponses) {
+        List<Long> expectedLineIds = Stream.of(createResponses)
+                .map(it -> Long.parseLong(it.header(HEADER_LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultLineIds = response.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
