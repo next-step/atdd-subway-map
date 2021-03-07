@@ -125,7 +125,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         List<Long> expectedLineIds = createLineResponses
                 .stream()
-                .skip(1)
                 .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
 

@@ -155,7 +155,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         List<Long> expectedLineIds = createLineResponses
                 .stream()
-                .skip(1)
                 .map(r -> Long.parseLong(r.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
 
