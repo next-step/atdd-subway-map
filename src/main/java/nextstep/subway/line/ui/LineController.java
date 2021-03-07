@@ -51,7 +51,6 @@ public class LineController {
 
     @ExceptionHandler(NotFoundLineException.class)
     public ResponseEntity notFoundLineExceptionHandler(NotFoundLineException e) {
-        String errorMessage = e.getMessage();
-        return ResponseEntity.badRequest().body(errorMessage);
+        return ResponseEntity.notFound().build();
     }
 }
