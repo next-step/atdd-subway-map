@@ -68,27 +68,43 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> getResponses = RestAssured.given()
-                .log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> getResponses = 지하철_노선_목록_조회_결과_요청();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
         assertThat(getResponses.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        List<LineResponse> lineResponses = getResponses.jsonPath().getList(".", LineResponse.class);
+        List<LineResponse> lineResponses = 지하철_노선_목록_조회_결과_리스트(getResponses);
         assertThat(lineResponses.size()).isEqualTo(2);
 
-        List<Long> expectedLineIds = Arrays.asList(createResponse1, createResponse2).stream()
+        List<Long> expectedLineIds = 지하철_노선_목록_예상_아이디_리스트(createResponse1, createResponse2);
+        List<Long> resultLineIds = 지하철_노선_목록_결과_아이디_리스트(getResponses);
+        assertThat(resultLineIds).containsAll(expectedLineIds);
+    }
+
+    ExtractableResponse<Response> 지하철_노선_목록_조회_결과_요청(){
+        return RestAssured.given()
+                .log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all().extract();
+    }
+
+    List<LineResponse> 지하철_노선_목록_조회_결과_리스트(ExtractableResponse<Response> getResponses){
+        return getResponses.jsonPath().getList(".", LineResponse.class);
+    }
+
+    List<Long> 지하철_노선_목록_예상_아이디_리스트(ExtractableResponse<Response>... responses){
+        return Arrays.asList(responses).stream()
                 .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<Long> resultLineIds = getResponses.jsonPath().getList(".", LineResponse.class).stream()
+    }
+
+    List<Long> 지하철_노선_목록_결과_아이디_리스트(ExtractableResponse<Response> getResponses){
+        return 지하철_노선_목록_조회_결과_리스트(getResponses).stream()
                 .map(it -> it.getId())
                 .collect(Collectors.toList());
-        assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -99,23 +115,31 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse =
                 지하철_노선_생성_요청("선릉", "green darken-1");
 
-        Long id = Long.parseLong(
-                createResponse
-                        .header("Location")
-                        .split("/")[2]
-        );
+        Long id = 생성된_Entity의_ID_가져오기(createResponse);
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-        .accept(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/lines/" + id)
-        .then().log().all().extract();
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회_요청(id);
 
         // then
         // 지하철_노선_응답됨
         assertThat(getResponse.statusCode())
                 .isEqualTo(HttpStatus.OK.value());
+    }
+
+    ExtractableResponse<Response> 지하철_노선_조회_요청(Long id){
+        return RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
+                .then().log().all().extract();
+    }
+
+    Long 생성된_Entity의_ID_가져오기(ExtractableResponse<Response> createResponse){
+        return Long.parseLong(
+                createResponse
+                        .header("Location")
+                        .split("/")[2]
+        );
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -126,21 +150,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse =
                 지하철_노선_생성_요청("선릉", "green darken-1");
 
-        Long id = Long.parseLong(
-                createResponse
-                        .header("Location")
-                        .split("/")[2]
-        );
+        Long id = 생성된_Entity의_ID_가져오기(createResponse);
 
         // when
         // 지하철_노선_수정_요청
         Map<String, String> param = 파라미터_생성("선정릉", "red darken-1");
-        ExtractableResponse<Response> updateResponse = RestAssured.given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .log().all()
-                .when().put("/lines/" + id)
-                .then().log().all().extract();
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, param);
 
         // then
         // 지하철_노선_수정됨
@@ -148,7 +163,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .isEqualTo(param.get("name"));
         assertThat(updateResponse.jsonPath().getMap(".").get("color"))
                 .isEqualTo(param.get("color"));
+    }
 
+    ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, Map<String, String> param){
+        return RestAssured.given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .log().all()
+                .when().put("/lines/" + id)
+                .then().log().all().extract();
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -159,20 +182,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse =
                 지하철_노선_생성_요청("선릉", "green darken-1");
 
-
-        Long id = Long.parseLong(
-                createResponse
-                        .header("Location")
-                        .split("/")[2]
-        );
+        Long id = 생성된_Entity의_ID_가져오기(createResponse);
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> deleteResponse = RestAssured.given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/" + id)
-                .then().log().all().extract();
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제_요청(id);
         // then
         // 지하철_노선_삭제됨
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    ExtractableResponse<Response> 지하철_노선_삭제_요청(Long id){
+        return RestAssured.given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/" + id)
+                .then().log().all().extract();
+    }
+
 }
