@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineSteps.assertCreateLine;
+import static nextstep.subway.line.LineSteps.assertCreateLineFail;
 import static nextstep.subway.line.LineSteps.assertDeleteLine;
 import static nextstep.subway.line.LineSteps.assertGetLine;
 import static nextstep.subway.line.LineSteps.assertGetLines;
@@ -30,6 +31,20 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertCreateLine(response);
+    }
+
+    @Test
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
+    void createLineWithDuplicateName() {
+        // given
+        requestCreateLineDx();
+
+        // when
+        ExtractableResponse<Response> response = requestCreateLineDx();
+
+        // then
+        assertCreateLineFail(response);
+
     }
 
     @Test

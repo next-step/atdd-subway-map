@@ -83,6 +83,10 @@ public class LineSteps {
         assertThat(response.header("Location")).isNotBlank();
     }
 
+    public static void assertCreateLineFail(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     public static void assertGetLines(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
