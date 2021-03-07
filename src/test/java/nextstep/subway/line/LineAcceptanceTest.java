@@ -198,7 +198,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void assertGetLinesSuccess(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-//        assertThat(response.as(List.class)).isInstanceOf(LineResponse[].class);
+        // NOTE: 어떤 값을 비교하는게 좋을까?
     }
 
     private void assertGetLineDetailSuccess(ExtractableResponse<Response> response) {
