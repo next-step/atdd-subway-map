@@ -9,6 +9,8 @@ import nextstep.subway.station.support.StationSteps;
 import nextstep.subway.station.support.StationVerifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,16 +32,17 @@ public class StationAcceptanceTest extends AcceptanceTest {
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
-    @Test
-    void createStationWithDuplicateName() {
+    @ParameterizedTest
+    @CsvSource(value = {"강남역", "역삼역", "방배역"})
+    void createStationWithDuplicateName(String stationName) {
         //Given
-        StationSteps.지하철역_생성_요청(new StationRequest("강남역"));
+        StationSteps.지하철역_등록됨(new StationRequest(stationName));
 
         //When
-        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청(new StationRequest("강남역"));
+        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청(new StationRequest(stationName));
 
         //Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        StationVerifier.지하철역_생성_실패됨(response);
     }
 
     @DisplayName("지하철역을 조회한다.")

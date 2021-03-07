@@ -1,5 +1,7 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.common.error.ErrorInformation;
+import nextstep.subway.line.DuplicatedLineNameException;
 import nextstep.subway.line.NotFoundLineException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
@@ -52,5 +54,11 @@ public class LineController {
     @ExceptionHandler(NotFoundLineException.class)
     public ResponseEntity notFoundLineExceptionHandler(NotFoundLineException e) {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(DuplicatedLineNameException.class)
+    public ResponseEntity duplicatedLineNameException(DuplicatedLineNameException e){
+        ErrorInformation errorInformation = new ErrorInformation(e.getMessage());
+        return ResponseEntity.badRequest().body(errorInformation);
     }
 }

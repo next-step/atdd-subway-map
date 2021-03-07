@@ -29,4 +29,11 @@ public class StationVerifier {
 
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
+
+    public static void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("errorMessage")).isNotNull()
+        );
+    }
 }
