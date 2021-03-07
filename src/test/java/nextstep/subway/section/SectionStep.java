@@ -8,6 +8,7 @@ import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.utils.Extractor;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,5 +66,22 @@ public class SectionStep {
 
     public static void 응답_에러_메세지_확인(ExtractableResponse<Response> response, String msg) {
         assertThat(response.jsonPath().getObject("cause", String.class)).isEqualTo(msg);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_요청(Long lineId, Long stationId) {
+        String path = 서비스_호출_경로_생성(lineId, null);
+        path += "?stationId="+stationId;
+        return Extractor.delete(path);
+    }
+
+    public static void 지하철_노선_구간_삭제됨(ExtractableResponse<Response> deletedResponse) {
+        assertThat(deletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_노선_지하철역_삭제됨(ExtractableResponse<Response> response, Long stationId) {
+        List<Long> stationIds = response.jsonPath()
+                .getList("stations.id", Long.class);
+
+        assertThat(stationIds).isNotIn(stationId);
     }
 }

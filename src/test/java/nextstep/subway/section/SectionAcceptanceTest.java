@@ -1,4 +1,4 @@
-package nextstep.subway.line;
+package nextstep.subway.section;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -7,16 +7,15 @@ import nextstep.subway.data.Lines;
 import nextstep.subway.data.Stations;
 import nextstep.subway.exceptions.AlreadyExistsEntityException;
 import nextstep.subway.exceptions.NotEqualsStationException;
-import nextstep.subway.line.LineStep;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.section.SectionStep;
 import nextstep.subway.station.StationStep;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static nextstep.subway.line.LineStep.*;
 import static nextstep.subway.section.SectionStep.*;
 import static nextstep.subway.section.SectionStep.지하철_노선_구간_등록;
 import static nextstep.subway.section.SectionStep.지하철_노선_구간_생성;
@@ -44,7 +43,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Lines.사호선.put("downStationId", 범계역.getId() + "");
         Lines.사호선.put("distance", 10 + "");
 
-        사호선 = LineStep.지하철_노선_등록(Lines.사호선).as(LineResponse.class);
+        사호선 = 지하철_노선_생성_요청(Lines.사호선).as(LineResponse.class);
 
 
     }
@@ -86,7 +85,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //when
         //지하철_노선_구간_등록
         SectionRequest 범계역_평촌 = 지하철_노선_구간_생성(범계역, 평촌역, 10);
-
         SectionRequest 평촌_금정역 = 지하철_노선_구간_생성(평촌역, 금정역, 10);
 
         ExtractableResponse<Response> createdResponse1 = 지하철_노선_구간_등록(사호선.getId(), 범계역_평촌);
@@ -96,5 +94,36 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //지하철_노선_구간_등록_실패됨
         지하철_노선_구간_등록_실패됨(createdResponse2);
         응답_에러_메세지_확인(createdResponse2, AlreadyExistsEntityException.DEFAULT_EXCEPTION_MSG);
+    }
+
+    @DisplayName("지하철 노선의 구간을 제거한다.")
+    @Test
+    void deleteSectionOfLine() {
+        //given
+        SectionRequest 범계_평촌 = 지하철_노선_구간_생성(범계역, 평촌역, 10);
+        SectionRequest 평촌_인덕원 = 지하철_노선_구간_생성(평촌역, 인덕원역, 10);
+        ExtractableResponse<Response> createdResponse1 = 지하철_노선_구간_등록(사호선.getId(), 범계_평촌);
+        ExtractableResponse<Response> createdResponse2 = 지하철_노선_구간_등록(사호선.getId(), 평촌_인덕원);
+
+        //when
+        //지하철_노선_구간_삭제_요청
+        ExtractableResponse<Response> deletedResponse = 지하철_노선_구간_삭제_요청(사호선.getId(), 인덕원역.getId());
+        ExtractableResponse<Response> readResponse2 = 지하철_노선_조회_요청(사호선.getId());
+
+        //then
+        SectionStep.지하철_노선_구간_삭제됨(deletedResponse);
+        SectionStep.지하철_노선_지하철역_삭제됨(readResponse2, 인덕원역.getId());
+    }
+
+    @DisplayName("지하철 노선의 중간구간을 삭제시도한다.")
+    @Test
+    void deleteCenterSectionOfLine() {
+
+    }
+
+    @DisplayName("지하철 노선의 구간이 1개인경우 삭제를 시도한다.")
+    @Test
+    void deleteLastSectionOfLine() {
+
     }
 }
