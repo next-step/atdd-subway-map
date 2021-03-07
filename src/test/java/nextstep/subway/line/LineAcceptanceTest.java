@@ -90,7 +90,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private long getLineId(ExtractableResponse<Response> response) {
-        return response.body().jsonPath().getLong("id");
+        return response.body().as(LineResponse.class).getId();
     }
 
     private List<Long> getLineIds(ExtractableResponse<Response> response) {
@@ -102,8 +102,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private Long 지하철_노선_등록되어_있음(String name, String color) {
-        return 지하철_노선_등록요청(name, color)
-                .jsonPath().getLong("id");
+        return 지하철_노선_등록요청(name, color).as(LineResponse.class).getId();
     }
 
     private ExtractableResponse<Response> 지하철_노선_목록조회요청() {
