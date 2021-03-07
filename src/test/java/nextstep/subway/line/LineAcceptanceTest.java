@@ -75,6 +75,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         지하철_노선_조회됨(response, 1);
     }
+
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
