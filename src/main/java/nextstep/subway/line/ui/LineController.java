@@ -27,22 +27,14 @@ public class LineController {
 
     @GetMapping("/{id}")
     public ResponseEntity findLine(@PathVariable long id) {
-        try {
-            LineResponse line = lineService.findLine(id);
-            return ResponseEntity.ok().body(line);
-        } catch (NullPointerException e) {
-            return ResponseEntity.badRequest().body("존재하지 않는 Line에 대한 요청입니다.");
-        }
+        LineResponse line = lineService.findLine(id);
+        return ResponseEntity.ok().body(line);
     }
 
     @PostMapping
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-        try {
-            LineResponse line = lineService.saveLine(lineRequest);
-            return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-        } catch (ExistingLineException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        LineResponse line = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @PutMapping("/{id}")
@@ -56,11 +48,17 @@ public class LineController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity removeLine(@PathVariable long id) {
-        try {
-            lineService.removeLine(id);
-            return ResponseEntity.noContent().build();
-        } catch (NullPointerException e) {
-            return ResponseEntity.badRequest().body("존재하지 않는 Line에 대한 요청입니다.");
-        }
+        lineService.removeLine(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(ExistingLineException.class)
+    public ResponseEntity handlerExistingLineException(ExistingLineException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity handlerNullPointException(NullPointerException e) {
+        return ResponseEntity.badRequest().body("존재하지 않는 Line에 대한 요청입니다.");
     }
 }
