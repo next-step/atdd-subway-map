@@ -57,17 +57,6 @@ public class LineService {
         return LineResponse.of(findLine(lineId));
     }
 
-    private boolean checkExistsName(String name) {
-        return lineRepository.findByName(name).isPresent();
-    }
-
-    @Transactional(readOnly = true)
-    public LineResponse getLine(Long lineId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new NotFoundException(lineId));
-        return LineResponse.of(line);
-    }
-
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLine() {
         List<Line> lines = lineRepository.findAll();
