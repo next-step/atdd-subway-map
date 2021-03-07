@@ -73,7 +73,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdResponse);
 
         // then
-        지하철_노선_조회됨(response, 1);
+        지하철_노선_조회됨(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -135,10 +135,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private void 지하철_노선_조회됨(ExtractableResponse<Response> response, int inputCount) {
+    private void 지하철_노선_조회됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-        assertThat(response.jsonPath().getObject(".", LineResponse.class).getId()).isEqualTo(inputCount);
     }
 
     private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, int inputCount) {
