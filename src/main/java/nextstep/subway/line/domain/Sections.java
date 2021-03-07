@@ -34,53 +34,42 @@ public class Sections {
 
         List<Station> stations = this.getStations();
 
-        validate(stations, section);
+        sameStationValidate(section);
 
         if (stations.isEmpty()) {
             this.sections.add(section);
             return;
         }
 
+        lastStationMatchValidate(section);
+        upAndDownExistsValidate(stations, section);
+        downExistsValidate(stations, section);
+
         this.sections.add(section);
     }
 
-    private void validate(List<Station> stations, Section section) {
-
-        if (isSameStation(section)) {
-            throw new IllegalArgumentException("구간의 두 역이 동일합니다.");
-        }
-
-        if (stations.isEmpty()) {
-            return;
-        }
-
-        if (!isLastStationMatch(section)) {
+    private void lastStationMatchValidate(Section section) {
+        if (!findLastStation().equals(section.getUpStation())) {
             throw new IllegalArgumentException("추가하는 구간의 상행역이 잘못되었습니다.");
         }
+    }
 
-        if (isUpAndDownExists(stations, section)) {
+    private void upAndDownExistsValidate(List<Station> stations, Section section) {
+        if (stations.contains(section.getUpStation()) && stations.contains(section.getDownStation())) {
             throw new IllegalArgumentException("상행역과 하행역이 이미 존재합니다.");
         }
+    }
 
-        if (isDownExists(stations, section)) {
+    private void downExistsValidate(List<Station> stations, Section section) {
+        if (stations.contains(section.getDownStation())) {
             throw new IllegalArgumentException("하행역이 이미 노선에 포함되어 있습니다.");
         }
     }
 
-    private boolean isLastStationMatch(Section section) {
-        return findLastStation().equals(section.getUpStation());
-    }
-
-    private boolean isUpAndDownExists(List<Station> stations, Section section) {
-        return stations.contains(section.getUpStation()) && stations.contains(section.getDownStation());
-    }
-
-    private boolean isDownExists(List<Station> stations, Section section) {
-        return stations.contains(section.getDownStation());
-    }
-
-    private boolean isSameStation(Section section) {
-        return section.getUpStation().equals(section.getDownStation());
+    private void sameStationValidate(Section section) {
+        if (section.getUpStation().equals(section.getDownStation())) {
+            throw new IllegalArgumentException("구간의 두 역이 동일합니다.");
+        }
     }
 
     public void removeSection(Station station) {
