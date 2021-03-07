@@ -4,6 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -58,7 +60,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        List<Long> expextedLineIds = Arrays.asList(createResponse1,createResponse2).stream()
+        List<Long> expectedLineIds = Arrays.asList(createResponse1,createResponse2).stream()
                 .map(result-> Long.parseLong(result.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
 
@@ -66,7 +68,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .map(result -> result.getId())
                 .collect(Collectors.toList());
 
-        assertThat(resultLineIds).containsAll(expextedLineIds);
+        assertEquals(expectedLineIds, resultLineIds);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
