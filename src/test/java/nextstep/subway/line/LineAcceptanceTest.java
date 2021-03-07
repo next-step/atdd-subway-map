@@ -30,8 +30,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성할 경우 에러 발생")
     @Test
     void createLineAboutExisting() {
-        // when
+        // given
         지하철_노선_생성_요청("신분당선", "red");
+
+        // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "red");
 
         // then

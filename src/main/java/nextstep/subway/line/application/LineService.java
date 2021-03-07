@@ -21,7 +21,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        if (lineRepository.findFirstByName(request.getName()) != null) {
+        if (lineRepository.existsByName(request.getName())) {
             throw new ExistingLineException();
         }
         Line persistLine = lineRepository.save(request.toLine());
@@ -40,7 +40,7 @@ public class LineService {
                     .map(LineResponse::of)
                     .orElseThrow(NullPointerException::new);
     }
-    @Transactional
+
     public LineResponse updateLine(LineRequest request, long id) {
         Line line = lineRepository.findById(id)
                                   .orElseThrow(NullPointerException::new);
