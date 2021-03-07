@@ -16,53 +16,53 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-  private LineRepository lineRepository;
+    private LineRepository lineRepository;
 
-  public LineService(LineRepository lineRepository) {
-    this.lineRepository = lineRepository;
-  }
-
-  public LineResponse saveLine(LineRequest request) {
-    boolean isExistSubwayName = lineRepository.existsByName(request.getName());
-    if (isExistSubwayName) {
-      throw new SubwayNameDuplicateException();
+    public LineService(LineRepository lineRepository) {
+        this.lineRepository = lineRepository;
     }
 
-    Line persistLine = lineRepository.save(request.toLine());
-    return LineResponse.of(persistLine);
-  }
+    public LineResponse saveLine(LineRequest request) {
+        boolean isExistSubwayName = lineRepository.existsByName(request.getName());
+        if (isExistSubwayName) {
+            throw new SubwayNameDuplicateException();
+        }
 
-  public List<LineResponse> getAll() {
-    List<Line> lines = lineRepository.findAll();
-    if (lines.isEmpty()) {
-      return Collections.emptyList();
+        Line persistLine = lineRepository.save(request.toLine());
+        return LineResponse.of(persistLine);
     }
 
-    return lines.stream()
-            .map(LineResponse::of)
-            .collect(Collectors.toList());
-  }
+    public List<LineResponse> getAll() {
+        List<Line> lines = lineRepository.findAll();
+        if (lines.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-  private Line getLine(long id) {
-    return Optional.of(lineRepository.findById(id))
-            .orElseThrow(NullPointerException::new)
-            .get();
-  }
+        return lines.stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+    }
 
-  public LineResponse get(long id) {
-    return LineResponse.of(getLine(id));
-  }
+    private Line getLine(long id) {
+        return Optional.of(lineRepository.findById(id))
+                .orElseThrow(NullPointerException::new)
+                .get();
+    }
 
-  public LineResponse saveLine(Long id, LineRequest lineRequest) {
-    Line line = getLine(id);
-    line.update(lineRequest.toLine());
+    public LineResponse get(long id) {
+        return LineResponse.of(getLine(id));
+    }
 
-    lineRepository.save(line);
-    return LineResponse.of(line);
-  }
+    public LineResponse saveLine(Long id, LineRequest lineRequest) {
+        Line line = getLine(id);
+        line.update(lineRequest.toLine());
 
-  public void delete(long id) {
-    Line line = getLine(id);
-    lineRepository.delete(line);
-  }
+        lineRepository.save(line);
+        return LineResponse.of(line);
+    }
+
+    public void delete(long id) {
+        Line line = getLine(id);
+        lineRepository.delete(line);
+    }
 }

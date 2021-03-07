@@ -12,42 +12,43 @@ import java.net.URI;
 @RestController
 @RequestMapping("/lines")
 public class LineController {
-  private final LineService lineService;
+    private final LineService lineService;
 
-  public LineController(final LineService lineService) {
-    this.lineService = lineService;
-  }
-
-  @PostMapping
-  public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-    try {
-      LineResponse line = lineService.saveLine(lineRequest);
-      return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-    } catch (SubwayNameDuplicateException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+    public LineController(final LineService lineService) {
+        this.lineService = lineService;
     }
-  }
 
-  @GetMapping
-  public ResponseEntity getAllLine() {
-    return ResponseEntity.ok().body(lineService.getAll());
-  }
+    @PostMapping
+    public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
 
-  @GetMapping("/{id}")
-  public ResponseEntity getLine(@PathVariable long id) {
-    LineResponse line = lineService.get(id);
-    return ResponseEntity.ok().body(line);
-  }
+    @GetMapping
+    public ResponseEntity getAllLine() {
+        return ResponseEntity.ok().body(lineService.getAll());
+    }
 
-  @PutMapping("/{id}")
-  public ResponseEntity update(@PathVariable long id, @RequestBody LineRequest lineRequest) {
-    LineResponse line = lineService.saveLine(id, lineRequest);
-    return ResponseEntity.ok().body(line);
-  }
+    @GetMapping("/{id}")
+    public ResponseEntity getLine(@PathVariable long id) {
+        LineResponse line = lineService.get(id);
+        return ResponseEntity.ok().body(line);
+    }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity remove(@PathVariable long id) {
-    lineService.delete(id);
-    return ResponseEntity.noContent().build();
-  }
+    @PutMapping("/{id}")
+    public ResponseEntity update(@PathVariable long id, @RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.saveLine(id, lineRequest);
+        return ResponseEntity.ok().body(line);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity remove(@PathVariable long id) {
+        lineService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(SubwayNameDuplicateException.class)
+    public ResponseEntity duplicateExceptionHandler(SubwayNameDuplicateException e) {
+        return ResponseEntity.badRequest().body("이미 등록된 노선 이름입니다.");
+    }
 }

@@ -77,7 +77,6 @@ public class LineSteps {
 
   public static ExtractableResponse<Response> 지하철_노선_제거_요청(LineResponse line) {
     return RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .delete("/lines/{id}", line.getId())
             .then().log().all()
