@@ -2,10 +2,11 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.error.NameExistsException;
 import nextstep.subway.error.NotFoundException;
-import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.*;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.application.StationService;
+import nextstep.subway.station.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,18 +17,34 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
         if (checkExistsName(request.getName())) {
             throw new NameExistsException(request.getName());
         }
+        return LineResponse.of(addSectionsAndCreateLine(request));
+    }
 
+    private Line addSectionsAndCreateLine(LineRequest request) {
         Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        Station upStation = stationService.findByStation(request.getUpStationId());
+        Station downStation = stationService.findByStation(request.getDownStationId());
+
+        Section section = Section.Builder.aSection()
+                .line(persistLine)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(new Distance(request.getDistance()))
+                .build();
+
+        persistLine.getSections().addSection(section);
+        return lineRepository.save(persistLine);
     }
 
     private boolean checkExistsName(String name) {
