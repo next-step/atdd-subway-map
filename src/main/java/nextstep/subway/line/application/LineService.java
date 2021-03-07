@@ -5,6 +5,7 @@ import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
+import nextstep.subway.line.exception.NoSuchLineException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,9 +44,12 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("Not found lineId"+lineId));
     }
 
-    public void updateLine(final Long lineId, LineRequest lineRequest){
-        Line findLine = lineRepository.getOne(lineId);
-        findLine.update(lineRequest.toLine());
+    public void updateLine(final Long lineId, LineRequest lineRequest) {
+        Optional< Line > optionalLine = lineRepository.findById(lineId);
+        if(!optionalLine.isPresent()) {
+            throw new NoSuchLineException("해당하는 라인이 없습니다.");
+        }
+        optionalLine.get().update(lineRequest.toLine());
     }
 
     public void deleteLine(final Long lineId) {
