@@ -30,6 +30,12 @@ public class LineController {
         return ResponseEntity.ok().body(lineService.getAllLines());
     }
 
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long lineId) {
+        return ResponseEntity.ok().body(lineService.getLine(lineId));
+    }
+
+
 
 
 }
