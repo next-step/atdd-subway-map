@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static nextstep.subway.common.exception.ExceptionMessage.EXCEPTION_MESSAGE_EXIST_LINE_NAME;
-import static nextstep.subway.common.exception.ExceptionMessage.EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME;
-
 @Service
 @Transactional
 public class LineService {
+
+    private static final String EXCEPTION_MESSAGE_EXIST_LINE_NAME = "존재하는 지하철 노선 입니다.";
+    private static final String EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME = "존재하지 않는 지하철 노선입니다.";
 
     private final LineRepository lineRepository;
 
