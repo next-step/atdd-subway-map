@@ -79,10 +79,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_포함됨(response);
     }
 
-
-
-
-
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
@@ -115,8 +111,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> params = Maps.of("name", name, "color", color);
         return RestAssured
                 .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all().extract();
     }
@@ -124,6 +119,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return RestAssured
                 .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
                 .then().log().all().extract();
     }
@@ -131,13 +127,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> 지하철_노선_조회_요청() {
         return RestAssured
                 .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/1")
                 .then().log().all().extract();
     }
 
     private ExtractableResponse<Response> 지하철_노선_수정_요청(Map<String, String> params) {
         return RestAssured
-                .given().log().all().body(params)
+                .given().log().all()
+                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/1")
                 .then().log().all().extract();
     }
@@ -145,6 +143,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> 지하철_노선_제거_요청() {
         return RestAssured
                 .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/lines/1")
                 .then().log().all().extract();
     }
