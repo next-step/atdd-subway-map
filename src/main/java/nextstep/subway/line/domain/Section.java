@@ -34,4 +34,15 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
+    public Station getUpStation() {
+        return this.upStation;
+    }
+
+    public Station getDownStation() {
+        return this.downStation;
+    }
+
+    public int getDistance() {
+        return this.distance;
+    }
 }

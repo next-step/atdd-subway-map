@@ -26,6 +26,7 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         try {
             Line persistLine = lineRepository.save(request.toLine());

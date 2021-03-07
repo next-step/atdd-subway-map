@@ -37,11 +37,9 @@ public class LineRequest {
     public int getDistance() { return distance; }
 
     public Line toLine() {
-        return new Line(name, color);
+        Line line = new Line(name, color);
+        line.addSection(new Section(new Station(upStationId.toString()), new Station(downStationId.toString()), distance));
+        return line;
     }
 
-    public Section toSection() {
-        // NOTE: Station 생성 시에 Name 만 초기값인데, 실제 요청에서는 Long으로 Id값만 받고 있다.
-        return new Section(new Station(upStationId.toString()), new Station(downStationId.toString()), distance);
-    }
 }

@@ -39,9 +39,9 @@ public class LineResponse {
         return new LineResponse(line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getUpStationId(),
-                line.getDownStationId(),
-                line.getDistance(),
+                line.getUpStation().getId(),
+                line.getDownStation().getId(),
+                line.getLineDistance(),
                 line.getCreatedDate(),
                 line.getModifiedDate());
     }

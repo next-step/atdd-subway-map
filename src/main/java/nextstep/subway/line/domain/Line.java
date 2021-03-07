@@ -1,10 +1,13 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 public class Line extends BaseEntity {
@@ -43,9 +46,20 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Long getUpStationId() { return 0L; }
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
 
-    public Long getDownStationId() { return 0L; }
+    public Station getUpStation() {
+        return this.sections.get(0).getUpStation();
+    }
 
-    public int getDistance() { return 0; }
+    public Station getDownStation() {
+        return this.sections.get(this.sections.size()-1).getDownStation();
+    }
+
+    public Integer getLineDistance() {
+        return this.sections.stream().
+                reduce(0, (TotalDistance, section) -> TotalDistance + section.getDistance(), Integer::sum);
+    }
 }
