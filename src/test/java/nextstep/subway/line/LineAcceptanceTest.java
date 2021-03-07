@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -33,6 +34,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
      *
      *          Then I should get the id of new line
      */
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
@@ -242,14 +244,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> registerLineHelper(final Map<String, String> line) {
         return RestAssured.
                 given().
-                log().all().
-                body(line).
-                contentType(MediaType.APPLICATION_JSON_VALUE).
+                    log().all().
+                    body(line).
+                    contentType(MediaType.APPLICATION_JSON_VALUE).
                 when().
-                post("/lines").
+                    post("/lines").
                 then().
-                log().all().
-                extract();
+                    log().all().
+                    extract();
     }
 
     private  ExtractableResponse<Response> findLineHelper(final LineResponse InputLine) {
