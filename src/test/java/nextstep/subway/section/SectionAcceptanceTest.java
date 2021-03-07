@@ -48,17 +48,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         //when
         //지하철_노선_구간_등록
-        SectionRequest 금정_범계 = SectionRequest.Builder()
+        SectionRequest 범계_평촌 = SectionRequest.Builder()
                 .upStationId(범계역.getId())
                 .downStationId(평촌역.getId())
                 .distance(10)
                 .build();
 
-        ExtractableResponse<Response> response = SectionStep.지하철_노선_구간_등록(사호선.getId(), 금정_범계);
+        ExtractableResponse<Response> response = SectionStep.지하철_노선_구간_등록(사호선.getId(), 범계_평촌);
 
         //then
-        //등록된_구간_상행역_하행_종점역_일치함
-        SectionStep.등록된_구간_상행역_하행_종점역_일치함(response);
+        //기존_지하철_구간_하행역_신규_상행역_일치함
+        SectionStep.기존_지하철_구간_하행역_신규_상행역_일치함(범계역.getId(), response);
     }
 
     @DisplayName("지하철 노선 구간 등록시 하행역을 현재 등록되어있는 역으로 한다.")
