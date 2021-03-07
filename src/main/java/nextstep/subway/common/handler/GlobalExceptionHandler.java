@@ -14,12 +14,17 @@ import nextstep.subway.station.exception.NotFoundStationException;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(value = {NotFoundLineException.class, NotFoundStationException.class})
-	public ResponseEntity<String> notFoundExceptionHandler(BusinessException e) {
+	public ResponseEntity<String> handleNotFoundException(BusinessException e) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<Void> handleIllegalArgsException(DataIntegrityViolationException e) {
 		return ResponseEntity.badRequest().build();
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
 }

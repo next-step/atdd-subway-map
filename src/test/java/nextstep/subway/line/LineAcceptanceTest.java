@@ -253,7 +253,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> map) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> map) {
         return RestAssured
             .given().log().all()
             .body(map)
@@ -277,7 +277,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private Map<String, String> 노선_생성(
+    public static Map<String, String> 노선_생성(
         String name, String color, String upStationId,
         String downStationId, String distance) {
         Map<String, String> map = new HashMap<>();

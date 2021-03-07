@@ -66,6 +66,16 @@ public class LineService {
 		);
 	}
 
+	public LineResponse addSection(Long lineId, LineRequest lineRequest) {
+		final Line line = lineRepository.findById(lineId)
+			.orElseThrow(() -> new NotFoundLineException(lineId));
+		final Station upStation = findStationById(lineRequest.getUpStationId());
+		final Station downStation = findStationById(lineRequest.getDownStationId());
+
+		line.addStations(upStation, downStation, lineRequest.getDistance());
+		return LineResponse.of(line);
+	}
+
 	private Station findStationById(Long stationId) {
 		return stationRepository.findById(stationId)
 			.orElseThrow(() -> new NotFoundStationException(stationId));
