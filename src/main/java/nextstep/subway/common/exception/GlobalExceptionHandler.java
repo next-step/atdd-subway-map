@@ -1,6 +1,6 @@
 package nextstep.subway.common.exception;
 
-import org.springframework.dao.DataIntegrityViolationException;
+import nextstep.subway.station.exception.StationNameDuplicatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,8 +11,8 @@ import java.io.IOException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public void handleDataIntegrityViolationException(HttpServletResponse response) throws IOException {
+    @ExceptionHandler(StationNameDuplicatedException.class)
+    public void handle(HttpServletResponse response, StationNameDuplicatedException e) throws IOException {
         response.sendError(HttpStatus.BAD_REQUEST.value());
     }
 }
