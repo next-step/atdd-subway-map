@@ -19,7 +19,7 @@ public class ControllerExceptionAdvice {
     }
 
     @ExceptionHandler()
-    public ResponseEntity<Void> handleIllegalArgsException(DataIntegrityViolationException e) {
+    public ResponseEntity<Void> invalidJpaDataExceptionHandler(DataIntegrityViolationException e) {
         return ResponseEntity.badRequest().build();
     }
 
