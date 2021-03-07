@@ -1,6 +1,7 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.exceptions.AlreadyExistsEntityException;
+import nextstep.subway.exceptions.NotEqualsStationException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.Section;
@@ -12,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/lines")
@@ -53,11 +56,6 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(AlreadyExistsEntityException.class)
-    public ResponseEntity alreadyExistsEntityException(AlreadyExistsEntityException e) {
-        return ResponseEntity.badRequest().build();
-    }
-
     @PostMapping("/{lineId}/sections")
     public ResponseEntity addLineStation(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
         Line line = lineService.addLineStation(lineId, sectionRequest);
@@ -65,5 +63,19 @@ public class LineController {
         SectionResponse sectionResponse = SectionResponse.of(lastSection);
 
         return ResponseEntity.created(URI.create(String.format("/lines/%d/sections/%d", lineId, lastSection.getId()))).body(sectionResponse);
+    }
+
+    @ExceptionHandler(AlreadyExistsEntityException.class)
+    public ResponseEntity alreadyExistsEntityException(AlreadyExistsEntityException e) {
+        return ResponseEntity.badRequest().body(createMessageMap("cause", e.getMessage()));
+    }
+
+    @ExceptionHandler(NotEqualsStationException.class)
+    public ResponseEntity notEqualsStationException(NotEqualsStationException e) {
+        return ResponseEntity.badRequest().body(createMessageMap("cause", e.getMessage()));
+    }
+
+    private Map createMessageMap(String key, String value) {
+        return new HashMap<String, String>(){{put(key, value);}};
     }
 }

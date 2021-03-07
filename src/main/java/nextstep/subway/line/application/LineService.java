@@ -80,6 +80,7 @@ public class LineService {
     public Line addLineStation(Long lineId, SectionRequest sectionRequest) {
         Line line = findLineById(lineId);
         Section section = createSection(sectionRequest);
+        line.isValidSection(section);
 
         line.addSection(section);
 
