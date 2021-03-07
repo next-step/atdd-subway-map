@@ -20,8 +20,6 @@ import static nextstep.subway.line.LineStep.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-    private LineResponse 사호선;
-    private LineResponse 신분당선;
     private StationResponse 금정역;
     private StationResponse 범계역;
     private StationResponse 강남역;

@@ -7,6 +7,8 @@ import nextstep.subway.data.Lines;
 import nextstep.subway.data.Stations;
 import nextstep.subway.exceptions.AlreadyExistsEntityException;
 import nextstep.subway.exceptions.NotEqualsStationException;
+import nextstep.subway.exceptions.OnlyOneSectionException;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.StationStep;
@@ -111,19 +113,33 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> readResponse2 = 지하철_노선_조회_요청(사호선.getId());
 
         //then
-        SectionStep.지하철_노선_구간_삭제됨(deletedResponse);
-        SectionStep.지하철_노선_지하철역_삭제됨(readResponse2, 인덕원역.getId());
+        지하철_노선_구간_삭제됨(deletedResponse);
+        지하철_노선_지하철역_삭제됨(readResponse2, 인덕원역.getId());
     }
 
     @DisplayName("지하철 노선의 중간구간을 삭제시도한다.")
     @Test
     void deleteCenterSectionOfLine() {
+        //given
+        SectionRequest 범계_평촌 = 지하철_노선_구간_생성(범계역, 평촌역, 10);
+        ExtractableResponse<Response> createdResponse = 지하철_노선_구간_등록(사호선.getId(), 범계_평촌);
 
+        //when
+        ExtractableResponse<Response> deletedResponse = 지하철_노선_구간_삭제_요청(사호선.getId(), 범계역.getId());
+
+        //then
+        지하철_노선_구간_삭제_실패됨(deletedResponse);
+        응답_에러_메세지_확인(deletedResponse, Line.ONLY_DOWN_STATION_CAN_DELETED);
     }
 
     @DisplayName("지하철 노선의 구간이 1개인경우 삭제를 시도한다.")
     @Test
     void deleteLastSectionOfLine() {
+        //when
+        ExtractableResponse<Response> deletedResponse = 지하철_노선_구간_삭제_요청(사호선.getId(), 범계역.getId());
 
+        //then
+        지하철_노선_구간_삭제_실패됨(deletedResponse);
+        응답_에러_메세지_확인(deletedResponse, OnlyOneSectionException.DEFAULT_MSG);
     }
 }
