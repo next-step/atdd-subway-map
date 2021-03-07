@@ -1,6 +1,5 @@
 package nextstep.subway.station.domain;
 
-import nextstep.subway.station.dto.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,7 @@ class StationRepositoryTest {
     @DisplayName("지하철 역이 존재할 경우")
     void existStationName() {
         // given
-        StationRequest stationRequest = new StationRequest("강남역");
-        Station savedStation = stationRepository.save(stationRequest.toStation());
+        Station savedStation = stationRepository.save(new Station("강남역"));
 
         // when
         boolean result = stationRepository.existsByName(savedStation.getName());
