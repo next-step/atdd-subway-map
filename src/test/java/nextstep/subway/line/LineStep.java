@@ -1,12 +1,11 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.utils.Extractor;
 import org.assertj.core.api.ListAssert;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +78,7 @@ public class LineStep {
         return Long.parseLong(response.header("Location").split("/")[2]);
     }
 
-    public static void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
+    public static void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 

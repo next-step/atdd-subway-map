@@ -113,7 +113,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_삭제됨(response);
     }
 
-    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
     @Test
     void createStationWithDuplicateName() {
         //given
@@ -123,6 +123,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_등록(신분당선);
 
         // then
-        지하철역_생성_실패됨(response);
+        지하철_노선_생성_실패됨(response);
     }
 }
