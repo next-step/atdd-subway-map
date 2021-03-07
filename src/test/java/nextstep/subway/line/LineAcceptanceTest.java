@@ -96,4 +96,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_삭제됨(response);
     }
 
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 만든다")
+    @Test
+    void createLineWithDuplicateName(){
+        // given
+        지하철_노선_생성_요청(RED, 신분당선);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(RED, 신분당선);
+
+        // then
+        지하철_노선_생성_실패됨(response);
+    }
 }
