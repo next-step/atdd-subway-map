@@ -3,6 +3,7 @@ package nextstep.subway.line.ui;
 import nextstep.subway.error.NameExistsException;
 import nextstep.subway.line.application.LineSectionService;
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
@@ -65,4 +66,5 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
+ 
 }

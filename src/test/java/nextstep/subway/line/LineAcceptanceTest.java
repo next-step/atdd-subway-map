@@ -40,6 +40,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         STATION_2 = 지하철역_생성_요청("신촌역");
         firstRequest = new LineRequest(LINE_NAME_1, COLOR_1, STATION_1, STATION_2, DISTANCE);
         secondRequest = new LineRequest(LINE_NAME_2, COLOR_2, STATION_1, STATION_2, DISTANCE);
+       
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -124,6 +125,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
 
     public static ExtractableResponse<Response> 노선_생성_요청(LineRequest params) {
+
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -147,6 +149,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     public static ExtractableResponse<Response> 노선_조회_요청(ExtractableResponse<Response> mockLine) {
+
         String uri = mockLine.header("Location");
 
         return RestAssured

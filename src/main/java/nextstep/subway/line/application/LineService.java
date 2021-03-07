@@ -19,6 +19,7 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
 
+
     public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
@@ -45,6 +46,17 @@ public class LineService {
 
         persistLine.getSections().addSection(section);
         return lineRepository.save(persistLine);
+    }
+
+    private boolean checkExistsName(String name) {
+        return lineRepository.findByName(name).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse getLine(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException(lineId));
+        return LineResponse.of(line);
     }
 
     private boolean checkExistsName(String name) {
