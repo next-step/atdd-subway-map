@@ -53,7 +53,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_목록_조회됨(response, 2);
-        지하철_노선_목록_포함됨(response, createdResponse1, createdResponse2);
+        지하철_노선_목록_포함됨(response, Arrays.asList(createdResponse1, createdResponse2));
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -145,14 +145,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getList(".", LineResponse.class)).hasSize(inputCount);
     };
 
-    private void 지하철_노선_목록_포함됨(ExtractableResponse<Response> ... responses) {
-        List<Long> resultLineIds = responses[0].jsonPath()
+    private void 지하철_노선_목록_포함됨(ExtractableResponse<Response> readAllLinesResponse,
+                               List<ExtractableResponse<Response>> createLineResponses) {
+        List<Long> resultLineIds = readAllLinesResponse.jsonPath()
                 .getList(".", LineResponse.class)
                 .stream()
                 .map(r -> r.getId())
                 .collect(Collectors.toList());
 
-        List<Long> expectedLineIds = Arrays.asList(responses)
+        List<Long> expectedLineIds = createLineResponses
                 .stream()
                 .skip(1)
                 .map(r -> Long.parseLong(r.header("Location").split("/")[2]))
