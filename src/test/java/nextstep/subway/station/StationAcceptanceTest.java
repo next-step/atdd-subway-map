@@ -15,7 +15,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("지하철역을 생성한다.")
     void createStation() {
-        // given & when - 강남역 지하철 생성 요청
+        // given & when
         ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
 
         // then
@@ -25,24 +25,24 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
     void createStationWithDuplicateName() {
-        // given - 존재할 지하철 역 생성
+        // given
         지하철_역_생성_요청("강남역");
 
-        // when - 기존에 존재하는 지하철역 이름으로 지하철 역 생성 요청
+        // when
         ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
 
-        // then - 지하철 역 생성 실패
+        // then
         지하철_역_생성_실패_됨(response);
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() {
-        /// given - 조회될 지하철 역 생성
+        /// given
         ExtractableResponse<Response> createResponse1 = 지하철_역_생성_요청("강남역");
         ExtractableResponse<Response> createResponse2 = 지하철_역_생성_요청("역삼역");
 
-        // when - 지하철 역 목록 조회 요청
+        // when
         ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
 
         // then
@@ -53,7 +53,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-        // given - 제거할 지하철 역 생성
+        // given
         ExtractableResponse<Response> createResponse = 지하철_역_생성_요청("강남역");
 
         // when
