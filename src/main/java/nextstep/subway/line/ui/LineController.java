@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/lines")
 public class LineController {
+
     private final LineService lineService;
 
     public LineController(final LineService lineService) {
@@ -24,8 +26,10 @@ public class LineController {
     }
 
     @GetMapping
-    public ResponseEntity getLines() {
-        return ResponseEntity.ok().body(lineService.getLines());
+    public ResponseEntity<List<LineResponse>> getAllLines() {
+        return ResponseEntity.ok().body(lineService.getAllLines());
     }
+
+
 
 }

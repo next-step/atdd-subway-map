@@ -24,7 +24,7 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
-    public List<LineResponse> getLines() {
+    public List<LineResponse> getAllLines() {
         return lineRepository.findAll().stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
