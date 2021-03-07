@@ -54,7 +54,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         노선_생성됨(response);
     }
 
-    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 노선을 생성한다.")
     @Test
     void createLineWithDuplicateName() {
         // given

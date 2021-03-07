@@ -30,15 +30,10 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Section> findSection(Station upStation, Station downStation) {
-        return this.sections.stream()
-                .filter(section -> section.upAndDownStationMatch(upStation, downStation))
-                .findFirst();
-    }
-
     public void addSection(Section section) {
 
         List<Station> stations = this.getStations();
+
         validate(stations, section);
 
         if (stations.isEmpty()) {
@@ -50,6 +45,11 @@ public class Sections {
     }
 
     private void validate(List<Station> stations, Section section) {
+
+        if (isSameStation(section)) {
+            throw new IllegalArgumentException("구간의 두 역이 동일합니다.");
+        }
+
         if (stations.isEmpty()) {
             return;
         }
@@ -77,6 +77,10 @@ public class Sections {
 
     private boolean isDownExists(List<Station> stations, Section section) {
         return stations.contains(section.getDownStation());
+    }
+
+    private boolean isSameStation(Section section) {
+        return section.getUpStation().equals(section.getDownStation());
     }
 
     public void removeSection(Station station) {
