@@ -17,7 +17,7 @@ public class LineVerificationSteps {
     }
 
     public static void 지하철_노선_생성_실패_됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     public static void 생성된_지하철_노선_URI_경로_존재_함(ExtractableResponse<Response> response) {
@@ -49,7 +49,15 @@ public class LineVerificationSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    public static void 지하철_노선_수정_실패_됨(ExtractableResponse<Response> updateResponse) {
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     public static void 지하철_노선_제거_됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_노선_제거_실패_됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }

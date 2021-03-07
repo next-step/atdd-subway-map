@@ -79,6 +79,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 노선을 수정한다.")
+    void updateNonExistLine() {
+        // when
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(1L, "구분당선", "bg-blue-600");
+
+        // then
+        지하철_노선_수정_실패_됨(updateResponse);
+    }
+
+    @Test
     @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
         // given
@@ -90,5 +100,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_제거_됨(deleteResponse);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 노선을 제거한다.")
+    void deleteNonExistLine() {
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_제거_요청("/lines/1");
+
+        // then
+        지하철_노선_제거_실패_됨(deleteResponse);
     }
 }
