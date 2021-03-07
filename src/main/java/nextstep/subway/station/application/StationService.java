@@ -1,5 +1,6 @@
 package nextstep.subway.station.application;
 
+import nextstep.subway.station.DuplicatedStationNameException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
@@ -20,6 +21,9 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        if(stationRepository.existsStationByName(stationRequest.getName())){
+            throw new DuplicatedStationNameException(stationRequest.getName());
+        }
         Station persistStation = stationRepository.save(stationRequest.toStation());
         return StationResponse.of(persistStation);
     }

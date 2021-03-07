@@ -1,17 +1,18 @@
 package nextstep.subway.line.application;
 
 import nextstep.subway.line.NotFoundLineException;
+import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -23,20 +24,33 @@ public class LineServiceTest {
     @Autowired
     private LineService lineService;
 
+    @Autowired
+    private LineRepository lineRepository;
 
-    @Test
-    public void loadContext(){
-        assertThat(lineService).isNotNull();
+    private LineResponse created;
+    private List<LineResponse> createdLines = new ArrayList<>();
+
+    @BeforeEach
+    public void setUp() {
+        created = lineService.saveLine(new LineRequest("1호선", "blue"));;
+        createdLines.add(created);
+        createdLines.add(lineService.saveLine(new LineRequest("2호선", "green")));
+        createdLines.add(lineService.saveLine(new LineRequest("3호선", "brown")));
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
-    public void findByIdTest(String stationName, String color) {
+    @AfterEach
+    public void clean(){
+        lineRepository.deleteAll();
+    }
+
+    @DisplayName("노선을 등록한다.")
+    @Test
+    public void findLineById() {
         //Given
-        LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
+        LineResponse createdResponse = lineService.saveLine(new LineRequest("5호선", "purple"));
 
         //When
-        LineResponse response = lineService.findById(createdResponse.getId());
+        LineResponse response = lineService.findLineById(createdResponse.getId());
 
         //Then
         assertAll(
@@ -51,53 +65,38 @@ public class LineServiceTest {
     public void notFoundLineException() {
         assertThatThrownBy(() -> {
                  Long id = lineService.saveLine(new LineRequest("6호선", "brown")).getId();
-                 lineService.findById(id + 1);
-        }).isInstanceOf(NotFoundLineException.class);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
-    public void updateLine(String stationName, String color) {
-        //Given
-        String postFixColor= "-600";
-        LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
-        LineRequest lineRequest = new LineRequest(stationName, color+postFixColor);
-
-        //When
-        lineService.update(createdResponse.getId(), lineRequest);
-        LineResponse updatedResponse = lineService.findById(createdResponse.getId());
-
-        //Then
-        assertThat(updatedResponse.getColor()).isEqualTo(color+postFixColor);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"1호선:blue", "3호선:orange", "5호선:purple"}, delimiter = ':')
-    public void deleteLine(String stationName, String color) {
-        assertThatThrownBy(() -> {
-            LineResponse createdResponse = lineService.saveLine(new LineRequest(stationName, color));
-
-            lineService.deleteById(createdResponse.getId());
-            lineService.findById(createdResponse.getId());
+                 lineService.findLineById(id + 1);
         }).isInstanceOf(NotFoundLineException.class);
     }
 
     @Test
-    public void findAll() {
+    public void updateLine() {
         //Given
-        int size = 2;
-        List<LineResponse> created = createLines(size);
+        String postFixColor= "-600";
+        LineRequest lineRequest = new LineRequest(created.getName(), created.getColor()+postFixColor);
 
         //When
-        List<LineResponse> lines = lineService.findAll();
+        lineService.updateLine(created.getId(), lineRequest);
+        LineResponse updatedResponse = lineService.findLineById(created.getId());
 
         //Then
-        assertThat(lines.size()).isEqualTo(created.size());
+        assertThat(updatedResponse.getColor()).isEqualTo(created.getColor()+postFixColor);
     }
 
-    private List<LineResponse> createLines(int size) {
-        return IntStream.range(0, size)
-                .mapToObj(i -> lineService.saveLine(new LineRequest(i+"호선", "blue")))
-                .collect(Collectors.toList());
+    @Test
+    public void deleteLine() {
+        assertThatThrownBy(() -> {
+            lineService.deleteLineById(created.getId());
+            lineService.findLineById(created.getId());
+        }).isInstanceOf(NotFoundLineException.class);
+    }
+
+    @Test
+    public void findAllLines() {
+        //Given & When
+        List<LineResponse> lines = lineService.findAllLines();
+
+        //Then
+        assertThat(lines.size()).isEqualTo(createdLines.size());
     }
 }

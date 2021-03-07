@@ -1,5 +1,7 @@
 package nextstep.subway.station.ui;
 
+import nextstep.subway.common.error.ErrorInformation;
+import nextstep.subway.station.DuplicatedStationNameException;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
@@ -36,8 +38,9 @@ public class StationController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity handleIllegalArgsException(DataIntegrityViolationException e) {
-        return ResponseEntity.badRequest().build();
+    @ExceptionHandler(DuplicatedStationNameException.class)
+    public ResponseEntity handleIllegalArgsException(DuplicatedStationNameException e) {
+        ErrorInformation errorInformation = new ErrorInformation(e.getMessage());
+        return ResponseEntity.badRequest().body(errorInformation);
     }
 }

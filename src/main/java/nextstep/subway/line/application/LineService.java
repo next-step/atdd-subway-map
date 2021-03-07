@@ -1,5 +1,6 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.line.DuplicatedLineNameException;
 import nextstep.subway.line.NotFoundLineException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
@@ -21,29 +22,32 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if(lineRepository.existsLineByName(request.getName())){
+            throw new DuplicatedLineNameException(request.getName());
+        }
         Line persistLine = lineRepository.save(request.toLine());
         return LineResponse.of(persistLine);
     }
 
-    public LineResponse findById(Long id) {
+    public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
         return LineResponse.of(line);
     }
 
-    public void update(Long id, LineRequest updateRequest) {
+    public void updateLine(Long id, LineRequest updateRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
         line.update(updateRequest.toLine());
     }
 
-    public void deleteById(Long id) {
+    public void deleteLineById(Long id) {
         lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
         lineRepository.deleteById(id);
     }
 
-    public List<LineResponse> findAll() {
+    public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
                 .map(line -> LineResponse.of(line))

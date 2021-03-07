@@ -1,5 +1,7 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.common.error.ErrorInformation;
+import nextstep.subway.line.DuplicatedLineNameException;
 import nextstep.subway.line.NotFoundLineException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
@@ -21,7 +23,7 @@ public class LineController {
 
     @GetMapping("/lines")
     public ResponseEntity findAllLines(){
-        List<LineResponse> lineResponses = lineService.findAll();
+        List<LineResponse> lineResponses = lineService.findAllLines();
         return ResponseEntity.ok().body(lineResponses);
     }
 
@@ -32,26 +34,31 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity getLine(@PathVariable Long id) {
-        LineResponse line = lineService.findById(id);
+    public ResponseEntity findLineById(@PathVariable Long id) {
+        LineResponse line = lineService.findLineById(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/lines/{id}")
     public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        lineService.update(id, lineRequest);
+        lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity deleteLine(@PathVariable Long id) {
-        lineService.deleteById(id);
+        lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(NotFoundLineException.class)
     public ResponseEntity notFoundLineExceptionHandler(NotFoundLineException e) {
-        String errorMessage = e.getMessage();
-        return ResponseEntity.badRequest().body(errorMessage);
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(DuplicatedLineNameException.class)
+    public ResponseEntity duplicatedLineNameException(DuplicatedLineNameException e){
+        ErrorInformation errorInformation = new ErrorInformation(e.getMessage());
+        return ResponseEntity.badRequest().body(errorInformation);
     }
 }
