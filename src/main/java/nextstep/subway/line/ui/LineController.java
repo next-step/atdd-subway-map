@@ -2,8 +2,10 @@ package nextstep.subway.line.ui;
 
 import nextstep.subway.exceptions.AlreadyExistsEntityException;
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,4 +56,12 @@ public class LineController {
         return ResponseEntity.badRequest().build();
     }
 
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity addLineStation(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
+        Line line = lineService.addLineStation(lineId, sectionRequest);
+        Long lastedSectionId = line.getLastSection().getId();
+        LineResponse response = LineResponse.of(line);
+
+        return ResponseEntity.created(URI.create(String.format("/lines/%d/sections/%d", lineId, lastedSectionId))).body(response);
+    }
 }
