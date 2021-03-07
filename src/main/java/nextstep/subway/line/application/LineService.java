@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(final LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(final LineRequest request) {
         Line persistLine = lineRepository.save(request.toLine());
         return LineResponse.of(persistLine);
     }
@@ -35,20 +35,20 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineResponse getLine(Long id) {
+    public LineResponse getLine(final Long id) {
         return lineRepository.findById(id)
                 .map(l -> LineResponse.of(l))
                 .orElseThrow(() -> new LineNotFoundException());
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(final Long id, final LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new LineNotFoundException());
         line.update(lineRequest.toLine());
     }
 
     @Transactional
-    public void deleteLine(Long id) {
+    public void deleteLine(final Long id) {
         lineRepository.deleteById(id);
     }
 }
