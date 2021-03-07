@@ -1,7 +1,5 @@
 package nextstep.subway.line.ui;
 
-import nextstep.subway.exceptions.AlreadyExistsEntityException;
-import nextstep.subway.exceptions.NotEqualsStationException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.Section;
@@ -65,13 +63,14 @@ public class LineController {
         return ResponseEntity.created(URI.create(String.format("/lines/%d/sections/%d", lineId, lastSection.getId()))).body(sectionResponse);
     }
 
-    @ExceptionHandler(AlreadyExistsEntityException.class)
-    public ResponseEntity alreadyExistsEntityException(AlreadyExistsEntityException e) {
-        return ResponseEntity.badRequest().body(createMessageMap("cause", e.getMessage()));
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity deleteLineStation(@PathVariable Long lineId, @RequestParam(value = "stationId") Long stationId) {
+        lineService.deleteLineStation(lineId, stationId);
+        return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(NotEqualsStationException.class)
-    public ResponseEntity notEqualsStationException(NotEqualsStationException e) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity exception(RuntimeException e) {
         return ResponseEntity.badRequest().body(createMessageMap("cause", e.getMessage()));
     }
 
