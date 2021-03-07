@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+    //주석
     private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -43,7 +44,6 @@ public class LineService {
     public LineResponse updateLine(Long id, LineRequest request){
         Line originLine = lineRepository.getOne(id);
         Line updateLine = request.toLine();
-
         originLine.update(updateLine);
 
         lineRepository.save(originLine);
