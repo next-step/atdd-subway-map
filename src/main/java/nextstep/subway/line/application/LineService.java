@@ -4,6 +4,8 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.DuplicateLineException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +23,13 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        try {
+            Line persistLine = lineRepository.save(request.toLine());
+            return LineResponse.of(persistLine);
+        } catch (DataIntegrityViolationException e){
+            throw new DuplicateLineException("이미 등록한 라인 입니다.");
+        }
+
     }
 
     public List<LineResponse> getLines() {
