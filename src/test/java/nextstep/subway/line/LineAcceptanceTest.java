@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -29,7 +28,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(line);
 
         //Then
-        LineVerifier.지하철_노선_등록검증(line, response);
+        LineVerifier.지하철_노선_등록됨(line, response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -43,10 +42,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> foundedLinesResponse = LineSteps.지하철_노선_목록_조회요청();
 
         //Then
-        assertAll(
-                () -> assertThat(foundedLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> LineVerifier.지하철_노선_목록_조회검증(createdId1, createdId2, foundedLinesResponse)
-        );
+        LineVerifier.지하철_노선_목록_조회됨(createdId1, createdId2, foundedLinesResponse);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -61,11 +57,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineResponse foundedResponse = LineSteps.지하철_노선_요청_응답값(foundApiResponse);
 
         //Then
-        assertAll(
-                () -> assertThat(foundApiResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(foundApiResponse.jsonPath().getString("stations")).isNotNull(),
-                () -> LineVerifier.지하철_노선_조회검증(foundedResponse, createdResponse)
-        );
+        LineVerifier.지하철_노선_조회됨(foundApiResponse, foundedResponse, createdResponse);
     }
 
     @DisplayName("등록되지 않는 지하철 노선을 조회한다.")
@@ -93,10 +85,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineResponse updatedResponse = LineSteps.지하철_노선_요청_응답값(LineSteps.지하철_특정노선_찾기_요청(createdResponse.getId()));
 
         //Then
-        assertAll(
-                () -> assertThat(updatedApiResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(updatedResponse.getColor()).isEqualTo(updateColor)
-        );
+        LineVerifier.지하철_노선_수정됨(updatedApiResponse, updatedResponse, updateColor);
     }
 
     @DisplayName("등록되지 않는 노선에 수정을 요청한다")
