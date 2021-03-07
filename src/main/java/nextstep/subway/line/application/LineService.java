@@ -25,6 +25,18 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
+    public void validateReduplicationLine(LineRequest request) {
+        List<Line> lines = lineRepository.findAll();
+
+        lines.stream()
+                .filter(line -> line.getName().equals(request.getName()))
+                .findAny()
+                .ifPresent(line -> {
+                    throw new IllegalArgumentException("이미 존재하는 라인입니다.");
+                });
+    }
+
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
