@@ -16,13 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationSteps {
 
-    public static Map<String, String> 지하철역_등록되어_있음(String stationName) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
-        return params;
-    }
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

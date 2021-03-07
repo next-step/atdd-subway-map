@@ -26,7 +26,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void validateReduplicationLine() {
         // given
-        지하철_노선_등록되어_있음("2호선", "green");
+        지하철_노선_생성_요청("2호선", "green");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "blue");
@@ -39,9 +39,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createdResponse1 = 지하철_노선_등록되어_있음("2호선", "green");
+        ExtractableResponse<Response> createdResponse1 = 지하철_노선_생성_요청("2호선", "green");
 
-        ExtractableResponse<Response> createdResponse2 = 지하철_노선_등록되어_있음("1호선", "blue");
+        ExtractableResponse<Response> createdResponse2 = 지하철_노선_생성_요청("1호선", "blue");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
@@ -55,7 +55,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철_노선_등록되어_있음("2호선", "green");
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성_요청("2호선", "green");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(createdResponse);
@@ -68,7 +68,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철_노선_등록되어_있음("2호선", "green");
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성_요청("2호선", "green");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_수정_요청("2호선", "red", createdResponse);
@@ -81,7 +81,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철_노선_등록되어_있음("2호선", "green");
+        ExtractableResponse<Response> createdResponse = 지하철_노선_생성_요청("2호선", "green");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_제거_요청(createdResponse);

@@ -15,17 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String lineName, String lineColor) {
-        LineRequest lineRequest = new LineRequest(lineName, lineColor);
-        return RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(String lineName, String lineColor) {
         LineRequest lineRequest = new LineRequest(lineName, lineColor);
         return RestAssured.given().log().all()

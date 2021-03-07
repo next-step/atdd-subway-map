@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import static nextstep.subway.utils.StationSteps.*;
 
@@ -16,11 +15,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = 지하철역_등록되어_있음("강남역");
-
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
 
         // then
         지하철역_생성됨(response);
@@ -30,11 +26,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        Map<String, String> params = 지하철역_등록되어_있음("강남역");
-        지하철역_생성_요청(params);
+        지하철역_생성_요청("강남역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
 
         // then
         지하철역_생성_실패됨(response);
@@ -44,11 +39,9 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> params1 = 지하철역_등록되어_있음("강남역");
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(params1);
+        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청("강남역");
 
-        Map<String, String> params2 = 지하철역_등록되어_있음("역삼역");
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(params2);
+        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청("역삼역");
 
         // when
         ExtractableResponse<Response> response = 지하철역_조회_요청();
@@ -62,8 +55,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = 지하철역_등록되어_있음("강남역");
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(params);
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청("강남역");
 
         // when
         ExtractableResponse<Response> response = 지하철역_제거_요청(createResponse);
