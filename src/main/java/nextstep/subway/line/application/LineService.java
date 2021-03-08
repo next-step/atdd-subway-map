@@ -8,6 +8,7 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
 import nextstep.subway.line.exception.WrongUpStationException;
@@ -65,18 +66,27 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
-        Section lastSection = sectionRepository.findLastSectionByLineId(id);
-
-        if (isWrongUpStation(sectionRequest, lastSection)) {
-            throw new WrongUpStationException(lastSection.getDownStation());
+    public SectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
+        if (isWrongUpStation(lineId, sectionRequest)) {
+            throw new WrongUpStationException();
+        }
+        if (idDownStationDuplicated(lineId, sectionRequest)) {
+            throw new DownStationDuplicatedException();
         }
 
-        Section persistSection = sectionRepository.save(lineMapper.toSection(id, sectionRequest));
+        Section persistSection = sectionRepository.save(lineMapper.toSection(lineId, sectionRequest));
         return SectionResponse.of(persistSection);
     }
 
-    private boolean isWrongUpStation(SectionRequest sectionRequest, Section lastSection) {
+    private boolean isWrongUpStation(Long lineId, SectionRequest sectionRequest) {
+        Section lastSection = sectionRepository.findLastSectionByLineId(lineId);
         return lastSection != null && lastSection.isDownStationOfSectionNotEqualToUpStation(sectionRequest.getUpStationId());
+    }
+
+    private boolean idDownStationDuplicated(Long lineId, SectionRequest sectionRequest) {
+        List<Long> downStationIds = sectionRepository.findAllByLineId(lineId).stream()
+                .map(it -> it.getDownStation().getId())
+                .collect(Collectors.toList());
+        return downStationIds.contains(sectionRequest.getDownStationId());
     }
 }

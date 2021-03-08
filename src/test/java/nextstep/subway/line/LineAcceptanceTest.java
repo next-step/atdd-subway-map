@@ -135,7 +135,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("노선의 현재 등록되어있는 하행 종점역이 아닌 상행역으로 지하철 구간을 생성한다.")
+    @DisplayName("노선에 현재 등록되어있는 하행 종점역이 아닌 상행역으로 지하철 구간을 생성한다.")
     void createSectionWithWrongUpStation() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
@@ -143,6 +143,21 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationSadangResponse);
+
+        //then
+        assertCreateSectionFail(response);
+    }
+
+    @Test
+    @DisplayName("노선에 현재 등록되어있는 하행역으로 지하철 구간을 생성한다.")
+    void createSectionWithDuplicatedDownStation() {
+        // given
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
+
+        // when
+        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationPangyoResponse);
 
         //then
         assertCreateSectionFail(response);

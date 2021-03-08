@@ -1,5 +1,6 @@
 package nextstep.subway.common.exception;
 
+import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.WrongUpStationException;
 import nextstep.subway.station.exception.StationNameDuplicatedException;
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(WrongUpStationException.class)
     public void handle(HttpServletResponse response, WrongUpStationException e) throws IOException {
+        response.sendError(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler(DownStationDuplicatedException.class)
+    public void handle(HttpServletResponse response, DownStationDuplicatedException e) throws IOException {
         response.sendError(HttpStatus.BAD_REQUEST.value());
     }
 }
