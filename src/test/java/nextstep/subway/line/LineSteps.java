@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
         Map<String, String> params = Maps.of("name", name, "color", color);
         return RestAssured
                 .given().log().all()

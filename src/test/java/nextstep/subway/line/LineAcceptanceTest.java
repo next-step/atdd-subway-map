@@ -23,19 +23,32 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given & when
-        ExtractableResponse<Response> response = 지하철_노선_등록되어_있음("경강선", "deep-blue");
+        ExtractableResponse<Response> response = 지하철_노선_생성("경강선", "deep-blue");
 
         // then
         응답_HTTP_CREATED(response);
         지하철_노선_포함됨(response);
     }
 
+    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @Test
+    void createStationWithDuplicateName() {
+        //given
+        지하철_노선_생성("경강선", "deep-blue");
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성("경강선", "deep-blue");
+
+        // then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+    }
+
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
         // given
-        지하철_노선_등록되어_있음("경강선", "deep-blue");
-        지하철_노선_등록되어_있음("신분당선", "red");
+        지하철_노선_생성("경강선", "deep-blue");
+        지하철_노선_생성("신분당선", "red");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
@@ -49,7 +62,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        지하철_노선_등록되어_있음("경강선", "deep-blue");
+        지하철_노선_생성("경강선", "deep-blue");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청();
@@ -63,7 +76,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        지하철_노선_등록되어_있음("경강선", "deep-blue");
+        지하철_노선_생성("경강선", "deep-blue");
 
         // when
         Map<String, String> params = Maps.of("name", "신분당선", "color", "red");
@@ -77,7 +90,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        지하철_노선_등록되어_있음("2호선", "green");
+        지하철_노선_생성("2호선", "green");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_제거_요청();
