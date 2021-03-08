@@ -39,20 +39,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_실패(response);
     }
 
-    private Map<String, String> 노선_2호선() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-green-600");
-        return params;
-    }
-
-    private Map<String, String> 노선_1호선() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "1호선");
-        params.put("color", "bg-blue-600");
-        return params;
-    }
-
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
@@ -107,6 +93,21 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_제거_성공(deleteResponse);
-
     }
+
+    private Map<String, String> 노선_2호선() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "2호선");
+        params.put("color", "bg-green-600");
+        // 구간 정보 추가
+        return params;
+    }
+
+    private Map<String, String> 노선_1호선() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "1호선");
+        params.put("color", "bg-blue-600");
+        return params;
+    }
+
 }
