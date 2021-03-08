@@ -4,6 +4,9 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.DuplicateLineException;
+import nextstep.subway.line.exception.NoSuchLineException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,24 +24,34 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        try {
+            Line persistLine = lineRepository.save(request.toLine());
+            return LineResponse.of(persistLine);
+        } catch (DataIntegrityViolationException e){
+            throw new DuplicateLineException("이미 등록한 라인 입니다.");
+        }
+
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> LineResponse.of(line)).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(final Long lineId) {
         Optional<Line> line = lineRepository.findById(lineId);
         return line.map(LineResponse::of)
-                .orElseThrow(() -> new IllegalArgumentException("Not found lineId"+lineId));
+                .orElseThrow(() -> new NoSuchLineException("Not found lineId"+lineId));
     }
 
-    public void updateLine(final Long lineId, LineRequest lineRequest){
-        Line findLine = lineRepository.getOne(lineId);
-        findLine.update(lineRequest.toLine());
+    public void updateLine(final Long lineId, LineRequest lineRequest) {
+        Optional< Line > optionalLine = lineRepository.findById(lineId);
+        if(!optionalLine.isPresent()) {
+            throw new NoSuchLineException("해당하는 라인이 없습니다.");
+        }
+        optionalLine.get().update(lineRequest.toLine());
     }
 
     public void deleteLine(final Long lineId) {
