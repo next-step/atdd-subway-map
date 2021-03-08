@@ -99,7 +99,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "2호선");
         params.put("color", "bg-green-600");
-        // 구간 정보 추가
         return params;
     }
 

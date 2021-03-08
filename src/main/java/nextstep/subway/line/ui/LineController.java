@@ -38,12 +38,8 @@ public class LineController {
 
     @PutMapping(value = "/lines/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity modifyLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        try {
             lineService.updateLine(id, lineRequest);
             return ResponseEntity.ok().build();
-        } catch (NoSuchElementException e) {
-            return handleNoSuchElementException();
-        }
     }
 
     @DeleteMapping(value = "/lines/{id}")
@@ -51,6 +47,11 @@ public class LineController {
        lineService.deleteLine(id);
        return ResponseEntity.noContent().build();
     }
+
+//    @PostMapping(value = "/lines/{id}/sections")
+//    public ResponseEntity addSectionToLine(@PathVariable Long id, @RequestBody ) {
+//
+//    }
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity handleNoSuchElementException() {

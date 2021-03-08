@@ -97,5 +97,16 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static void 지하철_노선에_구간_등록_요청() {}
+
+    public static void 지하철_노선에_구간_등록_성공() {}
+
+    public static void 지하철_노선에_구간_등록_실패() {}
+
+    public static void 지하철_구간_삭제() {}
+
+    public static void 지하철_구간_삭제_성공() {}
+
+    public static void 지하철_구간_삭제_실패() {}
 
 }
