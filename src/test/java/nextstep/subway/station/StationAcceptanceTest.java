@@ -6,6 +6,8 @@ import nextstep.subway.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static nextstep.subway.station.StationRequestSteps.*;
 import static nextstep.subway.station.StationVerificationSteps.*;
 
@@ -47,7 +49,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_역_목록_조회_됨(response);
-        지하철_역_목록_조회_결과에_2개_역_포함_확인(createResponse1, createResponse2, response);
+        지하철_역_목록_조회_결과에_생성한_역_포함_확인(response, Arrays.asList(createResponse1, createResponse2));
     }
 
     @DisplayName("지하철역을 제거한다.")
