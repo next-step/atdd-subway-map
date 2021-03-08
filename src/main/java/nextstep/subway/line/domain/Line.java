@@ -37,4 +37,8 @@ public class Line extends BaseEntity {
     public String getColor() {
         return color;
     }
+
+//    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+//    private Sections sections;
+    //section 핵심 로직은 여기에서 등록 할 수 있도록 한다.
 }

@@ -5,6 +5,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,5 +65,11 @@ public class LineService {
     public void delete(long id) {
         Line line = getLine(id);
         lineRepository.delete(line);
+    }
+
+    public LineResponse addSection(long lineId, SectionRequest sectionRequest) {
+        //Line domain에서 비즈니스 로직 수행
+        //response return
+        return null;
     }
 }

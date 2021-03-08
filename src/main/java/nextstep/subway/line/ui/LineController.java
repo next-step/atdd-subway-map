@@ -4,6 +4,7 @@ import nextstep.subway.exception.SubwayNameDuplicateException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,4 +52,11 @@ public class LineController {
     public ResponseEntity duplicateExceptionHandler(SubwayNameDuplicateException e) {
         return ResponseEntity.badRequest().body("이미 등록된 노선 이름입니다.");
     }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity createSections(@PathVariable long lineId, @RequestBody SectionRequest sectionRequest) {
+        LineResponse lineResponse = lineService.addSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
+    }
+
 }
