@@ -1,10 +1,10 @@
 package nextstep.subway.station.application;
 
-import nextstep.subway.common.exception.ExistResourceException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
+import nextstep.subway.station.exception.StationAlreadyExistException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +32,7 @@ public class StationService {
 
     private void validateStationName(String stationName) {
         if (stationRepository.existsByName(stationName)) {
-            throw new ExistResourceException(EXCEPTION_MESSAGE_EXIST_STATION_NAME);
+            throw new StationAlreadyExistException(EXCEPTION_MESSAGE_EXIST_STATION_NAME);
         }
     }
 
