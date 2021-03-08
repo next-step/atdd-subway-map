@@ -3,18 +3,22 @@ package nextstep.subway.line.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.Section;
-import nextstep.subway.line.domain.SectionRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
 import nextstep.subway.line.exception.NoSuchLineException;
+import nextstep.subway.line.exception.NoSuchStationException;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.tools.tree.GreaterOrEqualExpression;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,17 +27,24 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
 
-    private SectionRepository sectionRepository;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
         try {
             Line newLine = request.toLine();
-            newLine.addSection(request.toSection());
+            Optional< Station > optionalUpStation = this.stationRepository.findById(request.getUpStationId());
+            Station upStation = optionalUpStation.orElseThrow(()-> new NoSuchStationException("No such up station Id: " + request.getUpStationId()));
+
+            Optional< Station > optionalDownStation = this.stationRepository.findById(request.getDownStationId());
+            Station downStation =  optionalDownStation.orElseThrow(()-> new NoSuchStationException("No such down station Id: " + request.getDownStationId()));
+
+            newLine.addSection(new Section(upStation, downStation, request.getDistance()));
             Line persistLine = lineRepository.save(newLine);
             return LineResponse.of(persistLine);
         } catch (DataIntegrityViolationException e){
