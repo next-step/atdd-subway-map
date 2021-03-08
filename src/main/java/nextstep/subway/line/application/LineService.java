@@ -33,15 +33,17 @@ public class LineService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> LineResponse.of(line)).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(final Long lineId) {
         Optional<Line> line = lineRepository.findById(lineId);
         return line.map(LineResponse::of)
-                .orElseThrow(() -> new IllegalArgumentException("Not found lineId"+lineId));
+                .orElseThrow(() -> new NoSuchLineException("Not found lineId"+lineId));
     }
 
     public void updateLine(final Long lineId, LineRequest lineRequest) {

@@ -1,14 +1,17 @@
 package nextstep.subway.station.ui;
 
+import nextstep.subway.line.exception.NoSuchLineException;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
+import nextstep.subway.station.exception.DuplicateStationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -39,5 +42,12 @@ public class StationController {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handleIllegalArgsException(DataIntegrityViolationException e) {
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(DuplicateStationException.class)
+    public ResponseEntity handleDuplicateStationException(DuplicateStationException e) {
+        HashMap<String, String> resultBody = new HashMap();
+        resultBody.put("message", e.getMessage());
+        return ResponseEntity.badRequest().body(resultBody);
     }
 }
