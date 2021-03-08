@@ -15,6 +15,7 @@ import static nextstep.subway.line.LineSteps.assertIncludeLines;
 import static nextstep.subway.line.LineSteps.assertUpdateLine;
 import static nextstep.subway.line.LineSteps.requestCreateLine2;
 import static nextstep.subway.line.LineSteps.requestCreateLineDx;
+import static nextstep.subway.line.LineSteps.requestCreateLineDxAgain;
 import static nextstep.subway.line.LineSteps.requestDeleteLine;
 import static nextstep.subway.line.LineSteps.requestGetLine;
 import static nextstep.subway.line.LineSteps.requestGetLines;
@@ -40,7 +41,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         requestCreateLineDx();
 
         // when
-        ExtractableResponse<Response> response = requestCreateLineDx();
+        ExtractableResponse<Response> response = requestCreateLineDxAgain();
 
         // then
         assertCreateLineFail(response);

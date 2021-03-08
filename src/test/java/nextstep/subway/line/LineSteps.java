@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
+import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
+import static nextstep.subway.station.StationSteps.requestCreateStationSadang;
+import static nextstep.subway.station.StationSteps.requestCreateStationYeoksam;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
@@ -21,16 +25,48 @@ public class LineSteps {
     private static final String HEADER_LOCATION = "Location";
 
     public static ExtractableResponse<Response> requestCreateLineDx() {
-        Map<String, String> params = makeLineParams("bg-red-600", "신분당선");
+        ExtractableResponse<Response> createResponse1 = requestCreateStationGangnam();
+        ExtractableResponse<Response> createResponse2 = requestCreateStationPangyo();
+
+        Map<String, Object> params = makeLineParams(
+                "bg-red-600",
+                "신분당선",
+                createResponse1.jsonPath().getLong("id"),
+                createResponse2.jsonPath().getLong("id"),
+                100000
+        );
+        return requestCreateLine(params);
+    }
+
+    public static ExtractableResponse<Response> requestCreateLineDxAgain() {
+        ExtractableResponse<Response> createResponse1 = requestCreateStationYeoksam();
+        ExtractableResponse<Response> createResponse2 = requestCreateStationSadang();
+
+        Map<String, Object> params = makeLineParams(
+                "bg-red-600",
+                "신분당선",
+                createResponse1.jsonPath().getLong("id"),
+                createResponse2.jsonPath().getLong("id"),
+                100000
+        );
         return requestCreateLine(params);
     }
 
     public static ExtractableResponse<Response> requestCreateLine2() {
-        Map<String, String> params = makeLineParams("bg-green-600", "2호선");
+        ExtractableResponse<Response> createResponse1 = requestCreateStationYeoksam();
+        ExtractableResponse<Response> createResponse2 = requestCreateStationSadang();
+
+        Map<String, Object> params = makeLineParams(
+                "bg-green-600",
+                "2호선",
+                createResponse1.jsonPath().getLong("id"),
+                createResponse2.jsonPath().getLong("id"),
+                150000
+        );
         return requestCreateLine(params);
     }
 
-    public static ExtractableResponse<Response> requestCreateLine(Map<String, String> params) {
+    public static ExtractableResponse<Response> requestCreateLine(Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -61,8 +97,15 @@ public class LineSteps {
     }
 
     public static ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> createResponse) {
-        Map<String, String> params = makeLineParams("bg-blue-600", "구분당선");
+        Map<String, Object> params = makeLineParams(
+                "bg-blue-600",
+                "구분당선",
+                createResponse.jsonPath().getLong("downStationId"),
+                createResponse.jsonPath().getLong("upStationId"),
+                200000
+        );
         String uri = createResponse.header(HEADER_LOCATION);
+
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -117,10 +160,13 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static Map<String, String> makeLineParams(String color, String name) {
-        Map<String, String> params = new HashMap<>();
+    public static Map<String, Object> makeLineParams(String color, String name, Long upStationId, Long downStationId, int distance) {
+        Map<String, Object> params = new HashMap<>();
         params.put("color", color);
         params.put("name", name);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
         return params;
     }
 }

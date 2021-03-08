@@ -17,9 +17,11 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final LineMapper lineMapper;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, LineMapper lineMapper) {
         this.lineRepository = lineRepository;
+        this.lineMapper = lineMapper;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -27,7 +29,7 @@ public class LineService {
             throw new LineNameDuplicatedException(lineRequest.getName());
         }
 
-        Line persistLine = lineRepository.save(lineRequest.toLine());
+        Line persistLine = lineRepository.save(lineMapper.toLine(lineRequest));
         return LineResponse.of(persistLine);
     }
 
@@ -41,7 +43,7 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineResponse getLine(Long id) {
+    public LineResponse toLine(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::of)
                 .orElseThrow(() -> new LineNotFoundException(id));
@@ -49,7 +51,7 @@ public class LineService {
 
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new LineNotFoundException(id));
-        line.update(lineRequest.toLine());
+        line.update(lineMapper.toLine(lineRequest));
     }
 
     public void deleteLine(Long id) {

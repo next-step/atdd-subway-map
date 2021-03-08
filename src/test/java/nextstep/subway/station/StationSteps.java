@@ -30,6 +30,16 @@ public class StationSteps {
         return requestCreateStation(params);
     }
 
+    public static ExtractableResponse<Response> requestCreateStationPangyo() {
+        Map<String, String> params = makeStationParams("판교역");
+        return requestCreateStation(params);
+    }
+
+    public static ExtractableResponse<Response> requestCreateStationSadang() {
+        Map<String, String> params = makeStationParams("사당역");
+        return requestCreateStation(params);
+    }
+
     public static ExtractableResponse<Response> requestCreateStation(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
