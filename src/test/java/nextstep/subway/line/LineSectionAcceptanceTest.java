@@ -65,6 +65,19 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         지하철_구간_삭제_실패();
     }
 
+    @DisplayName("등록된 구간을 통해 역 목록 조회")
+    @Test
+    void getLineStationOrderBySection() {
+        // given
+        지하철_노선_생성_요청(노선_2호선());
+        지하철_노선에_구간_등록_요청();
+        지하철_노선에_구간_등록_요청();
+        // when
+        지하철_노선_목록_조회();
+        // then
+        // 구간 순서대로 정렬되었는가??
+    }
+
 
     private Map<String, String> 노선_2호선() {
         Map<String, String> params = new HashMap<>();
