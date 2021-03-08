@@ -49,15 +49,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_응답_성공(response);
 
         // 지하철_노선_목록_포함됨
-        List<Long> expectedLineIds = Arrays.asList(createResponse1, createResponse2).stream()
-                .map(list -> Long.parseLong(list.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-
-        List<Long> responseLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
-                .map(list -> list.getId())
-                .collect(Collectors.toList());
-
-        assertThat(responseLineIds).containsAll(expectedLineIds);
+        지하철_노선_포함_확인(Arrays.asList(createResponse1, createResponse2), response);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -111,6 +103,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_삭제됨
         지하철_노선_삭제_성공(response);
+    }
+
+    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @Test
+    void createLineWithDuplicateName() {
+        //given
+         지하철_노선_등록("2호선","bg-green-600");
+
+         // when
+        ExtractableResponse<Response> response = 지하철_노선_등록("2호선","bg-green-600");
+
+        // then
+        지하철_노선_생성_실패(response);
     }
 
     /** 중복코드 리팩터링 */
@@ -179,9 +184,28 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void 지하철_노선_생성_성공(ExtractableResponse<Response> response){
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void 지하철_노선_생성_실패(ExtractableResponse<Response> response){
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private void 지하철_노선_삭제_성공(ExtractableResponse<Response> response){
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void 지하철_노선_포함_확인(List<ExtractableResponse<Response>> expectedList,
+                              ExtractableResponse<Response> realList){
+
+        List<Long> expectedLineIds = Arrays.asList(expectedList.get(0),expectedList.get(1)).stream()
+                .map(list -> Long.parseLong(list.header("Location").split("/")[2]))
+                .collect(Collectors.toList());
+
+        List<Long> responseLineIds = realList.jsonPath().getList(".", LineResponse.class).stream()
+                .map(list -> list.getId())
+                .collect(Collectors.toList());
+
+        assertThat(responseLineIds).containsAll(expectedLineIds);
     }
 }
