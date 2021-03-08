@@ -18,5 +18,11 @@ public class HttpAssertions {
     public static void 응답_HTTP_NO_CONTENT(ExtractableResponse<Response> response) {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    public static void 응답_HTTP_FORBIDDEN(ExtractableResponse<Response> response) {
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+    }
+
+
     
 }
