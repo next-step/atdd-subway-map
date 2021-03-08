@@ -4,6 +4,7 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
+import nextstep.subway.line.exception.NoSuchLineException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +54,13 @@ public class LineController {
 
     @ExceptionHandler(DuplicateLineException.class)
     public ResponseEntity handleDuplicateLineException(DuplicateLineException e) {
+        HashMap<String, String> resultBody = new HashMap();
+        resultBody.put("message", e.getMessage());
+        return ResponseEntity.badRequest().body(resultBody);
+    }
+
+    @ExceptionHandler(NoSuchLineException.class)
+    public ResponseEntity handleNoSuchLineException(NoSuchLineException e) {
         HashMap<String, String> resultBody = new HashMap();
         resultBody.put("message", e.getMessage());
         return ResponseEntity.badRequest().body(resultBody);
