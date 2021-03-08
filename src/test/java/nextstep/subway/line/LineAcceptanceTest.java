@@ -40,11 +40,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         // 지하철 노선
-        final Map NewLine = createLineMapHelper("KANGNAM","green");
+        final Map newLine = createLineMapHelper("KANGNAM","green");
 
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response = this.registerLineHelper(NewLine);
+        ExtractableResponse<Response> response = this.registerLineHelper(newLine);
 
         // then
         // 지하철_노선_생성됨
