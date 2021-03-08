@@ -13,10 +13,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
-import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
-import static nextstep.subway.station.StationSteps.requestCreateStationSadang;
-import static nextstep.subway.station.StationSteps.requestCreateStationYeoksam;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
@@ -25,43 +21,25 @@ public class LineSteps {
     private static final String URI_SECTIONS = "/sections";
     private static final String HEADER_LOCATION = "Location";
 
-    public static ExtractableResponse<Response> requestCreateLineDx() {
-        ExtractableResponse<Response> createResponse1 = requestCreateStationGangnam();
-        ExtractableResponse<Response> createResponse2 = requestCreateStationPangyo();
-
+    public static ExtractableResponse<Response> requestCreateLineDx(ExtractableResponse<Response> upStationResponse,
+                                                                    ExtractableResponse<Response> downStationResponse) {
         Map<String, Object> params = makeLineParams(
                 "bg-red-600",
                 "신분당선",
-                createResponse1.jsonPath().getLong("id"),
-                createResponse2.jsonPath().getLong("id"),
+                upStationResponse.jsonPath().getLong("id"),
+                downStationResponse.jsonPath().getLong("id"),
                 100000
         );
         return requestCreateLine(params);
     }
 
-    public static ExtractableResponse<Response> requestCreateLineDxAgain() {
-        ExtractableResponse<Response> createResponse1 = requestCreateStationYeoksam();
-        ExtractableResponse<Response> createResponse2 = requestCreateStationSadang();
-
-        Map<String, Object> params = makeLineParams(
-                "bg-red-600",
-                "신분당선",
-                createResponse1.jsonPath().getLong("id"),
-                createResponse2.jsonPath().getLong("id"),
-                100000
-        );
-        return requestCreateLine(params);
-    }
-
-    public static ExtractableResponse<Response> requestCreateLine2() {
-        ExtractableResponse<Response> createResponse1 = requestCreateStationYeoksam();
-        ExtractableResponse<Response> createResponse2 = requestCreateStationSadang();
-
+    public static ExtractableResponse<Response> requestCreateLine2(ExtractableResponse<Response> upStationResponse,
+                                                                   ExtractableResponse<Response> downStationResponse) {
         Map<String, Object> params = makeLineParams(
                 "bg-green-600",
                 "2호선",
-                createResponse1.jsonPath().getLong("id"),
-                createResponse2.jsonPath().getLong("id"),
+                upStationResponse.jsonPath().getLong("id"),
+                downStationResponse.jsonPath().getLong("id"),
                 150000
         );
         return requestCreateLine(params);
@@ -125,11 +103,9 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestCreateSection() {
-        ExtractableResponse<Response> createLineResponse = requestCreateLineDx();
-        ExtractableResponse<Response> upStationResponse = requestCreateStationYeoksam();
-        ExtractableResponse<Response> downStationResponse = requestCreateStationSadang();
-
+    public static ExtractableResponse<Response> requestCreateSection(ExtractableResponse<Response> upStationResponse,
+                                                                     ExtractableResponse<Response> downStationResponse) {
+        ExtractableResponse<Response> createLineResponse = requestCreateLineDx(upStationResponse, downStationResponse);
         Map<String, Object> params = makeSectionParams(upStationResponse, downStationResponse);
         String uri = createLineResponse.header(HEADER_LOCATION);
 
