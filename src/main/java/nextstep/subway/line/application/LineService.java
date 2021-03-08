@@ -4,6 +4,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.LineAlreadyExistsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class LineService {
         List<Line> lines = lineRepository.findByNameContaining(request.getName());
 
         if(lines.size() > 0) {
-            throw new IllegalArgumentException("이미 존재하는 라인입니다.");
+            throw new LineAlreadyExistsException();
         };
     }
 
