@@ -74,12 +74,24 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
+        LineRequest request = new LineRequest("신분당선", "bg-red-600");
+        final Long id = 지하철_노선_등록되어_있음(request.getName(), request.getColor());
 
         // when
         // 지하철_노선_수정_요청
+        LineRequest updateRequest = new LineRequest("신분당선", "bg-green-600");
+        final ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(updateRequest.getName(), updateRequest.getColor(), id);
 
         // then
         // 지하철_노선_수정됨
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(id);
+        LineResponse lineResponse = getLineResponse(response);
+
+        assertThat(lineResponse.getId()).isEqualTo(id);
+        assertThat(lineResponse.getName()).isEqualTo(updateRequest.getName());
+        assertThat(lineResponse.getColor()).isEqualTo(updateRequest.getColor());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -108,6 +120,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    private static ExtractableResponse<Response> 지하철_노선_수정_요청(String name, String color, Long id) {
+        LineRequest request = new LineRequest(name, color);
+
+        return RestAssured
+                .given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
     private static Long 지하철_노선_등록되어_있음(String name, String color) {
 
         return 지하철_노선_생성_요청(name, color).as(LineResponse.class).getId();
@@ -125,6 +150,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private static List<Long> 지하철_노선_목록_포함됨(ExtractableResponse<Response> response) {
+
         return response.jsonPath().getList(".", LineResponse.class)
                 .stream()
                 .map(LineResponse::getId)
@@ -132,6 +158,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private static ExtractableResponse<Response> 지하철_노선_조회_요청(long id) {
+
         return RestAssured
                 .given().log().all()
                 .when()
@@ -141,5 +168,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     }
 
+    private static LineResponse getLineResponse(ExtractableResponse<Response> response) {
 
+        return response.jsonPath().getObject(".", LineResponse.class);
+    }
 }
