@@ -53,27 +53,34 @@ public class LineService {
 	}
 
 	public void updateLine(Long lineId, LineRequest lineRequest) {
-		final Line findLine = lineRepository.findById(lineId)
-			.orElseThrow(() -> new NotFoundLineException(lineId));
+		final Line findLine = findLineById(lineId);
 
 		findLine.update(lineRequest.toLine());
 	}
 
 	public void deleteLine(Long lineId) {
-		lineRepository.delete(
-			lineRepository.findById(lineId)
-				.orElseThrow(() -> new NotFoundLineException(lineId))
-		);
+		lineRepository.delete(findLineById(lineId));
 	}
 
 	public LineResponse addSection(Long lineId, LineRequest lineRequest) {
-		final Line line = lineRepository.findById(lineId)
-			.orElseThrow(() -> new NotFoundLineException(lineId));
+		final Line line = findLineById(lineId);
 		final Station upStation = findStationById(lineRequest.getUpStationId());
 		final Station downStation = findStationById(lineRequest.getDownStationId());
 
-		line.addStations(upStation, downStation, lineRequest.getDistance());
+		line.addSection(upStation, downStation, lineRequest.getDistance());
 		return LineResponse.of(line);
+	}
+
+	public void deleteSection(Long lineId, Long stationId) {
+		final Line line = findLineById(lineId);
+		final Station station = findStationById(stationId);
+
+		line.deleteSection(station);
+	}
+
+	private Line findLineById(Long lineId) {
+		return lineRepository.findById(lineId)
+			.orElseThrow(() -> new NotFoundLineException(lineId));
 	}
 
 	private Station findStationById(Long stationId) {

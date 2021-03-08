@@ -55,13 +55,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteSection() {
 		// given
-		// 지하철_노선_생성
+		지하철_노선에_구간_등록_요청(신분당선, 양재역, 판교역, 3);
 
 		// when
-		// 지하철_구간_제거_요청
+		final ExtractableResponse<Response> response = 지하철_구간_제거_요청(신분당선, 판교역);
 
 		// then
-		// 지하철_구간_제거됨
+		지하철_구간_제거됨(response);
 	}
 
 	@DisplayName("지하철 노선에 등록된 구간을 통해 역 목록을 조회한다.")
@@ -121,5 +121,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
 	private void 지하철_노선에_구간_등록됨(ExtractableResponse<Response> response) {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+	}
+
+	private void 지하철_구간_제거됨(ExtractableResponse<Response> response) {
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
+	private ExtractableResponse<Response> 지하철_구간_제거_요청(LineResponse line, StationResponse station) {
+		return RestAssured
+			.given().log().all()
+			.pathParam("lineId", line.getId())
+			.queryParam("stationId", station.getId())
+			.when().delete("/lines/{lineId}/sections")
+			.then().log().all()
+			.extract();
 	}
 }
