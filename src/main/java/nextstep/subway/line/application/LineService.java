@@ -25,13 +25,14 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
 
-
+    @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
         Optional<Line> line = lineRepository.findOneById(id);
 
@@ -45,8 +46,8 @@ public class LineService {
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Optional<Line> line = lineRepository.findOneById(id);
 
-        line.ifPresent(t-> {
-            t.update(lineRequest.toLine());
+        line.ifPresent(persistLine-> {
+            persistLine.update(lineRequest.toLine());
         });
 
         return line.map(LineResponse::of).orElse(null);

@@ -29,40 +29,4 @@ public class AcceptanceTest {
 
         databaseCleanup.execute();
     }
-
-    public ExtractableResponse<Response> getRequest(String path) {
-        return RestAssured.given().log().all()
-                .when()
-                .get(path)
-                .then().log().all()
-                .extract();
-    }
-
-    public ExtractableResponse<Response> postRequest(String path, Map params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(path)
-                .then().log().all()
-                .extract();
-    }
-
-    public ExtractableResponse<Response> putRequest(String path, Map params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put(path)
-                .then().log().all()
-                .extract();
-    }
-
-    public ExtractableResponse<Response> deleteRequest(String path) {
-        return RestAssured.given().log().all()
-                .when()
-                .delete(path)
-                .then().log().all()
-                .extract();
-    }
 }
