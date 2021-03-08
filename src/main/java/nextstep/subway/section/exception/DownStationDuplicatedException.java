@@ -1,4 +1,4 @@
-package nextstep.subway.line.exception;
+package nextstep.subway.section.exception;
 
 public class DownStationDuplicatedException extends RuntimeException {
 

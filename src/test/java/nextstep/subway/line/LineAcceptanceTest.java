@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineSteps.assertCreateLine;
 import static nextstep.subway.line.LineSteps.assertCreateLineFail;
-import static nextstep.subway.line.LineSteps.assertCreateSection;
-import static nextstep.subway.line.LineSteps.assertCreateSectionFail;
 import static nextstep.subway.line.LineSteps.assertDeleteLine;
 import static nextstep.subway.line.LineSteps.assertGetLine;
 import static nextstep.subway.line.LineSteps.assertGetLines;
@@ -18,7 +16,6 @@ import static nextstep.subway.line.LineSteps.assertIncludeLines;
 import static nextstep.subway.line.LineSteps.assertUpdateLine;
 import static nextstep.subway.line.LineSteps.requestCreateLine2;
 import static nextstep.subway.line.LineSteps.requestCreateLineDx;
-import static nextstep.subway.line.LineSteps.requestCreateSection;
 import static nextstep.subway.line.LineSteps.requestDeleteLine;
 import static nextstep.subway.line.LineSteps.requestGetLine;
 import static nextstep.subway.line.LineSteps.requestGetLines;
@@ -121,45 +118,5 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertDeleteLine(response);
-    }
-
-    @Test
-    @DisplayName("지하철 구간을 생성한다.")
-    void createSection() {
-        // when
-        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
-
-        // then
-        assertCreateSection(response);
-    }
-
-    @Test
-    @DisplayName("노선에 현재 등록되어있는 하행 종점역이 아닌 상행역으로 지하철 구간을 생성한다.")
-    void createSectionWithWrongUpStation() {
-        // given
-        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
-
-        // when
-        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationSadangResponse);
-
-        //then
-        assertCreateSectionFail(response);
-    }
-
-    @Test
-    @DisplayName("노선에 현재 등록되어있는 하행역으로 지하철 구간을 생성한다.")
-    void createSectionWithDuplicatedDownStation() {
-        // given
-        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
-
-        // when
-        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationPangyoResponse);
-
-        //then
-        assertCreateSectionFail(response);
     }
 }

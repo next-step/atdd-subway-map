@@ -1,8 +1,8 @@
 package nextstep.subway.common.exception;
 
-import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
-import nextstep.subway.line.exception.WrongUpStationException;
+import nextstep.subway.section.exception.DownStationDuplicatedException;
+import nextstep.subway.section.exception.WrongUpStationException;
 import nextstep.subway.station.exception.StationNameDuplicatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

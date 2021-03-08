@@ -2,16 +2,10 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
-import nextstep.subway.line.domain.Section;
-import nextstep.subway.line.domain.SectionRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.dto.SectionResponse;
-import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
-import nextstep.subway.line.exception.WrongUpStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +17,10 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
     private final LineMapper lineMapper;
 
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, LineMapper lineMapper) {
+    public LineService(LineRepository lineRepository, LineMapper lineMapper) {
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
         this.lineMapper = lineMapper;
     }
 
@@ -64,29 +56,5 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    public SectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
-        if (isWrongUpStation(lineId, sectionRequest)) {
-            throw new WrongUpStationException();
-        }
-        if (idDownStationDuplicated(lineId, sectionRequest)) {
-            throw new DownStationDuplicatedException();
-        }
-
-        Section persistSection = sectionRepository.save(lineMapper.toSection(lineId, sectionRequest));
-        return SectionResponse.of(persistSection);
-    }
-
-    private boolean isWrongUpStation(Long lineId, SectionRequest sectionRequest) {
-        Section lastSection = sectionRepository.findLastSectionByLineId(lineId);
-        return lastSection != null && lastSection.isDownStationOfSectionNotEqualToUpStation(sectionRequest.getUpStationId());
-    }
-
-    private boolean idDownStationDuplicated(Long lineId, SectionRequest sectionRequest) {
-        List<Long> downStationIds = sectionRepository.findAllByLineId(lineId).stream()
-                .map(it -> it.getDownStation().getId())
-                .collect(Collectors.toList());
-        return downStationIds.contains(sectionRequest.getDownStationId());
     }
 }
