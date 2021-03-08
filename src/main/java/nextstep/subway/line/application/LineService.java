@@ -7,6 +7,7 @@ import nextstep.subway.line.dto.LineResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.OperationNotSupportedException;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+
     private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -22,8 +24,12 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        Line line = request.toLine();
+        boolean alreadyRegistered = lineRepository.findByName(line.getName()).isPresent();
+        if (alreadyRegistered) {
+            throw new UnsupportedOperationException("이미 등록된 노선입니다.");
+        }
+        return LineResponse.of(lineRepository.save(line));
     }
 
     public List<LineResponse> getAllLines() {
