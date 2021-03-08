@@ -91,11 +91,11 @@ public class LineSteps {
                 .extract();
     }
 
-    public static void 지하철_노선_수정됨(ExtractableResponse<Response> response, String lineName, String lineColor) {
+    public static void 지하철_노선_수정됨(ExtractableResponse<Response> response, LineRequest lineRequest) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
-        assertThat(lineResponse.getName()).isEqualTo(lineName);
-        assertThat(lineResponse.getColor()).isEqualTo(lineColor);
+        assertThat(lineResponse.getName()).isEqualTo(lineRequest.getName());
+        assertThat(lineResponse.getColor()).isEqualTo(lineRequest.getColor());
     }
 
     public static ExtractableResponse<Response> 지하철_노선_제거_요청(ExtractableResponse<Response> createdResponse) {

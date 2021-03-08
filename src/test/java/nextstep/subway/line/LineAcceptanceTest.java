@@ -3,6 +3,7 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -74,7 +75,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_수정_요청("2호선", "red", createdResponse);
 
         // then
-        지하철_노선_수정됨(response, "2호선", "red");
+        지하철_노선_수정됨(response, new LineRequest("2호선", "red"));
     }
 
     @DisplayName("지하철 노선을 제거한다.")
