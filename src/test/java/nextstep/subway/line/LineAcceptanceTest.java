@@ -99,12 +99,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
+        final Long id = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
 
         // when
         // 지하철_노선_제거_요청
+        ExtractableResponse<Response> response = 지하철_노선_제거_요청(id);
 
         // then
         // 지하철_노선_삭제됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
@@ -129,6 +132,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철_노선_제거_요청(Long id) {
+
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
