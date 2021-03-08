@@ -75,11 +75,12 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철역_삭제됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철역_등록되어_있음(String name) {
+    public static ExtractableResponse<Response> 지하철역_등록되어_있음(String name) {
         return 지하철역_생성_요청(name);
     }
 
-    private ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+
         StationRequest stationRequest = new StationRequest(name);
 
         return RestAssured
