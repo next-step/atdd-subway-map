@@ -3,13 +3,14 @@ package nextstep.subway.section;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.utils.Extractor;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,13 +22,14 @@ public class SectionStep {
         return Extractor.post(path, 금정_범계);
     }
 
-    public static void 기존_지하철_구간_하행역_신규_상행역_일치함(Long prevDownStationId, ExtractableResponse<Response> newCreatedSectionResponse) {
-        SectionResponse newSectionResponse = 지하철_노선_구간_추출됨(newCreatedSectionResponse);
-        assertThat(prevDownStationId).isEqualTo(newSectionResponse.getUpStation().getId());
+    public static void 기존_지하철_구간_하행역_신규_상행역_일치함(ExtractableResponse<Response> newCreatedSectionResponse, StationResponse ...stations) {
+        List<String> lineStations = 지하철_노선_구간_추출됨(newCreatedSectionResponse);
+        List<String> stationNames = Stream.of(stations).map(StationResponse::getName).collect(Collectors.toList());
+        assertThat(lineStations).containsAll(stationNames);
     }
 
-    public static SectionResponse 지하철_노선_구간_추출됨(ExtractableResponse<Response> response) {
-        return response.jsonPath().getObject(".", SectionResponse.class);
+    public static List<String> 지하철_노선_구간_추출됨(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("stations.name", String.class);
     }
 
     private static String 서비스_호출_경로_생성(Long lineId, Long sectionId) {

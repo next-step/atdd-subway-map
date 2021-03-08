@@ -62,7 +62,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         //then
         //기존_지하철_구간_하행역_신규_상행역_일치함
-        기존_지하철_구간_하행역_신규_상행역_일치함(범계역.getId(), response);
+        기존_지하철_구간_하행역_신규_상행역_일치함(response, 금정역, 범계역, 평촌역);
     }
 
     @DisplayName("지하철 노선 신규 구간의 상행역을 현재 하행 종점역이 아닌 지하철역으로 한다.")
