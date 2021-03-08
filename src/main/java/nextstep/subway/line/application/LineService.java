@@ -10,6 +10,7 @@ import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
+import nextstep.subway.line.exception.WrongUpStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,17 @@ public class LineService {
     }
 
     public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
+        Section lastSection = sectionRepository.findLastSectionByLineId(id);
+
+        if (isWrongUpStation(sectionRequest, lastSection)) {
+            throw new WrongUpStationException(lastSection.getDownStation());
+        }
+
         Section persistSection = sectionRepository.save(lineMapper.toSection(id, sectionRequest));
         return SectionResponse.of(persistSection);
+    }
+
+    private boolean isWrongUpStation(SectionRequest sectionRequest, Section lastSection) {
+        return lastSection != null && lastSection.isDownStationOfSectionNotEqualToUpStation(sectionRequest.getUpStationId());
     }
 }

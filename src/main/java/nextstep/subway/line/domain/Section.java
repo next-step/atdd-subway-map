@@ -61,4 +61,8 @@ public class Section extends BaseEntity {
     public int getDistance() {
         return distance;
     }
+
+    public boolean isDownStationOfSectionNotEqualToUpStation(Long upStationId) {
+        return !downStation.getId().equals(upStationId);
+    }
 }

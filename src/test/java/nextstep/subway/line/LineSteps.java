@@ -103,11 +103,11 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestCreateSection(ExtractableResponse<Response> upStationResponse,
+    public static ExtractableResponse<Response> requestCreateSection(ExtractableResponse<Response> lineResponse,
+                                                                     ExtractableResponse<Response> upStationResponse,
                                                                      ExtractableResponse<Response> downStationResponse) {
-        ExtractableResponse<Response> createLineResponse = requestCreateLineDx(upStationResponse, downStationResponse);
         Map<String, Object> params = makeSectionParams(upStationResponse, downStationResponse);
-        String uri = createLineResponse.header(HEADER_LOCATION);
+        String uri = lineResponse.header(HEADER_LOCATION);
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -158,6 +158,10 @@ public class LineSteps {
     public static void assertCreateSection(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    public static void assertCreateSectionFail(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     public static Map<String, Object> makeLineParams(String color, String name, Long upStationId, Long downStationId, int distance) {

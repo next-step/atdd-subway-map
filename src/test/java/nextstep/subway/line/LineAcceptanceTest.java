@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static nextstep.subway.line.LineSteps.assertCreateLine;
 import static nextstep.subway.line.LineSteps.assertCreateLineFail;
 import static nextstep.subway.line.LineSteps.assertCreateSection;
+import static nextstep.subway.line.LineSteps.assertCreateSectionFail;
 import static nextstep.subway.line.LineSteps.assertDeleteLine;
 import static nextstep.subway.line.LineSteps.assertGetLine;
 import static nextstep.subway.line.LineSteps.assertGetLines;
@@ -126,9 +127,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 구간을 생성한다.")
     void createSection() {
         // when
-        ExtractableResponse<Response> response = requestCreateSection(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // then
         assertCreateSection(response);
+    }
+
+    @Test
+    @DisplayName("노선의 현재 등록되어있는 하행 종점역이 아닌 상행역으로 지하철 구간을 생성한다.")
+    void createSectionWithWrongUpStation() {
+        // given
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+
+        // when
+        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationSadangResponse);
+
+        //then
+        assertCreateSectionFail(response);
     }
 }
