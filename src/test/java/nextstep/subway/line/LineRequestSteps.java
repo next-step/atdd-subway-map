@@ -8,10 +8,10 @@ import org.springframework.http.MediaType;
 
 public class LineRequestSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(new LineRequest(name, color))
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .post("/lines")
