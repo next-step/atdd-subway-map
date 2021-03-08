@@ -1,7 +1,7 @@
 package nextstep.subway.common.advice;
 
+import nextstep.subway.common.exception.ApplicationException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,8 +14,8 @@ public class SubwayControllerAdvice {
         return ResponseEntity.badRequest().build();
     }
 
-    @ExceptionHandler(EmptyResultDataAccessException.class)
-    public ResponseEntity handlerEmptyValueException(DataIntegrityViolationException e) {
-        return ResponseEntity.notFound().build();
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity handleIllegalArgsException(ApplicationException e) {
+        return new ResponseEntity(e.getStatus());
     }
 }

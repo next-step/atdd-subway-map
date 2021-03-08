@@ -64,6 +64,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_조회_성공(response);
     }
 
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLineWithNoId() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
+
+        // then
+        지하철_노선_조회_결과_없음(response);
+    }
+
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
