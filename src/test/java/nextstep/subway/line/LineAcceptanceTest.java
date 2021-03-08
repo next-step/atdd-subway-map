@@ -58,12 +58,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
+        final Long id = 지하철_노선_등록되어_있음("신분당선", "bg-red-600");
 
         // when
         // 지하철_노선_조회_요청
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(id);
 
         // then
         // 지하철_노선_응답됨
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -127,4 +130,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());
     }
+
+    private static ExtractableResponse<Response> 지하철_노선_조회_요청(long id) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+
+    }
+
+
 }
