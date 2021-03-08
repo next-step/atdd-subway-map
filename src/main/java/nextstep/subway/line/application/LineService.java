@@ -44,6 +44,11 @@ public class LineService {
         line.update(request.toLine());
     }
 
+    public void deleteLine(Long id) {
+        final Line line = fineLineById(id);
+        lineRepository.delete(line);
+    }
+
     private Line fineLineById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
