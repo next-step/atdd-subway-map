@@ -35,18 +35,14 @@ public class LineService {
         if (lineRepository.existsByName(requestName)) {
             throw new AlreadyExistsEntityException(String.format(LINE_EXCEPTION, requestName));
         }
-        Section section =  createSection(request.toSectionRequest());
+
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+
+        Section section =  request.toSection(upStation, downStation);
         Line persistLine = lineRepository.save(request.toLine(section));
 
         return LineResponse.of(persistLine);
-    }
-
-    private Section createSection(SectionRequest request) {
-        return Section.Builder()
-                .upStation(findStationById(request.getUpStationId()))
-                .downStation(findStationById(request.getDownStationId()))
-                .distance(request.getDistance())
-                .build();
     }
 
     public List<LineResponse> readLines() {
@@ -73,7 +69,10 @@ public class LineService {
 
     public Line addLineStation(Long lineId, SectionRequest sectionRequest) {
         Line line = findLineById(lineId);
-        Section section = createSection(sectionRequest);
+        Station upStation = findStationById(sectionRequest.getUpStationId());
+        Station downStation = findStationById(sectionRequest.getDownStationId());
+
+        Section section = sectionRequest.toSection(upStation, downStation);
 
         line.addSection(section);
 
