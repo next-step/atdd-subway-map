@@ -42,7 +42,13 @@ public class Section extends BaseEntity {
         return this.downStation;
     }
 
+    public Long getId(){  return this.id; }
+
     public int getDistance() {
         return this.distance;
+    }
+
+    public void setLine(Line line){
+        this.line = line;
     }
 }

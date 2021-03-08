@@ -2,9 +2,12 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.domain.SectionRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
 import nextstep.subway.line.exception.NoSuchLineException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,10 +32,12 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest request) {
         try {
-            Line persistLine = lineRepository.save(request.toLine());
+            Line newLine = request.toLine();
+            newLine.addSection(request.toSection());
+            Line persistLine = lineRepository.save(newLine);
             return LineResponse.of(persistLine);
         } catch (DataIntegrityViolationException e){
-            throw new DuplicateLineException("이미 등록한 라인 입니다.");
+            throw new DuplicateLineException("Duplicated Line");
         }
     }
 
@@ -50,7 +55,7 @@ public class LineService {
     public void updateLine(final Long lineId, LineRequest lineRequest) {
         Optional< Line > optionalLine = lineRepository.findById(lineId);
         if(!optionalLine.isPresent()) {
-            throw new NoSuchLineException("해당하는 라인이 없습니다.");
+            throw new NoSuchLineException("No such line");
         }
         optionalLine.get().update(lineRequest.toLine());
     }
@@ -60,5 +65,15 @@ public class LineService {
         if(line.isPresent()){
             lineRepository.delete(line.get());
         }
+    }
+
+    public SectionResponse saveSection(final Long lineId, SectionRequest sectionRequest) {
+        Optional<Line> optionalLine = lineRepository.findById(lineId);
+        if(!optionalLine.isPresent()){
+            throw new NoSuchLineException("No such line");
+        }
+        Line line = optionalLine.get();
+        line.addSection(sectionRequest.toSection());
+        return new SectionResponse();
     }
 }

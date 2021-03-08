@@ -4,8 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
 import org.assertj.core.groups.Tuple;
+import org.graalvm.compiler.replacements.nodes.ArrayEqualsNode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -40,20 +44,30 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         // 지하철 노선
-        final Map NewLine = new HashMap<String, String>() {
-            {
-                put("name", "KANGNAM");
-                put("color", "green");
-            }
-        };
+        LineRequest request = new LineRequest("KANGNAM","green", 201L, 202L, 10);
 
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response = this.registerLineHelper(NewLine);
+        LineResponse response = this.registerLineHelper(request);
 
         // then
         // 지하철_노선_생성됨
-        this.assertCreateNewLineSuccess(response);
+        this.assertCreateNewLineSuccess(request, response);
+    }
+
+    @DisplayName("구간을 추가한다.")
+    @Test
+    void createSection() {
+        // given
+        // 지하철 노선
+        LineRequest newLine = new LineRequest("KANGNAM","green", 201L, 202L, 10);
+
+        LineResponse createdLine = this.registerLineHelper(newLine);
+
+        // when
+        SectionRequest newSection = new SectionRequest(202L, 203L, 5);
+        this.registerSectionHelper(createdLine.getId(), newSection);
+        // then
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
@@ -192,6 +206,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.as(LineResponse.class)).isNotNull();
     }
 
+    private void assertCreateNewLineSuccess(LineRequest request, LineResponse response) {
+        assertThat(response).isNotNull();
+        assertThat(request.getColor()).isEqualTo(response.getColor());
+        assertThat(request.getName()).isEqualTo(response.getName());
+        assertThat(request.getDistance()).isEqualTo(response.getDistance());
+        assertThat(request.getDownStationId()).isEqualTo(response.getDownStationId());
+        assertThat(request.getUpStationId()).isEqualTo(response.getUpStationId());
+    }
+
     private void assertCreateDuplicatedLineFail(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
@@ -254,6 +277,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
+    private LineResponse registerLineHelper(final LineRequest request) {
+        return RestAssured.given().log().all().
+                    body(request).
+                    contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                    post("/lines").
+                then().log().all().
+                    extract().
+                    as(LineResponse.class);
+    }
+
     private  ExtractableResponse<Response> findLineHelper(final LineResponse InputLine) {
         return RestAssured.
                 given().
@@ -293,4 +327,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     log().all().
                     extract();
     }
+
+    private SectionResponse registerSectionHelper(final Long lineId, final SectionRequest newSection) {
+        return RestAssured.given().log().all().
+                    contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                    pathParam("lineId", lineId).
+                    post("/lines/{lineId}/sections").
+                then().
+                    log().all().
+                    extract().
+                    as(SectionResponse.class);
+    }
+
 }

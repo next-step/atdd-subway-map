@@ -37,9 +37,11 @@ public class LineRequest {
     public int getDistance() { return distance; }
 
     public Line toLine() {
-        Line line = new Line(name, color);
-        line.addSection(new Section(new Station(upStationId.toString()), new Station(downStationId.toString()), distance));
-        return line;
+        return new Line(name, color);
+    }
+
+    public Section toSection() {
+        return new Section(new Station(upStationId.toString()), new Station(downStationId.toString()), distance);
     }
 
 }

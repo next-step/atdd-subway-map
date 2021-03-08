@@ -3,6 +3,8 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,12 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable("lineId") Long lineId) {
         lineService.deleteLine(lineId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SectionResponse> createSection(@PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
+        SectionResponse section = lineService.saveSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineId +"/sections")).body(section);
     }
 
     @ExceptionHandler(DuplicateLineException.class)
