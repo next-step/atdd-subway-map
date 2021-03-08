@@ -35,7 +35,7 @@ public class LineService {
         if (lineRepository.existsByName(requestName)) {
             throw new AlreadyExistsEntityException(String.format(LINE_EXCEPTION, requestName));
         }
-        Section section = createSection(request.toSectionRequest());
+        Section section =  createSection(request.toSectionRequest());
 
         Line persistLine = lineRepository.save(Line.of(request, section));
         return LineResponse.of(persistLine);
@@ -51,7 +51,9 @@ public class LineService {
 
     public List<LineResponse> readLines() {
         List<Line> lines = lineRepository.findAll();
-        return lines.stream().map(LineResponse::of).collect(Collectors.toList());
+        return lines.stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
     }
 
     public LineResponse readLine(Long id) {
@@ -70,11 +72,13 @@ public class LineService {
     }
 
     private Line findLineById(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new NotFoundLineException(id));
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundLineException(id));
     }
 
     private Station findStationById(Long id) {
-        return stationRepository.findById(id).orElseThrow(NotFoundStationException::new);
+        return stationRepository.findById(id)
+                .orElseThrow(NotFoundStationException::new);
     }
 
     public Line addLineStation(Long lineId, SectionRequest sectionRequest) {

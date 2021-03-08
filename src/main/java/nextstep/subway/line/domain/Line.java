@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line extends BaseEntity {
@@ -108,9 +109,13 @@ public class Line extends BaseEntity {
         return getSections().get(getSections().size() - 1).getDownStation();
     }
 
-    private Boolean isExistsDownStation(Station station) {
+    private boolean isExistsDownStation(Station station) {
         return sections.stream()
-                .anyMatch(section -> section.getUpStation().equals(station) || section.getDownStation().equals(station));
+                .anyMatch(section -> isEqualDownAndUpStation(station, section));
+    }
+
+    private boolean isEqualDownAndUpStation(Station station, Section section) {
+        return Objects.equals(section.getUpStation(), station) || Objects.equals(section.getDownStation(), station);
     }
 
     public void deleteLastSection(Long stationId) {
@@ -121,8 +126,11 @@ public class Line extends BaseEntity {
 
     private void isValidDeleteSection(Long stationId) {
         Section lastSection = getLastSection();
+        boolean isEqualDownStationAndTarget = lastSection.getDownStation()
+                .getId()
+                .equals(stationId);
 
-        if (!lastSection.getDownStation().getId().equals(stationId)) {
+        if (!isEqualDownStationAndTarget) {
             throw new IllegalArgumentException(ONLY_DOWN_STATION_CAN_DELETED);
         }
 

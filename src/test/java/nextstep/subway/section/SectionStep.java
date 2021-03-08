@@ -24,16 +24,21 @@ public class SectionStep {
 
     public static void 기존_지하철_구간_하행역_신규_상행역_일치함(ExtractableResponse<Response> newCreatedSectionResponse, StationResponse ...stations) {
         List<String> lineStations = 지하철_노선_구간_추출됨(newCreatedSectionResponse);
-        List<String> stationNames = Stream.of(stations).map(StationResponse::getName).collect(Collectors.toList());
+        List<String> stationNames = Stream.of(stations)
+                .map(StationResponse::getName)
+                .collect(Collectors.toList());
+
         assertThat(lineStations).containsAll(stationNames);
     }
 
     public static List<String> 지하철_노선_구간_추출됨(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("stations.name", String.class);
+        return response.jsonPath()
+                .getList("stations.name", String.class);
     }
 
     private static String 서비스_호출_경로_생성(Long lineId, Long sectionId) {
         String path = String.format(DEFAULT_PATH, lineId);
+
         if (Objects.nonNull(sectionId)) {
             return path + "/" + sectionId;
         }

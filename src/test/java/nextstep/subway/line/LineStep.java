@@ -73,7 +73,8 @@ public class LineStep {
     }
 
     public static Long 지하철_노선_아이디_추출(ExtractableResponse<Response> response) {
-        return Long.parseLong(response.header("Location").split("/")[2]);
+        return Long.parseLong(response.header("Location")
+                .split("/")[2]);
     }
 
     public static void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
