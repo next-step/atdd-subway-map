@@ -34,10 +34,18 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
-        LineResponse line = LineResponse
-                .of(lineRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new));
+        final Line line = fineLineById(id);
 
-        return line;
+        return LineResponse.of(line);
+    }
+
+    public void updateLine(Long id, LineRequest request) {
+        final Line line = fineLineById(id);
+        line.update(request.toLine());
+    }
+
+    private Line fineLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
     }
 }
