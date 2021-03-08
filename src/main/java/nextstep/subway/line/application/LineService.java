@@ -31,4 +31,13 @@ public class LineService {
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public LineResponse getLine(Long id) {
+        LineResponse line = LineResponse
+                .of(lineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new));
+
+        return line;
+    }
 }
