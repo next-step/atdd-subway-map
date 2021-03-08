@@ -3,6 +3,8 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineRequest;
+import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +17,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
-        // given & when
-        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
+        // given
+        StationResponse 강남역 = new StationResponse();
+        StationResponse 광교역 = new StationResponse();
+        LineRequest 신분당선 = new LineRequest("신분당선", "bg-red-600", 강남역.getId(), 광교역.getId(), 13);
+
+        // when
+        ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(신분당선);
 
         // then
         지하철_노선_생성_됨(createLineResponse);
