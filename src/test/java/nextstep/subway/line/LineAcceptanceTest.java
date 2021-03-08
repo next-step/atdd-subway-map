@@ -47,7 +47,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        지하철_노선_목록_조회됨(response, 2);
+        지하철_노선_목록_조회됨(response);
         지하철_노선_목록_포함됨(response, Arrays.asList(createdResponse1, createdResponse2));
     }
 

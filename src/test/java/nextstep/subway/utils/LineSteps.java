@@ -48,10 +48,9 @@ public class LineSteps {
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
     }
 
-    public static void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, int inputCount) {
+    public static void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-        assertThat(response.jsonPath().getList(".", LineResponse.class)).hasSize(inputCount);
     };
 
     public static void 지하철_노선_목록_포함됨(ExtractableResponse<Response> readAllLinesResponse,
