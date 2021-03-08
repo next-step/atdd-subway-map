@@ -9,9 +9,12 @@ import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static nextstep.subway.line.LineRequestSteps.지하철_노선_생성_요청;
 import static nextstep.subway.line.LineSectionRequestSteps.지하철_노선에_지하철_역_등록_요청;
 import static nextstep.subway.line.LineSectionVerificationSteps.지하철_노선에_지하철_역_등록됨;
+import static nextstep.subway.line.LineSectionVerificationSteps.지하철_노선에_지하철_역_포함_됨;
 import static nextstep.subway.station.StationRequestSteps.지하철_역_등록_됨;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
@@ -33,5 +36,6 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선에_지하철_역_등록됨(response);
+        지하철_노선에_지하철_역_포함_됨(response, Arrays.asList(강남역, 판교역, 광교역));
     }
 }
