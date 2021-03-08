@@ -3,12 +3,12 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exceptions.ExistingLineException;
 import nextstep.subway.line.exceptions.NotFoundLineException;
-import nextstep.subway.section.application.SectionService;
-import nextstep.subway.section.exception.NotFoundSectionException;
-import nextstep.subway.section.exception.NotLastSectionException;
-import nextstep.subway.section.exception.OnlyOneSectionException;
+import nextstep.subway.line.exceptions.NotFoundSectionException;
+import nextstep.subway.line.exceptions.IsNotValidUpStationException;
+import nextstep.subway.line.exceptions.IsDownStationExistedException;
 import nextstep.subway.station.exception.NotFoundStationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +20,9 @@ import java.util.List;
 @RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
-    private final SectionService sectionService;
 
-    public LineController(
-        final LineService lineService,
-        final SectionService sectionService
-    ) {
+    public LineController(final LineService lineService) {
         this.lineService = lineService;
-        this.sectionService = sectionService;
     }
 
     @GetMapping
@@ -63,6 +58,18 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity addLineStation(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.addLineStation(id, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity removeLineStation(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.removeLineStation(id, stationId);
+        return ResponseEntity.ok().build();
+    }
+
 
 
 
@@ -87,13 +94,13 @@ public class LineController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(NotLastSectionException.class)
-    public ResponseEntity handleNotLastSectionException(NotLastSectionException e) {
+    @ExceptionHandler(IsNotValidUpStationException.class)
+    public ResponseEntity handleNotLastSectionException(IsNotValidUpStationException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(OnlyOneSectionException.class)
-    public ResponseEntity handleOnlyOneSectionException(OnlyOneSectionException e) {
+    @ExceptionHandler(IsDownStationExistedException.class)
+    public ResponseEntity handleOnlyOneSectionException(IsDownStationExistedException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
