@@ -63,14 +63,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> params1 = this.createStationInput("강남역");
-        ExtractableResponse<Response> createResponse1 = this.createStationHelper(params1);
+        Map<String, String> params1 = createStationInput("강남역");
+        ExtractableResponse<Response> createResponse1 = createStationHelper(params1);
 
-        Map<String, String> params2 = this.createStationInput("역삼역");
-        ExtractableResponse<Response> createResponse2 = this.createStationHelper(params2);
+        Map<String, String> params2 = createStationInput("역삼역");
+        ExtractableResponse<Response> createResponse2 = createStationHelper(params2);
 
         // when
-        ExtractableResponse<Response> response = this.getStationsHelper();
+        ExtractableResponse<Response> response = getStationsHelper();
 
         // then
         assertRetrieveStationStatusSuccess(response);
@@ -81,18 +81,18 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = this.createStationInput("강남역");
-        ExtractableResponse<Response> createResponse = this.createStationHelper(params);
+        Map<String, String> params = createStationInput("강남역");
+        ExtractableResponse<Response> createResponse = createStationHelper(params);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = this.deleteStationHelper(uri);
+        ExtractableResponse<Response> response = deleteStationHelper(uri);
 
         // then
         assertDeleteStationStatusSuccess(response);
     }
 
-    private Map<String, String> createStationInput(final String stationName) {
+    public static Map<String, String> createStationInput(final String stationName) {
         return new HashMap<String, String>() {
             {
                 put("name", stationName);
@@ -100,7 +100,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         };
     }
 
-    private ExtractableResponse<Response> createStationHelper(Map params) {
+    public static ExtractableResponse<Response> createStationHelper(Map params) {
         return RestAssured.given().log().all()
                     .body(params)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +110,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
                     .extract();
     }
 
-    private ExtractableResponse<Response> deleteStationHelper(final String uri) {
+    public static ExtractableResponse<Response> deleteStationHelper(final String uri) {
         return  RestAssured.given().log().all()
                 .when()
                     .delete(uri)
@@ -118,7 +118,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .   extract();
     }
 
-    private ExtractableResponse<Response> getStationsHelper(){
+    public static ExtractableResponse<Response> getStationsHelper(){
         return RestAssured.given().log().all()
                 .when()
                     .get("/stations")
