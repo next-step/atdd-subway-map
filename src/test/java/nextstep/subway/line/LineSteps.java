@@ -14,10 +14,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
-    
-    public static ExtractableResponse<Response> 지하철_노선_생성요청(String name, String color) {
-        LineRequest request = new LineRequest(name, color);
 
+    public static ExtractableResponse<Response> 지하철_노선_생성요청(LineRequest request) {
         return RestAssured
                 .given().log().all().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
