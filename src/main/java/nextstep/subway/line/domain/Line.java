@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.line.exception.AlreadyExistDownStationException;
+import nextstep.subway.line.exception.NotSameUpStationException;
 import nextstep.subway.station.domain.Station;
 
 @Entity
@@ -26,7 +28,7 @@ public class Line extends BaseEntity {
     private String color;
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    private final List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
@@ -52,24 +54,14 @@ public class Line extends BaseEntity {
     }
 
     public void addStations(final Station upStation, final Station downStation, int distance) {
-        final Station lastStation = getSections().get(sections.size() - 1).getDownStation();
-        if (!upStation.equals(lastStation)) {
-            throw new IllegalArgumentException("추가되는 상행역은 마지막 하행역과 같아야 합니다.");
-        }
+        final Station lastStation = findLastStation();
+        validateStation(upStation, downStation, lastStation);
         sections.add(Section.of(this, upStation, downStation, distance));
     }
 
     public List<Station> getStations() {
         return sections.stream()
-            .sorted((section1, section2) -> {
-                if (section1.getDownStation().equals(section2.getUpStation())) {
-                    return -1;
-                }
-                if (section1.getUpStation().equals(section2.getDownStation())) {
-                    return 1;
-                }
-                return 0;
-            })
+            .sorted()
             .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
             .distinct()
             .collect(Collectors.toList());
@@ -89,5 +81,18 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    private Station findLastStation() {
+        return getSections().get(sections.size() - 1).getDownStation();
+    }
+
+    private void validateStation(Station upStation, Station downStation, Station lastStation) {
+        if (!upStation.equals(lastStation)) {
+            throw new NotSameUpStationException(upStation.getName(), lastStation.getName());
+        }
+        if (getStations().contains(downStation)) {
+            throw new AlreadyExistDownStationException(downStation.getName());
+        }
     }
 }

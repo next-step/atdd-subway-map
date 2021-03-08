@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import nextstep.subway.line.exception.AlreadyExistDownStationException;
+import nextstep.subway.line.exception.NotSameUpStationException;
 import nextstep.subway.station.domain.Station;
 
 class LineTest {
@@ -33,5 +35,30 @@ class LineTest {
 
 		assertThat(stationNames)
 			.containsExactlyElementsOf(Arrays.asList("강남역", "양재역", "판교역"));
+
+		line.addStations(new Station("판교역"), new Station("정자역"), 4);
+
+		final List<String> addAfterStationNames = line.getStations().stream()
+			.map(Station::getName)
+			.collect(toList());
+
+		assertThat(addAfterStationNames)
+			.containsExactlyElementsOf(Arrays.asList("강남역", "양재역", "판교역", "정자역"));
+	}
+
+	@DisplayName("추가되는 상행역과 마지막 하행역이 같지 않으면 예외 발생")
+	@Test
+	void addStations_notSameUpStationException() {
+		assertThatThrownBy(
+			() -> line.addStations(new Station("판교역"), new Station("정자역"), 4))
+			.isInstanceOf(NotSameUpStationException.class);
+	}
+
+	@DisplayName("추가되는 하행역이 이미 존재하면 예외 발생")
+	@Test
+	void addStations_alreadyExistDownStationException() {
+		assertThatThrownBy(
+			() -> line.addStations(new Station("양재역"), new Station("강남역"), 4))
+			.isInstanceOf(AlreadyExistDownStationException.class);
 	}
 }

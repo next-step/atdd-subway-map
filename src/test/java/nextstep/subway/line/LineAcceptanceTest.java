@@ -243,7 +243,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(lineColors).containsExactlyElementsOf(resultColors);
     }
 
-    private <T, R> List<R> convertToList(List<T> lines, Function<T, R> function) {
+    public static <T, R> List<R> convertToList(List<T> lines, Function<T, R> function) {
         return lines.stream()
             .map(function)
             .collect(toList());
