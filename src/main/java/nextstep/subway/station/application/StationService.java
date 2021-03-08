@@ -4,6 +4,7 @@ import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
+import nextstep.subway.station.exception.StationAlreadyExistsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +21,18 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateReduplicationStation(stationRequest);
         Station persistStation = stationRepository.save(stationRequest.toStation());
         return StationResponse.of(persistStation);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateReduplicationStation(StationRequest request) {
+        List<Station> lines = stationRepository.findByNameContaining(request.getName());
+
+        if(lines.size() > 0) {
+            throw new StationAlreadyExistsException();
+        };
     }
 
     @Transactional(readOnly = true)

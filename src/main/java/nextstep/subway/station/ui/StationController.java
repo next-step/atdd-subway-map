@@ -3,7 +3,7 @@ package nextstep.subway.station.ui;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
-import org.springframework.dao.DataIntegrityViolationException;
+import nextstep.subway.station.exception.StationAlreadyExistsException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +36,8 @@ public class StationController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity handleIllegalArgsException(DataIntegrityViolationException e) {
+    @ExceptionHandler(StationAlreadyExistsException.class)
+    public ResponseEntity handleIllegalArgsException(StationAlreadyExistsException e) {
         return ResponseEntity.badRequest().build();
     }
 }
