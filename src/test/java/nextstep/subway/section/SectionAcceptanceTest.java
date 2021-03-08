@@ -8,7 +8,7 @@ import nextstep.subway.data.Stations;
 import nextstep.subway.exceptions.AlreadyExistsEntityException;
 import nextstep.subway.exceptions.NotEqualsStationException;
 import nextstep.subway.exceptions.OnlyOneSectionException;
-import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.Sections;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.StationStep;
@@ -17,10 +17,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.line.LineStep.*;
+import static nextstep.subway.line.LineStep.지하철_노선_생성_요청;
+import static nextstep.subway.line.LineStep.지하철_노선_조회_요청;
 import static nextstep.subway.section.SectionStep.*;
-import static nextstep.subway.section.SectionStep.지하철_노선_구간_등록;
-import static nextstep.subway.section.SectionStep.지하철_노선_구간_생성;
 
 @DisplayName("지하철 구간 기능 관련")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -129,7 +128,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         //then
         지하철_노선_구간_삭제_실패됨(deletedResponse);
-        응답_에러_메세지_확인(deletedResponse, Line.ONLY_DOWN_STATION_CAN_DELETED);
+        응답_에러_메세지_확인(deletedResponse, Sections.ONLY_DOWN_STATION_CAN_DELETED);
     }
 
     @DisplayName("지하철 노선의 구간이 1개인경우 삭제를 시도한다.")

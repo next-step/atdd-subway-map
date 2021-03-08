@@ -71,20 +71,9 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private Line findLineById(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundLineException(id));
-    }
-
-    private Station findStationById(Long id) {
-        return stationRepository.findById(id)
-                .orElseThrow(NotFoundStationException::new);
-    }
-
     public Line addLineStation(Long lineId, SectionRequest sectionRequest) {
         Line line = findLineById(lineId);
         Section section = createSection(sectionRequest);
-        line.isValidSection(section);
 
         line.addSection(section);
 
@@ -95,5 +84,15 @@ public class LineService {
     public void deleteLineStation(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
         line.deleteLastSection(stationId);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundLineException(id));
+    }
+
+    private Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(NotFoundStationException::new);
     }
 }
