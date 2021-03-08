@@ -32,10 +32,6 @@ public class Sections {
         return new Sections(line, Arrays.asList(sections));
     }
 
-    public List<Section> getSectionList() {
-        return sectionList;
-    }
-
     public void addSection(Line line, Section section) {
         boolean isPresent = sectionList.stream()
                 .anyMatch(section::equals);
