@@ -36,8 +36,8 @@ public class LineService {
             throw new AlreadyExistsEntityException(String.format(LINE_EXCEPTION, requestName));
         }
         Section section =  createSection(request.toSectionRequest());
+        Line persistLine = lineRepository.save(request.toLine(section));
 
-        Line persistLine = lineRepository.save(Line.of(request, section));
         return LineResponse.of(persistLine);
     }
 

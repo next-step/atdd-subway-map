@@ -42,10 +42,6 @@ public class Line extends BaseEntity {
         this.addSection(section);
     }
 
-    public static Line of(LineRequest request, Section section) {
-        return new Line(request.getName(), request.getColor(), section);
-    }
-
     public void update(Line line) {
         this.name = line.getName();
         this.color = line.getColor();
