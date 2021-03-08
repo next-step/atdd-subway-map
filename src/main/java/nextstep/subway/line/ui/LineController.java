@@ -1,15 +1,16 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
+import javax.xml.ws.Response;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/lines")
@@ -24,5 +25,27 @@ public class LineController {
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LineResponse>> findAllLines() {
+        List<LineResponse> lineResponseList = lineService.getLineList();
+        return ResponseEntity.ok(lineResponseList);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<LineResponse> findLine(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(lineService.getLine(id));
+    }
+
+    @PutMapping
+    public ResponseEntity<LineResponse> updateLine(@RequestBody Line line) {
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(lineService.updateLine(line));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteLine(@PathVariable("id") Long id) {
+        lineService.deleteLine(id);
+        return ResponseEntity.noContent().build();
     }
 }
