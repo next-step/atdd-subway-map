@@ -31,10 +31,10 @@ public class LineController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineResponse>> findAllLines() {
-        List<LineResponse> allLines = lineService.findAllLines();
+        List<LineResponse> allLineResponses = lineService.findAllLines();
         return ResponseEntity.ok()
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .body(allLines);
+                .body(allLineResponses);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
