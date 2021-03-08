@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineSteps.assertCreateLine;
 import static nextstep.subway.line.LineSteps.assertCreateLineFail;
+import static nextstep.subway.line.LineSteps.assertCreateSection;
 import static nextstep.subway.line.LineSteps.assertDeleteLine;
 import static nextstep.subway.line.LineSteps.assertGetLine;
 import static nextstep.subway.line.LineSteps.assertGetLines;
@@ -16,6 +17,7 @@ import static nextstep.subway.line.LineSteps.assertUpdateLine;
 import static nextstep.subway.line.LineSteps.requestCreateLine2;
 import static nextstep.subway.line.LineSteps.requestCreateLineDx;
 import static nextstep.subway.line.LineSteps.requestCreateLineDxAgain;
+import static nextstep.subway.line.LineSteps.requestCreateSection;
 import static nextstep.subway.line.LineSteps.requestDeleteLine;
 import static nextstep.subway.line.LineSteps.requestGetLine;
 import static nextstep.subway.line.LineSteps.requestGetLines;
@@ -100,6 +102,17 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertDeleteLine(response);
+    }
+
+
+    @Test
+    @DisplayName("지하철 구간을 생성한다.")
+    void createSection() {
+        // when
+        ExtractableResponse<Response> response = requestCreateSection();
+
+        // then
+        assertCreateSection(response);
     }
 
 }

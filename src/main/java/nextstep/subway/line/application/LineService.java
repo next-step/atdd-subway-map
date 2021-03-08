@@ -2,8 +2,12 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.Section;
+import nextstep.subway.line.domain.SectionRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,10 +21,12 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
     private final LineMapper lineMapper;
 
-    public LineService(LineRepository lineRepository, LineMapper lineMapper) {
+    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, LineMapper lineMapper) {
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
         this.lineMapper = lineMapper;
     }
 
@@ -56,5 +62,10 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
+        Section persistSection = sectionRepository.save(lineMapper.toSection(id, sectionRequest));
+        return SectionResponse.of(persistSection);
     }
 }

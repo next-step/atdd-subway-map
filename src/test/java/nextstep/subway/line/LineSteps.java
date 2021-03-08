@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineSteps {
 
     private static final String URI_LINES = "/lines";
+    private static final String URI_SECTIONS = "/sections";
     private static final String HEADER_LOCATION = "Location";
 
     public static ExtractableResponse<Response> requestCreateLineDx() {
@@ -124,6 +125,24 @@ public class LineSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> requestCreateSection() {
+        ExtractableResponse<Response> createLineResponse = requestCreateLineDx();
+        ExtractableResponse<Response> upStationResponse = requestCreateStationYeoksam();
+        ExtractableResponse<Response> downStationResponse = requestCreateStationSadang();
+
+        Map<String, Object> params = makeSectionParams(upStationResponse, downStationResponse);
+        String uri = createLineResponse.header(HEADER_LOCATION);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(uri + URI_SECTIONS)
+                .then().log().all()
+                .extract();
+    }
+
     public static void assertCreateLine(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header(HEADER_LOCATION)).isNotBlank();
@@ -160,6 +179,11 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static void assertCreateSection(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
     public static Map<String, Object> makeLineParams(String color, String name, Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("color", color);
@@ -167,6 +191,15 @@ public class LineSteps {
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
         params.put("distance", distance);
+        return params;
+    }
+
+    private static Map<String, Object> makeSectionParams(ExtractableResponse<Response> upStationResponse,
+                                                         ExtractableResponse<Response> downStationResponse) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationResponse.jsonPath().getLong("id"));
+        params.put("downStationId", downStationResponse.jsonPath().getLong("id"));
+        params.put("distance", 1000);
         return params;
     }
 }

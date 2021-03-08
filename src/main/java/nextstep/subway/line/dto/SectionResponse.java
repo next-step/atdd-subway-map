@@ -1,27 +1,25 @@
 package nextstep.subway.line.dto;
 
-import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.Section;
 
 import java.time.LocalDateTime;
 
-public class LineResponse {
+public class SectionResponse {
 
     private Long id;
-    private String name;
-    private String color;
+    private Long lineId;
     private Long upStationId;
     private Long downStationId;
     private int distance;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    private LineResponse() {
+    private SectionResponse() {
     }
 
-    private LineResponse(Long id, String name, String color, Long upStationId, Long downStationId, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private SectionResponse(Long id, Long lineId, Long upStationId, Long downStationId, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
-        this.name = name;
-        this.color = color;
+        this.lineId = lineId;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -29,16 +27,15 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    public static LineResponse of(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getUpStation().getId(),
-                line.getDownStation().getId(),
-                line.getDistance(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
+    public static SectionResponse of(Section section) {
+        return new SectionResponse(
+                section.getId(),
+                section.getLine().getId(),
+                section.getUpStation().getId(),
+                section.getDownStation().getId(),
+                section.getDistance(),
+                section.getCreatedDate(),
+                section.getModifiedDate()
         );
     }
 
@@ -46,12 +43,8 @@ public class LineResponse {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
+    public Long getLineId() {
+        return lineId;
     }
 
     public Long getUpStationId() {
