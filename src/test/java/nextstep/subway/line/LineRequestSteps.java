@@ -38,14 +38,14 @@ public class LineRequestSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String uri, String name, String color) {
         return RestAssured
                 .given().log().all()
                 .body(new LineRequest(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put("/lines/" + id)
+                .put(uri)
                 .then().log().all()
                 .extract();
     }

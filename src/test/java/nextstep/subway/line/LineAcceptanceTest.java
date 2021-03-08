@@ -47,7 +47,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_목록_조회_됨(readLinesResponse);
-        지하철_노선_목록_조회_결과에_2개_노선_포함_확인(readLinesResponse);
+        지하철_노선_목록_조회_결과에_생성된_노선_포함_확인(readLinesResponse);
     }
 
     @Test
@@ -71,8 +71,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // when
-        Long id = 수정할_지하철_노선_ID_가져오기(createResponse);
-        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, "구분당선", "bg-blue-600");
+        String uri = 생성된_지하철_노선_URI_경로_확인(createResponse);
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(uri, "구분당선", "bg-blue-600");
 
         // then
         지하철_노선_수정_됨(updateResponse);
@@ -82,7 +82,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("존재하지 않는 노선을 수정한다.")
     void updateNonExistLine() {
         // when
-        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(1L, "구분당선", "bg-blue-600");
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청("/lines/1", "구분당선", "bg-blue-600");
 
         // then
         지하철_노선_수정_실패_됨(updateResponse);

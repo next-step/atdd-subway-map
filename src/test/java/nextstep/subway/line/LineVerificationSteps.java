@@ -32,17 +32,13 @@ public class LineVerificationSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 지하철_노선_목록_조회_결과에_2개_노선_포함_확인(ExtractableResponse<Response> readLinesResponse) {
+    public static void 지하철_노선_목록_조회_결과에_생성된_노선_포함_확인(ExtractableResponse<Response> readLinesResponse) {
         List<LineResponse> lines = readLinesResponse.jsonPath().getList(".", LineResponse.class);
         assertThat(lines).hasSize(2);
     }
 
     public static void 지하철_노선_조회_됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    public static Long 수정할_지하철_노선_ID_가져오기(ExtractableResponse<Response> createResponse) {
-        return createResponse.as(LineResponse.class).getId();
     }
 
     public static void 지하철_노선_수정_됨(ExtractableResponse<Response> response) {
