@@ -163,7 +163,6 @@ public class SectionAcceptanceTest {
     }
 
 
-    // TODO: 지하철 노선에 등록된 구간을 통해 역 목록을 조회하는 기능 구현
     @DisplayName("지하철 노선 조회시 등록된 구간을 조회하는 테스트")
     @Test
     public void getLineWithSectionsTest() {

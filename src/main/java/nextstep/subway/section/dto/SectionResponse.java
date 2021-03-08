@@ -2,6 +2,7 @@ package nextstep.subway.section.dto;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.section.domain.Section;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
 
@@ -38,8 +39,16 @@ public class SectionResponse {
         );
     }
 
-    public static SectionResponse of(long id, LineResponse line, StationResponse upStation, StationResponse downStation, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
-        return new SectionResponse(id, line, upStation, downStation, distance, createdDate, modifiedDate);
+    public static SectionResponse of(Section section) {
+        return of(
+            section.getId(),
+            section.getLine(),
+            section.getUpStation(),
+            section.getDownStation(),
+            section.getDistance(),
+            section.getCreatedDate(),
+            section.getModifiedDate()
+        );
     }
 
     public long getId() {

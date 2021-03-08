@@ -4,6 +4,12 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exceptions.ExistingLineException;
+import nextstep.subway.line.exceptions.NotFoundLineException;
+import nextstep.subway.section.application.SectionService;
+import nextstep.subway.section.exception.NotFoundSectionException;
+import nextstep.subway.section.exception.NotLastSectionException;
+import nextstep.subway.section.exception.OnlyOneSectionException;
+import nextstep.subway.station.exception.NotFoundStationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +20,14 @@ import java.util.List;
 @RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(final LineService lineService) {
+    public LineController(
+        final LineService lineService,
+        final SectionService sectionService
+    ) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @GetMapping
@@ -52,13 +63,37 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+
+
+
+
     @ExceptionHandler(ExistingLineException.class)
-    public ResponseEntity handlerExistingLineException(ExistingLineException e) {
+    public ResponseEntity handleExistingLineException(ExistingLineException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity handlerNullPointException(NullPointerException e) {
-        return ResponseEntity.badRequest().body("존재하지 않는 Line에 대한 요청입니다.");
+    @ExceptionHandler(NotFoundLineException.class)
+    public ResponseEntity handleNotFoundLineException(NotFoundLineException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundStationException.class)
+    public ResponseEntity handleNotFoundStationException(NotFoundStationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundSectionException.class)
+    public ResponseEntity handleNotFoundSectionException(NotFoundSectionException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotLastSectionException.class)
+    public ResponseEntity handleNotLastSectionException(NotLastSectionException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(OnlyOneSectionException.class)
+    public ResponseEntity handleOnlyOneSectionException(OnlyOneSectionException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
