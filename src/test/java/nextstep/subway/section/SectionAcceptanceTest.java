@@ -11,9 +11,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.section.SectionSteps.*;
 import static nextstep.subway.station.StationSteps.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest {
@@ -27,23 +32,23 @@ public class SectionAcceptanceTest {
     @Test()
     public void createSectionTest() {
         // given
-        LineResponse lineResponse = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
-        StationResponse stationResponse1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
-        StationResponse stationResponse2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
+        LineResponse line = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
+        StationResponse station1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
+        StationResponse station2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
         SectionRequest sectionRequest = SectionRequest.of(
-            stationResponse1.getId(),
-            stationResponse2.getId(),
+            station1.getId(),
+            station2.getId(),
             3
         );
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_생성_요청(
             sectionRequest,
-            lineResponse.getId()
+            line.getId()
         );
 
         // then
-        지하철_구간_생성_됨(response, sectionRequest, lineResponse.getId());
+        지하철_구간_생성_됨(response, sectionRequest, line.getId());
     }
 
 
@@ -55,48 +60,37 @@ public class SectionAcceptanceTest {
 
         SectionResponse sectionResponse = response.as(SectionResponse.class);
 
-        Assertions.assertThat(response.statusCode())
-                  .isEqualTo(HttpStatus.CREATED.value());
-
-        Assertions.assertThat(sectionResponse.getLine().getId())
-                  .isEqualTo(expectedLineId);
-
-        Assertions.assertThat(sectionResponse.getUpStation().getId())
-                  .isEqualTo(expected.getUpStationId());
-
-        Assertions.assertThat(sectionResponse.getDownStation().getId())
-                  .isEqualTo(expected.getDownStationId());
-
-        Assertions.assertThat(sectionResponse.getDistance())
-                  .isEqualTo(expected.getDistance());
-
-        Assertions.assertThat(sectionResponse.getDistance())
-                  .isEqualTo(expected.getDistance());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(sectionResponse.getLine().getId()).isEqualTo(expectedLineId);
+        assertThat(sectionResponse.getUpStation().getId()).isEqualTo(expected.getUpStationId());
+        assertThat(sectionResponse.getDownStation().getId()).isEqualTo(expected.getDownStationId());
+        assertThat(sectionResponse.getDistance()).isEqualTo(expected.getDistance());
+        assertThat(sectionResponse.getDistance()).isEqualTo(expected.getDistance());
     }
 
     @DisplayName("지하철 노선에서 구간을 제거하는 테스트: 정상 삭제 테스트")
     @Test
     public void removeSectionTest() {
         // given
-        LineResponse lineResponse = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
-        StationResponse stationResponse1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
-        StationResponse stationResponse2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
-        StationResponse stationResponse3 = 지하철역_생성_요청(복정역).as(StationResponse.class);
+        LineResponse line = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
+        StationResponse station1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
+        StationResponse station2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
+        StationResponse station3 = 지하철역_생성_요청(복정역).as(StationResponse.class);
 
         지하철_구간_생성_요청(
-            SectionRequest.of(stationResponse1.getId(), stationResponse2.getId(), 3),
-            lineResponse.getId()
+            SectionRequest.of(station1.getId(), station2.getId(), 3),
+            line.getId()
         ).as(SectionResponse.class);
 
         지하철_구간_생성_요청(
-            SectionRequest.of(stationResponse2.getId(), stationResponse3.getId(), 4),
-            lineResponse.getId()
+            SectionRequest.of(station2.getId(), station3.getId(), 4),
+            line.getId()
         ).as(SectionResponse.class);
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_제거_요청(
-            lineResponse.getId(),
-            stationResponse3.getId()
+            line.getId(),
+            station3.getId()
         );
 
         // then
@@ -104,27 +98,26 @@ public class SectionAcceptanceTest {
     }
 
     private void 지하철_구간_제거_됨(ExtractableResponse<Response> response) {
-        Assertions.assertThat(response.statusCode())
-            .isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("지하철 노선에서 구간을 제거하는 테스트: 구간이 1개인 경우 역을 삭제할 수 없다.")
     @Test
     public void removeSectionFailTest_01() {
         // given
-        LineResponse lineResponse = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
-        StationResponse stationResponse1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
-        StationResponse stationResponse2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
+        LineResponse line = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
+        StationResponse station1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
+        StationResponse station2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
 
         지하철_구간_생성_요청(
-            SectionRequest.of(stationResponse1.getId(), stationResponse2.getId(), 3),
-            lineResponse.getId()
+            SectionRequest.of(station1.getId(), station2.getId(), 3),
+            line.getId()
         ).as(SectionResponse.class);
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_제거_요청(
-            lineResponse.getId(),
-            stationResponse2.getId()
+            line.getId(),
+            station2.getId()
         );
 
         // then
@@ -135,29 +128,29 @@ public class SectionAcceptanceTest {
     @Test
     public void removeSectionFailTest_02() {
         // given
-        LineResponse lineResponse = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
-        StationResponse stationResponse1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
-        StationResponse stationResponse2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
-        StationResponse stationResponse3 = 지하철역_생성_요청(복정역).as(StationResponse.class);
+        LineResponse line = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
+        StationResponse station1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
+        StationResponse station2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
+        StationResponse station3 = 지하철역_생성_요청(복정역).as(StationResponse.class);
 
         지하철_구간_생성_요청(
-            SectionRequest.of(stationResponse1.getId(), stationResponse2.getId(), 3),
-            lineResponse.getId()
+            SectionRequest.of(station1.getId(), station2.getId(), 3),
+            line.getId()
         ).as(SectionResponse.class);
 
         지하철_구간_생성_요청(
-            SectionRequest.of(stationResponse2.getId(), stationResponse3.getId(), 4),
-            lineResponse.getId()
+            SectionRequest.of(station2.getId(), station3.getId(), 4),
+            line.getId()
         ).as(SectionResponse.class);
 
         // when
         ExtractableResponse<Response> response1 = 지하철_구간_제거_요청(
-            lineResponse.getId(),
-            stationResponse1.getId()
+            line.getId(),
+            station1.getId()
         );
         ExtractableResponse<Response> response2 = 지하철_구간_제거_요청(
-            lineResponse.getId(),
-            stationResponse2.getId()
+            line.getId(),
+            station2.getId()
         );
 
         // then
@@ -166,12 +159,61 @@ public class SectionAcceptanceTest {
     }
 
     private void 지하철_구간_제거_실패_됨(ExtractableResponse<Response> response) {
-        Assertions.assertThat(response.statusCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 
     // TODO: 지하철 노선에 등록된 구간을 통해 역 목록을 조회하는 기능 구현
+    @DisplayName("지하철 노선 조회시 등록된 구간을 조회하는 테스트")
+    @Test
+    public void getLineWithSectionsTest() {
 
+        // given
+        LineResponse line = 지하철_노선_생성_요청(분당선, "yello").as(LineResponse.class);
+        StationResponse station1 = 지하철역_생성_요청(태평역).as(StationResponse.class);
+        StationResponse station2 = 지하철역_생성_요청(가천대역).as(StationResponse.class);
+        StationResponse station3 = 지하철역_생성_요청(복정역).as(StationResponse.class);
+
+        지하철_구간_생성_요청(
+            SectionRequest.of(station1.getId(), station2.getId(), 3),
+            line.getId()
+        ).as(SectionResponse.class);
+
+        지하철_구간_생성_요청(
+            SectionRequest.of(station2.getId(), station3.getId(), 4),
+            line.getId()
+        ).as(SectionResponse.class);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(line.getId());
+
+        // then
+        지하철_노선_조회_됨(response);
+        지하철_노선에_구간_포함_됨(response, Arrays.asList(
+            station1, station2, station3
+        ));
+    }
+
+    private void 지하철_노선_조회_됨(ExtractableResponse<Response> response) {
+        Assertions.assertThat(response.statusCode())
+                  .isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void 지하철_노선에_구간_포함_됨(
+        ExtractableResponse<Response> response,
+        List<StationResponse> expected
+    ) {
+        List<Long> resultStationIds = response.as(LineResponse.class)
+                                              .getStations()
+                                              .stream()
+                                              .map(StationResponse::getId)
+                                              .collect(Collectors.toList());
+
+        List<Long> expectedStationIds = expected.stream()
+                                                .map(StationResponse::getId)
+                                                .collect(Collectors.toList());
+
+        assertThat(resultStationIds).containsAll(expectedStationIds);
+    }
 
 }
