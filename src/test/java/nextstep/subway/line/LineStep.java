@@ -2,15 +2,13 @@ package nextstep.subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.utils.Extractor;
 import org.assertj.core.api.ListAssert;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,8 +22,8 @@ public class LineStep {
     }
 
     public static List<Long> 지하철_노선_객체_리스트_반환(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList(".", Line.class).stream()
-                .map(Line::getId)
+        return  response.jsonPath().getList(".", LineResponse.class).stream()
+                .map(LineResponse::getId)
                 .collect(Collectors.toList());
     }
 
@@ -46,10 +44,10 @@ public class LineStep {
     }
 
     public static void 지하철_노선_수정_확인(ExtractableResponse<Response> response, HashMap<String, String> params) {
-        Line line = response.jsonPath().getObject(".", Line.class);
+        LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
 
-        assertThat(line.getName()).isEqualTo(params.get("name"));
-        assertThat(line.getColor()).isEqualTo(params.get("color"));
+        assertThat(lineResponse.getName()).isEqualTo(params.get("name"));
+        assertThat(lineResponse.getColor()).isEqualTo(params.get("color"));
     }
 
     public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
@@ -64,7 +62,7 @@ public class LineStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_등록(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
         return Extractor.post(서비스_호출_경로_생성(null), params);
     }
 
@@ -75,13 +73,19 @@ public class LineStep {
     }
 
     public static Long 지하철_노선_아이디_추출(ExtractableResponse<Response> response) {
-        return Long.parseLong(response.header("Location").split("/")[2]);
+        return Long.parseLong(response.header("Location")
+                .split("/")[2]);
     }
 
     public static void 지하철_노선_생성_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    public static List<Long> 지하철_노선_아이디_추출(StationResponse ...stations) {
+        return Arrays.stream(stations)
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+    }
 
     public static String 서비스_호출_경로_생성(Long createdId) {
         String path = "/lines";
