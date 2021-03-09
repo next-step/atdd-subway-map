@@ -19,7 +19,7 @@ public class StationTestUtils extends BaseTestUtils{
     private StationTestUtils() {}
 
     private static final String PARAM_NAME = "name";
-    private static final String BASE_URL = "/lines";
+    private static final String BASE_URL = "/stations";
 
     public static Map<String, String> 역_파라미터_설정(String name) {
         Map<String, String> params = new HashMap<>();
@@ -32,7 +32,7 @@ public class StationTestUtils extends BaseTestUtils{
                 .body(강남역)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/stations")
+                .post(BASE_URL)
                 .then().log().all()
                 .extract();
     }
@@ -40,7 +40,7 @@ public class StationTestUtils extends BaseTestUtils{
     public static ExtractableResponse<Response> 역_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when()
-                .get("/stations")
+                .get(BASE_URL)
                 .then().log().all()
                 .extract();
     }

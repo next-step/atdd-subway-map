@@ -19,10 +19,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private static final String LINE_TWO_COLOR = "bg-green-600";
     private static final String LINE_BUNDANG_NAME = "구분당선";
     private static final String LINE_BUNDANG_COLOR = "bg-blue-600";
-    private static final String HTTP_HEADER_LOCATION = "Location";
-    private static final String PARAM_NAME = "name";
-    private static final String PARAM_COLOR = "color";
-    private static final String BASE_URL = "/lines";
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test

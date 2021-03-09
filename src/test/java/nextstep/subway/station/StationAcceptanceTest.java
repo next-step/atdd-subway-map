@@ -30,8 +30,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         응답_헤더_로케이션_값_있음(역생성응답);
     }
 
-
-
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
     @Test
     void createStationWithDuplicateName() {
@@ -78,6 +76,4 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         응답_상태코드_확인(역삭제응답, HttpStatus.NO_CONTENT);
     }
-
-
 }
