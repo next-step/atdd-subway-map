@@ -1,89 +1,94 @@
 package nextstep.subway.line;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.section.dto.SectionRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.line.LineAcceptanceTest.ë…¸ì„ _2í˜¸ì„ ;
 import static nextstep.subway.line.LineSteps.*;
-import static nextstep.subway.line.LineSteps.ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_½ÇÆĞ;
+import static nextstep.subway.line.LineSteps.ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ì‹¤íŒ¨;
+import static nextstep.subway.station.StationAcceptanceTest.ê°•ë‚¨ì—­;
+import static nextstep.subway.station.StationAcceptanceTest.ì—­ì‚¼ì—­;
+import static nextstep.subway.station.StationSteps.ì§€í•˜ì² _ì—­_ìƒì„±_ìš”ì²­;
 
-@DisplayName("ÁöÇÏÃ¶ ±¸°£ °ü·Ã ±â´É")
+@DisplayName("ì§€í•˜ì²  êµ¬ê°„ ê´€ë ¨ ê¸°ëŠ¥")
 public class LineSectionAcceptanceTest extends AcceptanceTest {
 
-    @DisplayName("ÁöÇÏÃ¶ ³ë¼±¿¡ ±¸°£À» µî·ÏÇÑ´Ù.")
+    @DisplayName("ì§€í•˜ì²  ë…¸ì„ ì— êµ¬ê°„ì„ ë“±ë¡í•œë‹¤.")
     @Test
     void addSectionToLine() {
         // given
-        ÁöÇÏÃ¶_³ë¼±_»ı¼º_¿äÃ»(³ë¼±_2È£¼±());
+        ExtractableResponse<Response> lineResponse = ì§€í•˜ì² _ë…¸ì„ _ìƒì„±_ìš”ì²­(ë…¸ì„ _2í˜¸ì„ ());
+        Long lineId = parseIdFromResponseHeader(lineResponse);
+        ExtractableResponse<Response> stationResponse1 = ì§€í•˜ì² _ì—­_ìƒì„±_ìš”ì²­(ê°•ë‚¨ì—­());
+        Long station1Id = parseIdFromResponseHeader(stationResponse1);
+        ExtractableResponse<Response> stationResponse2 = ì§€í•˜ì² _ì—­_ìƒì„±_ìš”ì²­(ì—­ì‚¼ì—­());
+        Long station2Id = parseIdFromResponseHeader(stationResponse2);
+
         // when
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¿äÃ»();
+        ExtractableResponse<Response> addSectionResponse = ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ìš”ì²­(lineId, new SectionRequest(station1Id, station2Id, 7));
         // then
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¼º°ø();
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ì„±ê³µ(addSectionResponse);
     }
 
-    @DisplayName("ÁöÇÏÃ¶ ³ë¼±¿¡ ±¸°£ µî·Ï¿¡ ½ÇÆĞÇÑ´Ù.")
+    @DisplayName("ì§€í•˜ì²  ë…¸ì„ ì— êµ¬ê°„ ë“±ë¡ì— ì‹¤íŒ¨í•œë‹¤.")
     @Test
     void failToAddSectionToLine() {
         // given
-        ÁöÇÏÃ¶_³ë¼±_»ı¼º_¿äÃ»(³ë¼±_2È£¼±());
+        ì§€í•˜ì² _ë…¸ì„ _ìƒì„±_ìš”ì²­(ë…¸ì„ _2í˜¸ì„ ());
         // when
-//        »õ·Î¿î ±¸°£ÀÇ »óÇà¿ªÀº ÇöÀç µî·ÏµÇ¾îÀÖ´Â ÇÏÇà Á¾Á¡¿ªÀÌ¾î¾ß ÇÑ´Ù.
-//        »õ·Î¿î ±¸°£ÀÇ ÇÏÇà¿ªÀº ÇöÀç µî·ÏµÇ¾îÀÖ´Â ¿ªÀÏ ¼ö ¾ø´Ù.
-//        Á¶°Ç¿¡ ºÎÇÕÇÏÁö ¾Ê´Â ±¸°£ µî·Ï.
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¿äÃ»();
+//        ìƒˆë¡œìš´ êµ¬ê°„ì˜ ìƒí–‰ì—­ì€ í˜„ì¬ ë“±ë¡ë˜ì–´ìˆëŠ” í•˜í–‰ ì¢…ì ì—­ì´ì–´ì•¼ í•œë‹¤.
+//        ìƒˆë¡œìš´ êµ¬ê°„ì˜ í•˜í–‰ì—­ì€ í˜„ì¬ ë“±ë¡ë˜ì–´ìˆëŠ” ì—­ì¼ ìˆ˜ ì—†ë‹¤.
+//        ì¡°ê±´ì— ë¶€í•©í•˜ì§€ ì•ŠëŠ” êµ¬ê°„ ë“±ë¡.
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ìš”ì²­();
         // then
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_½ÇÆĞ();
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ì‹¤íŒ¨();
     }
 
-    @DisplayName("ÁöÇÏÃ¶ ³ë¼±¿¡¼­ ±¸°£À» Á¦°ÅÇÑ´Ù.")
+    @DisplayName("ì§€í•˜ì²  ë…¸ì„ ì—ì„œ êµ¬ê°„ì„ ì œê±°í•œë‹¤.")
     @Test
     void deleteSectionFromLine() {
         // given
-        ÁöÇÏÃ¶_³ë¼±_»ı¼º_¿äÃ»(³ë¼±_2È£¼±());
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¿äÃ»();
+        ì§€í•˜ì² _ë…¸ì„ _ìƒì„±_ìš”ì²­(ë…¸ì„ _2í˜¸ì„ ());
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ìš”ì²­();
         // when
-        ÁöÇÏÃ¶_±¸°£_»èÁ¦();
+        ì§€í•˜ì² _êµ¬ê°„_ì‚­ì œ();
         // then
-        ÁöÇÏÃ¶_±¸°£_»èÁ¦_¼º°ø();
+        ì§€í•˜ì² _êµ¬ê°„_ì‚­ì œ_ì„±ê³µ();
     }
 
-    @DisplayName("ÁöÇÏÃ¶ ³ë¼±¿¡¼­ ±¸°£ Á¦°Å¿¡ ½ÇÆĞÇÑ.")
+    @DisplayName("ì§€í•˜ì²  ë…¸ì„ ì—ì„œ êµ¬ê°„ ì œê±°ì— ì‹¤íŒ¨í•œ.")
     @Test
     void failToDeleteSectionFromLine() {
         // given
-        ÁöÇÏÃ¶_³ë¼±_»ı¼º_¿äÃ»(³ë¼±_2È£¼±());
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¿äÃ»();
+        ì§€í•˜ì² _ë…¸ì„ _ìƒì„±_ìš”ì²­(ë…¸ì„ _2í˜¸ì„ ());
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ìš”ì²­();
         // when
-//        ÁöÇÏÃ¶ ³ë¼±¿¡ µî·ÏµÈ ¸¶Áö¸· ¿ª(ÇÏÇà Á¾Á¡¿ª)¸¸ Á¦°ÅÇÒ ¼ö ÀÖ´Ù.
-//        ÁöÇÏÃ¶ ³ë¼±¿¡ »óÇà Á¾Á¡¿ª°ú ÇÏÇà Á¾Á¡¿ª¸¸ ÀÖ´Â °æ¿ì(±¸°£ÀÌ 1°³ÀÎ °æ¿ì) ¿ªÀ» »èÁ¦ÇÒ ¼ö ¾ø´Ù.
-//          Á¶°Ç¿¡ ºÎÇÕÇÏÁö ¾Ê´Â °æ¿ì
-        ÁöÇÏÃ¶_±¸°£_»èÁ¦();
+//        ì§€í•˜ì²  ë…¸ì„ ì— ë“±ë¡ëœ ë§ˆì§€ë§‰ ì—­(í•˜í–‰ ì¢…ì ì—­)ë§Œ ì œê±°í•  ìˆ˜ ìˆë‹¤.
+//        ì§€í•˜ì²  ë…¸ì„ ì— ìƒí–‰ ì¢…ì ì—­ê³¼ í•˜í–‰ ì¢…ì ì—­ë§Œ ìˆëŠ” ê²½ìš°(êµ¬ê°„ì´ 1ê°œì¸ ê²½ìš°) ì—­ì„ ì‚­ì œí•  ìˆ˜ ì—†ë‹¤.
+//          ì¡°ê±´ì— ë¶€í•©í•˜ì§€ ì•ŠëŠ” ê²½ìš°
+        ì§€í•˜ì² _êµ¬ê°„_ì‚­ì œ();
         // then
-        ÁöÇÏÃ¶_±¸°£_»èÁ¦_½ÇÆĞ();
+        ì§€í•˜ì² _êµ¬ê°„_ì‚­ì œ_ì‹¤íŒ¨();
     }
 
-    @DisplayName("µî·ÏµÈ ±¸°£À» ÅëÇØ ¿ª ¸ñ·Ï Á¶È¸")
+    @DisplayName("ë“±ë¡ëœ êµ¬ê°„ì„ í†µí•´ ì—­ ëª©ë¡ ì¡°íšŒ")
     @Test
     void getLineStationOrderBySection() {
         // given
-        ÁöÇÏÃ¶_³ë¼±_»ı¼º_¿äÃ»(³ë¼±_2È£¼±());
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¿äÃ»();
-        ÁöÇÏÃ¶_³ë¼±¿¡_±¸°£_µî·Ï_¿äÃ»();
+        ì§€í•˜ì² _ë…¸ì„ _ìƒì„±_ìš”ì²­(ë…¸ì„ _2í˜¸ì„ ());
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ìš”ì²­();
+        ì§€í•˜ì² _ë…¸ì„ ì—_êµ¬ê°„_ë“±ë¡_ìš”ì²­();
         // when
-        ÁöÇÏÃ¶_³ë¼±_¸ñ·Ï_Á¶È¸();
+        ì§€í•˜ì² _ë…¸ì„ _ëª©ë¡_ì¡°íšŒ();
         // then
-        // ±¸°£ ¼ø¼­´ë·Î Á¤·ÄµÇ¾ú´Â°¡??
-    }
-
-
-    private Map<String, String> ³ë¼±_2È£¼±() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2È£¼±");
-        params.put("color", "bg-green-600");
-        return params;
+        // êµ¬ê°„ ìˆœì„œëŒ€ë¡œ ì •ë ¬ë˜ì—ˆëŠ”ê°€??
     }
 
 }

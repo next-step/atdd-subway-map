@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.section.dto.SectionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -97,9 +98,19 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static void 지하철_노선에_구간_등록_요청() {}
+    public static  ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(Long id, SectionRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + id + "/sections")
+                .then().log().all()
+                .extract();
+    }
 
-    public static void 지하철_노선에_구간_등록_성공() {}
+    public static void 지하철_노선에_구간_등록_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
 
     public static void 지하철_노선에_구간_등록_실패() {}
 

@@ -24,13 +24,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철_역_생성_성공(response);
     }
 
-    private Map<String, String> 강남역() {
+    public static Map<String, String> 강남역() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
         return params;
     }
 
-    private Map<String, String> 역삼역() {
+    public static Map<String, String> 역삼역() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "역삼역");
         return params;

@@ -1,8 +1,10 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.section.dto.SectionRequest;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 public class LineController {
@@ -27,13 +30,16 @@ public class LineController {
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+    public ResponseEntity<List<LineResponse>> getAllLines() {
+        return ResponseEntity.ok().body(lineService.findAllLines()
+                                                   .stream()
+                                                   .map(LineResponse::of)
+                                                   .collect(Collectors.toList()));
     }
 
     @GetMapping(value = "/lines/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> showLinesById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+    public ResponseEntity<LineResponse> getLineById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(LineResponse.of(lineService.findLineById(id)));
     }
 
     @PutMapping(value = "/lines/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -48,10 +54,11 @@ public class LineController {
        return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping(value = "/lines/{id}/sections")
-//    public ResponseEntity addSectionToLine(@PathVariable Long id, @RequestBody ) {
-//
-//    }
+    @PostMapping(value = "/lines/{id}/sections")
+    public ResponseEntity addSectionToLine(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.addSectionToLine(id, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity handleNoSuchElementException() {

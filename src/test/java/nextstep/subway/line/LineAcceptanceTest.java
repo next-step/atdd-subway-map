@@ -95,14 +95,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_제거_성공(deleteResponse);
     }
 
-    private Map<String, String> 노선_2호선() {
+    public static Map<String, String> 노선_2호선() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "2호선");
         params.put("color", "bg-green-600");
         return params;
     }
 
-    private Map<String, String> 노선_1호선() {
+    public static Map<String, String> 노선_1호선() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "1호선");
         params.put("color", "bg-blue-600");
