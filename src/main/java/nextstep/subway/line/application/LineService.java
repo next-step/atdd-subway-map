@@ -90,6 +90,7 @@ public class LineService {
         Line line = lineRepository.findById(lineId)
             .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
 
+        if(line.getSections().size() == 0) throw new InvalidSectionException("삭제할 구간이 없습니다.");
         if(line.getSections().size() == 1) throw new InvalidSectionException("구간이 1개남은경우 삭제할 수 없습니다.");
 
         boolean isLastStation = line.getSections().get(line.getSections().size() - 1)

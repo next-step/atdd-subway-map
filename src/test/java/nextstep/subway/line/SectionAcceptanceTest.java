@@ -42,6 +42,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
+  private void 노선_구간_삭제실패됨(ExtractableResponse<Response> response) {
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
   private ExtractableResponse<Response> 구간등록요청(long upStationId, long downStationId,int distance){
 
     Map params = new HashMap<>();
@@ -137,6 +141,44 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     //then 노선의 구간 삭제됨
     노선_구간_삭제됨(removeResponse);
   }
+
+  @DisplayName("노선의 종점이 아닌 구간을 삭제한다")
+  @Test
+  void deleteWithNoLastSection(){
+
+    //given 지하철 노선 생성됨
+    지하철_노선_생성됨();
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(광교역,광교중앙역,30);
+    long 상현역 =  지하철역_생성_요청("상현역").body().jsonPath().getLong("id");
+    long 성복역 =  지하철역_생성_요청("성복역").body().jsonPath().getLong("id");
+    구간등록요청(광교중앙역,상현역,30);
+    구간등록요청(상현역,성복역,30);
+
+    //when 노선의 구간 삭제요청함
+    ExtractableResponse<Response> removeResponse =  구간삭제요청(상현역);
+
+
+    //then 노선의 구간 삭제됨
+    노선_구간_삭제실패됨(removeResponse);
+  }
+
+  @DisplayName("1개남은 노선의 구간을 삭제한다")
+  @Test
+  void deleteWithLastSection(){
+
+    //given 지하철 노선 생성됨
+    지하철_노선_생성됨();
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(광교역,광교중앙역,30);
+
+
+    //when 노선의 구간 삭제요청함
+    ExtractableResponse<Response> removeResponse =  구간삭제요청(광교중앙역);
+
+
+    //then 노선의 구간 삭제됨
+    노선_구간_삭제실패됨(removeResponse);
+  }
+
 
 
 }
