@@ -7,6 +7,7 @@ import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
 import nextstep.subway.line.exception.NoSuchStationException;
+import nextstep.subway.line.exception.NoSuchLineException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,13 +33,13 @@ public class LineController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        List<LineResponse> lines = lineService.getAllLines();
+        List<LineResponse> lines = lineService.getLines();
         return ResponseEntity.ok().body(lines);
     }
 
     @GetMapping(value = "/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> getLine(@PathVariable("lineId") Long lineId) {
-        LineResponse line = lineService.getLineById(lineId);
+        LineResponse line = lineService.getLine(lineId);
         return ResponseEntity.ok().body(line);
     }
 
@@ -69,6 +70,13 @@ public class LineController {
 
     @ExceptionHandler(NoSuchStationException.class)
     public ResponseEntity handleNoSuchStationException(NoSuchStationException e) {
+        HashMap<String, String> resultBody = new HashMap();
+        resultBody.put("message", e.getMessage());
+        return ResponseEntity.badRequest().body(resultBody);
+    }
+
+    @ExceptionHandler(NoSuchLineException.class)
+    public ResponseEntity handleNoSuchLineException(NoSuchLineException e) {
         HashMap<String, String> resultBody = new HashMap();
         resultBody.put("message", e.getMessage());
         return ResponseEntity.badRequest().body(resultBody);

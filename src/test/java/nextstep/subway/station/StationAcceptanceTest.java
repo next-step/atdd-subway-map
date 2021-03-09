@@ -36,113 +36,71 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = createStationInputHelper("강남역");
 
         // when
-        ExtractableResponse<Response> response = this.createStationHelper(params);
+        ExtractableResponse<Response> response = createStationHelper(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertCreateStationSuccess(response);
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
     @Test
     void createStationWithDuplicateName() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        RestAssured.given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all()
-                    .extract();
+        Map<String, String> params = createStationInputHelper("강남역");
+        createStationHelper(params).as(StationResponse.class);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all()
-                    .extract();
+        ExtractableResponse<Response> response = createStationHelper(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertDuplicateStationStatusFail(response);
     }
 
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
         /// given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "강남역");
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                    .body(params1)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all()
-                    .extract();
+        Map<String, String> params1 = createStationInputHelper("강남역");
+        ExtractableResponse<Response> createResponse1 = createStationHelper(params1);
 
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "역삼역");
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                    .body(params2)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all()
-                    .extract();
+        Map<String, String> params2 = createStationInputHelper("역삼역");
+        ExtractableResponse<Response> createResponse2 = createStationHelper(params2);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                    .get("/stations")
-                .then().log().all()
-                    .extract();
+        ExtractableResponse<Response> response = getStationsHelper();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedLineIds = Arrays.asList(createResponse1, createResponse2).stream()
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath().getList(".", StationResponse.class).stream()
-                .map(it -> it.getId())
-                .collect(Collectors.toList());
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+        assertRetrieveStationStatusSuccess(response);
+        assertRetrieveStationDetailSuccess(response, createResponse1, createResponse2);
     }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given
-        Map< String, String > params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse< Response > createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> params = createStationInputHelper("강남역");
+        ExtractableResponse<Response> createResponse = createStationHelper(params);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse< Response > response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = deleteStationHelper(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertDeleteStationStatusSuccess(response);
     }
 
-    private ExtractableResponse<Response>  createStationHelper(Map params) {
+    public static Map<String, String> createStationInputHelper(final String stationName) {
+        return new HashMap<String, String>() {
+            {
+                put("name", stationName);
+            }
+        };
+    }
+
+    public static ExtractableResponse<Response> createStationHelper(Map params) {
         return RestAssured.given().log().all()
                     .body(params)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -150,5 +108,50 @@ public class StationAcceptanceTest extends AcceptanceTest {
                     .post("/stations")
                 .then().log().all()
                     .extract();
+    }
+
+    public static ExtractableResponse<Response> deleteStationHelper(final String uri) {
+        return  RestAssured.given().log().all()
+                .when()
+                    .delete(uri)
+                .then().log().all()
+                .   extract();
+    }
+
+    public static ExtractableResponse<Response> getStationsHelper(){
+        return RestAssured.given().log().all()
+                .when()
+                    .get("/stations")
+                .then().log().all()
+                    .extract();
+    }
+
+    private void assertCreateStationSuccess(ExtractableResponse<Response> response){
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void assertDuplicateStationStatusFail(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void assertRetrieveStationStatusSuccess(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void assertDeleteStationStatusSuccess(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void assertRetrieveStationDetailSuccess(
+            ExtractableResponse<Response> resultResponse,
+            ExtractableResponse<Response>... args) {
+        List<Long> expectedLineIds = Arrays.asList(args).stream()
+                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+                .collect(Collectors.toList());
+        List<Long> resultLineIds = resultResponse.jsonPath().getList(".", StationResponse.class).stream()
+                .map(it -> it.getId())
+                .collect(Collectors.toList());
+        assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 }

@@ -20,4 +20,16 @@ public class SectionRequest {
     public Section toSection(){
         return new Section(new Station(this.upStationId.toString()), new Station(this.downStationId.toString()), this.distance);
     }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
 }

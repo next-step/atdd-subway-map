@@ -15,10 +15,8 @@ import nextstep.subway.station.domain.StationRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.tools.tree.GreaterOrEqualExpression;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,15 +50,17 @@ public class LineService {
         }
     }
 
-    public List<LineResponse> getAllLines() {
+    @Transactional(readOnly = true)
+    public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(line -> LineResponse.of(line)).collect(Collectors.toList());
     }
 
-    public LineResponse getLineById(final Long lineId) {
+    @Transactional(readOnly = true)
+    public LineResponse getLine(final Long lineId) {
         Optional<Line> line = lineRepository.findById(lineId);
         return line.map(LineResponse::of)
-                .orElseThrow(() -> new IllegalArgumentException("Not found lineId"+lineId));
+                .orElseThrow(() -> new NoSuchLineException("Not found lineId"+lineId));
     }
 
     public void updateLine(final Long lineId, LineRequest lineRequest) {

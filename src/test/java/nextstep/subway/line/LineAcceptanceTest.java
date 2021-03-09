@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.station.StationAcceptanceTest;
 import nextstep.subway.station.dto.StationResponse;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
@@ -41,27 +42,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         // 지하철 노선
-        Map<String, String> upStation = new HashMap<>();
-        upStation.put("name", "강남역");
-
-        Map<String, String> downStation = new HashMap<>();
-        downStation.put("name", "서초역");
-
+        final Map newLine = createLineMapHelper("KangNam Line","green");
+        final Map upStation = StationAcceptanceTest.createStationInputHelper("강남역");
+        final Map downStation = StationAcceptanceTest.createStationInputHelper("서초역");
         final int distance = 10;
-        final Map newLine = new HashMap<String, String>() {
-            {
-                put("name", "KangName Line");
-                put("color", "green");
-            }
-        };
 
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response  = this.registerLineWithStationsHelper(newLine, upStation, downStation, distance);
+        ExtractableResponse<Response> response = registerLineWithStationsHelper(newLine, upStation, downStation, distance);
 
         // then
         // 지하철_노선_생성됨
-        this.assertCreateNewLineSuccess(response);
+        assertCreateNewLineSuccess(response);
     }
 
     @DisplayName("구간을 추가한다.")
@@ -69,39 +61,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createSection() {
         // given
         // 지하철 노선
-        Map<String, String> kangNamStation = new HashMap<>();
-        kangNamStation.put("name", "강남역");
-        StationResponse kangNameStationResponse = this.createStationHelper(kangNamStation).as(StationResponse.class);
+        LineResponse createdLineResponse  =
+                registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
+                .as(LineResponse.class);
 
-        Map<String, String> seochoStation = new HashMap<>();
-        seochoStation.put("name", "서초역");
-        StationResponse seochoStationResponse = this.createStationHelper(seochoStation).as(StationResponse.class);
-
-        final String SAME_LINE_NAME = "KangName Line";
-        final Map newLine = new HashMap<String, String>() {
-            {
-                put("name", SAME_LINE_NAME);
-                put("color", "green");
-                put("upStationId", kangNameStationResponse.getId().toString());
-                put("downStationId", seochoStationResponse.getId().toString());
-                put("distance", "10");
-            }
-        };
-        LineResponse createdLineResponse  = this.registerLineHelper(newLine).as(LineResponse.class);
-
-        Map<String, String> bangBaeStation = new HashMap<>();
-        seochoStation.put("name", "방배역");
-        StationResponse bangBaeStationResponse = this.createStationHelper(bangBaeStation).as(StationResponse.class);
+        final Map newDownStation = StationAcceptanceTest.createStationInputHelper("방배역");
+        StationResponse newDownStationResponse = StationAcceptanceTest.createStationHelper(newDownStation).as(StationResponse.class);
 
         // when
         Map<String, String> newSection = new HashMap<>();
-        newSection.put("upStationId", seochoStationResponse.getId().toString());
-        newSection.put("downStationId",bangBaeStationResponse.getId().toString());
+        newSection.put("upStationId", createdLineResponse.getDownStationId().toString());
+        newSection.put("downStationId",newDownStationResponse.getId().toString());
         newSection.put("distance", "5");
-        ExtractableResponse<Response> newSectionResponse = this.registerSectionHelper(createdLineResponse.getId(), newSection);
+        ExtractableResponse<Response> newSectionResponse = registerSectionHelper(createdLineResponse.getId(), newSection);
 
         // then
-        this.assertCreateNewLineSuccess(newSectionResponse);
+        assertAppendNewSectioSuccess(newSectionResponse);
 
     }
 
@@ -110,26 +85,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createStationWithDuplicateName() {
         // given
         // 지하철_노선_등록되어_있음
-        final String SAME_LINE_NAME = "KANGNAM";
-        final Map newLine = new HashMap<String, String>() {
-            {
-                put("name", SAME_LINE_NAME);
-                put("color", "green");
-            }
-        };
-        this.assertCreateNewLineSuccess(this.registerLineHelper(newLine));
+        final String sameLineName = "KANGNAM";
+        final Map newLine = createLineMapHelper(sameLineName,"green");
+        assertCreateNewLineSuccess(registerLineHelper(newLine));
 
         // when
-        final Map DuplicateNameLine = new HashMap<String, String>() {
-            {
-                put("name", SAME_LINE_NAME);
-                put("color", "green");
-            }
-        };
-        ExtractableResponse<Response> response = this.registerLineHelper(DuplicateNameLine);
+        final Map duplicateNameLine = createLineMapHelper(sameLineName,"green");
+        ExtractableResponse<Response> response = registerLineHelper(duplicateNameLine);
 
         // then
-        this.assertCreateDuplicatedLineFail(response);
+        assertCreateDuplicatedLineFail(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -138,30 +103,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        final Map KangNamLine = new HashMap<String, String>() {
-            {
-                put("name", "KANGNAM");
-                put("color", "green");
-            }
-        };
-        this.assertCreateNewLineSuccess(this.registerLineHelper(KangNamLine));
-        final Map BunDangLine = new HashMap<String, String>() {
-            {
-                put("name", "BUNDANG");
-                put("color", "yellow");
-            }
-        };
-        this.assertCreateNewLineSuccess(this.registerLineHelper(BunDangLine));
+        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
+        assertCreateNewLineSuccess(registerLineHelper(kangNamLine));
+        final Map bunDangLine = createLineMapHelper("BUNDANG","yellow");
+        assertCreateNewLineSuccess(registerLineHelper(bunDangLine));
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = this.getLinesHelper();
+        ExtractableResponse<Response> response = getLinesHelper();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
         this.assertGetLinesSuccess(response);
-        this.assertGetLinesContainIn(response, Arrays.asList(KangNamLine, BunDangLine));
+        this.assertGetLinesContainIn(response, Arrays.asList(kangNamLine, bunDangLine));
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -169,23 +124,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final Map KangNamLine = new HashMap<String, String>() {
-            {
-                put("name", "KANGNAM");
-                put("color", "green");
-            }
-        };
-        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(KangNamLine);
-        this.assertCreateNewLineSuccess(registerLineResponse);
+        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
+        ExtractableResponse<Response> registerLineResponse = registerLineHelper(kangNamLine);
+        assertCreateNewLineSuccess(registerLineResponse);
         LineResponse registeredLine  = registerLineResponse.as(LineResponse.class);
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = this.findLineHelper(registeredLine);
+        ExtractableResponse<Response> response = findLineHelper(registeredLine);
 
         // then
         // 지하철_노선_응답됨
-        this.assertGetLineDetailSuccess(response);
+        assertGetLineDetailSuccess(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -193,20 +143,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final Map KangNamLine = new HashMap<String, String>() {
-            {
-                put("name", "KANGNAM");
-                put("color", "green");
-            }
-        };
-        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(KangNamLine);
-        this.assertCreateNewLineSuccess(registerLineResponse);
+        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
+        ExtractableResponse<Response> registerLineResponse = registerLineHelper(kangNamLine);
+        assertCreateNewLineSuccess(registerLineResponse);
         LineResponse registeredLine  = registerLineResponse.as(LineResponse.class);
 
         // when
         // 지하철_노선_수정_요청
-        KangNamLine.put("color", "gold");
-        ExtractableResponse<Response> response  = this.updateLineHelper(registeredLine.getId(), KangNamLine);
+        kangNamLine.put("color", "gold");
+        ExtractableResponse<Response> response  = updateLineHelper(registeredLine.getId(), kangNamLine);
 
         // then
         // 지하철_노선_수정됨
@@ -218,22 +163,21 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final Map KangNamLine = new HashMap<String, String>() {
-            {
-                put("name", "KANGNAM");
-                put("color", "green");
-            }
-        };
-        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(KangNamLine);
+        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
+        ExtractableResponse<Response> registerLineResponse = registerLineHelper(kangNamLine);
         LineResponse registeredLine  = registerLineResponse.as(LineResponse.class);
 
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> response  = this.deleteLineHelper(registeredLine.getId());
+        ExtractableResponse<Response> response  = deleteLineHelper(registeredLine.getId());
 
         // then
         // 지하철_노선_삭제됨
         this.assertDeleteLineSuccess(response);
+    }
+
+    private void assertAppendNewSectioSuccess(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     private void assertCreateNewLineSuccess(ExtractableResponse<Response> response) {
@@ -278,7 +222,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> getLinesHelper() {
+    public static  ExtractableResponse<Response> getLinesHelper() {
         return RestAssured.
                 given().
                     log().all().
@@ -290,7 +234,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    private ExtractableResponse<Response> registerLineHelper(final Map<String, String> line) {
+    public static ExtractableResponse<Response> registerLineHelper(final Map<String, String> line) {
         return RestAssured.
                 given().
                     log().all().
@@ -303,33 +247,46 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    private ExtractableResponse<Response> registerLineWithStationsHelper(
+    public static ExtractableResponse<Response> registerLineWithStationsHelper(
             final Map<String, String> newLine,
             final Map<String, String> upStation,
             final Map<String, String> downStation,
             final int distance) {
-        StationResponse upStationResponse = this.createStationHelper(upStation).as(StationResponse.class);
-        StationResponse downStationResponse = this.createStationHelper(downStation).as(StationResponse.class);
+        StationResponse upStationResponse = StationAcceptanceTest.createStationHelper(upStation).as(StationResponse.class);
+        StationResponse downStationResponse = StationAcceptanceTest.createStationHelper(downStation).as(StationResponse.class);
         newLine.put("upStationId", upStationResponse.getId().toString());
         newLine.put("downStationId", downStationResponse.getId().toString());
         newLine.put("distance", String.valueOf(distance));
-        return this.registerLineHelper(newLine);
+        return registerLineHelper(newLine);
     }
 
-    private  ExtractableResponse<Response> findLineHelper(final LineResponse InputLine) {
+
+    public static ExtractableResponse<Response> registerLineWithStationsHelper(
+            final String lineName,
+            final String lineColor,
+            final String upStationName,
+            final String downStationName,
+            final int distance) {
+        final Map newLine = createLineMapHelper(lineName,lineColor);
+        final Map upStation = StationAcceptanceTest.createStationInputHelper(upStationName);
+        final Map downStation = StationAcceptanceTest.createStationInputHelper(downStationName);
+        return registerLineWithStationsHelper(newLine, upStation, downStation, distance);
+    }
+
+    public static  ExtractableResponse<Response> findLineHelper(final LineResponse inputLine) {
         return RestAssured.
                 given().
                     log().all().
                     contentType(MediaType.APPLICATION_JSON_VALUE).
                 when().
-                    pathParam("lineId", InputLine.getId()).
+                    pathParam("lineId", inputLine.getId()).
                     get("/lines/{lineId}").
                 then().
                     log().all().
                     extract();
     }
 
-    private  ExtractableResponse<Response> updateLineHelper(final Long lineId, final Map<String, String> line) {
+    public static ExtractableResponse<Response> updateLineHelper(final Long lineId, final Map<String, String> line) {
         return RestAssured.
                 given().
                     log().all().
@@ -343,7 +300,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    private  ExtractableResponse<Response> deleteLineHelper(final Long lineId) {
+    public static ExtractableResponse<Response> deleteLineHelper(final Long lineId) {
         return RestAssured.
                 given().
                     log().all().
@@ -356,7 +313,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    private ExtractableResponse<Response> registerSectionHelper(final Long lineId, final Map newSection) {
+
+    public static ExtractableResponse<Response> registerSectionHelper(final Long lineId, final Map newSection) {
         return RestAssured.given().log().all().
                     contentType(MediaType.APPLICATION_JSON_VALUE).
                 when().
@@ -368,14 +326,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    private ExtractableResponse<Response>  createStationHelper(Map params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+    public static Map createLineMapHelper(
+            final String lineName,
+            final String lineColor){
+        return new HashMap<String, String>() {
+            {
+                put("name", lineName);
+                put("color", lineColor);
+            }
+        };
     }
-
 }
