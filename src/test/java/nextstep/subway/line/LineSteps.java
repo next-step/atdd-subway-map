@@ -16,22 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static final String 신분당선 = "신분당선";
-    public static final String 노선2호선 = "2호선";
-    public static final String RED = "bg-red-60";
-    public static final String GREEN = "bg-green-600";
-
-    public static Map<String, String> createLine(String color, String name){
-        Map<String, String> params = new HashMap<>();
-        params.put("color", color);
-        params.put("name", name);
-        return params;
-    }
-
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String color, String name){
-        // given
-        Map<String, String> params = createLine(color, name);
-        // then
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params){
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -46,8 +31,8 @@ public class LineSteps {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String color, String name){
-        return 지하철_노선_생성_요청(color, name);
+    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(Map<String, String> params){
+        return 지하철_노선_생성_요청(params);
     }
 
     public static void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response){
@@ -101,9 +86,8 @@ public class LineSteps {
     }
 
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, String color, String name){
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, Map<String, String> params){
         // given
-        Map<String, String> params = createLine(color, name);
         String uri = response.header("Location");
         // then
         return RestAssured.given().log().all()
