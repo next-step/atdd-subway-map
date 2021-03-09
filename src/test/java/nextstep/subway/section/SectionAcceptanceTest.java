@@ -39,8 +39,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("지하철 구간을 생성한다.")
     void createSection() {
-        // when
+        // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+
+        // when
         ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // then
@@ -82,10 +84,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
         requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
+        ExtractableResponse<Response> sectionResponse = requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // when
-        ExtractableResponse<Response> response = requestDeleteSection(createResponse);
+        ExtractableResponse<Response> response = requestDeleteSection(sectionResponse);
 
         // then
         assertDeleteSection(response);
@@ -96,11 +98,11 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSectionWithNotLast() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> sectionResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
         requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // when
-        ExtractableResponse<Response> response = requestDeleteSection(createResponse);
+        ExtractableResponse<Response> response = requestDeleteSection(sectionResponse);
 
         //then
         assertDeleteSectionFail(response);
@@ -111,10 +113,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSectionWithOnlyOne() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> sectionResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // when
-        ExtractableResponse<Response> response = requestDeleteSection(createResponse);
+        ExtractableResponse<Response> response = requestDeleteSection(sectionResponse);
 
         //then
         assertDeleteSectionFail(response);

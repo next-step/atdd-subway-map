@@ -60,8 +60,8 @@ public class StationSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestDeleteStation(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header(HEADER_LOCATION);
+    public static ExtractableResponse<Response> requestDeleteStation(ExtractableResponse<Response> stationResponse) {
+        String uri = stationResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)
@@ -83,8 +83,8 @@ public class StationSteps {
     }
 
     @SafeVarargs
-    public static void assertIncludeStations(ExtractableResponse<Response> response, ExtractableResponse<Response>... createResponses) {
-        List<Long> expectedLineIds = Stream.of(createResponses)
+    public static void assertIncludeStations(ExtractableResponse<Response> response, ExtractableResponse<Response>... stationResponses) {
+        List<Long> expectedLineIds = Stream.of(stationResponses)
                 .map(it -> Long.parseLong(it.header(HEADER_LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultLineIds = response.jsonPath().getList(".", StationResponse.class).stream()

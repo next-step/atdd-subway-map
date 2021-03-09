@@ -32,8 +32,8 @@ public class SectionSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestDeleteSection(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header(HEADER_LOCATION);
+    public static ExtractableResponse<Response> requestDeleteSection(ExtractableResponse<Response> sectionResponse) {
+        String uri = sectionResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)

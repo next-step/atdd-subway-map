@@ -46,25 +46,25 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = requestCreateStationGangnam();
-        ExtractableResponse<Response> createResponse2 = requestCreateStationYeoksam();
+        ExtractableResponse<Response> stationResponse1 = requestCreateStationGangnam();
+        ExtractableResponse<Response> stationResponse2 = requestCreateStationYeoksam();
 
         // when
         ExtractableResponse<Response> response = requestGetStations();
 
         // then
         assertGetStations(response);
-        assertIncludeStations(response, createResponse1, createResponse2);
+        assertIncludeStations(response, stationResponse1, stationResponse2);
     }
 
     @Test
     @DisplayName("지하철역을 제거한다.")
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = requestCreateStationGangnam();
+        ExtractableResponse<Response> stationResponse = requestCreateStationGangnam();
 
         // when
-        ExtractableResponse<Response> response = requestDeleteStation(createResponse);
+        ExtractableResponse<Response> response = requestDeleteStation(stationResponse);
 
         // then
         assertDeleteStation(response);

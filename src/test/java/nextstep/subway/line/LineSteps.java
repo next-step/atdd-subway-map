@@ -64,8 +64,8 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestGetLine(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header(HEADER_LOCATION);
+    public static ExtractableResponse<Response> requestGetLine(ExtractableResponse<Response> lineResponse) {
+        String uri = lineResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -74,7 +74,7 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> createResponse,
+    public static ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> lineResponse,
                                                                   ExtractableResponse<Response> upStationResponse,
                                                                   ExtractableResponse<Response> downStationResponse) {
         Map<String, Object> params = makeLineParams(
@@ -84,7 +84,7 @@ public class LineSteps {
                 downStationResponse.jsonPath().getLong("id"),
                 200000
         );
-        String uri = createResponse.header(HEADER_LOCATION);
+        String uri = lineResponse.header(HEADER_LOCATION);
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -95,8 +95,8 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestDeleteLine(ExtractableResponse<Response> createResponse) {
-        String uri = createResponse.header(HEADER_LOCATION);
+    public static ExtractableResponse<Response> requestDeleteLine(ExtractableResponse<Response> lineResponse) {
+        String uri = lineResponse.header(HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)
@@ -118,8 +118,8 @@ public class LineSteps {
     }
 
     @SafeVarargs
-    public static void assertIncludeLines(ExtractableResponse<Response> response, ExtractableResponse<Response>... createResponses) {
-        List<Long> expectedIds = Stream.of(createResponses)
+    public static void assertIncludeLines(ExtractableResponse<Response> response, ExtractableResponse<Response>... lineResponses) {
+        List<Long> expectedIds = Stream.of(lineResponses)
                 .map(it -> Long.parseLong(it.header(HEADER_LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultIds = response.jsonPath().getList(".", LineResponse.class).stream()
