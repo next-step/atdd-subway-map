@@ -20,6 +20,7 @@ import static nextstep.subway.line.LineSteps.requestDeleteLine;
 import static nextstep.subway.line.LineSteps.requestGetLine;
 import static nextstep.subway.line.LineSteps.requestGetLines;
 import static nextstep.subway.line.LineSteps.requestUpdateLine;
+import static nextstep.subway.section.SectionSteps.requestCreateSection;
 import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
 import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
 import static nextstep.subway.station.StationSteps.requestCreateStationSadang;
@@ -70,25 +71,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> createResponse2 = requestCreateLine2(stationYeoksamResponse, stationSadangResponse);
+        ExtractableResponse<Response> lineResponse1 = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse1, stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> lineResponse2 = requestCreateLine2(stationYeoksamResponse, stationSadangResponse);
+        requestCreateSection(lineResponse2, stationYeoksamResponse, stationSadangResponse);
 
         // when
         ExtractableResponse<Response> response = requestGetLines();
 
         // then
         assertGetLines(response);
-        assertIncludeLines(response, createResponse1, createResponse2);
+        assertIncludeLines(response, lineResponse1, lineResponse2);
     }
 
     @Test
     @DisplayName("지하철 노선을 조회한다.")
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // when
-        ExtractableResponse<Response> response = requestGetLine(createResponse);
+        ExtractableResponse<Response> response = requestGetLine(lineResponse);
 
         // then
         assertGetLine(response);
@@ -98,10 +102,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
 
         // when
-        ExtractableResponse<Response> response = requestUpdateLine(createResponse);
+        ExtractableResponse<Response> response = requestUpdateLine(lineResponse, stationYeoksamResponse, stationSadangResponse);
 
         // then
         assertUpdateLine(response);
@@ -111,10 +115,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
 
         // when
-        ExtractableResponse<Response> response = requestDeleteLine(createResponse);
+        ExtractableResponse<Response> response = requestDeleteLine(lineResponse);
 
         // then
         assertDeleteLine(response);

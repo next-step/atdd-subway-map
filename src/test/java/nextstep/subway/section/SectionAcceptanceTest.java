@@ -48,7 +48,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("노선에 현재 등록되어있는 하행 종점역이 아닌 상행역으로 지하철 구간을 생성한다.")
+    @DisplayName("지하철 노선에 현재 등록되어있는 하행 종점역이 아닌 상행역으로 지하철 구간을 생성한다.")
     void createSectionWithWrongUpStation() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
@@ -62,7 +62,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("노선에 현재 등록되어있는 하행역으로 지하철 구간을 생성한다.")
+    @DisplayName("지하철 노선에 현재 등록되어있는 하행역으로 지하철 구간을 생성한다.")
     void createSectionWithDuplicatedDownStation() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
@@ -81,7 +81,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSection() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // when
         ExtractableResponse<Response> response = requestDeleteSection(createResponse);
@@ -91,12 +92,26 @@ class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("노선에 현재 등록되어있는 마지막 구간이 아닌 지하철 구간을 제거한다.")
-    void deleteSectionWithNotLastDownStation() {
+    @DisplayName("지하철 노선에 현재 등록되어있는 마지막 구간이 아닌 지하철 구간을 제거한다.")
+    void deleteSectionWithNotLast() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
         ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
         requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
+
+        // when
+        ExtractableResponse<Response> response = requestDeleteSection(createResponse);
+
+        //then
+        assertDeleteSectionFail(response);
+    }
+
+    @Test
+    @DisplayName("지하철 노선에 현재 등록되어있는 구간이 1개인 경우에 지하철 구간을 제거한다.")
+    void deleteSectionWithOnlyOne() {
+        // given
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // when
         ExtractableResponse<Response> response = requestDeleteSection(createResponse);

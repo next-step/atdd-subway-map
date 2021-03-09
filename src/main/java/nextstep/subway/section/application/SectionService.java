@@ -6,6 +6,7 @@ import nextstep.subway.section.dto.SectionRequest;
 import nextstep.subway.section.dto.SectionResponse;
 import nextstep.subway.section.exception.CreateSectionWithWrongUpStationException;
 import nextstep.subway.section.exception.DeleteSectionWithNotLastException;
+import nextstep.subway.section.exception.DeleteSectionWithOnlyOneException;
 import nextstep.subway.section.exception.DownStationDuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +39,11 @@ public class SectionService {
     }
 
     public void deleteSectionById(Long lineId, Long sectionId) {
-        Section lastSection = sectionRepository.findLastSectionByLineId(lineId);
-        if (lastSection.isNotEqualToSection(sectionId)) {
+        if (isNotLastSection(lineId, sectionId)) {
             throw new DeleteSectionWithNotLastException();
+        }
+        if (isOnlyOneSection(lineId)) {
+            throw new DeleteSectionWithOnlyOneException();
         }
 
         sectionRepository.deleteById(sectionId);
@@ -56,5 +59,15 @@ public class SectionService {
                 .map(it -> it.getDownStation().getId())
                 .collect(Collectors.toList());
         return downStationIds.contains(sectionRequest.getDownStationId());
+    }
+
+    private boolean isNotLastSection(Long lineId, Long sectionId) {
+        Section lastSection = sectionRepository.findLastSectionByLineId(lineId);
+        return lastSection.isNotEqualToSection(sectionId);
+    }
+
+    private boolean isOnlyOneSection(Long lineId) {
+        long count = sectionRepository.countByLineId(lineId);
+        return count == 1;
     }
 }

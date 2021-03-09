@@ -12,4 +12,6 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     Section findLastSectionByLineId(@Param("lineId") Long lineId);
 
     List<Section> findAllByLineId(Long lineId);
+
+    long countByLineId(Long lineId);
 }
