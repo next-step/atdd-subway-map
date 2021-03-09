@@ -30,6 +30,20 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     신분당선 = createLineResponse.body().jsonPath().getLong("id");
   }
 
+  @DisplayName("노선에 구간을 등록하면 구간이함께 조회된다")
+  @Test
+  void findSectionByLine(){
+     //given 구간등록
+     구간등록요청(신분당선,광교역,광교중앙역,30);
+     long 상현역 =  지하철역_생성_요청("상현역").body().jsonPath().getLong("id");
+     long 성복역 =  지하철역_생성_요청("성복역").body().jsonPath().getLong("id");
+     구간등록요청(신분당선,광교중앙역,상현역,30);
+     구간등록요청(신분당선,상현역,성복역,30);
+     //when 노선조회요청
+     ExtractableResponse<Response> response = 지하철_노선조회_요청(신분당선);
+     //then 노선조회됨
+     지하철_노선에서_구간_조회됨(response);
+  }
 
   @DisplayName("지하철 노선에 구간을 등록한다")
   @Test
