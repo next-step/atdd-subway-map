@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 
 @RestController
 @RequestMapping(value = "/lines")
@@ -27,7 +29,7 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
@@ -53,6 +55,20 @@ public class LineController {
     @DeleteMapping(value = "/{lineId}")
     public ResponseEntity<Void> deleteLine(@PathVariable("lineId") Long lineId) {
         lineService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LineResponse> addSection(
+        @PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
+        LineResponse line = lineService.addSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId() + "/sections")).body(line);
+    }
+
+    @DeleteMapping(value = "/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(
+        @PathVariable("lineId") Long lineId, @RequestParam Long stationId) {
+        lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

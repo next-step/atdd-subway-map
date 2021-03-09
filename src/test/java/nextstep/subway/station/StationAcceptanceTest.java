@@ -1,8 +1,8 @@
 package nextstep.subway.station;
 
+import static nextstep.subway.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -80,22 +79,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철역_제거됨(response);
-    }
-
-    private Map<String, String> 지하철역_생성(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return params;
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
-        return RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/stations")
-            .then().log().all()
-            .extract();
     }
 
     private void 지하철역_생성됨(ExtractableResponse<Response> response) {

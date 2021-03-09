@@ -1,10 +1,12 @@
 package nextstep.subway.line;
 
 import static java.util.stream.Collectors.*;
+import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.station.StationAcceptanceTest.*;
+import static nextstep.subway.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,20 +21,31 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-
+    private StationResponse 강남역;
+    private StationResponse 양재역;
+    private StationResponse 가평역;
+    private StationResponse 춘천역;
     private Map<String, String> 신분당선;
     private Map<String, String> 경춘선;
 
     @BeforeEach
     void before() {
-        신분당선 = 노선_생성("신분당선", "bg-red-600");
-        경춘선 = 노선_생성("경춘선", "bg-green-600");
+        강남역 = 지하철역_생성_요청(지하철역_생성("강남역")).as(StationResponse.class);
+        양재역 = 지하철역_생성_요청(지하철역_생성("양재역")).as(StationResponse.class);
+        가평역 = 지하철역_생성_요청(지하철역_생성("가평역")).as(StationResponse.class);
+        춘천역 = 지하철역_생성_요청(지하철역_생성("춘천역")).as(StationResponse.class);
+
+        신분당선 = 노선_생성("신분당선", "bg-red-600",
+            String.valueOf(강남역.getId()), String.valueOf(양재역.getId()), "5");
+        경춘선 = 노선_생성("경춘선", "bg-green-600",
+            String.valueOf(가평역.getId()), String.valueOf(춘천역.getId()), "4");
     }
 
-    @DisplayName("지하철 노선을 생성한다.")
+    @DisplayName("지하철 노선을 생성시 종점역이 추가된다.")
     @Test
     void createLine() {
         // when
@@ -40,11 +53,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_생성됨(response);
+        지하철_노선_종점역_추가됨(response, Arrays.asList(강남역, 양재역));
     }
 
     @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 생성한다.")
     @Test
-    void createLineWithDuplicateName() {
+    void createLine_duplicateName() {
         // given
         지하철_노선_생성_요청(신분당선);
 
@@ -87,10 +101,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine_notExist() {
         //given
-        final String LINE_ID = "1";
+        final String lineId = "1";
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(LINE_ID);
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
 
         // then
         지하철_노선_조회_실패됨(response);
@@ -209,29 +223,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .map(LineResponse::getId)
             .collect(toList());
 
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+        assertThat(resultLineIds).containsExactlyElementsOf(expectedLineIds);
 
         final List<LineResponse> lines = responses.stream()
             .map(it -> it.as(LineResponse.class))
             .collect(toList());
 
-        assertThat(lines)
-            .usingRecursiveComparison()
-            .isEqualTo(results);
+        지하철_노선_동등비교(results, lines);
+    }
+
+    private void 지하철_노선_동등비교(List<LineResponse> results, List<LineResponse> lines) {
+        assertThat(results).usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyElementsOf(lines);
     }
 
     private void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> map) {
-        return RestAssured
-            .given().log().all()
-            .body(map)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
     }
 
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
@@ -248,14 +255,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private Map<String, String> 노선_생성(String name, String color) {
-        Map<String, String> map = new HashMap<>();
-        map.put("name", name);
-        map.put("color", color);
-        return map;
-    }
-
     private void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void 지하철_노선_종점역_추가됨(ExtractableResponse<Response> response, List<StationResponse> stations) {
+        assertThat(response.jsonPath().getList("stations", StationResponse.class))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyElementsOf(stations);
     }
 }
