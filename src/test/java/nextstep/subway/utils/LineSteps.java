@@ -15,8 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String lineName, String lineColor) {
-        LineRequest lineRequest = new LineRequest(lineName, lineColor);
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -78,9 +77,8 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String lineName, String lineColor,
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(LineRequest lineRequest,
                                                        ExtractableResponse<Response> createdResponse) {
-        LineRequest lineRequest = new LineRequest(lineName, lineColor);
         String uri = createdResponse.header("Location");
         return RestAssured.given().log().all()
                 .body(lineRequest)
@@ -109,5 +107,30 @@ public class LineSteps {
 
     public static void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static LineRequest 지하철_노선_구간_셋팅(Long upStationId, Long downStationId, int distance) {
+        return new LineRequest(upStationId, downStationId, distance);
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_생성_요청(LineRequest lineRequest,
+                                                  ExtractableResponse<Response> lineResponse) {
+        String uri = lineResponse.header("Location");
+        return RestAssured.given().log().all()
+                          .body(lineRequest)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when()
+                          .post(uri + "/sections")
+                          .then().log().all()
+                          .extract();
+    }
+
+    public static void 지하철_구간_생성됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    public static void 지하철_구간_생성_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.EXPECTATION_FAILED.value());
     }
 }
