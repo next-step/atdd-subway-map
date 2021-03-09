@@ -18,7 +18,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     private StationResponse 잠실역;
     private StationResponse 강변역;
     private LineRequest 이호선정보;
-    private ExtractableResponse<Response> lineResponse;
+    private ExtractableResponse<Response> 이호선;
 
     @BeforeEach
     public void setUp() {
@@ -28,18 +28,14 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         잠실역 = 지하철역_생성_요청("잠실역").as(StationResponse.class);
         강변역 = 지하철역_생성_요청("강변역").as(StationResponse.class);
         이호선정보 = new LineRequest("2호선", "green", 강남역.getId(), 삼성역.getId(), 10);
-        lineResponse = 지하철_노선_생성_요청(이호선정보);
+        이호선 = 지하철_노선_생성_요청(이호선정보);
     }
 
     @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void createSection() {
-        // given
-        LineRequest 신구간 = 지하철_노선_구간_셋팅(삼성역.getId(), 잠실역.getId(), 20);
-
         // when
-        ExtractableResponse<Response> response
-                = 지하철_구간_생성_요청(신구간, lineResponse);
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(이호선, 삼성역, 잠실역, 20);
 
         // then
         지하철_구간_생성됨(response);
@@ -48,12 +44,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록시 상행역은 현재 등록되어 있는 하행 종점역이 아닐 경우 실패됨")
     @Test
     void validateUpStationRegist() {
-        // given
-        LineRequest 잘못된구간 = 지하철_노선_구간_셋팅(강남역.getId(), 잠실역.getId(), 20);
-
         // when
-        ExtractableResponse<Response> response
-                = 지하철_구간_생성_요청(잘못된구간, lineResponse);
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(이호선, 강남역, 잠실역, 30);
 
         // then
         지하철_구간_생성_실패됨(response);
@@ -62,12 +54,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록시 하행역이 현재 등록되어 있을 경우 실패됨")
     @Test
     void validateDownStationRegist() {
-        // given
-        LineRequest 잘못된구간 = 지하철_노선_구간_셋팅(삼성역.getId(), 강남역.getId(), 20);
-
         // when
-        ExtractableResponse<Response> response
-                = 지하철_구간_생성_요청(잘못된구간, lineResponse);
+        ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록_요청(이호선, 삼성역, 강남역, 5);
 
         // then
         지하철_구간_생성_실패됨(response);

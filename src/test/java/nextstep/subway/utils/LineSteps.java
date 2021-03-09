@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -109,12 +110,9 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static LineRequest 지하철_노선_구간_셋팅(Long upStationId, Long downStationId, int distance) {
-        return new LineRequest(upStationId, downStationId, distance);
-    }
-
-    public static ExtractableResponse<Response> 지하철_구간_생성_요청(LineRequest lineRequest,
-                                                  ExtractableResponse<Response> lineResponse) {
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록_요청(ExtractableResponse<Response> lineResponse,
+                                                  StationResponse upStation, StationResponse downStation, int distance) {
+        LineRequest lineRequest = new LineRequest(upStation.getId(), downStation.getId(), distance);
         String uri = lineResponse.header("Location");
         return RestAssured.given().log().all()
                           .body(lineRequest)
