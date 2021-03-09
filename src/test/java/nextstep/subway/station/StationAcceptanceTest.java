@@ -24,7 +24,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     private int port;
 
     @Autowired
-    DatabaseCleanup databaseCleanup;
+    private DatabaseCleanup databaseCleanup;
 
     @BeforeEach
     public void setUp(){

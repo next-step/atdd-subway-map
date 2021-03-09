@@ -29,7 +29,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private int port;
 
     @Autowired
-    DatabaseCleanup databaseCleanup;
+    private DatabaseCleanup databaseCleanup;
 
     // Station 인수테스트 재사용
     private StationResponse 강남역;
