@@ -64,14 +64,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_조회_성공(response);
     }
 
-    @DisplayName("지하철 노선을 조회한다.")
+    @DisplayName("존재하지 않는 노선을 조회한다.")
     @Test
     void getLineWithNoId() {
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
 
         // then
-        지하철_노선_조회_결과_없음(response);
+        존재하지_않는_지하철_노선(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -88,6 +88,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_수정_성공(response);
     }
 
+    @DisplayName("존재하지 않는 지하철 노선을 수정한다.")
+    @Test
+    void updateLineWithNoId() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(1L, "2호선", "orange");
+
+        // then
+        존재하지_않는_지하철_노선(response);
+    }
+
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
@@ -101,4 +111,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         지하철_노선_삭제_성공(response);
     }
+
+    @DisplayName("존재하지 않는 지하철 노선을 제거한다.")
+    @Test
+    void deleteLineWithNoId() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_삭제_요청(1L);
+
+        // then
+        존재하지_않는_지하철_노선(response);
+    }
+
 }

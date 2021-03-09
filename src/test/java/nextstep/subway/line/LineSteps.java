@@ -40,8 +40,8 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 지하철_노선_조회_결과_없음(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    public static void 존재하지_않는_지하철_노선(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long createdLineId) {

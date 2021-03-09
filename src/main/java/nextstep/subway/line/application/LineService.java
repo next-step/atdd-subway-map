@@ -49,7 +49,10 @@ public class LineService {
     }
 
     public void deleteLineById(Long id) {
-        lineRepository.deleteById(id);
+        Optional<Line> line = lineRepository.findOneById(id);
+        line.orElseThrow(() -> new ApplicationException(ApplicationType.CONTENT_NOT_FOUND));
+
+        lineRepository.delete(line.get());
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
