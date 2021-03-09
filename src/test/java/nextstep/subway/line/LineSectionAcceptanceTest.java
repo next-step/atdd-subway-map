@@ -60,4 +60,40 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // then
         지하철_구간_생성_실패됨(response);
     }
+
+    @DisplayName("지하철 노선 구간의 마지막역(하행 종점역)을 제거한다.")
+    @Test
+    void deleteSection() {
+        // given
+        지하철_노선에_지하철역_등록_요청(이호선, 삼성역, 잠실역, 20);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_마지막역_제거_요청(이호선, 잠실역);
+
+        // then
+        지하철_노선_마지막역_제거됨(response);
+    }
+
+    @DisplayName("제거하려는 역이 노선의 마지막역 아닐 시 실패")
+    @Test
+    void validateDownStationDelete() {
+        // given
+        지하철_노선에_지하철역_등록_요청(이호선, 삼성역, 잠실역, 20);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_마지막역_제거_요청(이호선, 삼성역);
+
+        // then
+        지하철_노선_마지막역_제거_실패됨(response);
+    }
+
+    @DisplayName("지하철 노선에 구간이 1개만 있을 경우 제거 실패")
+    @Test
+    void validateOneSectionDelete() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_마지막역_제거_요청(이호선, 삼성역);
+
+        // then
+        지하철_노선_마지막역_제거_실패됨(response);
+    }
 }

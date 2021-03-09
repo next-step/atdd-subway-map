@@ -131,4 +131,23 @@ public class LineSteps {
     public static void 지하철_구간_생성_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.EXPECTATION_FAILED.value());
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_마지막역_제거_요청(ExtractableResponse<Response> line,
+                                                                                        StationResponse station) {
+        String uri = line.header("Location");
+        return RestAssured.given().log().all()
+                          .param("stationId", station.getId())
+                          .when()
+                          .delete(uri + "/sections")
+                          .then().log().all()
+                          .extract();
+    }
+
+    public static void 지하철_노선_마지막역_제거됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_노선_마지막역_제거_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.EXPECTATION_FAILED.value());
+    }
 }
