@@ -4,8 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nextstep.subway.AcceptanceTest.parseIdFromResponseHeader;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationSteps {
@@ -27,6 +26,11 @@ public class StationSteps {
                 .post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    public static Long 지하철_역_생성_요청_ID_반환(Map<String, String> params) {
+        ExtractableResponse<Response> stationResponse1 = 지하철_역_생성_요청(params);
+        return parseIdFromResponseHeader(stationResponse1);
     }
 
     public static void 지하철_역_생성_성공(ExtractableResponse<Response> response) {

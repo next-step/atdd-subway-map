@@ -34,11 +34,11 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
-    public Station findStationById(Long id) {
+    public Station findById(Long id) {
         return stationRepository.findById(id).orElseThrow(RuntimeException::new);
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteById(Long id) {
         stationRepository.deleteById(id);
     }
 }

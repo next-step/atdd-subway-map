@@ -2,7 +2,6 @@ package nextstep.subway.line.ui;
 
 import nextstep.subway.common.SectionValidationException;
 import nextstep.subway.line.application.LineService;
-import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.section.dto.SectionRequest;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 public class LineController {
@@ -32,15 +30,12 @@ public class LineController {
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines()
-                                                   .stream()
-                                                   .map(LineResponse::of)
-                                                   .collect(Collectors.toList()));
+        return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @GetMapping(value = "/lines/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> getLineById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(LineResponse.of(lineService.findLineById(id)));
+        return ResponseEntity.ok().body(lineService.findLineById(id));
     }
 
     @PutMapping(value = "/lines/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -59,6 +54,12 @@ public class LineController {
     public ResponseEntity addSectionToLine(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         lineService.addSectionToLine(id, sectionRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/lines/{id}/sections")
+    public ResponseEntity deleteStationFromLine(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteStationFromLine(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(NoSuchElementException.class)

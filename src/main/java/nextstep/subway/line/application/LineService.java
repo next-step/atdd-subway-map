@@ -9,10 +9,12 @@ import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.dto.SectionRequest;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,24 +28,39 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+        Line persistLine = lineRepository.save(new Line(request.getName(),
+                                                        request.getColor(),
+                                                        upStation, downStation, request.getDistance()));
+        return createLineResponse(persistLine);
     }
 
     @Transactional(readOnly = true)
-    public List<Line> findAllLines() {
-        return lineRepository.findAll();
+    public List<LineResponse> findAllLines() {
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream()
+                    .map(this::createLineResponse)
+                    .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Line findLineById(Long id) {
-        return lineRepository.findById(id).orElseThrow(RuntimeException::new);
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        return createLineResponse(line);
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        List<StationResponse> stations = getStations(line).stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations, line.getCreatedDate(), line.getModifiedDate());
     }
 
     public void updateLine(Long id, LineRequest request) {
         Optional<Line> line = lineRepository.findById(id);
         if (!line.isPresent()) {
-            throw new NoSuchElementException("no line to update!");
+            throw new NoSuchElementException("수정할 노선이 없습니다.");
         }
         lineRepository.save(request.toLine());
     }
@@ -53,14 +70,14 @@ public class LineService {
     }
 
     public void addSectionToLine(Long id, SectionRequest request) {
-        Line line = findLineById(id);
-        Station upStation = stationService.findStationById(request.getUpStationId());
-        Station downStation = stationService.findStationById(request.getDownStationId());
-        checkSectionValidity(line, upStation, downStation);
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+        checkSectionAddValidity(line, upStation, downStation);
         line.getSections().add(new Section(line, upStation, downStation, request.getDistance()));
     }
 
-    private void checkSectionValidity(Line line, Station newUpStation, Station newDownStation) {
+    private void checkSectionAddValidity(Line line, Station newUpStation, Station newDownStation) {
         List<Station> stations = getStations(line);
         if (stations.isEmpty()) return;
         if (isNotValidUpStation(newUpStation, stations)) {
@@ -79,7 +96,28 @@ public class LineService {
         return stations.stream().anyMatch(x -> x.getId() == newDownStation.getId());
     }
 
-    public List<Station> getStations(Line line) {
+    public void deleteStationFromLine(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+        checkStationDeleteValidity(line, stationId);
+        line.getSections().stream()
+                .filter(x -> x.getDownStation().getId() == stationId)
+                .findFirst()
+                .ifPresent(x -> line.getSections().remove(x));
+    }
+
+    private void checkStationDeleteValidity(Line line, Long stationId) {
+        if (line.getSections().size() <= 1) {
+            throw new SectionValidationException("구간이 1개인 경우 역을 삭제할 수 없습니다.");
+        }
+
+        List<Station> stationsOfLine = getStations(line);
+        int lastIndex = stationsOfLine.size() - 1;
+        if (stationsOfLine.get(lastIndex).getId() != stationId) {
+            throw new SectionValidationException("하행 종점역만 삭제가 가능합니다.");
+        }
+    }
+
+    private List<Station> getStations(Line line) {
         List<Station> stations = new ArrayList<>();
 
         if (line.getSections().isEmpty()) {

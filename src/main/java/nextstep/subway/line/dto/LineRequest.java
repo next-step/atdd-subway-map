@@ -29,5 +29,15 @@ public class LineRequest {
         return new Line(name, color);
     }
 
+    public Long getUpStationId() {
+        return upStationId;
+    }
 
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
 }

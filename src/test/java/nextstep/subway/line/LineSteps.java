@@ -18,7 +18,7 @@ import static nextstep.subway.AcceptanceTest.parseIdFromResponseHeader;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -26,6 +26,17 @@ public class LineSteps {
                 .post("/lines")
                 .then().log().all()
                 .extract();
+    }
+
+    public static Long 지하철_노선_생성_요청_ID_반환(Map<String, Object> params) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+        return parseIdFromResponseHeader(response);
     }
 
     public static void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
@@ -37,10 +48,18 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_목록_조회() {
+    public static ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when()
                 .get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_역_목록_조회_요청(Long id) {
+        return RestAssured.given().log().all()
+                .when()
+                .get("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
@@ -72,7 +91,7 @@ public class LineSteps {
 
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Map<String, String> params, Long id) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Map<String, Object> params, Long id) {
         return RestAssured.given().log().all()
                 .when()
                 .body(params)
@@ -98,7 +117,7 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static  ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(Long id, SectionRequest request) {
+    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(Long id, SectionRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -116,10 +135,29 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    public static void 지하철_구간_삭제() {}
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+    }
 
-    public static void 지하철_구간_삭제_성공() {}
+    public static void 지하철_구간_삭제_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 
-    public static void 지하철_구간_삭제_실패() {}
+    public static void 지하철_구간_삭제_실패(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    public static void 지하철_노선_역_목록_포함됨(List<Long> ids, ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<Long> stationIds = response.jsonPath().getList("stations.id", Long.class);
+        assertThat(ids).containsAll(stationIds);
+    }
+
+
 
 }

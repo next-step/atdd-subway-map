@@ -4,17 +4,17 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.section.dto.SectionRequest;
-import nextstep.subway.station.StationAcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Map;
 
-import static nextstep.subway.line.LineAcceptanceTest.노선_2호선;
+import static nextstep.subway.line.LineAcceptanceTest.makeLine;
 import static nextstep.subway.line.LineSteps.*;
-import static nextstep.subway.line.LineSteps.지하철_노선에_구간_등록_실패;
 import static nextstep.subway.station.StationAcceptanceTest.*;
 import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
+import static nextstep.subway.station.StationSteps.지하철_역_생성_요청_ID_반환;
 
 @DisplayName("지하철 구간 관련 기능")
 public class LineSectionAcceptanceTest extends AcceptanceTest {
@@ -23,61 +23,50 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionToLine() {
         // given
-        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(노선_2호선);
-        Long lineId = parseIdFromResponseHeader(lineResponse);
-        ExtractableResponse<Response> stationResponse1 = 지하철_역_생성_요청(강남역);
-        Long upStationId = parseIdFromResponseHeader(stationResponse1);
-        ExtractableResponse<Response> stationResponse2 = 지하철_역_생성_요청(역삼역);
-        Long downStationId = parseIdFromResponseHeader(stationResponse2);
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
 
         // when
-        ExtractableResponse<Response> addSectionResponse = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(upStationId, downStationId, 7));
+        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(params);
+
         // then
-        지하철_노선에_구간_등록_성공(addSectionResponse);
+        지하철_노선_생성됨(lineResponse);
     }
 
-    @DisplayName("지하철 노선에 구간 등록에 실패한다.")
+    @DisplayName("지하철 노선에 구간 등록에 실패(새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 함)")
     @Test
     void failToAddSectionToLine_upStationError() {
         // given
-        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(노선_2호선);
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(params);
         Long lineId = parseIdFromResponseHeader(lineResponse);
-        ExtractableResponse<Response> stationResponse1 = 지하철_역_생성_요청(강남역);
-        Long upStationId = parseIdFromResponseHeader(stationResponse1);
-        ExtractableResponse<Response> stationResponse2 = 지하철_역_생성_요청(역삼역);
-        Long downStationId = parseIdFromResponseHeader(stationResponse2);
-        ExtractableResponse<Response> addSectionResponse = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(upStationId, downStationId, 7));
-        지하철_노선에_구간_등록_성공(addSectionResponse);
 
         // when
-        // 새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.
-        ExtractableResponse<Response> newUpStationResponse = 지하철_역_생성_요청(선릉역);
-        Long newUpStationId = parseIdFromResponseHeader(newUpStationResponse);
-        ExtractableResponse<Response> newDownStationResponse = 지하철_역_생성_요청(삼성역);
-        Long newDownStationId = parseIdFromResponseHeader(newDownStationResponse);
-        ExtractableResponse<Response> whenResponse = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(newUpStationId, newDownStationId, 3));
+        ExtractableResponse<Response> stationResponse3 = 지하철_역_생성_요청(삼성역);
+        Long newDownStationId = parseIdFromResponseHeader(stationResponse3);
+
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(upStationId, newDownStationId, 3));
+
         // then
-        지하철_노선에_구간_등록_실패(whenResponse);
+        지하철_노선에_구간_등록_실패(response);
     }
 
-    @DisplayName("지하철 노선에 구간 등록에 실패한다.")
+    @DisplayName("지하철 노선에 구간 등록에 실패(새로운 구간의 하행역은 현재 등록되어있는 역일 수 없음)")
     @Test
     void failToAddSectionToLine_downStationError() {
         // given
-        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(노선_2호선);
-        Long lineId = parseIdFromResponseHeader(lineResponse);
-        ExtractableResponse<Response> stationResponse1 = 지하철_역_생성_요청(강남역);
-        Long upStationId = parseIdFromResponseHeader(stationResponse1);
-        ExtractableResponse<Response> stationResponse2 = 지하철_역_생성_요청(역삼역);
-        Long downStationId = parseIdFromResponseHeader(stationResponse2);
-        ExtractableResponse<Response> addSectionResponse = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(upStationId, downStationId, 7));
-        지하철_노선에_구간_등록_성공(addSectionResponse);
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600", upStationId, downStationId,7);
+        Long lineId = 지하철_노선_생성_요청_ID_반환(params);
 
         // when
-        // 새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.
-        ExtractableResponse<Response> newUpStationResponse = 지하철_역_생성_요청(선릉역);
-        Long newUpStationId = parseIdFromResponseHeader(newUpStationResponse);
+        Long newUpStationId = 지하철_역_생성_요청_ID_반환(선릉역);
         ExtractableResponse<Response> whenResponse = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(newUpStationId, downStationId, 3));
+
         // then
         지하철_노선에_구간_등록_실패(whenResponse);
     }
@@ -86,39 +75,80 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionFromLine() {
         // given
-        addSectionToLine();
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+
+        Long lineId = 지하철_노선_생성_요청_ID_반환(params);
+        Long newDownStationId =  지하철_역_생성_요청_ID_반환(선릉역);
+
+        ExtractableResponse<Response> addSectionResponse2 = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(downStationId, newDownStationId, 3));
+        지하철_노선에_구간_등록_성공(addSectionResponse2);
+
         // when
-        지하철_구간_삭제();
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, newDownStationId);
+
         // then
-        지하철_구간_삭제_성공();
+        지하철_구간_삭제_성공(response);
     }
 
-//    @DisplayName("지하철 노선에서 구간 제거에 실패한.")
-//    @Test
-//    void failToDeleteSectionFromLine() {
-//        // given
-//        지하철_노선_생성_요청(노선_2호선);
-//        지하철_노선에_구간_등록_요청();
-//        // when
-////        지하철 노선에 등록된 마지막 역(하행 종점역)만 제거할 수 있다.
-////        지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
-////          조건에 부합하지 않는 경우
-//        지하철_구간_삭제();
-//        // then
-//        지하철_구간_삭제_실패();
-//    }
-//
-//    @DisplayName("등록된 구간을 통해 역 목록 조회")
-//    @Test
-//    void getLineStationOrderBySection() {
-//        // given
-//        지하철_노선_생성_요청(노선_2호선);
-//        지하철_노선에_구간_등록_요청();
-//        지하철_노선에_구간_등록_요청();
-//        // when
-//        지하철_노선_목록_조회();
-//        // then
-//        // 구간 순서대로 정렬되었는가??
-//    }
+    @DisplayName("지하철 노선에서 구간 제거에 실패(하행 종점역이 아님)")
+    @Test
+    void failToDeleteSectionFromLine_downStationError() {
+        // given
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Long lineId = 지하철_노선_생성_요청_ID_반환(params);
+        Long newDownStationId = 지하철_역_생성_요청_ID_반환(삼성역);
+
+        ExtractableResponse<Response> addSectionResponse2 = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(downStationId, newDownStationId, 3));
+        지하철_노선에_구간_등록_성공(addSectionResponse2);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_구간_삭제_요청(lineId, downStationId);
+        // then
+        지하철_구간_삭제_실패(deleteResponse);
+    }
+
+    @DisplayName("지하철 노선에서 구간 제거에 실패(구간이 1개)")
+    @Test
+    void failToDeleteSectionFromLine_oneSectionError() {
+        // given
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+
+        Long lineId = 지하철_노선_생성_요청_ID_반환(params);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_구간_삭제_요청(lineId, downStationId);
+
+        // then
+        지하철_구간_삭제_실패(deleteResponse);
+
+    }
+
+    @DisplayName("등록된 구간을 통해 역 목록 조회")
+    @Test
+    void getLineStationOrderBySection() {
+        // given
+        Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
+        Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
+        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+
+        Long lineId = 지하철_노선_생성_요청_ID_반환(params);
+
+        Long newDownStationId = 지하철_역_생성_요청_ID_반환(삼성역);
+
+        ExtractableResponse<Response> addSectionResponse2 = 지하철_노선에_구간_등록_요청(lineId, new SectionRequest(downStationId, newDownStationId, 3));
+        지하철_노선에_구간_등록_성공(addSectionResponse2);
+
+        // when
+        ExtractableResponse<Response> lineStationResponse = 지하철_노선_역_목록_조회_요청(lineId);
+
+        // then
+        지하철_노선_역_목록_포함됨(Arrays.asList(upStationId, downStationId, newDownStationId), lineStationResponse);
+    }
 
 }
