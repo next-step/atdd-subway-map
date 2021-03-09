@@ -62,6 +62,11 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity removeSection(@PathVariable Long lineId, @RequestParam Long stationId){
+        lineService.removeSection(lineId, stationService.findById(stationId));
+        return ResponseEntity.noContent().build();
+    }
 
     @ExceptionHandler(NotFoundLineException.class)
     public ResponseEntity notFoundLineExceptionHandler(NotFoundLineException e) {

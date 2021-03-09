@@ -27,4 +27,12 @@ public class SectionVerifier {
 
         assertThat(stationIds).containsExactlyElementsOf(ids);
     }
+
+    public static void 지하철_노선에_지하철역_제외됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_노선에_역_제거실패(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
 }

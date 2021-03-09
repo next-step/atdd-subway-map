@@ -17,4 +17,12 @@ public class SectionSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선에_지하철역_구간_제외요청(Long lineId, Long stationId) {
+        return RestAssured.given().log().all().
+                when().
+                delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
+                .then().log().all().
+                extract();
+    }
 }

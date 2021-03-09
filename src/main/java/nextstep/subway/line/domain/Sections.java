@@ -77,5 +77,20 @@ public class Sections {
         return downStation;
     }
 
+    public void removeSection(Station station) {
+        if (sections.size() <= 1) {
+            throw new RuntimeException("해당 노선에 등록된 역이 없습니다");
+        }
 
+        Station downStation = sections.get(sections.size() -1).getDownStation();
+        boolean isNotValidUpStation = downStation.getId() != station.getId();
+        if (isNotValidUpStation) {
+            throw new RuntimeException("하행 종점역만 삭제가 가능합니다.");
+        }
+
+        sections.stream()
+                .filter(it -> it.getDownStation().getId() == station.getId())
+                .findFirst()
+                .ifPresent(it -> sections.remove(it));
+    }
 }

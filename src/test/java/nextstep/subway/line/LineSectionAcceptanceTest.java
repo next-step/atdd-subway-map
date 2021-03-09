@@ -1,6 +1,5 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -56,7 +55,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선에 하행역과 새롭게 등록될 상행역이 다른역인 조건에서 등록한다.")
     @Test
-    public void addSectionAlreadyStation(){
+    public void addSectionAlreadyStation() {
         //Given
         SectionSteps.지하철_노선에_지하철역_등록요청(이호선.getId(), new SectionRequest(강남역.getId(), 역삼역.getId(), 6));
 
@@ -69,7 +68,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선의 하행역과 새롭게 등록될 하행역이 같은역인 조건에서 등록한다.")
     @Test
-    public void addSectionMatchDownStation(){
+    public void addSectionMatchDownStation() {
         //Given
         SectionSteps.지하철_노선에_지하철역_등록요청(이호선.getId(), new SectionRequest(강남역.getId(), 역삼역.getId(), 6));
 
@@ -78,5 +77,34 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
 
         //Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("지하철 노선 구간에 등록된 역을 제거한다.")
+    @Test
+    public void removeSection() {
+        //Given
+        SectionSteps.지하철_노선에_지하철역_등록요청(이호선.getId(), new SectionRequest(강남역.getId(), 역삼역.getId(), 6));
+        SectionSteps.지하철_노선에_지하철역_등록요청(이호선.getId(), new SectionRequest(역삼역.getId(), 방배역.getId(), 5));
+
+        //When
+        ExtractableResponse<Response> response = SectionSteps.지하철_노선에_지하철역_구간_제외요청(이호선.getId(), 방배역.getId());
+        ExtractableResponse<Response> expected = LineSteps.지하철_특정노선_찾기_요청(이호선.getId());
+
+        //Then
+        SectionVerifier.지하철_노선에_지하철역_제외됨(response);
+        SectionVerifier.지하철_노선에_지하철역_정렬됨(expected, Arrays.asList(강남역.getId(), 역삼역.getId()));
+    }
+
+    @DisplayName("지하철 노선 구간이 1개일 때 등록된 역을 제거한다.")
+    @Test
+    public void removeWhenSectionLessThenOne() {
+        //Given
+        SectionSteps.지하철_노선에_지하철역_등록요청(이호선.getId(), new SectionRequest(강남역.getId(), 역삼역.getId(), 6));
+
+        //When
+        ExtractableResponse<Response> response = SectionSteps.지하철_노선에_지하철역_구간_제외요청(이호선.getId(), 방배역.getId());
+
+        //Then
+        SectionVerifier.지하철_노선에_역_제거실패(response);
     }
 }
