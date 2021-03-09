@@ -84,4 +84,20 @@ public class LineService {
 
 
     }
+
+    public void removeSection(long lineId, long stationId) {
+
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
+
+        if(line.getSections().size() == 1) throw new InvalidSectionException("구간이 1개남은경우 삭제할 수 없습니다.");
+
+        boolean isLastStation = line.getSections().get(line.getSections().size() - 1)
+            .getDownStation().getId().equals(stationId);
+        if(!isLastStation) throw new InvalidSectionException("노선의 종점이 아닌경우 삭제할 수 없습니다.");
+
+        line.removeSection(line.getSections().size()-1);
+
+
+    }
 }
