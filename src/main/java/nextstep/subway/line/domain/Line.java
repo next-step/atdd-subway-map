@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nextstep.subway.line.exception.LineExceptionMessage.*;
+import static nextstep.subway.station.exception.StationExceptionMessage.*;
+
 @Entity
 public class Line extends BaseEntity {
 
@@ -57,13 +60,13 @@ public class Line extends BaseEntity {
 
     private void validateUpStationMatching(Station upStation) {
         if (!getLastDownStation().equals(upStation)) {
-            throw new NotMatchingStationException("기존 노선의 하행선과 신규 노선의 상행선이 같지 않습니다.");
+            throw new NotMatchingStationException(EXCEPTION_MESSAGE_NOT_MATCHING_EXISTING_AND_NEW_STATION);
         }
     }
 
     private void validateExistDownStation(List<Section> sections, Station downStation) {
         if (sections.contains(downStation)) {
-            throw new StationAlreadyExistException("하행선이 이미 존재합니다.");
+            throw new StationAlreadyExistException(EXCEPTION_MESSAGE_EXIST_DOWN_STATION);
         }
     }
 
@@ -77,10 +80,10 @@ public class Line extends BaseEntity {
         boolean isEqualStation = lastDownStationId.equals(downStation);
 
         if (!isEqualStation) {
-            throw new IllegalArgumentException("하행 종점역만 제거할 수 있습니다.");
+            throw new IllegalArgumentException(EXCEPTION_MESSAGE_NOT_DELETABLE_STATION);
         }
         if (sections.size() == 1) {
-            throw new IllegalArgumentException("구간을 더이상 삭제할 수 없습니다.");
+            throw new IllegalArgumentException(EXCEPTION_MESSAGE_NOT_DELETABLE_SECTION);
         }
     }
 

@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.station.exception.StationExceptionMessage.EXCEPTION_MESSAGE_EXIST_STATION;
+
 @Service
 @Transactional
 public class StationService {
-
-    private static final String EXCEPTION_MESSAGE_EXIST_STATION_NAME = "존재하는 지하철 역 입니다.";
 
     private final StationRepository stationRepository;
 
@@ -32,7 +32,7 @@ public class StationService {
 
     private void validateStationName(String stationName) {
         if (stationRepository.existsByName(stationName)) {
-            throw new StationAlreadyExistException(EXCEPTION_MESSAGE_EXIST_STATION_NAME);
+            throw new StationAlreadyExistException(EXCEPTION_MESSAGE_EXIST_STATION);
         }
     }
 

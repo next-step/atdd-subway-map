@@ -16,13 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.line.exception.LineExceptionMessage.*;
+import static nextstep.subway.station.exception.StationExceptionMessage.EXCEPTION_MESSAGE_NON_EXIST_STATION;
+
 @Service
 @Transactional
 public class LineService {
-
-    private static final String EXCEPTION_MESSAGE_EXIST_LINE_NAME = "존재하는 지하철 노선 입니다.";
-    private static final String EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME = "존재하지 않는 지하철 노선입니다.";
-    private static final String EXCEPTION_MESSAGE_NON_EXIST_STATION = "존재하지 않는 지하철 역입니다.";
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
@@ -44,6 +43,12 @@ public class LineService {
         return LineResponse.of(savedLine);
     }
 
+    private void validateLineName(String lineName) {
+        if (lineRepository.existsByName(lineName)) {
+            throw new LineAlreadyExistException(EXCEPTION_MESSAGE_EXIST_LINE);
+        }
+    }
+
     public LineResponse addSectionToLine(Long id, SectionRequest sectionRequest) {
         Line line = findLineById(id);
 
@@ -53,7 +58,6 @@ public class LineService {
         line.addSection(upStation, downStation, sectionRequest.getDistance());
         return LineResponse.of(line);
     }
-
 
     public void deleteSectionToLine(Long id, Long stationId) {
         Line line = findLineById(id);
@@ -89,17 +93,11 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new LineNonExistException(EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME));
+                .orElseThrow(() -> new LineNonExistException(EXCEPTION_MESSAGE_NON_EXIST_LINE));
     }
 
     private Station findStationById(Long upStationId) {
         return stationRepository.findById(upStationId)
                 .orElseThrow(() -> new StationNonExistException(EXCEPTION_MESSAGE_NON_EXIST_STATION));
-    }
-
-    private void validateLineName(String lineName) {
-        if (lineRepository.existsByName(lineName)) {
-            throw new LineAlreadyExistException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
-        }
     }
 }
