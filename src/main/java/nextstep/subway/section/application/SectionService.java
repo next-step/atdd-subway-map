@@ -47,4 +47,8 @@ public class SectionService {
                 .collect(Collectors.toList());
         return downStationIds.contains(sectionRequest.getDownStationId());
     }
+
+    public void deleteSectionById(Long id) {
+        sectionRepository.deleteById(id);
+    }
 }

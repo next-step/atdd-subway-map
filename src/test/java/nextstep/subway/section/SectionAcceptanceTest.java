@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import static nextstep.subway.line.LineSteps.requestCreateLineDx;
 import static nextstep.subway.section.SectionSteps.assertCreateSection;
 import static nextstep.subway.section.SectionSteps.assertCreateSectionFail;
+import static nextstep.subway.section.SectionSteps.assertDeleteSection;
 import static nextstep.subway.section.SectionSteps.requestCreateSection;
+import static nextstep.subway.section.SectionSteps.requestDeleteSection;
 import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
 import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
 import static nextstep.subway.station.StationSteps.requestCreateStationSadang;
@@ -71,5 +73,19 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         //then
         assertCreateSectionFail(response);
+    }
+
+    @Test
+    @DisplayName("지하철 구간을 제거한다.")
+    void deleteSection() {
+        // given
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+
+        // when
+        ExtractableResponse<Response> response = requestDeleteSection(createResponse);
+
+        // then
+        assertDeleteSection(response);
     }
 }

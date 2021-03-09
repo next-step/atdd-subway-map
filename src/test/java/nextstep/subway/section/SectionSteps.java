@@ -32,6 +32,15 @@ public class SectionSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> requestDeleteSection(ExtractableResponse<Response> createResponse) {
+        String uri = createResponse.header(HEADER_LOCATION);
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
     public static void assertCreateSection(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
@@ -48,5 +57,9 @@ public class SectionSteps {
         params.put("downStationId", downStationResponse.jsonPath().getLong("id"));
         params.put("distance", 1000);
         return params;
+    }
+
+    public static void assertDeleteSection(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
