@@ -86,4 +86,11 @@ public class LineService {
 
         return LineResponse.of(line);
     }
+
+    public void deleteSection(Long id, Long stationId) {
+        Line line = findLine(id);
+        Station station = stationService.findStationById(stationId);
+
+        line.deleteSection(station);
+    }
 }

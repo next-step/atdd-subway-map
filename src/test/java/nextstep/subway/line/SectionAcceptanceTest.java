@@ -59,19 +59,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long lineId = 지하철_노선_생성됨(defaultLineRequest);
         지하철노선_구간_등록요청(lineId, new SectionRequest(station2, station3, distance));
 
-        // 지하철노선_구간_제거요청
+        // when
         ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, station3);
 
-        // 지하철노선_구간_삭제됨
+        // then
         지하철노선_구간_삭제됨(response);
     }
 
-    @DisplayName("지하철 노선에 등록된 구간 정보로 역목록을 조회한다.")
-    @Test
-    void getStations() {
-        // 지하철노선_구간_등록요청
-        // 지하철노선_구간역목록_조회요청
-        // 지하철노선_구간역록목_응답됨
-        // 지하철노선_구간역록목_포함됨
-    }
+//    @DisplayName("지하철 노선에 등록된 구간 정보로 역목록을 조회한다.")
+//    @Test
+//    void getStations() {
+//        // given
+//        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
+//        지하철노선_구간_등록요청(lineId, new SectionRequest(station2, station3, distance));
+//
+//        // 지하철노선_구간역목록_조회요청
+//
+//
+//        // 지하철노선_구간역록목_응답됨
+//        // 지하철노선_구간역록목_포함됨
+//    }
 }

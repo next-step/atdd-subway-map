@@ -1,7 +1,9 @@
 package nextstep.subway.line.domain;
 
+import nextstep.subway.line.exception.DeleteStationIsNotLastStationException;
 import nextstep.subway.line.exception.NewDownStationIsAlreadyRegistered;
 import nextstep.subway.line.exception.NewUpStationIsWrongException;
+import nextstep.subway.line.exception.OnlyOneSectionLeftCannotBeDeleted;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -49,5 +51,21 @@ public class Sections {
 
     private Set<Station> findAllStations() {
         return sections.stream().flatMap(it -> it.getStations().stream()).collect(Collectors.toSet());
+    }
+
+    public void deleteSection(Station station) {
+        validateStationAndCurrentLastStationAreMatched(station);
+        validateOnlyOneSectionLeftCannotBeDeleted();
+
+        sections.remove(sections.size() - 1);
+    }
+
+    private void validateStationAndCurrentLastStationAreMatched(Station station) {
+        if (station.equals(findLastStation())) return;
+        throw new DeleteStationIsNotLastStationException();
+    }
+
+    private void validateOnlyOneSectionLeftCannotBeDeleted() {
+        if (sections.size() == 1) throw new OnlyOneSectionLeftCannotBeDeleted();
     }
 }
