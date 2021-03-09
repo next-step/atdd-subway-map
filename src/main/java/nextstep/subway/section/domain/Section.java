@@ -64,6 +64,10 @@ public class Section extends BaseEntity {
     }
 
     public boolean isDownStationOfSectionNotEqualToUpStation(Long upStationId) {
-        return !downStation.getId().equals(upStationId);
+        return !getDownStation().getId().equals(upStationId);
+    }
+
+    public boolean isNotEqualToSection(Long sectionId) {
+        return !getId().equals(sectionId);
     }
 }

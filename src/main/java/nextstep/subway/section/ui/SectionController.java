@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/lines/{id}/sections")
+@RequestMapping("/lines/{lineId}/sections")
 public class SectionController {
 
     private final SectionService sectionService;
@@ -24,14 +24,14 @@ public class SectionController {
     }
 
     @PostMapping
-    public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionService.saveSection(id, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionResponse.getId())).body(sectionResponse);
+    public ResponseEntity<SectionResponse> createSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
+        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + sectionResponse.getId())).body(sectionResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long id) {
-        sectionService.deleteSectionById(id);
+    @DeleteMapping("/{sectionId}")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @PathVariable Long sectionId) {
+        sectionService.deleteSectionById(lineId, sectionId);
         return ResponseEntity.noContent().build();
     }
 }

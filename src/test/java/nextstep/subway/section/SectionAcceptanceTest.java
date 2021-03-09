@@ -11,6 +11,7 @@ import static nextstep.subway.line.LineSteps.requestCreateLineDx;
 import static nextstep.subway.section.SectionSteps.assertCreateSection;
 import static nextstep.subway.section.SectionSteps.assertCreateSectionFail;
 import static nextstep.subway.section.SectionSteps.assertDeleteSection;
+import static nextstep.subway.section.SectionSteps.assertDeleteSectionFail;
 import static nextstep.subway.section.SectionSteps.requestCreateSection;
 import static nextstep.subway.section.SectionSteps.requestDeleteSection;
 import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
@@ -87,5 +88,20 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         assertDeleteSection(response);
+    }
+
+    @Test
+    @DisplayName("노선에 현재 등록되어있는 마지막 구간이 아닌 지하철 구간을 제거한다.")
+    void deleteSectionWithNotLastDownStation() {
+        // given
+        ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> createResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
+
+        // when
+        ExtractableResponse<Response> response = requestDeleteSection(createResponse);
+
+        //then
+        assertDeleteSectionFail(response);
     }
 }

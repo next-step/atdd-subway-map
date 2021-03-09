@@ -4,8 +4,9 @@ import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.domain.SectionRepository;
 import nextstep.subway.section.dto.SectionRequest;
 import nextstep.subway.section.dto.SectionResponse;
+import nextstep.subway.section.exception.CreateSectionWithWrongUpStationException;
+import nextstep.subway.section.exception.DeleteSectionWithNotLastException;
 import nextstep.subway.section.exception.DownStationDuplicatedException;
-import nextstep.subway.section.exception.WrongUpStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class SectionService {
 
     public SectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
         if (isWrongUpStation(lineId, sectionRequest)) {
-            throw new WrongUpStationException();
+            throw new CreateSectionWithWrongUpStationException();
         }
         if (idDownStationDuplicated(lineId, sectionRequest)) {
             throw new DownStationDuplicatedException();
@@ -34,6 +35,15 @@ public class SectionService {
 
         Section persistSection = sectionRepository.save(sectionMapper.toSection(lineId, sectionRequest));
         return SectionResponse.of(persistSection);
+    }
+
+    public void deleteSectionById(Long lineId, Long sectionId) {
+        Section lastSection = sectionRepository.findLastSectionByLineId(lineId);
+        if (lastSection.isNotEqualToSection(sectionId)) {
+            throw new DeleteSectionWithNotLastException();
+        }
+
+        sectionRepository.deleteById(sectionId);
     }
 
     private boolean isWrongUpStation(Long lineId, SectionRequest sectionRequest) {
@@ -46,9 +56,5 @@ public class SectionService {
                 .map(it -> it.getDownStation().getId())
                 .collect(Collectors.toList());
         return downStationIds.contains(sectionRequest.getDownStationId());
-    }
-
-    public void deleteSectionById(Long id) {
-        sectionRepository.deleteById(id);
     }
 }
