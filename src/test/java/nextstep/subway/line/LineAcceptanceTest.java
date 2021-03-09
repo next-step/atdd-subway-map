@@ -30,12 +30,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     public void setUp() {
         super.setUp();
 
-        Long station1Id = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
-        Long station2Id = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
+        Long downStationId = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
+        Long upStationId = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
         int distance = 10;
 
-        line1Request = new LineRequest(일호선.name, 일호선.color, station1Id, station2Id, distance);
-        line2Request = new LineRequest(분당선.name, 분당선.color, station1Id, station2Id, distance);
+        line1Request = new LineRequest(일호선.name, 일호선.color, downStationId, upStationId, distance);
+        line2Request = new LineRequest(분당선.name, 분당선.color, downStationId, upStationId, distance);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
