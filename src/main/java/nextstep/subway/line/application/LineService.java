@@ -4,6 +4,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exception.LineAlreadyExistException;
 import nextstep.subway.line.exception.LineNonExistException;
 import nextstep.subway.station.domain.Station;
@@ -41,6 +42,16 @@ public class LineService {
         savedLine.addSection(upStation, downStation, request.getDistance());
 
         return LineResponse.of(savedLine);
+    }
+
+    public LineResponse addSectionToLine(Long id, SectionRequest sectionRequest) {
+        Line line = findLineById(id);
+
+        Station upStation = findStationById(sectionRequest.getUpStationId());
+        Station downStation = findStationById(sectionRequest.getDownStationId());
+
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+        return LineResponse.of(line);
     }
 
     private Station findStationById(Long upStationId) {
