@@ -6,9 +6,14 @@ import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.StationAcceptanceTest;
+import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -23,14 +28,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    Map<String, String> 파라미터_생성(String name, String color){
+    StationAcceptanceTest stationAcceptanceTest;
+
+    Long stationId1;
+    Long stationId2;
+    final int DISTANCE = 5;
+
+    @BeforeEach
+    void 미리_역_생성(){
+        stationAcceptanceTest = new StationAcceptanceTest();
+        ExtractableResponse<Response> createStation1 = stationAcceptanceTest.지하철역_생성_요청("강남");
+        ExtractableResponse<Response> createStation2 = stationAcceptanceTest.지하철역_생성_요청("선릉");
+        stationId1 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation1);
+        stationId2 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation2);
+    }
+
+
+    Map<String, String> 파라미터_생성(String name, String color) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
         param.put("color", color);
+
         return param;
     }
 
-    ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color){
+    ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId, Long downStationId, int distance) {
         return RestAssured.given()
                 .body(파라미터_생성(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -46,7 +68,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         // 지하철_노선_생성_요청
         ExtractableResponse<Response> response =
-                지하철_노선_생성_요청("선릉", "green darken-1");
+                지하철_노선_생성_요청("1호선", "green darken-1", stationId1, stationId2, DISTANCE);
 
         // then
         // 지하철_노선_생성됨
@@ -60,11 +82,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
 
+        ExtractableResponse<Response> createStation3 = stationAcceptanceTest.지하철역_생성_요청("대청");
+        ExtractableResponse<Response> createStation4 = stationAcceptanceTest.지하철역_생성_요청("일원");
+        Long stationId3 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation3);
+        Long stationId4 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation4);
+
         ExtractableResponse<Response> createResponse1 =
-                지하철_노선_생성_요청("선릉", "green darken-1");
+                지하철_노선_생성_요청("1호선", "green darken-1", stationId1, stationId2, DISTANCE);
 
         ExtractableResponse<Response> createResponse2 =
-                지하철_노선_생성_요청("강남", "green darken-1");
+                지하철_노선_생성_요청("2호선", "green darken-2", stationId3, stationId4, 10);
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -113,7 +140,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청("선릉", "green darken-1");
+                지하철_노선_생성_요청("선릉", "green darken-1", stationId1, stationId2, DISTANCE);
 
         Long id = 생성된_Entity의_ID_가져오기(createResponse);
 
@@ -148,7 +175,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청("선릉", "green darken-1");
+                지하철_노선_생성_요청("선릉", "green darken-1", stationId1, stationId2, DISTANCE);
 
         Long id = 생성된_Entity의_ID_가져오기(createResponse);
 
@@ -180,7 +207,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청("선릉", "green darken-1");
+                지하철_노선_생성_요청("선릉", "green darken-1", stationId1, stationId2, DISTANCE);
 
         Long id = 생성된_Entity의_ID_가져오기(createResponse);
         // when

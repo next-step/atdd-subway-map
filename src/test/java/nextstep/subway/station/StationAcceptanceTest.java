@@ -38,7 +38,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    ExtractableResponse<Response> 지하철역_생성_요청(String name){
+    public ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         return RestAssured.given().log().all()
                 .body(파라미터_생성(name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -46,6 +46,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    public Long 생성된_지하철역_ID_가져오기(ExtractableResponse<Response> createResponse){
+        return Long.parseLong(
+                createResponse
+                        .header("Location")
+                        .split("/")[2]
+        );
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
