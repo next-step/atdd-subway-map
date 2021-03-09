@@ -7,6 +7,7 @@ import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.dto.SectionRequest;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
+import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.station.exception.StationNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,16 @@ public class SectionMapper {
         Station upStation = getStation(sectionRequest.getUpStationId());
         Station downStation = getStation(sectionRequest.getDownStationId());
         return new Section(line, upStation, downStation, sectionRequest.getDistance());
+    }
+
+    public StationResponse toStationResponseWithUpStation(Section section) {
+        Station upStation = section.getUpStation();
+        return new StationResponse(upStation.getId(), upStation.getName(), upStation.getCreatedDate(), upStation.getModifiedDate());
+    }
+
+    public StationResponse toStationResponseWithDownStation(Section section) {
+        Station downStation = section.getDownStation();
+        return new StationResponse(downStation.getId(), downStation.getName(), downStation.getCreatedDate(), downStation.getModifiedDate());
     }
 
     private Station getStation(Long id) {

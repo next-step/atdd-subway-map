@@ -74,12 +74,14 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> createResponse) {
+    public static ExtractableResponse<Response> requestUpdateLine(ExtractableResponse<Response> createResponse,
+                                                                  ExtractableResponse<Response> upStationResponse,
+                                                                  ExtractableResponse<Response> downStationResponse) {
         Map<String, Object> params = makeLineParams(
                 "bg-blue-600",
                 "구분당선",
-                createResponse.jsonPath().getLong("downStationId"),
-                createResponse.jsonPath().getLong("upStationId"),
+                upStationResponse.jsonPath().getLong("id"),
+                downStationResponse.jsonPath().getLong("id"),
                 200000
         );
         String uri = createResponse.header(HEADER_LOCATION);

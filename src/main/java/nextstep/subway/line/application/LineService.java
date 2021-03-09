@@ -30,7 +30,7 @@ public class LineService {
         }
 
         Line persistLine = lineRepository.save(lineMapper.toLine(lineRequest));
-        return LineResponse.of(persistLine);
+        return lineMapper.toLineResponse(persistLine);
     }
 
     @Transactional(readOnly = true)
@@ -38,14 +38,14 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(LineResponse::of)
+                .map(lineMapper::toLineResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public LineResponse toLine(Long id) {
+    public LineResponse getLine(Long id) {
         return lineRepository.findById(id)
-                .map(LineResponse::of)
+                .map(lineMapper::toLineResponse)
                 .orElseThrow(() -> new LineNotFoundException(id));
     }
 
