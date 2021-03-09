@@ -71,7 +71,8 @@ public class StationSteps {
 
     public enum Station {
         강남역("강남역"),
-        역삼역("역삼역");
+        역삼역("역삼역"),
+        선릉역("선릉역");
 
         public String name;
 

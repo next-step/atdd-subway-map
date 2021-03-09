@@ -3,6 +3,7 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
 import org.springframework.http.MediaType;
@@ -24,7 +25,6 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -48,6 +48,12 @@ public class LineController {
     public ResponseEntity<LineResponse> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineResponse line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @ExceptionHandler(LineNotFoundException.class)

@@ -3,6 +3,9 @@ package nextstep.subway.line.domain;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Section {
@@ -28,8 +31,7 @@ public class Section {
     public Section() {
     }
 
-    public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
-        this.id = id;
+    public Section(Line line, Station upStation, Station downStation, int distance) {
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -74,5 +76,9 @@ public class Section {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public List<Station> getStations() {
+        return Stream.of(upStation, downStation).collect(Collectors.toList());
     }
 }

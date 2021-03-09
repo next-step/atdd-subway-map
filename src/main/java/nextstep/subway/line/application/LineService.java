@@ -4,6 +4,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
 import nextstep.subway.station.application.StationService;
@@ -36,10 +37,10 @@ public class LineService {
     }
 
     private Line createLine(LineRequest request) {
-        Line requestLine = request.toLine();
-        addSection(requestLine, request.getUpStationId(), request.getDownStationId(), request.getDistance());
+        Line line = request.toLine();
+        addSection(line, request.getUpStationId(), request.getDownStationId(), request.getDistance());
 
-        return lineRepository.save(requestLine);
+        return lineRepository.save(line);
     }
 
     private void addSection(Line line, Long upStationId, Long downStationId, int distance) {
@@ -60,8 +61,11 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
+        return LineResponse.of(findLine(id));
+    }
+
+    public Line findLine(Long id) {
         return lineRepository.findById(id)
-                .map(LineResponse::of)
                 .orElseThrow(LineNotFoundException::new);
     }
 
@@ -74,5 +78,12 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public LineResponse addSection(Long id, SectionRequest request) {
+        Line line = findLine(id);
+        addSection(line, request.getUpStationId(), request.getDownStationId(), request.getDistance());
+
+        return LineResponse.of(line);
     }
 }
