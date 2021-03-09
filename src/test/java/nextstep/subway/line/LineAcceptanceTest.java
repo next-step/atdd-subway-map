@@ -60,7 +60,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         지하철_노선_생성_요청(신분당선);
-        지하철_노선_생성_요청(new LineRequest("2호선", "bg-green-600"));
 
         // when
         ExtractableResponse<Response> readLinesResponse = 지하철_노선_목록_조회_요청();

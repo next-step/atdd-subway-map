@@ -3,9 +3,11 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,7 +36,16 @@ public class LineVerificationSteps {
 
     public static void 지하철_노선_목록_조회_결과에_생성된_노선_포함_확인(ExtractableResponse<Response> readLinesResponse) {
         List<LineResponse> lines = readLinesResponse.jsonPath().getList(".", LineResponse.class);
-        assertThat(lines).hasSize(2);
+        assertThat(lines).hasSize(1);
+        지하철_노선_목록_조회_결과에_생성된_노선_ID_확인(lines);
+    }
+
+    private static void 지하철_노선_목록_조회_결과에_생성된_노선_ID_확인(List<LineResponse> lines) {
+        List<StationResponse> stationResponses = lines.get(0).getStations();
+        List<Long> collect = stationResponses.stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+        assertThat(collect).containsExactly(1L, 2L);
     }
 
     public static void 지하철_노선_조회_됨(ExtractableResponse<Response> response) {
