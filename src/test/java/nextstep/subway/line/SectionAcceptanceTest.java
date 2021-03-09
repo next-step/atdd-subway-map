@@ -35,12 +35,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
   private void 노선_구간_등록됨(ExtractableResponse<Response> response){
     assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
   }
+  private void 노선_구간_실패됨(ExtractableResponse<Response> response){
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
 
-  private ExtractableResponse<Response> 구간등록요청(int distance){
+  private ExtractableResponse<Response> 구간등록요청(long upStationId, long downStationId,int distance){
 
     Map params = new HashMap<>();
-    params.put("upStationId",startStationId);
-    params.put("downStationId",endStationId);
+    params.put("upStationId",upStationId);
+    params.put("downStationId",downStationId);
     params.put("distance",distance);
 
     return RestAssured.given().log().all()
@@ -59,10 +62,27 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     지하철_노선_생성됨();
 
     //when 지하철 노선에 구간등록 요청
-    ExtractableResponse<Response> sectionResponse =  구간등록요청(30);
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(startStationId,endStationId,30);
 
     //then 지하철 노선에 구간등록 완료됨
     노선_구간_등록됨(sectionResponse);
   }
+
+  @DisplayName("신규구간의 상행역이 노선의 종점역이 아닌 구간을 등록한다")
+  @Test
+  void createSectionWithoutEndSection() {
+    //given 지하철 노선 생성됨
+    지하철_노선_생성됨();
+    long stationId =  지하철역_생성_요청("동천역").body().jsonPath().getLong("id");
+
+    //when 지하철 노선에 구간등록 요청
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(stationId,endStationId,30);
+
+    //then 지하철 노선에 구간등록 완료됨
+    노선_구간_실패됨(sectionResponse);
+  }
+
+
+
 
 }
