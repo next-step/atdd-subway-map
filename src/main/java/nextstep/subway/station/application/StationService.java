@@ -36,7 +36,7 @@ public class StationService {
         }
     }
 
-   @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
 
