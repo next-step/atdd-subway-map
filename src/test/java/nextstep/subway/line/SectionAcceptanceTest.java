@@ -3,7 +3,6 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import nextstep.subway.AcceptanceTest;
@@ -35,8 +34,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
   private void 노선_구간_등록됨(ExtractableResponse<Response> response){
     assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
   }
-  private void 노선_구간_실패됨(ExtractableResponse<Response> response){
+  private void 노선_구간_등록실패됨(ExtractableResponse<Response> response){
     assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  private void 노선_구간_삭제됨(ExtractableResponse<Response> response){
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
   private ExtractableResponse<Response> 구간등록요청(long upStationId, long downStationId,int distance){
@@ -54,6 +57,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         .then().log().all()
         .extract();
   }
+
+  private ExtractableResponse<Response> 구간삭제요청(long downStationId){
+    return RestAssured.given().log().all()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .delete("/lines/{lineId}/sections?stationId={downStationId}",lineId,downStationId)
+        .then().log().all()
+        .extract();
+  }
+
 
   @DisplayName("지하철 노선에 구간을 등록한다")
   @Test
@@ -84,7 +97,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     ExtractableResponse<Response> sectionResponse =  구간등록요청(동천역,광교중앙역,30);
 
     //then 지하철 노선에 구간등록 완료됨
-    노선_구간_실패됨(sectionResponse);
+    노선_구간_등록실패됨(sectionResponse);
   }
 
 
@@ -101,10 +114,29 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     ExtractableResponse<Response> sectionResponse =  구간등록요청(상현역,광교중앙역,30);
 
     //then 지하철 노선에 구간등록 완료됨
-    노선_구간_실패됨(sectionResponse);
+    노선_구간_등록실패됨(sectionResponse);
   }
 
 
+  @DisplayName("노선의 구간을 삭제한다")
+  @Test
+  void deleteSection(){
+
+    //given 지하철 노선 생성됨
+    지하철_노선_생성됨();
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(광교역,광교중앙역,30);
+    long 상현역 =  지하철역_생성_요청("상현역").body().jsonPath().getLong("id");
+    long 성복역 =  지하철역_생성_요청("성복역").body().jsonPath().getLong("id");
+    구간등록요청(광교중앙역,상현역,30);
+    구간등록요청(상현역,성복역,30);
+
+    //when 노선의 구간 삭제요청함
+    ExtractableResponse<Response> removeResponse =  구간삭제요청(성복역);
+
+
+    //then 노선의 구간 삭제됨
+    노선_구간_삭제됨(removeResponse);
+  }
 
 
 }
