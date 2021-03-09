@@ -20,15 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SectionAcceptanceTest extends AcceptanceTest {
 
 
-  private long startStationId;
-  private long endStationId;
+  private long 광교역;
+  private long 광교중앙역;
   private long lineId;
   private ExtractableResponse<Response> createLineResponse;
 
   private void 지하철_노선_생성됨(){
-    startStationId = 지하철역_생성_요청("광교역").body().jsonPath().getLong("id");
-    endStationId = 지하철역_생성_요청("광교중앙역").body().jsonPath().getLong("id");
-    createLineResponse = 지하철_노선_생성요청("신분당선",LineColor.RED,startStationId,endStationId);
+    광교역 = 지하철역_생성_요청("광교역").body().jsonPath().getLong("id");
+    광교중앙역 = 지하철역_생성_요청("광교중앙역").body().jsonPath().getLong("id");
+    createLineResponse = 지하철_노선_생성요청("신분당선",LineColor.RED,광교역,광교중앙역);
     lineId = createLineResponse.body().jsonPath().getLong("id");
   }
 
@@ -62,7 +62,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     지하철_노선_생성됨();
 
     //when 지하철 노선에 구간등록 요청
-    ExtractableResponse<Response> sectionResponse =  구간등록요청(startStationId,endStationId,30);
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(광교역,광교중앙역,30);
+    long 상현역 =  지하철역_생성_요청("상현역").body().jsonPath().getLong("id");
+    long 성복역 =  지하철역_생성_요청("성복역").body().jsonPath().getLong("id");
+    구간등록요청(광교중앙역,상현역,30);
+    구간등록요청(상현역,성복역,30);
 
     //then 지하철 노선에 구간등록 완료됨
     노선_구간_등록됨(sectionResponse);
@@ -73,11 +77,28 @@ public class SectionAcceptanceTest extends AcceptanceTest {
   void createSectionWithoutEndSection() {
     //given 지하철 노선 생성됨
     지하철_노선_생성됨();
-    long stationId =  지하철역_생성_요청("동천역").body().jsonPath().getLong("id");
-    구간등록요청(startStationId,endStationId,30);
+    long 동천역 =  지하철역_생성_요청("동천역").body().jsonPath().getLong("id");
+    구간등록요청(광교역,광교중앙역,30);
 
     //when 지하철 노선에 구간등록 요청
-    ExtractableResponse<Response> sectionResponse =  구간등록요청(stationId,endStationId,30);
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(동천역,광교중앙역,30);
+
+    //then 지하철 노선에 구간등록 완료됨
+    노선_구간_실패됨(sectionResponse);
+  }
+
+
+  @DisplayName("신규구간의 상행역이 노선의 종점역이 아닌 구간을 등록한다")
+  @Test
+  void createSectionWithDuplicatedSection() {
+    //given 지하철 노선 생성됨
+    지하철_노선_생성됨();
+    long 상현역 =  지하철역_생성_요청("상현역").body().jsonPath().getLong("id");
+    구간등록요청(광교역,광교중앙역,30);
+    구간등록요청(광교중앙역,상현역,30);
+
+    //when 지하철 노선에 구간등록 요청
+    ExtractableResponse<Response> sectionResponse =  구간등록요청(상현역,광교중앙역,30);
 
     //then 지하철 노선에 구간등록 완료됨
     노선_구간_실패됨(sectionResponse);
