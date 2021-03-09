@@ -9,7 +9,7 @@ import nextstep.subway.line.exception.LineAlreadyExistException;
 import nextstep.subway.line.exception.LineNonExistException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
-import nextstep.subway.station.exception.NonExistStationException;
+import nextstep.subway.station.exception.StationNonExistException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,15 +54,18 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    private Station findStationById(Long upStationId) {
-        return stationRepository.findById(upStationId)
-                .orElseThrow(() -> new NonExistStationException(EXCEPTION_MESSAGE_NON_EXIST_STATION));
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        Line line = findLineById(id);
+
+        line.update(lineRequest.toLine());
+
+        return LineResponse.of(line);
     }
 
-    private void validateLineName(String lineName) {
-        if (lineRepository.existsByName(lineName)) {
-            throw new LineAlreadyExistException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
-        }
+    public void deleteLine(Long id) {
+        Line line = findLineById(id);
+
+        lineRepository.delete(line);
     }
 
     @Transactional(readOnly = true)
@@ -78,22 +81,19 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    public LineResponse updateLine(Long id, LineRequest lineRequest) {
-        Line line = findLineById(id);
-
-        line.update(lineRequest.toLine());
-
-        return LineResponse.of(line);
-    }
-
-    public void deleteLine(Long id) {
-        Line line = findLineById(id);
-
-        lineRepository.delete(line);
-    }
-
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNonExistException(EXCEPTION_MESSAGE_NON_EXIST_LINE_NAME));
+    }
+
+    private Station findStationById(Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new StationNonExistException(EXCEPTION_MESSAGE_NON_EXIST_STATION));
+    }
+
+    private void validateLineName(String lineName) {
+        if (lineRepository.existsByName(lineName)) {
+            throw new LineAlreadyExistException(EXCEPTION_MESSAGE_EXIST_LINE_NAME);
+        }
     }
 }

@@ -56,11 +56,11 @@ public class Section implements Comparable<Section> {
     }
 
     @Override
-    public int compareTo(Section o) {
-        if (this.upStation.equals(o.getDownStation())) {
+    public int compareTo(Section section) {
+        if (this.upStation.equals(section.getDownStation())) {
             return 1;
         }
-        if (this.downStation.equals(o.getUpStation())) {
+        if (this.downStation.equals(section.getUpStation())) {
             return -1;
         }
         return 0;

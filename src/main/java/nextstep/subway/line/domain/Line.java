@@ -2,6 +2,8 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.exception.NotMatchingStationException;
+import nextstep.subway.station.exception.StationAlreadyExistException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -38,8 +40,31 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Station upStation, Station downStation, int distance) {
-        Section section = new Section(this, upStation, downStation, distance);
-        sections.add(section);
+        if (sections.isEmpty()) {
+            sections.add(createSection(upStation, downStation, distance));
+            return;
+        }
+
+        validateUpStationMatching(upStation);
+        validateExistDownStation(sections, downStation);
+
+        sections.add(createSection(upStation, downStation, distance));
+    }
+
+    private Section createSection(Station upStation, Station downStation, int distance) {
+        return new Section(this, upStation, downStation, distance);
+    }
+
+    private void validateUpStationMatching(Station upStation) {
+        if (!getLastDownStation().equals(upStation)) {
+            throw new NotMatchingStationException("기존 노선의 하행선과 신규 노선의 상행선이 같지 않습니다.");
+        }
+    }
+
+    private void validateExistDownStation(List<Section> sections, Station downStation) {
+        if (sections.contains(downStation)) {
+            throw new StationAlreadyExistException("하행선이 이미 존재합니다.");
+        }
     }
 
     public Long getId() {
@@ -64,5 +89,10 @@ public class Line extends BaseEntity {
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    public Station getLastDownStation() {
+        Section section = this.sections.get(sections.size() - 1);
+        return section.getDownStation();
     }
 }
