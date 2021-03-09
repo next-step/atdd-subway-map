@@ -1,5 +1,6 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.common.SectionValidationException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
@@ -62,6 +63,11 @@ public class LineController {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity handleNoSuchElementException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(SectionValidationException.class)
+    public ResponseEntity handleSectionValidationException() {
         return ResponseEntity.badRequest().build();
     }
 

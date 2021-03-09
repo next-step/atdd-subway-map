@@ -112,7 +112,9 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 지하철_노선에_구간_등록_실패() {}
+    public static void 지하철_노선에_구간_등록_실패(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     public static void 지하철_구간_삭제() {}
 

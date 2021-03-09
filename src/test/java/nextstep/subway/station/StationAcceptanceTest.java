@@ -14,36 +14,30 @@ import static nextstep.subway.station.StationSteps.*;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
+
+    public static Map<String, String> 강남역 = makeStation("강남역");
+    public static Map<String, String> 역삼역 = makeStation("역삼역");
+    public static Map<String, String> 선릉역 = makeStation("선릉역");
+    public static Map<String, String> 삼성역 = makeStation("삼성역");
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철_역_생성_요청(강남역());
+        ExtractableResponse<Response> response = 지하철_역_생성_요청(강남역);
 
         // then
         지하철_역_생성_성공(response);
-    }
-
-    public static Map<String, String> 강남역() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        return params;
-    }
-
-    public static Map<String, String> 역삼역() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "역삼역");
-        return params;
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
     @Test
     void createStationWithDuplicatedName() {
         // given
-        지하철_역_생성_요청(강남역());
+        지하철_역_생성_요청(강남역);
 
         // when
-        ExtractableResponse<Response> response = 지하철_역_생성_요청(강남역());
+        ExtractableResponse<Response> response = 지하철_역_생성_요청(강남역);
 
         // then
         지하철_역_생성_실패(response);
@@ -53,8 +47,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = 지하철_역_생성_요청(강남역());
-        ExtractableResponse<Response> createResponse2 = 지하철_역_생성_요청(역삼역());
+        ExtractableResponse<Response> createResponse1 = 지하철_역_생성_요청(강남역);
+        ExtractableResponse<Response> createResponse2 = 지하철_역_생성_요청(역삼역);
 
         // when
         ExtractableResponse<Response> response = 지하철_역_조회();
@@ -67,7 +61,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_역_생성_요청(강남역());
+        ExtractableResponse<Response> createResponse = 지하철_역_생성_요청(강남역);
 
         // when
         String uri = createResponse.header("Location");
@@ -76,4 +70,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         지하철_역_삭제_성공(response);
     }
+
+    public static Map<String, String> makeStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        return params;
+    }
+
 }

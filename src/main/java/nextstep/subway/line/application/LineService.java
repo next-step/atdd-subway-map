@@ -1,5 +1,6 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.common.SectionValidationException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
@@ -63,10 +64,10 @@ public class LineService {
         List<Station> stations = getStations(line);
         if (stations.isEmpty()) return;
         if (isNotValidUpStation(newUpStation, stations)) {
-            throw new RuntimeException("새로운 구간의 상행역은 기존 하행 종점역이어야 합니다.");
+            throw new SectionValidationException("새로운 구간의 상행역은 기존 하행 종점역이어야 합니다.");
         }
         if (isNotValidDownStation(newDownStation, stations)) {
-            throw new RuntimeException("하행역이 이미 등록되어 있습니다.");
+            throw new SectionValidationException("하행역이 이미 등록되어 있습니다.");
         }
     }
 
