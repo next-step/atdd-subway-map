@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import nextstep.subway.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import static nextstep.subway.station.StationRequestBuilder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선구간 관련 기능")
-public class SectionAcceptanceTest {
+public class SectionAcceptanceTest extends AcceptanceTest {
 
 
   private long startStationId;
@@ -46,7 +47,7 @@ public class SectionAcceptanceTest {
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
-        .post(MessageFormat.format("/lines/{1}/sections",lineId))
+        .post("/lines/{lineId}/sections",lineId)
         .then().log().all()
         .extract();
   }
