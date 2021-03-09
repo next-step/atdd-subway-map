@@ -11,8 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineRequestSteps.지하철_노선_생성_요청;
 import static nextstep.subway.line.LineSectionRequestSteps.*;
-import static nextstep.subway.line.LineSectionVerificationSteps.지하철_노선에_등록된_구간_제거_됨;
-import static nextstep.subway.line.LineSectionVerificationSteps.지하철_노선에_새로운_구간_등록_됨;
+import static nextstep.subway.line.LineSectionVerificationSteps.*;
 import static nextstep.subway.station.StationRequestSteps.지하철_역_등록_됨;
 
 @DisplayName("지하철 노선에 역 등록 관련 기능")
@@ -41,7 +40,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간을 등록한다.")
     void addLineSection() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_새로운_구간_등록_요청(신분당선, 양재역.getId(), 양재시민의숲역.getId(), 5);
+        ExtractableResponse<Response> response = 지하철_노선에_새로운_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5);
 
         // then
         지하철_노선에_새로운_구간_등록_됨(response);
@@ -51,7 +50,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 등록된 구간을 제거한다.")
     void removeLineSection() {
         // given
-        LineResponse 신분당선 = 지하철_노선에_새로운_구간_등록_요청(this.신분당선, 양재역.getId(), 양재시민의숲역.getId(), 5).as(LineResponse.class);
+        지하철_노선에_새로운_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5).as(LineResponse.class);
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선에_등록된_구간_제거_요청(신분당선.getId(), 양재시민의숲역.getId());

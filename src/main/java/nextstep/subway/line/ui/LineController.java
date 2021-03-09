@@ -63,11 +63,17 @@ public class LineController {
     }
 
     @PostMapping(value = "/{id}/sections", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> addLineStation(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<LineResponse> addLineSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         LineResponse lineResponse = lineService.addSectionToLine(id, sectionRequest);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .body(lineResponse);
+    }
+
+    @DeleteMapping(value = "/{id}/sections")
+    public ResponseEntity<Void> deleteLineSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSectionToLine(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 }

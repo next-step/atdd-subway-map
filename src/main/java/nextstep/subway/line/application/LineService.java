@@ -54,6 +54,12 @@ public class LineService {
         return LineResponse.of(line);
     }
 
+
+    public void deleteSectionToLine(Long id, Long stationId) {
+        Line line = findLineById(id);
+        line.deleteLastDownStation(stationId);
+    }
+
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = findLineById(id);
 

@@ -13,7 +13,7 @@ public class LineSectionVerificationSteps {
     }
 
     public static void 지하철_노선에_등록된_구간_제거_됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 }

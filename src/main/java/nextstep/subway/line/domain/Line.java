@@ -67,6 +67,23 @@ public class Line extends BaseEntity {
         }
     }
 
+    public void deleteLastDownStation(Long downStation) {
+        Station lastDownStation = getLastDownStation();
+        validateDeletableStation(downStation, lastDownStation.getId());
+        sections.remove(lastDownStation);
+    }
+
+    private void validateDeletableStation(Long downStation, Long lastDownStationId) {
+        boolean isEqualStation = lastDownStationId.equals(downStation);
+
+        if (!isEqualStation) {
+            throw new IllegalArgumentException("하행 종점역만 제거할 수 있습니다.");
+        }
+        if (sections.size() == 1) {
+            throw new IllegalArgumentException("구간을 더이상 삭제할 수 없습니다.");
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -79,6 +96,11 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public Station getLastDownStation() {
+        Section section = this.sections.get(sections.size() - 1);
+        return section.getDownStation();
+    }
+
     public List<Section> getSections() {
         return sections;
     }
@@ -89,10 +111,5 @@ public class Line extends BaseEntity {
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
                 .distinct()
                 .collect(Collectors.toList());
-    }
-
-    public Station getLastDownStation() {
-        Section section = this.sections.get(sections.size() - 1);
-        return section.getDownStation();
     }
 }
