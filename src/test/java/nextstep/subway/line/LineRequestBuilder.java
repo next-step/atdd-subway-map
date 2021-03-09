@@ -93,4 +93,43 @@ public class LineRequestBuilder {
         .when().delete("/lines/{id}",id)
         .then().log().all().extract();
   }
+  public static void 노선_구간_등록됨(ExtractableResponse<Response> response){
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+  }
+  public static void 노선_구간_등록실패됨(ExtractableResponse<Response> response){
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  public static void 노선_구간_삭제됨(ExtractableResponse<Response> response){
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
+
+  public static void 노선_구간_삭제실패됨(ExtractableResponse<Response> response) {
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+  public static  ExtractableResponse<Response> 구간등록요청(long lineId,long upStationId, long downStationId,int distance){
+
+    Map params = new HashMap<>();
+    params.put("upStationId",upStationId);
+    params.put("downStationId",downStationId);
+    params.put("distance",distance);
+
+    return RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .post("/lines/{lineId}/sections",lineId)
+        .then().log().all()
+        .extract();
+  }
+
+  public static ExtractableResponse<Response> 구간삭제요청(long lineId,long downStationId){
+    return RestAssured.given().log().all()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .delete("/lines/{lineId}/sections?stationId={downStationId}",lineId,downStationId)
+        .then().log().all()
+        .extract();
+  }
+
 }
