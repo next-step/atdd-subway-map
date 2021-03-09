@@ -5,6 +5,7 @@ import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.station.exception.StationNameDuplicatedException;
+import nextstep.subway.station.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,16 @@ public class StationService {
         return stations.stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public StationResponse getStation(Long id) {
+        return StationResponse.of(findStationById(id));
+    }
+
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(StationNotFoundException::new);
     }
 
     public void deleteStation(Long id) {
