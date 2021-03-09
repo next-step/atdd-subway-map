@@ -9,6 +9,7 @@ import nextstep.subway.line.exception.LineAlreadyExistsException;
 import nextstep.subway.line.exception.LineIllegalStationException;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +56,14 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).get();
-        return LineResponse.of(line);
+        int lastIndex = line.getSections().size() - 1;
+        List<StationResponse> stations = line.getSections()
+                .stream()
+                .map(s -> StationResponse.of(s.getUpStation()))
+                .collect(Collectors.toList());
+        stations.add(StationResponse.of(line.getSections().get(lastIndex).getDownStation()));
+
+        return LineResponse.of(line, stations);
     }
 
     public LineResponse updateLineById(Long id, LineRequest lineRequest) {
