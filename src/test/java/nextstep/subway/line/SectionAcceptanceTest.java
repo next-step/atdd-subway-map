@@ -27,7 +27,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
   private void 지하철_노선_생성됨(){
     startStationId = 지하철역_생성_요청("광교역").body().jsonPath().getLong("id");
-    endStationId = 지하철역_생성_요청("강남역").body().jsonPath().getLong("id");
+    endStationId = 지하철역_생성_요청("광교중앙역").body().jsonPath().getLong("id");
     createLineResponse = 지하철_노선_생성요청("신분당선",LineColor.RED,startStationId,endStationId);
     lineId = createLineResponse.body().jsonPath().getLong("id");
   }
@@ -74,6 +74,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     //given 지하철 노선 생성됨
     지하철_노선_생성됨();
     long stationId =  지하철역_생성_요청("동천역").body().jsonPath().getLong("id");
+    구간등록요청(startStationId,endStationId,30);
 
     //when 지하철 노선에 구간등록 요청
     ExtractableResponse<Response> sectionResponse =  구간등록요청(stationId,endStationId,30);

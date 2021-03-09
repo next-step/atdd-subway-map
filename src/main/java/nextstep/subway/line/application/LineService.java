@@ -1,7 +1,7 @@
 package nextstep.subway.line.application;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.NoResultException;
+import nextstep.subway.common.exception.InvalidSectionException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.Section;
@@ -63,7 +63,25 @@ public class LineService {
         Line line = lineRepository.findById(lineId)
             .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
 
+        if(line.getSections().size() == 0) {
+            line.addSection(new Section(line,upStation,downStation,sectionRequest.getDistance()));
+            return;
+        }
+
+        //하행종점은 다른 구간의 상행역이 아니다
+        //구간의 상행역으로 등록되지 않은 하행역이 하행종점
+        boolean isValidUpStation =  !line.getSections().get(line.getSections().size()-1)
+            .getDownStation().equals(upStation);
+
+        boolean isValidDownStation = line.getSections().stream()
+            .anyMatch(section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation));
+
+        if(isValidUpStation) throw new InvalidSectionException("상행역은 현재 노선의 하행 종점역이어야 합니다.");
+        if(isValidDownStation) throw new InvalidSectionException("하행역은 노선에 이미 등록되어 있습니다.");
+
         line.addSection(new Section(line,upStation,downStation,sectionRequest.getDistance()));
+
+
 
     }
 }
