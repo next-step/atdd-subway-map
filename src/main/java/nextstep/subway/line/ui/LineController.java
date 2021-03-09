@@ -55,6 +55,12 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
     }
 
+    @DeleteMapping(value = "{id}/sections")
+    public ResponseEntity deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSectionById(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(LineAlreadyExistsException.class)
     public ResponseEntity lineIllegalArgsException(LineAlreadyExistsException e) {
         return ResponseEntity.badRequest().build();
