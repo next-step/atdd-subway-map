@@ -46,9 +46,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철_역_등록되어_있음(name);
 
         // when
+        // 지하철_역_생성_요청
         ExtractableResponse<Response> response = 지하철_역_생성_요청(name);
 
         // then
+        // 지하철_역_생성_실패됨
         지하철_역_생성_실패됨(response);
     }
 
