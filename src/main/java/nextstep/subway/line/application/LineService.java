@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,15 +32,12 @@ public class LineService {
     }
 
     public LineResponse getLine(Long id) {
-        return Optional.ofNullable(lineRepository.findById(id).get())
-                .map(line -> LineResponse.of(line))
-                .get();
+        return LineResponse.of(lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("라인이 존재하지 않습니다.")));
     }
 
-    public LineResponse updateLine(Line line) {
-        Line addedLine = lineRepository.findById(line.getId()).orElse(new Line());
-        addedLine.update(line);
-        return LineResponse.of(lineRepository.save(addedLine));
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line addedLine = lineRepository.getOne(id);
+        addedLine.update(lineRequest.toLine());
     }
 
     public void deleteLine(Long id) {
