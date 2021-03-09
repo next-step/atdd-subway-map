@@ -3,11 +3,11 @@ package nextstep.subway.line.domain;
 import nextstep.subway.exception.NoOtherStationException;
 import nextstep.subway.exception.NotEqualsNameException;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.dto.StationResponse;
 
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,14 +24,6 @@ public class Sections {
 
     }
 
-    public <T> Sections(Line line, List<Section> sections) {
-
-    }
-
-    public static Sections of(Line line, Section... section) {
-        return new Sections(line, Arrays.asList(section));
-    }
-
     public List<Section> getSections() {
         return sections;
     }
@@ -45,14 +37,14 @@ public class Sections {
     }
 
     public Station getDownStation() {
-        return sections.get(sections.size() - 1).getDownStation();
+        return sections.get(size() -1).getDownStation();
     }
 
     private void addSectionValidate(Section section) {
         Station upStation = section.getUpStation();
-        Station downStation = getDownStation();
+        Station downStation = section.getDownStation();
 
-        if(!upStation.equals(downStation)) {
+        if (!upStation.equals(downStation)) {
             throw new NotEqualsNameException();
         }
     }
@@ -62,7 +54,7 @@ public class Sections {
     }
 
     private boolean isTarget(long stationId) {
-        return Objects.equals(getFinishSection().getId(), stationId);
+        return Objects.equals(getDownStation().getId(), stationId);
     }
 
     private void isValidDeleteSection(long stationId) {
@@ -76,7 +68,6 @@ public class Sections {
     }
 
     public void addSection(Section section) {
-        addSectionValidate(section);
         sections.add(section);
     }
 
@@ -84,4 +75,13 @@ public class Sections {
         isValidDeleteSection(stationId);
         sections.remove(getFinishSection());
     }
+
+    public List<StationResponse> getAllStation() {
+        List<StationResponse> responses = new ArrayList<>();
+        responses.add(StationResponse.of(sections.get(0).getUpStation()));
+
+        sections.forEach(section -> responses.add(StationResponse.of(section.getDownStation())));
+        return responses;
+    }
+
 }
