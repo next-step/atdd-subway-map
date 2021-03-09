@@ -1,27 +1,19 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
-import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import static nextstep.subway.line.LineSteps.Line.분당선;
 import static nextstep.subway.line.LineSteps.Line.일호선;
-import static nextstep.subway.line.LineSteps.지하철_노선_생성요청;
 import static nextstep.subway.line.SectionSteps.*;
 import static nextstep.subway.station.StationSteps.Station.*;
 import static nextstep.subway.station.StationSteps.지하철역_생성요청;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -63,9 +55,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간을 제거한다.")
     @Test
     void deleteSection() {
-        // 지하철노선_구간_등록요청
+        // given
+        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
+        지하철노선_구간_등록요청(lineId, new SectionRequest(station2, station3, distance));
+
         // 지하철노선_구간_제거요청
+        ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, station3);
+
         // 지하철노선_구간_삭제됨
+        지하철노선_구간_삭제됨(response);
     }
 
     @DisplayName("지하철 노선에 등록된 구간 정보로 역목록을 조회한다.")

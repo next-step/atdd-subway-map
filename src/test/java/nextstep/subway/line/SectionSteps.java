@@ -34,4 +34,15 @@ public class SectionSteps {
     public static void 지하철노선_구간_등록됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
+
+    public static ExtractableResponse<Response> 지하철노선_구간_제거요청(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
+                .then().log().all().extract();
+    }
+
+    public static void 지하철노선_구간_삭제됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }
