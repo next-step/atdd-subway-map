@@ -55,7 +55,7 @@ public class LineRequestBuilder {
 
   public static void 지하철_노선에서_구간_조회됨(ExtractableResponse<Response> response) {
     assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.body().jsonPath().getList("sections").size()).isNotEqualTo(0);
+    assertThat(response.body().jsonPath().getList("stations").size()).isNotEqualTo(0);
   }
 
   public static void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
