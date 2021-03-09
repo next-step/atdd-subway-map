@@ -40,7 +40,7 @@ public class Line extends BaseEntity {
     private int distance;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private final List<Section> sections = new ArrayList<>();
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
