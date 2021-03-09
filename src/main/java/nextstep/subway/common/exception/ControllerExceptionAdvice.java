@@ -24,7 +24,7 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> invalidJpaDataExceptionHandler(DataIntegrityViolationException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
