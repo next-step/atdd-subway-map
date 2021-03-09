@@ -4,6 +4,8 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.LineAlreadyExistsException;
+import nextstep.subway.line.exception.LineIllegalStationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,8 +49,19 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping(value = "{id}/sections")
+    public ResponseEntity createSections(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        lineService.saveSections(id, lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
+    }
+
     @ExceptionHandler(LineAlreadyExistsException.class)
     public ResponseEntity lineIllegalArgsException(LineAlreadyExistsException e) {
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(LineIllegalStationException.class)
+    public ResponseEntity lineStationIllegalArgsException(LineIllegalStationException e) {
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
     }
 }
