@@ -1,6 +1,5 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -8,7 +7,6 @@ import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.line.LineSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -29,7 +28,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_생성됨
         지하철_노선_생성_성공(response);
-        assertThat("신분당선").isEqualTo(response.jsonPath().get("name"));
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -86,7 +84,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_수정됨
         지하철_노선_응답_성공(response);
-        assertThat(updateParam.get("name")).isEqualTo(response.jsonPath().get("name"));
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -119,65 +116,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /** 중복코드 리팩터링 */
-    private String getResponseURI(ExtractableResponse<Response> response){
-        if(response!=null) {
-            return response.header("Location");
-        }else
-            return null;
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_등록(String name, String color){
-
-        ExtractableResponse<Response> createResponse;
-        Map<String, String> param1 = new HashMap<>();
-
-        param1.put("color", color);
-        param1.put("name", name);
-
-        createResponse = RestAssured.given().log().all()
-                .body(param1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        return createResponse;
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_제거_요청(ExtractableResponse<Response> request){
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete(getResponseURI(request))
-                .then().log().all().extract();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> request){
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get(getResponseURI(request))
-                .then().log().all().extract();
-        return response;
-    }
-
-    private ExtractableResponse<Response> 지하철_전체노선_조회_요청(ExtractableResponse<Response> request){
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get(getResponseURI(request).split("/")[1])
-                .then().log().all().extract();
-        return response;
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> request,Map<String, String> param){
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put(getResponseURI(request))
-                .then().log().all().extract();
-
-        return response;
-    }
-
     private void 지하철_노선_응답_성공(ExtractableResponse<Response> response){
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
