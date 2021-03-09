@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
-    private Long downStationId;
     private Long upStationId;
+    private Long downStationId;
     private int distance;
 
     private LineRequest lineRequest;
@@ -37,11 +37,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void setUp() {
         super.setUp();
 
-        downStationId = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
-        upStationId = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
+        upStationId = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
+        downStationId = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
         distance = 10;
 
-        lineRequest = new LineRequest(일호선.name, 일호선.color, downStationId, upStationId, distance);
+        lineRequest = new LineRequest(일호선.name, 일호선.color, upStationId, downStationId, distance);
     }
 
     @DisplayName("지하철 노선에 구간을 등록한다.")
@@ -52,7 +52,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long lineId = lineResponse.getId();
 
         // when (지하철노선_구간_등록요청)
-        SectionRequest request = new SectionRequest(downStationId, upStationId, distance);
+        SectionRequest request = new SectionRequest(upStationId, downStationId, distance);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE).body(request)
                 .when().post("/lines/{lineId}/sections", lineId)
