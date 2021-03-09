@@ -22,7 +22,7 @@ public class StationSteps {
         return 지하철_역_생성_요청("역역");
     }
 
-    private static ExtractableResponse<Response> 지하철_역_생성_요청(String name) {
+    public static ExtractableResponse<Response> 지하철_역_생성_요청(String name) {
         Map<String, String> params = createParams(name);
         return postRequest("/stations", params);
     }
@@ -40,6 +40,10 @@ public class StationSteps {
     }
 
     public static void 지하철_역_생성_실패(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    public static void 존재하지_않는_지하철_역이기_때문에_잘못된_요청(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -85,4 +89,5 @@ public class StationSteps {
 
         return params;
     }
+
 }

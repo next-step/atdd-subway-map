@@ -28,7 +28,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         강남역_생성();
 
         // when
-
         ExtractableResponse<Response> response = 강남역_생성();
 
         // then

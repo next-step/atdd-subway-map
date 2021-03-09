@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
-        Map<String, String> params = createParams(name, color);
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long downStationId) {
+        Map<String, Object> params = createParams(name, color, downStationId);
         return postRequest("/lines", params);
     }
 
@@ -40,7 +40,7 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 존재하지_않는_지하철_노선(ExtractableResponse<Response> response) {
+    public static void 존재하지_않는_지하철_노선_오류(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
@@ -57,8 +57,9 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long createdLineId, String name, String color) {
-        Map<String, String> params = createParams(name,color);
+
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long createdLineId, String name, String color, Long downStationId) {
+        Map<String, Object> params = createParams(name,color, downStationId);
         return putRequest("/lines/"+createdLineId, params);
     }
 
@@ -71,10 +72,11 @@ public class LineSteps {
     }
 
 
-    private static Map<String, String> createParams(String name, String color) {
-        Map<String, String> params = new HashMap<>();
+    private static Map<String, Object> createParams(String name, String color, Long downStationId) {
+        Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
+        params.put("downStationId", downStationId);
 
         return params;
     }

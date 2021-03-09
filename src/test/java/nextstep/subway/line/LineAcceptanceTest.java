@@ -7,40 +7,71 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.line.SectionSteps.*;
+import static nextstep.subway.station.StationSteps.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        // given
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "green", stationId);
 
         // then
         지하철_노선_생성_성공(response);
+    }
+
+    @DisplayName("존재하지 않는 지하철 역 ID로 지하철 노선을 생성한다.")
+    @Test
+    void createLineWithNotExistStationId() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "green", 1L);
+
+        // then
+        존재하지_않는_지하철_역이기_때문에_잘못된_요청(response);
     }
 
     @DisplayName("기존에 존재하는 노선 이름으로 노선을 생성한다.")
     @Test
     void createLineWithDuplicateName() {
         // given
-        지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+        지하철_노선_생성_요청("2호선", "green", stationId);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "green", stationId);
 
         // then
         지하철_노선_생성_실패(response);
+    }
+
+    @DisplayName("종점역 ID 없이 지하철 노선을 생성한다.")
+    @Test
+    void createLineWithoutStationID() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "green", null);
+
+        // then
+        지하철_노선_생성_성공(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
         // given
-        지하철_노선_생성_요청("2호선", "green");
-        지하철_노선_생성_요청("3호선", "orange");
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+
+        지하철_노선_생성_요청("2호선", "green", stationId);
+        지하철_노선_생성_요청("3호선", "orange", stationId);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
@@ -54,7 +85,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+
+        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", stationId);
         Long createdLineId = 생성된_지하철_노선_ID_확인(createdLine);
 
         // when
@@ -71,18 +105,21 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
 
         // then
-        존재하지_않는_지하철_노선(response);
+        존재하지_않는_지하철_노선_오류(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+
+        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", stationId);
         Long createdLineId = 생성된_지하철_노선_ID_확인(createdLine);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_수정_요청(createdLineId, "2호선", "orange");
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(createdLineId, "2호선", "orange", stationId);
 
         // then
         지하철_노선_수정_성공(response);
@@ -91,18 +128,25 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("존재하지 않는 지하철 노선을 수정한다.")
     @Test
     void updateLineWithNoId() {
+        // given
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+
         // when
-        ExtractableResponse<Response> response = 지하철_노선_수정_요청(1L, "2호선", "orange");
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(1L, "2호선", "orange", stationId);
 
         // then
-        존재하지_않는_지하철_노선(response);
+        존재하지_않는_지하철_노선_오류(response);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로3가");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+
+        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", stationId);
         Long createdLineId = 생성된_지하철_노선_ID_확인(createdLine);
 
         // when
@@ -119,7 +163,57 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_삭제_요청(1L);
 
         // then
-        존재하지_않는_지하철_노선(response);
+        존재하지_않는_지하철_노선_오류(response);
     }
 
+    //구간 등록 성공
+    /*
+    @DisplayName("구간 등록 정상적으로 성공")
+    @Test
+    void createSection() {
+        //given
+        //역1 생성
+        ExtractableResponse<Response> stationResponse1 = 상행선으로_사용될_지하철_역_생성("을지로입구");
+        Long stationId1 = 생성된_지하철_역_ID_확인(stationResponse1);
+
+        //역2 생성
+        ExtractableResponse<Response> stationResponse2 = 하행선으로_사용될_지하철_역_생성("을지로3가");
+        Long stationId2 = 생성된_지하철_역_ID_확인(stationResponse2);
+
+        //노선 생성
+        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", stationId1);
+        Long createdLineId = 생성된_지하철_노선_ID_확인(createdLine);
+
+        //when
+        //구간 등록
+        ExtractableResponse<Response> createdSection = 구간_생성_요청(createdLineId, stationId1, stationId2, 3L);
+
+        //then
+        //성공
+        지하철_구간_등록_성공(createdSection);
+    }
+    */
+    //새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닐 때
+    /*
+    @DisplayName("구간 등록 정상적으로 성공")
+    @Test
+    void createSectionWithoutLineDownStationId() {
+        //given
+        //역1 생성
+        ExtractableResponse<Response> stationResponse = 지하철_역_생성_요청("을지로입구");
+        Long stationId = 생성된_지하철_역_ID_확인(stationResponse);
+
+        //노선 생성
+        ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", stationId);
+        Long createdLineId = 생성된_지하철_노선_ID_확인(createdLine);
+
+        //when
+        //구간 등록
+        ExtractableResponse<Response> response = 구간_생성_요청(createdLineId, stationId+1, stationId, 3L);
+
+        //then
+        //성공
+        지하철_구간_등록_시_상행역이_노선의_종점역이_아님_오류(response);
+    }
+    */
 }

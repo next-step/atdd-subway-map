@@ -1,5 +1,7 @@
 package nextstep.subway.station.application;
 
+import nextstep.subway.common.exception.ApplicationException;
+import nextstep.subway.common.exception.ApplicationType;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
@@ -39,6 +41,11 @@ public class StationService {
         Optional<Station> line = stationRepository.findOneById(id);
 
         return line.map(StationResponse::of).orElse(null);
+    }
+
+    public void validateStationId(Long id) {
+        Optional<Station> station = stationRepository.findOneById(id);
+        station.orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));
     }
 
     public void deleteStationById(Long id) {
