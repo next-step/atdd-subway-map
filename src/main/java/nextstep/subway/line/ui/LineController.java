@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 
 @RestController
 @RequestMapping(value = "/lines")
@@ -59,8 +60,9 @@ public class LineController {
 
     @PostMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> addSection(
-        @PathVariable("lineId") Long lineId, @RequestBody LineRequest lineRequest) {
-        return ResponseEntity.ok(lineService.addSection(lineId, lineRequest));
+        @PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
+        LineResponse line = lineService.addSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId() + "/sections")).body(line);
     }
 
     @DeleteMapping(value = "/{lineId}/sections")

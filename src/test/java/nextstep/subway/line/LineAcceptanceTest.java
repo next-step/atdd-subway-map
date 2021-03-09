@@ -1,14 +1,14 @@
 package nextstep.subway.line;
 
 import static java.util.stream.Collectors.*;
+import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.station.StationAcceptanceTest.*;
+import static nextstep.subway.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
             String.valueOf(가평역.getId()), String.valueOf(춘천역.getId()), "4");
     }
 
-    @DisplayName("지하철 노선을 생성한다.")
+    @DisplayName("지하철 노선을 생성시 종점역이 추가된다.")
     @Test
     void createLine() {
         // when
@@ -53,6 +53,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_생성됨(response);
+        지하철_노선_종점역_추가됨(response, Arrays.asList(강남역, 양재역));
     }
 
     @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 생성한다.")
@@ -232,35 +233,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private void 지하철_노선_동등비교(List<LineResponse> results, List<LineResponse> lines) {
-        final List<String> lineNames = convertToList(lines, LineResponse::getName);
-        final List<String> resultNames = convertToList(results, LineResponse::getName);
-
-        assertThat(lineNames).containsExactlyElementsOf(resultNames);
-
-        final List<String> lineColors = convertToList(lines, LineResponse::getColor);
-        final List<String> resultColors = convertToList(results, LineResponse::getColor);
-
-        assertThat(lineColors).containsExactlyElementsOf(resultColors);
-    }
-
-    public static <T, R> List<R> convertToList(List<T> lines, Function<T, R> function) {
-        return lines.stream()
-            .map(function)
-            .collect(toList());
+        assertThat(results).usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyElementsOf(lines);
     }
 
     private void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> map) {
-        return RestAssured
-            .given().log().all()
-            .body(map)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
     }
 
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
@@ -277,19 +255,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    public static Map<String, String> 노선_생성(
-        String name, String color, String upStationId,
-        String downStationId, String distance) {
-        Map<String, String> map = new HashMap<>();
-        map.put("name", name);
-        map.put("color", color);
-        map.put("upStationId", upStationId);
-        map.put("downStationId", downStationId);
-        map.put("distance", distance);
-        return map;
-    }
-
     private void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void 지하철_노선_종점역_추가됨(ExtractableResponse<Response> response, List<StationResponse> stations) {
+        assertThat(response.jsonPath().getList("stations", StationResponse.class))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyElementsOf(stations);
     }
 }

@@ -1,7 +1,7 @@
 package nextstep.subway.line;
 
-import static nextstep.subway.line.LineAcceptanceTest.*;
-import static nextstep.subway.station.StationAcceptanceTest.*;
+import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
@@ -82,13 +82,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
 		final LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
 
-		final List<Long> responseIds = convertToList(lineResponse.getStations(), StationResponse::getId);
-		final List<Long> expectedIds = convertToList(stationResponses, StationResponse::getId);
-		assertThat(responseIds).containsExactlyElementsOf(expectedIds);
-
-		final List<String> responseNames = convertToList(lineResponse.getStations(), StationResponse::getName);
-		final List<String> expectedNames = convertToList(stationResponses, StationResponse::getName);
-		assertThat(responseNames).containsExactlyElementsOf(expectedNames);
+		assertThat(lineResponse.getStations()).usingRecursiveFieldByFieldElementComparator()
+			.containsExactlyElementsOf(stationResponses);
 	}
 
 	private ExtractableResponse<Response> 지하철역_목록_조회() {
@@ -120,7 +115,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	}
 
 	private void 지하철_노선에_구간_등록됨(ExtractableResponse<Response> response) {
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 	}
 
 	private void 지하철_구간_제거됨(ExtractableResponse<Response> response) {

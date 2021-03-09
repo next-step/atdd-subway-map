@@ -1,5 +1,7 @@
 package nextstep.subway.line.domain;
 
+import java.util.stream.Stream;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,10 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import nextstep.subway.common.BaseEntity;
 import nextstep.subway.station.domain.Station;
 
 @Entity
-public class Section implements Comparable<Section> {
+public class Section extends BaseEntity implements Comparable<Section> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,16 +34,19 @@ public class Section implements Comparable<Section> {
 
 	private int distance;
 
-	protected Section() {
+	public Section() {
 	}
 
-	public static Section of(Line line, Station upStation, Station downStation, int distance) {
-		Section section = new Section();
-		section.line = line;
-		section.upStation = upStation;
-		section.downStation = downStation;
-		section.distance = distance;
-		return section;
+	private Section(Line line, Station upStation, Station downStation, int distance) {
+		this.line = line;
+		this.upStation = upStation;
+		this.downStation = downStation;
+		this.distance = distance;
+	}
+
+	public static Section of(
+		Line line, Station upStation, Station downStation, int distance) {
+		return new Section(line, upStation, downStation, distance);
 	}
 
 	public Long getId() {
@@ -59,8 +65,8 @@ public class Section implements Comparable<Section> {
 		return downStation;
 	}
 
-	public int getDistance() {
-		return distance;
+	public Stream<Station> getStations() {
+		return Stream.of(upStation, downStation);
 	}
 
 	@Override
