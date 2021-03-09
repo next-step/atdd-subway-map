@@ -8,6 +8,7 @@ import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -22,11 +23,14 @@ import static org.springframework.http.HttpStatus.CREATED;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
+    @Autowired
+    private StationSupport stationSupport;
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
+        ExtractableResponse<Response> response = stationSupport.지하철역_생성_요청("강남역");
 
         // then
         지하철역_생성됨(response);
@@ -36,10 +40,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        지하철역_등록되어_있음("강남역");
+        stationSupport.지하철역_등록되어_있음("강남역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
+        ExtractableResponse<Response> response = stationSupport.지하철역_생성_요청("강남역");
 
         // then
         지하철역_생성_실패됨(response);
@@ -49,11 +53,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         // given
-        Long stationId1 = 지하철역_등록되어_있음("강남역");
-        Long stationId2 = 지하철역_등록되어_있음("역삼역");
+        Long stationId1 = stationSupport.지하철역_등록되어_있음("강남역");
+        Long stationId2 = stationSupport.지하철역_등록되어_있음("역삼역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_조회_요청();
+        ExtractableResponse<Response> response = stationSupport.지하철역_조회_요청();
 
         // then
         지하철역_조회됨(response, stationId1, stationId2);
@@ -63,45 +67,15 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Long stationId = 지하철역_등록되어_있음("강남역");
+        Long stationId = stationSupport.지하철역_등록되어_있음("강남역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_제거_요청(stationId);
+        ExtractableResponse<Response> response = stationSupport.지하철역_제거_요청(stationId);
 
         // then
         지하철역_제거됨(response);
     }
 
-    private Long 지하철역_등록되어_있음(String station) {
-        return 지하철역_생성_요청(station)
-                .jsonPath().getLong("id");
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성_요청(String station) {
-        return RestAssured.given().log().all()
-                .body(new StationRequest(station))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_조회_요청() {
-        return RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_제거_요청(Long stationId) {
-        return RestAssured.given().log().all()
-                .when()
-                .delete("/stations/{stationId}", stationId)
-                .then().log().all()
-                .extract();
-    }
 
     private void 지하철역_생성됨(ExtractableResponse<Response> response) {
         응답코드_확인(response, CREATED);
