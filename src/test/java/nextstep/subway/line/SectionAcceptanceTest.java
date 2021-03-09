@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import static nextstep.subway.line.LineSteps.Line.분당선;
 import static nextstep.subway.line.LineSteps.Line.일호선;
 import static nextstep.subway.line.LineSteps.지하철_노선_생성요청;
+import static nextstep.subway.line.SectionSteps.*;
 import static nextstep.subway.station.StationSteps.Station.*;
 import static nextstep.subway.station.StationSteps.지하철역_생성요청;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,19 +49,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void addSection() {
-        // given (지하철_노선_생성됨)
-        LineResponse lineResponse = 지하철_노선_생성요청(defaultLineRequest).as(LineResponse.class);
-        Long lineId = lineResponse.getId();
+        // given
+        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
 
-        // when (지하철노선_구간_등록요청)
+        // when
         SectionRequest request = new SectionRequest(station2, station3, distance);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE).body(request)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, request);
 
-        // then (지하철노선_구간_등록됨)
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        // then
+        지하철노선_구간_등록됨(response);
     }
 
     @DisplayName("지하철 노선에 구간을 제거한다.")
