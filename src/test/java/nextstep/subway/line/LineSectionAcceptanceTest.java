@@ -40,22 +40,58 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간을 등록한다.")
     void addLineSection() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_새로운_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5);
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5);
 
         // then
-        지하철_노선에_새로운_구간_등록_됨(response);
+        지하철_노선에_구간_등록_됨(response);
+    }
+
+    @Test
+    @DisplayName("지하철 노선에 이미 포함된 역을 구간으로 등록한다.")
+    void addLineSectionAlreadyIncluded() {
+        // given
+        지하철_노선에_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5);
+
+        // then
+        지하철_노선에_구간_등록_실패_됨(response);
     }
 
     @Test
     @DisplayName("지하철 노선에 등록된 구간을 제거한다.")
     void removeLineSection() {
         // given
-        지하철_노선에_새로운_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5).as(LineResponse.class);
+        지하철_노선에_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5).as(LineResponse.class);
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선에_등록된_구간_제거_요청(신분당선.getId(), 양재시민의숲역.getId());
 
         // then
         지하철_노선에_등록된_구간_제거_됨(deleteResponse);
+    }
+
+    @Test
+    @DisplayName("지하철 노선에 등록된 하행 종점역이 아닌 역을 제거한다.")
+    void removeLineSectionNotLastDownStation() {
+        // given
+        지하철_노선에_구간_등록_요청(신분당선.getId(), 양재역.getId(), 양재시민의숲역.getId(), 5).as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선에_등록된_구간_제거_요청(신분당선.getId(), 양재역.getId());
+
+        // then
+        지하철_노선에_등록된_구간_제거_실패_됨(deleteResponse);
+    }
+
+    @Test
+    @DisplayName("지하철 노선에 구간이 하나일 때 지하철역을 제외한다.")
+    void removeLineSectionOnlyOneSection() {
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_노선에_등록된_구간_제거_요청(신분당선.getId(), 양재시민의숲역.getId());
+
+        // then
+        지하철_노선에_등록된_구간_제거_실패_됨(deleteResponse);
     }
 }

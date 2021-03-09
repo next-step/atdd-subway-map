@@ -13,7 +13,7 @@ public class LineSectionRequestSteps {
         return new LineRequest(name, color, upStationId, downStationId, distance);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선에_새로운_구간_등록_요청(Long lineId, Long upStationId, Long downStationId, int distance) {
+    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(Long lineId, Long upStationId, Long downStationId, int distance) {
         SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
 
         return RestAssured

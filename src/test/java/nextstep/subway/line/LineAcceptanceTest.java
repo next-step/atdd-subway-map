@@ -20,6 +20,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private StationResponse 양재역;
     private LineRequest 신분당선;
 
+    private StationResponse 역삼역;
+    private LineRequest 이호선;
+
     @Override
     @BeforeEach
     public void setUp() {
@@ -30,6 +33,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         양재역 = 지하철_역_등록_됨("양재역").as(StationResponse.class);
 
         신분당선 = new LineRequest("신분당선", "bg-red-600", 강남역.getId(), 양재역.getId(), 7);
+
+        역삼역 = 지하철_역_등록_됨("역삼역").as(StationResponse.class);
+        이호선 = new LineRequest("2호선", "bg-red-600", 강남역.getId(), 역삼역.getId(), 2);
     }
 
     @Test
@@ -60,6 +66,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         지하철_노선_생성_요청(신분당선);
+        지하철_노선_생성_요청(이호선);
 
         // when
         ExtractableResponse<Response> readLinesResponse = 지하철_노선_목록_조회_요청();

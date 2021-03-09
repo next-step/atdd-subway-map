@@ -1,8 +1,10 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.line.exception.NotRemoveSectionException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.exception.NotMatchingStationException;
+import nextstep.subway.station.exception.NotRemoveStationException;
 import nextstep.subway.station.exception.StationAlreadyExistException;
 
 import javax.persistence.*;
@@ -80,10 +82,10 @@ public class Line extends BaseEntity {
         boolean isEqualStation = lastDownStationId.equals(downStation);
 
         if (!isEqualStation) {
-            throw new IllegalArgumentException(EXCEPTION_MESSAGE_NOT_DELETABLE_STATION);
+            throw new NotRemoveStationException(EXCEPTION_MESSAGE_NOT_DELETABLE_STATION);
         }
         if (sections.size() == 1) {
-            throw new IllegalArgumentException(EXCEPTION_MESSAGE_NOT_DELETABLE_SECTION);
+            throw new NotRemoveSectionException(EXCEPTION_MESSAGE_NOT_DELETABLE_SECTION);
         }
     }
 
