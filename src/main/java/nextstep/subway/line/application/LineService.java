@@ -1,11 +1,14 @@
 package nextstep.subway.line.application;
 
+import nextstep.subway.exception.NotFoundException;
 import nextstep.subway.exception.SubwayNameDuplicateException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+
+    private StationRepository stationRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -68,8 +73,30 @@ public class LineService {
     }
 
     public LineResponse addSection(long lineId, SectionRequest sectionRequest) {
-        //Line domain에서 비즈니스 로직 수행
-        //response return
-        return null;
+        Line line = findLineById(lineId);
+
+        Station upStation = findStationById(sectionRequest.getUpStationId());
+        Station downStation = findStationById(sectionRequest.getUpStationId());
+
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+        return LineResponse.of(line);
+    }
+
+    public LineResponse deleteSection(long lineId, long stationId) {
+        Line line = findLineById(lineId);
+        Station station = findStationById(stationId);
+
+        line.deleteSection(station.getId());
+        return LineResponse.of(line);
+    }
+
+    private Line findLineById(long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException("지하철 노선"));
+    }
+
+    private Station findStationById(long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new NotFoundException("지하철역"));
     }
 }
