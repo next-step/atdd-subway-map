@@ -6,16 +6,18 @@ import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 
-@Component
-public class LineSupport {
+public class LineRequestStep {
 
-    public Long 지하철_노선_등록되어_있음(String name, String color) {
+    public static Long 지하철_노선_등록되어_있음(String name, String color) {
         return 지하철_노선_등록요청(name, color).as(LineResponse.class).getId();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_목록조회요청() {
+    public static Long 지하철_구간_등록되어_있음(Long lineId, LineRequest line) {
+        return 지하철_구간_등록요청(lineId, line).as(LineResponse.class).getId();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_목록조회요청() {
 
         return RestAssured
                 .given().log().all()
@@ -23,15 +25,15 @@ public class LineSupport {
                 .then().log().all().extract();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_조회요청(Long lineId) {
+    public static ExtractableResponse<Response> 지하철_노선_조회요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .when().get("/lines/{lineId}", lineId)
                 .then().log().all().extract();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_등록요청(String name, String color) {
-        LineRequest request = new LineRequest(name, color);
+    public static ExtractableResponse<Response> 지하철_노선_등록요청(String name, String color) {
+        LineRequest request = LineRequest.of(name, color);
 
         return RestAssured
                 .given().log().all()
@@ -42,8 +44,8 @@ public class LineSupport {
                 .then().log().all().extract();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_수정요청(String name, String color, Long lineId) {
-        LineRequest request = new LineRequest(name, color);
+    public static ExtractableResponse<Response> 지하철_노선_수정요청(String name, String color, Long lineId) {
+        LineRequest request = LineRequest.of(name, color);
 
         return RestAssured
                 .given().log().all()
@@ -54,10 +56,20 @@ public class LineSupport {
                 .then().log().all().extract();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_삭제요청(Long lineId) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .when().delete("/lines/{lineId}", lineId)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_등록요청(Long lineId, LineRequest line) {
+        return RestAssured
+                .given().log().all()
+                .body(line)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{lineId}/sections", lineId)
                 .then().log().all().extract();
     }
 }

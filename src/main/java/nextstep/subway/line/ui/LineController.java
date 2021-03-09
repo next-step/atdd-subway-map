@@ -22,7 +22,7 @@ public class LineController {
     @PostMapping
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        return ResponseEntity.created(URI.create(String.format("/lines/%d", line.getId()))).body(line);
     }
 
     @GetMapping
@@ -58,6 +58,6 @@ public class LineController {
             @RequestBody LineRequest request
     ) {
        LineResponse line = lineService.createSection(id, request);
-       return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(line);
+       return ResponseEntity.created(URI.create(String.format("/stations/%d/sections",id))).body(line);
     }
 }

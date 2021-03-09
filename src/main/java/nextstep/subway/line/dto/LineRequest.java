@@ -12,15 +12,23 @@ public class LineRequest {
     public LineRequest() {
     }
 
-    public LineRequest(String name, String color) {
+    private LineRequest(String name, String color) {
         this.name = name;
         this.color = color;
     }
 
-    public LineRequest(Long upStationId, Long downStationId, int distance) {
+    private LineRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public static LineRequest of(String name, String color) {
+        return new LineRequest(name, color);
+    }
+
+    public static LineRequest of(Long upStationId, Long downStationId, int distance) {
+        return new LineRequest(upStationId, downStationId, distance);
     }
 
     public String getName() {

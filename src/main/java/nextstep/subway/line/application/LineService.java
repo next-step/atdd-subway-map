@@ -26,7 +26,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
+        final Line persistLine = lineRepository.save(request.toLine());
         return LineResponse.of(persistLine);
     }
 
@@ -40,14 +40,12 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse getLine(Long id) {
-        final Line line = findLineById(id);
-        return LineResponse.of(line);
+        return LineResponse.of(findLineById(id));
     }
 
     public LineResponse updateLine(Long id, LineRequest request) {
-        final Line line = findLineById(id);
-        line.update(request.toLine());
-        return LineResponse.of(line);
+        findLineById(id).update(request.toLine());
+        return LineResponse.of(findLineById(id));
     }
 
     public void deleteLine(Long id) {
@@ -55,8 +53,7 @@ public class LineService {
     }
 
     private Line findLineById(Long id) {
-        return lineRepository.findById(id)
-                .orElse(null);
+        return lineRepository.findById(id).orElse(null);
     }
 
     public LineResponse createSection(Long id, LineRequest request) {
