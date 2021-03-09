@@ -11,18 +11,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ControllerExceptionAdvice {
 
     @ExceptionHandler({ExistResourceException.class, NotMatchingStationException.class, NotRemoveResourceException.class})
-    public ResponseEntity<Void> existResourceExceptionHandler(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    public ResponseEntity<ErrorResponse> existResourceExceptionHandler(RuntimeException e) {
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.CONFLICT.value());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(NonExistResourceException.class)
-    public ResponseEntity<Void> nonExistResourceExceptionHandler(RuntimeException e) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<ErrorResponse> nonExistResourceExceptionHandler(RuntimeException e) {
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler()
-    public ResponseEntity<Void> invalidJpaDataExceptionHandler(DataIntegrityViolationException e) {
-        return ResponseEntity.badRequest().build();
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> invalidJpaDataExceptionHandler(DataIntegrityViolationException e) {
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
 }
