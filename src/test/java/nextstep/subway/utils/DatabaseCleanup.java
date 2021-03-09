@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 @Service
 @ActiveProfiles("test")
 public class DatabaseCleanup implements InitializingBean {
-    @Autowired
-    StationRepository stationRepository;
 
     @PersistenceContext
     private EntityManager entityManager;

@@ -36,7 +36,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // given
         String 강남역 = "강남역";
         지하철역_생성_요청(강남역);
-
+ 
         // when
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
 

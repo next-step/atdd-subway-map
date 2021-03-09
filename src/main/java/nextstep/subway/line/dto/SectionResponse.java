@@ -26,30 +26,6 @@ public class SectionResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    public static SectionResponse of(long id, Line line, Station upStation, Station downStation, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
-        return new SectionResponse(
-            id,
-            LineResponse.of(line),
-            StationResponse.of(upStation),
-            StationResponse.of(downStation),
-            distance,
-            createdDate,
-            modifiedDate
-        );
-    }
-
-    public static SectionResponse of(Section section) {
-        return of(
-            section.getId(),
-            section.getLine(),
-            section.getUpStation(),
-            section.getDownStation(),
-            section.getDistance(),
-            section.getCreatedDate(),
-            section.getModifiedDate()
-        );
-    }
-
     public long getId() {
         return id;
     }
