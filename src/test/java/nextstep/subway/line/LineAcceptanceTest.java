@@ -17,7 +17,7 @@ import static nextstep.subway.station.StationRequestSteps.지하철_역_등록_�
 public class LineAcceptanceTest extends AcceptanceTest {
 
     private StationResponse 강남역;
-    private StationResponse 광교역;
+    private StationResponse 양재역;
     private LineRequest 신분당선;
 
     @Override
@@ -27,9 +27,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // given
         강남역 = 지하철_역_등록_됨("강남역").as(StationResponse.class);
-        광교역 = 지하철_역_등록_됨("광교역").as(StationResponse.class);
+        양재역 = 지하철_역_등록_됨("양재역").as(StationResponse.class);
 
-        신분당선 = new LineRequest("신분당선", "bg-red-600", 강남역.getId(), 광교역.getId(), 13);
+        신분당선 = new LineRequest("신분당선", "bg-red-600", 강남역.getId(), 양재역.getId(), 7);
     }
 
     @Test
