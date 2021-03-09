@@ -107,16 +107,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        LineResponse lineResponse = 지하철_노선_생성_요청("1호선", "blue")
-                .as(LineResponse.class);
+        Long lineId = 지하철_노선_생성_요청("1호선", "blue")
+                .as(LineResponse.class)
+                .getId();
 
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> response = 지하철_노선_제거_요청(lineResponse.getId());
+        ExtractableResponse<Response> response = 지하철_노선_제거_요청(lineId);
 
         // then
-        // 지하철_노선_삭제됨
-        지하철_노선_삭제됨(response);
+        // 지하철_노선_제거됨
+        지하철_노선_제거됨(response);
     }
 
     private Map<String, String> createParam(String name, String color) {
@@ -210,7 +211,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
     }
 
-    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
+    private void 지하철_노선_제거됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode())
                 .isEqualTo(NO_CONTENT.value());
     }
