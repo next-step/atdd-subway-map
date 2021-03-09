@@ -1,51 +1,48 @@
 package nextstep.subway.line;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineRequest;
-import nextstep.subway.line.dto.LineResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import static nextstep.subway.line.LineRequestBuilder.*;
+import static nextstep.subway.station.StationRequestBuilder.*;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    private long extractLineId(ExtractableResponse<Response> lineCreateResponse) {
-        return lineCreateResponse.body().jsonPath().getLong("id");
+    private long startStationId;
+    private long endStationId;
+    private long lineId;
+    private ExtractableResponse<Response> createLineResponse;
+
+    @BeforeEach
+    public void init() {
+        startStationId = 지하철역_생성_요청("광교역").body().jsonPath().getLong("id");
+        endStationId = 지하철역_생성_요청("강남역").body().jsonPath().getLong("id");
+        createLineResponse = 지하철_노선_생성요청("신분당선",LineColor.RED,startStationId,endStationId);
+        lineId = createLineResponse.body().jsonPath().getLong("id");
     }
+
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        // when
-        // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+
         // then
         // 지하철_노선_생성됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선_생성됨(createLineResponse);
     }
 
     @DisplayName("이미 등록된 노선을 생성한다.")
     @Test
     void createLineWithDuplicateName() {
         //given
-        LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
+        지하철_노선_생성됨(createLineResponse);
         //when
-        ExtractableResponse<Response> response = LineRequestBuilder
-            .requestCreateLine("신분당선",LineColor.RED);
+        ExtractableResponse<Response> response = 지하철_노선_생성요청("신분당선",LineColor.RED,startStationId,endStationId);
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        지하철_노선생성_실패됨(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -54,18 +51,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
-        LineRequestBuilder.requestCreateLine("2호선",LineColor.GREEN);
+        지하철_노선_생성됨(createLineResponse);
 
         // when
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = LineRequestBuilder.requestFindLines();
+        ExtractableResponse<Response> response = 지하철_노선목록조회_요청();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.body().asString()).contains("신분당선").contains("2호선");
+        지하철_노선목록_조회됨(response,"신분당선");
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -73,15 +68,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> lineCreateResponse = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
-        long id = extractLineId(lineCreateResponse);
+        지하철_노선_생성됨(createLineResponse);
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = LineRequestBuilder.requestFindLine(id);
+        ExtractableResponse<Response> response = 지하철_노선조회_요청(lineId);
 
         // then
         // 지하철_노선_응답됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_조회됨(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -89,18 +83,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> lineCreateResponse =  LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
-        Map<String,String> params = LineRequestBuilder.createLineRequestParams("신분당선",LineColor.YELLOW);
-        long id = extractLineId(lineCreateResponse);
+        지하철_노선_생성됨(createLineResponse);
+
         // when
         // 지하철_노선_수정_요청
-        ExtractableResponse<Response> response = LineRequestBuilder
-            .requestUpdateLine(params,id);
+        ExtractableResponse<Response> response = 지하철_노선수정_요청(createLineRequestParams("신분당선",LineColor.YELLOW,startStationId,endStationId),lineId);
 
         // then
         // 지하철_노선_수정됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(response.as(LineResponse.class).getColor()).isEqualTo("YELLOW");
+        지하철_노선_수정됨(response,LineColor.YELLOW);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -108,15 +99,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> lineCreateResponse = LineRequestBuilder.requestCreateLine("신분당선",LineColor.RED);
-        long id = extractLineId(lineCreateResponse);
+        지하철_노선_생성됨(createLineResponse);
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> response = LineRequestBuilder.requestDeleteLine(id);
+        ExtractableResponse<Response> response = 지하철_노선삭제_요청(lineId);
 
         // then
         // 지하철_노선_삭제됨
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_노선삭제됨(response);
 
     }
 }
