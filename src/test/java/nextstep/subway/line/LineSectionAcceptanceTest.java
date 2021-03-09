@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.utils.LineSteps.*;
-import static nextstep.subway.utils.StationSteps.지하철역_생성_요청;
+import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.station.StationSteps.지하철역_생성_요청;
 
 public class LineSectionAcceptanceTest extends AcceptanceTest {
     private StationResponse 강남역;

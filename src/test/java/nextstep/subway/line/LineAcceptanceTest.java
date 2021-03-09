@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static nextstep.subway.utils.LineSteps.*;
-import static nextstep.subway.utils.StationSteps.지하철역_생성_요청;
+import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.station.StationSteps.지하철역_생성_요청;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {

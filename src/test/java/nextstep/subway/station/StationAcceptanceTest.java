@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static nextstep.subway.utils.StationSteps.*;
+import static nextstep.subway.station.StationSteps.*;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
