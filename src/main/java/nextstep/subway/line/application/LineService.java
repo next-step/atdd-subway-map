@@ -24,18 +24,22 @@ public class LineService {
 
     private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(StationRepository stationRepository,
+                       LineRepository lineRepository) {
+        this.stationRepository = stationRepository;
         this.lineRepository = lineRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+
         boolean isExistSubwayName = lineRepository.existsByName(request.getName());
         if (isExistSubwayName) {
             throw new SubwayNameDuplicateException();
         }
-
-        Line persistLine = lineRepository.save(request.toLine());
-        return LineResponse.of(persistLine);
+        Line line = Line.of(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
+        return LineResponse.of(lineRepository.save(line));
     }
 
     public List<LineResponse> getAll() {
@@ -76,7 +80,7 @@ public class LineService {
         Line line = findLineById(lineId);
 
         Station upStation = findStationById(sectionRequest.getUpStationId());
-        Station downStation = findStationById(sectionRequest.getUpStationId());
+        Station downStation = findStationById(sectionRequest.getDownStationId());
 
         line.addSection(upStation, downStation, sectionRequest.getDistance());
         return LineResponse.of(line);

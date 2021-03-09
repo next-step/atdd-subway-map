@@ -2,6 +2,7 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.dto.StationResponse;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,21 +17,25 @@ public class Line extends BaseEntity {
     private String color;
 
     @Embedded
-    private Sections sections;
+    private Sections sections = new Sections();
 
     public Line() {
+
     }
 
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = new Sections();
     }
 
-    public Line(String name, String color, Section section) {
+    private Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        this.sections = Sections.of(this, section);
+        this.sections.addSection(Section.of(this, upStation, downStation, distance));
+    }
+
+    public static Line of(String name, String color, Station upStation, Station downStation, int distance) {
+        return new Line(name, color, upStation, downStation, distance);
     }
 
     public void update(Line line) {
@@ -58,7 +63,7 @@ public class Line extends BaseEntity {
         sections.deleteLastSection(stationId);
     }
 
-    public List<Section> getSections() {
-        return sections.getSections();
+    public List<StationResponse> getAllStations() {
+        return sections.getAllStation();
     }
 }

@@ -17,10 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LineSteps {
 
-  public static ExtractableResponse<Response> 지하철_노선_생성요청(String stationName, String stationColor) {
-    Map<String, String> params = new HashMap<>();
-    params.put("name", stationName);
-    params.put("color", stationColor);
+  public static ExtractableResponse<Response> 지하철_노선_생성요청(Map<String, Object> params) {
 
     return RestAssured.given().log().all()
             .body(params)
