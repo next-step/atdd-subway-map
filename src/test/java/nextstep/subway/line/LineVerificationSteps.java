@@ -23,10 +23,10 @@ public class LineVerificationSteps {
     }
 
     public static void 생성된_지하철_노선_URI_경로_존재_함(ExtractableResponse<Response> response) {
-        assertThat(생성된_지하철_노선_URI_경로_확인(response)).isNotBlank();
+        assertThat(생성된_지하철_노선의_URI_경로(response)).isNotBlank();
     }
 
-    public static String 생성된_지하철_노선_URI_경로_확인(ExtractableResponse<Response> response) {
+    public static String 생성된_지하철_노선의_URI_경로(ExtractableResponse<Response> response) {
         return response.header("Location");
     }
 

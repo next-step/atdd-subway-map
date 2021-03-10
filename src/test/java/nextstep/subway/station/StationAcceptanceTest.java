@@ -59,8 +59,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_역_생성_요청("강남역");
 
         // when
-        String uri = 생성된_지하철_역_URI_경로_확인(createResponse);
-        ExtractableResponse<Response> response = 지하철_역_제거_요청(uri);
+        ExtractableResponse<Response> response = 지하철_역_제거_요청(생성된_지하철_역_URI_경로_확인(createResponse));
 
         // then
         지하철_역_제거_됨(response);

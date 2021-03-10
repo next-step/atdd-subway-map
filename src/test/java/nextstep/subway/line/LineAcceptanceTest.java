@@ -82,8 +82,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
 
         // when
-        String uri = 생성된_지하철_노선_URI_경로_확인(createResponse);
-        ExtractableResponse<Response> readLineResponse = 지하철_노선_조회_요청(uri);
+        ExtractableResponse<Response> readLineResponse = 지하철_노선_조회_요청(생성된_지하철_노선의_URI_경로(createResponse));
 
         // then
         지하철_노선_조회_됨(readLineResponse);
@@ -96,8 +95,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
 
         // when
-        String uri = 생성된_지하철_노선_URI_경로_확인(createResponse);
-        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(uri, "구분당선", "bg-blue-600");
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(생성된_지하철_노선의_URI_경로(createResponse), "구분당선", "bg-blue-600");
 
         // then
         지하철_노선_수정_됨(updateResponse);
@@ -120,8 +118,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
 
         // when
-        String uri = 생성된_지하철_노선_URI_경로_확인(createResponse);
-        ExtractableResponse<Response> deleteResponse = 지하철_노선_제거_요청(uri);
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_제거_요청(생성된_지하철_노선의_URI_경로(createResponse));
 
         // then
         지하철_노선_제거_됨(deleteResponse);
