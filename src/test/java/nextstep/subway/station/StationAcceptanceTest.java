@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static nextstep.subway.utils.HttpAssertions.*;
+import static nextstep.subway.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -31,15 +32,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         응답_HTTP_CREATED(response);
         헤더_LOCATION_존재(response);
-    }
-
-    private ExtractableResponse<Response> 지하철_역_생성(String name) {
-        Map<String, String> params = Maps.of("name", name);
-        return RestAssured.given().log().all()
-                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
@@ -74,13 +66,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
-    private ExtractableResponse<Response> 지하철_역_목록_조회() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
@@ -92,13 +77,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         응답_HTTP_NO_CONTENT(response);
-    }
-
-    private ExtractableResponse<Response> 지하철_역_삭제(Long id) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract();
     }
 
     private Long 리소스_ID(ExtractableResponse<Response> response) {
