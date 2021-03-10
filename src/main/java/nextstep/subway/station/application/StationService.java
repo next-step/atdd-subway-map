@@ -19,26 +19,25 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
+    public StationResponse save(StationRequest stationRequest) {
         Station persistStation = stationRepository.save(stationRequest.toStation());
         return StationResponse.of(persistStation);
     }
 
     @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
+    public List<StationResponse> findAll() {
         List<Station> stations = stationRepository.findAll();
-
         return stations.stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Station findById(Long id) {
+    public Station find(Long id) {
         return stationRepository.findById(id).orElseThrow(NoSuchStationException::new);
     }
 
-    public void deleteById(Long id) {
+    public void delete(Long id) {
         stationRepository.deleteById(id);
     }
 }
