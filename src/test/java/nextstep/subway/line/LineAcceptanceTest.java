@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -380,7 +379,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     log().all().
                     extract();
     }
-
 
     public static ExtractableResponse<Response> registerSectionHelper(final Long lineId, final Map newSection) {
         return RestAssured.given().log().all().
