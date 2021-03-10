@@ -1,23 +1,19 @@
 package nextstep.subway.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.station.dto.StationResponse;
-import nextstep.subway.utils.HttpAssertions;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.groovy.util.Maps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static nextstep.subway.utils.HttpAssertions.*;
 import static nextstep.subway.station.StationSteps.*;
+import static nextstep.subway.utils.HttpAssertions.*;
+import static nextstep.subway.utils.HttpTestUtils.리소스_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -79,16 +75,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         응답_HTTP_NO_CONTENT(response);
     }
 
-    private Long 리소스_ID(ExtractableResponse<Response> response) {
-        return Optional.ofNullable(response)
-                .map(this::리소스_URI)
-                .map(it -> StringUtils.substringAfterLast(it, "/"))
-                .map(Long::parseLong)
-                .orElse(null);
-    }
 
-    private String 리소스_URI(ExtractableResponse<Response> response) {
-        return response.header("Location");
-    }
 
 }
