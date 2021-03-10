@@ -66,7 +66,11 @@ public class LineSectionAcceptanceTest {
         return params;
     }
 
-    String createUri(LineResponse line){
+    /* =========================================
+     * (1) 구간 등록 기능
+     * =========================================*/
+
+    String setCreateUri(LineResponse line){
         return "/lines/" + line.getId() + "/sections";
     }
 
@@ -74,10 +78,10 @@ public class LineSectionAcceptanceTest {
     @Test
     void createLineSection(){
         // given
-        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역, 10), createUri(신분당선));
+        지하철_노선에_구간이_등록되어_있음(createParams(강남역, 양재역, 10), setCreateUri(신분당선));
 
         //when
-        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲, 5), createUri(신분당선));
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲, 5), setCreateUri(신분당선));
 
         // then
         지하철_노선에_구간_생성됨(response);
@@ -88,10 +92,10 @@ public class LineSectionAcceptanceTest {
     @Test
     void createLineSectionWithUpStation(){
         // given
-        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역, 10), createUri(신분당선));
+        지하철_노선에_구간이_등록되어_있음(createParams(강남역, 양재역, 10), setCreateUri(신분당선));
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(광교역, 양재시민의숲, 5), createUri(신분당선));
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(광교역, 양재시민의숲, 5), setCreateUri(신분당선));
 
         // then
         지하철_노선에_구간_생성_실패됨(response);
@@ -101,13 +105,60 @@ public class LineSectionAcceptanceTest {
     @Test
     void createLineSectionWithDownStation(){
         // given
-        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역, 10), createUri(신분당선));
-        지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲, 5), createUri(신분당선));
+        지하철_노선에_구간이_등록되어_있음(createParams(강남역, 양재역, 10), setCreateUri(신분당선));
+        지하철_노선에_구간이_등록되어_있음(createParams(양재역, 양재시민의숲, 5), setCreateUri(신분당선));
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재시민의숲, 강남역, 7), createUri(신분당선));
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재시민의숲, 강남역, 7), setCreateUri(신분당선));
 
         // then
         지하철_노선에_구간_생성_실패됨(response);
+    }
+
+    /* =========================================
+     * (2) 구간 제거 기능
+     * =========================================*/
+
+    @DisplayName("지하철 노선의 구간을 제거한다.")
+    @Test
+    void deleteLineSection(){
+        // given
+        // 지하철_노선에_구간이_등록되어_있음
+        // 지하철_노선에_구간이_등록되어_있음
+
+        // when
+        // 지하철_노선의_구간_삭제_요청
+
+        // then
+        // 지하철_노선_구간_삭제됨
+        // 지하철_노선_순서대로_정렬됨
+
+    }
+
+    @DisplayName("지하철 노선의 마지막역이 아닌 역을 제거 한다.")
+    @Test
+    void deleteNoneLastStation(){
+        // given
+        // 지하철_노선에_구간이_등록되어_있음
+        // 지하철_노선에_구간이_등록되어_있음
+
+        // when
+        // 지하철_노선의_구간_삭제_요청
+
+        // then
+        // 지하철_노선_구간_삭제_실패됨
+    }
+
+    @DisplayName("구간이 한개인 지하철 노선의 역을 제거 한다.")
+    @Test
+    void deleteSingleSectionLine(){
+        // given
+        // 지하철_노선에_구간이_등록되어_있음
+
+        // when
+        // 지하철_노선의_구간_삭제_요청
+
+        // then
+        // 지하철_노선_구간_삭제_실패됨
     }
 }

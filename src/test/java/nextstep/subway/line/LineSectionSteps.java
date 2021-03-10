@@ -25,6 +25,10 @@ public class LineSectionSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선에_구간이_등록되어_있음(Map<String, String> params, String uri) {
+        return 지하철_노선에_구간_등록_요청(params, uri);
+    }
+
     public static void 지하철_노선에_구간_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
