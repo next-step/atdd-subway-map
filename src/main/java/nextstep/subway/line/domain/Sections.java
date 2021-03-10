@@ -42,7 +42,10 @@ public class Sections {
     }
 
     private void validateNewUpStationAndCurrentLastStationAreMatched(Section section) {
-        if (section.getUpStation().equals(findLastStation())) return;
+        if (section.getUpStation().equals(findLastStation())) {
+            return;
+        }
+
         throw new NewUpStationIsWrongException();
     }
 
@@ -51,7 +54,10 @@ public class Sections {
     }
 
     private void validateNewDownStationShouldNotBeAlreadyRegistered(Section section) {
-        if (!findAllStations().contains(section.getDownStation())) return;
+        if (!findAllStations().contains(section.getDownStation())) {
+            return;
+        }
+
         throw new NewDownStationIsAlreadyRegisteredException();
     }
 
@@ -70,7 +76,10 @@ public class Sections {
     }
 
     private void validateStationAndCurrentLastStationAreMatched(Station station) {
-        if (station.equals(findLastStation())) return;
+        if (station.equals(findLastStation())) {
+            return;
+        }
+
         throw new DeleteStationIsNotLastStationException();
     }
 
