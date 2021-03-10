@@ -33,10 +33,13 @@ public class Sections {
             return;
         }
 
+        validateAddSection(section);
+        sections.add(section);
+    }
+
+    private void validateAddSection(Section section) {
         validateNewUpStationAndCurrentLastStationAreMatched(section);
         validateNewDownStationShouldNotBeAlreadyRegistered(section);
-
-        sections.add(section);
     }
 
     private void validateNewUpStationAndCurrentLastStationAreMatched(Section section) {
@@ -58,10 +61,13 @@ public class Sections {
     }
 
     public void deleteSection(Station station) {
+        vaildateDeleteSection(station);
+        sections.remove(sections.size() - 1);
+    }
+
+    private void vaildateDeleteSection(Station station) {
         validateStationAndCurrentLastStationAreMatched(station);
         validateOnlyOneSectionLeftCannotBeDeleted();
-
-        sections.remove(sections.size() - 1);
     }
 
     private void validateStationAndCurrentLastStationAreMatched(Station station) {
