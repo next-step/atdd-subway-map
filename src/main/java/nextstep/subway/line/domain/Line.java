@@ -4,6 +4,7 @@ import nextstep.subway.common.BaseEntity;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -43,6 +44,10 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 
     public void addSection(Station upStation, Station downStation, int distance) {

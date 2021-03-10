@@ -23,6 +23,10 @@ public class Sections {
     public Sections() {
     }
 
+    public List<Station> getStations() {
+        return findAllStations();
+    }
+
     public void addSection(Section section) {
         if (sections.isEmpty()) {
             sections.add(section);
@@ -49,8 +53,8 @@ public class Sections {
         throw new NewDownStationIsAlreadyRegistered();
     }
 
-    private Set<Station> findAllStations() {
-        return sections.stream().flatMap(it -> it.getStations().stream()).collect(Collectors.toSet());
+    private List<Station> findAllStations() {
+        return sections.stream().flatMap(it -> it.getStations().stream()).distinct().collect(Collectors.toList());
     }
 
     public void deleteSection(Station station) {

@@ -5,7 +5,7 @@ import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.StationSteps;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +15,8 @@ import java.util.Arrays;
 
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.line.LineSteps.Line.*;
-import static nextstep.subway.station.StationSteps.Station.강남역;
-import static nextstep.subway.station.StationSteps.Station.역삼역;
+import static nextstep.subway.line.SectionSteps.지하철노선_구간_등록요청;
+import static nextstep.subway.station.StationSteps.Station.*;
 import static nextstep.subway.station.StationSteps.지하철역_생성요청;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -25,17 +25,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private LineRequest line1Request;
     private LineRequest line2Request;
 
+    private Long station1;
+    private Long station2;
+    private Long station3;
+    private int distance;
+
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        Long downStationId = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
-        Long upStationId = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
-        int distance = 10;
+        station1 = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
+        station2 = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
+        station3 = 지하철역_생성요청(선릉역.name).as(StationResponse.class).getId();
+        distance = 10;
 
-        line1Request = new LineRequest(일호선.name, 일호선.color, downStationId, upStationId, distance);
-        line2Request = new LineRequest(분당선.name, 분당선.color, downStationId, upStationId, distance);
+        line1Request = new LineRequest(일호선.name, 일호선.color, station1, station2, distance);
+        line2Request = new LineRequest(분당선.name, 분당선.color, station1, station2, distance);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -81,9 +87,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청(line1Request);
+        Long lineId = createdResponse.as(LineResponse.class).getId();
+        지하철노선_구간_등록요청(lineId, new SectionRequest(station2, station3, distance));
 
         // when
-        Long lineId = createdResponse.as(LineResponse.class).getId();
         ExtractableResponse<Response> response = 지하철_노선_조회요청(lineId);
 
         // then
