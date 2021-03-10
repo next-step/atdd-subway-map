@@ -71,29 +71,10 @@ public class LineService {
             .orElseThrow(()-> new NoResourceException("상행역을 찾을수 없습니다."));
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
             .orElseThrow(()-> new NoResourceException("하행역을 찾을수 없습니다."));
-        Line line = lineRepository.findById(lineId)
-            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
 
-        if(line.getSections().size() == 0) {
-            line.addSection(new Section(line,upStation,downStation,sectionRequest.getDistance()));
-            return;
-        }
-        validateSection(line,upStation,downStation);
-        line.addSection(new Section(line,upStation,downStation,sectionRequest.getDistance()));
-
-
-
-    }
-
-    private void validateSection(Line line,Station upStation, Station downStation){
-        boolean isValidUpStation =  !line.getSections().get(line.getSections().size()-1)
-            .getDownStation().equals(upStation);
-
-        boolean isValidDownStation = line.getSections().stream()
-            .anyMatch(section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation));
-
-        if(isValidUpStation) { throw new InvalidSectionException("상행역은 현재 노선의 하행 종점역이어야 합니다.");}
-        if(isValidDownStation){ throw new InvalidSectionException("하행역은 노선에 이미 등록되어 있습니다."); }
+        lineRepository.findById(lineId)
+            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."))
+            .addSection(upStation,downStation,sectionRequest.getDistance());
     }
 
     public void removeSection(long lineId, long stationId) {
