@@ -80,7 +80,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertAppendNewSectionSuccess(newSectionResponse);
     }
 
-    @DisplayName("등록하려는 구간의 상행역이 종점역이 아닌경우 에러처리한다.")
+    @DisplayName("등록하려는 구간의 상행역이 종점역이 아닌경우 등록되지 않는다.")
     @Test
     void createSectionWithNotMatchedDownStation() {
         // given

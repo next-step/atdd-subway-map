@@ -57,18 +57,19 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        if (!isSameAsLastStationWithSectionUpStation(section)) {
+        if (!isEmptySections() && !isAppendableSection(section)) {
             throw new InvalidSectionException("Input section is invalid");
         }
         this.sections.add(section);
         section.setLine(this);
     }
 
-    private Boolean isSameAsLastStationWithSectionUpStation(final Section section){
-        if (this.sections.size() > 0){
-            return getLastSection().getDownStation().equals(section.getUpStation());
-        }
-        return true;
+    private Boolean isEmptySections() {
+        return (this.sections.size() == 0);
+    }
+
+    private Boolean isAppendableSection(final Section section){
+        return getLastSection().getDownStation().equals(section.getUpStation());
     }
 
     public Section getLastSection() {
