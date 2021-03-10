@@ -80,9 +80,9 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    public void deleteSection(Long lineId, Long sectionId) {
+    public void deleteSection(Long lineId, Long stationId) {
         Line line = getLineById(lineId);
-        line.removeSection(sectionId);
+        line.removeByStationId(stationId);
     }
 
     private Station getStationById(Long id) {

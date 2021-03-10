@@ -3,10 +3,12 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,9 +36,13 @@ public class SectionSteps {
 
     public static ExtractableResponse<Response> requestDeleteSection(ExtractableResponse<Response> sectionResponse) {
         String uri = sectionResponse.header(HEADER_LOCATION);
+        List<StationResponse> stationResponses = sectionResponse.jsonPath().getList("stations", StationResponse.class);
+        Long lastStationId = stationResponses.get(stationResponses.size() - 1).getId();
+
         return RestAssured.given().log().all()
+                .queryParam("stationId", lastStationId)
                 .when()
-                .delete(uri)
+                .delete(uri + URI_SECTIONS)
                 .then().log().all()
                 .extract();
     }

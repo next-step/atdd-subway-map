@@ -100,9 +100,9 @@ public class Line extends BaseEntity {
         section.setLine(this);
     }
 
-    public void removeSection(Long sectionId) {
-        validateRemoveSection(sectionId);
-        getSections().removeIf(it -> it.getId().equals(sectionId));
+    public void removeByStationId(Long stationId) {
+        validateRemoveSection(stationId);
+        getSections().removeIf(it -> it.getDownStation().getId().equals(stationId));
     }
 
     public List<Station> getStations() {
@@ -119,18 +119,10 @@ public class Line extends BaseEntity {
     }
 
     public Long getLastStationId() {
-        List<Station> stations = getStations();
-        if (stations.isEmpty()) {
-            return 0L;
-        }
-        return stations.get(stations.size() - 1).getId();
-    }
-
-    public Long getLastSectionId() {
         if (sections.isEmpty()) {
             return 0L;
         }
-        return sections.get(sections.size() - 1).getId();
+        return sections.get(sections.size() - 1).getDownStation().getId();
     }
 
     public boolean isWrongUpStation(Long upStationId) {
@@ -146,11 +138,11 @@ public class Line extends BaseEntity {
         return stationIds.contains(downStationId);
     }
 
-    public boolean isNotLastSection(Long sectionId) {
+    public boolean isNotLastStation(Long stationId) {
         if (sections.isEmpty()) {
             return false;
         }
-        return !getLastSectionId().equals(sectionId);
+        return !getLastStationId().equals(stationId);
     }
 
     public boolean isHasOnlyOneSection() {
@@ -166,8 +158,8 @@ public class Line extends BaseEntity {
         }
     }
 
-    private void validateRemoveSection(Long sectionId) {
-        if (isNotLastSection(sectionId)) {
+    private void validateRemoveSection(Long stationId) {
+        if (isNotLastStation(stationId)) {
             throw new DeleteSectionWithNotLastException();
         }
         if (isHasOnlyOneSection()) {
