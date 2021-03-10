@@ -12,9 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import static nextstep.subway.line.LineSteps.지하철_노선_생성요청;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.section.SectionSteps.*;
-import static nextstep.subway.station.StationSteps.지하철역_생성_요청;
+import static nextstep.subway.station.StationSteps.*;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -48,13 +52,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         지하철_노선_구간_응답_확인(createResponse.statusCode(), HttpStatus.CREATED);
     }
 
-
-    @DisplayName("지하철 노선 구간 역 목록을 조회한다.")
-    @Test
-    void getLineSection() {
-
-    }
-
     @DisplayName("지하철 노선 구간 제거 한다.")
     @Test
     void deleteLineSection() {
@@ -65,5 +62,32 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> remove = 지하철_구간_제거_요청(pinkLine.getId(), 산성역.getId());
 
         지하철_노선_구간_응답_확인(remove.statusCode(), HttpStatus.NO_CONTENT);
+    }
+
+    @DisplayName("지하철 노선 구간 역 목록을 조회한다.")
+    @Test
+    void getLineSection() {
+        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
+
+        지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
+
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(pinkLine);
+
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
+
+        List<Long> stationIds = stationResponseToList(지하철역_조회_요청());
+        List<Long> resultStationIds = Stream.of(석촌역, 남한산성입구역, 산성역)
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        지하철역_목록_응답_확인(stationIds, resultStationIds);
+    }
+
+    List<Long> stationResponseToList(ExtractableResponse<Response> stationResponse) {
+        return stationResponse.jsonPath().getList(".", StationResponse.class)
+                .stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
     }
 }
