@@ -8,17 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LineResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private List<StationResponse> stations;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<StationResponse> stations;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
-    public LineResponse() {
-    }
-
-    public LineResponse(
+    private LineResponse(
         Long id,
         String name,
         String color,
@@ -32,6 +29,20 @@ public class LineResponse {
         this.stations = stations;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+    }
+
+    public static LineResponse of(Line line) {
+        return new LineResponse(
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            line.getStations()
+                .stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList()),
+            line.getCreatedDate(),
+            line.getModifiedDate()
+        );
     }
 
     public Long getId() {
