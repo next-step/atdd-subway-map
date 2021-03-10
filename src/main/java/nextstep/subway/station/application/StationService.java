@@ -1,14 +1,14 @@
 package nextstep.subway.station.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import nextstep.subway.common.exception.NoResourceException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,6 +31,12 @@ public class StationService {
         return stations.stream()
                 .map(station -> StationResponse.of(station))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Station findStation(long stationId){
+        return stationRepository.findById(stationId)
+            .orElseThrow(()-> new NoResourceException("등록되지 않은 역 입니다."));
     }
 
     public void deleteStationById(Long id) {

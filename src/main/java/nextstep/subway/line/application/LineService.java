@@ -2,7 +2,6 @@ package nextstep.subway.line.application;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import nextstep.subway.common.exception.NoResourceException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
@@ -10,8 +9,8 @@ import nextstep.subway.line.domain.Sections;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,19 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
 
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-            .orElseThrow(()-> new NoResourceException("상행역을 찾을수 없습니다."));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-            .orElseThrow(()-> new NoResourceException("하행역을 찾을수 없습니다."));
+        Station upStation = stationService.findStation(request.getUpStationId());
+        Station downStation = stationService.findStation(request.getDownStationId());
         Line persistLine = lineRepository.save(request.toLine(upStation,downStation));
         return LineResponse.of(persistLine,toStationResponse(persistLine.getSections()));
     }
@@ -51,12 +48,9 @@ public class LineService {
     }
 
     public LineResponse modifyLine(long id,LineRequest lineRequest) {
-        Line line  =  lineRepository.findById(id)
-            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-            .orElseThrow(()-> new NoResourceException("상행역을 찾을수 없습니다."));
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-            .orElseThrow(()-> new NoResourceException("하행역을 찾을수 없습니다."));
+        Line line  =  lineRepository.findById(id).orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
+        Station upStation = stationService.findStation(lineRequest.getUpStationId());
+        Station downStation = stationService.findStation(lineRequest.getDownStationId());
         line.update(lineRequest.toLine(upStation,downStation));
         return LineResponse.of(line,toStationResponse(line.getSections()));
     }
@@ -67,10 +61,8 @@ public class LineService {
 
     public void addSection(long lineId, SectionRequest sectionRequest) {
 
-        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
-            .orElseThrow(()-> new NoResourceException("상행역을 찾을수 없습니다."));
-        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
-            .orElseThrow(()-> new NoResourceException("하행역을 찾을수 없습니다."));
+        Station upStation = stationService.findStation(sectionRequest.getUpStationId());
+        Station downStation = stationService.findStation(sectionRequest.getDownStationId());
 
         lineRepository.findById(lineId)
             .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."))
