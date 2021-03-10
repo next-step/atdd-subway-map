@@ -32,13 +32,13 @@ public class StationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteStation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStation(id);
         return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(StationNameDuplicatedException.class)
-    public ResponseEntity handleStationNameDuplicatedException(StationNameDuplicatedException e) {
+    public ResponseEntity<Void> handleStationNameDuplicatedException(StationNameDuplicatedException e) {
         return ResponseEntity.badRequest().build();
     }
 }

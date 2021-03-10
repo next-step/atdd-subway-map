@@ -23,7 +23,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -56,38 +56,38 @@ public class LineController {
     }
 
     @DeleteMapping(value = "/{id}/sections")
-    public ResponseEntity<LineResponse> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
         lineService.deleteSection(id, stationId);
         return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(LineNotFoundException.class)
-    public ResponseEntity handleLineNotFoundException(LineNotFoundException e) {
+    public ResponseEntity<Void> handleLineNotFoundException(LineNotFoundException e) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(LineNameDuplicatedException.class)
-    public ResponseEntity handleLineNameDuplicatedException(LineNameDuplicatedException e) {
+    public ResponseEntity<Void> handleLineNameDuplicatedException(LineNameDuplicatedException e) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(NewUpStationIsWrongException.class)
-    public ResponseEntity handleNewUpStationIsWrongException(NewUpStationIsWrongException e) {
+    public ResponseEntity<Void> handleNewUpStationIsWrongException(NewUpStationIsWrongException e) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(NewDownStationIsAlreadyRegisteredException.class)
-    public ResponseEntity handleNewDownStationIsAlreadyRegisteredException(NewDownStationIsAlreadyRegisteredException e) {
+    public ResponseEntity<Void> handleNewDownStationIsAlreadyRegisteredException(NewDownStationIsAlreadyRegisteredException e) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(DeleteStationIsNotLastStationException.class)
-    public ResponseEntity handleDeleteStationIsNotLastStationException(DeleteStationIsNotLastStationException e) {
+    public ResponseEntity<Void> handleDeleteStationIsNotLastStationException(DeleteStationIsNotLastStationException e) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(OnlyOneSectionLeftCannotBeDeletedException.class)
-    public ResponseEntity handleOnlyOneSectionLeftCannotBeDeletedException(OnlyOneSectionLeftCannotBeDeletedException e) {
+    public ResponseEntity<Void> handleOnlyOneSectionLeftCannotBeDeletedException(OnlyOneSectionLeftCannotBeDeletedException e) {
         return ResponseEntity.badRequest().build();
     }
 }
