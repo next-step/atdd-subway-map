@@ -3,15 +3,14 @@ package nextstep.subway.section;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static nextstep.subway.line.LineSteps.지하철_노선_생성요청;
 import static nextstep.subway.section.SectionSteps.*;
@@ -20,39 +19,31 @@ import static nextstep.subway.station.StationSteps.지하철역_생성_요청;
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
-    private LineResponse pinkLine;
-    private StationResponse 천호역;
-    private StationResponse 송파역;
-    private StationResponse 잠실역;
     private StationResponse 석촌역;
     private StationResponse 남한산성입구역;
-
+    private StationResponse 산성역;
+    private LineRequest lineRequest;
 
     @BeforeEach
     void setup() {
-        int distance = 4;
+        super.setUp();
 
-        천호역 = 지하철역_생성_요청("천호역").as(StationResponse.class);
-        송파역 = 지하철역_생성_요청("송파역").as(StationResponse.class);
-        잠실역 = 지하철역_생성_요청("잠실역").as(StationResponse.class);
+        int distance = 4;
         석촌역 = 지하철역_생성_요청("석촌역").as(StationResponse.class);
         남한산성입구역 = 지하철역_생성_요청("남한산성입구역").as(StationResponse.class);
+        산성역 = 지하철역_생성_요청("산성역").as(StationResponse.class);
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", "8호선");
-        map.put("color", "pink");
-        map.put("upStationId", 석촌역.getId());
-        map.put("downStationId", 남한산성입구역.getId());
-        map.put("distance", distance);
+        lineRequest = new LineRequest("8호선", "pink", 석촌역.getId(), 남한산성입구역.getId(), distance);
 
-        pinkLine = 지하철_노선_생성요청(map).as(LineResponse.class);
     }
 
     @DisplayName("지하철 노선 구간 추가 한다.")
     @Test
     void createLineSection() {
+        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
         ExtractableResponse<Response> createResponse =
-                지하철_노선에_구간_등록_요청(석촌역.getId(), 남한산성입구역.getId(), pinkLine.getId(), 3);
+                지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
 
         지하철_노선_구간_응답_확인(createResponse.statusCode(), HttpStatus.CREATED);
     }
@@ -67,9 +58,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 구간 제거 한다.")
     @Test
     void deleteLineSection() {
-        지하철_노선에_구간_등록_요청(석촌역.getId(), 남한산성입구역.getId(), pinkLine.getId(), 4);
+        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
+        지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
 
-        ExtractableResponse<Response> remove = 지하철_구간_제거_요청(pinkLine.getId(), 남한산성입구역.getId());
+        ExtractableResponse<Response> remove = 지하철_구간_제거_요청(pinkLine.getId(), 산성역.getId());
 
         지하철_노선_구간_응답_확인(remove.statusCode(), HttpStatus.NO_CONTENT);
     }

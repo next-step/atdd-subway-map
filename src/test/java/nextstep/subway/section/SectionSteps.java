@@ -3,24 +3,17 @@ package nextstep.subway.section;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(long upStationId, long downStationId, long lineId, int distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
+    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(SectionRequest sectionRequest, long lineId) {
         return RestAssured.given().log().all()
-                .body(params)
+                .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .pathParam("lineId", lineId)
