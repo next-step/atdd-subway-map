@@ -40,7 +40,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성(강남역);
         Long downStationId = 지하철_역_생성(역삼역);
-        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600", upStationId, downStationId,7);
         ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(params);
         Long lineId = getLocationId(lineResponse);
 
