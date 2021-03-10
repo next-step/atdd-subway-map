@@ -25,9 +25,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private LineRequest line1Request;
     private LineRequest line2Request;
 
-    private Long station1;
-    private Long station2;
-    private Long station3;
+    private Long stationId1;
+    private Long stationId2;
+    private Long stationId3;
     private int distance;
 
     @Override
@@ -35,13 +35,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     public void setUp() {
         super.setUp();
 
-        station1 = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
-        station2 = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
-        station3 = 지하철역_생성요청(선릉역.name).as(StationResponse.class).getId();
+        stationId1 = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
+        stationId2 = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
+        stationId3 = 지하철역_생성요청(선릉역.name).as(StationResponse.class).getId();
         distance = 10;
 
-        line1Request = new LineRequest(일호선.name, 일호선.color, station1, station2, distance);
-        line2Request = new LineRequest(분당선.name, 분당선.color, station1, station2, distance);
+        line1Request = new LineRequest(일호선.name, 일호선.color, stationId1, stationId2, distance);
+        line2Request = new LineRequest(분당선.name, 분당선.color, stationId1, stationId2, distance);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -88,7 +88,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         ExtractableResponse<Response> createdResponse = 지하철_노선_생성요청(line1Request);
         Long lineId = createdResponse.as(LineResponse.class).getId();
-        지하철노선_구간_등록요청(lineId, new SectionRequest(station2, station3, distance));
+        지하철노선_구간_등록요청(lineId, new SectionRequest(stationId2, stationId3, distance));
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회요청(lineId);
