@@ -64,6 +64,7 @@ public class LineService {
         return LineResponse.of(findLine(id));
     }
 
+    @Transactional(readOnly = true)
     public Line findLine(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
