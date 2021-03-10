@@ -55,7 +55,8 @@ public class SectionService {
     }
 
     private boolean idDownStationDuplicated(Long lineId, SectionRequest sectionRequest) {
-        List<Long> downStationIds = sectionRepository.findAllByLineId(lineId).stream()
+        List<Long> downStationIds = sectionRepository.findAllByLineId(lineId)
+                .stream()
                 .map(it -> it.getDownStation().getId())
                 .collect(Collectors.toList());
         return downStationIds.contains(sectionRequest.getDownStationId());

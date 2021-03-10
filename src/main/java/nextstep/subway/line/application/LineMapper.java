@@ -45,7 +45,8 @@ public class LineMapper {
     }
 
     private List<Section> getSortedSections(Line line) {
-        return line.getSections().stream()
+        return line.getSections()
+                .stream()
                 .sorted(Comparator.comparing(Section::getId))
                 .collect(Collectors.toList());
     }
