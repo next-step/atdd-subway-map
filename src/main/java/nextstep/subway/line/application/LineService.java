@@ -38,6 +38,7 @@ public class LineService {
         if (isExistSubwayName) {
             throw new SubwayNameDuplicateException();
         }
+
         Line line = Line.of(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
         return LineResponse.of(lineRepository.save(line));
     }
