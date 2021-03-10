@@ -1,6 +1,9 @@
-package nextstep.subway.section;
+package nextstep.subway.line;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("구간 관련 기능")
 public class SectionAcceptanceTest {
@@ -15,4 +18,16 @@ public class SectionAcceptanceTest {
         1.3 노선의 유일한 구간을 삭제하려는 경우 -> 에러 응답
     3. 지하철 노선을 조회할 때 구간들이 순서대로 출력되어야 한다.
      */
+
+    @DisplayName("새로운 구간의 상행역이 현재 등록 되어 있는 하행 종점역인 경우 -> 정상 응답")
+    @Test
+    void createSection_WhenNormalRequest_ThenReturnSuccess() {
+        //given
+
+        //when
+
+        //then
+
+
+    }
 }

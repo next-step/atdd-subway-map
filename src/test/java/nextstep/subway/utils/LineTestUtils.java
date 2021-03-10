@@ -19,13 +19,19 @@ public class LineTestUtils extends BaseTestUtils{
     private static final String PARAM_NAME = "name";
     private static final String PARAM_COLOR = "color";
     private static final String BASE_URL = "/lines";
+    private static final String PARAM_UP_STATION_ID = "upStationId";
+    private static final String PARAM_DOWN_STATION_ID = "downStationId";;
+    private static final String PARAM_DISTANCE = "distance";
 
     private LineTestUtils() {}
 
-    public static Map<String, String> 노선_파라미터_설정(String name, String color) {
+    public static Map<String, String> 노선_파라미터_설정(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_NAME, name);
         params.put(PARAM_COLOR, color);
+        params.put(PARAM_UP_STATION_ID, String.valueOf(upStationId));
+        params.put(PARAM_DOWN_STATION_ID, String.valueOf(downStationId));
+        params.put(PARAM_DISTANCE, String.valueOf(distance));
         return params;
     }
 
