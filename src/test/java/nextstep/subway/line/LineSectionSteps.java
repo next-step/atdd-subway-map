@@ -58,4 +58,17 @@ public class LineSectionSteps {
     public static void 지하철_노선_구간_삭제_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    public static void 지하철_노선의_목록_조회됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선의_목록_조회_요청(String uri) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
+    }
 }
