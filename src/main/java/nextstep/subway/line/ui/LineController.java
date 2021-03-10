@@ -1,8 +1,12 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.application.SectionService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.line.exception.LineCreateFailException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +20,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(final LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -26,7 +32,7 @@ public class LineController {
         try {
             LineResponse line = lineService.saveLine(lineRequest);
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-        } catch (DataIntegrityViolationException e) {
+        } catch (LineCreateFailException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -52,5 +58,17 @@ public class LineController {
         lineService.deleteLine(lineId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<SectionResponse> addSection(@PathVariable Long lineId, @RequestBody SectionRequest request) {
+        try {
+            SectionResponse sectionResponse = sectionService.addSection(lineId, request);
+            String uri = String.format("/lines/%d/sections", lineId);
+            return ResponseEntity.created(URI.create(uri)).body(sectionResponse);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
 
 }

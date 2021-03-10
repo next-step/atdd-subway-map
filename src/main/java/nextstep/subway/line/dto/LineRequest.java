@@ -66,4 +66,7 @@ public class LineRequest {
         return this;
     }
 
+    public SectionRequest toSectionRequest() {
+        return new SectionRequest(upStationId, downStationId, distance);
+    }
 }
