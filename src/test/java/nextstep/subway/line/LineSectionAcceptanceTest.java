@@ -52,32 +52,32 @@ public class LineSectionAcceptanceTest {
         lineParams = new HashMap<>();
         lineParams.put("name", "신분당선");
         lineParams.put("color", "bg-red-600");
-        lineParams.put("upStationId", 강남역.getId() + "");
-        lineParams.put("downStationId", 양재역.getId() + "");
-        lineParams.put("distance", "10");
+        //lineParams.put("upStationId", 강남역.getId() + "");
+        //lineParams.put("downStationId", 양재역.getId() + "");
+        //lineParams.put("distance", "10");
         신분당선 = 지하철_노선_생성_요청(lineParams).as(LineResponse.class);
     }
 
-    Map<String, String> createParams(StationResponse upStation, StationResponse downStation){
+    Map<String, String> createParams(StationResponse upStation, StationResponse downStation, int distance){
         Map<String, String> params = new HashMap<>();
-        params.put("downStationId", upStation.getId() + "");
-        params.put("upStationId", downStation.getId() + "");
-        params.put("distance","10");
+        params.put("upStationId", upStation.getId() + "");
+        params.put("downStationId", downStation.getId() + "");
+        params.put("distance", distance + "");
         return params;
     }
 
     String createUri(LineResponse line){
-        return "/lines/" + line.getId() + "sections";
+        return "/lines/" + line.getId() + "/sections";
     }
 
     @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void createLineSection(){
         // given
-        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역), createUri(신분당선));
+        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역, 10), createUri(신분당선));
 
         //when
-        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲), createUri(신분당선));
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲, 5), createUri(신분당선));
 
         // then
         지하철_노선에_구간_생성됨(response);
@@ -88,10 +88,10 @@ public class LineSectionAcceptanceTest {
     @Test
     void createLineSectionWithUpStation(){
         // given
-        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역), createUri(신분당선));
+        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역, 10), createUri(신분당선));
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(광교역, 양재시민의숲), createUri(신분당선));
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(광교역, 양재시민의숲, 5), createUri(신분당선));
 
         // then
         지하철_노선에_구간_생성_실패됨(response);
@@ -101,11 +101,11 @@ public class LineSectionAcceptanceTest {
     @Test
     void createLineSectionWithDownStation(){
         // given
-        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역), createUri(신분당선));
-        지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲), createUri(신분당선));
+        지하철_노선에_구간_등록_요청(createParams(강남역, 양재역, 10), createUri(신분당선));
+        지하철_노선에_구간_등록_요청(createParams(양재역, 양재시민의숲, 5), createUri(신분당선));
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재시민의숲, 강남역), createUri(신분당선));
+        ExtractableResponse<Response> response = 지하철_노선에_구간_등록_요청(createParams(양재시민의숲, 강남역, 7), createUri(신분당선));
 
         // then
         지하철_노선에_구간_생성_실패됨(response);

@@ -18,11 +18,17 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL) // section을 각각 persist안해주기 위해
+    //@OneToMany(mappedBy = "line", cascade = CascadeType.ALL) // section을 각각 persist안해주기 위해
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sectionList = new ArrayList<>(); // 초기화
 
     // 기본생성자
     protected Line() {
+    }
+
+    public Line(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     // 생성메서드
@@ -30,20 +36,59 @@ public class Line extends BaseEntity {
         Line line = new Line();
         line.setName(name);
         line.setColor(color);
-        line.addSection(createSection(line, upStation, downStation, distance)); // 구간(Section)을 바로 안받고 역(Station)으로 구간을 생성
+        line.addSection(upStation, downStation, distance); // 구간(Section)을 바로 안받고 역(Station)으로 구간을 생성
         return line;
     }
 
-    // 연관관계메서드
-    private void addSection(Section section) {
-        this.sectionList.add(section);
+    public void addSection(Station upStation, Station downStation, int distance) {
+        this.sectionList.add(createSection(this, upStation, downStation, distance));
     }
 
-    // TODO 우선 이름, 색만 업데이트
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
-        //this.sectionList = sectionList;
+    }
+
+    public boolean isContainsStation(Long stationId){
+        boolean isUpStation = sectionList.stream()
+                                .anyMatch(it -> it.getUpStation().getId() == stationId);
+        boolean isDownStation = sectionList.stream()
+                                .anyMatch(it -> it.getDownStation().getId() == stationId);
+        return isUpStation || isDownStation;
+    }
+
+    public int sectionSize(){
+        return sectionList == null ? 0 : sectionList.size();
+    }
+
+    public Station getLastStation(){
+        return sectionList.size() == 0 ? null : sectionList.get(sectionList.size() -1).getDownStation();
+    }
+    public Station getFirstStation() { return sectionList.size() == 0 ? null : sectionList.get(0).getUpStation(); }
+
+    public Long getLastStationId(){
+        return sectionList.size() == 0 ? null : sectionList.get(sectionList.size() -1).getDownStation().getId();
+    }
+    public Long getFirstStationId() { return sectionList.size() == 0 ? null : sectionList.get(0).getUpStation().getId(); }
+
+    /*public Station getPrevStation(Long stationId){
+        return sectionList.stream()
+                .filter(it -> it.getDownStation().getId() == stationId)
+                .findFirst()
+                .get()
+                .getUpStation();
+    }*/
+
+    public Station getNextStation(Long stationId){
+        Station nextStation = null;
+        if(sectionList.size() != 0){
+            Section section = sectionList.stream()
+                                    .filter(it -> it.getUpStation().getId() == stationId)
+                                    .findFirst()
+                                    .orElse(new Section()); // TODO 널이면 뭐 리턴하지...
+            nextStation = section.getDownStation();
+        }
+        return nextStation;
     }
 
     public Long getId() {

@@ -30,16 +30,23 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
+    // TODO 지저분하다...
     // Line -> LineResponse
     public static LineResponse of(Line line) {
-        // Section -> Station -> StationResponse
-        List<StationResponse> stationResponses = new ArrayList<>();
-        List<Section> sections = line.getSectionList();
-        for(Section section : sections){
-            stationResponses.add(StationResponse.of(section.getUpStation())); // 상행역
-            stationResponses.add(StationResponse.of(section.getDownStation())); // 하행역
+        List<StationResponse> list = new ArrayList<>();
+
+        if(line.sectionSize() > 0){
+            Long id = line.getFirstStationId();
+            list.add(StationResponse.of(line.getFirstStation()));
+
+            Station station = null;
+            while((station = line.getNextStation(id)) != null){
+                id = station.getId();
+                list.add(StationResponse.of(station));
+            }
         }
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses, line.getCreatedDate(), line.getModifiedDate());
+
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), list, line.getCreatedDate(), line.getModifiedDate());
     }
 
     public Long getId() {

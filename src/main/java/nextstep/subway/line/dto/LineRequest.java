@@ -1,12 +1,6 @@
 package nextstep.subway.line.dto;
 
 import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.Section;
-import nextstep.subway.station.domain.Station;
-
-import static nextstep.subway.line.domain.Line.createLine;
-import static nextstep.subway.line.domain.Section.createSection;
-import static nextstep.subway.station.domain.Station.createStation;
 
 public class LineRequest {
     private String name;
@@ -34,11 +28,9 @@ public class LineRequest {
         return color;
     }
 
-    /*public Line toLine() {
-        Station upStation = createStation(""); // id -> 이름 : 리파지토리 안가고 가능한가...?
-        Station downStation = createStation("");
-        return createLine(name, color, upStation, downStation, distance);
-    }*/
+    public Line toLine() {
+        return new Line(name, color);
+    }
 
     public Long getUpStationId() {
         return upStationId;

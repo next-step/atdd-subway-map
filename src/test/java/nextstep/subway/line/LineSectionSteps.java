@@ -26,7 +26,7 @@ public class LineSectionSteps {
     }
 
     public static void 지하철_노선에_구간_생성됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     public static void 지하철_노선에_구간_생성_실패됨(ExtractableResponse<Response> response) {
