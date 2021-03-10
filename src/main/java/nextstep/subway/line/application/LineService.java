@@ -7,9 +7,7 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
-import nextstep.subway.line.exception.InvalidDownStationException;
-import nextstep.subway.line.exception.InvalidUpStationException;
-import nextstep.subway.line.exception.NoLineFoundException;
+import nextstep.subway.line.exception.*;
 import nextstep.subway.station.exception.NoStationFoundException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
@@ -71,9 +69,9 @@ public class LineService {
 
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
+
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(NoStationFoundException::new);
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(NoStationFoundException::new);
-
         Line line = lineRepository.findById(lineId).orElseThrow(NoLineFoundException::new);
 
         if(!line.isValidUpstation(upStation)) {
@@ -85,9 +83,23 @@ public class LineService {
         }
 
         Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
-
         line.addSection(section);
 
         return SectionResponse.of(section);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(NoLineFoundException::new);
+
+        if(line.hasOnlyOneSection()) {
+            throw new OnlyOneSectionRemainingException();
+        }
+
+        if(!line.isProperStationToDelete(stationId)) {
+            throw new InvalidDownStationException();
+        }
+
+        line.deleteSection(stationId);
     }
 }

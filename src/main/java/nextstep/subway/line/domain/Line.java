@@ -1,6 +1,9 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.line.exception.InvalidDownStationException;
+import nextstep.subway.line.exception.InvalidStationIdException;
+import nextstep.subway.line.exception.InvalidUpStationException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -71,5 +74,21 @@ public class Line extends BaseEntity {
     public boolean isValidDownStation(Station downStation) {
         return !sections.stream()
                 .anyMatch( section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation) );
+    }
+
+    public void deleteSection(Long stationId) {
+        Section lastSection = sections.stream()
+                .filter(section -> section.hasAsDownStation(stationId))
+                .findAny().orElseThrow(InvalidStationIdException::new);
+
+        this.sections.remove(lastSection);
+    }
+
+    public boolean isProperStationToDelete(Long stationId) {
+        return getFinalStation().getId().equals(stationId);
+    }
+
+    public boolean hasOnlyOneSection() {
+        return this.sections.size() == 1;
     }
 }

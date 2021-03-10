@@ -31,9 +31,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         1.2 새로운 구간의 상행역이 현재 등록 되어 있는 하행 종점역이 아닌 경우 -> 에러 응
         1.3 새로운 구간의 하행역이 현재 등록 되어 있는 경우 -> 에러 응답
     2. 지하철 노선에 구간을 제거할 수 있어야 한다.
-        1.1 노선의 구간이 2개 이상이면서, 제일 마지막 구간(구간의 하행역 == 하행 종점역)을 삭제하는 경우 -> 정상 응답
-        1.2 (구간의 하행역 != 하행 종점역)인 구간을 삭제하는 경우 -> 에러 응답
-        1.3 노선의 유일한 구간을 삭제하려는 경우 -> 에러 응답
+        2.1 노선의 구간이 2개 이상이면서, 제일 마지막 구간(구간의 하행역 == 하행 종점역)을 삭제하는 경우 -> 정상 응답
+        2.2 (구간의 하행역 != 하행 종점역)인 구간을 삭제하는 경우 -> 에러 응답
+        2.3 노선의 유일한 구간을 삭제하려는 경우 -> 에러 응답
     3. 지하철 노선을 조회할 때 구간들이 순서대로 출력되어야 한다.
      */
     private StationResponse 판교역응답;
@@ -137,5 +137,113 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(미금판교구간생성응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("노선의 구간이 2개 이상이면서, 제일 마지막 구간(구간의 하행역 == 하행 종점역)을 삭제하는 경우 -> 정상 응답")
+    @Test
+    void deleteSection_WhenNormalRequest_ThenReturnSuccess() {
+        //given
+        Map<String, String> 미금역 = 역_파라미터_설정("미금역");
+        StationResponse 미금역응답 = StationTestUtils.역_생성_요청(미금역).as(StationResponse.class);
+
+        Map<String, String> 정자미금구간 = new HashMap<>();
+        정자미금구간.put("upStationId", String.valueOf(정자역응답.getId()));
+        정자미금구간.put("downStationId", String.valueOf(미금역응답.getId()));
+        정자미금구간.put("distance", String.valueOf(10));
+
+        RestAssured.given().log().all()
+                .body(정자미금구간)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 신분당선응답.getId() + "/sections")
+                .then().log().all()
+                .extract();
+
+        //when
+        ExtractableResponse<Response> 정자미금구간삭제= RestAssured.given().log().all()
+                .param("stationId", 미금역응답.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + 신분당선응답.getId() + "/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(정자미금구간삭제.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("(구간의 하행역 != 하행 종점역)인 구간을 삭제하는 경우 -> 에러 응답")
+    @Test
+    void deleteSection_WhenInvalidDownStation_ThenReturnError() {
+        //given
+        Map<String, String> 미금역 = 역_파라미터_설정("미금역");
+        StationResponse 미금역응답 = StationTestUtils.역_생성_요청(미금역).as(StationResponse.class);
+
+        Map<String, String> 정자미금구간 = new HashMap<>();
+        정자미금구간.put("upStationId", String.valueOf(정자역응답.getId()));
+        정자미금구간.put("downStationId", String.valueOf(미금역응답.getId()));
+        정자미금구간.put("distance", String.valueOf(10));
+
+        RestAssured.given().log().all()
+                .body(정자미금구간)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 신분당선응답.getId() + "/sections")
+                .then().log().all()
+                .extract();
+
+        //when
+        ExtractableResponse<Response> 판교정자구간삭제= RestAssured.given().log().all()
+                .param("stationId", 정자역응답.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + 신분당선응답.getId() + "/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(판교정자구간삭제.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("노선의 유일한 구간을 삭제하려는 경우 -> 에러 응답")
+    @Test
+    void deleteSection_WhenOnlyOneSectionExists_ThenReturnError() {
+        //given
+
+        //when
+        ExtractableResponse<Response> 판교정자구간삭제= RestAssured.given().log().all()
+                .param("stationId", 정자역응답.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + 신분당선응답.getId() + "/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(판교정자구간삭제.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선을 조회할 때 구간들이 순서대로 출력되어야 한다.")
+    @Test
+    void selectLine_WithAllSectionsOrdered() {
+        //given
+        Map<String, String> 미금역 = 역_파라미터_설정("미금역");
+        StationResponse 미금역응답 = StationTestUtils.역_생성_요청(미금역).as(StationResponse.class);
+
+        Map<String, String> 정자미금구간 = new HashMap<>();
+        정자미금구간.put("upStationId", String.valueOf(정자역응답.getId()));
+        정자미금구간.put("downStationId", String.valueOf(미금역응답.getId()));
+        정자미금구간.put("distance", String.valueOf(10));
+
+        RestAssured.given().log().all()
+                .body(정자미금구간)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 신분당선응답.getId() + "/sections")
+                .then().log().all()
+                .extract();
+
+        //when
+        
     }
 }

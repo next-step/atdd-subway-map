@@ -61,4 +61,8 @@ public class Section extends BaseEntity {
     public void setLine(Line line) {
         this.line = line;
     }
+
+    public boolean hasAsDownStation(Long stationId) {
+        return downStation.getId().equals(stationId);
+    }
 }
