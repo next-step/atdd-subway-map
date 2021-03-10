@@ -36,7 +36,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         신분당선_강남_양재_노선_요청 = new LineRequest("신분당선", "bg-red-600", 강남역.getId(), 양재역.getId(), 7);
 
         역삼역 = 지하철_역_등록_됨("역삼역").as(StationResponse.class);
-        이호선_강남_역삼_노선_요청 = new LineRequest("2호선", "bg-red-600", 강남역.getId(), 역삼역.getId(), 2);
+        이호선_강남_역삼_노선_요청 = new LineRequest("2호선", "bg-green-600", 강남역.getId(), 역삼역.getId(), 2);
     }
 
     @Test
@@ -66,15 +66,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given
-        지하철_노선_생성_요청(신분당선_강남_양재_노선_요청);
-        지하철_노선_생성_요청(이호선_강남_역삼_노선_요청);
+        ExtractableResponse<Response> 신분당선_강남_양재_구간 = 지하철_노선_생성_요청(신분당선_강남_양재_노선_요청);
+        ExtractableResponse<Response> 이호선_강남_역삼_구간 = 지하철_노선_생성_요청(이호선_강남_역삼_노선_요청);
 
         // when
         ExtractableResponse<Response> readLinesResponse = 지하철_노선_목록_조회_요청();
 
         // then
         지하철_노선_목록_조회_됨(readLinesResponse);
-        지하철_노선_목록_조회_결과에_생성된_노선_ID_포함_확인(readLinesResponse, Arrays.asList(강남역, 양재역, 역삼역));
+        지하철_노선_목록_조회_결과에_생성된_노선_ID_포함_확인(readLinesResponse, Arrays.asList(신분당선_강남_양재_구간, 이호선_강남_역삼_구간));
     }
 
     @Test

@@ -3,7 +3,6 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -34,18 +33,16 @@ public class LineVerificationSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 지하철_노선_목록_조회_결과에_생성된_노선_ID_포함_확인(ExtractableResponse<Response> response, List<StationResponse> stationResponses) {
-        List<Long> resultStationIds = response.as(LineResponse.class)
-                .getStations()
-                .stream()
-                .map(StationResponse::getId)
+    public static void 지하철_노선_목록_조회_결과에_생성된_노선_ID_포함_확인(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> createdResponses) {
+        List<Long> expectedLineIds = createdResponses.stream()
+                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
 
-        List<Long> expectedStationIds = stationResponses.stream()
-                .map(StationResponse::getId)
+        List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
+                .map(LineResponse::getId)
                 .collect(Collectors.toList());
 
-        assertThat(resultStationIds).containsAll(expectedStationIds);
+        assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
     public static void 지하철_노선_조회_됨(ExtractableResponse<Response> response) {
