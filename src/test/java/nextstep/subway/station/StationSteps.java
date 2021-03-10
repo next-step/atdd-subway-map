@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static nextstep.subway.AcceptanceTest.parseIdFromResponseHeader;
+import static nextstep.subway.AcceptanceTest.getLocationId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationSteps {
@@ -28,9 +28,9 @@ public class StationSteps {
                 .extract();
     }
 
-    public static Long 지하철_역_생성_요청_ID_반환(Map<String, String> params) {
+    public static Long 지하철_역_생성(Map<String, String> params) {
         ExtractableResponse<Response> stationResponse1 = 지하철_역_생성_요청(params);
-        return parseIdFromResponseHeader(stationResponse1);
+        return getLocationId(stationResponse1);
     }
 
     public static void 지하철_역_생성_성공(ExtractableResponse<Response> response) {
@@ -52,7 +52,7 @@ public class StationSteps {
 
     public static void 지하철_생성한_역_목록_조회_성공(Stream<ExtractableResponse<Response>> createResponses, ExtractableResponse<Response> getResponse) {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedIds = createResponses.map(AcceptanceTest::parseIdFromResponseHeader)
+        List<Long> expectedIds = createResponses.map(AcceptanceTest::getLocationId)
                 .collect(Collectors.toList());
         List<Long> resultIds = getResponse.jsonPath().getList(".", StationResponse.class)
                 .stream()

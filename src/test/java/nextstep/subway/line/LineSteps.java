@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static nextstep.subway.AcceptanceTest.parseIdFromResponseHeader;
+import static nextstep.subway.AcceptanceTest.getLocationId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
@@ -28,7 +28,7 @@ public class LineSteps {
                 .extract();
     }
 
-    public static Long 지하철_노선_생성_요청_ID_반환(Map<String, Object> params) {
+    public static Long 지하철_노선_생성(Map<String, Object> params) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -36,7 +36,7 @@ public class LineSteps {
                 .post("/lines")
                 .then().log().all()
                 .extract();
-        return parseIdFromResponseHeader(response);
+        return getLocationId(response);
     }
 
     public static void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
@@ -66,7 +66,7 @@ public class LineSteps {
 
     public static void 지하철_생성한_노선_목록_조회_성공(Stream<ExtractableResponse<Response>> createResponses, ExtractableResponse<Response> getResponse) {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedIds = createResponses.map(AcceptanceTest::parseIdFromResponseHeader)
+        List<Long> expectedIds = createResponses.map(AcceptanceTest::getLocationId)
                                                  .collect(Collectors.toList());
         List<Long> resultIds = getResponse.jsonPath().getList(".", LineResponse.class)
                 .stream()
@@ -85,7 +85,7 @@ public class LineSteps {
 
     public static void 지하철_생성한_노선_조회_성공(ExtractableResponse<Response> createResponse, ExtractableResponse<Response> getResponse) {
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        Long createId = parseIdFromResponseHeader(createResponse);
+        Long createId = getLocationId(createResponse);
         Long resultId = (getResponse.jsonPath().getObject(".", LineResponse.class)).getId();
         assertThat(resultId).isEqualTo(createId);
 

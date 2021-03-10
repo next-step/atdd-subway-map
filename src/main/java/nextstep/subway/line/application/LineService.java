@@ -7,7 +7,6 @@ import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.section.dto.SectionRequest;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,25 +31,25 @@ public class LineService {
         Line persistLine = lineRepository.save(new Line(request.getName(),
                                                         request.getColor(),
                                                         upStation, downStation, request.getDistance()));
-        return createLineResponse(persistLine);
+        return LineResponse.of(persistLine);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAll() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                    .map(this::createLineResponse)
+                    .map(LineResponse::of)
                     .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse find(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchLineException::new);
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     public void update(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(NoSuchLineException::new);
+        lineRepository.findById(id).orElseThrow(NoSuchLineException::new);
         lineRepository.save(request.toLine());
     }
 
@@ -69,12 +68,4 @@ public class LineService {
         Station downStation = stationService.find(request.getDownStationId());
         line.addSectionToLine(upStation, downStation, request.getDistance());
     }
-
-    private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stations = line.getStations().stream()
-                .map(StationResponse::of)
-                .collect(Collectors.toList());
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations, line.getCreatedDate(), line.getModifiedDate());
-    }
-
 }
