@@ -1,14 +1,14 @@
 package nextstep.subway.line.application;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import nextstep.subway.common.exception.InvalidSectionException;
+import nextstep.subway.common.exception.NoResourceException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
-import nextstep.subway.line.domain.Section;
+import nextstep.subway.line.domain.Sections;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.common.exception.NoResourceException;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
@@ -78,24 +78,14 @@ public class LineService {
     }
 
     public void removeSection(long lineId, long stationId) {
-
-        Line line = lineRepository.findById(lineId)
-            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
-
-        if(line.getSections().size() == 0) throw new InvalidSectionException("삭제할 구간이 없습니다.");
-        if(line.getSections().size() == 1) throw new InvalidSectionException("구간이 1개남은경우 삭제할 수 없습니다.");
-
-        boolean isLastStation = line.getSections().get(line.getSections().size() - 1)
-            .getDownStation().getId().equals(stationId);
-        if(!isLastStation) throw new InvalidSectionException("노선의 종점이 아닌경우 삭제할 수 없습니다.");
-
-        line.removeSection(line.getSections().size()-1);
-
-
+        lineRepository.findById(lineId)
+            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."))
+            .removeSection(stationId);
     }
 
-    private List<StationResponse> toStationResponse(List<Section> sections) {
-      return  sections.stream().sorted().flatMap(section -> Stream.of(section.getUpStation(),section.getDownStation()))
-            .distinct().map(StationResponse::of).collect(Collectors.toList());
+    private List<StationResponse> toStationResponse(Sections sections) {
+      return  sections.getSortedStations().stream()
+          .map(StationResponse::of)
+          .collect(Collectors.toList());
     }
 }

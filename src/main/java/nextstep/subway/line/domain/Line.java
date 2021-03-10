@@ -1,9 +1,12 @@
 package nextstep.subway.line.domain;
-import java.util.ArrayList;
-import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import nextstep.subway.common.BaseEntity;
-import javax.persistence.*;
-import nextstep.subway.common.exception.InvalidSectionException;
 import nextstep.subway.station.domain.Station;
 
 @Entity
@@ -14,9 +17,8 @@ public class Line extends BaseEntity {
     @Column(unique = true)
     private String name;
     private String color;
-
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -25,7 +27,7 @@ public class Line extends BaseEntity {
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        sections.add(new Section(this, upStation, downStation, distance));
+        sections.add(this, upStation, downStation, distance);
     }
 
     public void update(Line line) {
@@ -34,22 +36,11 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Station upStation,Station downStation,int distance) {
-        validateSection(this,upStation,downStation);
-        sections.add(new Section(this,upStation,downStation,distance));
+        sections.add(this,upStation,downStation,distance);
     }
 
-    private void validateSection(Line line,Station upStation, Station downStation){
-        boolean isValidUpStation =  !line.getSections().get(line.getSections().size()-1)
-            .getDownStation().equals(upStation);
-        boolean isValidDownStation = line.getSections().stream()
-            .anyMatch(section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation));
-        if(line.getSections().size() == 0) return;
-        if(isValidUpStation) { throw new InvalidSectionException("상행역은 현재 노선의 하행 종점역이어야 합니다.");}
-        if(isValidDownStation){ throw new InvalidSectionException("하행역은 노선에 이미 등록되어 있습니다."); }
-    }
-
-    public void removeSection(int index) {
-        sections.remove(index);
+    public void removeSection(long stationId) {
+        sections.remove(stationId);
     }
 
     public Long getId() {
@@ -64,7 +55,7 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 }
