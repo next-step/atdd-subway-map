@@ -104,7 +104,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long upStationId = parseIdFromResponseHeader(stationResponse1);
         ExtractableResponse<Response> stationResponse2 = 지하철_역_생성_요청(역삼역);
         Long downStationId = parseIdFromResponseHeader(stationResponse2);
-        Map<String, Object> params = makeLine("2호선","bg-green-600", upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600", upStationId, downStationId,7);
         return params;
     }
 
@@ -113,7 +113,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long upStationId = parseIdFromResponseHeader(stationResponse1);
         ExtractableResponse<Response> stationResponse2 = 지하철_역_생성_요청(삼성역);
         Long downStationId = parseIdFromResponseHeader(stationResponse2);
-        Map<String, Object> params = makeLine("2호선","bg-green-600", upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600", upStationId, downStationId,7);
         return params;
     }
 
@@ -122,11 +122,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long upStationId = parseIdFromResponseHeader(stationResponse1);
         ExtractableResponse<Response> stationResponse2 = 지하철_역_생성_요청(서울역);
         Long downStationId = parseIdFromResponseHeader(stationResponse2);
-        Map<String, Object> params = makeLine("1호선","bg-blue-600", upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("1호선","bg-blue-600", upStationId, downStationId,7);
         return params;
     }
 
-    public static Map<String, Object> makeLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public static Map<String, Object> makeLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);

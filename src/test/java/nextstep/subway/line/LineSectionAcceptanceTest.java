@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Map;
 
-import static nextstep.subway.line.LineAcceptanceTest.makeLine;
+import static nextstep.subway.line.LineAcceptanceTest.makeLineRequest;
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.station.StationAcceptanceTest.*;
 import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
@@ -25,7 +25,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
 
         // when
         ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(params);
@@ -40,7 +40,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
         ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(params);
         Long lineId = parseIdFromResponseHeader(lineResponse);
 
@@ -60,7 +60,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600", upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600", upStationId, downStationId,7);
         Long lineId = 지하철_노선_생성_요청_ID_반환(params);
 
         // when
@@ -77,7 +77,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
 
         Long lineId = 지하철_노선_생성_요청_ID_반환(params);
         Long newDownStationId =  지하철_역_생성_요청_ID_반환(선릉역);
@@ -98,7 +98,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
         Long lineId = 지하철_노선_생성_요청_ID_반환(params);
         Long newDownStationId = 지하철_역_생성_요청_ID_반환(삼성역);
 
@@ -117,7 +117,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
 
         Long lineId = 지하철_노선_생성_요청_ID_반환(params);
 
@@ -135,7 +135,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         // given
         Long upStationId = 지하철_역_생성_요청_ID_반환(강남역);
         Long downStationId = 지하철_역_생성_요청_ID_반환(역삼역);
-        Map<String, Object> params = makeLine("2호선","bg-green-600",upStationId, downStationId,7);
+        Map<String, Object> params = makeLineRequest("2호선","bg-green-600",upStationId, downStationId,7);
 
         Long lineId = 지하철_노선_생성_요청_ID_반환(params);
 

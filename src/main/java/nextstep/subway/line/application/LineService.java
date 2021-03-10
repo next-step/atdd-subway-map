@@ -1,6 +1,5 @@
 package nextstep.subway.line.application;
 
-import nextstep.subway.common.SectionValidationException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
-    private StationService stationService;
+    private final LineRepository lineRepository;
+    private final StationService stationService;
 
     public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
@@ -46,7 +45,7 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchLineException::new);
         return createLineResponse(line);
     }
 
@@ -70,7 +69,7 @@ public class LineService {
     }
 
     public void addSectionToLine(Long id, SectionRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchLineException::new);
         Station upStation = stationService.findById(request.getUpStationId());
         Station downStation = stationService.findById(request.getDownStationId());
         checkSectionAddValidity(line, upStation, downStation);
@@ -79,7 +78,9 @@ public class LineService {
 
     private void checkSectionAddValidity(Line line, Station newUpStation, Station newDownStation) {
         List<Station> stations = getStations(line);
-        if (stations.isEmpty()) return;
+        if (stations.isEmpty()) {
+            return;
+        }
         if (isNotValidUpStation(newUpStation, stations)) {
             throw new SectionValidationException("새로운 구간의 상행역은 기존 하행 종점역이어야 합니다.");
         }
@@ -93,16 +94,16 @@ public class LineService {
     }
 
     private boolean isNotValidDownStation(Station newDownStation, List<Station> stations) {
-        return stations.stream().anyMatch(x -> x.getId() == newDownStation.getId());
+        return stations.stream().anyMatch(it -> it.getId() == newDownStation.getId());
     }
 
     public void deleteStationFromLine(Long lineId, Long stationId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+        Line line = lineRepository.findById(lineId).orElseThrow(NoSuchLineException::new);
         checkStationDeleteValidity(line, stationId);
         line.getSections().stream()
-                .filter(x -> x.getDownStation().getId() == stationId)
+                .filter(it -> it.getDownStation().getId() == stationId)
                 .findFirst()
-                .ifPresent(x -> line.getSections().remove(x));
+                .ifPresent(it -> line.getSections().remove(it));
     }
 
     private void checkStationDeleteValidity(Line line, Long stationId) {

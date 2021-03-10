@@ -15,12 +15,12 @@ import static nextstep.subway.station.StationSteps.*;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
-    public static Map<String, String> 강남역 = makeStation("강남역");
-    public static Map<String, String> 역삼역 = makeStation("역삼역");
-    public static Map<String, String> 선릉역 = makeStation("선릉역");
-    public static Map<String, String> 삼성역 = makeStation("삼성역");
-    public static Map<String, String> 시청역 = makeStation("시청역");
-    public static Map<String, String> 서울역 = makeStation("서울역");
+    public static Map<String, String> 강남역 = makeStationRequest("강남역");
+    public static Map<String, String> 역삼역 = makeStationRequest("역삼역");
+    public static Map<String, String> 선릉역 = makeStationRequest("선릉역");
+    public static Map<String, String> 삼성역 = makeStationRequest("삼성역");
+    public static Map<String, String> 시청역 = makeStationRequest("시청역");
+    public static Map<String, String> 서울역 = makeStationRequest("서울역");
 
     @DisplayName("지하철역을 생성한다.")
     @Test
@@ -73,7 +73,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철_역_삭제_성공(response);
     }
 
-    public static Map<String, String> makeStation(String name) {
+    public static Map<String, String> makeStationRequest(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         return params;
