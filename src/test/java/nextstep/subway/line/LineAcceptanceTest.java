@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static nextstep.subway.line.LineRequestSteps.*;
 import static nextstep.subway.line.LineVerificationSteps.*;
 import static nextstep.subway.station.StationRequestSteps.지하철_역_등록_됨;
@@ -72,7 +74,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_목록_조회_됨(readLinesResponse);
-        지하철_노선_목록_조회_결과에_생성된_노선_포함_확인(readLinesResponse);
+        지하철_노선_목록_조회_결과에_생성된_노선_ID_포함_확인(readLinesResponse, Arrays.asList(강남역, 양재역, 역삼역));
     }
 
     @Test

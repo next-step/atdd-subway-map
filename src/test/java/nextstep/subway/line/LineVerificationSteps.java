@@ -34,19 +34,18 @@ public class LineVerificationSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static void 지하철_노선_목록_조회_결과에_생성된_노선_포함_확인(ExtractableResponse<Response> readLinesResponse) {
-        List<LineResponse> lines = readLinesResponse.jsonPath().getList(".", LineResponse.class);
-        assertThat(lines).hasSize(2);
-        지하철_노선_목록_조회_결과에_생성된_노선_역이름_확인(lines, 0, "강남역", "양재역");
-        지하철_노선_목록_조회_결과에_생성된_노선_역이름_확인(lines, 1, "강남역", "역삼역");
-    }
-
-    private static void 지하철_노선_목록_조회_결과에_생성된_노선_역이름_확인(List<LineResponse> lines, int index, String upStationName, String downStationName) {
-        List<StationResponse> stationResponses = lines.get(index).getStations();
-        List<String> collect = stationResponses.stream()
-                .map(StationResponse::getName)
+    public static void 지하철_노선_목록_조회_결과에_생성된_노선_ID_포함_확인(ExtractableResponse<Response> response, List<StationResponse> stationResponses) {
+        List<Long> resultStationIds = response.as(LineResponse.class)
+                .getStations()
+                .stream()
+                .map(StationResponse::getId)
                 .collect(Collectors.toList());
-        assertThat(collect).containsExactly(upStationName, downStationName);
+
+        List<Long> expectedStationIds = stationResponses.stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        assertThat(resultStationIds).containsAll(expectedStationIds);
     }
 
     public static void 지하철_노선_조회_됨(ExtractableResponse<Response> response) {
