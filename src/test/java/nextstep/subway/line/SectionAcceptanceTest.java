@@ -5,9 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.station.dto.StationResponse;
-import nextstep.subway.utils.LineTestUtils;
 import nextstep.subway.utils.StationTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -221,29 +219,5 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(판교정자구간삭제.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    @DisplayName("지하철 노선을 조회할 때 구간들이 순서대로 출력되어야 한다.")
-    @Test
-    void selectLine_WithAllSectionsOrdered() {
-        //given
-        Map<String, String> 미금역 = 역_파라미터_설정("미금역");
-        StationResponse 미금역응답 = StationTestUtils.역_생성_요청(미금역).as(StationResponse.class);
-
-        Map<String, String> 정자미금구간 = new HashMap<>();
-        정자미금구간.put("upStationId", String.valueOf(정자역응답.getId()));
-        정자미금구간.put("downStationId", String.valueOf(미금역응답.getId()));
-        정자미금구간.put("distance", String.valueOf(10));
-
-        RestAssured.given().log().all()
-                .body(정자미금구간)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/" + 신분당선응답.getId() + "/sections")
-                .then().log().all()
-                .extract();
-
-        //when
-        
     }
 }

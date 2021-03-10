@@ -1,9 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.line.exception.InvalidDownStationException;
 import nextstep.subway.line.exception.InvalidStationIdException;
-import nextstep.subway.line.exception.InvalidUpStationException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
@@ -58,6 +56,10 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     public void addSection(Section section) {
         section.setLine(this);
         this.sections.add(section);
@@ -90,5 +92,18 @@ public class Line extends BaseEntity {
 
     public boolean hasOnlyOneSection() {
         return this.sections.size() == 1;
+    }
+
+    public List<Station> fetchAllStations() {
+        List<Station> stations = new ArrayList<>();
+
+        Station firstStation = sections.get(0).getUpStation();
+        stations.add(firstStation);
+
+        sections.stream()
+            .map(Section::getDownStation)
+            .forEach(station -> stations.add(station));
+
+        return stations;
     }
 }

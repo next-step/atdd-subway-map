@@ -68,15 +68,4 @@ public class LineController {
     private ResponseEntity InvalidUpStationException(RuntimeException runtimeException){
         return ResponseEntity.badRequest().body(runtimeException.getMessage());
     }
-
-/*    @ExceptionHandler(InvalidDownStationException.class)
-    private ResponseEntity InvalidDownStationException(InvalidDownStationException invalidDownStationException){
-        return ResponseEntity.badRequest().body(invalidDownStationException.getMessage());
-    }
-
-    @ExceptionHandler(OnlyOneSectionRemainingException.class)
-    private ResponseEntity OnlyOneSectionRemainingException(InvalidDownStationException invalidDownStationException){
-        return ResponseEntity.badRequest().body(invalidDownStationException.getMessage());
-    }*/
-
 }
