@@ -92,8 +92,8 @@ public class LineService {
         boolean isValidDownStation = line.getSections().stream()
             .anyMatch(section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation));
 
-        if(isValidUpStation) throw new InvalidSectionException("상행역은 현재 노선의 하행 종점역이어야 합니다.");
-        if(isValidDownStation) throw new InvalidSectionException("하행역은 노선에 이미 등록되어 있습니다.");
+        if(isValidUpStation) { throw new InvalidSectionException("상행역은 현재 노선의 하행 종점역이어야 합니다.");}
+        if(isValidDownStation){ throw new InvalidSectionException("하행역은 노선에 이미 등록되어 있습니다."); }
     }
 
     public void removeSection(long lineId, long stationId) {

@@ -17,7 +17,7 @@ public class LineRequestBuilder {
     Map params = new HashMap<>();
     params.put("name",name);
     params.put("color",LineColor.of(color));
-    params.put("upstationId",startId);
+    params.put("upStationId",startId);
     params.put("downStationId",endId);
     return params;
   }

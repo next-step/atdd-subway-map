@@ -50,10 +50,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
   void createSection(){
 
     //when 지하철 노선에 구간등록 요청
-    ExtractableResponse<Response> sectionResponse =  구간등록요청(신분당선,광교역,광교중앙역,30);
     long 상현역 =  지하철역_생성_요청("상현역").body().jsonPath().getLong("id");
     long 성복역 =  지하철역_생성_요청("성복역").body().jsonPath().getLong("id");
-    구간등록요청(신분당선,광교중앙역,상현역,30);
+    ExtractableResponse<Response> sectionResponse = 구간등록요청(신분당선,광교중앙역,상현역,30);
     구간등록요청(신분당선,상현역,성복역,30);
 
     //then 지하철 노선에 구간등록 완료됨
