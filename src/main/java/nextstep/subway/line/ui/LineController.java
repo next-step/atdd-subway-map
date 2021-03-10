@@ -26,7 +26,7 @@ public class LineController {
             LineResponse line = lineService.saveLine(lineRequest);
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
         } catch (UnsupportedOperationException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

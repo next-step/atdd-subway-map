@@ -8,7 +8,6 @@ import org.apache.groovy.util.Maps;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성("경강선", "deep-blue");
 
         // then
-        응답_HTTP_FORBIDDEN(response);
+        응답_HTTP_BAD_REQUEST(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")

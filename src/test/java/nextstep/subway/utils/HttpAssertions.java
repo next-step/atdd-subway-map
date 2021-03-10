@@ -19,7 +19,7 @@ public class HttpAssertions {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static void 응답_HTTP_FORBIDDEN(ExtractableResponse<Response> response) {
+    public static void 응답_HTTP_BAD_REQUEST(ExtractableResponse<Response> response) {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
     }
 
