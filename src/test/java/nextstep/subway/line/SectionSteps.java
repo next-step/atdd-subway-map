@@ -43,7 +43,7 @@ public class SectionSteps {
 
     public static void assertCreateSection(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(HEADER_LOCATION)).isNotBlank();
     }
 
     public static void assertCreateSectionFail(ExtractableResponse<Response> response) {
