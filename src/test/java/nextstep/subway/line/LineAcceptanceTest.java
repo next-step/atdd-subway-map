@@ -228,10 +228,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
         List<LineResponse> expected
     ) {
         List<LineResponse> lines = response.body().jsonPath().getList(".", LineResponse.class);
-        assertThat(lines.get(0).getName()).isEqualTo(expected.get(0).getName());
-        assertThat(lines.get(0).getColor()).isEqualTo(expected.get(0).getColor());
-        assertThat(lines.get(1).getName()).isEqualTo(expected.get(1).getName());
-        assertThat(lines.get(1).getColor()).isEqualTo(expected.get(1).getColor());
+
+        assertThat(lines)
+            .extracting((lineResponse -> Arrays.asList(lineResponse.getName(), lineResponse.getColor())))
+            .containsAll(
+                expected.stream()
+                    .map((lineResponse -> Arrays.asList(lineResponse.getName(), lineResponse.getColor())))
+                    .collect(Collectors.toList())
+            );
     }
 
     private void 지하철_노선_응답됨(ExtractableResponse<Response> response, LineResponse expected) {
