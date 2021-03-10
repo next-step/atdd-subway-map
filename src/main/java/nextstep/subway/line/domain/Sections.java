@@ -27,15 +27,10 @@ public class Sections {
     if (sectionList.size() < MIN) {
       return;
     }
-    boolean isValidUpStation = !sectionList.get(sectionList.size() - 1)
-        .getDownStation().equals(upStation);
-    boolean isValidDownStation = sectionList.stream()
-        .anyMatch(section -> section.getUpStation().equals(downStation) || section.getDownStation()
-            .equals(downStation));
-    if (isValidUpStation) {
+    if (isValidUpStation(upStation)) {
       throw new InvalidSectionException("상행역은 현재 노선의 하행 종점역이어야 합니다.");
     }
-    if (isValidDownStation) {
+    if (isValidDownStation(downStation)) {
       throw new InvalidSectionException("하행역은 노선에 이미 등록되어 있습니다.");
     }
   }
@@ -55,22 +50,39 @@ public class Sections {
     if (!isLastStation(stationId)) {
       throw new InvalidSectionException("노선의 종점이 아닌경우 삭제할 수 없습니다.");
     }
-    sectionList.remove(getSize() - 1);
+    sectionList.remove(lastIndex());
   }
 
   public int getSize() {
     return this.sectionList.size();
   }
 
+  private int lastIndex() {
+    return getSize() - 1;
+  }
+
+  private boolean isValidUpStation(Station upStation) {
+    return !sectionList.get(lastIndex())
+        .getDownStation()
+        .equals(upStation);
+  }
+
+  private boolean isValidDownStation(Station downStation) {
+    return sectionList.stream()
+        .anyMatch(section -> section.getUpStation().equals(downStation) || section.getDownStation()
+            .equals(downStation));
+  }
+
   public boolean isLastStation(long stationId) {
-    return sectionList.get(getSize() - 1)
+    return sectionList.get(lastIndex())
         .getDownStation().getId()
         .equals(stationId);
   }
 
 
   public List<Station> getSortedStations() {
-    return sectionList.stream().sorted()
+    return sectionList.stream()
+        .sorted()
         .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
         .distinct()
         .collect(Collectors.toList());
