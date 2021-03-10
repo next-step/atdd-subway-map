@@ -48,7 +48,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         ExtractableResponse<Response> createResponse1 = 지하철_역_생성("강남역");
-        ExtractableResponse<Response> createResponse2 = 지하철_역_생성("역삼역");
+        ExtractableResponse<Response> createResponse2 = 지하철_역_생성("양재역");
 
         // when
         ExtractableResponse<Response> response = 지하철_역_목록_조회();

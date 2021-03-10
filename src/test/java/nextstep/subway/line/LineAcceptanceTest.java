@@ -3,7 +3,10 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.StationSteps;
+import nextstep.subway.utils.HttpTestUtils;
 import org.apache.groovy.util.Maps;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.station.StationSteps.지하철_역_생성;
 import static nextstep.subway.utils.HttpAssertions.*;
+import static nextstep.subway.utils.HttpTestUtils.리소스_ID;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -21,8 +26,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        // given & when
-        ExtractableResponse<Response> response = 지하철_노선_생성("경강선", "deep-blue");
+        // given
+        Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
+        Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
+
+        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+                .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성(lineRequest);
 
         // then
         응답_HTTP_CREATED(response);
@@ -33,10 +44,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         //given
-        지하철_노선_생성("경강선", "deep-blue");
+        Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
+        Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
+
+        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+                .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
+        지하철_노선_생성(lineRequest);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성("경강선", "deep-blue");
+        ExtractableResponse<Response> response = 지하철_노선_생성(lineRequest);
 
         // then
         응답_HTTP_BAD_REQUEST(response);
@@ -46,8 +62,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        지하철_노선_생성("경강선", "deep-blue");
-        지하철_노선_생성("신분당선", "red");
+        Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
+        Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
+
+        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+                .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
+        지하철_노선_생성(lineRequest);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
@@ -61,7 +81,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        지하철_노선_생성("경강선", "deep-blue");
+        Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
+        Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
+
+        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+                .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
+        지하철_노선_생성(lineRequest);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청();
@@ -75,10 +100,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        지하철_노선_생성("경강선", "deep-blue");
+        Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
+        Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
+
+        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+                .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
+        지하철_노선_생성(lineRequest);
 
         // when
-        Map<String, String> params = Maps.of("name", "신분당선", "color", "red");
+        Map<String, String> params = Maps.of("name", "2호선", "color", "green");
         ExtractableResponse<Response> response = 지하철_노선_수정_요청(params);
 
         // then
@@ -89,10 +119,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        지하철_노선_생성("2호선", "green");
+        Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
+        Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
+
+        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+                .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성(lineRequest);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_제거_요청();
+        ExtractableResponse<Response> response = 지하철_노선_제거_요청(리소스_ID(createResponse));
 
         // then
         응답_HTTP_NO_CONTENT(response);

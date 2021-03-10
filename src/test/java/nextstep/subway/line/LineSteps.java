@@ -3,15 +3,23 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.LineRequest;
 import org.apache.groovy.util.Maps;
 import org.springframework.http.MediaType;
 
 import java.util.Map;
 
+import static java.lang.String.valueOf;
+
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
-        Map<String, String> params = Maps.of("name", name, "color", color);
+    public static ExtractableResponse<Response> 지하철_노선_생성(LineRequest lineRequest) {
+        Map<String, String> params = Maps.of(
+                "name", lineRequest.getName()
+                , "color", lineRequest.getColor()
+                , "upStationId", valueOf(lineRequest.getUpStationId())
+                , "downStationId", valueOf(lineRequest.getDownStationId())
+                , "distance", valueOf(lineRequest.getDistance()));
         return RestAssured
                 .given().log().all()
                 .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -43,11 +51,11 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_제거_요청() {
+    public static ExtractableResponse<Response> 지하철_노선_제거_요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1")
+                .when().delete("/lines/" + lineId)
                 .then().log().all().extract();
     }
     
