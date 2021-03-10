@@ -34,6 +34,14 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
+    public static Section of(Station upStation, Station downStation, int distance){
+        if(upStation.equals(downStation)){
+            throw new IllegalArgumentException("upStation and downStation should be different");
+        }
+        if(distance < 0) { throw new IllegalArgumentException("distance should be great than 0"); }
+        return new Section(upStation, downStation, distance);
+    }
+
     public Station getUpStation() {
         return this.upStation;
     }

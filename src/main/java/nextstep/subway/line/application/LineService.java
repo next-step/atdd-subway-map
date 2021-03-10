@@ -8,6 +8,7 @@ import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
+import nextstep.subway.line.exception.IllegalSectionArgument;
 import nextstep.subway.line.exception.NoSuchLineException;
 import nextstep.subway.line.exception.NoSuchStationException;
 import nextstep.subway.station.domain.Station;
@@ -36,13 +37,7 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
         try {
             Line newLine = request.toLine();
-            Optional< Station > optionalUpStation = this.stationRepository.findById(request.getUpStationId());
-            Station upStation = optionalUpStation.orElseThrow(()-> new NoSuchStationException("No such up station Id: " + request.getUpStationId()));
-
-            Optional< Station > optionalDownStation = this.stationRepository.findById(request.getDownStationId());
-            Station downStation =  optionalDownStation.orElseThrow(()-> new NoSuchStationException("No such down station Id: " + request.getDownStationId()));
-
-            newLine.addSection(new Section(upStation, downStation, request.getDistance()));
+            newLine.addSection(makeSectionHelper(request));
             Line persistLine = lineRepository.save(newLine);
             return LineResponse.of(persistLine);
         } catch (DataIntegrityViolationException e){
@@ -79,12 +74,32 @@ public class LineService {
     }
 
     public SectionResponse saveSection(final Long lineId, SectionRequest sectionRequest) {
+        final Line line = getLineById(lineId);
+        final Station upStation = getStationById(sectionRequest.getUpStationId());
+        final Station downStation = getStationById(sectionRequest.getDownStationId());
+
+        line.addSection(new Section(upStation, downStation, sectionRequest.getDistance()));
+        lineRepository.save(line);
+        return SectionResponse.of(line.getLastSection());
+    }
+
+    private Line getLineById(final Long lineId) {
         Optional<Line> optionalLine = lineRepository.findById(lineId);
-        if(!optionalLine.isPresent()){
-            throw new NoSuchLineException("No such line");
+        return optionalLine.orElseThrow(()-> new NoSuchLineException("No such lineId: "+ lineId));
+    }
+
+    private Station getStationById(final Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(()-> new NoSuchStationException("No such up station Id: " + stationId));
+    }
+
+    private Section makeSectionHelper(LineRequest request){
+        try{
+            Station upStation = getStationById(request.getUpStationId());
+            Station downStation = getStationById(request.getDownStationId());
+            return Section.of(upStation, downStation, request.getDistance());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalSectionArgument(e.getMessage());
         }
-        Line line = optionalLine.get();
-        line.addSection(sectionRequest.toSection());
-        return new SectionResponse();
     }
 }

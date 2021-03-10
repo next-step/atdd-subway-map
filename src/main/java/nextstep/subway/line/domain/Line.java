@@ -1,13 +1,19 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.line.exception.InvalidSectionException;
+import nextstep.subway.line.exception.NoSectionException;
+import nextstep.subway.line.exception.NoSuchStationException;
 import nextstep.subway.station.domain.Station;
+import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
+import org.springframework.data.util.Optionals;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Entity
 public class Line extends BaseEntity {
@@ -50,9 +56,27 @@ public class Line extends BaseEntity {
         return this.sections;
     }
 
-    public void addSection(Section section){
+    public void addSection(Section section) {
+        if (!isSameAsLastStationWithSectionUpStation(section)) {
+            throw new InvalidSectionException("Input section is invalid");
+        }
         this.sections.add(section);
         section.setLine(this);
+    }
+
+    private Boolean isSameAsLastStationWithSectionUpStation(final Section section){
+        if (this.sections.size() > 0){
+            return getLastSection().getDownStation().equals(section.getUpStation());
+        }
+        return true;
+    }
+
+    public Section getLastSection() {
+        return this.sections
+                .stream()
+                .skip(this.sections.size() - 1)
+                .findFirst()
+                .orElseThrow(()-> new NoSectionException("No registered Section"));
     }
 
     public Station getUpStation() {

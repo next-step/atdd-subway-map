@@ -6,6 +6,7 @@ import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.DuplicateLineException;
+import nextstep.subway.line.exception.InvalidSectionException;
 import nextstep.subway.line.exception.NoSuchStationException;
 import nextstep.subway.line.exception.NoSuchLineException;
 import org.springframework.http.MediaType;
@@ -56,7 +57,7 @@ public class LineController {
     }
 
     @PostMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SectionResponse> createSection(@PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<SectionResponse> appendSection(@PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
         SectionResponse section = lineService.saveSection(lineId, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId +"/sections")).body(section);
     }
@@ -77,6 +78,13 @@ public class LineController {
 
     @ExceptionHandler(NoSuchLineException.class)
     public ResponseEntity handleNoSuchLineException(NoSuchLineException e) {
+        HashMap<String, String> resultBody = new HashMap();
+        resultBody.put("message", e.getMessage());
+        return ResponseEntity.badRequest().body(resultBody);
+    }
+
+    @ExceptionHandler(InvalidSectionException.class)
+    public ResponseEntity handleInvalidSectionException(InvalidSectionException e) {
         HashMap<String, String> resultBody = new HashMap();
         resultBody.put("message", e.getMessage());
         return ResponseEntity.badRequest().body(resultBody);
