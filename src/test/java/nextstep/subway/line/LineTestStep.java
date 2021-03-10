@@ -93,6 +93,10 @@ public class LineTestStep {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static void 노선_생성_실패됨(ExtractableResponse<Response> response) {
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     // util
     public static Map<String, String> makeLineParam(LineRequest lineRequest) {
         Map<String, String> params = new HashMap<>();
