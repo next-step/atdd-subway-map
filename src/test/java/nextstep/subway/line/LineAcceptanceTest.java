@@ -38,6 +38,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         응답_HTTP_CREATED(response);
         지하철_노선_포함됨(response);
+        지하철_역_포함됨(response);
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
@@ -141,6 +142,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_포함됨(ExtractableResponse<Response> response) {
         LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
         Assertions.assertThat(lineResponse).isNotNull();
+    }
+
+    private void 지하철_역_포함됨(ExtractableResponse<Response> response) {
+        LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
+        Assertions.assertThat(lineResponse.getStations()).isNotEmpty();
     }
 
 }
