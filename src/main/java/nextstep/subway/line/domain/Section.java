@@ -1,12 +1,12 @@
 package nextstep.subway.line.domain;
 
+import nextstep.subway.common.BaseEntity;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
-import java.util.Map;
 
 @Entity
-public class Section {
+public class Section extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +36,29 @@ public class Section {
 
     public static Section of(final Station upStation, final Station downStation, final int distance) {
         return new Section(upStation, downStation, distance);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
     }
 }

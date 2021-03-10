@@ -3,6 +3,10 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.line.exception.InvalidDownStationException;
+import nextstep.subway.line.exception.InvalidUpStationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +48,21 @@ public class LineController {
     public ResponseEntity<LineResponse> deleteLine(@PathVariable final Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/lines/{lineId}/sections",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity createLineSection(@PathVariable final Long lineId, @RequestBody final SectionRequest sectionRequest) {
+        SectionResponse section = lineService.saveSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/" + section.getId())).body(section);
+    }
+
+    @ExceptionHandler(InvalidUpStationException.class)
+    private ResponseEntity InvalidUpStationException(InvalidUpStationException invalidUpStationException){
+        return ResponseEntity.badRequest().body(invalidUpStationException.getMessage());
+    }
+
+    @ExceptionHandler(InvalidDownStationException.class)
+    private ResponseEntity InvalidDownStationException(InvalidDownStationException invalidDownStationException){
+        return ResponseEntity.badRequest().body(invalidDownStationException.getMessage());
     }
 }

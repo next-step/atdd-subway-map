@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class LineResponse {
     private Long id;
     private String name;
-    private String color;
+    private String color; //TODO : ADD sections?
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 

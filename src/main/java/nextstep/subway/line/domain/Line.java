@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,10 +28,14 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
+    public Line(final String name, final String color, final Section section) {
+        this.name = name;
+        this.color = color;
+        addSection(section);
+    }
+
     public static Line of(final String name, final String color, final Section section) {
-        Line line = new Line(name, color);
-        line.addSection(section);
-        return line;
+        return new Line(name, color, section);
     }
 
     public void update(final Line line) {
@@ -51,6 +56,20 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        sections.add(section);
+        section.setLine(this);
+        this.sections.add(section);
+    }
+
+    public boolean isValidUpstation(Station upStation) {
+        return upStation.equals(getFinalStation());
+    }
+
+    private Station getFinalStation() {
+        return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    public boolean isValidDownStation(Station downStation) {
+        return !sections.stream()
+                .anyMatch( section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation) );
     }
 }
