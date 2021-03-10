@@ -1,10 +1,10 @@
 package nextstep.subway.common.exception;
 
+import nextstep.subway.line.exception.CreateSectionWithWrongUpStationException;
+import nextstep.subway.line.exception.DeleteSectionWithNotLastException;
+import nextstep.subway.line.exception.DeleteSectionWithOnlyOneException;
+import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
-import nextstep.subway.section.exception.CreateSectionWithWrongUpStationException;
-import nextstep.subway.section.exception.DeleteSectionWithNotLastException;
-import nextstep.subway.section.exception.DeleteSectionWithOnlyOneException;
-import nextstep.subway.section.exception.DownStationDuplicatedException;
 import nextstep.subway.station.exception.StationNameDuplicatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,7 +1,6 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.domain.BaseEntity;
-import nextstep.subway.section.domain.Section;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -15,7 +14,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -87,5 +88,40 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        section.setLine(this);
+    }
+
+    public List<Station> getStations() {
+        if (sections.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Station> stations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        stations.add(sections.get(sections.size() - 1).getDownStation());
+
+        return stations;
+    }
+
+    public Long getLastStationId() {
+        List<Station> stations = getStations();
+        if (stations.isEmpty()) {
+            return 0L;
+        }
+
+        return stations.get(stations.size() - 1).getId();
+    }
+
+    public Long getLastSectionId() {
+        if (sections.isEmpty()) {
+            return 0L;
+        }
+
+        return sections.get(sections.size() - 1).getId();
     }
 }

@@ -1,4 +1,4 @@
-package nextstep.subway.section;
+package nextstep.subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -8,12 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineSteps.requestCreateLineDx;
-import static nextstep.subway.section.SectionSteps.assertCreateSection;
-import static nextstep.subway.section.SectionSteps.assertCreateSectionFail;
-import static nextstep.subway.section.SectionSteps.assertDeleteSection;
-import static nextstep.subway.section.SectionSteps.assertDeleteSectionFail;
-import static nextstep.subway.section.SectionSteps.requestCreateSection;
-import static nextstep.subway.section.SectionSteps.requestDeleteSection;
+import static nextstep.subway.line.SectionSteps.assertCreateSection;
+import static nextstep.subway.line.SectionSteps.assertCreateSectionFail;
+import static nextstep.subway.line.SectionSteps.assertDeleteSection;
+import static nextstep.subway.line.SectionSteps.assertDeleteSectionFail;
+import static nextstep.subway.line.SectionSteps.requestCreateSection;
+import static nextstep.subway.line.SectionSteps.requestDeleteSection;
 import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
 import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
 import static nextstep.subway.station.StationSteps.requestCreateStationSadang;

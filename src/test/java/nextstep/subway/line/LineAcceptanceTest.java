@@ -20,7 +20,7 @@ import static nextstep.subway.line.LineSteps.requestDeleteLine;
 import static nextstep.subway.line.LineSteps.requestGetLine;
 import static nextstep.subway.line.LineSteps.requestGetLines;
 import static nextstep.subway.line.LineSteps.requestUpdateLine;
-import static nextstep.subway.section.SectionSteps.requestCreateSection;
+import static nextstep.subway.line.SectionSteps.requestCreateSection;
 import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
 import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
 import static nextstep.subway.station.StationSteps.requestCreateStationSadang;
