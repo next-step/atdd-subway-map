@@ -11,4 +11,9 @@ public class GlobalExceptionController {
     public ResponseEntity handleNotValidDownStationException(ExistDownStationException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(CanNotMatchUpStationException.class)
+    public ResponseEntity handleNotValidDownStationException(CanNotMatchUpStationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }

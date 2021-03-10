@@ -1,6 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.exception.CanNotMatchUpStationException;
 import nextstep.subway.exception.ExistDownStationException;
 import nextstep.subway.section.Section;
 import nextstep.subway.station.domain.Station;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line extends BaseEntity {
@@ -39,15 +41,41 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        boolean isExist = isExistDownStation(section.getDownStation());
+        if(isEmptySections()) {
+            setSection(section);
+            return;
+        }
+        checkValidStation(section);
+        setSection(section);
+    }
 
-        checkValidDownStation(isExist);
+    private boolean isEmptySections() {
+        return sections.size() == 0;
+    }
 
+    private void setSection(Section section) {
         sections.add(section);
         section.addLine(this);
     }
 
-    private void checkValidDownStation(boolean isExist) {
+    private void checkValidStation(Section section) {
+        checkValidDownStation(section);
+        checkValidUpStation(section);
+    }
+
+    private void checkValidUpStation(Section section) {
+        Section lastSection = getLastSection();
+        if(!lastSection.isEqual(section.getUpStation())) {
+            throw new CanNotMatchUpStationException();
+        }
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size() - 1);
+    }
+
+    private void checkValidDownStation(Section section) {
+        boolean isExist = isExistDownStation(section.getDownStation());
         if(isExist) {
             throw new ExistDownStationException();
         }

@@ -1,11 +1,11 @@
 package nextstep.subway.section;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Section extends BaseEntity {
@@ -52,7 +52,16 @@ public class Section extends BaseEntity {
         return downStation;
     }
 
+    public Station getUpStation() {
+        return upStation;
+    }
+
     public boolean isExistStation(Station downStation) {
-        return upStation.equals(downStation) || downStation.equals(downStation);
+        return Objects.equals(this.upStation, downStation)
+                || Objects.equals(this.downStation, downStation);
+    }
+
+    public boolean isEqual(Station upStation) {
+        return Objects.equals(this.downStation, upStation);
     }
 }
