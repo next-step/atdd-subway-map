@@ -51,7 +51,7 @@ public class Line extends BaseEntity {
         }
 
         validateUpStationMatching(upStation);
-        validateExistDownStation(sections, downStation);
+        validateExistDownStation(downStation);
 
         sections.add(createSection(upStation, downStation, distance));
     }
@@ -66,7 +66,7 @@ public class Line extends BaseEntity {
         }
     }
 
-    private void validateExistDownStation(List<Section> sections, Station downStation) {
+    private void validateExistDownStation(Station downStation) {
         if (sections.contains(downStation)) {
             throw new StationAlreadyExistException(EXCEPTION_MESSAGE_EXIST_DOWN_STATION);
         }
@@ -102,7 +102,7 @@ public class Line extends BaseEntity {
     }
 
     public Station getLastDownStation() {
-        Section section = this.sections.get(sections.size() - 1);
+        Section section = sections.get(sections.size() - 1);
         return section.getDownStation();
     }
 
