@@ -6,10 +6,6 @@ import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.exception.CreateSectionWithWrongUpStationException;
-import nextstep.subway.line.exception.DeleteSectionWithNotLastException;
-import nextstep.subway.line.exception.DeleteSectionWithOnlyOneException;
-import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
 import nextstep.subway.line.exception.LineNotFoundException;
 import nextstep.subway.station.domain.Station;
@@ -74,17 +70,10 @@ public class LineService {
 
     public LineResponse saveSection(Long lineId, SectionRequest sectionRequest) {
         Line line = getLineById(lineId);
-
-        if (isWrongUpStation(line, sectionRequest)) {
-            throw new CreateSectionWithWrongUpStationException();
-        }
-        if (idDownStationDuplicated(line, sectionRequest)) {
-            throw new DownStationDuplicatedException();
-        }
-
         Station upStation = getStationById(sectionRequest.getUpStationId());
         Station downStation = getStationById(sectionRequest.getDownStationId());
         Section section = sectionRequest.toSection(upStation, downStation);
+
         line.addSection(section);
         lineRepository.flush();
 
@@ -93,16 +82,7 @@ public class LineService {
 
     public void deleteSection(Long lineId, Long sectionId) {
         Line line = getLineById(lineId);
-
-        if (isNotLastSection(line, sectionId)) {
-            throw new DeleteSectionWithNotLastException();
-        }
-        if (isOnlyOneSection(line)) {
-            throw new DeleteSectionWithOnlyOneException();
-        }
-
-        line.getSections()
-                .removeIf(it -> it.getId().equals(lineId));
+        line.removeSection(sectionId);
     }
 
     private Station getStationById(Long id) {
@@ -113,26 +93,5 @@ public class LineService {
     private Line getLineById(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new LineNotFoundException(lineId));
-    }
-
-    private boolean isWrongUpStation(Line line, SectionRequest sectionRequest) {
-        return !line.getSections().isEmpty()
-                && !line.getLastStationId().equals(sectionRequest.getUpStationId());
-    }
-
-    private boolean idDownStationDuplicated(Line line, SectionRequest sectionRequest) {
-        List<Long> stationIds = line.getStations()
-                .stream()
-                .map(Station::getId)
-                .collect(Collectors.toList());
-        return stationIds.contains(sectionRequest.getDownStationId());
-    }
-
-    private boolean isNotLastSection(Line line, Long sectionId) {
-        return !line.getLastSectionId().equals(sectionId);
-    }
-
-    private boolean isOnlyOneSection(Line line) {
-        return line.getSections().size() == 1;
     }
 }

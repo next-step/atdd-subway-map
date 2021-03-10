@@ -1,6 +1,10 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.domain.BaseEntity;
+import nextstep.subway.line.exception.CreateSectionWithWrongUpStationException;
+import nextstep.subway.line.exception.DeleteSectionWithNotLastException;
+import nextstep.subway.line.exception.DeleteSectionWithOnlyOneException;
+import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -91,8 +95,14 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
+        validateAddSection(section);
         this.sections.add(section);
         section.setLine(this);
+    }
+
+    public void removeSection(Long sectionId) {
+        validateRemoveSection(sectionId);
+        getSections().removeIf(it -> it.getId().equals(sectionId));
     }
 
     public List<Station> getStations() {
@@ -113,7 +123,6 @@ public class Line extends BaseEntity {
         if (stations.isEmpty()) {
             return 0L;
         }
-
         return stations.get(stations.size() - 1).getId();
     }
 
@@ -121,7 +130,48 @@ public class Line extends BaseEntity {
         if (sections.isEmpty()) {
             return 0L;
         }
-
         return sections.get(sections.size() - 1).getId();
+    }
+
+    public boolean isWrongUpStation(Long upStationId) {
+        return !sections.isEmpty()
+                && !getLastStationId().equals(upStationId);
+    }
+
+    public boolean idDownStationDuplicated(Long downStationId) {
+        List<Long> stationIds = getStations()
+                .stream()
+                .map(Station::getId)
+                .collect(Collectors.toList());
+        return stationIds.contains(downStationId);
+    }
+
+    public boolean isNotLastSection(Long sectionId) {
+        if (sections.isEmpty()) {
+            return false;
+        }
+        return !getLastSectionId().equals(sectionId);
+    }
+
+    public boolean isHasOnlyOneSection() {
+        return sections.size() == 1;
+    }
+
+    private void validateAddSection(Section section) {
+        if (isWrongUpStation(section.getUpStation().getId())) {
+            throw new CreateSectionWithWrongUpStationException();
+        }
+        if (idDownStationDuplicated(section.getDownStation().getId())) {
+            throw new DownStationDuplicatedException();
+        }
+    }
+
+    private void validateRemoveSection(Long sectionId) {
+        if (isNotLastSection(sectionId)) {
+            throw new DeleteSectionWithNotLastException();
+        }
+        if (isHasOnlyOneSection()) {
+            throw new DeleteSectionWithOnlyOneException();
+        }
     }
 }
