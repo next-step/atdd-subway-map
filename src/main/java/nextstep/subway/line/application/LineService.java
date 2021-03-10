@@ -2,14 +2,12 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
-import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exceptions.*;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
-import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.station.exception.NotFoundStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,19 +30,8 @@ public class LineService {
         if (lineRepository.existsByName(request.getName())) {
             throw new ExistingLineException();
         }
-        Station upStation = getStation(request.getUpStationId());
-        Station downStation = getStation(request.getDownStationId());
-        return LineResponse.of(
-            lineRepository.save(
-                new Line(
-                    request.getName(),
-                    request.getColor(),
-                    upStation,
-                    downStation,
-                    request.getDistance()
-                )
-            )
-        );
+        Line line = request.toLineByGetStation(this::getStation);
+        return LineResponse.of(lineRepository.save(line));
     }
 
     public List<LineResponse> findAllLines() {

@@ -1,6 +1,9 @@
 package nextstep.subway.line.dto;
 
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.station.domain.Station;
+
+import java.util.function.Function;
 
 public class LineRequest {
     private String name;
@@ -42,6 +45,16 @@ public class LineRequest {
 
     public Line toLine() {
         return new Line(name, color);
+    }
+
+    public Line toLineByGetStation(Function<Long, Station> getStation) {
+        return new Line(
+            name,
+            color,
+            getStation.apply(upStationId),
+            getStation.apply(downStationId),
+            distance
+        );
     }
 
 }
