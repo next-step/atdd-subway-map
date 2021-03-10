@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static nextstep.subway.line.LineSectionSteps.*;
+import static nextstep.subway.line.LineSteps.지하철_노선_구간_삭제됨;
 import static nextstep.subway.line.LineSteps.지하철_노선_생성_요청;
 import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,46 +120,51 @@ public class LineSectionAcceptanceTest {
      * (2) 구간 제거 기능
      * =========================================*/
 
+    String setDeleteUri(LineResponse line, StationResponse station){
+        return "/lines/" + line.getId() + "/sections?stationId=" + station.getId();
+    }
+
     @DisplayName("지하철 노선의 구간을 제거한다.")
     @Test
     void deleteLineSection(){
         // given
-        // 지하철_노선에_구간이_등록되어_있음
-        // 지하철_노선에_구간이_등록되어_있음
+        지하철_노선에_구간이_등록되어_있음(createParams(강남역, 양재역, 10), setCreateUri(신분당선));
+        지하철_노선에_구간이_등록되어_있음(createParams(양재역, 양재시민의숲, 5), setCreateUri(신분당선));
 
         // when
-        // 지하철_노선의_구간_삭제_요청
+        ExtractableResponse<Response> response = 지하철_노선의_구간_삭제_요청(setDeleteUri(신분당선, 양재시민의숲));
 
         // then
-        // 지하철_노선_구간_삭제됨
-        // 지하철_노선_순서대로_정렬됨
-
+        지하철_노선_구간_삭제됨(response);
+        지하철_노선_순서대로_정렬됨(response, Arrays.asList(강남역.getId(), 양재역.getId()));
     }
+
+
 
     @DisplayName("지하철 노선의 마지막역이 아닌 역을 제거 한다.")
     @Test
     void deleteNoneLastStation(){
         // given
-        // 지하철_노선에_구간이_등록되어_있음
-        // 지하철_노선에_구간이_등록되어_있음
+        지하철_노선에_구간이_등록되어_있음(createParams(강남역, 양재역, 10), setCreateUri(신분당선));
+        지하철_노선에_구간이_등록되어_있음(createParams(양재역, 양재시민의숲, 5), setCreateUri(신분당선));
 
         // when
-        // 지하철_노선의_구간_삭제_요청
+        ExtractableResponse<Response> response = 지하철_노선의_구간_삭제_요청(setDeleteUri(신분당선, 양재역));
 
         // then
-        // 지하철_노선_구간_삭제_실패됨
+        지하철_노선_구간_삭제_실패됨(response);
     }
 
     @DisplayName("구간이 한개인 지하철 노선의 역을 제거 한다.")
     @Test
     void deleteSingleSectionLine(){
         // given
-        // 지하철_노선에_구간이_등록되어_있음
+        지하철_노선에_구간이_등록되어_있음(createParams(강남역, 양재역, 10), setCreateUri(신분당선));
 
         // when
-        // 지하철_노선의_구간_삭제_요청
+        ExtractableResponse<Response> response = 지하철_노선의_구간_삭제_요청(setDeleteUri(신분당선, 양재역));
 
         // then
-        // 지하철_노선_구간_삭제_실패됨
+        지하철_노선_구간_삭제_실패됨(response);
     }
 }

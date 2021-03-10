@@ -45,4 +45,17 @@ public class LineSectionSteps {
                 .collect(Collectors.toList());
         assertThat(responseIds).containsExactlyElementsOf(expectedIds);
     }
+
+    public static ExtractableResponse<Response> 지하철_노선의_구간_삭제_요청(String uri) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    public static void 지하철_노선_구간_삭제_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
