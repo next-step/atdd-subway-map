@@ -82,4 +82,17 @@ public class LineService {
 
         return LineResponse.of(line);
     }
+
+    public LineResponse deleteLineSection(Long lineId, Long stationId) {
+        Line line = lineRepository.getOne(lineId);
+
+        // 벨리데이션
+        if(line.getLastStationId() != stationId) throw new IllegalArgumentException("마지막 역(하행 종점역)만 제거할 수 있다.");
+        if(line.sectionSize() == 1) throw new IllegalArgumentException("구간이 1개인 경우 역을 삭제할 수 없다.");
+
+        // 마지막 노선 제거
+        line.removeLastSection();
+
+        return LineResponse.of(line);
+    }
 }

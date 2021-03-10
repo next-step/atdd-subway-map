@@ -5,6 +5,7 @@ import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static nextstep.subway.line.domain.Section.createSection;
@@ -20,7 +21,7 @@ public class Line extends BaseEntity {
 
     //@OneToMany(mappedBy = "line", cascade = CascadeType.ALL) // section을 각각 persist안해주기 위해
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sectionList = new ArrayList<>(); // 초기화
+    private List<Section> sectionList = new LinkedList<>(); // 초기화
 
     // 기본생성자
     protected Line() {
@@ -42,6 +43,13 @@ public class Line extends BaseEntity {
 
     public void addSection(Station upStation, Station downStation, int distance) {
         this.sectionList.add(createSection(this, upStation, downStation, distance));
+    }
+
+    public void removeLastSection(){
+        int idx = sectionSize() - 1;
+        if(idx > 0){
+            this.sectionList.remove(idx);
+        }
     }
 
     public void update(String name, String color) {
