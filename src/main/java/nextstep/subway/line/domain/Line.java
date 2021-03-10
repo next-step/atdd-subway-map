@@ -1,12 +1,16 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.exception.ExistDownStationException;
 import nextstep.subway.section.Section;
 import nextstep.subway.station.domain.Station;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -35,8 +39,27 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        boolean isExist = isExistDownStation(section.getDownStation());
+
+        checkValidDownStation(isExist);
+
+        sections.add(section);
         section.addLine(this);
+    }
+
+    private void checkValidDownStation(boolean isExist) {
+        if(isExist) {
+            throw new ExistDownStationException();
+        }
+    }
+
+    private boolean isExistDownStation(Station downStation) {
+        return sections.stream()
+                .anyMatch(section -> isExistDownStation(section, downStation));
+    }
+
+    private boolean isExistDownStation(Section section, Station downStation) {
+        return section.isExistStation(downStation);
     }
 
     public Long getId() {
@@ -52,6 +75,6 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return Collections.unmodifiableList(sections);
     }
 }

@@ -1,5 +1,6 @@
 package nextstep.subway.section;
 
+import jdk.nashorn.internal.objects.annotations.Getter;
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.station.domain.Station;
@@ -29,10 +30,14 @@ public class Section extends BaseEntity {
     public Section() {
     }
 
-    public Section(Station upStation, Station downStation, int distance) {
+    private Section(Station upStation, Station downStation, int distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public static Section of(Station upStation, Station downStation, int distance) {
+        return new Section(upStation, downStation, distance);
     }
 
     public void addLine(Line line) {
@@ -41,5 +46,13 @@ public class Section extends BaseEntity {
 
     public Long getId() {
         return id;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public boolean isExistStation(Station downStation) {
+        return upStation.equals(downStation) || downStation.equals(downStation);
     }
 }
