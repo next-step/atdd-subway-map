@@ -69,38 +69,16 @@ public class LineController {
         lineService.removeLineStation(id, stationId);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-
-    @ExceptionHandler(ExistingLineException.class)
-    public ResponseEntity handleExistingLineException(ExistingLineException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(NotFoundLineException.class)
-    public ResponseEntity handleNotFoundLineException(NotFoundLineException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(NotFoundStationException.class)
-    public ResponseEntity handleNotFoundStationException(NotFoundStationException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(NotFoundSectionException.class)
-    public ResponseEntity handleNotFoundSectionException(NotFoundSectionException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(IsNotValidUpStationException.class)
-    public ResponseEntity handleNotLastSectionException(IsNotValidUpStationException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(IsDownStationExistedException.class)
-    public ResponseEntity handleOnlyOneSectionException(IsDownStationExistedException e) {
+    
+    @ExceptionHandler({
+        ExistingLineException.class,
+        NotFoundLineException.class,
+        NotFoundStationException.class,
+        NotFoundSectionException.class,
+        IsNotValidUpStationException.class,
+        IsDownStationExistedException.class,
+    })
+    public ResponseEntity handleExistingLineException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
