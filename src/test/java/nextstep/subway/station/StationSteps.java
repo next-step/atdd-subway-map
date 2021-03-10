@@ -19,7 +19,7 @@ public class StationSteps {
     }
 
     public static ExtractableResponse<Response> 역삼역_생성() {
-        return 지하철_역_생성_요청("역역");
+        return 지하철_역_생성_요청("역삼역");
     }
 
     public static ExtractableResponse<Response> 지하철_역_생성_요청(String name) {

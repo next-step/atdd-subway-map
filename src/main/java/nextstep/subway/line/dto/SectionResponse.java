@@ -1,19 +1,16 @@
 package nextstep.subway.line.dto;
 
-import nextstep.subway.common.exception.ApplicationException;
-import nextstep.subway.common.exception.ApplicationType;
 import nextstep.subway.line.domain.Section;
-import org.springframework.util.StringUtils;
 
-public class SectionRequest {
+public class SectionResponse {
     private Long upStationId;
     private Long downStationId;
     private int distance;
 
-    public SectionRequest() {
+    public SectionResponse() {
     }
 
-    public SectionRequest(Long upStationId, Long downStationId, int distance) {
+    public SectionResponse(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -25,11 +22,8 @@ public class SectionRequest {
 
     public int getDistance() { return this.distance; }
 
-    public void validate() {
-
-        if (this.upStationId == null || this.downStationId == null) {
-            throw new ApplicationException(ApplicationType.INVALID_REQUEST_PARAMETER);
-        }
+    public static SectionResponse of(Section section) {
+        return new SectionResponse(section.getUpStationId(), section.getDownStationId(), section.getDistance());
     }
 
     public Section toSection() {

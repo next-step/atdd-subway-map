@@ -35,7 +35,7 @@ public class LineRequest {
     public Long getDownStationId() { return this.downStationId; }
 
     public Line toLine() {
-        return new Line(this.name, this.color, this.upStationId, this.downStationId);
+        return new Line(this.name, this.color, this.upStationId, this.downStationId, this.distance);
     }
 
     public void validate() {

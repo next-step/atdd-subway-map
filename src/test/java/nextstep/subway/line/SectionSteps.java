@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nextstep.subway.RestAssuredRequest.postRequest;
+import static nextstep.subway.line.LineSteps.지하철_노선_조회_요청;
 import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,6 +41,10 @@ public class SectionSteps {
 
     public static void 지하철_구간_등록_시_distance_누락_오류(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    public static ExtractableResponse<Response> 구간_생성_후_연장된_지하철_노선_조회(Long createdLineId) {
+        return 지하철_노선_조회_요청(createdLineId);
     }
 
     private static Map<String, Object> createParams(Long upStationId, Long downStationId, Long distance) {

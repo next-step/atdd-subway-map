@@ -4,8 +4,10 @@ import nextstep.subway.common.exception.ApplicationException;
 import nextstep.subway.common.exception.ApplicationType;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.application.StationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +22,19 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
     private StationService stationService;
+    private SectionService sectionService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionService sectionService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
+        this.sectionService = sectionService;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse creteLine(LineRequest request) {
 
         validateLineRequest(request);
+
+        Line line = request.toLine();
 
         Line persistLine;
         try {
@@ -49,7 +56,6 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
         Optional<Line> line = lineRepository.findOneById(id);
-
         return line.map(LineResponse::of).orElseThrow(() -> new ApplicationException(ApplicationType.CONTENT_NOT_FOUND));
     }
 
@@ -77,6 +83,7 @@ public class LineService {
     새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.
     새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
      */
+
     //구간 제거
     /*
     지하철 노선에 구간을 제거하는 기능 구현
@@ -93,7 +100,22 @@ public class LineService {
 
     private void validateLineRequest(LineRequest lineRequest) {
         lineRequest.validate();
-        stationService.validateStationId(lineRequest.getUpStationId());
         stationService.validateStationId(lineRequest.getDownStationId());
+    }
+
+    public Line createLineSection(Long id, SectionRequest sectionRequest) {
+        Optional<Line> line = lineRepository.findOneById(id);
+        List<Section> sections = sectionService.getSectionsByLineId(id);
+
+        line.orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));
+
+        if (line.get().validateExtentionAvailable(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sections)) {
+            throw new ApplicationException(ApplicationType.INVALID_STATION_ID);
+        }
+
+        Section section = sectionService.createSection(id, sectionRequest);
+        line.get().extendsLine(section.getDownStationId(), section.getDistance());
+
+        return line.get();
     }
 }
