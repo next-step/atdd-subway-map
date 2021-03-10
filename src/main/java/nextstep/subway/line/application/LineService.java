@@ -4,6 +4,7 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.LineCreateFailException;
 import nextstep.subway.line.exception.LineNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class LineService {
         Line line = request.toLine();
         boolean alreadyRegistered = lineRepository.findByName(line.getName()).isPresent();
         if (alreadyRegistered) {
-            throw new DataIntegrityViolationException("이미 등록된 노선입니다.");
+            throw LineCreateFailException.alreadyExist();
         }
         return LineResponse.of(lineRepository.save(line));
     }
