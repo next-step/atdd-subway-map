@@ -111,7 +111,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, stationId2);
 
         // then
-        지하철노선_구간_등록실패됨(response);
+        지하철노선_구간_삭제실패됨(response);
     }
 
     @DisplayName("구간이 1개인 경우 삭제시도시 실패한다.")
@@ -124,6 +124,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, stationId2);
 
         // then
-        지하철노선_구간_등록실패됨(response);
+        지하철노선_구간_삭제실패됨(response);
     }
 }
