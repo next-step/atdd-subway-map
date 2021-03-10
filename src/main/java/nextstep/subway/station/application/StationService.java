@@ -13,33 +13,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+  private StationRepository stationRepository;
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station persistStation = stationRepository.save(stationRequest.toStation());
-        return StationResponse.of(persistStation);
-    }
+  public StationService(StationRepository stationRepository) {
+    this.stationRepository = stationRepository;
+  }
 
-    @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
-        List<Station> stations = stationRepository.findAll();
+  public StationResponse saveStation(StationRequest stationRequest) {
+    Station persistStation = stationRepository.save(stationRequest.toStation());
+    return StationResponse.of(persistStation);
+  }
 
-        return stations.stream()
-                .map(station -> StationResponse.of(station))
-                .collect(Collectors.toList());
-    }
+  @Transactional(readOnly = true)
+  public List<StationResponse> findAllStations() {
+    List<Station> stations = stationRepository.findAll();
 
-    @Transactional(readOnly = true)
-    public Station findStation(long stationId){
-        return stationRepository.findById(stationId)
-            .orElseThrow(()-> new NoResourceException("등록되지 않은 역 입니다."));
-    }
+    return stations.stream()
+        .map(station -> StationResponse.of(station))
+        .collect(Collectors.toList());
+  }
 
-    public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
-    }
+  @Transactional(readOnly = true)
+  public Station findStation(long stationId) {
+    return stationRepository.findById(stationId)
+        .orElseThrow(() -> new NoResourceException("등록되지 않은 역 입니다."));
+  }
+
+  public void deleteStationById(Long id) {
+    stationRepository.deleteById(id);
+  }
 }

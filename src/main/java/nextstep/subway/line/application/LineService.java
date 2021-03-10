@@ -18,66 +18,69 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
-    private StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+  private LineRepository lineRepository;
+  private StationService stationService;
 
-        this.lineRepository = lineRepository;
-        this.stationService = stationService;
-    }
+  public LineService(LineRepository lineRepository, StationService stationService) {
 
-    public LineResponse saveLine(LineRequest request) {
-        Station upStation = stationService.findStation(request.getUpStationId());
-        Station downStation = stationService.findStation(request.getDownStationId());
-        Line persistLine = lineRepository.save(request.toLine(upStation,downStation));
-        return LineResponse.of(persistLine,toStationResponse(persistLine.getSections()));
-    }
+    this.lineRepository = lineRepository;
+    this.stationService = stationService;
+  }
 
-    public List<LineResponse> getLines() {
-        List<Line> lineList =  lineRepository.findAll();
-        return lineList.stream()
-            .map(line -> LineResponse.of(line,toStationResponse(line.getSections())))
-            .collect(Collectors.toList());
-    }
+  public LineResponse saveLine(LineRequest request) {
+    Station upStation = stationService.findStation(request.getUpStationId());
+    Station downStation = stationService.findStation(request.getDownStationId());
+    Line persistLine = lineRepository.save(request.toLine(upStation, downStation));
+    return LineResponse.of(persistLine, toStationResponse(persistLine.getSections()));
+  }
 
-    public LineResponse findLineById(long id) {
-        Line line = lineRepository.findById(id).orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
-        return LineResponse.of(line,toStationResponse(line.getSections()));
+  public List<LineResponse> getLines() {
+    List<Line> lineList = lineRepository.findAll();
+    return lineList.stream()
+        .map(line -> LineResponse.of(line, toStationResponse(line.getSections())))
+        .collect(Collectors.toList());
+  }
 
-    }
+  public LineResponse findLineById(long id) {
+    Line line = lineRepository.findById(id)
+        .orElseThrow(() -> new NoResourceException("노선을 찾을수 없습니다."));
+    return LineResponse.of(line, toStationResponse(line.getSections()));
 
-    public LineResponse modifyLine(long id,LineRequest lineRequest) {
-        Line line  =  lineRepository.findById(id).orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."));
-        Station upStation = stationService.findStation(lineRequest.getUpStationId());
-        Station downStation = stationService.findStation(lineRequest.getDownStationId());
-        line.update(lineRequest.toLine(upStation,downStation));
-        return LineResponse.of(line,toStationResponse(line.getSections()));
-    }
+  }
 
-    public void removeLine(long id) {
-        lineRepository.deleteById(id);
-    }
+  public LineResponse modifyLine(long id, LineRequest lineRequest) {
+    Line line = lineRepository.findById(id)
+        .orElseThrow(() -> new NoResourceException("노선을 찾을수 없습니다."));
+    Station upStation = stationService.findStation(lineRequest.getUpStationId());
+    Station downStation = stationService.findStation(lineRequest.getDownStationId());
+    line.update(lineRequest.toLine(upStation, downStation));
+    return LineResponse.of(line, toStationResponse(line.getSections()));
+  }
 
-    public void addSection(long lineId, SectionRequest sectionRequest) {
+  public void removeLine(long id) {
+    lineRepository.deleteById(id);
+  }
 
-        Station upStation = stationService.findStation(sectionRequest.getUpStationId());
-        Station downStation = stationService.findStation(sectionRequest.getDownStationId());
+  public void addSection(long lineId, SectionRequest sectionRequest) {
 
-        lineRepository.findById(lineId)
-            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."))
-            .addSection(upStation,downStation,sectionRequest.getDistance());
-    }
+    Station upStation = stationService.findStation(sectionRequest.getUpStationId());
+    Station downStation = stationService.findStation(sectionRequest.getDownStationId());
 
-    public void removeSection(long lineId, long stationId) {
-        lineRepository.findById(lineId)
-            .orElseThrow(()-> new NoResourceException("노선을 찾을수 없습니다."))
-            .removeSection(stationId);
-    }
+    lineRepository.findById(lineId)
+        .orElseThrow(() -> new NoResourceException("노선을 찾을수 없습니다."))
+        .addSection(upStation, downStation, sectionRequest.getDistance());
+  }
 
-    private List<StationResponse> toStationResponse(Sections sections) {
-      return  sections.getSortedStations().stream()
-          .map(StationResponse::of)
-          .collect(Collectors.toList());
-    }
+  public void removeSection(long lineId, long stationId) {
+    lineRepository.findById(lineId)
+        .orElseThrow(() -> new NoResourceException("노선을 찾을수 없습니다."))
+        .removeSection(stationId);
+  }
+
+  private List<StationResponse> toStationResponse(Sections sections) {
+    return sections.getSortedStations().stream()
+        .map(StationResponse::of)
+        .collect(Collectors.toList());
+  }
 }
