@@ -3,30 +3,27 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static nextstep.subway.line.LineSteps.지하철_노선_생성요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionSteps {
 
-    public static Long 지하철_노선_생성됨(LineRequest lineRequest) {
-        LineResponse lineResponse = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+    public static Long 지하철_노선_생성됨(Map<String, String> params) {
+        LineResponse lineResponse = 지하철_노선_생성요청(params).as(LineResponse.class);
         Long lineId = lineResponse.getId();
 
         return lineId;
     }
 
-    public static ExtractableResponse<Response> 지하철노선_구간_등록요청(Long lineId, SectionRequest request) {
+    public static ExtractableResponse<Response> 지하철노선_구간_등록요청(Long lineId, Map<String, String> params) {
         return RestAssured
-                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE).body(request)
+                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE).body(params)
                 .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all().extract();
     }

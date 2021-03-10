@@ -3,21 +3,21 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성요청(LineRequest request) {
+    public static ExtractableResponse<Response> 지하철_노선_생성요청(Map<String, String> params) {
         return RestAssured
-                .given().log().all().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all().extract();
     }
@@ -74,11 +74,9 @@ public class LineSteps {
         assertThat(resultLineId).isEqualTo(expectedLineId);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정요청(Long lineId, String name, String color) {
-        LineRequest request = new LineRequest(name, color);
-
+    public static ExtractableResponse<Response> 지하철_노선_수정요청(Long lineId, Map<String, String> params) {
         ExtractableResponse<Response> response = RestAssured
-                .given().log().all().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", lineId)
                 .then().log().all().extract();
 

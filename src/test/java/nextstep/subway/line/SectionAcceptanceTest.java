@@ -3,55 +3,66 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineRequest;
-import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.exception.NewUpStationIsWrongException;
 import nextstep.subway.station.dto.StationResponse;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static nextstep.subway.line.LineSteps.Line.일호선;
-import static nextstep.subway.line.LineSteps.지하철_노선_생성실패됨;
-import static nextstep.subway.line.LineSteps.지하철_노선_생성요청;
 import static nextstep.subway.line.SectionSteps.*;
-import static nextstep.subway.line.SectionSteps.지하철노선_구간_등록됨;
 import static nextstep.subway.station.StationSteps.Station.*;
 import static nextstep.subway.station.StationSteps.지하철역_생성요청;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
+    private Map<String, String> lineParams = new HashMap<>();
+    private Map<String, String> sectionParams = new HashMap<>();
+    private Map<String, String> stationParams1 = new HashMap<>();
+    private Map<String, String> stationParams2 = new HashMap<>();
+    private Map<String, String> stationParams3 = new HashMap<>();
+
     private Long stationId1;
     private Long stationId2;
     private Long stationId3;
     private int distance;
-
-    private LineRequest defaultLineRequest;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        stationId1 = 지하철역_생성요청(강남역.name).as(StationResponse.class).getId();
-        stationId2 = 지하철역_생성요청(역삼역.name).as(StationResponse.class).getId();
-        stationId3 = 지하철역_생성요청(선릉역.name).as(StationResponse.class).getId();
+        stationParams1.put("name", 강남역.name);
+        stationParams2.put("name", 역삼역.name);
+        stationParams3.put("name", 선릉역.name);
+
+        stationId1 = 지하철역_생성요청(stationParams1).as(StationResponse.class).getId();
+        stationId2 = 지하철역_생성요청(stationParams2).as(StationResponse.class).getId();
+        stationId3 = 지하철역_생성요청(stationParams3).as(StationResponse.class).getId();
         distance = 10;
 
-        defaultLineRequest = new LineRequest(일호선.name, 일호선.color, stationId1, stationId2, distance);
+        lineParams.put("name", 일호선.name);
+        lineParams.put("color", 일호선.color);
+        lineParams.put("upStationId", String.valueOf(stationId1));
+        lineParams.put("downStationId", String.valueOf(stationId2));
+        lineParams.put("distance", String.valueOf(distance));
     }
 
     @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void addSection() {
         // given
-        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
+        Long lineId = 지하철_노선_생성됨(lineParams);
 
         // when
-        SectionRequest request = new SectionRequest(stationId2, stationId3, distance);
-        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, request);
+        sectionParams.put("upStationId", String.valueOf(stationId2));
+        sectionParams.put("downStationId", String.valueOf(stationId3));
+        sectionParams.put("distance", String.valueOf(distance));
+
+        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, sectionParams);
 
         // then
         지하철노선_구간_등록됨(response);
@@ -61,11 +72,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void failNewUpStationIsWrong() {
         // given
-        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
+        Long lineId = 지하철_노선_생성됨(lineParams);
 
         // when
-        SectionRequest request = new SectionRequest(stationId1, stationId3, distance);
-        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, request);
+        sectionParams.put("upStationId", String.valueOf(stationId1));
+        sectionParams.put("downStationId", String.valueOf(stationId3));
+        sectionParams.put("distance", String.valueOf(distance));
+
+        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, sectionParams);
 
         // then
         지하철노선_구간_등록실패됨(response);
@@ -75,11 +89,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void failNewDownStationIsAlreadyRegistered() {
         // given
-        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
+        Long lineId = 지하철_노선_생성됨(lineParams);
 
         // when & then
-        SectionRequest request = new SectionRequest(stationId2, stationId1, distance);
-        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, request);
+        sectionParams.put("upStationId", String.valueOf(stationId2));
+        sectionParams.put("downStationId", String.valueOf(stationId1));
+        sectionParams.put("distance", String.valueOf(distance));
+
+        ExtractableResponse<Response> response = 지하철노선_구간_등록요청(lineId, sectionParams);
 
         // then
         지하철노선_구간_등록실패됨(response);
@@ -89,8 +106,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
-        지하철노선_구간_등록요청(lineId, new SectionRequest(stationId2, stationId3, distance));
+        Long lineId = 지하철_노선_생성됨(lineParams);
+
+        sectionParams.put("upStationId", String.valueOf(stationId2));
+        sectionParams.put("downStationId", String.valueOf(stationId3));
+        sectionParams.put("distance", String.valueOf(distance));
+
+        지하철노선_구간_등록요청(lineId, sectionParams);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, stationId3);
@@ -103,9 +125,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void failDeleteStationIsNotLastStation() {
         // given
-        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
-        SectionRequest request = new SectionRequest(stationId2, stationId3, distance);
-        지하철노선_구간_등록요청(lineId, request);
+        Long lineId = 지하철_노선_생성됨(lineParams);
+
+        sectionParams.put("upStationId", String.valueOf(stationId2));
+        sectionParams.put("downStationId", String.valueOf(stationId3));
+        sectionParams.put("distance", String.valueOf(distance));
+
+        지하철노선_구간_등록요청(lineId, sectionParams);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, stationId2);
@@ -118,7 +144,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void failOnlyOneSectionLeft() {
         // given
-        Long lineId = 지하철_노선_생성됨(defaultLineRequest);
+        Long lineId = 지하철_노선_생성됨(lineParams);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_구간_제거요청(lineId, stationId2);
