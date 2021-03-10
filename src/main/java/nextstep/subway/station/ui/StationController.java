@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityExistsException;
 import java.net.URI;
 import java.util.List;
 
@@ -21,7 +22,12 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+        StationResponse station = null;
+        try{
+            station = stationService.saveStation(stationRequest);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
