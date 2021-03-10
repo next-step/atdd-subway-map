@@ -1,7 +1,7 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.line.exception.NotRemoveSectionException;
+import nextstep.subway.line.exception.CannotRemoveSectionException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.exception.NotMatchingStationException;
 import nextstep.subway.station.exception.NotRemoveStationException;
@@ -9,6 +9,7 @@ import nextstep.subway.station.exception.StationAlreadyExistException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +86,7 @@ public class Line extends BaseEntity {
             throw new NotRemoveStationException(EXCEPTION_MESSAGE_NOT_DELETABLE_STATION);
         }
         if (sections.size() == 1) {
-            throw new NotRemoveSectionException(EXCEPTION_MESSAGE_NOT_DELETABLE_SECTION);
+            throw new CannotRemoveSectionException(EXCEPTION_MESSAGE_NOT_DELETABLE_SECTION);
         }
     }
 
@@ -107,7 +108,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return Collections.unmodifiableList(sections);
     }
 
     public List<Station> getStations() {
