@@ -14,7 +14,7 @@ public class StationResponse {
     private StationResponse() {
     }
 
-    public StationResponse(Long id, String name, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private StationResponse(Long id, String name, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.createdDate = createdDate;
