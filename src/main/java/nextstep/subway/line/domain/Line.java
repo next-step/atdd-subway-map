@@ -3,16 +3,13 @@ package nextstep.subway.line.domain;
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.exception.InvalidSectionException;
 import nextstep.subway.line.exception.NoSectionException;
-import nextstep.subway.line.exception.NoSuchStationException;
 import nextstep.subway.station.domain.Station;
-import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
-import org.springframework.data.util.Optionals;
+import nextstep.subway.station.dto.StationResponse;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Entity
@@ -52,44 +49,95 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSection() {
-        return this.sections;
-    }
-
     public void addSection(Section section) {
-        if (!isEmptySections() && !isAppendableSection(section)) {
+        if (isAlreadyRegistered(section) || !isAppendableSection(section) ) {
             throw new InvalidSectionException("Input section is invalid");
         }
         this.sections.add(section);
         section.setLine(this);
     }
 
+    private Boolean isLeftOneSection(){
+        return (this.sections.size() == 1);
+    }
+
     private Boolean isEmptySections() {
         return (this.sections.size() == 0);
     }
 
-    private Boolean isAppendableSection(final Section section){
-        return getLastSection().getDownStation().equals(section.getUpStation());
+    private Boolean isAppendableSection(final Section section) {
+        if (isEmptySections()) {
+            return true;
+        }
+        return (getLastDownStationId() == section.getUpStation().getId());
     }
 
-    public Section getLastSection() {
-        return this.sections
-                .stream()
-                .skip(this.sections.size() - 1)
+    private Boolean isAlreadyRegistered(final Section section) {
+        return sections.stream()
+                .anyMatch(s -> s.getUpStation().equals(section.getDownStation())
+                        && s.getDownStation().equals(section.getDownStation()));
+    }
+
+    public void deleteStation(final Station station){
+        final Section section = getLastSection();
+        if(!section.getDownStation().equals(station) || isLeftOneSection()){
+            throw new InvalidSectionException("Invalid Station Id" + station.getId());
+        }
+        sections.remove(section);
+    }
+
+    public List<StationResponse> getStations(){
+        List<Station> sequentialStations = new ArrayList<>();
+        for (Station station = firstStation(); station != null; station = nextStation(station)){
+            sequentialStations.add(station);
+        }
+        return sequentialStations.stream()
+                .map(StationResponse::of).collect(Collectors.toList());
+    }
+
+    private Station firstStation(){
+        return sections.stream()
+                .filter(section -> !matchAnyDownStation(section.getUpStation()))
+                .map(section -> section.getUpStation())
                 .findFirst()
-                .orElseThrow(()-> new NoSectionException("No registered Section"));
+                .orElse(null);
     }
 
-    public Station getUpStation() {
-        return this.sections.get(0).getUpStation();
+    private Station nextStation(final Station station) {
+        return sections.stream()
+                .filter(section -> section.getUpStation().equals(station))
+                .map(section -> section.getDownStation())
+                .findFirst()
+                .orElse(null);
     }
 
-    public Station getDownStation() {
-        return this.sections.get(this.sections.size()-1).getDownStation();
+    public Section getLastSection(){
+        return sections.stream()
+                .filter(section -> !matchAnyUpStation(section.getDownStation()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Boolean matchAnyUpStation(final Station station) {
+        return sections.stream()
+                .anyMatch(section -> section.getUpStation().equals(station));
+    }
+
+    private Boolean matchAnyDownStation(final Station station) {
+        return sections.stream()
+                .anyMatch(section -> section.getDownStation().equals(station));
+    }
+
+    public Long getLastUpStationId(){
+        return getLastSection().getUpStation().getId();
+    }
+
+    public Long getLastDownStationId(){
+        return getLastSection().getDownStation().getId();
     }
 
     public Integer getLineDistance() {
-        return this.sections.stream().
+        return sections.stream().
                 reduce(0, (TotalDistance, section) -> TotalDistance + section.getDistance(), Integer::sum);
     }
 }

@@ -1,10 +1,7 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineService;
-import nextstep.subway.line.dto.LineRequest;
-import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.line.dto.*;
 import nextstep.subway.line.exception.DuplicateLineException;
 import nextstep.subway.line.exception.InvalidSectionException;
 import nextstep.subway.line.exception.NoSuchStationException;
@@ -27,19 +24,19 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<CreatedLineResponse> createLine(@RequestBody LineRequest lineRequest) {
+        CreatedLineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> getAllLines() {
+    public ResponseEntity<List<LineResponse>> getLines() {
         List<LineResponse> lines = lineService.getLines();
         return ResponseEntity.ok().body(lines);
     }
 
     @GetMapping(value = "/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> getLine(@PathVariable("lineId") Long lineId) {
+    public ResponseEntity<LineResponse> getLineById(@PathVariable("lineId") Long lineId) {
         LineResponse line = lineService.getLine(lineId);
         return ResponseEntity.ok().body(line);
     }
@@ -60,6 +57,12 @@ public class LineController {
     public ResponseEntity<SectionResponse> appendSection(@PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
         SectionResponse section = lineService.saveSection(lineId, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId +"/sections")).body(section);
+    }
+
+    @DeleteMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteSection(@PathVariable("lineId") Long lineId, @RequestParam("stationId") Long stationId) {
+        lineService.deleteStation(lineId, stationId);
+        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler(DuplicateLineException.class)

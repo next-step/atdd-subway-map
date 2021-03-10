@@ -3,20 +3,15 @@ package nextstep.subway.line.application;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.Section;
-import nextstep.subway.line.dto.LineRequest;
-import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.dto.SectionResponse;
-import nextstep.subway.line.exception.DuplicateLineException;
-import nextstep.subway.line.exception.IllegalSectionArgument;
-import nextstep.subway.line.exception.NoSuchLineException;
-import nextstep.subway.line.exception.NoSuchStationException;
+import nextstep.subway.line.dto.*;
+import nextstep.subway.line.exception.*;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.InsufficientResourcesException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,12 +29,12 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
+    public CreatedLineResponse saveLine(LineRequest request) {
         try {
             Line newLine = request.toLine();
             newLine.addSection(makeSectionHelper(request));
             Line persistLine = lineRepository.save(newLine);
-            return LineResponse.of(persistLine);
+            return CreatedLineResponse.of(persistLine);
         } catch (DataIntegrityViolationException e){
             throw new DuplicateLineException("Duplicated Line");
         }
@@ -77,10 +72,17 @@ public class LineService {
         final Line line = getLineById(lineId);
         final Station upStation = getStationById(sectionRequest.getUpStationId());
         final Station downStation = getStationById(sectionRequest.getDownStationId());
-
         line.addSection(new Section(upStation, downStation, sectionRequest.getDistance()));
         lineRepository.save(line);
         return SectionResponse.of(line.getLastSection());
+    }
+
+    @Transactional
+    public void deleteStation(final Long lineId, final Long stationId) {
+        final Line line = getLineById(lineId);
+        final Station station = getStationById(stationId);
+        line.deleteStation(station);
+        lineRepository.save(line);
     }
 
     private Line getLineById(final Long lineId) {

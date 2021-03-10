@@ -4,9 +4,9 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.CreatedLineResponse;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionResponse;
-import nextstep.subway.line.exception.NoSuchStationException;
 import nextstep.subway.station.StationAcceptanceTest;
 import nextstep.subway.station.dto.StationResponse;
 import org.assertj.core.groups.Tuple;
@@ -62,9 +62,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createSection() {
         // given
         // 지하철 노선
-        LineResponse createdLineResponse  =
+        CreatedLineResponse createdLineResponse  =
                 registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
-                .as(LineResponse.class);
+                .as(CreatedLineResponse.class);
 
         final Map newDownStation = StationAcceptanceTest.createStationInputHelper("방배역");
         StationResponse newDownStationResponse = StationAcceptanceTest.createStationHelper(newDownStation).as(StationResponse.class);
@@ -80,14 +80,66 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertAppendNewSectionSuccess(newSectionResponse);
     }
 
+    @DisplayName("구간을 제거한다.")
+    @Test
+    void deleteSection() {
+        // given
+        // 지하철 노선
+        // 구간 추가
+        CreatedLineResponse createdLineResponse  =
+                registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
+                        .as(CreatedLineResponse.class);
+
+        final Map newDownStation = StationAcceptanceTest.createStationInputHelper("방배역");
+        StationResponse newDownStationResponse = StationAcceptanceTest.createStationHelper(newDownStation).as(StationResponse.class);
+        Map<String, String> newSection = createSectionMapHelper(
+                createdLineResponse.getDownStationId(),
+                newDownStationResponse.getId(),
+                5);
+        SectionResponse newSectionResponse = registerSectionHelper(createdLineResponse.getId(), newSection).as(SectionResponse.class);
+
+        // when
+        // 구간 삭제
+        ExtractableResponse<Response> deleteSectionResponse = deleteStationHelper(createdLineResponse.getId(), newDownStationResponse.getId());
+
+        // then
+        assertDeleteSuccess(deleteSectionResponse);
+    }
+
+    @DisplayName("하나가 남은 구간은 제거가 안된다.")
+    @Test
+    void deleteLastOneSection() {
+        // given
+        // 지하철 노선
+        // 구간 추가
+        CreatedLineResponse createdLineResponse  =
+                registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
+                        .as(CreatedLineResponse.class);
+
+        final Map newDownStation = StationAcceptanceTest.createStationInputHelper("방배역");
+        StationResponse newDownStationResponse = StationAcceptanceTest.createStationHelper(newDownStation).as(StationResponse.class);
+        Map<String, String> newSection = createSectionMapHelper(
+                createdLineResponse.getDownStationId(),
+                newDownStationResponse.getId(),
+                5);
+        SectionResponse newSectionResponse = registerSectionHelper(createdLineResponse.getId(), newSection).as(SectionResponse.class);
+
+        // when
+        // 구간 삭제
+        ExtractableResponse<Response> deleteSectionResponse = deleteStationHelper(createdLineResponse.getId(), newSectionResponse.getId());
+
+        // then
+        assertBadRequestFail(deleteSectionResponse);
+    }
+
     @DisplayName("등록하려는 구간의 상행역이 종점역이 아닌경우 등록되지 않는다.")
     @Test
     void createSectionWithNotMatchedDownStation() {
         // given
         // 지하철 노선
-        LineResponse createdLineResponse  =
+        CreatedLineResponse createdLineResponse  =
                 registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
-                        .as(LineResponse.class);
+                        .as(CreatedLineResponse.class);
 
         final Map newDownStation = StationAcceptanceTest.createStationInputHelper("방배역");
         StationResponse newDownStationResponse = StationAcceptanceTest.createStationHelper(newDownStation).as(StationResponse.class);
@@ -110,12 +162,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        LineResponse kangNamLineResponse  =
+        CreatedLineResponse kangNamLineResponse  =
                 registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
-                        .as(LineResponse.class);
-        LineResponse bunDangLineResponse  =
+                        .as(CreatedLineResponse.class);
+        CreatedLineResponse bunDangLineResponse  =
                 registerLineWithStationsHelper("Bundang Line", "yellow", "양재역","분당역", 20)
-                        .as(LineResponse.class);
+                        .as(CreatedLineResponse.class);
 
         // when역
         // 지하철_노선_목록_조회_요청
@@ -133,9 +185,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        LineResponse registeredLine  =
+        CreatedLineResponse registeredLine  =
                 registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
-                        .as(LineResponse.class);
+                        .as(CreatedLineResponse.class);
 
         // when
         // 지하철_노선_조회_요청
@@ -151,9 +203,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        LineResponse registeredLine  =
+        CreatedLineResponse registeredLine  =
                 registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
-                        .as(LineResponse.class);
+                        .as(CreatedLineResponse.class);
 
         // when
         // 지하철_노선_생성_요청
@@ -176,9 +228,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        LineResponse registeredLine  =
+        CreatedLineResponse registeredLine  =
                 registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10)
-                        .as(LineResponse.class);
+                        .as(CreatedLineResponse.class);
 
         // when
         // 지하철_노선_제거_요청
@@ -218,6 +270,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
+    private void assertDeleteSuccess(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
     private void assertBadRequestFail(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
@@ -225,7 +281,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void assertCreateNewLineSuccess(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.as(LineResponse.class)).isNotNull();
+        assertThat(response.as(CreatedLineResponse.class)).isNotNull();
     }
 
     private void assertGetLinesSuccess(ExtractableResponse<Response> response) {
@@ -246,7 +302,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private void assertGetLinesContainIn(ExtractableResponse<Response> response, final List<LineResponse> expectedLines) {
+    private void assertGetLinesContainIn(ExtractableResponse<Response> response, final List<CreatedLineResponse> expectedLines) {
         // NOTE: https://stackoverflow.com/questions/15531767/rest-assured-generic-list-deserialization
         // List<LineResponse> responseLines = response.as(LineResponse[].class); <- Not Working
         List<Tuple> resultLines = response.jsonPath().
@@ -285,7 +341,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     extract();
     }
 
-    public static  ExtractableResponse<Response> findLineHelper(final LineResponse inputLine) {
+    public static  ExtractableResponse<Response> findLineHelper(final CreatedLineResponse inputLine) {
         return RestAssured.
                 given().
                     log().all().
@@ -333,6 +389,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
                     body(newSection).
                     pathParam("lineId", lineId).
                     post("/lines/{lineId}/sections").
+                then().
+                    log().all().
+                    extract();
+    }
+
+    public static ExtractableResponse<Response> deleteStationHelper(final Long lineId, final Long stationId) {
+        return RestAssured.given().log().all().
+                    contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                    pathParam("lineId", lineId).
+                    queryParam("stationId", stationId).
+                    delete("/lines/{lineId}/sections").
                 then().
                     log().all().
                     extract();
