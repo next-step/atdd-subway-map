@@ -1,9 +1,9 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.line.exception.DeleteStationIsNotLastStationException;
-import nextstep.subway.line.exception.NewDownStationIsAlreadyRegistered;
+import nextstep.subway.line.exception.NewDownStationIsAlreadyRegisteredException;
 import nextstep.subway.line.exception.NewUpStationIsWrongException;
-import nextstep.subway.line.exception.OnlyOneSectionLeftCannotBeDeleted;
+import nextstep.subway.line.exception.OnlyOneSectionLeftCannotBeDeletedException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -11,7 +11,6 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Embeddable
@@ -53,7 +52,7 @@ public class Sections {
 
     private void validateNewDownStationShouldNotBeAlreadyRegistered(Section section) {
         if (!findAllStations().contains(section.getDownStation())) return;
-        throw new NewDownStationIsAlreadyRegistered();
+        throw new NewDownStationIsAlreadyRegisteredException();
     }
 
     private List<Station> findAllStations() {
@@ -76,6 +75,6 @@ public class Sections {
     }
 
     private void validateOnlyOneSectionLeftCannotBeDeleted() {
-        if (sections.size() == 1) throw new OnlyOneSectionLeftCannotBeDeleted();
+        if (sections.size() == 1) throw new OnlyOneSectionLeftCannotBeDeletedException();
     }
 }
