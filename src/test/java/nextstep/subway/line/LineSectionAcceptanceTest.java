@@ -22,9 +22,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     private StationResponse 양재시민의숲역;
     private LineResponse 신분당선;
 
-    @Override
     @BeforeEach
-    public void setUp() {
+    public void init() {
         super.setUp();
 
         // given

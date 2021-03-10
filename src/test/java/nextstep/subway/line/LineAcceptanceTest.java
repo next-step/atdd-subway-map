@@ -23,9 +23,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private StationResponse 역삼역;
     private LineRequest 이호선;
 
-    @Override
     @BeforeEach
-    public void setUp() {
+    public void init() {
         super.setUp();
 
         // given
