@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static nextstep.subway.line.LineSteps.assertCreateLine;
 import static nextstep.subway.line.LineSteps.assertCreateLineFail;
 import static nextstep.subway.line.LineSteps.assertDeleteLine;
+import static nextstep.subway.line.LineSteps.assertExistStations;
 import static nextstep.subway.line.LineSteps.assertGetLine;
 import static nextstep.subway.line.LineSteps.assertGetLines;
 import static nextstep.subway.line.LineSteps.assertIncludeLines;
@@ -50,6 +51,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertCreateLine(response);
+        assertExistStations(response);
     }
 
     @Test

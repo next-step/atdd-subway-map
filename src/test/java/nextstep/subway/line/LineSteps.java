@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -107,6 +108,11 @@ public class LineSteps {
     public static void assertCreateLine(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header(HEADER_LOCATION)).isNotBlank();
+    }
+
+    public static void assertExistStations(ExtractableResponse<Response> response) {
+        List<StationResponse> stationResponses = response.jsonPath().getList("stations", StationResponse.class);
+        assertThat(stationResponses.isEmpty()).isFalse();
     }
 
     public static void assertCreateLineFail(ExtractableResponse<Response> response) {
