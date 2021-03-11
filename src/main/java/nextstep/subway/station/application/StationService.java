@@ -1,6 +1,6 @@
 package nextstep.subway.station.application;
 
-import nextstep.subway.section.exception.CannotRemoveRegisteredStation;
+import nextstep.subway.section.exception.CannotRemoveRegisteredStationException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
@@ -58,7 +58,7 @@ public class StationService {
             stationRepository.deleteById(id);
             stationRepository.flush();
         } catch (DataIntegrityViolationException e) {
-            throw new CannotRemoveRegisteredStation(id);
+            throw new CannotRemoveRegisteredStationException(id);
         }
     }
 }
