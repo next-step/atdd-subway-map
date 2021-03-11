@@ -3,8 +3,8 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.line.exception.LineNameDuplicatedException;
-import nextstep.subway.line.exception.LineNotFoundException;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.exception.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -49,13 +49,45 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping(value = "/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineResponse line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @DeleteMapping(value = "/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(LineNotFoundException.class)
-    public ResponseEntity handleLineNotFoundException(LineNotFoundException e) {
+    public ResponseEntity<Void> handleLineNotFoundException(LineNotFoundException e) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(LineNameDuplicatedException.class)
-    public ResponseEntity handleLineNameDuplicatedException(LineNameDuplicatedException e) {
+    public ResponseEntity<Void> handleLineNameDuplicatedException(LineNameDuplicatedException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(NewUpStationIsWrongException.class)
+    public ResponseEntity<Void> handleNewUpStationIsWrongException(NewUpStationIsWrongException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(NewDownStationIsAlreadyRegisteredException.class)
+    public ResponseEntity<Void> handleNewDownStationIsAlreadyRegisteredException(NewDownStationIsAlreadyRegisteredException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(DeleteStationIsNotLastStationException.class)
+    public ResponseEntity<Void> handleDeleteStationIsNotLastStationException(DeleteStationIsNotLastStationException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(OnlyOneSectionLeftCannotBeDeletedException.class)
+    public ResponseEntity<Void> handleOnlyOneSectionLeftCannotBeDeletedException(OnlyOneSectionLeftCannotBeDeletedException e) {
         return ResponseEntity.badRequest().build();
     }
 }

@@ -3,23 +3,21 @@ package nextstep.subway.station;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationSteps {
 
-    public static ExtractableResponse<Response> 지하철역_생성요청(String name) {
-        StationRequest request = new StationRequest(name);
-
+    public static ExtractableResponse<Response> 지하철역_생성요청(Map<String, String> params) {
         return RestAssured
-                .given().log().all().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .given().log().all().body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all().extract();
     }
@@ -71,7 +69,8 @@ public class StationSteps {
 
     public enum Station {
         강남역("강남역"),
-        역삼역("역삼역");
+        역삼역("역삼역"),
+        선릉역("선릉역");
 
         public String name;
 
