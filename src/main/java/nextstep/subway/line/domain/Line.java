@@ -74,14 +74,8 @@ public class Line extends BaseEntity {
     }
 
     public void validateStationDelete(Long stationId) {
-        Section lastSection = sections.get(getLastSectionIndex());
-        if (sections.size() <= 1) {
-            throw new LineIllegalStationException("구간이 1개 이하여서 삭제 불가합니다.");
-        }
-
-        if (lastSection.getDownStation().getId() != stationId) {
-            throw new LineIllegalStationException("마지막 역만 제거 가능합니다.");
-        }
+        checkMinimumSection();
+        checkLastDownStation(stationId);
     }
 
     public void removeLastSections() {
@@ -107,5 +101,18 @@ public class Line extends BaseEntity {
                 .ifPresent(s -> {
                     throw new LineIllegalStationException("새 구간의 하행역은 기존에 존재할 수 없습니다.");
                 });
+    }
+
+    private void checkMinimumSection() {
+        if (sections.size() <= 1) {
+            throw new LineIllegalStationException("구간이 1개 이하여서 삭제 불가합니다.");
+        }
+    }
+
+    private void checkLastDownStation(Long stationId) {
+        Section lastSection = sections.get(getLastSectionIndex());
+        if (lastSection.getDownStation().getId() != stationId) {
+            throw new LineIllegalStationException("마지막 역만 제거 가능합니다.");
+        }
     }
 }
