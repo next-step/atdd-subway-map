@@ -10,19 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineTestStep {
     public static ExtractableResponse 지하철_노선_생성_요청(String name, String color) {
-        Map<String, String> params = makeLineParam(new LineRequest(name, color));
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(new LineRequest(name, color))
                 .when().post("/lines")
                 .then().log().all().extract();
     }
@@ -69,10 +66,9 @@ public class LineTestStep {
     }
 
     public static ExtractableResponse<Response> 지하철_노선_수정_요청(String name, String color, Long id) {
-        Map<String, String> params = makeLineParam(new LineRequest(name, color));
         return RestAssured
                 .given().log().all()
-                .body(params)
+                .body(new LineRequest(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/" + id)
                 .then().log().all().extract();
@@ -93,22 +89,11 @@ public class LineTestStep {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    public static void 노선_생성_실패됨(ExtractableResponse<Response> response) {
+    public static void 지하철_노선_생성_실패_확인(ExtractableResponse<Response> response) {
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     // util
-    public static Map<String, String> makeLineParam(LineRequest lineRequest) {
-        Map<String, String> params = new HashMap<>();
-        if(lineRequest.getName() != null) {
-            params.put("name", lineRequest.getName());
-        }
-        if(lineRequest.getColor() != null) {
-            params.put("color", lineRequest.getColor());
-        }
-        return params;
-    }
-
     public static LineResponse getAddedLine(ExtractableResponse<Response> responseExtractableResponse) {
         return responseExtractableResponse.jsonPath().getObject(".", LineResponse.class);
     }

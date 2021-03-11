@@ -85,6 +85,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "yellow");
 
         // then
-        노선_생성_실패됨(response);
+        지하철_노선_생성_실패_확인(response);
     }
 }
