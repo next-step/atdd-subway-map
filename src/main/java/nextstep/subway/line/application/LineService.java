@@ -7,8 +7,8 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.LineAlreadyExistsException;
 import nextstep.subway.line.exception.LineIllegalStationException;
-import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,24 +21,24 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
-    private StationService stationService;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.stationService = stationService;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
         validateReduplicationLine(request);
-        Station upStation = stationService.findStationById(request.getUpStationId());
-        Station downStation = stationService.findStationById(request.getDownStationId());
+        Station upStation = stationRepository.findById(request.getUpStationId()).get();
+        Station downStation = stationRepository.findById(request.getDownStationId()).get();
         Line persistLine = lineRepository.save(request.toLine(upStation, downStation));
         return LineResponse.of(persistLine);
     }
 
     @Transactional(readOnly = true)
     public void validateReduplicationLine(LineRequest request) {
-        List<Line> lines = lineRepository.findByNameContaining(request.getName());
+        List<Line> lines = lineRepository.findByName(request.getName());
 
         if(lines.size() > 0) {
             throw new LineAlreadyExistsException();
@@ -81,8 +81,8 @@ public class LineService {
     }
 
     private void addLineSections(LineRequest lineRequest, Line line) {
-        Station upStation = stationService.findStationById(lineRequest.getUpStationId());
-        Station downStation = stationService.findStationById(lineRequest.getDownStationId());
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).get();
         validateStationMatching(line, upStation, downStation);
         line.addSections(Section.of(line, upStation, downStation, lineRequest.getDistance()));
     }
@@ -124,7 +124,7 @@ public class LineService {
         if (lastSection.getDownStation().getId() != stationId) {
             throw new LineIllegalStationException("마지막 역만 제거 가능합니다.");
         }
-        stationService.deleteStationById(stationId);
+        stationRepository.deleteById(stationId);
         sections.remove(lastIndex);
     }
 }

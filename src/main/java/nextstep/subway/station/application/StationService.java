@@ -28,7 +28,7 @@ public class StationService {
 
     @Transactional(readOnly = true)
     public void validateReduplicationStation(StationRequest request) {
-        List<Station> lines = stationRepository.findByNameContaining(request.getName());
+        List<Station> lines = stationRepository.findByName(request.getName());
 
         if(lines.size() > 0) {
             throw new StationAlreadyExistsException();
@@ -46,9 +46,5 @@ public class StationService {
 
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    public Station findStationById(Long upStationId) {
-        return stationRepository.findById(upStationId).get();
     }
 }
