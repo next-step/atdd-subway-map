@@ -15,6 +15,9 @@ public class SectionVerificationStep {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static void 지하철_구간_삭제실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
 
     public static void 지하철_구간_등록실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());

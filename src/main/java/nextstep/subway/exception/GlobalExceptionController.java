@@ -13,7 +13,12 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(CanNotMatchUpStationException.class)
-    public ResponseEntity handleNotValidDownStationException(CanNotMatchUpStationException e) {
+    public ResponseEntity handleCanNotMatchUpStationException(CanNotMatchUpStationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(CanNotRemoveSectionException.class)
+    public ResponseEntity handleCanNotRemoveSectionException(CanNotRemoveSectionException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

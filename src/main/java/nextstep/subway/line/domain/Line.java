@@ -2,6 +2,7 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.exception.CanNotMatchUpStationException;
+import nextstep.subway.exception.CanNotRemoveSectionException;
 import nextstep.subway.exception.ExistDownStationException;
 import nextstep.subway.section.Section;
 import nextstep.subway.station.domain.Station;
@@ -91,7 +92,18 @@ public class Line extends BaseEntity {
     }
 
     public void remove() {
+        checkValidSection();
+        removeSection();
+    }
+
+    private void removeSection() {
         sections.remove(sections.size() - 1);
+    }
+
+    private void checkValidSection() {
+        if(sections.size() == 1) {
+            throw new CanNotRemoveSectionException();
+        }
     }
 
     public Long getId() {
