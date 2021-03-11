@@ -16,7 +16,7 @@ public class CreatedLineResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public CreatedLineResponse() {
+    private CreatedLineResponse() {
     }
 
     public CreatedLineResponse(Long id,

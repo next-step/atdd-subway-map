@@ -56,7 +56,7 @@ public class LineController {
     @PostMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SectionResponse> appendSection(@PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
         SectionResponse section = lineService.saveSection(lineId, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId +"/sections")).body(section);
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).body(section);
     }
 
     @DeleteMapping(value = "/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)

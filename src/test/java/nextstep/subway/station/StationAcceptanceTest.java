@@ -11,15 +11,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
@@ -36,10 +35,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        Map<String, String> params = createStationInputHelper("강남역");
+        Map<String, String> params = StationSteps.createStationInputHelper("강남역");
 
         // when
-        ExtractableResponse<Response> response = createStationHelper(params);
+        ExtractableResponse<Response> response = StationSteps.createStationHelper(params);
 
         // then
         assertCreateStationSuccess(response);
@@ -49,11 +48,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        Map<String, String> params = createStationInputHelper("강남역");
-        createStationHelper(params).as(StationResponse.class);
+        Map<String, String> params = StationSteps.createStationInputHelper("강남역");
+        StationSteps.createStationHelper(params).as(StationResponse.class);
 
         // when
-        ExtractableResponse<Response> response = createStationHelper(params);
+        ExtractableResponse<Response> response = StationSteps.createStationHelper(params);
 
         // then
         assertDuplicateStationStatusFail(response);
@@ -63,14 +62,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> params1 = createStationInputHelper("강남역");
-        ExtractableResponse<Response> createResponse1 = createStationHelper(params1);
+        Map<String, String> params1 = StationSteps.createStationInputHelper("강남역");
+        ExtractableResponse<Response> createResponse1 = StationSteps.createStationHelper(params1);
 
-        Map<String, String> params2 = createStationInputHelper("역삼역");
-        ExtractableResponse<Response> createResponse2 = createStationHelper(params2);
+        Map<String, String> params2 = StationSteps.createStationInputHelper("역삼역");
+        ExtractableResponse<Response> createResponse2 = StationSteps.createStationHelper(params2);
 
         // when
-        ExtractableResponse<Response> response = getStationsHelper();
+        ExtractableResponse<Response> response = StationSteps.getStationsHelper();
 
         // then
         assertRetrieveStationStatusSuccess(response);
@@ -81,49 +80,15 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = createStationInputHelper("강남역");
-        ExtractableResponse<Response> createResponse = createStationHelper(params);
+        Map< String, String > params = StationSteps.createStationInputHelper("강남역");
+        ExtractableResponse< Response > createResponse = StationSteps.createStationHelper(params);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = deleteStationHelper(uri);
+        ExtractableResponse< Response > response = StationSteps.deleteStationHelper(uri);
 
         // then
         assertDeleteStationStatusSuccess(response);
-    }
-
-    public static Map<String, String> createStationInputHelper(final String stationName) {
-        return new HashMap<String, String>() {
-            {
-                put("name", stationName);
-            }
-        };
-    }
-
-    public static ExtractableResponse<Response> createStationHelper(Map params) {
-        return RestAssured.given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all()
-                    .extract();
-    }
-
-    public static ExtractableResponse<Response> deleteStationHelper(final String uri) {
-        return  RestAssured.given().log().all()
-                .when()
-                    .delete(uri)
-                .then().log().all()
-                .   extract();
-    }
-
-    public static ExtractableResponse<Response> getStationsHelper(){
-        return RestAssured.given().log().all()
-                .when()
-                    .get("/stations")
-                .then().log().all()
-                    .extract();
     }
 
     private void assertCreateStationSuccess(ExtractableResponse<Response> response){

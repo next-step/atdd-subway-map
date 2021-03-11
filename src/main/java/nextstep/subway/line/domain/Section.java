@@ -28,18 +28,19 @@ public class Section extends BaseEntity {
     public Section() {
     }
 
-    public Section(Station upStation, Station downStation, int distance) {
+    public Section(Line line, Station upStation, Station downStation, int distance) {
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
     }
 
-    public static Section of(Station upStation, Station downStation, int distance){
+    public static Section of(Line line, Station upStation, Station downStation, int distance){
         if(upStation.equals(downStation)){
             throw new IllegalArgumentException("upStation and downStation should be different");
         }
         if(distance < 0) { throw new IllegalArgumentException("distance should be great than 0"); }
-        return new Section(upStation, downStation, distance);
+        return new Section(line, upStation, downStation, distance);
     }
 
     public Station getUpStation() {

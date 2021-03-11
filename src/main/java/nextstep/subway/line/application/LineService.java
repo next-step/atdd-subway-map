@@ -32,7 +32,8 @@ public class LineService {
     public CreatedLineResponse saveLine(LineRequest request) {
         try {
             Line newLine = request.toLine();
-            newLine.addSection(makeSectionHelper(request));
+            newLine.addSection(getStationById(request.getUpStationId()),
+                    getStationById(request.getDownStationId()), request.getDistance());
             Line persistLine = lineRepository.save(newLine);
             return CreatedLineResponse.of(persistLine);
         } catch (DataIntegrityViolationException e){
@@ -42,23 +43,23 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
-        List<Line> lines = lineRepository.findAll();
-        return lines.stream().map(line -> LineResponse.of(line)).collect(Collectors.toList());
+        return lineRepository.findAll()
+                .stream()
+                .map(line -> LineResponse.of(line))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse getLine(final Long lineId) {
-        Optional<Line> line = lineRepository.findById(lineId);
-        return line.map(LineResponse::of)
+        return lineRepository.findById(lineId)
+                .map(LineResponse::of)
                 .orElseThrow(() -> new NoSuchLineException("Not found lineId"+lineId));
     }
 
     public void updateLine(final Long lineId, LineRequest lineRequest) {
-        Optional< Line > optionalLine = lineRepository.findById(lineId);
-        if(!optionalLine.isPresent()) {
-            throw new NoSuchLineException("No such line");
-        }
-        optionalLine.get().update(lineRequest.toLine());
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(()-> new NoSuchLineException("No such line"));
+        line.update(lineRequest.toLine());
     }
 
     public void deleteLine(final Long lineId) {
@@ -68,26 +69,24 @@ public class LineService {
         }
     }
 
+    @Transactional
     public SectionResponse saveSection(final Long lineId, SectionRequest sectionRequest) {
         final Line line = getLineById(lineId);
         final Station upStation = getStationById(sectionRequest.getUpStationId());
         final Station downStation = getStationById(sectionRequest.getDownStationId());
-        line.addSection(new Section(upStation, downStation, sectionRequest.getDistance()));
-        lineRepository.save(line);
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
         return SectionResponse.of(line.getLastSection());
     }
 
     @Transactional
     public void deleteStation(final Long lineId, final Long stationId) {
         final Line line = getLineById(lineId);
-        final Station station = getStationById(stationId);
-        line.deleteStation(station);
-        lineRepository.save(line);
+        line.deleteStation(getStationById(stationId));
     }
 
     private Line getLineById(final Long lineId) {
-        Optional<Line> optionalLine = lineRepository.findById(lineId);
-        return optionalLine.orElseThrow(()-> new NoSuchLineException("No such lineId: "+ lineId));
+        return  lineRepository.findById(lineId)
+                .orElseThrow(()-> new NoSuchLineException("No such lineId: "+ lineId));
     }
 
     private Station getStationById(final Long stationId) {
@@ -95,13 +94,4 @@ public class LineService {
                 .orElseThrow(()-> new NoSuchStationException("No such up station Id: " + stationId));
     }
 
-    private Section makeSectionHelper(LineRequest request){
-        try{
-            Station upStation = getStationById(request.getUpStationId());
-            Station downStation = getStationById(request.getDownStationId());
-            return Section.of(upStation, downStation, request.getDistance());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalSectionArgument(e.getMessage());
-        }
-    }
 }
