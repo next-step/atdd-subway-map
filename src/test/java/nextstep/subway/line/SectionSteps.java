@@ -36,8 +36,7 @@ public class SectionSteps {
 
     public static ExtractableResponse<Response> requestDeleteSection(ExtractableResponse<Response> sectionResponse) {
         String uri = sectionResponse.header(HEADER_LOCATION);
-        List<StationResponse> stationResponses = sectionResponse.jsonPath().getList("stations", StationResponse.class);
-        Long lastStationId = stationResponses.get(stationResponses.size() - 1).getId();
+        Long lastStationId = getLastStationId(sectionResponse);
 
         return RestAssured.given().log().all()
                 .queryParam("stationId", lastStationId)
@@ -71,5 +70,10 @@ public class SectionSteps {
 
     public static void assertDeleteSectionFail(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private static Long getLastStationId(ExtractableResponse<Response> sectionResponse) {
+        List<StationResponse> stationResponses = sectionResponse.jsonPath().getList("stations", StationResponse.class);
+        return stationResponses.get(stationResponses.size() - 1).getId();
     }
 }

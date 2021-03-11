@@ -27,7 +27,7 @@ public class LineSteps {
                 "신분당선",
                 upStationResponse.jsonPath().getLong("id"),
                 downStationResponse.jsonPath().getLong("id"),
-                100000
+                1000
         );
         return requestCreateLine(params);
     }
@@ -39,7 +39,7 @@ public class LineSteps {
                 "2호선",
                 upStationResponse.jsonPath().getLong("id"),
                 downStationResponse.jsonPath().getLong("id"),
-                150000
+                1500
         );
         return requestCreateLine(params);
     }
@@ -82,7 +82,7 @@ public class LineSteps {
                 "구분당선",
                 upStationResponse.jsonPath().getLong("id"),
                 downStationResponse.jsonPath().getLong("id"),
-                200000
+                2000
         );
         String uri = lineResponse.header(HEADER_LOCATION);
 

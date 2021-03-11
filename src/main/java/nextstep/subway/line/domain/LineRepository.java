@@ -9,11 +9,11 @@ import java.util.Optional;
 public interface LineRepository extends JpaRepository<Line, Long> {
 
     @Override
-    @EntityGraph(attributePaths = {"upStation", "downStation", "sections"})
+    @EntityGraph(attributePaths = {"sections"})
     List<Line> findAll();
 
     @Override
-    @EntityGraph(attributePaths = {"upStation", "downStation", "sections"})
+    @EntityGraph(attributePaths = {"sections"})
     Optional<Line> findById(Long aLong);
 
     boolean existsByName(String name);

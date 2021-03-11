@@ -43,7 +43,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
 
         // when
-        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
+        ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // then
         assertCreateSection(response);
@@ -54,7 +54,6 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void createSectionWithWrongUpStation() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // when
         ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationSadangResponse);
@@ -68,8 +67,6 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void createSectionWithDuplicatedDownStation() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // when
         ExtractableResponse<Response> response = requestCreateSection(lineResponse, stationYeoksamResponse, stationPangyoResponse);
@@ -83,7 +80,6 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSection() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
         ExtractableResponse<Response> sectionResponse = requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // when
@@ -98,11 +94,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSectionWithNotLast() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> sectionResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
         requestCreateSection(lineResponse, stationPangyoResponse, stationYeoksamResponse);
 
         // when
-        ExtractableResponse<Response> response = requestDeleteSection(sectionResponse);
+        ExtractableResponse<Response> response = requestDeleteSection(lineResponse);
 
         //then
         assertDeleteSectionFail(response);
@@ -113,10 +108,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSectionWithOnlyOne() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        ExtractableResponse<Response> sectionResponse = requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // when
-        ExtractableResponse<Response> response = requestDeleteSection(sectionResponse);
+        ExtractableResponse<Response> response = requestDeleteSection(lineResponse);
 
         //then
         assertDeleteSectionFail(response);

@@ -20,7 +20,6 @@ import static nextstep.subway.line.LineSteps.requestDeleteLine;
 import static nextstep.subway.line.LineSteps.requestGetLine;
 import static nextstep.subway.line.LineSteps.requestGetLines;
 import static nextstep.subway.line.LineSteps.requestUpdateLine;
-import static nextstep.subway.line.SectionSteps.requestCreateSection;
 import static nextstep.subway.station.StationSteps.requestCreateStationGangnam;
 import static nextstep.subway.station.StationSteps.requestCreateStationPangyo;
 import static nextstep.subway.station.StationSteps.requestCreateStationSadang;
@@ -72,9 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         ExtractableResponse<Response> lineResponse1 = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse1, stationGangnamResponse, stationPangyoResponse);
         ExtractableResponse<Response> lineResponse2 = requestCreateLine2(stationYeoksamResponse, stationSadangResponse);
-        requestCreateSection(lineResponse2, stationYeoksamResponse, stationSadangResponse);
 
         // when
         ExtractableResponse<Response> response = requestGetLines();
@@ -89,7 +86,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         ExtractableResponse<Response> lineResponse = requestCreateLineDx(stationGangnamResponse, stationPangyoResponse);
-        requestCreateSection(lineResponse, stationGangnamResponse, stationPangyoResponse);
 
         // when
         ExtractableResponse<Response> response = requestGetLine(lineResponse);
