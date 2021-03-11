@@ -6,6 +6,8 @@ import nextstep.subway.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static nextstep.subway.station.StationRequestSteps.*;
 import static nextstep.subway.station.StationVerificationSteps.*;
 
@@ -47,7 +49,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_역_목록_조회_됨(response);
-        지하철_역_목록_조회_결과에_2개_역_포함_확인(createResponse1, createResponse2, response);
+        지하철_역_목록_조회_결과에_생성한_역_포함_확인(response, Arrays.asList(createResponse1, createResponse2));
     }
 
     @DisplayName("지하철역을 제거한다.")
@@ -57,8 +59,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_역_생성_요청("강남역");
 
         // when
-        String uri = 생성된_지하철_역_URI_경로_확인(createResponse);
-        ExtractableResponse<Response> response = 지하철_역_제거_요청(uri);
+        ExtractableResponse<Response> response = 지하철_역_제거_요청(생성된_지하철_역_URI_경로_확인(createResponse));
 
         // then
         지하철_역_제거_됨(response);

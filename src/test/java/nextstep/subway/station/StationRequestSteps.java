@@ -8,6 +8,10 @@ import org.springframework.http.MediaType;
 
 public class StationRequestSteps {
 
+    public static ExtractableResponse<Response> 지하철_역_등록_됨(String name) {
+        return 지하철_역_생성_요청(name);
+    }
+
     public static ExtractableResponse<Response> 지하철_역_생성_요청(String name) {
         return RestAssured
                 .given().log().all()

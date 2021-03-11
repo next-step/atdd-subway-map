@@ -1,21 +1,21 @@
 package nextstep.subway.station.application;
 
-import nextstep.subway.common.exception.ExistResourceException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
+import nextstep.subway.station.exception.StationAlreadyExistException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.station.exception.StationExceptionMessage.EXCEPTION_MESSAGE_EXIST_STATION;
+
 @Service
 @Transactional
 public class StationService {
-
-    private static final String EXCEPTION_MESSAGE_EXIST_STATION_NAME = "존재하는 지하철 역 입니다.";
 
     private final StationRepository stationRepository;
 
@@ -32,11 +32,11 @@ public class StationService {
 
     private void validateStationName(String stationName) {
         if (stationRepository.existsByName(stationName)) {
-            throw new ExistResourceException(EXCEPTION_MESSAGE_EXIST_STATION_NAME);
+            throw new StationAlreadyExistException(EXCEPTION_MESSAGE_EXIST_STATION);
         }
     }
 
-   @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
 
