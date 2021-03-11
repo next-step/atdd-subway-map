@@ -69,4 +69,9 @@ public class LineService {
     private Station findStationById(Long stationId) {
         return stationRepository.findById(stationId).orElse(null);
     }
+
+    public void deleteSection(Long id) {
+        Line line = findLineById(id);
+        line.remove();
+    }
 }

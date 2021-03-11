@@ -1,5 +1,6 @@
 package nextstep.subway.section;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -8,6 +9,7 @@ import nextstep.subway.line.dto.LineResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.line.LineRequestStep.*;
 import static nextstep.subway.station.StationRequestStep.지하철역_등록되어_있음;
@@ -56,6 +58,21 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         지하철_구간_등록실패됨(response);
     }
+
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void delete() {
+        지하철_구간_등록되어_있음(신분당선, LineRequest.of(강남역, 역삼역, 10));
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections/", 신분당선)
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
 
     private void 지하철_구간_등록실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());

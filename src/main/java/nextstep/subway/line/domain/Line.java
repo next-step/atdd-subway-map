@@ -24,7 +24,7 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {
@@ -88,6 +88,10 @@ public class Line extends BaseEntity {
 
     private boolean isExistDownStation(Section section, Station downStation) {
         return section.isExistStation(downStation);
+    }
+
+    public void remove() {
+        sections.remove(sections.size() - 1);
     }
 
     public Long getId() {
