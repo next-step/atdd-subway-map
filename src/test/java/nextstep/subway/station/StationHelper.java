@@ -24,4 +24,12 @@ public class StationHelper {
         param.put("name", name);
         return param;
     }
+
+    public static Long 생성된_지하철역_ID_가져오기(ExtractableResponse<Response> createResponse){
+        return Long.parseLong(
+                createResponse
+                        .header("Location")
+                        .split("/")[2]
+        );
+    }
 }

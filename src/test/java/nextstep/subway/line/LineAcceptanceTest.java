@@ -7,6 +7,7 @@ import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.station.StationAcceptanceTest;
+import nextstep.subway.station.StationHelper;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,19 +29,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    StationAcceptanceTest stationAcceptanceTest;
-
     Long stationId1;
     Long stationId2;
     final int DISTANCE = 5;
 
     @BeforeEach
     void 미리_역_생성(){
-        stationAcceptanceTest = new StationAcceptanceTest();
-        ExtractableResponse<Response> createStation1 = stationAcceptanceTest.지하철역_생성_요청("강남");
-        ExtractableResponse<Response> createStation2 = stationAcceptanceTest.지하철역_생성_요청("선릉");
-        stationId1 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation1);
-        stationId2 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation2);
+        ExtractableResponse<Response> createStation1 = StationHelper.지하철역_생성_요청("강남");
+        ExtractableResponse<Response> createStation2 = StationHelper.지하철역_생성_요청("선릉");
+        stationId1 = StationHelper.생성된_지하철역_ID_가져오기(createStation1);
+        stationId2 = StationHelper.생성된_지하철역_ID_가져오기(createStation2);
     }
 
 
@@ -84,10 +82,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
 
-        ExtractableResponse<Response> createStation3 = stationAcceptanceTest.지하철역_생성_요청("대청");
-        ExtractableResponse<Response> createStation4 = stationAcceptanceTest.지하철역_생성_요청("일원");
-        Long stationId3 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation3);
-        Long stationId4 = stationAcceptanceTest.생성된_지하철역_ID_가져오기(createStation4);
+        ExtractableResponse<Response> createStation3 = StationHelper.지하철역_생성_요청("대청");
+        ExtractableResponse<Response> createStation4 = StationHelper.지하철역_생성_요청("일원");
+        Long stationId3 = StationHelper.생성된_지하철역_ID_가져오기(createStation3);
+        Long stationId4 = StationHelper.생성된_지하철역_ID_가져오기(createStation4);
 
         ExtractableResponse<Response> createResponse1 =
                 LineHelper.지하철_노선_생성_요청("1호선", "green darken-1");
