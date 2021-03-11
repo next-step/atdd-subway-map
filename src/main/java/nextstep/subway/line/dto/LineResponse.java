@@ -6,6 +6,7 @@ import nextstep.subway.station.dto.StationResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -50,6 +51,10 @@ public class LineResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 
     @Override

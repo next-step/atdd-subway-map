@@ -24,14 +24,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     private StationResponse 강남역;
     private StationResponse 판교역;
     private StationResponse 정자역;
-    private StationResponse 서초역;
-    private StationResponse 역삼역;
-    private StationResponse 석촌역;
-    private StationResponse 천호역;
-    private StationResponse 신도림역;
-    private StationResponse 영등포역;
-    private StationResponse 상수역;
-    private StationResponse 이태원역;
+
+
     private LineRequest lineRequest;
 
     @BeforeEach
@@ -39,22 +33,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         super.setUp();
 
         int distance = 6;
-
         강남역 = 지하철역_생성_요청("강남역").as(StationResponse.class);
         판교역 = 지하철역_생성_요청("판교역").as(StationResponse.class);
         정자역 = 지하철역_생성_요청("정자역").as(StationResponse.class);
-
-        서초역 = 지하철역_생성_요청("서초역").as(StationResponse.class);
-        역삼역 = 지하철역_생성_요청("역삼역").as(StationResponse.class);
-
-        석촌역 = 지하철역_생성_요청("석촌역").as(StationResponse.class);
-        천호역 = 지하철역_생성_요청("천호역").as(StationResponse.class);
-
-        신도림역 = 지하철역_생성_요청("신도림역").as(StationResponse.class);
-        영등포역 = 지하철역_생성_요청("영등포역").as(StationResponse.class);
-
-        상수역 = 지하철역_생성_요청("상수역").as(StationResponse.class);
-        이태원역 = 지하철역_생성_요청("이태원역").as(StationResponse.class);
 
         lineRequest = new LineRequest("신분당선", "red", 판교역.getId(), 정자역.getId(), distance);
     }
@@ -71,7 +52,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
+        StationResponse 서초역 = 지하철역_생성_요청("서초역").as(StationResponse.class);
+        StationResponse 역삼역 = 지하철역_생성_요청("역삼역").as(StationResponse.class);
         LineRequest greenLineRequest = setStationData("2호선", "green", 서초역.getId(), 역삼역.getId(), 3);
+
+        StationResponse 석촌역 = 지하철역_생성_요청("석촌역").as(StationResponse.class);
+        StationResponse 천호역 = 지하철역_생성_요청("천호역").as(StationResponse.class);
         LineRequest pinkLineRequest = setStationData("8호선", "pink", 석촌역.getId(), 천호역.getId(), 10);
 
         // given
@@ -94,6 +80,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine() {
+        StationResponse 신도림역 = 지하철역_생성_요청("신도림역").as(StationResponse.class);
+        StationResponse 영등포역 = 지하철역_생성_요청("영등포역").as(StationResponse.class);
+
         LineRequest blueLineRequest = setStationData("1호선", "blue", 신도림역.getId(), 영등포역.getId(), 10);
         // given
         LineResponse line = 지하철_노선_생성요청(blueLineRequest).as(LineResponse.class);
@@ -108,6 +97,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
+        StationResponse 상수역 = 지하철역_생성_요청("상수역").as(StationResponse.class);
+        StationResponse 이태원역 = 지하철역_생성_요청("이태원역").as(StationResponse.class);
+
         LineRequest brownLineRequest = setStationData("6호선", "brown", 상수역.getId(), 이태원역.getId(), 10);
 
         // given

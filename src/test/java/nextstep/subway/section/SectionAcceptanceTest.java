@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +39,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         산성역 = 지하철역_생성_요청("산성역").as(StationResponse.class);
 
         lineRequest = new LineRequest("8호선", "pink", 석촌역.getId(), 남한산성입구역.getId(), distance);
-
     }
 
     @DisplayName("지하철 노선 구간 추가 한다.")
@@ -64,24 +64,48 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         지하철_노선_구간_응답_확인(remove.statusCode(), HttpStatus.NO_CONTENT);
     }
 
-    @DisplayName("지하철 노선 구간 역 목록을 조회한다.")
+    @DisplayName("지하철 노선 구간이 1개인 경우 삭제 불가능")
     @Test
-    void getLineSection() {
+    public void stationOnlyOneSectionRemoveFail() {
+        // given
+        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_제거_요청(pinkLine.getId(), 남한산성입구역.getId());
+
+        // then
+        지하철_노선_구간_응답_확인(response.statusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @DisplayName("지하철 노선 마지막역(하행 종점역)만 아닌경우 삭제 불가능")
+    @Test
+    public void notFinishedStationRemoveFail() {
+        // given
         LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
         SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
 
         지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
 
+        // when
+        ExtractableResponse<Response> response1 = 지하철_구간_제거_요청(pinkLine.getId(), 석촌역.getId());
+
+        지하철_노선_구간_응답_확인(response1.statusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @DisplayName("지하철 노선 구간 역 목록을 조회한다.")
+    @Test
+    public void getLineSection() {
+        // given
+        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
+
+        지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
+
+        // when
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(pinkLine);
 
+        // then
         지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
-
-        List<Long> stationIds = stationResponseToList(지하철역_조회_요청());
-        List<Long> resultStationIds = Stream.of(석촌역, 남한산성입구역, 산성역)
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
-
-        지하철역_목록_응답_확인(stationIds, resultStationIds);
     }
 
     List<Long> stationResponseToList(ExtractableResponse<Response> stationResponse) {

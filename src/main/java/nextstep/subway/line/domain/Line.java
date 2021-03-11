@@ -63,6 +63,10 @@ public class Line extends BaseEntity {
         sections.deleteLastSection(stationId);
     }
 
+    public Sections getSections() {
+        return sections;
+    }
+
     public List<StationResponse> getAllStations() {
         return sections.getAllStation();
     }
