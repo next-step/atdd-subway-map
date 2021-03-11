@@ -1,8 +1,10 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.line.application.SectionValidationException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.section.dto.SectionRequest;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,38 +24,51 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineService.save(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+    public ResponseEntity<List<LineResponse>> getAllLines() {
+        return ResponseEntity.ok().body(lineService.findAll());
     }
 
     @GetMapping(value = "/lines/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> showLinesById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+    public ResponseEntity<LineResponse> getLineById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.find(id));
     }
 
     @PutMapping(value = "/lines/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity modifyLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        try {
-            lineService.updateLine(id, lineRequest);
+            lineService.update(id, lineRequest);
             return ResponseEntity.ok().build();
-        } catch (NoSuchElementException e) {
-            return handleNoSuchElementException();
-        }
     }
 
     @DeleteMapping(value = "/lines/{id}")
     public ResponseEntity deleteLine(@PathVariable Long id) {
-       lineService.deleteLine(id);
+       lineService.delete(id);
        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/lines/{id}/sections")
+    public ResponseEntity addSectionToLine(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.addSectionToLine(id, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/lines/{id}/sections")
+    public ResponseEntity deleteStationFromLine(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteStationFromLine(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity handleNoSuchElementException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(SectionValidationException.class)
+    public ResponseEntity handleSectionValidationException() {
         return ResponseEntity.badRequest().build();
     }
 
