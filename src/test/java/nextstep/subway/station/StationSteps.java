@@ -97,6 +97,10 @@ public class StationSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    public static void assertDeleteStationFail(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     public static Map<String, String> makeStationParams(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);

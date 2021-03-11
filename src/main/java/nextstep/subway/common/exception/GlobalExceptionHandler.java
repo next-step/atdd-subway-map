@@ -5,6 +5,7 @@ import nextstep.subway.line.exception.DeleteSectionWithNotLastException;
 import nextstep.subway.line.exception.DeleteSectionWithOnlyOneException;
 import nextstep.subway.line.exception.DownStationDuplicatedException;
 import nextstep.subway.line.exception.LineNameDuplicatedException;
+import nextstep.subway.section.exception.CannotRemoveRegisteredStation;
 import nextstep.subway.station.exception.StationNameDuplicatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +19,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(StationNameDuplicatedException.class)
     public void handle(HttpServletResponse response, StationNameDuplicatedException e) throws IOException {
+        response.sendError(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler(CannotRemoveRegisteredStation.class)
+    public void handle(HttpServletResponse response, CannotRemoveRegisteredStation e) throws IOException {
         response.sendError(HttpStatus.BAD_REQUEST.value());
     }
 
