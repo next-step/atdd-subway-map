@@ -62,10 +62,10 @@ public class LineSteps {
         assertThat(statusCode).isEqualTo(status.value());
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(LineResponse line) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(long lineId) {
         return RestAssured.given().log().all()
                 .when()
-                .get("/lines/{id}", line.getId())
+                .get("/lines/{id}", lineId)
                 .then().log().all()
                 .extract();
     }

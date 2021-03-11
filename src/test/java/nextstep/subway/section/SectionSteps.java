@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(SectionRequest sectionRequest, long lineId) {
+    public static ExtractableResponse<Response> 지하철_노선_구간_등록_요청(SectionRequest sectionRequest, long lineId) {
         return RestAssured.given().log().all()
                 .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

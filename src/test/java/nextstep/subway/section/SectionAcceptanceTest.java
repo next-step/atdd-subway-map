@@ -12,14 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.section.SectionSteps.*;
-import static nextstep.subway.station.StationSteps.*;
+import static nextstep.subway.station.StationSteps.지하철역_생성_요청;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -44,22 +39,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 구간 추가 한다.")
     @Test
     void createLineSection() {
-        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
-        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
-        ExtractableResponse<Response> createResponse =
-                지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
+        long lineId = createPinkLine();
+        ExtractableResponse<Response> response = stationInit(lineId);
 
-        지하철_노선_구간_응답_확인(createResponse.statusCode(), HttpStatus.CREATED);
+        지하철_노선_구간_응답_확인(response.statusCode(), HttpStatus.CREATED);
     }
 
     @DisplayName("지하철 노선 구간 제거 한다.")
     @Test
     void deleteLineSection() {
-        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
-        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
-        지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
+        long lineId = createPinkLine();
+        stationInit(lineId);
 
-        ExtractableResponse<Response> remove = 지하철_구간_제거_요청(pinkLine.getId(), 산성역.getId());
+        ExtractableResponse<Response> remove = 지하철_구간_제거_요청(lineId, 산성역.getId());
 
         지하철_노선_구간_응답_확인(remove.statusCode(), HttpStatus.NO_CONTENT);
     }
@@ -68,10 +60,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     public void stationOnlyOneSectionRemoveFail() {
         // given
-        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        long lineId = createPinkLine();
 
         // when
-        ExtractableResponse<Response> response = 지하철_구간_제거_요청(pinkLine.getId(), 남한산성입구역.getId());
+        ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, 남한산성입구역.getId());
 
         // then
         지하철_노선_구간_응답_확인(response.statusCode(), HttpStatus.BAD_REQUEST);
@@ -81,13 +73,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     public void notFinishedStationRemoveFail() {
         // given
-        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        long lineId = createPinkLine();
         SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
 
-        지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
+        지하철_노선_구간_등록_요청(sectionRequest, lineId);
 
         // when
-        ExtractableResponse<Response> response1 = 지하철_구간_제거_요청(pinkLine.getId(), 석촌역.getId());
+        ExtractableResponse<Response> response1 = 지하철_구간_제거_요청(lineId, 석촌역.getId());
 
         지하철_노선_구간_응답_확인(response1.statusCode(), HttpStatus.BAD_REQUEST);
     }
@@ -96,22 +88,25 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     public void getLineSection() {
         // given
-        LineResponse pinkLine = 지하철_노선_생성요청(lineRequest).as(LineResponse.class);
+        long lineId = createPinkLine();
         SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
 
-        지하철_노선에_구간_등록_요청(sectionRequest, pinkLine.getId());
+        지하철_노선_구간_등록_요청(sectionRequest, lineId);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(pinkLine);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(lineId);
 
         // then
         지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
     }
 
-    List<Long> stationResponseToList(ExtractableResponse<Response> stationResponse) {
-        return stationResponse.jsonPath().getList(".", StationResponse.class)
-                .stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+    ExtractableResponse<Response> stationInit(long lineId) {
+        SectionRequest sectionRequest = SectionRequest.of(남한산성입구역.getId(), 산성역.getId(), 3);
+        ExtractableResponse<Response> response = 지하철_노선_구간_등록_요청(sectionRequest, lineId);
+        return response;
+    }
+
+    long createPinkLine() {
+        return 지하철_노선_생성요청(lineRequest).as(LineResponse.class).getId();
     }
 }

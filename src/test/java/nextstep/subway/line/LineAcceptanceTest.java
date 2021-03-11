@@ -88,7 +88,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineResponse line = 지하철_노선_생성요청(blueLineRequest).as(LineResponse.class);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(line);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(line.getId());
 
         // then
         지하철_노선_요청에대한_응답_확인(response, line);
