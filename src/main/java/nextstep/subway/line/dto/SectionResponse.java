@@ -23,10 +23,13 @@ public class SectionResponse {
     public int getDistance() { return this.distance; }
 
     public static SectionResponse of(Section section) {
-        return new SectionResponse(section.getUpStationId(), section.getDownStationId(), section.getDistance());
+        //return new SectionResponse(section.getUpStation(), section.getDownStation(), section.getDistance());
+        return null;
     }
 
     public Section toSection() {
-        return new Section(this.upStationId, this.downStationId, this.distance);
+
+        //return new Section(this.upStationId, this.downStationId, this.distance);
+        return null;
     }
 }

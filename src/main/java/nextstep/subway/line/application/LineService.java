@@ -109,13 +109,18 @@ public class LineService {
 
         line.orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));
 
+        /*
         if (line.get().validateExtentionAvailable(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sections)) {
             throw new ApplicationException(ApplicationType.INVALID_STATION_ID);
         }
 
         Section section = sectionService.createSection(id, sectionRequest);
-        line.get().extendsLine(section.getDownStationId(), section.getDistance());
+        line.get().extendsLine(section.getDownStation(), section.getDistance());
 
         return line.get();
+
+         */
+
+        return null;
     }
 }

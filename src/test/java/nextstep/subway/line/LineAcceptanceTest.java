@@ -167,6 +167,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     //구간 등록 성공
+    /*
     @DisplayName("구간 등록 정상적으로 성공")
     @Test
     void createSection() {
@@ -189,8 +190,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_구간_등록_성공(createdSection);
         지하철_노선_종점역_연장_확인_정상(updatedLine, stationId2);
     }
-
+*/
     //새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닐 때
+    /*
     @DisplayName("등록하려는 구간의 상행역이 노선의 하행 종점역이 아닐 때")
     @Test
     void createSectionWithoutLineDownStationId() {
@@ -209,5 +211,5 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         지하철_구간_등록_시_상행역이_노선의_종점역이_아님_오류(response);
-    }
+    }*/
 }
