@@ -19,7 +19,7 @@ public class Section extends BaseEntity {
     private Station upStation;
 
     @JoinColumn(name = "down_station_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private Station downStation;
     private int distance;
 

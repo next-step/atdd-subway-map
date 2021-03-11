@@ -13,10 +13,6 @@ public class LineRequestStep {
         return 지하철_노선_등록요청(name, color).as(LineResponse.class).getId();
     }
 
-    public static Long 지하철_구간_등록되어_있음(Long lineId, LineRequest line) {
-        return 지하철_구간_등록요청(lineId, line).as(LineResponse.class).getId();
-    }
-
     public static ExtractableResponse<Response> 지하철_노선_목록조회요청() {
 
         return RestAssured
@@ -60,16 +56,6 @@ public class LineRequestStep {
         return RestAssured
                 .given().log().all()
                 .when().delete("/lines/{lineId}", lineId)
-                .then().log().all().extract();
-    }
-
-    public static ExtractableResponse<Response> 지하철_구간_등록요청(Long lineId, LineRequest line) {
-        return RestAssured
-                .given().log().all()
-                .body(line)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{lineId}/sections", lineId)
                 .then().log().all().extract();
     }
 }
