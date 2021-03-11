@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.station.StationSteps.지하철역_생성_요청;
 
@@ -39,6 +41,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_구간_생성됨(response);
+        지하철_노선에_지하철역_순서_정렬됨(response, Arrays.asList(강남역, 삼성역, 잠실역));
     }
 
     @DisplayName("구간 등록시 상행역은 현재 등록되어 있는 하행 종점역이 아닐 경우 실패됨")
@@ -72,6 +75,9 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_마지막역_제거됨(response);
+
+        ExtractableResponse<Response> deletedResponse = 지하철_노선_조회_요청(이호선);
+        지하철_노선에_지하철역_순서_정렬됨(deletedResponse, Arrays.asList(강남역, 삼성역));
     }
 
     @DisplayName("제거하려는 역이 노선의 마지막역 아닐 시 실패")

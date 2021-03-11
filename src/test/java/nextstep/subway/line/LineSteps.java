@@ -128,6 +128,18 @@ public class LineSteps {
         assertThat(response.header("Location")).isNotBlank();
     }
 
+    public static  void 지하철_노선에_지하철역_순서_정렬됨(ExtractableResponse<Response> response,
+                                            List<StationResponse> expectedStations) {
+        List<Long> stationsId = response.jsonPath().getObject(".", LineResponse.class).getStations()
+                .stream()
+                .map(s -> s.getId())
+                .collect(Collectors.toList());
+        List<Long> expectedStationsId = expectedStations.stream()
+                .map(s -> s.getId())
+                .collect(Collectors.toList());
+        assertThat(stationsId).containsExactlyElementsOf(expectedStationsId);
+    }
+
     public static void 지하철_구간_생성_실패됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.EXPECTATION_FAILED.value());
     }
