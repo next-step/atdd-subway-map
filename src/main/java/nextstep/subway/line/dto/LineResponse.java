@@ -67,6 +67,10 @@ public class LineResponse {
         return modifiedDate;
     }
 
+    public List<StationResponse> getStations() {
+        return stations;
+    }
+
     @Override
     public String toString() {
         return "LineResponse{" +

@@ -13,6 +13,7 @@ import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,12 +57,8 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).get();
-        int lastIndex = line.getSections().size() - 1;
-        List<StationResponse> stations = line.getSections()
-                .stream()
-                .map(s -> StationResponse.of(s.getUpStation()))
-                .collect(Collectors.toList());
-        stations.add(StationResponse.of(line.getSections().get(lastIndex).getDownStation()));
+
+        List<StationResponse> stations = getSortedStations(line);
 
         return LineResponse.of(line, stations);
     }
@@ -76,12 +73,30 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public void saveSections(Long id, LineRequest lineRequest) {
+    public LineResponse saveSections(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
+        addLineSections(lineRequest, line);
+        List<StationResponse> stations = getSortedStations(line);
+        return LineResponse.of(line, stations);
+    }
+
+    private void addLineSections(LineRequest lineRequest, Line line) {
         Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         Station downStation = stationService.findStationById(lineRequest.getDownStationId());
         validateStationMatching(line, upStation, downStation);
-        line.addSections(line, upStation, downStation, lineRequest.getDistance());
+        line.addSections(Section.of(line, upStation, downStation, lineRequest.getDistance()));
+    }
+
+    private List<StationResponse> getSortedStations(Line line) {
+        int lastIndex = line.getSections().size() - 1;
+
+        List<StationResponse> stations = line.getSections()
+                .stream()
+                .map(s -> StationResponse.of(s.getUpStation()))
+                .sorted(Comparator.comparing(s -> s.getId()))
+                .collect(Collectors.toList());
+        stations.add(StationResponse.of(line.getSections().get(lastIndex).getDownStation()));
+        return stations;
     }
 
     private void validateStationMatching(Line line, Station upStation, Station downStation) {
