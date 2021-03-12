@@ -1,20 +1,18 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.CreatedLineResponse;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.StationSteps;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,33 +38,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         // 지하철 노선
-        final Map newLine = createLineMapHelper("KANGNAM","green");
+        final Map newLine = LineSteps.createLineMapHelper("KangNam Line","green");
+        final Map upStation = StationSteps.createStationInputHelper("강남역");
+        final Map downStation = StationSteps.createStationInputHelper("서초역");
+        final int distance = 10;
 
         // when
         // 지하철_노선_생성_요청
-        ExtractableResponse<Response> response = this.registerLineHelper(newLine);
+        ExtractableResponse<Response> response = LineSteps.registerLineWithStationsHelper(newLine, upStation, downStation, distance);
 
         // then
         // 지하철_노선_생성됨
-        this.assertCreateNewLineSuccess(response);
+        assertCreateNewLineSuccess(response);
     }
 
-    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
-    @Test
-    void createStationWithDuplicateName() {
-        // given
-        // 지하철_노선_등록되어_있음
-        final String sameLineName = "KANGNAM";
-        final Map newLine = createLineMapHelper(sameLineName,"green");
-        this.assertCreateNewLineSuccess(this.registerLineHelper(newLine));
 
-        // when
-        final Map duplicateNameLine = createLineMapHelper(sameLineName,"green");
-        ExtractableResponse<Response> response = this.registerLineHelper(duplicateNameLine);
 
-        // then
-        this.assertCreateDuplicatedLineFail(response);
-    }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
@@ -74,20 +61,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         // 지하철_노선_등록되어_있음
         // 지하철_노선_등록되어_있음
-        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
-        this.assertCreateNewLineSuccess(this.registerLineHelper(kangNamLine));
-        final Map bunDangLine = createLineMapHelper("BUNDANG","yellow");
-        this.assertCreateNewLineSuccess(this.registerLineHelper(bunDangLine));
+        CreatedLineResponse kangNamLineResponse  =
+                LineSteps.registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10);
+        CreatedLineResponse bunDangLineResponse  =
+                LineSteps.registerLineWithStationsHelper("Bundang Line", "yellow", "양재역","분당역", 20);
 
-        // when
+        // when역
         // 지하철_노선_목록_조회_요청
-        ExtractableResponse<Response> response = this.getLinesHelper();
+        ExtractableResponse<Response> response = LineSteps.getLinesHelper();
 
         // then
         // 지하철_노선_목록_응답됨
         // 지하철_노선_목록_포함됨
         this.assertGetLinesSuccess(response);
-        this.assertGetLinesContainIn(response, Arrays.asList(kangNamLine, bunDangLine));
+        this.assertGetLinesContainIn(response, Arrays.asList(kangNamLineResponse, bunDangLineResponse));
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -95,18 +82,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
-        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(kangNamLine);
-        this.assertCreateNewLineSuccess(registerLineResponse);
-        LineResponse registeredLine  = registerLineResponse.as(LineResponse.class);
+        CreatedLineResponse registeredLine  =
+                LineSteps.registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10);
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = this.findLineHelper(registeredLine);
+        ExtractableResponse<Response> response = LineSteps.findLineHelper(registeredLine);
 
         // then
         // 지하철_노선_응답됨
-        this.assertGetLineDetailSuccess(response);
+        assertGetLineDetailSuccess(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -114,19 +99,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
-        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(kangNamLine);
-        this.assertCreateNewLineSuccess(registerLineResponse);
-        LineResponse registeredLine  = registerLineResponse.as(LineResponse.class);
+        CreatedLineResponse registeredLine  =
+                LineSteps.registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10);
 
         // when
-        // 지하철_노선_수정_요청
-        kangNamLine.put("color", "gold");
-        ExtractableResponse<Response> response  = this.updateLineHelper(registeredLine.getId(), kangNamLine);
+        // 지하철_노선_생성_요청
+        Map<String, String> updateRequestMap = LineSteps.createLineAndStationMapHelper(
+                registeredLine.getName(),
+                registeredLine.getColor(),
+                registeredLine.getUpStationId(),
+                registeredLine.getDownStationId(),
+                registeredLine.getDistance());
+        updateRequestMap.put("color", "yellogreen");
+        ExtractableResponse<Response> response  = LineSteps.updateLineHelper(registeredLine.getId(), updateRequestMap);
 
         // then
         // 지하철_노선_수정됨
-        this.assertUpdateLineSuccess(response);
+        assertUpdateLineSuccess(response);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -134,13 +123,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        final Map kangNamLine = createLineMapHelper("KANGNAM","green");
-        ExtractableResponse<Response> registerLineResponse = this.registerLineHelper(kangNamLine);
-        LineResponse registeredLine  = registerLineResponse.as(LineResponse.class);
+        CreatedLineResponse registeredLine  =
+                LineSteps.registerLineWithStationsHelper("KangName Line", "green", "강남역","서초역", 10);
 
         // when
         // 지하철_노선_제거_요청
-        ExtractableResponse<Response> response  = this.deleteLineHelper(registeredLine.getId());
+        ExtractableResponse<Response> response  = LineSteps.deleteLineHelper(registeredLine.getId());
 
         // then
         // 지하철_노선_삭제됨
@@ -149,11 +137,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void assertCreateNewLineSuccess(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.as(LineResponse.class)).isNotNull();
-    }
-
-    private void assertCreateDuplicatedLineFail(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(CreatedLineResponse.class)).isNotNull();
     }
 
     private void assertGetLinesSuccess(ExtractableResponse<Response> response) {
@@ -174,7 +158,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private void assertGetLinesContainIn(ExtractableResponse<Response> response, final List<Map> expectedLines) {
+    private void assertGetLinesContainIn(ExtractableResponse<Response> response, final List<CreatedLineResponse> expectedLines) {
         // NOTE: https://stackoverflow.com/questions/15531767/rest-assured-generic-list-deserialization
         // List<LineResponse> responseLines = response.as(LineResponse[].class); <- Not Working
         List<Tuple> resultLines = response.jsonPath().
@@ -183,83 +167,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 map(line -> new Tuple(line.getName(), line.getColor())).
                 collect(Collectors.toList());
         List<Tuple> inputLines = expectedLines.stream().
-                map(line -> new Tuple(line.get("name"), line.get("color"))).
+                map(line -> new Tuple(line.getName(), line.getColor())).
                 collect(Collectors.toList());
         assertThat(resultLines).isEqualTo(inputLines);
-
-    }
-
-    private ExtractableResponse<Response> getLinesHelper() {
-        return RestAssured.
-                given().
-                    log().all().
-                    contentType(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                    get("/lines").
-                then().
-                    log().all().
-                    extract();
-    }
-
-    private ExtractableResponse<Response> registerLineHelper(final Map<String, String> line) {
-        return RestAssured.
-                given().
-                    log().all().
-                    body(line).
-                    contentType(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                    post("/lines").
-                then().
-                    log().all().
-                    extract();
-    }
-
-    private  ExtractableResponse<Response> findLineHelper(final LineResponse InputLine) {
-        return RestAssured.
-                given().
-                    log().all().
-                    contentType(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                    pathParam("lineId", InputLine.getId()).
-                    get("/lines/{lineId}").
-                then().
-                    log().all().
-                    extract();
-    }
-
-    private  ExtractableResponse<Response> updateLineHelper(final Long lineId, final Map<String, String> line) {
-        return RestAssured.
-                given().
-                    log().all().
-                    contentType(MediaType.APPLICATION_JSON_VALUE).
-                    body(line).
-                when().
-                    pathParam("lineId", lineId).
-                    patch("/lines/{lineId}").
-                then().
-                    log().all().
-                    extract();
-    }
-
-    private  ExtractableResponse<Response> deleteLineHelper(final Long lineId) {
-        return RestAssured.
-                given().
-                    log().all().
-                    contentType(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                    pathParam("lineId", lineId).
-                    delete("/lines/{lineId}").
-                then().
-                    log().all().
-                    extract();
-    }
-
-    private  Map createLineMapHelper(final String lineName, final String lineColor) {
-        return new HashMap<String, String>() {
-            {
-                put("name", lineName);
-                put("color", lineColor);
-            }
-        };
     }
 }
