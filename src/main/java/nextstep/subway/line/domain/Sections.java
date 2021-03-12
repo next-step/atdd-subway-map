@@ -27,22 +27,22 @@ public class Sections {
         this.sections.add(section);
     }
 
-    private Boolean isLeftOneSection(){
+    private boolean isLeftOneSection(){
         return (this.sections.size() == MINIMUM_SECTION_SIZE);
     }
 
-    private Boolean isEmptySections() {
+    private boolean isEmptySections() {
         return (this.sections.size() < MINIMUM_SECTION_SIZE);
     }
 
-    private Boolean isAppendableSection(final Section section) {
+    private boolean isAppendableSection(final Section section) {
         if (isEmptySections()) {
             return true;
         }
         return (getLastSection().getDownStation().getId() == section.getUpStation().getId());
     }
 
-    private Boolean isAlreadyRegistered(final Section section) {
+    private boolean isAlreadyRegistered(final Section section) {
         return sections.stream()
                 .anyMatch(s -> s.getUpStation().equals(section.getDownStation())
                         && s.getDownStation().equals(section.getDownStation()));
@@ -88,12 +88,12 @@ public class Sections {
                 .orElse(null);
     }
 
-    private Boolean matchAnyUpStation(final Station station) {
+    private boolean matchAnyUpStation(final Station station) {
         return sections.stream()
                 .anyMatch(section -> section.getUpStation().equals(station));
     }
 
-    private Boolean matchAnyDownStation(final Station station) {
+    private boolean matchAnyDownStation(final Station station) {
         return sections.stream()
                 .anyMatch(section -> section.getDownStation().equals(station));
     }
