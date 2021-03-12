@@ -27,9 +27,9 @@ public class StationTestUtils extends BaseTestUtils{
         return params;
     }
 
-    public static ExtractableResponse<Response> 역_생성_요청(Map<String, String> 강남역) {
+    public static ExtractableResponse<Response> 역_생성_요청(Map<String, String> 역) {
         return RestAssured.given().log().all()
-                .body(강남역)
+                .body(역)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(BASE_URL)
@@ -45,8 +45,8 @@ public class StationTestUtils extends BaseTestUtils{
                 .extract();
     }
 
-    public static void 지하철_역_목록_포함됨(ExtractableResponse<Response> response, ExtractableResponse<Response> createResponse1, ExtractableResponse<Response> createResponse2) {
-        List<Long> expectedStationIds = Arrays.asList(createResponse1, createResponse2).stream()
+    public static void 지하철_역_목록_포함됨(ExtractableResponse<Response> response, List<ExtractableResponse<Response>> responses) {
+        List<Long> expectedStationIds = responses.stream()
                 .map(it -> Long.parseLong(it.header(HTTP_HEADER_LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
@@ -55,8 +55,8 @@ public class StationTestUtils extends BaseTestUtils{
         assertThat(resultStationIds).containsAll(expectedStationIds);
     }
 
-    public static ExtractableResponse<Response> 역_제거_요청(ExtractableResponse<Response> 강남역생성응답) {
-        String uri = 강남역생성응답.header(HTTP_HEADER_LOCATION);
+    public static ExtractableResponse<Response> 역_제거_요청(ExtractableResponse<Response> 역응답) {
+        String uri = 역응답.header(HTTP_HEADER_LOCATION);
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)

@@ -1,5 +1,6 @@
 package nextstep.subway.station;
 
+import com.sun.tools.javac.util.List;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
@@ -60,7 +61,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         응답_상태코드_확인(역목록조회응답, HttpStatus.OK);
-        지하철_역_목록_포함됨(역목록조회응답, 강남역생성응답, 역삼역생성응답);
+        지하철_역_목록_포함됨(역목록조회응답, List.of(강남역생성응답, 역삼역생성응답));
     }
 
     @DisplayName("지하철역을 제거한다.")

@@ -4,7 +4,6 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.InvalidDownStationException;
 import nextstep.subway.line.exception.InvalidUpStationException;
 import nextstep.subway.line.exception.OnlyOneSectionRemainingException;
@@ -53,16 +52,15 @@ public class LineController {
 
     @PostMapping(value = "/lines/{lineId}/sections")
     public ResponseEntity createSection(@PathVariable final Long lineId, @RequestBody final SectionRequest sectionRequest) {
-        SectionResponse section = lineService.saveSection(lineId, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/" + section.getId())).body(section);
+        lineService.saveSection(lineId, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).build();
     }
 
-    @DeleteMapping(value = "/lines/{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/lines/{lineId}/sections")
     public ResponseEntity deleteSection(@PathVariable final Long lineId, @RequestParam final Long stationId) {
         lineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
-
 
     @ExceptionHandler({InvalidUpStationException.class,InvalidDownStationException.class,OnlyOneSectionRemainingException.class})
     private ResponseEntity InvalidUpStationException(RuntimeException runtimeException){

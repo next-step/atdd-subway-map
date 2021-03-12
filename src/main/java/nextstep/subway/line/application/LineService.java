@@ -2,18 +2,15 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
-import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
-import nextstep.subway.line.dto.SectionResponse;
 import nextstep.subway.line.exception.*;
 import nextstep.subway.station.exception.NoStationFoundException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +29,9 @@ public class LineService {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(NoStationFoundException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(NoStationFoundException::new);
 
-        Section section = Section.of(upStation, downStation, lineRequest.getDistance());
-        Line line = Line.of(lineRequest.getName(), lineRequest.getColor(), section);
+        Line line = Line.of(lineRequest.getName(), lineRequest.getColor());
+
+        line.addSection(upStation, downStation, lineRequest.getDistance());
 
         lineRepository.save(line);
 
@@ -68,7 +66,7 @@ public class LineService {
     }
 
     @Transactional
-    public SectionResponse saveSection(final Long lineId, final SectionRequest sectionRequest) {
+    public void saveSection(final Long lineId, final SectionRequest sectionRequest) {
 
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(NoStationFoundException::new);
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(NoStationFoundException::new);
@@ -82,10 +80,7 @@ public class LineService {
             throw new InvalidDownStationException();
         }
 
-        Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
-        line.addSection(section);
-
-        return SectionResponse.of(section);
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
     }
 
     @Transactional

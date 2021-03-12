@@ -16,7 +16,6 @@ import static nextstep.subway.utils.LineTestUtils.노선_파라미터_설정;
 import static nextstep.subway.utils.LineTestUtils.지하철_노선_생성_요청;
 import static nextstep.subway.utils.SectionTestUtils.*;
 import static nextstep.subway.utils.StationTestUtils.역_파라미터_설정;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("구간 관련 기능")
@@ -79,7 +78,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 판교미금구간생성응답 = 지하철_구간_생성_요청(판교미금구간, 신분당선URL);
 
         //then
-        assertThat(판교미금구간생성응답.statusCode()).isEqualTo(BAD_REQUEST.value());
+        응답_상태코드_확인(판교미금구간생성응답, BAD_REQUEST);
     }
 
     @DisplayName("새로운 구간의 하행역이 현재 등록 되어 있는 경우 -> 에러 응답")
