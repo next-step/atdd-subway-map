@@ -68,13 +68,13 @@ public class LineService {
     }
 
     @Transactional
-    public SectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
+    public SectionResponse saveSection(final Long lineId, final SectionRequest sectionRequest) {
 
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(NoStationFoundException::new);
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(NoStationFoundException::new);
         Line line = lineRepository.findById(lineId).orElseThrow(NoLineFoundException::new);
 
-        if(!line.isValidUpstation(upStation)) {
+        if(!line.isValidUpStation(upStation)) {
             throw new InvalidUpStationException();
         }
 
@@ -89,7 +89,7 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteSection(Long lineId, Long stationId) {
+    public void deleteSection(final Long lineId, final Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(NoLineFoundException::new);
 
         if(line.hasOnlyOneSection()) {

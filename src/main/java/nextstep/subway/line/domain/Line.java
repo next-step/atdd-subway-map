@@ -3,13 +3,14 @@ package nextstep.subway.line.domain;
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.exception.InvalidStationIdException;
 import nextstep.subway.station.domain.Station;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
+    private static final int ONE = 1;
+    private static final int FIRST_SECTION_INDEX = 0;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -56,29 +57,25 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSections() {
-        return sections;
-    }
-
-    public void addSection(Section section) {
+    public void addSection(final Section section) {
         section.setLine(this);
         this.sections.add(section);
     }
 
-    public boolean isValidUpstation(Station upStation) {
+    public boolean isValidUpStation(final Station upStation) {
         return upStation.equals(getFinalStation());
     }
 
     private Station getFinalStation() {
-        return sections.get(sections.size() - 1).getDownStation();
+        return sections.get(sections.size() - ONE).getDownStation();
     }
 
-    public boolean isValidDownStation(Station downStation) {
+    public boolean isValidDownStation(final Station downStation) {
         return !sections.stream()
-                .anyMatch( section -> section.getUpStation().equals(downStation) || section.getDownStation().equals(downStation) );
+                .anyMatch( section -> section.equalsWithEitherUpOrDown(downStation) );
     }
 
-    public void deleteSection(Long stationId) {
+    public void deleteSection(final Long stationId) {
         Section lastSection = sections.stream()
                 .filter(section -> section.hasAsDownStation(stationId))
                 .findAny().orElseThrow(InvalidStationIdException::new);
@@ -86,18 +83,18 @@ public class Line extends BaseEntity {
         this.sections.remove(lastSection);
     }
 
-    public boolean isProperStationToDelete(Long stationId) {
+    public boolean isProperStationToDelete(final Long stationId) {
         return getFinalStation().getId().equals(stationId);
     }
 
     public boolean hasOnlyOneSection() {
-        return this.sections.size() == 1;
+        return this.sections.size() == ONE;
     }
 
     public List<Station> fetchAllStations() {
         List<Station> stations = new ArrayList<>();
 
-        Station firstStation = sections.get(0).getUpStation();
+        Station firstStation = sections.get(FIRST_SECTION_INDEX).getUpStation();
         stations.add(firstStation);
 
         sections.stream()

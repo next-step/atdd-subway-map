@@ -62,6 +62,10 @@ public class Section extends BaseEntity {
         this.line = line;
     }
 
+    public boolean equalsWithEitherUpOrDown(final Station downStation) {
+        return getUpStation().equals(downStation) || getDownStation().equals(downStation);
+    }
+
     public boolean hasAsDownStation(Long stationId) {
         return downStation.getId().equals(stationId);
     }
