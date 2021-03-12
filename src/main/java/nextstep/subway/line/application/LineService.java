@@ -2,53 +2,54 @@ package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.Lines;
+import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
+        validateReduplicationLine(request);
+        Station upStation = stationRepository.findById(request.getUpStationId()).get();
+        Station downStation = stationRepository.findById(request.getDownStationId()).get();
+        Line persistLine = lineRepository.save(request.toLine(upStation, downStation));
         return LineResponse.of(persistLine);
     }
 
     @Transactional(readOnly = true)
     public void validateReduplicationLine(LineRequest request) {
-        List<Line> lines = lineRepository.findAll();
-
-        lines.stream()
-                .filter(line -> line.getName().equals(request.getName()))
-                .findAny()
-                .ifPresent(line -> {
-                    throw new IllegalArgumentException("이미 존재하는 라인입니다.");
-                });
+        Lines lines = Lines.of(lineRepository.findByName(request.getName()));
+        lines.validateExistLine();
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        List<Line> lines = lineRepository.findAll();
-
-        return lines.stream()
-                .map(line -> LineResponse.of(line))
-                .collect(Collectors.toList());
+        Lines lines = Lines.of(lineRepository.findAll());
+        return lines.toResponses();
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).get();
-        return LineResponse.of(line);
+        List<StationResponse> stations = line.getSortedStations();
+        return LineResponse.of(line, stations);
     }
 
     public LineResponse updateLineById(Long id, LineRequest lineRequest) {
@@ -59,5 +60,26 @@ public class LineService {
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public LineResponse saveSections(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).get();
+        addLineSections(lineRequest, line);
+        List<StationResponse> stations = line.getSortedStations();
+        return LineResponse.of(line, stations);
+    }
+
+    public void deleteSectionById(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).get();
+        line.validateStationDelete(stationId);
+        stationRepository.deleteById(stationId);
+        line.removeLastSections();
+    }
+
+    private void addLineSections(LineRequest lineRequest, Line line) {
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).get();
+        line.validateStationAdd(upStation, downStation);
+        line.addSections(Section.of(line, upStation, downStation, lineRequest.getDistance()));
     }
 }

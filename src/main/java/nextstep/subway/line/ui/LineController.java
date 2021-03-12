@@ -3,6 +3,9 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.LineAlreadyExistsException;
+import nextstep.subway.line.exception.LineIllegalStationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,6 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
-        lineService.validateReduplicationLine(lineRequest);
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -47,8 +49,25 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity lineIllegalArgsException(IllegalArgumentException e) {
+    @PostMapping(value = "{id}/sections")
+    public ResponseEntity createSections(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.saveSections(id, lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(line);
+    }
+
+    @DeleteMapping(value = "{id}/sections")
+    public ResponseEntity deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSectionById(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(LineAlreadyExistsException.class)
+    public ResponseEntity lineIllegalArgsException(LineAlreadyExistsException e) {
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(LineIllegalStationException.class)
+    public ResponseEntity lineStationIllegalArgsException(LineIllegalStationException e) {
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
     }
 }
