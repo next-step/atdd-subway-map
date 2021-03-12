@@ -26,6 +26,9 @@ dependencies {
 	// jgraph
 	implementation 'org.jgrapht:jgrapht-core:1.0.1'
 
+	// p6spy
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.6.1'
+
 	testImplementation 'io.rest-assured:rest-assured:3.3.0'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

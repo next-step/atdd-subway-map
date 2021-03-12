@@ -1,10 +1,13 @@
 package nextstep.subway.station.application;
 
+import nextstep.subway.section.exception.CannotRemoveRegisteredStationException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.station.exception.StationNameDuplicatedException;
+import nextstep.subway.station.exception.StationNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,13 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
+    public StationResponse getStation(Long id) {
+        return stationRepository.findById(id)
+                .map(StationResponse::of)
+                .orElseThrow(() -> new StationNotFoundException(id));
+    }
+
+    @Transactional(readOnly = true)
     public List<StationResponse> getStations() {
         List<Station> stations = stationRepository.findAll();
 
@@ -39,7 +49,16 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+    public void deleteStation(Long id) {
+        deleteStationById(id);
+    }
+
+    private void deleteStationById(Long id) {
+        try {
+            stationRepository.deleteById(id);
+            stationRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new CannotRemoveRegisteredStationException(id);
+        }
     }
 }

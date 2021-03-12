@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  error:
+    include-message: always
+
+handlebars:
+  suffix: .html
+  enabled: true
+
+logging.level:
+  org.hibernate.SQL: debug
