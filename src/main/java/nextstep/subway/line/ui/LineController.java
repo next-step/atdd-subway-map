@@ -1,14 +1,11 @@
 package nextstep.subway.line.ui;
 
 import nextstep.subway.line.application.LineService;
-import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-import javax.xml.ws.Response;
 import java.net.URI;
 import java.util.List;
 
@@ -38,9 +35,10 @@ public class LineController {
         return ResponseEntity.ok(lineService.getLine(id));
     }
 
-    @PutMapping
-    public ResponseEntity<LineResponse> updateLine(@RequestBody Line line) {
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(lineService.updateLine(line));
+    @PutMapping(path = "/{id}")
+    public ResponseEntity updateLine(@PathVariable("id") Long id, @RequestBody LineRequest lineRequest) {
+        lineService.updateLine(id, lineRequest);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
