@@ -6,6 +6,7 @@ import nextstep.subway.station.domain.Station;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,9 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade ={CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
+    @Transient
+    private final int MINIMUM_SECTION_SIZE = 1;
+
     public void add(Section section) {
         if (isAlreadyRegistered(section) || !isAppendableSection(section) ) {
             throw new InvalidSectionException("Input section is invalid");
@@ -24,11 +28,11 @@ public class Sections {
     }
 
     private Boolean isLeftOneSection(){
-        return (this.sections.size() == 1);
+        return (this.sections.size() == MINIMUM_SECTION_SIZE);
     }
 
     private Boolean isEmptySections() {
-        return (this.sections.size() == 0);
+        return (this.sections.size() < MINIMUM_SECTION_SIZE);
     }
 
     private Boolean isAppendableSection(final Section section) {

@@ -19,7 +19,7 @@ public class CreatedLineResponse {
     private CreatedLineResponse() {
     }
 
-    public CreatedLineResponse(Long id,
+    private CreatedLineResponse(Long id,
                         String name,
                         String color,
                         Long upStationId,
