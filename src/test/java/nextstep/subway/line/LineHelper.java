@@ -16,7 +16,7 @@ public class LineHelper {
         return param;
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
         return RestAssured.given()
                 .body(파라미터_생성(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
