@@ -41,8 +41,8 @@ public class CreatedLineResponse {
         return new CreatedLineResponse(line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getLastUpStationId(),
-                line.getLastDownStationId(),
+                line.getLastUpStation().getId(),
+                line.getLastDownStation().getId(),
                 line.getLineDistance(),
                 line.getCreatedDate(),
                 line.getModifiedDate());

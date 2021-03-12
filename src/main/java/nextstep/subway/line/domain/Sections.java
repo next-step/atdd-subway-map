@@ -88,6 +88,14 @@ public class Sections {
                 .orElse(null);
     }
 
+    public Station getLastDownStation(){
+       return getLastSection().getDownStation();
+    }
+
+    public Station getLastUpStation(){
+        return getLastSection().getUpStation();
+    }
+
     private boolean matchAnyUpStation(final Station station) {
         return sections.stream()
                 .anyMatch(section -> section.getUpStation().equals(station));

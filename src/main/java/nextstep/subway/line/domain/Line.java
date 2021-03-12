@@ -1,16 +1,11 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.line.exception.InvalidSectionException;
-import nextstep.subway.line.exception.NoSectionException;
 import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.dto.StationResponse;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Entity
 public class Line extends BaseEntity {
@@ -61,12 +56,12 @@ public class Line extends BaseEntity {
         return sections.getStations();
     }
 
-    public Long getLastUpStationId(){
-        return sections.getLastSection().getUpStation().getId();
+    public Station getLastUpStation(){
+        return sections.getLastUpStation();
     }
 
-    public Long getLastDownStationId(){
-        return sections.getLastSection().getDownStation().getId();
+    public Station getLastDownStation(){
+        return sections.getLastDownStation();
     }
 
     public Integer getLineDistance(){
