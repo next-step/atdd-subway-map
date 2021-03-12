@@ -5,6 +5,7 @@ import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.section.Section;
+import nextstep.subway.section.SectionResponse;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -39,8 +40,8 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineResponse getLine(Long id) {
-        return LineResponse.of(findLineById(id));
+    public SectionResponse getLine(Long id) {
+        return SectionResponse.of(findLineById(id));
     }
 
     public LineResponse updateLine(Long id, LineRequest request) {

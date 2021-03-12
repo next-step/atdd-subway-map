@@ -6,15 +6,13 @@ import nextstep.subway.exception.CanNotRemoveSectionException;
 import nextstep.subway.exception.ExistDownStationException;
 import nextstep.subway.section.Section;
 import nextstep.subway.station.domain.Station;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.stream.Collectors.*;
 
 @Entity
 public class Line extends BaseEntity {
@@ -121,4 +119,22 @@ public class Line extends BaseEntity {
     public List<Section> getSections() {
         return Collections.unmodifiableList(sections);
     }
+
+    public List<Station> getStations() {
+        return getStationsFromSections();
+    }
+
+    private List<Station> getStationsFromSections() {
+        List<Station> stations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(toList());
+
+        stations.add(getLastDownStation());
+        return stations;
+    }
+
+    private Station getLastDownStation() {
+        return getLastSection().getDownStation();
+    }
+
 }

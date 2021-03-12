@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineRequestStep.*;
+import static nextstep.subway.line.LineVerificationStep.지하철_노선_조회됨;
 import static nextstep.subway.section.SectionRequestStep.*;
 import static nextstep.subway.section.SectionVerificationStep.*;
 import static nextstep.subway.station.StationRequestStep.*;
@@ -76,5 +77,15 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제요청(신분당선);
 
         지하철_구간_삭제실패됨(response);
+    }
+
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        지하철_구간_등록되어_있음(신분당선, 첫번째_라인_요청);
+
+        final ExtractableResponse<Response> response = 지하철_노선_조회요청(신분당선);
+
+        지하철_구간별_지하철역_조회됨(response);
     }
 }

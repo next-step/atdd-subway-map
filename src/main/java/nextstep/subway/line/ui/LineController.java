@@ -4,6 +4,7 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.section.Section;
+import nextstep.subway.section.SectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,8 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        LineResponse line = lineService.getLine(id);
+    public ResponseEntity<SectionResponse> getLine(@PathVariable Long id) {
+        SectionResponse line = lineService.getLine(id);
         return ResponseEntity.ok(line);
     }
 
@@ -61,7 +62,7 @@ public class LineController {
        return ResponseEntity.created(URI.create(String.format("/stations/%d/sections",id))).body(line);
     }
 
-    @DeleteMapping("/{id}/sections/")
+    @DeleteMapping("/{id}/sections")
     public ResponseEntity deleteSection(@PathVariable Long id) {
         lineService.deleteSection(id);
         return ResponseEntity.noContent().build();

@@ -31,17 +31,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_목록조회됨(blueLineId, redLineId, response);
     }
 
-    @DisplayName("지하철 노선을 조회한다.")
-    @Test
-    void getLine() {
-        final Long lineId = 지하철_노선_등록되어_있음("경강선", "blue");
-
-        final ExtractableResponse<Response> response = 지하철_노선_조회요청(lineId);
-
-        지하철_노선_조회됨(lineId, response);
-    }
-
-
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {

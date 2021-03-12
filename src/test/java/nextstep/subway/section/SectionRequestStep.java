@@ -7,6 +7,9 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.MediaType;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
+
 public class SectionRequestStep {
 
     public static ExtractableResponse<Response> 지하철_구간_삭제요청(Long lineId) {

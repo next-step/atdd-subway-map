@@ -6,8 +6,7 @@ import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 
 public class SectionVerificationStep {
 
@@ -26,5 +25,10 @@ public class SectionVerificationStep {
     public static void 지하철_구간_등록됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
         assertThat(response.body().as(LineResponse.class).getSections().size()).isEqualTo(1);
+    }
+
+    public static void 지하철_구간별_지하철역_조회됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+        assertThat(response.body().as(SectionResponse.class).getStations().size()).isEqualTo(2);
     }
 }
