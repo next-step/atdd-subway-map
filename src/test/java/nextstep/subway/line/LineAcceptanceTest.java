@@ -41,31 +41,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         stationId2 = StationHelper.생성된_지하철역_ID_가져오기(createStation2);
     }
 
-
-    Map<String, String> 파라미터_생성(String name, String color) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", name);
-        param.put("color", color);
-
-        return param;
-    }
-
-    ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId, Long downStationId, int distance) {
-        return RestAssured.given()
-                .body(파라미터_생성(name, color))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .log().all()
-                .when()
-                .post("/lines")
-                .then().log().all().extract();
-    }
-
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void 지하철_노선_생성_요청_및_확인() {
         // when
         ExtractableResponse<Response> response =
-                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1");
+                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1", stationId1, stationId2, DISTANCE);
 
         // then
         지하철_노선_생성_요청_응답됨(response);
@@ -88,10 +69,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long stationId4 = StationHelper.생성된_지하철역_ID_가져오기(createStation4);
 
         ExtractableResponse<Response> createResponse1 =
-                LineHelper.지하철_노선_생성_요청("1호선", "green darken-1");
+                LineHelper.지하철_노선_생성_요청("1호선", "green darken-1", stationId1, stationId2, DISTANCE);
 
         ExtractableResponse<Response> createResponse2 =
-                LineHelper.지하철_노선_생성_요청("2호선", "green darken-2");
+                LineHelper.지하철_노선_생성_요청("2호선", "green darken-2", stationId1, stationId2, DISTANCE);
 
         // when
         ExtractableResponse<Response> getResponses = 지하철_노선_목록_조회_결과_요청();
@@ -140,7 +121,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void 지하철_노선_조회() {
         // given
         ExtractableResponse<Response> createResponse =
-                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1");
+                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1", stationId1, stationId2, DISTANCE);
 
         Long id = LineHelper.생성된_Entity의_ID_가져오기(createResponse);
 
@@ -158,32 +139,32 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void 지하철_노선_수정() {
         // given
         ExtractableResponse<Response> createResponse =
-                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1");
+                LineHelper.지하철_노선_생성_요청("1호선", "green darken-1", stationId1, stationId2, DISTANCE);
 
         Long id = LineHelper.생성된_Entity의_ID_가져오기(createResponse);
 
         // when
-        Map<String, String> param = LineHelper.파라미터_생성("선정릉", "red darken-1");
-        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, param);
+        LineRequest lineRequest = LineHelper.파라미터_생성("1호선", "red darken-1", stationId1, stationId2, DISTANCE);
+        ExtractableResponse<Response> updateResponse = 지하철_노선_수정_요청(id, lineRequest);
 
         // then
-        지하철_노선_수정_확인(param, updateResponse);
+        지하철_노선_수정_확인(lineRequest, updateResponse);
     }
 
-    ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, Map<String, String> param){
+    ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest lineRequest){
         return RestAssured.given()
-                .body(param)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .log().all()
                 .when().put("/lines/" + id)
                 .then().log().all().extract();
     }
 
-    void 지하철_노선_수정_확인(Map<String, String> param, ExtractableResponse<Response> updateResponse){
+    void 지하철_노선_수정_확인(LineRequest lineRequest, ExtractableResponse<Response> updateResponse){
         assertThat(updateResponse.jsonPath().getMap(".").get("name"))
-                .isEqualTo(param.get("name"));
+                .isEqualTo(lineRequest.getName());
         assertThat(updateResponse.jsonPath().getMap(".").get("color"))
-                .isEqualTo(param.get("color"));
+                .isEqualTo(lineRequest.getColor());
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -191,7 +172,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void 지하철_노선_삭제() {
         // given
         ExtractableResponse<Response> createResponse =
-                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1");
+                LineHelper.지하철_노선_생성_요청("선릉", "green darken-1", stationId1, stationId2, DISTANCE);
 
         Long id = LineHelper.생성된_Entity의_ID_가져오기(createResponse);
 

@@ -3,22 +3,20 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.LineRequest;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LineHelper {
-    public static Map<String, String> 파라미터_생성(String name, String color) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", name);
-        param.put("color", color);
-        return param;
+    public static LineRequest 파라미터_생성(String name, String color, Long upStationId, Long downStationId, int distance) {
+        return new LineRequest(name, color, upStationId, downStationId, distance);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId, Long downStationId, int distance) {
         return RestAssured.given()
-                .body(파라미터_생성(name, color))
+                .body(파라미터_생성(name, color, upStationId, downStationId, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .log().all()
                 .when()
