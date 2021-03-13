@@ -25,7 +25,13 @@ public class SectionController {
 
     @GetMapping("/{lineId}/sections")
     public ResponseEntity getSectionList(@PathVariable Long lineId){
-        return ResponseEntity.ok().body(sectionService.getSectionList(lineId));
+        return ResponseEntity.ok().body(sectionService.getSectionResponseList(lineId));
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity deleteSection(@PathVariable Long lineId, @RequestParam Long stationId){
+        sectionService.deleteSection(lineId, stationId);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -28,4 +28,28 @@ public class SectionResponse {
     public static SectionResponse of(Section section){
         return new SectionResponse(section.getId(), section.getDownStation().getId(), section.getUpStation().getId(), section.getDistance(), section.getCreatedDate(), section.getModifiedDate());
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public LocalDateTime getModifiedDate() {
+        return modifiedDate;
+    }
 }

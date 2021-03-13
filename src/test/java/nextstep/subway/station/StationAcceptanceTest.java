@@ -25,7 +25,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationHelper.지하철역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        StationHelper.응답_201_확인(response);
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -33,7 +33,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_생성시_중복안되게_처리() {
         // given
-        ExtractableResponse<Response> response1 = StationHelper.지하철역_생성_요청("강남역");
+        StationHelper.지하철역_생성_요청("강남역");
 
         // when
         ExtractableResponse<Response> response2 = StationHelper.지하철역_생성_요청("강남역");
@@ -41,6 +41,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+
 
     @DisplayName("지하철역을 조회한다.")
     @Test
@@ -53,34 +55,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 StationHelper.지하철역_생성_요청("역삼역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_목록_조회_결과_요청();
+        ExtractableResponse<Response> response = StationHelper.지하철역_목록_조회_결과_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedLineIds = 지하철역_목록_예상_아이디_리스트(createResponse1, createResponse2);
-        List<Long> resultLineIds = 지하철_노선_목록_결과_아이디_리스트(response);
+        StationHelper.응답_200_확인(response);
+        List<Long> expectedLineIds = StationHelper.지하철역_목록_예상_아이디_리스트(createResponse1, createResponse2);
+        List<Long> resultLineIds = StationHelper.지하철_노선_목록_결과_아이디_리스트(response);
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
-    ExtractableResponse<Response> 지하철역_목록_조회_결과_요청(){
-        return RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-    }
 
-    List<Long> 지하철역_목록_예상_아이디_리스트(ExtractableResponse<Response>... responses){
-        return Arrays.stream(responses)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-    }
-
-    List<Long> 지하철_노선_목록_결과_아이디_리스트(ExtractableResponse<Response> response){
-        return response.jsonPath().getList(".", StationResponse.class).stream()
-                .map(it -> it.getId())
-                .collect(Collectors.toList());
-    }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
@@ -91,17 +75,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철역_삭제_요청(uri);
+        ExtractableResponse<Response> response = StationHelper.지하철역_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        StationHelper.응답_204_확인(response);
     }
 
-    ExtractableResponse<Response> 지하철역_삭제_요청(String uri){
-        return RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
-    }
+
 }

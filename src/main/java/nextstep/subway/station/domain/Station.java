@@ -12,10 +12,13 @@ public class Station extends BaseEntity {
     @Column(unique = true)
     private String name;
 
+    StationStatus status;
+
     public Station() {
     }
 
     public Station(String name) {
+        this.status = StationStatus.WAIT;
         this.name = name;
     }
 
@@ -25,5 +28,13 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    public StationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(StationStatus status) {
+        this.status = status;
     }
 }
