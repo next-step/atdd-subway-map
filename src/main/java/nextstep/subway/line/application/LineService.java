@@ -4,8 +4,8 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.section.Section;
-import nextstep.subway.section.SectionResponse;
+import nextstep.subway.section.domain.Section;
+import nextstep.subway.section.dto.SectionResponse;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -72,7 +72,6 @@ public class LineService {
     }
 
     public void deleteSection(Long id) {
-        Line line = findLineById(id);
-        line.remove();
+        findLineById(id).remove();
     }
 }

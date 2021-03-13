@@ -1,14 +1,16 @@
-package nextstep.subway.section;
+package nextstep.subway.section.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.exception.CanNotMatchUpStationException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Entity
-public class Section extends BaseEntity {
+public class Section extends BaseEntity implements Comparable<Section>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,12 +58,22 @@ public class Section extends BaseEntity {
         return upStation;
     }
 
-    public boolean isExistStation(Station downStation) {
-        return Objects.equals(this.upStation, downStation)
-                || Objects.equals(this.downStation, downStation);
-    }
-
     public boolean isEqual(Station upStation) {
         return Objects.equals(this.downStation, upStation);
+    }
+
+    public Stream<Station> getStations() {
+        return Stream.of(upStation, downStation);
+    }
+
+    @Override
+    public int compareTo(Section section) {
+        if(downStation.equals(section.getDownStation()) ) {
+            return -1;
+        }
+        if(upStation.equals(section.getUpStation())) {
+            return 1;
+        }
+        return 0;
     }
 }

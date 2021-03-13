@@ -8,11 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.line.LineRequestStep.*;
-import static nextstep.subway.line.LineVerificationStep.지하철_노선_조회됨;
+import static nextstep.subway.line.LineRequestStep.지하철_노선_등록되어_있음;
+import static nextstep.subway.line.LineRequestStep.지하철_노선_조회요청;
 import static nextstep.subway.section.SectionRequestStep.*;
 import static nextstep.subway.section.SectionVerificationStep.*;
-import static nextstep.subway.station.StationRequestStep.*;
+import static nextstep.subway.station.StationRequestStep.지하철역_등록되어_있음;
 
 @DisplayName("지하철 구간 관련 테스트")
 class SectionAcceptanceTest extends AcceptanceTest {
@@ -83,6 +83,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         지하철_구간_등록되어_있음(신분당선, 첫번째_라인_요청);
+        지하철_구간_등록되어_있음(신분당선, LineRequest.of(역삼역, 삼성역, 10));
 
         final ExtractableResponse<Response> response = 지하철_노선_조회요청(신분당선);
 

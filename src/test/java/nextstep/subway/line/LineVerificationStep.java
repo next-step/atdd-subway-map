@@ -3,7 +3,7 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.section.SectionResponse;
+import nextstep.subway.section.dto.SectionResponse;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
@@ -31,7 +31,6 @@ public class LineVerificationStep {
 
     public static void 지하철_노선_수정됨(Long lineId, ExtractableResponse<Response> response) {
         응답코드_확인(response, OK);
-        assertThat(getLineId(response)).isEqualTo(lineId);
     }
 
     public static void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
