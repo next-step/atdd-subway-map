@@ -1,5 +1,6 @@
 package nextstep.subway.advice;
 
+import nextstep.subway.exception.NotExistsStationIdException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +15,11 @@ public class SubwayAdvice {
 
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity handleIllegalArgsException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler({NotExistsStationIdException.class})
+    public ResponseEntity handleNotExistsStationIdException(NotExistsStationIdException e) {
         return ResponseEntity.badRequest().build();
     }
 }

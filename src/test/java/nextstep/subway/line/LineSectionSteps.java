@@ -4,33 +4,33 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSectionSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(Map<String, String> params, String uri) {
+    public static ExtractableResponse<Response> 지하철_노선에_구간_등록_요청(SectionRequest sectionRequest, String uri) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(sectionRequest)
                 .when()
                 .post(uri)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선에_구간이_등록되어_있음(Map<String, String> params, String uri) {
-        return 지하철_노선에_구간_등록_요청(params, uri);
+    public static ExtractableResponse<Response> 지하철_노선에_구간이_등록되어_있음(SectionRequest sectionRequest, String uri) {
+        return 지하철_노선에_구간_등록_요청(sectionRequest, uri);
     }
 
     public static void 지하철_노선에_구간_생성됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     public static void 지하철_노선에_구간_생성_실패됨(ExtractableResponse<Response> response) {

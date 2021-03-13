@@ -1,11 +1,12 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.dto.StationResponse;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import static nextstep.subway.line.domain.Section.createSection;
@@ -19,9 +20,8 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    //@OneToMany(mappedBy = "line", cascade = CascadeType.ALL) // section을 각각 persist안해주기 위해
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sectionList = new LinkedList<>(); // 초기화
+    @Embedded
+    private Sections sections = new Sections();
 
     // 기본생성자
     protected Line() {
@@ -32,24 +32,14 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    // 생성메서드
-    public static Line createLine(String name, String color, Station upStation, Station downStation, int distance) {
-        Line line = new Line();
-        line.setName(name);
-        line.setColor(color);
-        line.addSection(upStation, downStation, distance); // 구간(Section)을 바로 안받고 역(Station)으로 구간을 생성
-        return line;
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
+        this.name = name;
+        this.color = color;
+        this.addSection(upStation, downStation, distance); // 구간(Section)을 바로 안받고 역(Station)으로 구간을 생성
     }
 
     public void addSection(Station upStation, Station downStation, int distance) {
-        this.sectionList.add(createSection(this, upStation, downStation, distance));
-    }
-
-    public void removeLastSection(){
-        int idx = sectionSize() - 1;
-        if(idx > 0){
-            this.sectionList.remove(idx);
-        }
+        this.sections.addSection(createSection(this, upStation, downStation, distance));
     }
 
     public void update(String name, String color) {
@@ -57,46 +47,47 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public boolean isContainsStation(Long stationId){
-        boolean isUpStation = sectionList.stream()
-                                .anyMatch(it -> it.getUpStation().getId() == stationId);
-        boolean isDownStation = sectionList.stream()
-                                .anyMatch(it -> it.getDownStation().getId() == stationId);
-        return isUpStation || isDownStation;
+    /**
+     * 지하철 역 업데이트
+     */
+    public void update(String name, String color, Station upStation, Station downStation, int distance) {
+        // 벨리데이션
+        validateUpdate(upStation.getId(), downStation.getId());
+        // 수정
+        this.name = name;
+        this.color = color;
+        this.addSection(upStation, downStation, distance);
     }
 
-    public int sectionSize(){
-        return sectionList == null ? 0 : sectionList.size();
-    }
-
-    public Station getLastStation(){
-        return sectionList.size() == 0 ? null : sectionList.get(sectionList.size() -1).getDownStation();
-    }
-    public Station getFirstStation() { return sectionList.size() == 0 ? null : sectionList.get(0).getUpStation(); }
-
-    public Long getLastStationId(){
-        return sectionList.size() == 0 ? null : sectionList.get(sectionList.size() -1).getDownStation().getId();
-    }
-    public Long getFirstStationId() { return sectionList.size() == 0 ? null : sectionList.get(0).getUpStation().getId(); }
-
-    /*public Station getPrevStation(Long stationId){
-        return sectionList.stream()
-                .filter(it -> it.getDownStation().getId() == stationId)
-                .findFirst()
-                .get()
-                .getUpStation();
-    }*/
-
-    public Station getNextStation(Long stationId){
-        Station nextStation = null;
-        if(sectionList.size() != 0){
-            Section section = sectionList.stream()
-                                    .filter(it -> it.getUpStation().getId() == stationId)
-                                    .findFirst()
-                                    .orElse(new Section()); // TODO 널이면 뭐 리턴하지...
-            nextStation = section.getDownStation();
+    /**
+     * 지하철 역 업데이트 - 벨리데이션
+     */
+    private void validateUpdate(Long upStationId, Long downStationId){
+        if(sections.getSectionSize() != 0 && (sections.getLastStationId() != upStationId)) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.");
         }
-        return nextStation;
+        if(sections.isContainsStation(downStationId)) {
+            throw new IllegalArgumentException("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.");
+        }
+    }
+
+    /**
+     * LineResponse 반환
+     */
+    public LineResponse getLineResponse(){
+        List<StationResponse> stations = new ArrayList<>();
+
+        if(sections.getSectionSize() > 0){
+            Long id = sections.getFirstStationId();
+            stations.add(StationResponse.of(sections.getFirstStation()));
+
+            Station station = null;
+            while ((station = sections.getNextStation(id)) != null){
+                id = station.getId();
+                stations.add(StationResponse.of(station));
+            }
+        }
+        return new LineResponse(this.id, this.name, this.color, stations, this.getCreatedDate(), this.getModifiedDate());
     }
 
     public Long getId() {
@@ -111,8 +102,8 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSectionList() {
-        return sectionList;
+    public Sections getSections() {
+        return sections;
     }
 
     private void setId(Long id) {
@@ -127,7 +118,7 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    private void setSectionList(List<Section> sectionList) {
-        this.sectionList = sectionList;
+    private void setSections(Sections Sections) {
+        this.sections = sections;
     }
 }

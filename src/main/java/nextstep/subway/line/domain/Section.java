@@ -58,7 +58,8 @@ public class Section extends BaseEntity {
         this.line = line;
     }
 
-    public Station getUpStation() {
+    public Station
+    getUpStation() {
         return upStation;
     }
 

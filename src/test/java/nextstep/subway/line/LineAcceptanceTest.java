@@ -1,21 +1,16 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.station.dto.StationResponse;
-import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
@@ -25,44 +20,22 @@ import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest extends AcceptanceTest {
 
-    @LocalServerPort
-    private int port;
+    private StationResponse 강남역, 양재역, 역삼역;
 
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
+    private LineRequest 신분당선, 노선2호선;
 
-    // Station 인수테스트 재사용
-    private StationResponse 강남역;
-    private StationResponse 양재역;
-    private StationResponse 역삼역;
-    // TODO Map이 좋을까? 아니면 LineRequest가 좋을까?
-    private Map<String, String> 신분당선;
-    private Map<String, String> 노선2호선;
+    public LineAcceptanceTest(){
+        super(); // setUp메서드 상속을 받아서 사용
+    }
 
     @BeforeEach
-    public void setUp(){
-        // 랜덤포트 초기화
-        RestAssured.port = port;
-        databaseCleanup.execute();
-
+    public void setRequest(){
         강남역 = 지하철_역_생성_요청("강남역").as(StationResponse.class);
         양재역 = 지하철_역_생성_요청("양재역").as(StationResponse.class);
         역삼역 = 지하철_역_생성_요청("역삼역").as(StationResponse.class);
 
-        // 노선 생성에 필요한 파람값
-        신분당선 = new HashMap<>();
-        신분당선.put("name", "신분당선");
-        신분당선.put("color", "bg-red-600");
-        신분당선.put("upStationId", 강남역.getId() + "");
-        신분당선.put("downStationId", 양재역.getId() + "");
-        신분당선.put("distance", "10");
-
-        노선2호선 = new HashMap<>();
-        노선2호선.put("name", "2호선");
-        노선2호선.put("color", "bg-green-600");
-        노선2호선.put("upStationId", 강남역.getId() + "");
-        노선2호선.put("downStationId", 역삼역.getId() + "");
-        노선2호선.put("distance", "5");
+        신분당선 = new LineRequest("신분당선", "bg-red-600", 강남역.getId(), 양재역.getId(), 10);
+        노선2호선 = new LineRequest("2호선", "bg-green-600", 강남역.getId(), 양재역.getId(), 5);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -108,15 +81,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> response = 지하철_노선_등록되어_있음(신분당선);
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "구분당선");
-        params.put("color", "bg-blue-600");
-        params.put("upStationId", 신분당선.get("upStationId"));
-        params.put("downStationId", 신분당선.get("downStationId"));
-        params.put("distance", 신분당선.get("distance"));
+        LineRequest lineRequest = new LineRequest("구분당선", "bg-blue-600", 신분당선.getUpStationId(), 신분당선.getDownStationId(), 신분당선.getDistance());
 
         // when
-        ExtractableResponse<Response> resultResponse = 지하철_노선_수정_요청(response, params);
+        ExtractableResponse<Response> resultResponse = 지하철_노선_수정_요청(response, lineRequest);
 
         // then
         지하철_노선_수정됨(resultResponse);

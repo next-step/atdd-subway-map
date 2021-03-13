@@ -3,7 +3,8 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import org.springframework.dao.DataIntegrityViolationException;
+import nextstep.subway.station.application.StationService;
+import nextstep.subway.station.domain.Station;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,11 @@ import java.util.List;
 @RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
+    private StationService stationService;
 
-    public LineController(final LineService lineService) {
+    public LineController(final LineService lineService, StationService stationService) {
         this.lineService = lineService;
+        this.stationService = stationService;
     }
 
     @PostMapping
@@ -48,16 +51,20 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/sections")
-    public ResponseEntity<LineResponse> registerLineSection(@PathVariable Long id, @RequestBody LineRequest lineRequest){
-        LineResponse response = lineService.registerLineSection(id, lineRequest);
-        return ResponseEntity.ok().body(response);
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<LineResponse> registerLineSection(@PathVariable Long lineId, @RequestBody LineRequest lineRequest){
+        // 구간에 등록될 라인 정보 조회 : 서비스간의 참조를 컨트롤러에서 처리
+        Station upStation = stationService.selectStationById(lineRequest.getUpStationId());
+        Station downStation = stationService.selectStationById(lineRequest.getDownStationId());
+        // 지하철 노선에 구간을 등록
+        LineResponse response = lineService.registerLineSection(lineId, lineRequest, upStation, downStation);
+        return ResponseEntity.created(URI.create("lines/"+lineId+"/sections")).body(response); // 201, 300의 경우 Location값을 준다.
     }
 
     @DeleteMapping("/{lineId}/sections")
     public ResponseEntity<LineResponse> deleteLineSection(@PathVariable Long lineId, @RequestParam("stationId") Long stationId){
         LineResponse response = lineService.deleteLineSection(lineId, stationId);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.noContent().build();
     }
 
 }

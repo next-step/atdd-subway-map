@@ -17,10 +17,6 @@ public class Station extends BaseEntity {
     protected Station() {
     }
 
-    /*public Station(String name) {
-        this.name = name;
-    }*/
-
     // 생성메서드
     public static Station createStation(String name){
         Station station = new Station();
