@@ -1,5 +1,6 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.common.exception.InvalidRequestException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
@@ -45,5 +46,10 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable("id") Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity handleIllegalArgsException(InvalidRequestException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

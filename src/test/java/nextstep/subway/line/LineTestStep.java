@@ -90,7 +90,7 @@ public class LineTestStep {
     }
 
     public static void 지하철_노선_생성_실패_확인(ExtractableResponse<Response> response) {
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     // util
