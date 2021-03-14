@@ -43,6 +43,10 @@ public class StationService {
         return line.map(StationResponse::of).orElse(null);
     }
 
+    public Station getStation(long id) {
+        return stationRepository.findOneById(id).orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));
+    }
+
     public void validateStationId(Long id) {
         Optional<Station> station = stationRepository.findOneById(id);
         station.orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));

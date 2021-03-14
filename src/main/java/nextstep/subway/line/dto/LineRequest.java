@@ -3,14 +3,15 @@ package nextstep.subway.line.dto;
 import nextstep.subway.common.exception.ApplicationException;
 import nextstep.subway.common.exception.ApplicationType;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.Section;
 import org.springframework.util.StringUtils;
 
 public class LineRequest {
     private String name;
     private String color;
+    private int distance;
     private Long upStationId;       // 추가
     private Long downStationId;     // 추가
-    private int distance;
 
     public LineRequest() {
     }
@@ -34,8 +35,14 @@ public class LineRequest {
 
     public Long getDownStationId() { return this.downStationId; }
 
+    public int getDistance() {return this.distance; }
+
+    public Line toLine(Section section) {
+        return new Line(this.name, this.color, section);
+    }
+
     public Line toLine() {
-        return new Line(this.name, this.color, this.upStationId, this.downStationId, this.distance);
+        return new Line(this.name, this.color, null);
     }
 
     public void validate() {

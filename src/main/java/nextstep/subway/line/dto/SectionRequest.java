@@ -3,6 +3,7 @@ package nextstep.subway.line.dto;
 import nextstep.subway.common.exception.ApplicationException;
 import nextstep.subway.common.exception.ApplicationType;
 import nextstep.subway.line.domain.Section;
+import nextstep.subway.station.domain.Station;
 import org.springframework.util.StringUtils;
 
 public class SectionRequest {
@@ -32,7 +33,8 @@ public class SectionRequest {
         }
     }
 
-    public Section toSection() {
-        return new Section(this.upStationId, this.downStationId, this.distance);
+    public Section toSection(Station upStation, Station downStation) {
+
+        return new Section(upStation, downStation, this.distance);
     }
 }

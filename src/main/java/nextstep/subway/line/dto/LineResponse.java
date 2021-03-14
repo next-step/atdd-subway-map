@@ -1,33 +1,35 @@
 package nextstep.subway.line.dto;
 
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.dto.StationResponse;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+    private List<StationResponse> stations;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public LineResponse() {
-    }
+    public LineResponse() {}
 
-    public LineResponse(Long id, String name, String color, Long upStationId, Long downStationId, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    public LineResponse(Long id, String name, String color, List<StationResponse> stationResponses, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.stations = stationResponses;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
 
     public static LineResponse of(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStationId(), line.getDownStationId(), line.getDistance(), line.getCreatedDate(), line.getModifiedDate());
+        List<StationResponse> stations = line.getAllLineStations().stream().map(StationResponse::of).collect(Collectors.toList());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations, line.getCreatedDate(), line.getModifiedDate());
     }
 
     public Long getId() {
@@ -42,17 +44,13 @@ public class LineResponse {
         return color;
     }
 
-    public Long getUpStationId() { return upStationId;}
-
-    public Long getDownStationId() { return downStationId; }
-
-    public int getDistance() {return distance; }
+    public List<StationResponse> getStations() {return this.stations;}
 
     public LocalDateTime getCreatedDate() {
-        return createdDate;
+        return this.createdDate;
     }
 
     public LocalDateTime getModifiedDate() {
-        return modifiedDate;
+        return this.modifiedDate;
     }
 }

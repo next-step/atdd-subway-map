@@ -6,6 +6,7 @@ import nextstep.subway.station.domain.Station;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 public class Line extends BaseEntity {
@@ -18,16 +19,22 @@ public class Line extends BaseEntity {
 
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections;
 
     public Line() {
     }
 
-    public Line(String name, String color, Section section, int distance) {
+    public Line(String name, String color, Section section) {
+
+        this.sections = new Sections();
+
         this.name = name;
         this.color = color;
-        this.sections.add(section);
+
+        if (section !=null) {
+            this.sections.addSection(section);
+        }
     }
 
     public void update(Line line) {
@@ -36,18 +43,24 @@ public class Line extends BaseEntity {
     }
 
     public void extendsLine(Section section) {
-        this.sections.add(section);
+        this.sections.addSection(section);
+    }
+
+    public Station getLastStation() {
+        return this.sections.lastStationOfSections();
+    }
+
+    public boolean isRemovableStation(Long stationId) {
+        return this.getLastStation().getId().equals(stationId);
+    }
+
+    public void removeSection(Long stationId) {
+        this.sections.removeSectionByStationId(stationId);
     }
 
     public boolean isExtensionAvailable(Section section) {
 
-        if(isLineExtensionAvailable(section)) {
-
-        }
-
-        return true;
-        //Long registerdStationCount = sections.stream().filter(section -> section.getUpStation() == newDownStation || section.getDownStation() == newDownStation).count();
-//        return registerdStationCount <= 0;
+        return isAddSectionAvailable(section);
     }
 
     public Long getId() {
@@ -62,19 +75,12 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    private boolean isLineExtensionAvailable(Section section) {
-        long count = this.sections.stream().count();
+    private boolean isAddSectionAvailable(Section section) {
 
-        if (count <= 0) {
-            return true;
-        }
+        return this.sections.isAddSectionAvailable(section);
+    }
 
-        Station lastStation = this.sections.stream().skip(count - 1).findFirst().get().getDownStation();
-
-        if (lastStation.getId().equals(section.getUpStation())) {
-            return true;
-        }
-
-        return false;
+    public List<Station> getAllLineStations() {
+        return this.sections.getAllStations();
     }
 }
