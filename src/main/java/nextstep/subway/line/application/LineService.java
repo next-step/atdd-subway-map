@@ -9,6 +9,7 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.application.StationService;
+import nextstep.subway.station.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +35,22 @@ public class LineService {
 
         validateLineRequest(request);
 
-        Line line = request.toLine();
-
         Line persistLine;
+
+        Station upStation = stationService.getStation(request.getUpStationId());
+        Station downStation = stationService.getStation(request.getDownStationId());
+
+        Section section = new Section(upStation, downStation, request.getDistance());
         try {
+
             persistLine = lineRepository.save(request.toLine());
+            section.assignLine(persistLine);
+            persistLine.extendsLine(section);
+
         } catch (PersistenceException exception) {
             throw new ApplicationException(ApplicationType.KEY_DUPLICATED);
         }
+
 
         return LineResponse.of(persistLine);
     }
@@ -74,16 +83,6 @@ public class LineService {
         return  LineResponse.of(line);
     }
 
-    //https://edu.nextstep.camp/s/b7KHeSY2/ls/AgSPspmB
-    //노선 생성 시 종점역 추가
-    //구간 등록
-    /*
-    지하철 노선에 구간을 등록하는 기능을 구현
-    새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.
-    새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.
-    새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러 처리한다.
-     */
-
     //구간 제거
     /*
     지하철 노선에 구간을 제거하는 기능 구현
@@ -103,19 +102,36 @@ public class LineService {
         stationService.validateStationId(lineRequest.getDownStationId());
     }
 
-    public Line createLineSection(Long id, SectionRequest sectionRequest) {
+    public LineResponse createLineSection(Long id, SectionRequest sectionRequest) {
         Optional<Line> line = lineRepository.findOneById(id);
-        List<Section> sections = sectionService.getSectionsByLineId(id);
 
         line.orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));
 
-        if (line.get().validateExtentionAvailable(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sections)) {
+        Station upStation = stationService.getStation(sectionRequest.getUpStationId());
+        Station downStation = stationService.getStation(sectionRequest.getDownStationId());
+
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+
+        if (!line.get().isExtensionAvailable(section)) {
             throw new ApplicationException(ApplicationType.INVALID_STATION_ID);
         }
 
-        Section section = sectionService.createSection(id, sectionRequest);
-        line.get().extendsLine(section.getDownStationId(), section.getDistance());
+        section.assignLine(line.get());
+        line.get().extendsLine(section);
 
-        return line.get();
+        return LineResponse.of(line.get());
+    }
+
+    public void deleteSection(Long id, Long stationId) {
+        Optional<Line> line = lineRepository.findOneById(id);
+
+        line.orElseThrow(() -> new ApplicationException(ApplicationType.INVALID_ID));
+
+        //line 마지막값 가져와서 stationId가 맞는지를 validation 해
+        if (!line.get().isRemovableStation(stationId)) {
+            new ApplicationException(ApplicationType.INVALID_REQUEST_PARAMETER);
+        }
+        //삭제해
+        line.get().removeSection(stationId);
     }
 }

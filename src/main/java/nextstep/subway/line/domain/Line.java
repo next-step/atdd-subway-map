@@ -1,54 +1,66 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.common.exception.ApplicationException;
-import nextstep.subway.common.exception.ApplicationType;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
     private String name;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
+
     private String color;
+
+    @Embedded
+    private Sections sections;
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public Line(String name, String color, Section section) {
+
+        this.sections = new Sections();
+
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId == null ? downStationId : upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+
+        if (section !=null) {
+            this.sections.addSection(section);
+        }
     }
 
     public void update(Line line) {
         this.name = line.getName();
         this.color = line.getColor();
-        this.upStationId = line.getUpStationId();
-        this.downStationId = line.getDownStationId();
     }
 
-    public void extendsLine(Long downStationId, int distance) {
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public void extendsLine(Section section) {
+        this.sections.addSection(section);
     }
 
-    public boolean validateExtentionAvailable(Long newUpstationId, Long newDownStationId, List<Section> sections) {
-        if (this.downStationId != newUpstationId) {
-            return false;
-        }
+    public Station getLastStation() {
+        return this.sections.lastStationOfSections();
+    }
 
-        Long registerdStationCount = sections.stream().filter(section -> section.getUpStationId() == newDownStationId || section.getDownStationId() == newDownStationId).count();
-        return registerdStationCount <= 0;
+    public boolean isRemovableStation(Long stationId) {
+        return this.getLastStation().getId().equals(stationId);
+    }
+
+    public void removeSection(Long stationId) {
+        this.sections.removeSectionByStationId(stationId);
+    }
+
+    public boolean isExtensionAvailable(Section section) {
+
+        return isAddSectionAvailable(section);
     }
 
     public Long getId() {
@@ -63,9 +75,12 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Long getUpStationId() { return upStationId; };
+    private boolean isAddSectionAvailable(Section section) {
 
-    public Long getDownStationId() { return downStationId; };
+        return this.sections.isAddSectionAvailable(section);
+    }
 
-    public int getDistance() { return distance; }
+    public List<Station> getAllLineStations() {
+        return this.sections.getAllStations();
+    }
 }

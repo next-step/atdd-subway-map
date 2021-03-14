@@ -14,9 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionSteps {
 
-    public static ExtractableResponse<Response> 구간_생성_요청(Long createdLineId, Long upStationId, Long downStationId, Long distance) {
+    public static ExtractableResponse<Response> 구간_생성_요청(Long createdLineId, Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = createParams(upStationId, downStationId, distance);
-        return postRequest("/stations/"+createdLineId+"/section", params);
+        return postRequest("/lines/"+createdLineId+"/sections", params);
     }
 
     public static void 지하철_구간_등록_성공(ExtractableResponse<Response> response) {
@@ -47,7 +47,7 @@ public class SectionSteps {
         return 지하철_노선_조회_요청(createdLineId);
     }
 
-    private static Map<String, Object> createParams(Long upStationId, Long downStationId, Long distance) {
+    private static Map<String, Object> createParams(Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);

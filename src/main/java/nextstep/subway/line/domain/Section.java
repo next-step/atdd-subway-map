@@ -1,35 +1,56 @@
 package nextstep.subway.line.domain;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.station.domain.Station;
 
+import javax.persistence.*;
+
+@Entity
 public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long lineId;
-    private Long upStationId;
-    private Long downStationId;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "line_id")
+    private Line line;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
+
     private int distance;
 
-    public Section(Long upStationId, Long downStationId, int distance)
+    public Section() {}
+
+    public Section(Station upStation, Station downStation, int distance)
     {
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public void assignLine(Long lineId) {
-        this.lineId = lineId;
+    public void assignLine(Line line) {
+        this.line = line;
     }
 
-    public Long getUpStationId() { return upStationId;}
+    public Station getUpStation() { return upStation;}
 
-    public Long getDownStationId() { return downStationId; }
+    public Station getDownStation() { return downStation; }
 
     public int getDistance() { return distance; }
 
-    public Long getLineId() {return lineId;}
+    public Line getLine() {return line;}
+
+    public boolean isEqual(Long id) {
+        return this.id.equals(id);
+    }
+
+    public Long getId() {
+        return this.id;
+    }
 }

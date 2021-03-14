@@ -2,7 +2,7 @@ package nextstep.subway.station;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class StationSteps {
     }
 
     public static void 지하철_역_목록_조회_결과_2건(ExtractableResponse<Response> response) {
-        List<LineResponse> resultLines = response.jsonPath().getList(".", LineResponse.class);
+        List<StationResponse> resultLines = response.jsonPath().getList(".", StationResponse.class);
         assertThat(resultLines).hasSize(2);
     }
 
