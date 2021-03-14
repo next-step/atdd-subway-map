@@ -33,6 +33,15 @@ public class StationSteps {
 		assertThat(response.header("Location")).isNotBlank();
 	}
 
+	protected static void 지하철역_생성_실패됨(ExtractableResponse<Response> response) {
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+	}
+
+	protected static Long 지하철역_등록되어_있음(String name) {
+
+		return 지하철역_생성_요청(name).as(StationResponse.class).getId();
+	}
+
 	protected static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
 
 		return RestAssured.given().log().all()

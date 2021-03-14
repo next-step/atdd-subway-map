@@ -22,6 +22,19 @@ public class StationAcceptanceTest extends AcceptanceTest {
 		지하철역_생성_요청됨(response);
 	}
 
+	@DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+	@Test
+	void createStationWithDuplicateName() {
+		// given
+		지하철역_등록되어_있음("강남역");
+
+		// when
+		final ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
+
+		// then
+		지하철역_생성_실패됨(response);
+	}
+
 	@DisplayName("지하철역을 조회한다.")
 	@Test
 	void getStations() {
