@@ -9,14 +9,19 @@ public class Station extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
     private String name;
 
-    public Station() {
+    // 기본생성자
+    protected Station() {
     }
 
-    public Station(String name) {
-        this.name = name;
+    // 생성메서드
+    public static Station createStation(String name){
+        Station station = new Station();
+        station.setName(name);
+        return station;
     }
 
     public Long getId() {
@@ -25,5 +30,13 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    private void setId(Long id) {
+        this.id = id;
+    }
+
+    private void setName(String name) {
+        this.name = name;
     }
 }

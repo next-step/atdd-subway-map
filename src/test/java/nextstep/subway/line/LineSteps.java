@@ -3,37 +3,21 @@ package nextstep.subway.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static final String 신분당선 = "신분당선";
-    public static final String 노선2호선 = "2호선";
-    public static final String RED = "bg-red-60";
-    public static final String GREEN = "bg-green-600";
-
-    public static Map<String, String> createLine(String color, String name){
-        Map<String, String> params = new HashMap<>();
-        params.put("color", color);
-        params.put("name", name);
-        return params;
-    }
-
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String color, String name){
-        // given
-        Map<String, String> params = createLine(color, name);
-        // then
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest){
         return RestAssured.given().log().all()
-                .body(params)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -46,8 +30,8 @@ public class LineSteps {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(String color, String name){
-        return 지하철_노선_생성_요청(color, name);
+    public static ExtractableResponse<Response> 지하철_노선_등록되어_있음(LineRequest lineRequest){
+        return 지하철_노선_생성_요청(lineRequest);
     }
 
     public static void 지하철_노선_목록_응답됨(ExtractableResponse<Response> response){
@@ -101,14 +85,13 @@ public class LineSteps {
     }
 
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, String color, String name){
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, LineRequest lineRequest){
         // given
-        Map<String, String> params = createLine(color, name);
         String uri = response.header("Location");
         // then
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(lineRequest)
                 .when()
                 .put(uri)
                 .then().log().all()
@@ -138,4 +121,7 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    public static void 지하철_노선_구간_삭제됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }

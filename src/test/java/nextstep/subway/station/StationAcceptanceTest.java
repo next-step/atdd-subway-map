@@ -1,31 +1,23 @@
 package nextstep.subway.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Arrays;
+
 import static nextstep.subway.station.StationSteps.*;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest extends AcceptanceTest {
 
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    public void setUp(){
-        // 랜덤포트
-        RestAssured.port = port;
+    public StationAcceptanceTest(){
+        super(); // setUp메서드 상속을 받아서 사용
     }
 
     @DisplayName("지하철역을 생성한다.")
