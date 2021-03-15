@@ -19,22 +19,31 @@ public class Sections {
     public Sections(){}
 
     public void addSection(Section section) {
+        validateAddSection(section);
+        sections.add(section);
+    }
+
+    private void validateAddSection(Section section){
+        List<Station> stations = getStations();
         if (getStations().size() == 0) {
-            sections.add(section);
             return;
         }
-
-        boolean isNotValidUpStation = getStations().get(getStations().size() - 1).getId() != section.getUpStation().getId();
-        if (isNotValidUpStation) {
+        if (isNotValidUpStation(stations, section)) {
             throw new RuntimeException("상행역은 하행 종점역이어야 합니다.");
         }
 
-        boolean isDownStationExisted = getStations().stream().anyMatch(it -> it.getId() == section.getDownStation().getId());
-        if (isDownStationExisted) {
+        if (isDownStationExisted(stations, section)) {
             throw new RuntimeException("하행역이 이미 등록되어 있습니다.");
         }
+    }
 
-        sections.add(section);
+
+    private boolean isDownStationExisted(List<Station> stations, Section section) {
+        return stations.stream().anyMatch(it -> it.equals(section.getDownStation()));
+    }
+
+    private boolean isNotValidUpStation(List<Station> stations, Section section) {
+        return !stations.get(stations.size() - 1).equals(section.getUpStation());
     }
 
     public List<Station> getStations() {
