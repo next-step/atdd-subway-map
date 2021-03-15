@@ -1,4 +1,4 @@
-package nextstep.subway.section.domain;
+package nextstep.subway.line.domain.exception;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.domain.Line;
@@ -27,6 +27,12 @@ public class Section extends BaseEntity {
     private int distance;
 
     public Section() {}
+
+    public Section(Station upStation, Station downStation, int distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
 
     public Section(Line line, Station upStation, Station downStation, int distance) {
         this.line = line;
