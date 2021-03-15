@@ -21,7 +21,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(KANGNAM_STATION);
+        ExtractableResponse<Response> response = 지하철역_등록_요청(KANGNAM_STATION);
 
         // then
         지하철역_생성됨(response);
@@ -31,8 +31,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         // given
-        ExtractableResponse<Response> createResponse1 = 지하철역_등록됨(KANGNAM_STATION);
-        ExtractableResponse<Response> createResponse2 = 지하철역_등록됨(SEONLEUNG_STATION);
+        ExtractableResponse<Response> createResponse1 = 지하철역_등록(KANGNAM_STATION);
+        ExtractableResponse<Response> createResponse2 = 지하철역_등록(SEONLEUNG_STATION);
 
         // when
         ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
@@ -46,7 +46,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_등록됨(KANGNAM_STATION);
+        ExtractableResponse<Response> createResponse = 지하철역_등록(KANGNAM_STATION);
 
         // when
         ExtractableResponse<Response> response = 지하철역_제거_요청(createResponse);
@@ -59,10 +59,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         //given
-        지하철역_등록됨(KANGNAM_STATION);
+        지하철역_등록(KANGNAM_STATION);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(KANGNAM_STATION);
+        ExtractableResponse<Response> response = 지하철역_등록_요청(KANGNAM_STATION);
 
         // then
         지하철역_생성_실패(response);

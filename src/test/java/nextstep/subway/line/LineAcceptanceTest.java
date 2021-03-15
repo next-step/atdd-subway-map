@@ -4,6 +4,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,19 +17,50 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static nextstep.subway.line.LineSteps.*;
+import static nextstep.subway.station.StationSteps.지하철역_등록;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+    private LineResponse 초록2호선;
+    private StationResponse 강남역;
+    private StationResponse 역삼역;
+    private StationResponse 선릉역;
+    private StationResponse 잠실역;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        // given
+        강남역 = 지하철역_등록("강남역").as(StationResponse.class);
+        역삼역 = 지하철역_등록("역삼역").as(StationResponse.class);
+        선릉역 = 지하철역_등록("선릉역").as(StationResponse.class);
+        잠실역 = 지하철역_등록("잠실역").as(StationResponse.class);
+    }
+
+    private Map<String, String> getLineCreateParams(String lineName, String color, StationResponse upStation, StationResponse downStation, String distance){
+        Map<String, String> lineCreateParams;
+        lineCreateParams = new HashMap<>();
+        lineCreateParams.put("name", lineName);
+        lineCreateParams.put("color", color);
+        lineCreateParams.put("upStationId", upStation.getId().toString());
+        lineCreateParams.put("downStationId", downStation.getId().toString());
+        lineCreateParams.put("distance", distance);
+
+        return lineCreateParams;
+    }
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
 
-        ExtractableResponse<Response> response = 지하철_노선_등록("신분당선","bg-red-600");
+        Map<String,String> lineCreateParams =
+                getLineCreateParams("2호선","bg-green-600",강남역, 역삼역, "10");
+
+        ExtractableResponse<Response> 이호선 = 지하철_노선_등록(lineCreateParams);
+
         // then
-        // 지하철_노선_생성됨
-        지하철_노선_생성_성공(response);
+        지하철_노선_생성_성공(이호선);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -35,8 +68,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse1 = 지하철_노선_등록("신분당선","bg-red-600");
-        ExtractableResponse<Response> createResponse2 = 지하철_노선_등록("2호선","bg-green-600");
+        Map<String,String> lineCreateParams =
+                getLineCreateParams("2호선","bg-green-600",강남역,역삼역,"10");
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_등록(lineCreateParams);
+
+        lineCreateParams =
+                getLineCreateParams("신분당선","bg-red-600",선릉역, 잠실역, "4");
+        ExtractableResponse<Response> createResponse2 = 지하철_노선_등록(lineCreateParams);
 
         // when
         // 지하철_노선_목록_조회_요청
@@ -55,11 +93,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse1 = 지하철_노선_등록("신분당선","bg-red-600");
+        Map<String,String> lineCreateParams =
+                getLineCreateParams("2호선","bg-green-600",강남역,역삼역,"10");
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_등록(lineCreateParams);
+        LineResponse 이호선 = createResponse1.as(LineResponse.class);
+
 
         // when
         // 지하철_노선_조회_요청
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(createResponse1);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(이호선.getId());
 
         // then
         // 지하철_노선_응답됨
@@ -71,7 +113,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse = 지하철_노선_등록("신분당선","bg-red-600");
+        Map<String,String> lineCreateParams =
+                getLineCreateParams("신분당","bg-red-600",강남역,역삼역,"10");
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록(lineCreateParams);
 
         Map<String, String> updateParam = new HashMap<>();
         updateParam.put("color","bg-blue-600");
@@ -91,7 +135,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         // 지하철_노선_등록되어_있음
-        ExtractableResponse<Response> createResponse = 지하철_노선_등록("신분당선","bg-red-600");
+        Map<String,String> lineCreateParams =
+                getLineCreateParams("신분당","bg-red-600",강남역,역삼역,"10");
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록(lineCreateParams);
 
         // when
         // 지하철_노선_제거_요청
@@ -106,7 +152,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         //given
-         지하철_노선_등록("2호선","bg-green-600");
+        Map<String,String> lineCreateParams =
+                getLineCreateParams("2호","bg-green-600",강남역,역삼역,"10");
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록(lineCreateParams);
 
          // when
         ExtractableResponse<Response> response = 지하철_노선_등록("2호선","bg-green-600");
