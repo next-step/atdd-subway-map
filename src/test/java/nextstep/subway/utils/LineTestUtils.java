@@ -55,8 +55,8 @@ public class LineTestUtils extends BaseTestUtils{
                 .extract();
     }
 
-    public static void 지하철_노선_목록_포함됨(ExtractableResponse<Response> response, ExtractableResponse<Response> responseWhenPostLineDX, ExtractableResponse<Response> responseWhenPostLineTwo) {
-        List<Long> expectedLineIds = Arrays.asList(responseWhenPostLineDX, responseWhenPostLineTwo).stream()
+    public static void 지하철_노선_목록_포함됨(ExtractableResponse<Response> response, ExtractableResponse<Response> expectedResponse1, ExtractableResponse<Response> expectedResponse2) {
+        List<Long> expectedLineIds = Arrays.asList(expectedResponse1, expectedResponse2).stream()
                 .map(resp -> Long.parseLong(resp.header(HTTP_HEADER_LOCATION).split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
@@ -65,33 +65,43 @@ public class LineTestUtils extends BaseTestUtils{
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> responseWhenPostLineDX) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(ExtractableResponse<Response> response) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get(responseWhenPostLineDX.header(HTTP_HEADER_LOCATION))
+                .get(response.header(HTTP_HEADER_LOCATION))
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> responseWhenPostLineDX, Map<String, String> paramsForUpdating) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(String location) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(location)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, Map<String, String> paramsForUpdating) {
         return RestAssured
                 .given().log().all()
                 .body(paramsForUpdating)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put(responseWhenPostLineDX.header(HTTP_HEADER_LOCATION))
+                .put(response.header(HTTP_HEADER_LOCATION))
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_제거_요청(ExtractableResponse<Response> responseWhenPostLineDX) {
+    public static ExtractableResponse<Response> 지하철_노선_제거_요청(ExtractableResponse<Response> response) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .delete(responseWhenPostLineDX.header(HTTP_HEADER_LOCATION))
+                .delete(response.header(HTTP_HEADER_LOCATION))
                 .then().log().all()
                 .extract();
     }

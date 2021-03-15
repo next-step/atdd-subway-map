@@ -3,6 +3,7 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
+import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.utils.StationTestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import java.util.Map;
 
+import static nextstep.subway.constants.TestConstants.HTTP_HEADER_LOCATION;
 import static nextstep.subway.utils.LineTestUtils.*;
 import static nextstep.subway.utils.StationTestUtils.역_파라미터_설정;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -100,6 +103,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_등록되어_있음
         Map<String, String> 신분당선 = 노선_파라미터_설정(LINE_DX_NAME, LINE_DX_COLOR, 판교역응답.getId(), 정자역응답.getId(), 10);
         ExtractableResponse<Response> 신분당선응답 = 지하철_노선_생성_요청(신분당선);
+        String URL = 신분당선응답.header(HTTP_HEADER_LOCATION);
 
         // when
         // 지하철_노선_수정_요청
@@ -110,6 +114,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_수정됨
         응답_상태코드_확인(노선수정응답, HttpStatus.OK);
+
+        LineResponse 수정된노선 = 지하철_노선_조회_요청(URL).as(LineResponse.class);
+        assertThat(수정된노선.getName()).isEqualTo(LINE_TWO_NAME);
     }
 
     @DisplayName("지하철 노선을 제거한다.")
@@ -119,6 +126,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // 지하철_노선_등록되어_있음
         Map<String, String> 신분당선 = 노선_파라미터_설정(LINE_DX_NAME, LINE_DX_COLOR, 판교역응답.getId(), 정자역응답.getId(), 10);
         ExtractableResponse<Response> 신분당선응답 = 지하철_노선_생성_요청(신분당선);
+        String URL = 신분당선응답.header(HTTP_HEADER_LOCATION);
 
         // when
         // 지하철_노선_제거_요청
@@ -127,5 +135,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 지하철_노선_삭제됨
         응답_상태코드_확인(노선삭제응답, HttpStatus.NO_CONTENT);
+
+        //삭제된 노선 조회시 NoLineFoundException --> BAD_REQUEST 응답
+        ExtractableResponse<Response> 삭제된노선조회응답 = 지하철_노선_조회_요청(URL);
+        응답_상태코드_확인(삭제된노선조회응답, HttpStatus.BAD_REQUEST);
     }
 }

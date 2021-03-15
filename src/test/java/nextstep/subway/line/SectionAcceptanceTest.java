@@ -9,11 +9,12 @@ import nextstep.subway.utils.StationTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.util.Map;
 
+import static nextstep.subway.constants.TestConstants.HTTP_HEADER_LOCATION;
 import static nextstep.subway.utils.BaseTestUtils.응답_상태코드_확인;
-import static nextstep.subway.utils.LineTestUtils.노선_파라미터_설정;
-import static nextstep.subway.utils.LineTestUtils.지하철_노선_생성_요청;
+import static nextstep.subway.utils.LineTestUtils.*;
 import static nextstep.subway.utils.SectionTestUtils.*;
 import static nextstep.subway.utils.StationTestUtils.역_파라미터_설정;
 import static org.springframework.http.HttpStatus.*;
@@ -59,13 +60,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection_WhenNormalRequest_ThenReturnSuccess() {
         //given
+        //구간_파라미터_설정
         Map<String, String> 정자미금구간 = 구간_파라미터_설정(정자역응답, 미금역응답);
 
         //when
         ExtractableResponse<Response> 정자미금구간생성응답 = 지하철_구간_생성_요청(정자미금구간, 신분당선URL);
+        String URL = 정자미금구간생성응답.header(HTTP_HEADER_LOCATION);
 
         //then
         응답_상태코드_확인(정자미금구간생성응답, CREATED);
+        생성후_구간_존재_확인(URL, "정자역", "미금역");
     }
 
     @DisplayName("새로운 구간의 상행역이 현재 등록 되어 있는 하행 종점역이 아닌 경우 -> 에러 응답")
@@ -94,21 +98,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 미금판교구간생성응답 = 지하철_구간_생성_요청(미금판교구간, 신분당선URL);
 
         //then
-        응답_상태코드_확인(미금판교구간생성응답 ,BAD_REQUEST);
+        응답_상태코드_확인(미금판교구간생성응답, BAD_REQUEST);
     }
 
     @DisplayName("노선의 구간이 2개 이상이면서, 제일 마지막 구간(구간의 하행역 == 하행 종점역)을 삭제하는 경우 -> 정상 응답")
     @Test
     void deleteSection_WhenNormalRequest_ThenReturnSuccess() {
         //given
+        //(신분당선) 판교 정자 미금
         Map<String, String> 정자미금구간 = 구간_파라미터_설정(정자역응답, 미금역응답);
-        지하철_구간_생성_요청(정자미금구간, 신분당선URL);
+        String URL = 지하철_구간_생성_요청(정자미금구간, 신분당선URL).header(HTTP_HEADER_LOCATION);
 
         //when
         ExtractableResponse<Response> 정자미금구간삭제 = 지하철_구간_삭제_요청(미금역응답, 신분당선URL);
 
         //then
         응답_상태코드_확인(정자미금구간삭제, NO_CONTENT);
+        삭제후_구간_미존재_확인(URL, "미금역");
     }
 
     @DisplayName("(구간의 하행역 != 하행 종점역)인 구간을 삭제하는 경우 -> 에러 응답")

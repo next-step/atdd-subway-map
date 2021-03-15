@@ -3,16 +3,15 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.MediaType;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static nextstep.subway.constants.TestConstants.HTTP_HEADER_LOCATION;
+import static nextstep.subway.utils.LineTestUtils.지하철_노선_조회_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionTestUtils extends BaseTestUtils {
@@ -46,5 +45,17 @@ public class SectionTestUtils extends BaseTestUtils {
                 .delete(url)
                 .then().log().all()
                 .extract();
+    }
+
+    public static void 생성후_구간_존재_확인(String URL, String station1, String station2) {
+        assertThat(지하철_노선_조회_요청(URL)
+                .as(LineResponse.class).getStationResponses().stream()
+                .map(StationResponse::getName).collect(Collectors.toList())).contains(station1, station2);
+    }
+
+    public static void 삭제후_구간_미존재_확인(String URL, String station) {
+        assertThat(지하철_노선_조회_요청(URL)
+                .as(LineResponse.class).getStationResponses().stream()
+                .map(StationResponse::getName).collect(Collectors.toList())).doesNotContain(station);
     }
 }

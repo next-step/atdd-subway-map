@@ -9,7 +9,6 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Embeddable
 public class Sections {
@@ -45,10 +44,6 @@ public class Sections {
 
     public Section get(int index) {
         return sections.get(index);
-    }
-
-    public Stream<Section> stream() {
-        return sections.stream();
     }
 
     public List<? extends Station> fetchAllDownStations() {

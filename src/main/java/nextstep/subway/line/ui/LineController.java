@@ -6,6 +6,7 @@ import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exception.InvalidDownStationException;
 import nextstep.subway.line.exception.InvalidUpStationException;
+import nextstep.subway.line.exception.NoLineFoundException;
 import nextstep.subway.line.exception.OnlyOneSectionRemainingException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -53,16 +54,19 @@ public class LineController {
     @PostMapping(value = "/lines/{lineId}/sections")
     public ResponseEntity createSection(@PathVariable final Long lineId, @RequestBody final SectionRequest sectionRequest) {
         lineService.saveSection(lineId, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).build();
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
 
     @DeleteMapping(value = "/lines/{lineId}/sections")
     public ResponseEntity deleteSection(@PathVariable final Long lineId, @RequestParam final Long stationId) {
         lineService.deleteSection(lineId, stationId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().header("deletedLineId", "/lines/" + lineId).build();
     }
 
-    @ExceptionHandler({InvalidUpStationException.class,InvalidDownStationException.class,OnlyOneSectionRemainingException.class})
+    @ExceptionHandler({NoLineFoundException.class
+            ,InvalidUpStationException.class
+            ,InvalidDownStationException.class
+            ,OnlyOneSectionRemainingException.class})
     private ResponseEntity InvalidUpStationException(RuntimeException runtimeException){
         return ResponseEntity.badRequest().body(runtimeException.getMessage());
     }

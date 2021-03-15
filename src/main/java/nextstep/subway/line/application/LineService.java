@@ -6,11 +6,14 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.exception.*;
+import nextstep.subway.station.dto.StationResponse;
 import nextstep.subway.station.exception.NoStationFoundException;
 import nextstep.subway.station.domain.Station;
 import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +38,7 @@ public class LineService {
 
         lineRepository.save(line);
 
-        return LineResponse.of(line);
+        return convertStationToResponse(line);
     }
 
     @Transactional(readOnly = true)
@@ -43,14 +46,14 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(line -> LineResponse.of(line))
+                .map(line -> convertStationToResponse(line))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse getLine(final Long id) {
         return lineRepository.findById(id)
-                .map(l -> LineResponse.of(l))
+                .map(line -> convertStationToResponse(line))
                 .orElseThrow(() -> new NoLineFoundException());
     }
 
@@ -96,5 +99,13 @@ public class LineService {
         }
 
         line.deleteSection(stationId);
+    }
+
+    private LineResponse convertStationToResponse(Line line) {
+        List<StationResponse> stationResponses = line.fetchAllStations().stream()
+                .map(StationResponse::of)
+                .sorted(Comparator.comparingLong(StationResponse::getId))
+                .collect(Collectors.toList());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses, line.getCreatedDate(), line.getModifiedDate());
     }
 }
