@@ -18,10 +18,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         // when
@@ -35,10 +35,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithNotExistStationId() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         // when
@@ -53,10 +53,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLineWithDuplicateName() {
         // given
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
@@ -71,7 +71,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("종점역 ID 없이 지하철 노선을 생성한다.")
     @Test
     void createLineWithoutStationID() {
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
         // when
@@ -85,13 +85,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선2_지하철_역 = 지하철_역_생성_요청("충무로입구");
+        ExtractableResponse<Response> 하행선2_지하철_역 = 하행선으로_사용될_지하철_역_생성("충무로입구");
         Long 하행선2_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
         지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
@@ -109,10 +109,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
@@ -139,10 +139,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long upStationId = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long downStationId = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         ExtractableResponse<Response> 지하철_노선 = 지하철_노선_생성_요청("2호선", "green", upStationId, downStationId, 5);
@@ -159,10 +159,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLineWithNoId() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         // when
@@ -176,10 +176,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         ExtractableResponse<Response> createdLine = 지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
@@ -207,13 +207,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection() {
         //given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선2_지하철_역 = 지하철_역_생성_요청("시청");
+        ExtractableResponse<Response> 하행선2_지하철_역 = 하행선으로_사용될_지하철_역_생성("시청");
         Long 하행선2_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선2_지하철_역);
 
         ExtractableResponse<Response> 생성된_지하철_노선 = 지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
@@ -232,10 +232,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createSectionWithoutLineDownStationId() {
         //given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
         ExtractableResponse<Response> 상행선2_지하철_역 = 지하철_역_생성_요청("충무로역");
@@ -255,13 +255,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLinesWithSection() {
         // given
-        ExtractableResponse<Response> 상행선_지하철_역 = 지하철_역_생성_요청("을지로3가");
+        ExtractableResponse<Response>상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
         Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선_지하철_역 = 지하철_역_생성_요청("을지로입구");
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
         Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
 
-        ExtractableResponse<Response> 하행선2_지하철_역 = 지하철_역_생성_요청("시청역");
+        ExtractableResponse<Response> 하행선2_지하철_역 = 하행선으로_사용될_지하철_역_생성("시청역");
         Long 하행선2_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선2_지하철_역);
 
         ExtractableResponse<Response> 지하철_노선_역 = 지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
@@ -274,5 +274,55 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_조회_성공(lines);
+    }
+
+    @DisplayName("지하철 구간 삭제한다.")
+    @Test
+    void deleteLineSection() {
+        //given
+        ExtractableResponse<Response> 상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
+        Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
+
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
+        Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
+
+        ExtractableResponse<Response> 하행선2_지하철_역 = 하행선으로_사용될_지하철_역_생성("시청역");
+        Long 하행선2_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선2_지하철_역);
+
+        ExtractableResponse<Response> 지하철_노선_역 = 지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
+        Long 지하철_노선_ID = 생성된_지하철_노선_ID_확인(지하철_노선_역);
+
+        구간_생성_요청(지하철_노선_ID, 하행선_지하철_역_ID, 하행선2_지하철_역_ID, 3);
+
+        //when
+        ExtractableResponse<Response> sectionResponse = 지하철_구간_삭제_요청(지하철_노선_ID, 하행선2_지하철_역_ID);
+
+        //then
+        지하철_구간_삭제_성공(sectionResponse);
+    }
+
+    @DisplayName("지하철 구간 삭제 시 마지막 구간이 아닌 역을 삭제")
+    @Test
+    void deleteLinesectionWithIncorrectStationId() {
+        //given
+        ExtractableResponse<Response> 상행선_지하철_역 = 상행선으로_사용될_지하철_역_생성("을지로3가");
+        Long 상행선_지하철_역_ID = 생성된_지하철_역_ID_확인(상행선_지하철_역);
+
+        ExtractableResponse<Response> 하행선_지하철_역 = 하행선으로_사용될_지하철_역_생성("을지로입구");
+        Long 하행선_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선_지하철_역);
+
+        ExtractableResponse<Response> 하행선2_지하철_역 = 하행선으로_사용될_지하철_역_생성("시청역");
+        Long 하행선2_지하철_역_ID = 생성된_지하철_역_ID_확인(하행선2_지하철_역);
+
+        ExtractableResponse<Response> 지하철_노선_역 = 지하철_노선_생성_요청("2호선", "green", 상행선_지하철_역_ID, 하행선_지하철_역_ID, 5);
+        Long 지하철_노선_ID = 생성된_지하철_노선_ID_확인(지하철_노선_역);
+
+        구간_생성_요청(지하철_노선_ID, 하행선_지하철_역_ID, 하행선2_지하철_역_ID, 3);
+
+        //when
+        ExtractableResponse<Response> sectionResponse = 지하철_구간_삭제_요청(지하철_노선_ID, 하행선_지하철_역_ID);
+
+        //then
+        지하철_구간_삭제_실패(sectionResponse);
     }
 }

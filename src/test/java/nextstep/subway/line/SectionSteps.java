@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.RestAssuredRequest.deleteRequest;
 import static nextstep.subway.RestAssuredRequest.postRequest;
 import static nextstep.subway.line.LineSteps.지하철_노선_조회_요청;
 import static nextstep.subway.station.StationSteps.지하철_역_생성_요청;
@@ -62,5 +63,17 @@ public class SectionSteps {
 
     public static ExtractableResponse<Response> 하행선으로_사용될_지하철_역_생성(String stationName) {
         return 지하철_역_생성_요청(stationName);
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long stationId) {
+        return deleteRequest("/lines/"+lineId+"/sections?stationId=" + stationId);
+    }
+
+    public static void 지하철_구간_삭제_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_구간_삭제_실패(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

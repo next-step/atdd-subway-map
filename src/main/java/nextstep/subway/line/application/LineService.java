@@ -23,12 +23,10 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
     private StationService stationService;
-    private SectionService sectionService;
 
-    public LineService(LineRepository lineRepository, StationService stationService, SectionService sectionService) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
-        this.sectionService = sectionService;
     }
 
     public LineResponse creteLine(LineRequest request) {
@@ -129,7 +127,7 @@ public class LineService {
 
         //line 마지막값 가져와서 stationId가 맞는지를 validation 해
         if (!line.get().isRemovableStation(stationId)) {
-            new ApplicationException(ApplicationType.INVALID_REQUEST_PARAMETER);
+            throw new ApplicationException(ApplicationType.INVALID_REQUEST_PARAMETER);
         }
         //삭제해
         line.get().removeSection(stationId);
