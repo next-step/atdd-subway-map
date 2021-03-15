@@ -3,7 +3,6 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.support.LineSteps;
@@ -36,7 +35,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         역삼역 = StationSteps.지하철역_등록됨(new StationRequest("역삼역"));
         방배역 = StationSteps.지하철역_등록됨(new StationRequest("방배역"));
 
-        이호선 = LineSteps.지하철_노선이_등록됨(new LineRequest("2호선", "green"));
+        이호선 = LineSteps.지하철_노선이_등록됨("2호선", "green");
     }
 
 

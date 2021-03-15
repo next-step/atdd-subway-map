@@ -11,10 +11,10 @@ public class LineSteps {
 
     private static final String LINE_BASE_URL = "/lines";
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest createRequest) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String lineName, String color) {
         return RestAssured
                 .given().log().all()
-                .body(createRequest)
+                .body(new LineRequest(lineName, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(LINE_BASE_URL)
@@ -22,8 +22,8 @@ public class LineSteps {
                 .extract();
     }
 
-    public static LineResponse 지하철_노선이_등록됨(LineRequest lineRequest) {
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(lineRequest);
+    public static LineResponse 지하철_노선이_등록됨(String lineName, String color) {
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(lineName, color);
         return 지하철_노선_요청_응답값(response);
     }
 
@@ -32,10 +32,10 @@ public class LineSteps {
                 .getObject(".", LineResponse.class);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest updateRequest) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, String lineName, String color) {
         return RestAssured
                 .given().log().all()
-                .body(updateRequest)
+                .body(new LineRequest(lineName, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(LINE_BASE_URL+"/"+id)
