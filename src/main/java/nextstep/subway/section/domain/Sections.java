@@ -3,6 +3,7 @@ package nextstep.subway.section.domain;
 import nextstep.subway.exception.CanNotMatchUpStationException;
 import nextstep.subway.exception.CanNotRemoveSectionException;
 import nextstep.subway.exception.ExistDownStationException;
+import nextstep.subway.exception.NotLastStationException;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.CascadeType;
@@ -33,19 +34,29 @@ public class Sections {
         return sections.get(sections.size() - 1);
     }
 
-    public void removeSection() {
-        checkRemoveSection();
-        removeLastSection();
+    public void removeSection(Station station) {
+        checkRemoveSection(station);
+        removeLastSection(station);
     }
 
-    public void checkRemoveSection() {
+    public void checkRemoveSection(Station station) {
         if(sections.size() == 1) {
             throw new CanNotRemoveSectionException();
         }
+        if(!getLastStation().equals(station)) {
+            throw new NotLastStationException();
+        }
     }
 
-    private Section removeLastSection() {
-        return sections.remove(sections.size() - 1);
+    private Station getLastStation() {
+        return getStations().get(getStations().size() - 1);
+    }
+
+    private void removeLastSection(Station station) {
+        sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .findFirst()
+                .ifPresent(section -> sections.remove(section));
     }
 
     public List<Station> getStations() {

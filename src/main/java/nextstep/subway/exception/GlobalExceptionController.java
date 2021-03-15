@@ -21,4 +21,9 @@ public class GlobalExceptionController {
     public ResponseEntity handleCanNotRemoveSectionException(CanNotRemoveSectionException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(NotLastStationException.class)
+    public ResponseEntity handleNotLastStationException(NotLastStationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }

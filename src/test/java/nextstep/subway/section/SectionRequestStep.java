@@ -12,10 +12,13 @@ import static org.springframework.http.HttpStatus.OK;
 
 public class SectionRequestStep {
 
-    public static ExtractableResponse<Response> 지하철_구간_삭제요청(Long lineId) {
+    public static ExtractableResponse<Response> 지하철_구간_삭제요청(Long lineId, Long stationId) {
         return RestAssured
                 .given().log().all()
-                .when().delete("/lines/{lineId}/sections/", lineId)
+                .param("stationId", stationId)
+                .when()
+                .delete("/lines/{lineId}/sections/", lineId)
+
                 .then().log().all().extract();
     }
 

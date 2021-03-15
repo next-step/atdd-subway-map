@@ -71,7 +71,10 @@ public class LineService {
         return stationRepository.findById(stationId).orElse(null);
     }
 
-    public void deleteSection(Long id) {
-        findLineById(id).remove();
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        Station station = findStationById(stationId);
+
+        line.remove(station);
     }
 }

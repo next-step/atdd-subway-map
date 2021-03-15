@@ -26,7 +26,7 @@ public class LineVerificationStep {
 
     public static void 지하철_노선_조회됨(Long lineId, ExtractableResponse<Response> response) {
         응답코드_확인(response, OK);
-        assertThat(response.body().as(SectionResponse.class)).isEqualTo(lineId);
+        assertThat(response.body().as(LineResponse.class).getId()).isEqualTo(lineId);
     }
 
     public static void 지하철_노선_수정됨(Long lineId, ExtractableResponse<Response> response) {

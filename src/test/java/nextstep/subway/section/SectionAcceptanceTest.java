@@ -64,7 +64,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         지하철_구간_등록되어_있음(신분당선, 첫번째_라인_요청);
         지하철_구간_등록되어_있음(신분당선, LineRequest.of(역삼역, 삼성역, 10));
 
-        ExtractableResponse<Response> response = 지하철_구간_삭제요청(신분당선);
+        ExtractableResponse<Response> response = 지하철_구간_삭제요청(신분당선, 삼성역);
 
         지하철_구간_삭제됨(response);
     }
@@ -74,7 +74,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteNotAllowedWhenOneSectionLeft() {
         지하철_구간_등록되어_있음(신분당선, 첫번째_라인_요청);
 
-        ExtractableResponse<Response> response = 지하철_구간_삭제요청(신분당선);
+        ExtractableResponse<Response> response = 지하철_구간_삭제요청(신분당선, 역삼역);
 
         지하철_구간_삭제실패됨(response);
     }

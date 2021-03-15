@@ -10,7 +10,8 @@ import org.springframework.http.MediaType;
 public class LineRequestStep {
 
     public static Long 지하철_노선_등록되어_있음(String name, String color) {
-        return 지하철_노선_등록요청(name, color).as(LineResponse.class).getId();
+        LineRequest request = LineRequest.of(name, color);
+        return 지하철_노선_등록요청(request).as(LineResponse.class).getId();
     }
 
     public static ExtractableResponse<Response> 지하철_노선_목록조회요청() {
@@ -28,8 +29,7 @@ public class LineRequestStep {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_등록요청(String name, String color) {
-        LineRequest request = LineRequest.of(name, color);
+    public static ExtractableResponse<Response> 지하철_노선_등록요청(LineRequest request) {
 
         return RestAssured
                 .given().log().all()

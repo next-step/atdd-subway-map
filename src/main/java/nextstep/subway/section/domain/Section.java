@@ -1,7 +1,6 @@
 package nextstep.subway.section.domain;
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.exception.CanNotMatchUpStationException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.station.domain.Station;
 
@@ -21,12 +20,12 @@ public class Section extends BaseEntity implements Comparable<Section>{
     private Station upStation;
 
     @JoinColumn(name = "down_station_id")
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Station downStation;
     private int distance;
 
     @JoinColumn(name = "line_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Line line;
 
     public Section() {
@@ -75,5 +74,9 @@ public class Section extends BaseEntity implements Comparable<Section>{
             return 1;
         }
         return 0;
+    }
+
+    public void remove() {
+        this.downStation = null;
     }
 }
