@@ -18,11 +18,9 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
-    private final StationService stationService;
 
-    public LineController(LineService lineService, StationService stationService) {
+    public LineController(LineService lineService) {
         this.lineService = lineService;
-        this.stationService = stationService;
     }
 
 
@@ -64,7 +62,7 @@ public class LineController {
 
     @DeleteMapping("/lines/{lineId}/sections")
     public ResponseEntity removeSection(@PathVariable Long lineId, @RequestParam Long stationId){
-        lineService.removeSection(lineId, stationService.findById(stationId));
+        lineService.removeSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 

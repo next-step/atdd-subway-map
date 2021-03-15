@@ -71,9 +71,9 @@ public class LineService {
         line.addSection(new Section(line, upStation, downStation,sectionRequest.getDistance()));
     }
 
-    public void removeSection(Long lineId, Station station) {
+    public void removeSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId)
                     .orElseThrow(() -> new NotFoundLineException(lineId));
-        line.removeSection(station);
+        line.removeSection(stationId);
     }
 }
