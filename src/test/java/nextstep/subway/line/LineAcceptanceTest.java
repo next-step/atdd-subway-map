@@ -3,7 +3,6 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.support.LineSteps;
 import nextstep.subway.line.support.LineVerifier;
@@ -19,24 +18,22 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선을 생성한다.")
-    @Test
-    void createLine() {
-        //Given
-        LineRequest line = new LineRequest("1호선", "blue");
-
-        //When
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(line);
+    @ParameterizedTest
+    @CsvSource(value = {"1호선:blue", "2호선:green"}, delimiter = ':')
+    void createLine(String lineName, String color) {
+        //Given & When
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(lineName, color);
 
         //Then
-        LineVerifier.지하철_노선_등록됨(line, response);
+        LineVerifier.지하철_노선_등록됨(response, lineName, color);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void findAllLines() {
         //Given
-        Long createdId1 = LineSteps.지하철_노선이_등록됨(new LineRequest("1호선", "blue")).getId();
-        Long createdId2 = LineSteps.지하철_노선이_등록됨(new LineRequest("2호선", "green")).getId();
+        Long createdId1 = LineSteps.지하철_노선이_등록됨("1호선", "blue").getId();
+        Long createdId2 = LineSteps.지하철_노선이_등록됨("2호선", "green").getId();
 
         //When
         ExtractableResponse<Response> foundedLinesResponse = LineSteps.지하철_노선_목록_조회요청();
@@ -50,7 +47,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @CsvSource(value = {"1호선:blue","2호선:green","3호선:brown"}, delimiter = ':')
     void findLineById(String lineName, String color) {
         //Given
-        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(new LineRequest(lineName, color));
+        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(lineName, color);
 
         //When
         ExtractableResponse<Response> foundApiResponse = LineSteps.지하철_특정노선_찾기_요청(createdResponse.getId());
@@ -64,7 +61,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void notFoundLine() {
         //Given
-        LineResponse createdLine = LineSteps.지하철_노선이_등록됨(new LineRequest("1호선", "blue"));
+        LineResponse createdLine = LineSteps.지하철_노선이_등록됨("1호선", "blue");
 
         //When
         ExtractableResponse<Response> response = LineSteps.지하철_특정노선_찾기_요청(createdLine.getId()+1);
@@ -78,10 +75,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @CsvSource(value = {"1호선:blue:blue-600", "2호선:green:green-300", "3호선:brown:brown-200"}, delimiter = ':')
     void updateLine(String lineName, String color, String updateColor) {
         //Given
-        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(new LineRequest(lineName, color));
+        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(lineName, color);
 
         //When
-        ExtractableResponse<Response> updatedApiResponse = LineSteps.지하철_노선_수정_요청(createdResponse.getId(), new LineRequest(lineName, updateColor));
+        ExtractableResponse<Response> updatedApiResponse = LineSteps.지하철_노선_수정_요청(createdResponse.getId(), lineName, updateColor);
         LineResponse updatedResponse = LineSteps.지하철_노선_요청_응답값(LineSteps.지하철_특정노선_찾기_요청(createdResponse.getId()));
 
         //Then
@@ -93,10 +90,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @CsvSource(value = {"1호선:blue:blue-600", "2호선:green:green-300", "3호선:brown:brown-200"}, delimiter = ':')
     void notFoundUpdateLine(String lineName, String color, String updateColor) {
         //Given
-        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(new LineRequest(lineName, color));
+        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(lineName, color);
 
         //When
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_수정_요청(createdResponse.getId()+1, new LineRequest(lineName, updateColor));
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_수정_요청(createdResponse.getId()+1, lineName, updateColor);
 
         //Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -106,7 +103,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //Given
-        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨(new LineRequest("1호선", "blue"));
+        LineResponse createdResponse = LineSteps.지하철_노선이_등록됨("1호선", "blue");
 
         //When
         ExtractableResponse<Response> response = LineSteps.지하철_노선_삭제_요청(createdResponse.getId());
@@ -120,10 +117,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @CsvSource(value = {"1호선:blue","2호선:green","3호선:brown"}, delimiter = ':')
     void createLineWithDuplicationName(String lineName, String color) {
         //Given
-        LineSteps.지하철_노선이_등록됨(new LineRequest(lineName, color));
+        LineSteps.지하철_노선이_등록됨(lineName, color);
 
         //When
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(new LineRequest(lineName, color));
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(lineName, color);
 
         //Then
         LineVerifier.지하철_노선_생성_실패됨(response);

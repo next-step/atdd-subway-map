@@ -6,6 +6,7 @@ import nextstep.subway.line.NotFoundLineException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +15,10 @@ import java.util.List;
 
 @RestController
 public class LineController {
+
     private final LineService lineService;
 
-    public LineController(final LineService lineService) {
+    public LineController(LineService lineService) {
         this.lineService = lineService;
     }
 
@@ -48,6 +50,18 @@ public class LineController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity addSections(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
+        lineService.addLineStation(lineId, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity removeSection(@PathVariable Long lineId, @RequestParam Long stationId){
+        lineService.removeSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 

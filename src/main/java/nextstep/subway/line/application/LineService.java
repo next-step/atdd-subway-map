@@ -4,8 +4,12 @@ import nextstep.subway.line.DuplicatedLineNameException;
 import nextstep.subway.line.NotFoundLineException;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
+import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.station.domain.Station;
+import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +19,13 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
+
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -52,5 +59,21 @@ public class LineService {
         return lines.stream()
                 .map(line -> LineResponse.of(line))
                 .collect(Collectors.toList());
+    }
+
+    public void addLineStation(Long lineId, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(lineId)
+                        .orElseThrow(() -> new NotFoundLineException(lineId));
+
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).get();
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).get();
+
+        line.addSection(new Section(line, upStation, downStation,sectionRequest.getDistance()));
+    }
+
+    public void removeSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                    .orElseThrow(() -> new NotFoundLineException(lineId));
+        line.removeSection(stationId);
     }
 }
