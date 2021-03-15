@@ -1,5 +1,6 @@
 package nextstep.subway.line;
 
+import com.jayway.jsonpath.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineResponse;
@@ -14,8 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
-        Map<String, String> params = createParams(name, color);
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationsId, Long downStationId, int distance) {
+        Map<String, Object> params = createParams(name, color, upStationsId, downStationId, distance);
         return postRequest("/lines", params);
     }
 
@@ -40,6 +41,10 @@ public class LineSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    public static void 존재하지_않는_지하철_노선_오류(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long createdLineId) {
         return getRequest("/lines/"+createdLineId);
     }
@@ -48,13 +53,17 @@ public class LineSteps {
         return Long.parseLong(createdLine.header("Location").split("/")[2]);
     }
 
-
     public static void 지하철_노선_수정_성공(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long createdLineId, String name, String color) {
-        Map<String, String> params = createParams(name,color);
+    public static void 지하철_노선_종점역_연장_확인_정상(ExtractableResponse<Response> response, Long stationId) {
+        //String dataObject  = JsonPath.parse(response.body()).read("$.downStationId").toString();
+        //assertThat(String.valueOf(stationId)).isEqualTo(dataObject);
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long createdLineId, String name, String color,Long upStationId, Long downStationId, int distance) {
+        Map<String, Object> params = createParams(name,color, upStationId, downStationId, distance);
         return putRequest("/lines/"+createdLineId, params);
     }
 
@@ -67,10 +76,13 @@ public class LineSteps {
     }
 
 
-    private static Map<String, String> createParams(String name, String color) {
-        Map<String, String> params = new HashMap<>();
+    private static Map<String, Object> createParams(String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
 
         return params;
     }
