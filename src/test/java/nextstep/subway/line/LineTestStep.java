@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.assertj.core.api.Assertions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,11 +16,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineTestStep {
-    public static ExtractableResponse 지하철_노선_생성_요청(String name, String color) {
+    public static ExtractableResponse 지하철_노선_생성_요청(String name, String color, Long upStationId, Long downStationId, int distance) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new LineRequest(name, color))
+                .body(new LineRequest(name, color, upStationId, downStationId, distance))
                 .when().post("/lines")
                 .then().log().all().extract();
     }
@@ -30,9 +31,9 @@ public class LineTestStep {
     }
 
 
-    public static List<LineResponse> 지하철_노선_목록_등록되어_있음() {
-        LineResponse addedLine1 = 지하철_노선_등록되어_있음("신분당선", "red");
-        LineResponse addedLine2 = 지하철_노선_등록되어_있음("2호선", "green");
+    public static List<LineResponse> 지하철_노선_목록_등록되어_있음(List<StationResponse> stationResponseList) {
+        LineResponse addedLine1 = 지하철_노선_등록되어_있음("신분당선", "red", stationResponseList.get(1).getId(), stationResponseList.get(3).getId(), 1);
+        LineResponse addedLine2 = 지하철_노선_등록되어_있음("2호선", "green", stationResponseList.get(0).getId(), stationResponseList.get(2).getId(), 1);
         return Arrays.asList(addedLine1, addedLine2);
     }
 
@@ -49,8 +50,8 @@ public class LineTestStep {
         Assertions.assertThat(addedLineList).isEqualTo(lineResponseList);
     }
 
-    public static LineResponse 지하철_노선_등록되어_있음(String name, String color) {
-        return getAddedLine(지하철_노선_생성_요청(name, color));
+    public static LineResponse 지하철_노선_등록되어_있음(String name, String color, Long upStationId, Long downStationId, int distance) {
+        return getAddedLine(지하철_노선_생성_요청(name, color, upStationId, downStationId, distance));
     }
 
     public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
@@ -65,10 +66,10 @@ public class LineTestStep {
         Assertions.assertThat(getAddedLine(response)).isEqualTo(addedLine);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String name, String color, Long id) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String name, String color, Long id, Long upStationId, Long downStationId, int distance) {
         return RestAssured
                 .given().log().all()
-                .body(new LineRequest(name, color))
+                .body(new LineRequest(name, color, upStationId, downStationId, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/" + id)
                 .then().log().all().extract();

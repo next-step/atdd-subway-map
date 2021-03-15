@@ -42,7 +42,7 @@ public class StationTestStep {
     }
 
     public static List<StationResponse> 지하철_역_목록_등록되어_있음() {
-        return Arrays.asList(지하철_역_등록되어_있음("강남역"), 지하철_역_등록되어_있음("역삼역"));
+        return Arrays.asList(지하철_역_등록되어_있음("강남역"), 지하철_역_등록되어_있음("광교역"), 지하철_역_등록되어_있음("역삼역"), 지하철_역_등록되어_있음("광교중앙역"));
     }
 
     public static void 지하철_역_목록_조회_확인(List<StationResponse> addedStationList, ExtractableResponse<Response> response) {
