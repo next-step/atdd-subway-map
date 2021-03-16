@@ -12,11 +12,11 @@ public class StationSteps {
     public static final String KANGNAM_STATION = "강남역";
     public static final String SEONLEUNG_STATION = "선릉역";
 
-    public static ExtractableResponse<Response> 지하철역_등록됨(String name) {
-        return 지하철역_생성_요청(name);
+    public static ExtractableResponse<Response> 지하철역_등록(String name) {
+        return 지하철역_등록_요청(name);
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+    public static ExtractableResponse<Response> 지하철역_등록_요청(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 

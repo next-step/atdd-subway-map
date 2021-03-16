@@ -3,6 +3,9 @@ package nextstep.subway.line.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,6 @@ import java.util.List;
 
 @RestController
 public class LineController {
-    //주석
     private final LineService lineService;
 
     public LineController(final LineService lineService) {
@@ -20,7 +22,7 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -45,4 +47,31 @@ public class LineController {
     public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest){
         return ResponseEntity.ok().body(lineService.updateLine(id,lineRequest));
     }
+
+    @GetMapping("/lines/{id}/sections")
+    public ResponseEntity<List<StationResponse>> showAllStationsWithLineId(@PathVariable Long id) {
+        LineResponse lineResponse = lineService.findLine(id);
+        return ResponseEntity.ok().body(lineResponse.getStations());
+    }
+
+    @GetMapping("/lines/{id}/sections/last-section")
+    public ResponseEntity<SectionResponse> showLastSection(@PathVariable Long id) {
+        SectionResponse sectionResponse = lineService.findLastSection(id);
+        return ResponseEntity.ok().body(sectionResponse);
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> createSections(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineResponse lineResponse = lineService.addSection(id,sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
+    }
+
+    //    /lines/{lineId}/sections?stationId={stationId}
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity removeSection(@PathVariable Long lineId,@RequestParam Long stationId){
+        lineService.deleteSection(lineId,stationId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

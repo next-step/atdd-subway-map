@@ -1,8 +1,10 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -13,12 +15,25 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
+    @Embedded
+    private Sections sections = new Sections();
+
     public Line() {
     }
 
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public Line(String name, String color, nextstep.subway.station.domain.Station upStation, nextstep.subway.station.domain.Station downStation, int distance) {
+        this.name = name;
+        this.color = color;
+        this.sections.addSection(new Section(this,upStation,downStation,distance));
+    }
+
+    public static Line of(String name, String color, nextstep.subway.station.domain.Station upStation, nextstep.subway.station.domain.Station downStation, int distance) {
+        return new Line(name, color, upStation, downStation, distance);
     }
 
     public void update(Line line) {
@@ -37,4 +52,23 @@ public class Line extends BaseEntity {
     public String getColor() {
         return color;
     }
+
+    public Sections getSections() { return sections; }
+
+    public void addSection(nextstep.subway.station.domain.Station upStation, nextstep.subway.station.domain.Station downStation, int distance) {
+        sections.addSection(Section.of(this, upStation, downStation, distance));
+    }
+
+    public void deleteSection(long stationId) {
+        sections.deleteLastSection(stationId);
+    }
+
+    public List<Station> getAllStations() {
+        return sections.getAllStations();
+    }
+
+    public Section getLastSection() {
+       return sections.getLastSection();
+    }
+
 }
