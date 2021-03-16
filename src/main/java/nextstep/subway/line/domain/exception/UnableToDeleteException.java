@@ -1,4 +1,4 @@
-package nextstep.subway.section.domain;
+package nextstep.subway.line.domain.exception;
 
 public class UnableToDeleteException extends RuntimeException{
     String message;

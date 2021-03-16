@@ -1,4 +1,4 @@
-package nextstep.subway.line.domain.exception;
+package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.domain.Line;

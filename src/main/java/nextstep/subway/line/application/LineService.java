@@ -4,10 +4,8 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.section.application.SectionService;
-import nextstep.subway.section.domain.Section;
-import nextstep.subway.section.dto.SectionRequest;
-import nextstep.subway.section.dto.SectionResponse;
+import nextstep.subway.line.domain.Section;
+import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,27 +21,18 @@ public class LineService {
 
     private LineRepository lineRepository;
 
-    @Autowired
-    StationService stationService;
+    private StationService stationService;
 
-    @Autowired
-    SectionService sectionService;
-
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineRepository.save(request.toLine());
-        sectionService.createSection(
-                persistLine.getId(),
-                new SectionRequest(
-                        request.getUpStationId(),
-                        request.getDownStationId(),
-                        request.getDistance()
-                )
-        );
-
+        Station upStation = stationService.getStationById(request.getUpStationId());
+        Station downStation = stationService.getStationById(request.getDownStationId());
+        Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
+        Line persistLine = lineRepository.save(line);
         return lineToLineResponse(persistLine);
     }
 
@@ -57,38 +46,9 @@ public class LineService {
     public LineResponse getLine(Long id) {
         Line line = getLineById(id);
         LineResponse lineResponse = lineToLineResponse(line);
-        lineResponse.setStations(getStationListFromSections(id));
 
         return lineResponse;
     }
-
-    public List<Station> getStationListFromSections(Long lineId){
-        List<Station> stations = new ArrayList<>();
-        findFirstSection(lineId).ifPresent(section -> {
-            stations.add(section.getUpStation());
-            while (true) {
-                stations.add(section.getDownStation());
-                Optional<Section> optNextSection =
-                        findNextSection(lineId, section.getDownStation());
-
-                if (optNextSection.isPresent()) {
-                    section = optNextSection.get();
-                } else {
-                    break;
-                }
-            }
-        });
-        return stations;
-    }
-
-    public Optional<Section> findFirstSection(Long lineId) {
-        return sectionService.getFirstSection(lineId);
-    }
-
-    public Optional<Section> findNextSection(Long lineId, Station downStation) {
-        return sectionService.getNextSection(lineId, downStation);
-    }
-
 
     public LineResponse updateLine(Long id, LineRequest request) {
         Line line = getLineById(id);
@@ -106,5 +66,20 @@ public class LineService {
 
     private LineResponse lineToLineResponse(Line line) {
         return LineResponse.of(line);
+    }
+
+    public LineResponse createSection(Long lineId, SectionRequest request) {
+        Line line = getLineById(lineId);
+        Station upStation = stationService.getStationById(request.getUpStationId());
+        Station downStation = stationService.getStationById(request.getDownStationId());
+        line.addSection(new Section(line, upStation, downStation, request.getDistance()));
+        return LineResponse.of(line);
+    }
+
+    public void deleteSection(Long lineId, Long stationId){
+        Optional<Line> optLine = lineRepository.findById(lineId);
+        Station station = stationService.getStationById(stationId);
+        Line line = optLine.orElseThrow(() -> new NoSuchElementException());
+        line.deleteSection(station);
     }
 }

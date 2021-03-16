@@ -91,7 +91,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         Long id = LineHelper.생성된_Entity의_ID_가져오기(createResponse);
 
-        SectionHelper.구간_추가_요청(id, stationId1, stationId2, 10);
         SectionHelper.구간_추가_요청(id, stationId2, stationId3, 10);
 
 

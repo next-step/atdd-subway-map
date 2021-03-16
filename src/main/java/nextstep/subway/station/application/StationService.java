@@ -44,9 +44,4 @@ public class StationService {
     public Station getStationById(Long id) {
         return stationRepository.findById(id).orElseThrow(() -> new NoSuchElementException());
     }
-
-    public boolean isStationExist(Long id){
-        return stationRepository.existsById(id);
-    }
-
 }

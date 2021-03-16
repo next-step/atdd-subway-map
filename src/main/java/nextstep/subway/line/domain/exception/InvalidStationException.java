@@ -1,4 +1,4 @@
-package nextstep.subway.section.domain;
+package nextstep.subway.line.domain.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -10,7 +10,6 @@ public class InvalidStationException extends RuntimeException{
     public InvalidStationException() {}
 
     public InvalidStationException(String message) {
-        System.err.println(message);
         this.message = message;
     }
 }

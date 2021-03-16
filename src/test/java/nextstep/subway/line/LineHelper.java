@@ -85,7 +85,7 @@ public class LineHelper {
     public static void 지하철_노선_응답됨(ExtractableResponse<Response> getResponse){
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(getResponse.jsonPath().getObject(".", LineResponse.class)
-                .getStations().size()).isEqualTo(3);
+                .getStationResponses().size()).isEqualTo(3);
     }
 
     public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, LineRequest lineRequest){
