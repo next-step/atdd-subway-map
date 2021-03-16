@@ -87,7 +87,7 @@ public class LineSteps {
     }
 
     public static ExtractableResponse<Response> 지하철_노선에_지하철역_등록(LineResponse line, StationResponse upStation,
-                                                               StationResponse downStation,Integer distance){
+                                                                StationResponse downStation, Integer distance){
 
         ExtractableResponse<Response> createResponse;
 

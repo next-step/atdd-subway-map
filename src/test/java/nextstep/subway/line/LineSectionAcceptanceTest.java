@@ -65,8 +65,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록(초록2호선,강남역,잠실역,10);
 
-        // then --NotEqualsLastStationException
-        지하철_노선에서_삭제_실패(response);
+        // then --NotEqualsLastStationException(406)
+        지하철_노선에서_구간_삭제_실패(response);
     }
 
     @DisplayName("기존에 등록돼 있는 역을 구간으로 추가한다.")
@@ -76,8 +76,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = 지하철_노선에_지하철역_등록(초록2호선,역삼역,강남역,10);
 
-        // then --DuplicateStationException
-        지하철_노선에서_삭제_실패(response);
+        // then --DuplicateStationException->400
+        지하철_노선에_지하철역_등록_실패(response);
     }
 
     @DisplayName("지하철 노선에서 구간(종점역)을 제거한다.")
@@ -143,21 +143,25 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private void 지하철_노선에_지하철역_등록_성공(ExtractableResponse<Response> response){
+    private void 지하철_노선에_지하철역_등록_성공(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
-    }
-
-    private void 지하철_노선에_지하철역_등록_실패(ExtractableResponse<Response> response){
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private void 지하철_노선에_지하철역_삭제_성공(ExtractableResponse<Response> response){
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    private void 지하철_노선에_지하철역_등록_실패(ExtractableResponse<Response> response){
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE.value());
+    }
+
+    private void 지하철_노선에서_구간_삭제_실패(ExtractableResponse<Response> response){
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE.value());
+    }
+
     private void 지하철_노선에서_삭제_실패(ExtractableResponse<Response> response){
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 

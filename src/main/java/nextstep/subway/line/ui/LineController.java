@@ -5,6 +5,7 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.station.dto.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -48,19 +49,19 @@ public class LineController {
     }
 
     @GetMapping("/lines/{id}/sections")
-    public ResponseEntity showAllStationsWithLineId(@PathVariable Long id) {
+    public ResponseEntity<List<StationResponse>> showAllStationsWithLineId(@PathVariable Long id) {
         LineResponse lineResponse = lineService.findLine(id);
         return ResponseEntity.ok().body(lineResponse.getStations());
     }
 
     @GetMapping("/lines/{id}/sections/last-section")
-    public ResponseEntity showLastSection(@PathVariable Long id) {
+    public ResponseEntity<SectionResponse> showLastSection(@PathVariable Long id) {
         SectionResponse sectionResponse = lineService.findLastSection(id);
         return ResponseEntity.ok().body(sectionResponse);
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity createSections(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<LineResponse> createSections(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         LineResponse lineResponse = lineService.addSection(id,sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }

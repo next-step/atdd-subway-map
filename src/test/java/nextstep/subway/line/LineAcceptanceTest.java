@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-    private LineResponse 초록2호선;
     private StationResponse 강남역;
     private StationResponse 역삼역;
     private StationResponse 선릉역;
@@ -153,7 +152,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLineWithDuplicateName() {
         //given
         Map<String,String> lineCreateParams =
-                getLineCreateParams("2호","bg-green-600",강남역,역삼역,"10");
+                getLineCreateParams("2호선","bg-green-600",강남역,역삼역,"10");
         ExtractableResponse<Response> createResponse = 지하철_노선_등록(lineCreateParams);
 
          // when

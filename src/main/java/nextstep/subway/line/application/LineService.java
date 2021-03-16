@@ -7,8 +7,8 @@ import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
 import nextstep.subway.line.dto.SectionResponse;
+import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationsRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationsRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Station upStation = stationRepository.getOne(request.getUpStationId());
-        Station downStation = stationRepository.getOne(request.getDownStationId());
+        Station upStation = stationService.findStation(request.getUpStationId());
+        Station downStation = stationService.findStation(request.getDownStationId());
 
         Line line = Line.of(request.getName(),request.getColor(),upStation,downStation,request.getDistance());
 
@@ -63,8 +63,8 @@ public class LineService {
     public LineResponse addSection(long lineId, SectionRequest request){
         Line targetLine = lineRepository.getOne(lineId);
 
-        Station upStation = stationRepository.getOne(request.getUpStationId());
-        Station downStation = stationRepository.getOne(request.getDownStationId());
+        Station upStation = stationService.findStation(request.getUpStationId());
+        Station downStation = stationService.findStation(request.getDownStationId());
 
         targetLine.addSection(upStation,downStation,request.getDistance());
 
