@@ -55,7 +55,7 @@ public class LineSteps {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/" + lineId)
+                .when().delete("/lines/{lineId}" + lineId)
                 .then().log().all().extract();
     }
     
