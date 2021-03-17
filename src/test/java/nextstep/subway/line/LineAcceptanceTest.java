@@ -83,10 +83,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
                 .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
-        지하철_노선_생성(lineRequest);
+        Long 신분당선_ID = 리소스_ID(지하철_노선_생성(lineRequest));
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청();
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(신분당선_ID);
 
         // then
         응답_HTTP_OK(response);
@@ -103,7 +103,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineRequest createRequest = new LineRequest().name("신분당선").color("red")
                 .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
         지하철_노선_생성(createRequest);
-
 
         // when
         LineRequest updateRequest = new LineRequest().name("2호선").color("green");

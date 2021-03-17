@@ -29,11 +29,11 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청() {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/1")
+                .when().get("/lines/{lineId}", lineId)
                 .then().log().all().extract();
     }
 
