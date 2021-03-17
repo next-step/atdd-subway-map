@@ -14,15 +14,9 @@ import static java.lang.String.valueOf;
 public class LineSteps {
 
     public static ExtractableResponse<Response> 지하철_노선_생성(LineRequest lineRequest) {
-        Map<String, String> params = Maps.of(
-                "name", lineRequest.getName()
-                , "color", lineRequest.getColor()
-                , "upStationId", valueOf(lineRequest.getUpStationId())
-                , "downStationId", valueOf(lineRequest.getDownStationId())
-                , "distance", valueOf(lineRequest.getDistance()));
         return RestAssured
                 .given().log().all()
-                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all().extract();
     }
