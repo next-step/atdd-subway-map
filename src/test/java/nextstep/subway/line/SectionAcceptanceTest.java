@@ -5,14 +5,10 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
-import org.apache.groovy.util.Maps;
-import org.assertj.core.api.Assertions;
+import nextstep.subway.line.dto.SectionRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.Map;
 
 import static java.lang.String.valueOf;
 import static nextstep.subway.line.LineSteps.지하철_노선_생성;
@@ -31,23 +27,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
         Long 양재시민의숲역_ID = 리소스_ID(지하철_역_생성("양재시민의숲역"));
 
-        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+        LineRequest createRequest = new LineRequest().name("신분당선").color("red")
                 .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
-        Long 신분당선_ID = 리소스_ID(지하철_노선_생성(lineRequest));
+        Long 신분당선_ID = 리소스_ID(지하철_노선_생성(createRequest));
 
         // when
-        Map<String, String> params = Maps.of(
-                "upStationId", valueOf(양재역_ID)
-                , "downStationId", valueOf(양재시민의숲역_ID)
-                , "distance", valueOf(100));
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines/" + 신분당선_ID + "/sections")
-                .then().log().all().extract();
+        SectionRequest sectionRequest = new SectionRequest(양재역_ID, 양재시민의숲역_ID, 100);
+        ExtractableResponse<Response> response = 구간_추가_요청(신분당선_ID, sectionRequest);
 
         // then
         응답_HTTP_CREATED(response);
+    }
+
+    private ExtractableResponse<Response> 구간_추가_요청(Long lineId, SectionRequest sectionRequest) {
+        return RestAssured
+                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all().extract();
     }
 
 }
