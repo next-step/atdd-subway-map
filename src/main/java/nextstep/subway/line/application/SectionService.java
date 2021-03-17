@@ -1,7 +1,6 @@
 package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.LineDomainService;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.domain.Section;
 import nextstep.subway.line.dto.SectionRequest;
@@ -15,18 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SectionService {
 
-    private LineDomainService lineDomainService;
+    private LineService lineService;
     private StationService stationService;
     private LineRepository lineRepository;
 
-    public SectionService(LineDomainService lineDomainService, StationService stationService, LineRepository lineRepository) {
-        this.lineDomainService = lineDomainService;
+    public SectionService(LineService lineService, StationService stationService, LineRepository lineRepository) {
+        this.lineService = lineService;
         this.stationService = stationService;
         this.lineRepository = lineRepository;
     }
 
     public SectionResponse addSection(Long lineId, SectionRequest request) {
-        Line line = lineDomainService.getLineEntity(lineId);
+        Line line = lineService.getLineEntity(lineId);
         Station upStation = stationService.getStationEntity(request.getUpStationId());
         Station downStation = stationService.getStationEntity(request.getDownStationId());
 
@@ -35,4 +34,8 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
+    public void deleteSection(Long lineId, Long stationId) {
+
+
+    }
 }

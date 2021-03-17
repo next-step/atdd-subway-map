@@ -1,18 +1,14 @@
 package nextstep.subway.line.application;
 
 import nextstep.subway.line.domain.Line;
-import nextstep.subway.line.domain.LineDomainService;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.LineCreateFailException;
 import nextstep.subway.line.exception.LineNotFoundException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.OperationNotSupportedException;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -21,12 +17,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
 
-    private LineDomainService lineDomainService;
     private SectionService sectionService;
     private LineRepository lineRepository;
 
-    public LineService(LineDomainService lineDomainService, SectionService sectionService, LineRepository lineRepository) {
-        this.lineDomainService = lineDomainService;
+    public LineService(SectionService sectionService, LineRepository lineRepository) {
         this.sectionService = sectionService;
         this.lineRepository = lineRepository;
     }
@@ -52,16 +46,24 @@ public class LineService {
     }
 
     public LineResponse getLine(Long lineId) {
-        return LineResponse.of(lineDomainService.getLineEntity(lineId));
+        return LineResponse.of(getLineEntity(lineId));
+    }
+
+    public Line getLineEntity(Long lineId) {
+        if (Objects.isNull(lineId)) {
+            throw new IllegalArgumentException("지하철 노선 ID를 입력해주세요.");
+        }
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new LineNotFoundException(lineId));
     }
 
     public void updateLine(Long lineId, LineRequest lineRequest) {
-        Line line = lineDomainService.getLineEntity(lineId);
+        Line line = getLineEntity(lineId);
         line.update(lineRequest.toLine());
     }
 
     public void deleteLine(Long lineId) {
-        Line line = lineDomainService.getLineEntity(lineId);
+        Line line = getLineEntity(lineId);
         lineRepository.delete(line);
     }
 

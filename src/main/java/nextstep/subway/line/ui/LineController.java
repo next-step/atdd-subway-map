@@ -70,6 +70,14 @@ public class LineController {
         }
     }
 
-
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<SectionResponse> deleteSection(@PathVariable Long lineId, @RequestParam("stationId") Long stationId) {
+        try {
+            sectionService.deleteSection(lineId, stationId);
+            return ResponseEntity.noContent().build();
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 
 }
