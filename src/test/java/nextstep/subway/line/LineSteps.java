@@ -37,10 +37,10 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(LineRequest lineRequest) {
         return RestAssured
                 .given().log().all()
-                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/1")
                 .then().log().all().extract();
     }
@@ -49,7 +49,7 @@ public class LineSteps {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{lineId}" + lineId)
+                .when().delete("/lines/{lineId}", lineId)
                 .then().log().all().extract();
     }
     

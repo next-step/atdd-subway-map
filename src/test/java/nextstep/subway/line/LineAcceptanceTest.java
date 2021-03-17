@@ -5,13 +5,11 @@ import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
-import org.apache.groovy.util.Maps;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static nextstep.subway.line.LineSteps.*;
 import static nextstep.subway.station.StationSteps.지하철_역_생성;
@@ -102,13 +100,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Long 강남역_ID = 리소스_ID(지하철_역_생성("강남역"));
         Long 양재역_ID = 리소스_ID(지하철_역_생성("양재역"));
 
-        LineRequest lineRequest = new LineRequest().name("신분당선").color("red")
+        LineRequest createRequest = new LineRequest().name("신분당선").color("red")
                 .upStationId(강남역_ID).downStationId(양재역_ID).distance(100);
-        지하철_노선_생성(lineRequest);
+        지하철_노선_생성(createRequest);
+
 
         // when
-        Map<String, String> params = Maps.of("name", "2호선", "color", "green");
-        ExtractableResponse<Response> response = 지하철_노선_수정_요청(params);
+        LineRequest updateRequest = new LineRequest().name("2호선").color("green");
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(updateRequest);
 
         // then
         응답_HTTP_OK(response);
