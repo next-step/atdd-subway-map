@@ -76,4 +76,26 @@ public class Line extends BaseEntity {
         return sections.getAllStations();
     }
 
+    private boolean canDeleteSection() {
+        return getAllStations().size() <= 2;
+    }
+
+    private Section getLastSection() {
+        return sections.getLastSection();
+    }
+
+    public void deleteLastSection(Station station) {
+
+        if (canDeleteSection()) {
+            throw new RuntimeException("상행 종점역과 하행 종점역만 있는 경우 역을 삭제할 수 없습니다.");
+        }
+
+        Section lastSection = getLastSection();
+        if (!station.equals(lastSection.getDownStation())) {
+            throw new UnsupportedOperationException("노선의 마지막 역(하행 종점역)만 제거할 수 있습니다.");
+        }
+
+        sections.deleteSection(lastSection);
+    }
+
 }

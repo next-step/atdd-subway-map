@@ -67,4 +67,8 @@ public class Sections {
         return getAllStations().stream().anyMatch(station::equals);
     }
 
+    public void deleteSection(Section section) {
+        sections.remove(section);
+    }
+
 }
