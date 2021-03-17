@@ -30,9 +30,9 @@ public class SectionService {
         Station upStation = stationService.getStationEntity(request.getUpStationId());
         Station downStation = stationService.getStationEntity(request.getDownStationId());
 
-        line.addSection(upStation, downStation, request.getDistance());
-        Line savedLine = lineRepository.save(line);
-        return SectionResponse.of(savedLine.getLastSection());
+        Section section = line.addSection(upStation, downStation, request.getDistance());
+        lineRepository.save(line);
+        return SectionResponse.of(section);
     }
 
 }

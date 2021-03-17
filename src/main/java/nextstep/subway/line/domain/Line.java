@@ -20,8 +20,8 @@ public class Line extends BaseEntity {
 
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections;
 
     public Line() {
     }
@@ -53,66 +53,27 @@ public class Line extends BaseEntity {
         Section section = new Section(this, upStation, downStation, distance);
 
         if (sections.isEmpty()) {
-            sections.add(section);
+            sections.addSection(section);
             return section;
         }
 
-        Station downEndStation = getDownEndStation();
+        // 새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.
+        Station downEndStation = sections.getDownEndStation();
         if (upStation != downEndStation) {
             throw new RuntimeException();
         }
 
-        if (isAlreadyAddedStation(downStation)) {
+        // 새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.
+        if (sections.isAlreadyAddedStation(downStation)) {
             throw new RuntimeException();
         }
 
-        sections.add(section);
+        sections.addSection(section);
         return section;
     }
 
-    public Station getUpEndStation() {
-        List<Station> upStations = getUpStations();
-        List<Station> downStations = getDownStations();
-        upStations.removeAll(downStations);
-        return upStations.get(0);
-    }
-
-    public Station getDownEndStation() {
-        List<Station> upStations = getUpStations();
-        List<Station> downStations = getDownStations();
-        downStations.removeAll(upStations);
-        return downStations.get(0);
-    }
-
-    public List<Station> getUpStations() {
-        return sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toList());
-    }
-
-    public List<Station> getDownStations() {
-        return sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toList());
-    }
-
-    public boolean isAlreadyAddedStation(Station station) {
-        return getAllStations().stream().anyMatch(station::equals);
-    }
-
-    // 모든 상행역 + 하행 종점 = 모든 역
     public List<Station> getAllStations() {
-        List<Station> upStations = getUpStations();
-        upStations.add(getDownEndStation());
-        return upStations;
+        return sections.getAllStations();
     }
-
-    public Section getLastSection() {
-        Station downEndStation = getDownEndStation();
-        return sections.stream()
-                .filter(it -> it.getDownStation().equals(downEndStation))
-                .findFirst().orElse(null);
-    }
-
 
 }
