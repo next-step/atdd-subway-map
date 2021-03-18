@@ -4,11 +4,11 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.exception.LineCreateFailException;
+import nextstep.subway.line.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.OperationNotSupportedException;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,19 +17,26 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
 
+    private SectionService sectionService;
     private LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(SectionService sectionService, LineRepository lineRepository) {
+        this.sectionService = sectionService;
         this.lineRepository = lineRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
         Line line = request.toLine();
+
         boolean alreadyRegistered = lineRepository.findByName(line.getName()).isPresent();
         if (alreadyRegistered) {
-            throw new UnsupportedOperationException("이미 등록된 노선입니다.");
+            throw LineCreateFailException.alreadyExist();
         }
-        return LineResponse.of(lineRepository.save(line));
+
+        Line savedLine = lineRepository.save(line);
+        sectionService.addSection(savedLine.getId(), request.toSectionRequest());
+
+        return LineResponse.of(savedLine);
     }
 
     public List<LineResponse> getAllLines() {
@@ -42,6 +49,14 @@ public class LineService {
         return LineResponse.of(getLineEntity(lineId));
     }
 
+    public Line getLineEntity(Long lineId) {
+        if (Objects.isNull(lineId)) {
+            throw new IllegalArgumentException("지하철 노선 ID를 입력해주세요.");
+        }
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new LineNotFoundException(lineId));
+    }
+
     public void updateLine(Long lineId, LineRequest lineRequest) {
         Line line = getLineEntity(lineId);
         line.update(lineRequest.toLine());
@@ -52,13 +67,6 @@ public class LineService {
         lineRepository.delete(line);
     }
 
-    private Line getLineEntity(Long lineId) {
-        if (Objects.isNull(lineId)) {
-            throw new IllegalArgumentException("지하철 노선 ID를 입력해주세요.");
-        }
-        return lineRepository.findById(lineId)
-                .orElseThrow(EntityNotFoundException::new);
-    }
 
 
 }
