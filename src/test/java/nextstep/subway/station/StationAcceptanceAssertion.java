@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
-public class StationAssertion {
+public class StationAcceptanceAssertion {
 
     static void 지하철_역_생성됨(ExtractableResponse<Response> response) {
         SoftAssertions softly = new SoftAssertions();

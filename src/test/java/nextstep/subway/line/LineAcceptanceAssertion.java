@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
 
-public class LineAssertion {
+public class LineAcceptanceAssertion {
     static void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode())
                 .isEqualTo(CREATED.value());
