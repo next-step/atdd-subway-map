@@ -6,12 +6,10 @@ import nextstep.subway.AcceptanceTest;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
 import static nextstep.subway.station.StationTestStep.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
@@ -49,6 +47,19 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_역_목록_조회_확인(stationResponseList, response);
+    }
+
+    @DisplayName("지하철역을 조회한다.")
+    @Test
+    void getStation() {
+        // given
+        StationResponse addedStationResponse = 지하철_역_등록되어_있음("강남역");
+
+        // when
+        ExtractableResponse<Response> response = 지하철_역_조회_요청(addedStationResponse.getId());
+
+        // then
+        지하철_역_조회_확인(addedStationResponse, response);
     }
 
     @DisplayName("지하철역을 제거한다.")

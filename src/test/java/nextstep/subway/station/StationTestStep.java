@@ -67,4 +67,17 @@ public class StationTestStep {
     public static void 지하철_역_제거_확인(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    public static void 지하철_역_조회_확인(StationResponse addedStationResponse, ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getObject(".", StationResponse.class)).isEqualTo(addedStationResponse);
+    }
+
+    public static ExtractableResponse<Response> 지하철_역_조회_요청(Long id) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/stations/" + id)
+                .then().log().all()
+                .extract();
+        return response;
+    }
 }
