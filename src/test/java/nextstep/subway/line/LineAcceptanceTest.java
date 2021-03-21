@@ -4,7 +4,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
 import nextstep.subway.line.dto.LineResponse;
-import nextstep.subway.station.StationTestStep;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static nextstep.subway.line.LineTestStep.*;
+import static nextstep.subway.station.StationTestStep.지하철_역_목록_등록되어_있음;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -19,7 +19,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        List<StationResponse> stationResponseList = StationTestStep.지하철_역_목록_등록되어_있음();
+        List<StationResponse> stationResponseList = 지하철_역_목록_등록되어_있음();
         ExtractableResponse response = 지하철_노선_생성_요청("신분당선", "red", stationResponseList.get(0).getId(), stationResponseList.get(1).getId(), 1);
 
         // then
@@ -30,7 +30,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        List<StationResponse> stationResponseList = StationTestStep.지하철_역_목록_등록되어_있음();
+        List<StationResponse> stationResponseList = 지하철_역_목록_등록되어_있음();
         List<LineResponse> lineResponseList = 지하철_노선_목록_등록되어_있음(stationResponseList);
 
         // when
@@ -44,7 +44,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        List<StationResponse> stationResponseList = StationTestStep.지하철_역_목록_등록되어_있음();
+        List<StationResponse> stationResponseList = 지하철_역_목록_등록되어_있음();
         LineResponse addedLineResponse = 지하철_노선_등록되어_있음("신분당선", "red", stationResponseList.get(0).getId(), stationResponseList.get(1).getId(), 1);
 
         // when
@@ -58,7 +58,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        List<StationResponse> stationResponseList = StationTestStep.지하철_역_목록_등록되어_있음();
+        List<StationResponse> stationResponseList = 지하철_역_목록_등록되어_있음();
         LineResponse addedLineResponse = 지하철_노선_등록되어_있음("신분당선", "red", stationResponseList.get(0).getId(), stationResponseList.get(1).getId(), 1);
 
         // when
@@ -72,7 +72,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        List<StationResponse> stationResponseList = StationTestStep.지하철_역_목록_등록되어_있음();
+        List<StationResponse> stationResponseList = 지하철_역_목록_등록되어_있음();
         LineResponse addedLineResponse = 지하철_노선_등록되어_있음("신분당선", "red", stationResponseList.get(0).getId(), stationResponseList.get(1).getId(), 1);
 
         // when
@@ -86,7 +86,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         //given
-        List<StationResponse> stationResponseList = StationTestStep.지하철_역_목록_등록되어_있음();
+        List<StationResponse> stationResponseList = 지하철_역_목록_등록되어_있음();
         LineResponse addedLineResponse = 지하철_노선_등록되어_있음("신분당선", "red", stationResponseList.get(0).getId(), stationResponseList.get(1).getId(), 1);
 
         // when

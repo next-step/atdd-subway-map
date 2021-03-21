@@ -4,6 +4,7 @@ import nextstep.subway.common.exception.InvalidRequestException;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +28,13 @@ public class LineController {
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
-        List<LineResponse> lineResponseList = lineService.getLineList();
+        List<LineResponse> lineResponseList = lineService.findLineAll();
         return ResponseEntity.ok(lineResponseList);
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<LineResponse> findLine(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(lineService.getLine(id));
+        return ResponseEntity.ok(LineResponse.of(lineService.findLineById(id)));
     }
 
     @PutMapping(path = "/{id}")
@@ -46,6 +47,12 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable("id") Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity crateSection(@PathVariable("id") Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.addSection(id, sectionRequest);
+        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler(InvalidRequestException.class)
