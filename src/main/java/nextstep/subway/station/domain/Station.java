@@ -25,4 +25,8 @@ public class Station extends BaseEntity {
     public String getName() {
         return name;
     }
+
+    public boolean match(Station station) {
+        return this.name.equals(station.name);
+    }
 }
