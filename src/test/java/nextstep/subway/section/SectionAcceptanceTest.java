@@ -18,6 +18,7 @@ import static nextstep.subway.line.LineAcceptanceRequest.지하철_노선_생성
 import static nextstep.subway.line.LineAcceptanceRequest.지하철_노선_조회_요청;
 import static nextstep.subway.section.SectionAcceptanceAssertion.*;
 import static nextstep.subway.section.SectionAcceptanceRequest.지하철_구간_등록_요청;
+import static nextstep.subway.section.SectionAcceptanceRequest.지하철_구간_삭제_요청;
 import static nextstep.subway.station.StationAcceptanceRequest.지하철_역_생성_요청;
 
 
@@ -80,5 +81,43 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_구간_목록_응답됨(response, Arrays.asList(상행역, 하행역, 신규역));
+    }
+
+    @DisplayName("지하철 노선에 등록된 마지막 역(하행 종점역)만 제거할 수 있다.")
+    @Test
+    void deleteSection() {
+        //given
+        지하철_구간_등록_요청(lineId, new SectionRequest(하행역.getId(), 신규역.getId(), 25));
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철_구간_삭제_요청(lineId, 신규역.getId());
+        ExtractableResponse<Response> lineResponse = 지하철_노선_조회_요청(lineId);
+
+        // then
+        지하철_구간_삭제됨(deleteResponse);
+        지하철_구간_목록_응답됨(lineResponse, Arrays.asList(상행역, 하행역));
+    }
+
+    @DisplayName("지하철 노선에 등록된 마지막 역(하행 종점역)만 제거할 수 있다.")
+    @Test
+    void deleteSectionWithNotLastSection() {
+        //given
+        지하철_구간_등록_요청(lineId, new SectionRequest(하행역.getId(), 신규역.getId(), 25));
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, 하행역.getId());
+
+        // then
+        지하철_구간_삭제_실패됨(response);
+    }
+
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteSectionWithSingleSection() {
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(lineId, 하행역.getId());
+
+        // then
+        지하철_구간_삭제_실패됨(response);
     }
 }

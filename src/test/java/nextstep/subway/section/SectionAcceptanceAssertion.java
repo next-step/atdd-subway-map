@@ -23,6 +23,16 @@ public class SectionAcceptanceAssertion {
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    static void 지하철_구간_삭제됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode())
+                .isEqualTo(OK.value());
+    }
+
+    static void 지하철_구간_삭제_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     static void 지하철_구간_목록_응답됨(ExtractableResponse<Response> actualResponse, List<StationResponse> expectedResponses) {
         List<String> actualStations = toNames(actualResponse);
         List<String> expectedStations = toNames(expectedResponses);
