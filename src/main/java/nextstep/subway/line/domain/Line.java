@@ -2,14 +2,10 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.section.domain.Section;
-import nextstep.subway.section.exception.SectionNotLastStationException;
-import nextstep.subway.section.exception.SectionNotMatchException;
-import nextstep.subway.section.exception.SectionSingleException;
-import nextstep.subway.section.exception.SectionWithInvalidStationException;
+import nextstep.subway.section.domain.Sections;
 import nextstep.subway.station.domain.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,15 +17,15 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections;
 
     protected Line() {}
 
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        sections.add(new Section(this, upStation, downStation, distance));
+        sections = new Sections(new Section(this, upStation, downStation, distance));
     }
 
     public void update(Line line) {
@@ -50,51 +46,14 @@ public class Line extends BaseEntity {
     }
 
     public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-        stations.add(sections.get(0).getUpStation());
-        for (Section section : sections) {
-            stations.add(section.getDownStation());
-        }
-        return stations;
+        return sections.getStations();
     }
 
     public void addSection(Section section) {
-        Section lastSection = getLastSection();
-        if (!lastSection.matchable(section)) {
-            throw new SectionNotMatchException();
-        }
-        if (contains(section.getDownStation())) {
-            throw new SectionWithInvalidStationException();
-        }
-        sections.add(section);
+        sections.addSection(section);
     }
 
     public void deleteSection(Long stationId) {
-        int multiple = 2;
-        if (sections.size() < multiple) {
-            throw new SectionSingleException();
-        }
-        Section lastSection = getLastSection();
-        if (!lastSection.matchStationId(stationId)) {
-            throw new SectionNotLastStationException();
-        }
-        removeLastSection();
-    }
-
-    private int getLastSectionIndex() {
-        return sections.size() - 1;
-    }
-
-    private Section getLastSection() {
-        return sections.get(getLastSectionIndex());
-    }
-
-    private void removeLastSection() {
-        sections.remove(getLastSectionIndex());
-    }
-
-    private boolean contains(Station station) {
-        return sections.stream()
-                .anyMatch(section -> section.contains(station));
+        sections.deleteSection(stationId);
     }
 }
