@@ -3,10 +3,8 @@ package nextstep.subway.section;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.AcceptanceTest;
-import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.section.dto.SectionRequest;
-import nextstep.subway.station.dto.StationRequest;
 import nextstep.subway.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,11 +12,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static nextstep.subway.line.LineAcceptanceRequest.지하철_노선_생성_요청;
-import static nextstep.subway.line.LineAcceptanceRequest.지하철_노선_조회_요청;
+import static nextstep.subway.line.LineAcceptanceRequest.*;
 import static nextstep.subway.section.SectionAcceptanceAssertion.*;
 import static nextstep.subway.section.SectionAcceptanceRequest.지하철_구간_등록_요청;
 import static nextstep.subway.section.SectionAcceptanceRequest.지하철_구간_삭제_요청;
+import static nextstep.subway.station.StationAcceptanceRequest.createStationBody;
 import static nextstep.subway.station.StationAcceptanceRequest.지하철_역_생성_요청;
 
 
@@ -32,10 +30,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @BeforeEach
     public void initialize() {
         // given
-        상행역 = 지하철_역_생성_요청(new StationRequest("상행역")).as(StationResponse.class);
-        하행역 = 지하철_역_생성_요청(new StationRequest("하행역")).as(StationResponse.class);
-        신규역 = 지하철_역_생성_요청(new StationRequest("신규역")).as(StationResponse.class);
-        lineId = 지하철_노선_생성_요청(new LineRequest("1호선", "blue", 상행역.getId(), 하행역.getId(), 10))
+        상행역 = 지하철_역_생성_요청(createStationBody("상행역")).as(StationResponse.class);
+        하행역 = 지하철_역_생성_요청(createStationBody("하행역")).as(StationResponse.class);
+        신규역 = 지하철_역_생성_요청(createStationBody("신규역")).as(StationResponse.class);
+        lineId = 지하철_노선_생성_요청(createLineBody("1호선", "blue", 상행역.getId(), 하행역.getId(), 10))
                 .as(LineResponse.class)
                 .getId();
     }

@@ -3,15 +3,23 @@ package nextstep.subway.station;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.station.dto.StationRequest;
 import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StationAcceptanceRequest {
     private static final String STATION_PATH = "/stations";
 
-    public static ExtractableResponse<Response> 지하철_역_생성_요청(StationRequest stationRequest) {
+    public static Map<String, String> createStationBody(String name) {
+        Map<String, String> body = new HashMap<>();
+        body.put("name", name);
+        return body;
+    }
+
+    public static ExtractableResponse<Response> 지하철_역_생성_요청(Map<String, String> stationBody) {
         return RestAssured.given().log().all()
-                .body(stationRequest)
+                .body(stationBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(STATION_PATH)
