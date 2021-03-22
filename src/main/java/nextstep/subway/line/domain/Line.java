@@ -37,17 +37,6 @@ public class Line extends BaseEntity {
         this.color = line.getColor();
     }
 
-    public void addSection(Section section) {
-        Section lastSection = getLastSection();
-        if (!lastSection.matchable(section)) {
-            throw new SectionNotMatchException();
-        }
-        if (contains(section.getDownStation())) {
-            throw new SectionWithInvalidStationException();
-        }
-        sections.add(section);
-    }
-
     public Long getId() {
         return id;
     }
@@ -69,8 +58,20 @@ public class Line extends BaseEntity {
         return stations;
     }
 
+    public void addSection(Section section) {
+        Section lastSection = getLastSection();
+        if (!lastSection.matchable(section)) {
+            throw new SectionNotMatchException();
+        }
+        if (contains(section.getDownStation())) {
+            throw new SectionWithInvalidStationException();
+        }
+        sections.add(section);
+    }
+
     public void deleteSection(Long stationId) {
-        if (sections.size() < 2) {
+        int multiple = 2;
+        if (sections.size() < multiple) {
             throw new SectionSingleException();
         }
         Section lastSection = getLastSection();

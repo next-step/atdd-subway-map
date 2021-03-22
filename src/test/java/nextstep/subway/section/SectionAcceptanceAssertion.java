@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 public class SectionAcceptanceAssertion {
     static void 지하철_구간_등록됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode())
-                .isEqualTo(OK.value());
+                .isEqualTo(CREATED.value());
     }
 
     static void 지하철_구간_등록_실패됨(ExtractableResponse<Response> response) {
@@ -25,7 +26,7 @@ public class SectionAcceptanceAssertion {
 
     static void 지하철_구간_삭제됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode())
-                .isEqualTo(OK.value());
+                .isEqualTo(NO_CONTENT.value());
     }
 
     static void 지하철_구간_삭제_실패됨(ExtractableResponse<Response> response) {

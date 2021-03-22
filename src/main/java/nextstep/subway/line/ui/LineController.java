@@ -40,31 +40,31 @@ public class LineController {
     }
 
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         return ResponseEntity.ok()
                 .body(lineService.updateLine(id, lineRequest));
     }
 
     @DeleteMapping(value = "{id}")
-    public ResponseEntity deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "{id}/sections")
-    public ResponseEntity addSectionToLine(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<Void> addSectionToLine(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         lineService.addSectionToLine(id, sectionRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
     }
 
     @DeleteMapping(value = "{id}/sections")
-    public ResponseEntity deleteSectionFromLine(@PathVariable Long id, @RequestParam Long stationId) {
+    public ResponseEntity<Void> deleteSectionFromLine(@PathVariable Long id, @RequestParam Long stationId) {
         lineService.deleteSectionFromLine(id, stationId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity handleIllegalArgsException(DataIntegrityViolationException e) {
+    public ResponseEntity<Void> handleIllegalArgsException(DataIntegrityViolationException e) {
         return ResponseEntity.badRequest().build();
     }
 }
