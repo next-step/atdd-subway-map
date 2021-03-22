@@ -2,9 +2,11 @@ package nextstep.subway.line.ui;
 
 import nextstep.subway.common.exception.InvalidRequestException;
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.station.domain.Station;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +36,9 @@ public class LineController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<LineResponse> findLine(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(LineResponse.of(lineService.findLineById(id)));
+        Line line = lineService.findLineById(id);
+        List<Station> stations = lineService.getSortedStations(line.getSections());
+        return ResponseEntity.ok(LineResponse.of(line, stations));
     }
 
     @PutMapping(path = "/{id}")

@@ -36,13 +36,17 @@ public class LineService {
         Station downStation = stationService.findStationById(request.getDownStationId());
 
         Line persistLine = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
-        return LineResponse.of(persistLine);
+        List<Station> stations = this.getSortedStations(persistLine.getSections());
+        return LineResponse.of(persistLine, stations);
     }
 
     public List<LineResponse> findLineAll() {
         List<Line> lineList = lineRepository.findAll();
         return lineList.stream()
-                .map(line -> LineResponse.of(line))
+                .map(line -> {
+                    List<Station> stations = this.getSortedStations(line.getSections());
+                    return LineResponse.of(line, stations);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -91,7 +95,27 @@ public class LineService {
         return;
     }
 
-    private List<Station> getSortedStations(List<Section> sections) {
+    public void deleteSection(Long id, Long stationId) {
+        final Line line = findLineById(id);
+        List<Section> sections = line.getSections();
+
+        if(sections.size() < 2) {
+            throw new InvalidRequestException("구간이 2개 이상일때만 삭제할 수 있습니다.");
+        }
+
+        List<Station> sortedStations = getSortedStations(sections);
+        final Station downTerminalStation = sortedStations.get(sortedStations.size() - 1);
+        final Station inputStation = stationService.findStationById(stationId);
+
+        if(!downTerminalStation.equals(inputStation)) {
+            throw new InvalidRequestException("이 구간의 마지막 역만 삭제할 수 있습니다.");
+        }
+
+        Section targetSection = getSectionByDownStation(sections, downTerminalStation);
+        sections.remove(targetSection);
+    }
+
+    public List<Station> getSortedStations(List<Section> sections) {
         Station upTerminalStation = getUpTerminalStation(sections);
         Section sectionByUpStation = getSectionByUpStation(sections, upTerminalStation);
 
@@ -143,23 +167,4 @@ public class LineService {
         return null;
     }
 
-    public void deleteSection(Long id, Long stationId) {
-        final Line line = findLineById(id);
-        List<Section> sections = line.getSections();
-
-        if(sections.size() < 2) {
-            throw new InvalidRequestException("구간이 2개 이상일때만 삭제할 수 있습니다.");
-        }
-
-        List<Station> sortedStations = getSortedStations(sections);
-        final Station downTerminalStation = sortedStations.get(sortedStations.size() - 1);
-        final Station inputStation = stationService.findStationById(stationId);
-
-        if(!downTerminalStation.equals(inputStation)) {
-            throw new InvalidRequestException("이 구간의 마지막 역만 삭제할 수 있습니다.");
-        }
-
-        Section targetSection = getSectionByDownStation(sections, downTerminalStation);
-        sections.remove(targetSection);
-    }
 }
