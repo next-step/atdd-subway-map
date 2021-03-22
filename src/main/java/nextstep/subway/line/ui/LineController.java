@@ -55,6 +55,12 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity deleteSection(@PathVariable("id") Long id, @RequestParam(value = "stationId") Long stationId) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity handleIllegalArgsException(InvalidRequestException e) {
         return ResponseEntity.badRequest().body(e.getMessage());

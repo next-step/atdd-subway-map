@@ -24,4 +24,15 @@ public class SectionTestStep {
                 .then().log().all().extract();
         return response;
     }
+
+    public static void 지하철_구간_삭제_확인(ExtractableResponse<Response> response) {
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요쳥(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .when().queryParam("stationId", stationId).delete("/lines/" + lineId + "/sections")
+                .then().log().all().extract();
+    }
 }

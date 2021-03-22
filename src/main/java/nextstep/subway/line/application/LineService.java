@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,8 +79,12 @@ public class LineService {
         List<Station> sortedStations = getSortedStations(sections);
         Station terminalStationByBaseSections = sortedStations.get(sortedStations.size() - 1);
 
-        if(!terminalStationByBaseSections.equals(inputUpStation) || sortedStations.contains(inputDownStation)) {
-            throw new InvalidRequestException("새로운 구간의 상행역은 기존 구간의 하행종점역 이면서 하행역은 기존 구간에 포함된 역이 아니어야 합니다.");
+        if(!terminalStationByBaseSections.equals(inputUpStation)) {
+            throw new InvalidRequestException("새로운 구간의 상행역은 기존 구간의 하행종점역 이어야 합니다.");
+        }
+
+        if(sortedStations.contains(inputDownStation)) {
+            throw new InvalidRequestException("새로운 구간의 하행역은 기존 구간에 포함된 역이 아니어야 합니다.");
         }
 
         sections.add(newSection);
@@ -114,6 +117,15 @@ public class LineService {
         return null;
     }
 
+    private Section getSectionByDownStation(List<Section> sections, Station downTerminalStation) {
+        for(Section section : sections) {
+            if(section.getDownStation().equals(downTerminalStation)) {
+                return section;
+            }
+        }
+        return null;
+    }
+
     private Station getUpTerminalStation(List<Section> sections) {
         List<Station> upStations = new ArrayList<>();
         List<Station> downStations = new ArrayList<>();
@@ -131,4 +143,23 @@ public class LineService {
         return null;
     }
 
+    public void deleteSection(Long id, Long stationId) {
+        final Line line = findLineById(id);
+        List<Section> sections = line.getSections();
+
+        if(sections.size() < 2) {
+            throw new InvalidRequestException("구간이 2개 이상일때만 삭제할 수 있습니다.");
+        }
+
+        List<Station> sortedStations = getSortedStations(sections);
+        final Station downTerminalStation = sortedStations.get(sortedStations.size() - 1);
+        final Station inputStation = stationService.findStationById(stationId);
+
+        if(!downTerminalStation.equals(inputStation)) {
+            throw new InvalidRequestException("이 구간의 마지막 역만 삭제할 수 있습니다.");
+        }
+
+        Section targetSection = getSectionByDownStation(sections, downTerminalStation);
+        sections.remove(targetSection);
+    }
 }
