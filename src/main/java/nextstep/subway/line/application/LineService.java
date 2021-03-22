@@ -62,6 +62,11 @@ public class LineService {
         line.addSection(section);
     }
 
+    public void deleteSectionFromLine(Long lineId, Long stationId) {
+        Line line = getLineFromRepository(lineId);
+        line.deleteSection(stationId);
+    }
+
     private Line toLine(LineRequest lineRequest) {
         String name = lineRequest.getName();
         String color = lineRequest.getColor();

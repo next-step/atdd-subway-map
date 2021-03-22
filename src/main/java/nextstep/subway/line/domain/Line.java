@@ -2,7 +2,9 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.section.domain.Section;
+import nextstep.subway.section.exception.SectionNotLastStationException;
 import nextstep.subway.section.exception.SectionNotMatchException;
+import nextstep.subway.section.exception.SectionSingleException;
 import nextstep.subway.section.exception.SectionWithInvalidStationException;
 import nextstep.subway.station.domain.Station;
 
@@ -36,7 +38,7 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        Section lastSection = sections.get(sections.size() - 1);
+        Section lastSection = getLastSection();
         if (!lastSection.matchable(section)) {
             throw new SectionNotMatchException();
         }
@@ -65,6 +67,29 @@ public class Line extends BaseEntity {
             stations.add(section.getDownStation());
         }
         return stations;
+    }
+
+    public void deleteSection(Long stationId) {
+        if (sections.size() < 2) {
+            throw new SectionSingleException();
+        }
+        Section lastSection = getLastSection();
+        if (!lastSection.matchStationId(stationId)) {
+            throw new SectionNotLastStationException();
+        }
+        removeLastSection();
+    }
+
+    private int getLastSectionIndex() {
+        return sections.size() - 1;
+    }
+
+    private Section getLastSection() {
+        return sections.get(getLastSectionIndex());
+    }
+
+    private void removeLastSection() {
+        sections.remove(getLastSectionIndex());
     }
 
     private boolean contains(Station station) {

@@ -59,6 +59,12 @@ public class Section {
                 .match(section.upStation);
     }
 
+    public boolean matchStationId(Long stationId) {
+        return this.downStation
+                .getId()
+                .equals(stationId);
+    }
+
     public boolean contains(Station station) {
         return upStation.match(station) || downStation.match(station);
     }
