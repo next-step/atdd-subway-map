@@ -7,9 +7,8 @@ import nextstep.subway.line.dto.LineResponse;
 import nextstep.subway.line.exception.LineNotFoundException;
 import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.dto.SectionRequest;
+import nextstep.subway.station.application.StationService;
 import nextstep.subway.station.domain.Station;
-import nextstep.subway.station.domain.StationRepository;
-import nextstep.subway.station.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +19,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -74,8 +73,8 @@ public class LineService {
         Long downStationId = lineRequest.getDownStationId();
         int distance = lineRequest.getDistance();
 
-        Station upStation = getStationFromRepository(upStationId);
-        Station downStation = getStationFromRepository(downStationId);
+        Station upStation = stationService.getStationEntity(upStationId);
+        Station downStation = stationService.getStationEntity((downStationId));
 
         return new Line(name, color, upStation, downStation, distance);
     }
@@ -83,8 +82,8 @@ public class LineService {
     private Section toSection(SectionRequest sectionRequest, Line line) {
         return new Section(
                 line,
-                getStationFromRepository(sectionRequest.getUpStationId()),
-                getStationFromRepository(sectionRequest.getDownStationId()),
+                stationService.getStationEntity(sectionRequest.getUpStationId()),
+                stationService.getStationEntity(sectionRequest.getDownStationId()),
                 sectionRequest.getDistance()
         );
     }
@@ -92,10 +91,5 @@ public class LineService {
     private Line getLineFromRepository(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException(id));
-    }
-
-    private Station getStationFromRepository(Long id) {
-        return stationRepository.findById(id)
-                .orElseThrow(() -> new StationNotFoundException(id));
     }
 }
