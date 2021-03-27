@@ -36,17 +36,13 @@ public class LineService {
         Station downStation = stationService.findStationById(request.getDownStationId());
 
         Line persistLine = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
-        List<Station> stations = this.getSortedStations(persistLine.getSections());
-        return LineResponse.of(persistLine, stations);
+        return LineResponse.of(persistLine);
     }
 
     public List<LineResponse> findLineAll() {
         List<Line> lineList = lineRepository.findAll();
         return lineList.stream()
-                .map(line -> {
-                    List<Station> stations = this.getSortedStations(line.getSections());
-                    return LineResponse.of(line, stations);
-                })
+                .map(line -> LineResponse.of(line))
                 .collect(Collectors.toList());
     }
 
@@ -71,100 +67,13 @@ public class LineService {
         final Line line = findLineById(id);
         final Station inputUpStation = stationService.findStationById(sectionRequest.getUpStationId());
         final Station inputDownStation = stationService.findStationById(sectionRequest.getDownStationId());
-        final Section newSection = new Section(line, inputUpStation, inputDownStation, sectionRequest.getDistance());
-
-        List<Section> sections = line.getSections();
-
-        if(sections.size() == 0) {
-            sections.add(newSection);
-            return;
-        }
-
-        List<Station> sortedStations = getSortedStations(sections);
-        Station terminalStationByBaseSections = sortedStations.get(sortedStations.size() - 1);
-
-        if(!terminalStationByBaseSections.equals(inputUpStation)) {
-            throw new InvalidRequestException("새로운 구간의 상행역은 기존 구간의 하행종점역 이어야 합니다.");
-        }
-
-        if(sortedStations.contains(inputDownStation)) {
-            throw new InvalidRequestException("새로운 구간의 하행역은 기존 구간에 포함된 역이 아니어야 합니다.");
-        }
-
-        sections.add(newSection);
+        line.addSection(sectionRequest, inputUpStation, inputDownStation);
         return;
     }
 
     public void deleteSection(Long id, Long stationId) {
         final Line line = findLineById(id);
-        List<Section> sections = line.getSections();
-
-        if(sections.size() < 2) {
-            throw new InvalidRequestException("구간이 2개 이상일때만 삭제할 수 있습니다.");
-        }
-
-        List<Station> sortedStations = getSortedStations(sections);
-        final Station downTerminalStation = sortedStations.get(sortedStations.size() - 1);
         final Station inputStation = stationService.findStationById(stationId);
-
-        if(!downTerminalStation.equals(inputStation)) {
-            throw new InvalidRequestException("이 구간의 마지막 역만 삭제할 수 있습니다.");
-        }
-
-        Section targetSection = getSectionByDownStation(sections, downTerminalStation);
-        sections.remove(targetSection);
+        line.deleteSection(inputStation);
     }
-
-    public List<Station> getSortedStations(List<Section> sections) {
-        Station upTerminalStation = getUpTerminalStation(sections);
-        Section sectionByUpStation = getSectionByUpStation(sections, upTerminalStation);
-
-        List<Station> sortedStations = new ArrayList<>();
-        while(sectionByUpStation != null) {
-            if(sortedStations.isEmpty()) {
-                sortedStations.add(sectionByUpStation.getUpStation());
-            }
-
-            Station downStation = sectionByUpStation.getDownStation();
-            sortedStations.add(downStation);
-            sectionByUpStation = getSectionByUpStation(sections, downStation);
-        }
-        return sortedStations;
-    }
-
-    private Section getSectionByUpStation(List<Section> sections, Station upTerminalStation) {
-        for(Section section : sections) {
-            if(section.getUpStation().equals(upTerminalStation)) {
-                return section;
-            }
-        }
-        return null;
-    }
-
-    private Section getSectionByDownStation(List<Section> sections, Station downTerminalStation) {
-        for(Section section : sections) {
-            if(section.getDownStation().equals(downTerminalStation)) {
-                return section;
-            }
-        }
-        return null;
-    }
-
-    private Station getUpTerminalStation(List<Section> sections) {
-        List<Station> upStations = new ArrayList<>();
-        List<Station> downStations = new ArrayList<>();
-        
-        for(Section section : sections) {
-            upStations.add(section.getUpStation());
-            downStations.add(section.getDownStation());
-        }
-        
-        upStations.removeAll(downStations);
-        
-        if(upStations.size() > 0) {
-            return upStations.get(0);
-        }
-        return null;
-    }
-
 }

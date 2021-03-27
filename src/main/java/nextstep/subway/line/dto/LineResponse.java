@@ -51,8 +51,8 @@ public class LineResponse {
         return stations;
     }
 
-    public static LineResponse of(Line line, List<Station> sortedStations) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate(), sortedStations);
+    public static LineResponse of(Line line) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate(), line.getSortedStations());
     }
 
     @Override
