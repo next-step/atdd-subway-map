@@ -1,8 +1,12 @@
 package nextstep.subway.line.ui;
 
+import nextstep.subway.common.exception.InvalidRequestException;
 import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.dto.LineRequest;
 import nextstep.subway.line.dto.LineResponse;
+import nextstep.subway.line.dto.SectionRequest;
+import nextstep.subway.station.domain.Station;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +30,14 @@ public class LineController {
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
-        List<LineResponse> lineResponseList = lineService.getLineList();
+        List<LineResponse> lineResponseList = lineService.findLineAll();
         return ResponseEntity.ok(lineResponseList);
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<LineResponse> findLine(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(lineService.getLine(id));
+        Line line = lineService.findLineById(id);
+        return ResponseEntity.ok(LineResponse.of(line));
     }
 
     @PutMapping(path = "/{id}")
@@ -45,5 +50,22 @@ public class LineController {
     public ResponseEntity deleteLine(@PathVariable("id") Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity crateSection(@PathVariable("id") Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.addSection(id, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity deleteSection(@PathVariable("id") Long id, @RequestParam(value = "stationId") Long stationId) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity handleIllegalArgsException(InvalidRequestException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

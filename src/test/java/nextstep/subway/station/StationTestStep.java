@@ -42,7 +42,7 @@ public class StationTestStep {
     }
 
     public static List<StationResponse> 지하철_역_목록_등록되어_있음() {
-        return Arrays.asList(지하철_역_등록되어_있음("강남역"), 지하철_역_등록되어_있음("역삼역"));
+        return Arrays.asList(지하철_역_등록되어_있음("강남역"), 지하철_역_등록되어_있음("광교역"), 지하철_역_등록되어_있음("역삼역"), 지하철_역_등록되어_있음("광교중앙역"));
     }
 
     public static void 지하철_역_목록_조회_확인(List<StationResponse> addedStationList, ExtractableResponse<Response> response) {
@@ -66,5 +66,18 @@ public class StationTestStep {
 
     public static void 지하철_역_제거_확인(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static void 지하철_역_조회_확인(StationResponse addedStationResponse, ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getObject(".", StationResponse.class)).isEqualTo(addedStationResponse);
+    }
+
+    public static ExtractableResponse<Response> 지하철_역_조회_요청(Long id) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/stations/" + id)
+                .then().log().all()
+                .extract();
+        return response;
     }
 }
