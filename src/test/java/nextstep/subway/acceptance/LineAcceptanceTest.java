@@ -92,6 +92,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        지하철_노선_생성_요청("2호선", "bg-red-600");
+        ExtractableResponse<Response> response = RestAssured.given()
+                                                            .when()
+                                                            .get("/lines/1")
+                                                            .then()
+                                                            .extract();
+        String lineName = response.jsonPath().get("name");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineName).isEqualTo("2호선");
     }
 
     /**
