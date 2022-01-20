@@ -32,7 +32,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", lineColor);
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -42,9 +42,9 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(lineName),
-                () -> assertThat(response.jsonPath().getString("color")).isEqualTo(lineColor)
+                () -> assertThat(result.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(result.jsonPath().getString("name")).isEqualTo(lineName),
+                () -> assertThat(result.jsonPath().getString("color")).isEqualTo(lineColor)
         );
     }
 
@@ -112,6 +112,37 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        //given
+        String lineName = "이름";
+        String lineColor = "빨간색";
+
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", lineName);
+        params1.put("color", lineColor);
+
+        ExtractableResponse<Response> createLineResult = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        String createdLineId = createLineResult.jsonPath().getString("id");
+
+        //when
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
+                .when()
+                .get("/lines/" + createdLineId)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertAll(
+                () -> assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(result.jsonPath().getString("name")).isEqualTo(lineName),
+                () -> assertThat(result.jsonPath().getString("color")).isEqualTo(lineColor)
+        );
     }
 
     /**
