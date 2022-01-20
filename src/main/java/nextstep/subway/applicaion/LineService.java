@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class LineService {
 
     private final LineRepository lineRepository;
@@ -44,6 +45,7 @@ public class LineService {
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
+    @Transactional
     public void deleteLine(final Long lineId) {
         lineRepository.deleteById(lineId);
     }
