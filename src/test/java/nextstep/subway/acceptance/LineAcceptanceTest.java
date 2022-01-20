@@ -119,6 +119,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", "bg-blue-600");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                                                             .body(params)
+                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
                                                             .when()
                                                             .put("/lines/1")
                                                             .then().log().all()
