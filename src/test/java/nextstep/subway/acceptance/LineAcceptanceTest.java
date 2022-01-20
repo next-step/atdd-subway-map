@@ -124,13 +124,52 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 지하철 노선의 정보 수정을 요청 하면
-     * Then 지하철 노선의 정보 수정은 성공한다.
+     * Given 지하철 노선을 생성하고
+     * When 지하철 노선 수정을 요청한다,
+     * Then 지하철 노선이 수정이 완료된다.
      */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        //given
+
+        String 기존노선 = "기존 노선";
+        String 기존색상 = "기존 색상";
+        Map<String, String> param = new HashMap<>();
+        param.put("name", 기존노선);
+        param.put("color", 기존색상);
+
+        String 수정노선 = "수정 노선";
+        String 수정색상 = "수정 색상";
+        Map<String, String> updateParam = new HashMap<>();
+        updateParam.put("name", 수정노선);
+        updateParam.put("color", 수정색상);
+
+        //when
+        RestAssured
+                .given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().extract();
+
+        ExtractableResponse<Response> updateResponse = RestAssured
+                .given()
+                .body(updateParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/1")
+                .then().extract();
+
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .when().get("/lines/1")
+                .then().extract();
+
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(수정노선);
+
+
     }
 
     /**
