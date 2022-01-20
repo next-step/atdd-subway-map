@@ -153,6 +153,52 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        //given1 지하철 노선 생성
+        String lineName1 = "이름";
+        String lineColor1 = "빨간색";
+
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", lineName1);
+        params1.put("color", lineColor1);
+
+        ExtractableResponse<Response> createLineResult = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        String createdLineId = createLineResult.jsonPath().getString("id");
+        System.out.println("createdLineId = " + createdLineId);
+        //when
+        String lineName2 = "이름2";
+        String lineColor2 = "빨간색2";
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", lineName2);
+        params2.put("color", lineColor2);
+
+        ExtractableResponse<Response> updateLineResult = RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/" + createdLineId)
+                .then().log().all()
+                .extract();
+
+        //then
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
+                .when()
+                .get("/lines/" + createdLineId)
+                .then().log().all()
+                .extract();
+
+        assertAll(
+                () -> assertThat(updateLineResult.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(result.jsonPath().getString("name")).isEqualTo(lineName2),
+                () -> assertThat(result.jsonPath().getString("color")).isEqualTo(lineColor2)
+        );
     }
 
     /**
@@ -163,5 +209,39 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        //given1 지하철 노선 생성
+        String lineName1 = "이름";
+        String lineColor1 = "빨간색";
+
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", lineName1);
+        params1.put("color", lineColor1);
+
+        ExtractableResponse<Response> createLineResult = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        String createdLineId = createLineResult.jsonPath().getString("id");
+        System.out.println("createdLineId = " + createdLineId);
+        //when
+        ExtractableResponse<Response> updateLineResult = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/" + createdLineId)
+                .then().log().all()
+                .extract();
+
+        //then
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
+                .when()
+                .get("/lines/" + createdLineId)
+                .then().log().all()
+                .extract();
+
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
