@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "bg-red-600");
+
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
@@ -67,6 +70,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        지하철_노선_생성_요청("2호선", "bg-red-600");
+        지하철_노선_생성_요청("3호선", "bg-black-600");
+
+        ExtractableResponse<Response> response = RestAssured.given()
+                                                            .when()
+                                                            .get("/lines")
+                                                            .then()
+                                                            .extract();
+        List<String> lineNames = response.jsonPath().getList("name");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineNames).containsExactly("2호선", "3호선");
     }
 
     /**
