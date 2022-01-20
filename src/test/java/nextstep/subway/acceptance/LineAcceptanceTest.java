@@ -57,6 +57,51 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        //given1 지하철 노선 생성
+        String lineName1 = "이름";
+        String lineColor1 = "빨간색";
+
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", lineName1);
+        params1.put("color", lineColor1);
+
+        RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        //given2 새로운 지하철 노선 생성
+        String lineName2 = "이름2";
+        String lineColor2 = "빨간색2";
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", lineName2);
+        params2.put("color", lineColor2);
+
+        RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        //when
+        ExtractableResponse<Response> result = RestAssured.given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertAll(
+                () -> assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(result.jsonPath().getList("name")).containsExactly(lineName1, lineName2),
+                () -> assertThat(result.jsonPath().getList("color")).containsExactly(lineColor1, lineColor2)
+        );
     }
 
     /**
