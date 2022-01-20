@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
     /**
+     *
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
      */
