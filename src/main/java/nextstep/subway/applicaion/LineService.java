@@ -42,4 +42,15 @@ public class LineService {
                 )
                 .collect(Collectors.toList());
     }
+
+    public LineResponse searchLine(final Long lineId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        );
+    }
 }
