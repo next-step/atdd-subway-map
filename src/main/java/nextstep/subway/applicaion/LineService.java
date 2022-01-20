@@ -11,6 +11,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.responseconverter.LineResponseConverter;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -33,5 +34,11 @@ public class LineService {
                              .stream()
                              .map(lineResponseConverter::toResponse)
                              .collect(Collectors.toList());
+    }
+
+    public LineResponse findById(long id) {
+        return lineRepository.findById(id)
+                             .map(lineResponseConverter::toResponse)
+                             .orElseThrow(EntityNotFoundException::new);
     }
 }
