@@ -1,10 +1,38 @@
 package nextstep.subway.acceptance;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.utils.DatabaseCleanup;
 
 @DisplayName("지하철 노선 관리 기능")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LineAcceptanceTest extends AcceptanceTest {
+    @LocalServerPort
+    private int port;
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
+        databaseCleanup.execute();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -12,6 +40,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "bg-red-600");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured.given().log().all()
+                          .body(params)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when()
+                          .post("/lines")
+                          .then().log().all()
+                          .extract();
     }
 
     /**
