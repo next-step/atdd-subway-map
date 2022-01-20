@@ -23,38 +23,19 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineCreateRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return new LineResponse(line);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> searchAllLines() {
-        return lineRepository.findAll()
-                .stream().map(line -> new LineResponse(
-                        line.getId(),
-                        line.getName(),
-                        line.getColor(),
-                        line.getCreatedDate(),
-                        line.getModifiedDate())
-                )
-                .collect(Collectors.toList());
+        return lineRepository.findAll().stream().map(LineResponse::new).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse searchLine(final Long lineId) {
         Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+
+        return new LineResponse(line);
     }
 
     @Transactional
