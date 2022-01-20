@@ -50,7 +50,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        /// given
+        //// given
         String 강남역 = "강남역";
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", 강남역);
