@@ -16,6 +16,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
+     *
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
