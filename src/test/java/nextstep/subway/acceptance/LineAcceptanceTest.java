@@ -85,7 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
         assertThat(lineNames).containsExactly("신분당선", "2호선");
         List<String> lineColors = response.jsonPath().getList("color");
