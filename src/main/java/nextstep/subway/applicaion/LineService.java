@@ -34,4 +34,9 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
+
+    public LineResponse findById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
+        return LineResponse.of(line);
+    }
 }

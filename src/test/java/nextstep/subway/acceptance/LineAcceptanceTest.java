@@ -89,13 +89,38 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 조회를 요청 하면
-     * Then 생성한 지하철 노선을 응답받는다
+     * Given 지하철 노선을 생성하고
+     * When 생성된 지하철 노선을 요청한다.
+     * Then 생성된 지하철 노선을 반환한다.
      */
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+
+        //given
+
+        String 기존노선 = "기존 노선";
+        String 기존색상 = "기존 색상";
+        Map<String, String> param = new HashMap<>();
+        param.put("name", 기존노선);
+        param.put("color", 기존색상);
+
+        //when
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().extract();
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines/1")
+                .then().log().all().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(기존노선);
     }
 
     /**
