@@ -35,3 +35,7 @@ npm run dev
 ```
 ./gradlew bootRun
 ```
+
+# 1주차
+- ATDD 란?
+- 인수 테스트 실습
