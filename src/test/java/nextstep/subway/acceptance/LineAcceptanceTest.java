@@ -38,14 +38,54 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * Given 새로운 지하철 노선 생성을 요청 하고
-     * When 지하철 노선 목록 조회를 요청 하면
-     * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
+     * Given 지하철 노선을 생성한다.
+     * Given 새로운 지하철 노선을 생성한다.
+     * When 지하철 노선 조회를 요청한다.
+     * Then 지하철 노선을 반환한다.
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+
+        //given
+
+        String 기존노선 = "기존 노선";
+        String 기존색상 = "기존 색상";
+        Map<String, String> param = new HashMap<>();
+        param.put("name", 기존노선);
+        param.put("color", 기존색상);
+
+        String 새로운노선 = "새로운 노선";
+        String 새로운색상 = "새로운 색상";
+        Map<String, String> param2 = new HashMap<>();
+        param2.put("name", 새로운노선);
+        param2.put("color", 새로운색상);
+
+        //when
+        RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(param)
+                .when().post("/lines")
+                .then();
+
+
+        RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(param2)
+                .when().post("/lines")
+                .then();
+
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract();
+
+        //then
+        assertThat(response.jsonPath().getList("name")).contains(새로운노선, 기존노선);
+        assertThat(response.jsonPath().getList("color")).contains(새로운색상, 새로운색상);
     }
 
     /**
