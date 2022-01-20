@@ -27,7 +27,7 @@ npm install
 > `frontend` 디렉토리에서 수행해야 합니다.
 
 ### Usage
-#### webpack server 구동
+#### webpack server 구동 
 ```
 npm run dev
 ```
