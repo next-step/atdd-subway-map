@@ -7,10 +7,13 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -25,5 +28,23 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public List<LineResponse> findAllLines() {
+        List<Line> lines = lineRepository.findAll();
+
+        return lines.stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+            );
     }
 }
