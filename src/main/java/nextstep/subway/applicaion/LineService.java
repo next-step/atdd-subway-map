@@ -41,4 +41,10 @@ public class LineService {
                              .map(lineResponseConverter::toResponse)
                              .orElseThrow(EntityNotFoundException::new);
     }
+
+    public void edit(long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                                  .orElseThrow(EntityNotFoundException::new);
+        line.edit(lineRequest.getName(), lineRequest.getColor());
+    }
 }
