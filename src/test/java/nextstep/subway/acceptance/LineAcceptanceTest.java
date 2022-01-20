@@ -125,7 +125,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                                                             .then().log().all()
                                                             .extract();
 
-
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -137,5 +136,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        지하철_노선_생성_요청("2호선", "bg-red-600");
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                            .when()
+                                                            .delete("/lines/1")
+                                                            .then().log().all()
+                                                            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
