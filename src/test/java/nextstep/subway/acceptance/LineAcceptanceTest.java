@@ -73,10 +73,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_요청("2호선", "bg-red-600");
         지하철_노선_생성_요청("3호선", "bg-black-600");
 
-        ExtractableResponse<Response> response = RestAssured.given()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                                                             .when()
                                                             .get("/lines")
-                                                            .then()
+                                                            .then().log().all()
                                                             .extract();
         List<String> lineNames = response.jsonPath().getList("name");
 
@@ -93,10 +93,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         지하철_노선_생성_요청("2호선", "bg-red-600");
-        ExtractableResponse<Response> response = RestAssured.given()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                                                             .when()
                                                             .get("/lines/1")
-                                                            .then()
+                                                            .then().log().all()
                                                             .extract();
         String lineName = response.jsonPath().get("name");
 
@@ -112,6 +112,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        지하철_노선_생성_요청("2호선", "bg-red-600");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "3호선");
+        params.put("color", "bg-blue-600");
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                            .body(params)
+                                                            .when()
+                                                            .put("/lines/1")
+                                                            .then().log().all()
+                                                            .extract();
+
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
