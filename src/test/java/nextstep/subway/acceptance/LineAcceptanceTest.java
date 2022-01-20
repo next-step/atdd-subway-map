@@ -47,20 +47,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured.given().log().all()
-                          .body(params)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when()
-                          .post("/lines")
-                          .then().log().all()
-                          .extract();
-    }
-
     /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
@@ -93,11 +79,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         지하철_노선_생성_요청("2호선", "bg-red-600");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .when()
-                                                            .get("/lines/1")
-                                                            .then().log().all()
-                                                            .extract();
+        ExtractableResponse<Response> response = 지하철_노선_조회(1);
         String lineName = response.jsonPath().get("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -144,5 +126,27 @@ class LineAcceptanceTest extends AcceptanceTest {
                                                             .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured.given().log().all()
+                          .body(params)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when()
+                          .post("/lines")
+                          .then().log().all()
+                          .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회(final long id) {
+        return RestAssured.given().log().all()
+                          .when()
+                          .get("/lines/" + id)
+                          .then().log().all()
+                          .extract();
     }
 }
