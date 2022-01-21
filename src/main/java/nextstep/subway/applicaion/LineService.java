@@ -48,4 +48,10 @@ public class LineService {
                 line.getModifiedDate()
         );
     }
+
+    public LineResponse findLineBy(Long id) {
+        //TODO: Exception 처리
+        Line findLine = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        return createLineResponse(findLine);
+    }
 }
