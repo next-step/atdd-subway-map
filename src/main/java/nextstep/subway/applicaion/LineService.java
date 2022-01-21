@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +38,13 @@ public class LineService {
         return lines.stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse findLine(final Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(final Line line) {

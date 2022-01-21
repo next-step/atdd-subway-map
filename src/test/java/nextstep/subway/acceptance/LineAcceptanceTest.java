@@ -121,8 +121,8 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> responseResultData = resultResponse.jsonPath().getList("color");
-        assertThat(responseResultData).contains("color_1");
+        String responseResultData = resultResponse.jsonPath().get("color");
+        assertThat(responseResultData).isEqualTo("color_1");
     }
 
     /**
