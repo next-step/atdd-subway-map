@@ -7,6 +7,9 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class LineService {
@@ -25,5 +28,26 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public List<LineResponse> getLines() {
+        return lineRepository.findAll().stream()
+                .map(line -> new LineResponse(
+                        line.getId(),
+                        line.getName(),
+                        line.getColor(),
+                        line.getCreatedDate(),
+                        line.getModifiedDate()
+                )).collect(Collectors.toList());
+    }
+
+    public LineResponse getLine(Long id) {
+        return lineRepository.findById(id).map(line -> new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        )).orElseThrow(()-> new IllegalArgumentException("invalid id"));
     }
 }
