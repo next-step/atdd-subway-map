@@ -41,6 +41,13 @@ public class LineController {
         return ResponseEntity.ok(lines);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<ShowLineResponse> showLine(@PathVariable("id") Long id) {
+        ShowLineResponse line = lineService.findLine(id);
+
+        return ResponseEntity.ok(line);
+    }
+
     @PutMapping("{id}")
     public ResponseEntity<Void> updateLine(
         @PathVariable("id") Long id,

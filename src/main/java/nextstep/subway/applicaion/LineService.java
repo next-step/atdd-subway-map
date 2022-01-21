@@ -43,14 +43,25 @@ public class LineService {
             .collect(toList());
     }
 
+    @Transactional(readOnly = true)
+    public ShowLineResponse findLine(Long id) {
+        Line line = findLineById(id);
+
+        return createShowLineResponse(line);
+    }
+
     public void updateLine(Long id, UpdateLineRequest request) {
-        Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new LineNotFoundException());
+        Line line = findLineById(id);
         line.updateInfo(request.getName(), request.getColor());
     }
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(() -> new LineNotFoundException());
     }
 
     private ShowLineResponse createShowLineResponse(Line line) {
