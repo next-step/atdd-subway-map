@@ -101,12 +101,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        long id = createResponse.jsonPath().getLong("id");
-
+        String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .pathParam("id", id)
-                .when().get("/lines/{id}")
+                .when().get(uri)
                 .then().log().all()
                 .extract();
 
@@ -122,6 +120,33 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        String shinbundang = "신분당선";
+        Map<String, String> createParams = new HashMap<>();
+        createParams.put("name", shinbundang);
+        createParams.put("color", "bg-red-600");
+
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .body(createParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        String uri = createResponse.header("Location");
+        String gubundang = "구분당선";
+        Map<String, String> updateParams = new HashMap<>();
+        updateParams.put("name", gubundang);
+        updateParams.put("color", "bg-blue-600");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(updateParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(uri)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(gubundang);
     }
 
     /**
