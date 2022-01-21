@@ -8,6 +8,7 @@ import java.util.List;
 
 @Embeddable
 public class Stations {
+
     @OneToMany(cascade = CascadeType.PERSIST)
     private List<Station> stations = new ArrayList<>();
 

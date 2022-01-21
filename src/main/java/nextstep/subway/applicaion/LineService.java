@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+
     private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -30,32 +31,32 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
-                .collect(Collectors.toList());
+            .map(this::createLineResponse)
+            .collect(Collectors.toList());
     }
 
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundLineException(id));
+            .orElseThrow(() -> new NotFoundLineException(id));
 
         return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations().getStations(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-            );
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            line.getStations().getStations(),
+            line.getCreatedDate(),
+            line.getModifiedDate()
+        );
     }
 
     public void changeLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundLineException(id));
+            .orElseThrow(() -> new NotFoundLineException(id));
 
         line.update(lineRequest);
     }

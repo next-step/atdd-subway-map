@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
+
     private StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
@@ -29,8 +30,8 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+            .map(this::createStationResponse)
+            .collect(Collectors.toList());
     }
 
     public void deleteStationById(Long id) {
@@ -39,10 +40,10 @@ public class StationService {
 
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
+            station.getId(),
+            station.getName(),
+            station.getCreatedDate(),
+            station.getModifiedDate()
         );
     }
 }

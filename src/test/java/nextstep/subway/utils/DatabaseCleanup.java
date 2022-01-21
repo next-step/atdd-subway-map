@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 @ActiveProfiles("test")
 public class DatabaseCleanup implements InitializingBean {
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -23,9 +24,9 @@ public class DatabaseCleanup implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         tableNames = entityManager.getMetamodel().getEntities().stream()
-                .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
-                .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))
-                .collect(Collectors.toList());
+            .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
+            .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -35,7 +36,8 @@ public class DatabaseCleanup implements InitializingBean {
 
         for (String tableName : tableNames) {
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
-            entityManager.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+            entityManager.createNativeQuery(
+                "ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1").executeUpdate();
         }
 
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
