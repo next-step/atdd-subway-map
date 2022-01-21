@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/lines")
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;
@@ -20,7 +20,7 @@ public class LineController {
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> getLines() {
-        List<LineResponse> lines = lineService.getLines();
+        List<LineResponse> lines = lineService.findAll();
         return ResponseEntity.ok().body(lines);
     }
 

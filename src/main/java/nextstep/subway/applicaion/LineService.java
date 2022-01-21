@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import nextstep.subway.applicaion.converter.ResponseConverter;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -21,23 +22,13 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return createLineResponse(line);
+        return ResponseConverter.toLineResponse(line);
     }
 
-    public List<LineResponse> getLines() {
+    public List<LineResponse> findAll() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(ResponseConverter::toLineResponse)
                 .collect(Collectors.toList());
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 }
