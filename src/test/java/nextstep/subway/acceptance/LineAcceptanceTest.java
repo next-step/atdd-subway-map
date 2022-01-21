@@ -89,6 +89,29 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        String shinbundang = "신분당선";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", shinbundang);
+        params.put("color", "bg-red-600");
+
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        long id = createResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .pathParam("id", id)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(shinbundang);
     }
 
     /**
