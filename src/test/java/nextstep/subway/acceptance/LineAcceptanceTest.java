@@ -99,6 +99,30 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+
+        // 지하철 노선 1을 생성
+        Map<String, String> request1 = new HashMap<>();
+        request1.put("color", "color_1");
+        request1.put("name", "name_1");
+
+        // 요청을 하고 생성을 했을 때
+        ExtractableResponse<Response> requestResponse = RestAssured
+                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // 조회 결과
+        ExtractableResponse<Response> resultResponse = RestAssured
+                .given().log().all()
+                .when().get("/lines/{id}", 1)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> responseResultData = resultResponse.jsonPath().getList("color");
+        assertThat(responseResultData).contains("color_1");
     }
 
     /**
