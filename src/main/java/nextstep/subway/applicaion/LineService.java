@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.NotFoundLineException;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,18 +36,22 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(id + ": Line을 찾지 못했습니다."));
+        Line line = findLineById(id);
         return createLineResponse(line);
     }
 
     @Modifying
     public void updateLine(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(id + ": Line을 찾지 못했습니다."));
+        Line line = findLineById(id);
         line.update(new Line(request.getName(), request.getColor()));
     }
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new NotFoundLineException(id));
     }
 
     private LineResponse createLineResponse(Line line) {
