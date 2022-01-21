@@ -169,5 +169,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+
+        // 지하철 노선 1을 생성
+        Map<String, String> request1 = new HashMap<>();
+        request1.put("color", "color_1");
+        request1.put("name", "name_1");
+
+        // 요청을 하고 생성을 했을 때
+        RestAssured
+                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // 삭제를 한다.
+        ExtractableResponse<Response> resultResponse = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{id}", 1)
+                .then().log().all()
+                .extract();
+
+        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

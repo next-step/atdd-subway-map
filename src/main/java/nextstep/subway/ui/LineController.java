@@ -43,4 +43,10 @@ public class LineController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
