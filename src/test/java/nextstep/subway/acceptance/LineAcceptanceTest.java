@@ -100,6 +100,32 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("color", "bg-red-600");
+        params1.put("name", "신분당선");
+
+        RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("lines/1")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String name = response.jsonPath().get("name");
+        assertThat(name).isEqualTo("신분당선");
+        String color = response.jsonPath().get("color");
+        assertThat(color).isEqualTo("bg-red-600");
     }
 
     /**
