@@ -197,7 +197,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines")
+                .when().delete("/lines/1")
                 .then().log().all().extract();
 
         //then
