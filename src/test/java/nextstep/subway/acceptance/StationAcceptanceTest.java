@@ -80,6 +80,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
