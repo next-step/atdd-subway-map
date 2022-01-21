@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -43,5 +43,9 @@ public class LineService {
     public void update(Long id, LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
         line.update(request);
+    }
+
+    public void delete(Long id) {
+        lineRepository.deleteById(id);
     }
 }

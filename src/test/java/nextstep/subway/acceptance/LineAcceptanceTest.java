@@ -173,12 +173,34 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 삭제를 요청 하면
-     * Then 생성한 지하철 노선 삭제가 성공한다.
+     * Given 지하철 역 생성을 요청한다.
+     * When 지하철 역 삭제를 요청한다.
+     * Then 지하철 역이 삭제된다.
      */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        //given
+        String 기존노선 = "기존 노선";
+        String 기존색상 = "기존 색상";
+        Map<String, String> param = new HashMap<>();
+        param.put("name", 기존노선);
+        param.put("color", 기존색상);
+
+        //when
+        RestAssured
+                .given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then();
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines")
+                .then().log().all().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
