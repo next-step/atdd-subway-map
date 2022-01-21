@@ -3,7 +3,7 @@ package nextstep.subway.applicaion.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class LineListResponse {
+public class LineWithStationResponse {
   private Long id;
   private String name;
   private String color;
@@ -11,7 +11,7 @@ public class LineListResponse {
   private LocalDateTime modifiedDate;
   private List<StationResponse> stations;
 
-  public LineListResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate, List<StationResponse> stations) {
+  public LineWithStationResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate, List<StationResponse> stations) {
     this.id = id;
     this.name = name;
     this.color = color;
