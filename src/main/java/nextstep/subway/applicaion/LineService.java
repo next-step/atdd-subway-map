@@ -9,7 +9,7 @@ import nextstep.subway.applicaion.dto.ShowLineResponse;
 import nextstep.subway.applicaion.dto.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.exception.BadRequestException;
+import nextstep.subway.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +45,7 @@ public class LineService {
 
     public void updateLine(Long id, UpdateLineRequest request) {
         Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new BadRequestException());
+            .orElseThrow(() -> new LineNotFoundException());
         line.updateInfo(request.getName(), request.getColor());
     }
 

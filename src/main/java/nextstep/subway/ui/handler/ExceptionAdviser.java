@@ -1,6 +1,6 @@
 package nextstep.subway.ui.handler;
 
-import nextstep.subway.exception.BadRequestException;
+import nextstep.subway.exception.LineNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdviser {
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Void> badRequestHandler(BadRequestException exception) {
-        return ResponseEntity.badRequest()
+
+    @ExceptionHandler(LineNotFoundException.class)
+    public ResponseEntity<Void> lineNotFoundHandler(LineNotFoundException exception) {
+        return ResponseEntity.notFound()
             .build();
     }
 
