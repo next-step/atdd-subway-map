@@ -7,6 +7,7 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,20 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLine(Long id) {
+        return createLineResponse(findById(id));
+    }
+
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        Line line = findById(id);
+        line.edit(lineRequest.getName(), lineRequest.getColor());
+        return createLineResponse(line);
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("지하철 노선을 찾을 수 없습니다."));
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
@@ -39,10 +54,5 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
-    }
-
-    public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("지하철 노선을 찾을 수 없습니다."));
-        return createLineResponse(line);
     }
 }
