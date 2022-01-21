@@ -15,8 +15,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.transaction.Transactional;
 
 import static java.util.Objects.isNull;
 
@@ -154,5 +153,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        long 노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete(LINE_CONTROLLER_COMMON_PATH + "/" + 노선_id)
+                .then().log().all().extract();
+
+        // then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> 삭제된_지하철_노선_조회_response = ID로_지하철_노선_조회(노선_id);
+        Assertions.assertThat(삭제된_지하철_노선_조회_response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

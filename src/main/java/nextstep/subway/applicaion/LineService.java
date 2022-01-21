@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +34,20 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse getLine(long lineId) {
-        return LineResponse.of(lineRepository.getById(lineId));
+    public Optional<LineResponse> getLine(long lineId) {
+        Optional<Line> lineOptional = lineRepository.findById(lineId);
+        if (lineOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(LineResponse.of(lineOptional.get()));
+    }
+
+    public void updateLine(long lineId, LineRequest lineRequest) {
+        lineRepository.save(Line.of(lineId, lineRequest));
+    }
+
+    public void deleteLine(long lineId) {
+        lineRepository.deleteById(lineId);
     }
 }
