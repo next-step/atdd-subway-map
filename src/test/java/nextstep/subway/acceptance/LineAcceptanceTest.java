@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +55,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+
+        // 지하철 노선 1을 생성
+        Map<String, String> request1 = new HashMap<>();
+        request1.put("color", "color_1");
+        request1.put("name", "name_1");
+
+        // 지하철 노선 2를 생성
+        Map<String, String> request2 = new HashMap<>();
+        request2.put("color", "color_2");
+        request2.put("name", "name_2");
+
+        // 요청을 하고 생성을 했을 때
+        ExtractableResponse<Response> request1Response = RestAssured
+                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        ExtractableResponse<Response> request2Response = RestAssured
+                .given().body(request2).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        ExtractableResponse<Response> resultResponse = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        // 조회 포함 확인
+        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> resultResponseData = resultResponse.jsonPath().getList("color");
+        assertThat(resultResponseData).contains("color_1", "color_2");
     }
 
     /**

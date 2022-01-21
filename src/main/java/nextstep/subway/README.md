@@ -1,9 +1,9 @@
 
-- [ ] Scenario: 지하철 노선 생성 <br>
+- [X] Scenario: 지하철 노선 생성 <br>
     When 지하철 노선 생성을 요청 하면 <br>
     Then 지하철 노선 생성이 성공한다. <br>
 
-- [ ] Scenario: 지하철 노선 목록 조회 <br>
+- [X] Scenario: 지하철 노선 목록 조회 <br>
 Given 지하철 노선 생성을 요청 하고 <br>
 Given 새로운 지하철 노선 생성을 요청 하고 <br>
 When 지하철 노선 목록 조회를 요청 하면 <br>
