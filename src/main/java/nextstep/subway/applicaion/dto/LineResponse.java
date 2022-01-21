@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class LineResponse {
     private Long id;
@@ -35,5 +36,18 @@ public class LineResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineResponse that = (LineResponse) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(createdDate, that.createdDate) && Objects.equals(modifiedDate, that.modifiedDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, color, createdDate, modifiedDate);
     }
 }
