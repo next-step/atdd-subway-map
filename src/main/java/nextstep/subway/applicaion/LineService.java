@@ -2,14 +2,12 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.UpdateLineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.NotFoundLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,12 +53,14 @@ public class LineService {
             );
     }
 
-    public UpdateLineResponse changeLine(Long id, LineRequest lineRequest) {
+    public void changeLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
 
         line.update(lineRequest);
+    }
 
-        return new UpdateLineResponse(LocalDateTime.now());
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 }
