@@ -6,14 +6,17 @@ import java.util.List;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.ShowLineResponse;
+import nextstep.subway.applicaion.dto.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class LineService {
+
     private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -40,6 +43,12 @@ public class LineService {
             .collect(toList());
     }
 
+    public void updateLine(Long id, UpdateLineRequest request) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new BadRequestException());
+        line.updateInfo(request.getName(), request.getColor());
+    }
+
     private ShowLineResponse createShowLineResponse(Line line) {
         return ShowLineResponse.of(
             line.getId(),
@@ -49,4 +58,5 @@ public class LineService {
             line.getModifiedDate()
         );
     }
+
 }
