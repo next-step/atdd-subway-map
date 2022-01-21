@@ -83,18 +83,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         callCreateLines(shinbundangLine);
 
         // when
-        ExtractableResponse<Response> response = callGetLines();
+        ExtractableResponse<Response> response = callGetLines(1);
 
         // then
-        List<String> lineNames = response.jsonPath()
-            .getList(".", ShowLineResponse.class)
-            .stream()
-            .map(ShowLineResponse::getLineName)
-            .collect(toList());
+        String lineName = response.jsonPath()
+            .getString("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.body()).isNotNull();
-        assertThat(lineNames).contains(SHINBUNDANG_NAME);
+        assertThat(lineName).contains(SHINBUNDANG_NAME);
     }
 
     /**
@@ -190,6 +187,19 @@ class LineAcceptanceTest extends AcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .get("lines")
+            .then()
+            .log()
+            .all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> callGetLines(long id) {
+        return RestAssured.given()
+            .log()
+            .all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("lines/" + id)
             .then()
             .log()
             .all()
