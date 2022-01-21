@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 class LineAcceptanceTest extends AcceptanceTest {
 
     private static final String SHINBUNDANG_NAME = "신분당선";
+    private static final String NUMBER2_LINE_NAME = "2호선";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -51,18 +52,22 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         Map<String, String> shinbundangLine = createShinbundangLine();
         Map<String, String> number2Line = createNumber2Line();
+        callCreateLines(shinbundangLine);
+        callCreateLines(number2Line);
 
         // when
-        ExtractableResponse<Response> shinbundangResponse = callCreateLines(shinbundangLine);
-        ExtractableResponse<Response> number2Response = callCreateLines(number2Line);
+        ExtractableResponse<Response> response = callGetLines();
 
         // then
-        assertThat(shinbundangResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(number2Response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(shinbundangResponse.header("Location")).isNotBlank()
-            .isEqualTo("/lines/1");
-        assertThat(number2Response.header("Location")).isNotBlank()
-            .isEqualTo("/lines/2");
+        List<String> lineNames = response.jsonPath()
+            .getList(".", ShowLineResponse.class)
+            .stream()
+            .map(ShowLineResponse::getLineName)
+            .collect(toList());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineNames).contains(SHINBUNDANG_NAME, NUMBER2_LINE_NAME);
+
     }
 
     /**
@@ -229,7 +234,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private Map<String, String> createNumber2Line() {
         Map<String, String> result = new HashMap();
-        result.put("name", "2호선");
+        result.put("name", NUMBER2_LINE_NAME);
         result.put("color", "green");
 
         return result;
