@@ -133,6 +133,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+
+        // 지하철 노선 1을 생성
+        Map<String, String> request1 = new HashMap<>();
+        request1.put("color", "color_1");
+        request1.put("name", "name_1");
+
+        // 수정할 데이터
+        Map<String, String> request2 = new HashMap<>();
+        request2.put("color", "color_1");
+        request2.put("name", "new_name_1");
+
+        // 수정 요청
+        ExtractableResponse<Response> resultResponse = RestAssured
+                .given().log().all().body(request2)
+                .when().put("/lines/{id}", 1)
+                .then().log().all()
+                .extract();
+
+        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
