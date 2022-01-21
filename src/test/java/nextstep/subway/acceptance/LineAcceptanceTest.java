@@ -1,10 +1,22 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static nextstep.subway.acceptance.LineAcceptanceFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -12,6 +24,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        //given
+        Map<String, String> redLine = new HashMap<>();
+        redLine.put("name", RED_LINE_NAME);
+        redLine.put("color", RED_LINE_COLOR);
+
+        //when
+        ExtractableResponse<Response> response = createLine(redLine);
+
+        int actual = response.statusCode();
+
+        //then
+        assertThat(actual).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    private ExtractableResponse<Response> createLine(Map<String, String> param) {
+        return RestAssured.given().log().all()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -54,4 +88,5 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
     }
+
 }
