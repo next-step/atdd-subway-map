@@ -32,6 +32,12 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(id + ": Line을 찾지 못했습니다."));
+        return createLineResponse(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
