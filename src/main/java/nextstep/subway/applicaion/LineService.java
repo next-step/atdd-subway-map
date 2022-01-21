@@ -7,6 +7,7 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                Collections.EMPTY_LIST,
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
@@ -50,10 +52,11 @@ public class LineService {
     private LineResponse createLineResponse(final Line line) {
 
         return new LineResponse(
-          line.getId(),
-          line.getName(),
-          line.getColor(),
-          line.getCreatedDate(),
-          line.getModifiedDate());
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                Collections.EMPTY_LIST,
+                line.getCreatedDate(),
+                line.getModifiedDate());
     }
 }
