@@ -9,12 +9,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.LineAcceptanceFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private static final String LINES_URI = "/lines";
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -23,24 +28,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         //given
-        Map<String, String> redLine = new HashMap<>();
-        redLine.put("name", "redLine");
-        redLine.put("color", "red");
-
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(redLine)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = createLine(fixtureRed());
 
         int actual = response.statusCode();
 
         //then
         assertThat(actual).isEqualTo(HttpStatus.CREATED.value());
 
+    }
+
+    private ExtractableResponse<Response> createLine(Map<String, String> param) {
+        return RestAssured.given().log().all()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(LINES_URI)
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -52,6 +57,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        //given
+        createLine(fixtureRed());
+        createLine(fixtureBlue());
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get(LINES_URI)
+                .then().log().all()
+                .extract();
+
+        List<String> actual = response.jsonPath().getList("name");
+
+        //then
+        assertThat(actual).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME);
     }
 
     /**
