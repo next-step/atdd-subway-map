@@ -1,9 +1,9 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineListResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineWithStationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +26,14 @@ public class LineController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LineListResponse>> getLines() {
-        List<LineListResponse> lines = lineService.getLines();
+    public ResponseEntity<List<LineWithStationResponse>> getLines() {
+        List<LineWithStationResponse> lines = lineService.getLines();
         return ResponseEntity.ok().body(lines);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LineWithStationResponse> getLine(@PathVariable Long id) {
+        LineWithStationResponse line = lineService.getLine(id);
+        return ResponseEntity.ok().body(line);
     }
 }
