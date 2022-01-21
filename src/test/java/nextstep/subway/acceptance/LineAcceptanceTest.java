@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -134,6 +135,49 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-red-600");
+        params.put("name", "신분당선");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .post("/lines")
+                .then().log().all().extract();
+
+        String location = response.header("location");
+
+        // given
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("color", "bg-blue-600");
+        params2.put("name", "구분당선");
+
+        RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params2)
+                .when()
+                .put(location)
+                .then().log().all().extract();
+
+        // when
+        ExtractableResponse<Response> response2 = RestAssured
+                .given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(location)
+                .then().log().all().extract();
+
+        // then
+        assertAll(
+                () -> assertThat(response2.jsonPath().getString("color")).isEqualTo("bg-blue-600"),
+                () -> assertThat(response2.jsonPath().getString("name")).isEqualTo("구분당선")
+        );
     }
 
     /**

@@ -54,4 +54,9 @@ public class LineService {
         Line findLine = lineRepository.findById(id).orElseThrow(RuntimeException::new);
         return createLineResponse(findLine);
     }
+
+    public void modifyBy(Long id, LineRequest lineRequest) {
+        Line findLine = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        findLine.change(lineRequest.getName(), lineRequest.getColor());
+    }
 }
