@@ -10,19 +10,15 @@ public class LineAcceptanceFixture {
     public static final String BLUE_LINE_NAME = "blueLine";
     public static final String BLUE_LINE_COLOR = "blue";
 
+    public static final Map<String, String> FIXTURE_RED = new HashMap<>();
+    public static final Map<String, String> FIXTURE_BLUE = new HashMap<>();
 
-    public static Map<String, String> fixtureRed() {
-        return param(RED_LINE_NAME, RED_LINE_COLOR);
+    static {
+        FIXTURE_RED.put("name", RED_LINE_NAME);
+        FIXTURE_RED.put("color", RED_LINE_COLOR);
+
+        FIXTURE_BLUE.put("name", BLUE_LINE_NAME);
+        FIXTURE_BLUE.put("color", BLUE_LINE_COLOR);
     }
 
-    public static Map<String, String> fixtureBlue() {
-        return param(BLUE_LINE_NAME, BLUE_LINE_COLOR);
-    }
-
-    private static Map<String, String> param(String name, String color) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", name);
-        param.put("color", color);
-        return param;
-    }
 }
