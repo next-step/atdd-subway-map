@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
+    public static final String LINES_URI = "/lines";
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -40,7 +42,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines")
+                .post(LINES_URI)
                 .then().log().all()
                 .extract();
     }
@@ -59,16 +61,20 @@ class LineAcceptanceTest extends AcceptanceTest {
         createLine(fixtureBlue());
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = findLines(LINES_URI);
 
         List<String> actual = response.jsonPath().getList("name");
 
         //then
         assertThat(actual).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME);
+    }
+
+    private ExtractableResponse<Response> findLines(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -79,6 +85,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        //given
+        ExtractableResponse<Response> redLine = createLine(fixtureRed());
+        String uri = redLine.header("Location");
+
+        //when
+        ExtractableResponse<Response> response = findLines(uri);
+
+        String actual = response.jsonPath().get("name");
+
+        //then
+        assertThat(actual).isEqualTo(RED_LINE_NAME);
+
     }
 
     /**
