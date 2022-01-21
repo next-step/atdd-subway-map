@@ -15,6 +15,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static java.util.Objects.isNull;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -23,6 +26,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     public static final String LINE_CONTROLLER_COMMON_PATH = "/lines";
     public static final LineRequest 신분당선_LineRequest = new LineRequest("신분당선", "bg-red-600");
     public static final LineRequest _2호선_LineRequest = new LineRequest("2호선", "bg-green-600");
+    public static final LineRequest 구분당선_LineRequest = new LineRequest("구분당선", "bg-blue-600");
 
     @Autowired
     DatabaseCleanup databaseCleanup;
@@ -42,6 +46,13 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(LINE_CONTROLLER_COMMON_PATH)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> ID로_지하철_노선_조회(long 노선_id) {
+        return RestAssured
+                .given().log().all()
+                .when().get(LINE_CONTROLLER_COMMON_PATH + "/" + 노선_id)
                 .then().log().all().extract();
     }
 
@@ -103,10 +114,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         long 신분당선_노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get(LINE_CONTROLLER_COMMON_PATH + "/" + 신분당선_노선_id)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = ID로_지하철_노선_조회(신분당선_노선_id);
 
         // then
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -122,6 +130,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // when
+        Long 노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(구분당선_LineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(LINE_CONTROLLER_COMMON_PATH + "/" + 노선_id)
+                .then().log().all().extract();
+
+        // then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> 변경된_노선_response = ID로_지하철_노선_조회(노선_id);
+        Assertions.assertThat(변경된_노선_response.jsonPath().getString("name")).isEqualTo("구분당선");
+        Assertions.assertThat(변경된_노선_response.jsonPath().getString("color")).isEqualTo("bg-blue-600");
     }
 
     /**
