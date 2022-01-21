@@ -23,21 +23,21 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLine() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = findLineById(id);
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     @Modifying
@@ -52,15 +52,5 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id).orElseThrow(() -> new NotFoundLineException(id));
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 }
