@@ -67,13 +67,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         request2.put("name", "name_2");
 
         // 요청을 하고 생성을 했을 때
-        ExtractableResponse<Response> request1Response = RestAssured
+        RestAssured
                 .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
 
-        ExtractableResponse<Response> request2Response = RestAssured
+        RestAssured
                 .given().body(request2).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
                 .when().post("/lines")
                 .then().log().all()
@@ -106,7 +106,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         request1.put("name", "name_1");
 
         // 요청을 하고 생성을 했을 때
-        ExtractableResponse<Response> requestResponse = RestAssured
+        RestAssured
                 .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
                 .when().post("/lines")
                 .then().log().all()
@@ -139,6 +139,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         request1.put("color", "color_1");
         request1.put("name", "name_1");
 
+        // 요청을 하고 생성을 했을 때
+        RestAssured
+                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
         // 수정할 데이터
         Map<String, String> request2 = new HashMap<>();
         request2.put("color", "color_1");
@@ -146,7 +153,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // 수정 요청
         ExtractableResponse<Response> resultResponse = RestAssured
-                .given().log().all().body(request2)
+                .given().body(request2).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
                 .when().put("/lines/{id}", 1)
                 .then().log().all()
                 .extract();

@@ -49,6 +49,12 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public void updateLine(final Long id, final LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        line.updateLine(request);
+        lineRepository.save(line);
+    }
+
     private LineResponse createLineResponse(final Line line) {
 
         return new LineResponse(
