@@ -110,7 +110,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         param.put("color", "blue");
 
         // when
-        callUpdateLines(param);
+        ExtractableResponse<Response> responseUpdate = callUpdateLines(param);
 
         // then
         ExtractableResponse<Response> response = callGetLines();
@@ -120,6 +120,7 @@ class LineAcceptanceTest extends AcceptanceTest {
             .map(ShowLineResponse::getLineName)
             .collect(toList());
 
+        assertThat(responseUpdate.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(lineNames).contains("구분당선");
         assertThat(lineNames).doesNotContain(SHINBUNDANG_NAME);
     }
