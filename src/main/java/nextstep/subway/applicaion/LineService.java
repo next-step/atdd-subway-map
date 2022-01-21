@@ -23,13 +23,7 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return createLineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -53,6 +47,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                line.getStations().getStations(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
             );
