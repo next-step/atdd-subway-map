@@ -33,6 +33,7 @@ public class LineService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<LineWithStationResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
 
@@ -49,9 +50,9 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineWithStationResponse getLine(Long id) {
-        Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("일치하는 라인이 없습니다."));
+        Line line = getLineById(id);
 
         return new LineWithStationResponse(
             line.getId(),
@@ -61,5 +62,16 @@ public class LineService {
             line.getModifiedDate(),
             new ArrayList()
         );
+    }
+
+    public void editLine(Long id, LineRequest lineRequest) {
+        Line line = getLineById(id);
+
+        line.update(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    private Line getLineById(Long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("일치하는 라인이 없습니다."));
     }
 }
