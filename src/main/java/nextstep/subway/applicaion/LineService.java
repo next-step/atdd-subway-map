@@ -7,6 +7,9 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class LineService {
@@ -25,5 +28,20 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public List<LineResponse> findAll() {
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream().map(LineResponse::of).collect(Collectors.toList());
+    }
+
+    public LineResponse findById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
+        return LineResponse.of(line);
+    }
+
+    public void update(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
+        line.update(request);
     }
 }
