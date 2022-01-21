@@ -19,6 +19,13 @@ public class LineController {
         this.lineService = lineService;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
+        LineResponse line = lineService.findLine(id);
+
+        return ResponseEntity.ok().body(line);
+    }
+
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
