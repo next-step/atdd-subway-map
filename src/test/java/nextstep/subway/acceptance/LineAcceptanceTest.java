@@ -33,6 +33,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         databaseCleanup.execute();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
+        return RestAssured
+                .given().log().all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -41,13 +50,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineRequest param = new LineRequest("신분당선", "bg-red-600");
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(
+                new LineRequest("신분당선", "bg-red-600")
+        );
 
         // then
         Assertions.assertThat(response.statusCode())
@@ -71,6 +76,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        지하철_노선_생성_요청(new LineRequest("신분당선", "bg-red-600"));
+        지하철_노선_생성_요청(new LineRequest("2호선", "bg-green-600"));
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract();
+        // then
+
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.jsonPath().getList(".").size()).isEqualTo(2);
+        Assertions.assertThat(response.jsonPath().getList("name")).contains("신분당선", "2호선");
     }
 
     /**
