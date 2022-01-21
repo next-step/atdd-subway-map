@@ -220,23 +220,25 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", "bg-blue-600");
         params.put("name", "구분당선");
 
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
-                .then().log().all();
+                .then().log().all()
+                .extract();
 
         // when
+        String uri = createResponse.header(HttpHeaders.LOCATION);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
                 .when()
-                .delete("/lines/1")
+                .delete(uri)
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
