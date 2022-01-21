@@ -1,12 +1,15 @@
 package nextstep.subway.acceptance;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import nextstep.subway.applicaion.dto.ShowLineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -14,6 +17,8 @@ import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private static final String SHINBUNDANG_NAME = "신분당선";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -68,6 +73,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        Map<String, String> shinbundangLine = createShinbundangLine();
+        callCreateLines(shinbundangLine);
+
+        // when
+        ExtractableResponse<Response> response = callGetLines();
+
+        // then
+        List<String> lineNames = response.jsonPath()
+            .getList(".", ShowLineResponse.class)
+            .stream()
+            .map(ShowLineResponse::getLineName)
+            .collect(toList());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.body()).isNotNull();
+        assertThat(lineNames).contains(SHINBUNDANG_NAME);
     }
 
     /**
@@ -104,9 +126,23 @@ class LineAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
+    private ExtractableResponse<Response> callGetLines() {
+        return RestAssured.given()
+            .log()
+            .all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("lines")
+            .then()
+            .log()
+            .all()
+            .extract();
+    }
+
+
     private Map<String, String> createShinbundangLine() {
         Map<String, String> result = new HashMap();
-        result.put("name", "신분당선");
+        result.put("name", SHINBUNDANG_NAME);
         result.put("color", "red");
 
         return result;
