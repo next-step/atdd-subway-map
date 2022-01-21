@@ -24,12 +24,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        Map<String, String> createLineParam = new HashMap<>();
+        createLineParam.put("name", "신분당선");
+        createLineParam.put("color", "bg-red-600");
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
+                .body(createLineParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -50,24 +50,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
+        Map<String, String> createLineParam1 = new HashMap<>();
+        createLineParam1.put("name", "신분당선");
+        createLineParam1.put("color", "bg-red-600");
 
         RestAssured.given().log().all()
-                .body(params1)
+                .body(createLineParam1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
                 .then().log().all()
                 .extract();
 
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "2호선");
-        params2.put("color", "bg-green-600");
+        Map<String, String> createLineParam2 = new HashMap<>();
+        createLineParam2.put("name", "2호선");
+        createLineParam2.put("color", "bg-green-600");
 
         RestAssured.given().log().all()
-                .body(params2)
+                .body(createLineParam2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -81,8 +81,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        List<String> lineName = response.jsonPath().getList("name");
-        assertThat(lineName).contains("신분당선", "2호선");
+        List<String> linesName = response.jsonPath().getList("name");
+        assertThat(linesName).contains("신분당선", "2호선");
     }
 
     /**
@@ -94,29 +94,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
+        Map<String, String> createLineParam = new HashMap<>();
+        createLineParam.put("name", "신분당선");
+        createLineParam.put("color", "bg-red-600");
 
         RestAssured.given().log().all()
-                .body(params1)
+                .body(createLineParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
                 .then().log().all().
-                extract();
-
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "2호선");
-        params2.put("color", "bg-green-600");
-
-        RestAssured.given().log().all().
-                body(params2).
-                contentType(MediaType.APPLICATION_JSON_VALUE).
-                when().
-                post("/lines").
-                then().
-                log().all().
                 extract();
 
         // when
@@ -127,8 +114,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        List<String> lineName = response.jsonPath().getList("name");
-        assertThat(lineName).contains("신분당선", "2호선");
+        String lineName = response.jsonPath().getString("name");
+        assertThat(lineName).contains("신분당선");
     }
 
     /**
@@ -167,10 +154,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        String name = response.jsonPath().getString("name");
-        String color = response.jsonPath().getString("color");
-        assertThat(name).isEqualTo("2호선");
-        assertThat(color).isEqualTo("bg-green-600");
+        String lineName = response.jsonPath().getString("name");
+        String lineColor = response.jsonPath().getString("color");
+        assertThat(lineName).isEqualTo("2호선");
+        assertThat(lineColor).isEqualTo("bg-green-600");
     }
 
     /**
