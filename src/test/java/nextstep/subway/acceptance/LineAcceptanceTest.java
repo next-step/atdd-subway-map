@@ -45,6 +45,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        String shinbundang = "신분당선";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", shinbundang);
+        params1.put("color", "bg-red-600");
+
+        String line2 = "2호선";
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", line2);
+        params2.put("color", "bg-green-600");
+
+        RestAssured
+                .given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).contains(shinbundang, line2);
     }
 
     /**
