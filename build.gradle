@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.5.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'com.diffplug.spotless' version '5.7.0'
 }
 
 group = 'nextstep'
@@ -33,4 +34,18 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+// spotlessApply
+spotless {
+	java {
+		googleJavaFormat().aosp()
+
+		removeUnusedImports()
+		trimTrailingWhitespace()
+		indentWithSpaces(4)
+		endWithNewline()
+
+		importOrder ''
+	}
 }

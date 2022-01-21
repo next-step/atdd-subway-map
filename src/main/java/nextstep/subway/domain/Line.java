@@ -10,11 +10,11 @@ public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String color;
 
-    public Line() {
-    }
+    public Line() {}
 
     public Line(String name, String color) {
         this.name = name;
