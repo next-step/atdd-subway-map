@@ -64,6 +64,61 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("color", bgRed600);
+        params1.put("name", 신분당선);
+
+        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        Integer id1 = createResponse1.jsonPath().getInt("id");
+        String createDate1 = createResponse1.jsonPath().get("createdDate");
+        String modifiedDate1 = createResponse1.jsonPath().get("modifiedDate");
+
+        String bgGreen600 = "bg-green-600";
+        String line2 = "2호선";
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("color", bgGreen600);
+        params2.put("name", line2);
+
+        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        Integer id2 = createResponse2.jsonPath().getInt("id");
+        String createDate2 = createResponse2.jsonPath().get("createdDate");
+        String modifiedDate2 = createResponse2.jsonPath().get("modifiedDate");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> names = response.jsonPath().getList("name");
+        List<String> colors = response.jsonPath().getList("color");
+        List<Integer> ids = response.jsonPath().getList("id");
+        List<String> createdDates = response.jsonPath().getList("createdDate");
+        List<String> modifiedDates = response.jsonPath().getList("modifiedDate");
+
+        assertThat(names).contains(신분당선, line2);
+        assertThat(colors).contains(bgRed600, bgGreen600);
+        assertThat(ids).contains(id1, id2);
+        assertThat(createdDates).contains(createDate1, createDate2);
+        assertThat(modifiedDates).contains(modifiedDate1, modifiedDate2);
     }
 
     /**
