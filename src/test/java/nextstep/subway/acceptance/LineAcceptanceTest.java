@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.LineAcceptanceFixture.*;
@@ -25,13 +25,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         //given
-        Map<String, String> redLine = new HashMap<>();
-        redLine.put("name", RED_LINE_NAME);
-        redLine.put("color", RED_LINE_COLOR);
+        Map<String, String> param = fixtureRed();
 
         //when
-        ExtractableResponse<Response> response = createLine(redLine);
-
+        ExtractableResponse<Response> response = createLine(param);
         int actual = response.statusCode();
 
         //then
@@ -57,6 +54,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        //given
+        createLine(fixtureRed());
+        createLine(fixtureBlue());
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        List<String> actual = response.jsonPath().getList("name");
+
+        //then
+        assertThat(actual).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME);
     }
 
     /**
