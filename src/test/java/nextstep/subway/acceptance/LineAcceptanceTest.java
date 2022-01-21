@@ -17,7 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    public static final String LINES_URI = "/lines";
+    private static final String LINES_URI = "/lines";
+    private static final String LINE_NAME = "name";
+    private static final String LOCATION = "Location";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -36,16 +38,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(actual).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    private ExtractableResponse<Response> createLine(Map<String, String> param) {
-        return RestAssured.given().log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(LINES_URI)
-                .then().log().all()
-                .extract();
-    }
-
     /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
@@ -62,18 +54,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = findLines(LINES_URI);
 
-        List<String> actual = response.jsonPath().getList("name");
+        List<String> actual = response.jsonPath().getList(LINE_NAME);
 
         //then
         assertThat(actual).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME);
-    }
-
-    private ExtractableResponse<Response> findLines(String uri) {
-        return RestAssured.given().log().all()
-                .when()
-                .get(uri)
-                .then().log().all()
-                .extract();
     }
 
     /**
@@ -86,12 +70,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         //given
         ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
-        String uri = redLine.header("Location");
+        String uri = redLine.header(LOCATION);
 
         //when
         ExtractableResponse<Response> response = findLines(uri);
 
-        String actual = response.jsonPath().get("name");
+        String actual = response.jsonPath().get(LINE_NAME);
 
         //then
         assertThat(actual).isEqualTo(RED_LINE_NAME);
@@ -107,15 +91,55 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         //given
         ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
-        String uri = redLine.header("Location");
+        String uri = redLine.header(LOCATION);
 
         //when
         ExtractableResponse<Response> response = updateLine(uri, FIXTURE_BLUE);
 
-        String actual = response.jsonPath().get("name");
+        String actual = response.jsonPath().get(LINE_NAME);
 
         //then
         assertThat(actual).isEqualTo(BLUE_LINE_NAME);
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성한 지하철 노선 삭제를 요청 하면
+     * Then 생성한 지하철 노선 삭제가 성공한다.
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+        //given
+        ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
+        String uri = redLine.header(LOCATION);
+
+        //when
+        ExtractableResponse<Response> response = deleteLine(uri);
+
+        int actual = response.statusCode();
+
+        //then
+        assertThat(actual).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+
+    private ExtractableResponse<Response> createLine(Map<String, String> param) {
+        return RestAssured.given().log().all()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(LINES_URI)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> findLines(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> updateLine(String uri, Map<String, String> body) {
@@ -128,14 +152,12 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 삭제를 요청 하면
-     * Then 생성한 지하철 노선 삭제가 성공한다.
-     */
-    @DisplayName("지하철 노선 삭제")
-    @Test
-    void deleteLine() {
+    private ExtractableResponse<Response> deleteLine(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
     }
 
 }
