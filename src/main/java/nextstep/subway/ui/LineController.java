@@ -22,6 +22,7 @@ public class LineController {
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
+
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -46,6 +47,7 @@ public class LineController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+        lineService.deleteLine(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
