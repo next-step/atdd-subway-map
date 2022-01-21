@@ -1,10 +1,24 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -12,6 +26,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+
+        // 요청에 대한 데이터
+        Map<String, String> request = new HashMap<>();
+        request.put("color", "color_1");
+        request.put("name", "name_1");
+
+        // given, when, then
+        ExtractableResponse<Response> extract = RestAssured
+                .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // 상태 코드
+        assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(extract.header("Location")).isNotBlank();
     }
 
     /**
