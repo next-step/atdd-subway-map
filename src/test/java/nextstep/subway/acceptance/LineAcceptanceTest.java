@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         //given
         //when
-        ExtractableResponse<Response> response = createLine(fixtureRed());
+        ExtractableResponse<Response> response = createLine(FIXTURE_RED);
 
         int actual = response.statusCode();
 
@@ -58,8 +57,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        createLine(fixtureRed());
-        createLine(fixtureBlue());
+        createLine(FIXTURE_RED);
+        createLine(FIXTURE_BLUE);
 
         //when
         ExtractableResponse<Response> response = findLines(LINES_URI);
@@ -87,7 +86,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        ExtractableResponse<Response> redLine = createLine(fixtureRed());
+        ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
         String uri = redLine.header("Location");
 
         //when
@@ -107,6 +106,27 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        //given
+        ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
+        String uri = redLine.header("Location");
+        
+        //when
+        ExtractableResponse<Response> response = updateLine(uri, FIXTURE_BLUE);
+
+        String actual = response.jsonPath().get("name");
+
+        //then
+        assertThat(actual).isEqualTo(BLUE_LINE_NAME);
+    }
+
+    private ExtractableResponse<Response> updateLine(String uri, Map<String, String> line) {
+        return RestAssured.given().log().all()
+                .body(line)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
     }
 
     /**

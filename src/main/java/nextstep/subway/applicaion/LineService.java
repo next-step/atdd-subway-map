@@ -41,4 +41,9 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        line.update(lineRequest.getName(), lineRequest.getColor());
+        return new LineResponse(line);
+    }
 }
