@@ -49,6 +49,38 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "2호선");
+        params2.put("color", "bg-green-600");
+        ExtractableResponse<Response> createResponse2 = RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).containsExactly("신분당선", "2호선");
+        assertThat(response.jsonPath().getList("color")).containsExactly("bg-red-600", "bg-green-600");
     }
 
     /**
