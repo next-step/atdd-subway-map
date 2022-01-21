@@ -129,6 +129,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * When 없는 지하철 노선 조회를 요청 하면
+     * Then 404 응답을 받는다
+     */
+    @DisplayName("지하철 노선 조회 - 없는 노선")
+    @Test
+    void getInvalidLine() {
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("lines/999")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * When 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선의 정보 수정은 성공한다.
