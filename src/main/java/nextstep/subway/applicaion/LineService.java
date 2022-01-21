@@ -70,6 +70,10 @@ public class LineService {
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
+
     private Line getLineById(Long id) {
         return lineRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("일치하는 라인이 없습니다."));
