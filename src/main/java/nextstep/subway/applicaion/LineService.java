@@ -59,4 +59,8 @@ public class LineService {
         Line findLine = lineRepository.findById(id).orElseThrow(RuntimeException::new);
         findLine.change(lineRequest.getName(), lineRequest.getColor());
     }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

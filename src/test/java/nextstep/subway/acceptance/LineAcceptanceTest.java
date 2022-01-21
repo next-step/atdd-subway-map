@@ -188,5 +188,30 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-red-600");
+        params.put("name", "신분당선");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .post("/lines")
+                .then().log().all().extract();
+
+        String location = response.header("location");
+
+        // when
+        ExtractableResponse<Response> response2 = RestAssured
+                .given()
+                .when()
+                .delete(location)
+                .then().log().all().extract();
+
+        // then
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
