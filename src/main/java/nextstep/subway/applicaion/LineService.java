@@ -53,4 +53,8 @@ public class LineService {
         lineRepository.save(new Line(lineId, request.getName(), request.getColor()));
         return false;
     }
+
+    public void deleteLine(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
 }

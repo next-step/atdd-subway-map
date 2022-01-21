@@ -42,4 +42,10 @@ public class LineController {
                 ResponseEntity.ok().build() :
                 ResponseEntity.created(URI.create("/lines/" + lineId)).build();
     }
+
+    @DeleteMapping("/lines/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
+        lineService.deleteLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
 }
