@@ -153,6 +153,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        // given
+        Map<String, String> shinbundangLine = createShinbundangLine();
+        callCreateLines(shinbundangLine);
+
+        // when
+        ExtractableResponse<Response> response = callDeleteLines(1);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> callCreateLines(Map<String, String> lineParams) {
@@ -190,6 +199,19 @@ class LineAcceptanceTest extends AcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .put("lines/" + lineParams.get("id"))
+            .then()
+            .log()
+            .all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> callDeleteLines(long id) {
+        return RestAssured.given()
+            .log()
+            .all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete("lines/" + id)
             .then()
             .log()
             .all()
