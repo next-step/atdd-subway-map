@@ -155,6 +155,54 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-blue-600");
+        params.put("name", "구분당선");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .put("/lines/1")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * When 없는 지하철 노선의 정보 수정을 요청 하면
+     * Then 지하철 노선이 생성이 성공한다.
+     */
+    @DisplayName("지하철 노선 수정 - 없는 경우 생성")
+    @Test
+    void updateNotExistLine() {
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-blue-600");
+        params.put("name", "구분당선");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .put("/lines/1")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
     }
 
     /**
