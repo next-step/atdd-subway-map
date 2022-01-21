@@ -10,7 +10,6 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/lines")
 public class LineController {
     private final LineService lineService;
 
@@ -18,13 +17,20 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @GetMapping
+    @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getLines() {
         List<LineResponse> lines = lineService.findAll();
         return ResponseEntity.ok().body(lines);
     }
 
-    @PostMapping
+    @GetMapping("/lines/{lineId}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long lineId) {
+        LineResponse line = lineService.findLine(lineId);
+        return ResponseEntity.ok().body(line);
+    }
+
+    @PostMapping("/lines")
+
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);

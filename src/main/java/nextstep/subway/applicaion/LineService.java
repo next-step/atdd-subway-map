@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.converter.ResponseConverter;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.exception.LineNotFoundException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
@@ -30,5 +31,11 @@ public class LineService {
         return lines.stream()
                 .map(ResponseConverter::toLineResponse)
                 .collect(Collectors.toList());
+    }
+
+    public LineResponse findLine(Long lineId) throws LineNotFoundException {
+        return lineRepository.findById(lineId)
+                .map(ResponseConverter::toLineResponse)
+                .orElseThrow(() -> new LineNotFoundException("INVALID LINE id: " + lineId));
     }
 }
