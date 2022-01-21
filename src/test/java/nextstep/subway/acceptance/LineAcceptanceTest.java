@@ -20,6 +20,9 @@ import static java.util.Objects.isNull;
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LineAcceptanceTest extends AcceptanceTest {
+    public static final String LINE_CONTROLLER_COMMON_PATH = "/lines";
+    public static final LineRequest 신분당선_LineRequest = new LineRequest("신분당선", "bg-red-600");
+    public static final LineRequest _2호선_LineRequest = new LineRequest("2호선", "bg-green-600");
 
     @Autowired
     DatabaseCleanup databaseCleanup;
@@ -38,7 +41,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
+                .when().post(LINE_CONTROLLER_COMMON_PATH)
                 .then().log().all().extract();
     }
 
@@ -50,9 +53,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(
-                new LineRequest("신분당선", "bg-red-600")
-        );
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선_LineRequest);
 
         // then
         Assertions.assertThat(response.statusCode())
@@ -76,13 +77,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        지하철_노선_생성_요청(new LineRequest("신분당선", "bg-red-600"));
-        지하철_노선_생성_요청(new LineRequest("2호선", "bg-green-600"));
+        지하철_노선_생성_요청(신분당선_LineRequest);
+        지하철_노선_생성_요청(_2호선_LineRequest);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/lines")
+                .when().get(LINE_CONTROLLER_COMMON_PATH)
                 .then().log().all().extract();
         // then
 
@@ -99,6 +100,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        long 신분당선_노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get(LINE_CONTROLLER_COMMON_PATH + "/" + 신분당선_노선_id)
+                .then().log().all().extract();
+
+        // then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+        Assertions.assertThat(response.jsonPath().getLong("id")).isEqualTo(신분당선_노선_id);
     }
 
     /**

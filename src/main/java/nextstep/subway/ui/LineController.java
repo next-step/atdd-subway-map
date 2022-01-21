@@ -28,4 +28,9 @@ public class LineController {
     public ResponseEntity<List<LineResponse>> getLines() {
         return ResponseEntity.ok(lineService.getLines());
     }
+
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable int lineId) {
+        return ResponseEntity.ok(lineService.getLine(lineId));
+    }
 }

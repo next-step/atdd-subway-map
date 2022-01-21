@@ -24,24 +24,16 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> getLines() {
         return lineRepository.findAll().stream()
-                .map(line -> new LineResponse(
-                        line.getId(),
-                        line.getName(),
-                        line.getColor(),
-                        new Stations(),
-                        line.getCreatedDate(),
-                        line.getModifiedDate()
-                )).collect(Collectors.toList());
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public LineResponse getLine(long lineId) {
+        return LineResponse.of(lineRepository.getById(lineId));
     }
 }
