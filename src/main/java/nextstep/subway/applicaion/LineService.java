@@ -45,6 +45,10 @@ public class LineService {
         line.update(new Line(request.getName(), request.getColor()));
     }
 
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
