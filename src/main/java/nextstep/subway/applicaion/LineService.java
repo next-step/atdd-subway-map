@@ -40,4 +40,9 @@ public class LineService {
                 line.getModifiedDate()
         );
     }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("지하철 노선을 찾을 수 없습니다."));
+        return createLineResponse(line);
+    }
 }
