@@ -62,4 +62,11 @@ public class LineService {
                                         line.getModifiedDate()))
                 .orElseThrow(NotFoundException::new);
     }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        // TODO question: Entity에까지 LineRequest DTO를 들고 가는게 맞을까요?
+        line.changeLineInformation(lineRequest.getName(), lineRequest.getColor());
+    }
 }

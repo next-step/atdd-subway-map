@@ -8,6 +8,8 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -25,18 +27,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         lineRequest.put("color", "bg-red-600");
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(lineRequest)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> response = lineCreateRequest(lineRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -60,34 +51,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> lineRequestA = new HashMap<>();
         lineRequestA.put("name", lineNameA);
         lineRequestA.put("color", lineColorA);
-        ExtractableResponse<Response> responseA =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(lineRequestA)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> responseA = lineCreateRequest(lineRequestA);
 
         Map<String, String> lineRequestB = new HashMap<>();
         lineRequestB.put("name", lineNameB);
         lineRequestB.put("color", lineColorB);
-        ExtractableResponse<Response> responseB =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(lineRequestB)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> responseB = lineCreateRequest(lineRequestB);
 
         // when
         ExtractableResponse<Response> response =
@@ -110,20 +79,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> lineRequestA = new HashMap<>();
         lineRequestA.put("name", lineName);
         lineRequestA.put("color", lineColor);
-        ExtractableResponse<Response> createResponse =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(lineRequestA)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> createResponse = lineCreateRequest(lineRequestA);
 
-        Long id = createResponse.jsonPath().getLong("id");
+        long id = createResponse.jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> readLineResponse =
@@ -137,10 +95,65 @@ class LineAcceptanceTest extends AcceptanceTest {
     /** Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다. */
     @DisplayName("지하철 노선 수정")
     @Test
-    void updateLine() {}
+    void updateLine() {
+        // given
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
+
+        Map<String, String> createRequest = new HashMap<>();
+        createRequest.put("name", lineName);
+        createRequest.put("color", lineColor);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(createRequest);
+
+        long id = createResponse.jsonPath().getLong("id");
+
+        // when
+        String updateLineName = "구분당선";
+        String updateLineColor = "bg-blue-600";
+        Map<String, String> updateRequest = new HashMap<>();
+        updateRequest.put("name", updateLineName);
+        updateRequest.put("color", updateLineColor);
+        ExtractableResponse<Response> updateResponse = RestAssured.given()
+          .log()
+          .all()
+          .body(updateRequest)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when()
+          .put("/lines/" + id)
+          .then()
+          .log()
+          .all()
+          .extract();
+
+        // then
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(id);
+        assertThat(readUpdatedLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString("name");
+        assertThat(readUpdatedLineName).isEqualTo(updateLineName);
+    }
 
     /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 삭제를 요청 하면 Then 생성한 지하철 노선 삭제가 성공한다. */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {}
+
+    /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
+    static ExtractableResponse<Response> lineCreateRequest(Map<String, String> lineRequest){
+        return RestAssured.given()
+            .log()
+            .all()
+            .body(lineRequest)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then()
+            .log()
+            .all()
+            .extract();
+    }
+
+    static ExtractableResponse<Response> specificLineReadRequest(Long id){
+        return RestAssured.given().log().all().when().get("/lines/" + id).then().log().all().extract();
+    }
 }

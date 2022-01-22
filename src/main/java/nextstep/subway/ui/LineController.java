@@ -29,9 +29,15 @@ public class LineController {
         return ResponseEntity.ok().body(lines);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         LineResponse line = lineService.findSpecificLine(id);
         return ResponseEntity.ok().body(line);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest){
+
+        return ResponseEntity.noContent().build();
     }
 }
