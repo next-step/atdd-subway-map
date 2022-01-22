@@ -61,45 +61,37 @@ class LineAcceptanceTest extends AcceptanceTest {
         lineRequestA.put("name", lineNameA);
         lineRequestA.put("color", lineColorA);
         ExtractableResponse<Response> responseA =
-          RestAssured.given()
-            .log()
-            .all()
-            .body(lineRequestA)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then()
-            .log()
-            .all()
-            .extract();
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(lineRequestA)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
 
         Map<String, String> lineRequestB = new HashMap<>();
         lineRequestB.put("name", lineNameB);
         lineRequestB.put("color", lineColorB);
         ExtractableResponse<Response> responseB =
-          RestAssured.given()
-            .log()
-            .all()
-            .body(lineRequestB)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then()
-            .log()
-            .all()
-            .extract();
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(lineRequestB)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
 
         // when
         ExtractableResponse<Response> response =
-          RestAssured.given()
-            .log()
-            .all()
-            .when()
-            .get("/lines")
-            .then()
-            .log()
-            .all()
-            .extract();
+                RestAssured.given().log().all().when().get("/lines").then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -110,7 +102,47 @@ class LineAcceptanceTest extends AcceptanceTest {
     /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 조회를 요청 하면 Then 생성한 지하철 노선을 응답받는다 */
     @DisplayName("지하철 노선 조회")
     @Test
-    void getLine() {}
+    void getLine() {
+        // given
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
+
+        Map<String, String> lineRequestA = new HashMap<>();
+        lineRequestA.put("name", lineName);
+        lineRequestA.put("color", lineColor);
+        ExtractableResponse<Response> createResponse =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(lineRequestA)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
+
+        Long id = createResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> readLineResponse =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(lineRequestA)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines/" + id)
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
+
+        assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> stationNames = readLineResponse.jsonPath().getList("name");
+        assertThat(stationNames).contains(lineName);
+    }
 
     /** Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다. */
     @DisplayName("지하철 노선 수정")
