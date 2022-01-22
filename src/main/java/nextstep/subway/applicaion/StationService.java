@@ -20,6 +20,10 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new IllegalArgumentException("이미 존재하는 역입니다.");
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
