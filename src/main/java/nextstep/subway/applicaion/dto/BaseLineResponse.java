@@ -2,14 +2,14 @@ package nextstep.subway.applicaion.dto;
 
 import java.time.LocalDateTime;
 
-public class LineResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+public abstract class BaseLineResponse {
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
-    public LineResponse(
+    public BaseLineResponse(
             Long id,
             String name,
             String color,
