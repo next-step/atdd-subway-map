@@ -1,21 +1,42 @@
 # Requirements
 
-## Feature: 지하철 노선 관리 기능
+## [X] Feature: 지하철역 관리 기능
+
+### [X] Scenario: 중복이름으로 지하철역 생성
+* Given 지하철역 생성을 요청 하고
+* When 같은 이름으로 지하철역 생성을 요청 하면
+* Then 지하철역 생성이 실패한다.
+```
+POST /stations HTTP/1.1
+accept: */*
+content-type: application/json; charset=UTF-8
+content-length: 20
+host: localhost:13189
+connection: Keep-Alive
+user-agent: Apache-HttpClient/4.5.13 (Java/11.0.12)
+accept-encoding: gzip,deflate
+```
+```
+HTTP/1.1 400 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 22 Jan 2022 16:01:47 GMT
+Connection: close
+
+{
+    "timestamp": "2022-01-22T16:01:47.283+00:00",
+    "status": 400,
+    "error": "Bad Request",
+    "path": "/stations"
+}
+```
+
+## [ ] Feature: 지하철 노선 관리 기능
 
 ### Scenario: 중복이름으로 지하철 노선 생성
 * Given 지하철 노선 생성을 요청 하고
 * When 같은 이름으로 지하철 노선 생성을 요청 하면
 * Then 지하철 노선 생성이 실패한다.
-
-## [ ] Feature: 지하철역 관리 기능
-
-### [ ] Scenario: 중복이름으로 지하철역 생성
-* Given 지하철역 생성을 요청 하고
-* When 같은 이름으로 지하철역 생성을 요청 하면
-* Then 지하철역 생성이 실패한다.
-
-
-## [X] Feature: 지하철 노선 관리 기능
 
 ### [X] Scenario: 지하철 노선 생성
 * When 지하철 노선 생성을 요청 하면
