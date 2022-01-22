@@ -28,7 +28,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역_응답_상태_검증(response, HttpStatus.CREATED);
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -54,7 +54,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철역_응답_상태_검증(response, HttpStatus.OK);
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
@@ -79,7 +79,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철역_응답_상태_검증(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -99,7 +99,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        지하철역_응답_상태_검증(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ExtractableResponse<Response> 지하철역_생성_요청(String name) {
@@ -113,6 +113,10 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private void 지하철역_응답_상태_검증(ExtractableResponse<Response> response, HttpStatus status) {
+        assertThat(response.statusCode()).isEqualTo(status.value());
     }
 
 }
