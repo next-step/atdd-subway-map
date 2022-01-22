@@ -7,9 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static nextstep.subway.utils.RestAssuredRequest.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
 
         // then
-        지하철역_목록_조회됨(response);
+        지하철역_목록_조회됨(response, 강남역, 역삼역);
     }
 
     /**
@@ -126,10 +128,13 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    private void 지하철역_목록_조회됨(ExtractableResponse<Response> response) {
+    private void 지하철역_목록_조회됨(ExtractableResponse<Response> response, Map<String, String> ... params) {
         응답_요청_확인(response, HttpStatus.OK);
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역.get("name"), 역삼역.get("name"));
+        List<String> names = Arrays.stream(params)
+                .map(param -> param.get("name"))
+                .collect(Collectors.toList());
+        assertThat(stationNames).isEqualTo(names);
     }
 
     private void 지하철역_삭제됨(ExtractableResponse<Response> response) {
