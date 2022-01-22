@@ -3,13 +3,11 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.common.CommonLineAcceptance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.common.CommonLineAcceptance.*;
@@ -26,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        Map<String, String> params = getParamsMap("신분당선", "bg-red-600");
+        Map<String, String> params = getParamsLineMap("신분당선", "bg-red-600");
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // then
@@ -51,11 +49,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
+        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
         지하철_노선_생성_요청(params);
 
         //given
-        Map<String, String> params2 = getParamsMap("2호선", "bg-green-600");
+        Map<String, String> params2 = getParamsLineMap("2호선", "bg-green-600");
         지하철_노선_생성_요청(params2);
 
         // when
@@ -80,7 +78,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
+        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
 
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
@@ -107,12 +105,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
+        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
 
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // when
-        Map<String, String> modifyParams = getParamsMap("구분당선","bg-blue-600");
+        Map<String, String> modifyParams = getParamsLineMap("구분당선","bg-blue-600");
         String location = response.header("location");
 
         response = RestAssured
@@ -138,7 +136,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
+        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // when
@@ -153,8 +151,4 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-
-
-
-
 }

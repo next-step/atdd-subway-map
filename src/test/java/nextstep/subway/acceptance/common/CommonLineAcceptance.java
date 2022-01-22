@@ -20,7 +20,7 @@ public class CommonLineAcceptance {
         return response;
     }
 
-    public static Map<String, String> getParamsMap(String name, String color) {
+    public static Map<String, String> getParamsLineMap(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
