@@ -1,7 +1,8 @@
-package nextstep.subway.ui;
+package nextstep.subway.ui.controller;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.domain.Line;
 
 @RestController
 public class LineController {
@@ -27,25 +29,25 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = LineResponse.from(lineService.saveLine(lineRequest.toEntity()));
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        LineResponse line = toResponse(lineService.saveLine(lineRequest.toEntity()));
+        return ResponseEntity.created(getCreateStatusHeader(line)).body(line);
     }
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        List<LineResponse> lines = LineResponse.fromList(lineService.getAllLines());
+        List<LineResponse> lines = toListResponse(lineService.getAllLines());
         return ResponseEntity.ok().body(lines);
     }
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable long id) {
-        LineResponse line = LineResponse.from(lineService.getLine(id));
+        LineResponse line = toResponse(lineService.getLine(id));
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/lines/{id}")
     public ResponseEntity<LineResponse> updateLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
-        LineResponse line = LineResponse.from(lineService.updateLine(id, lineRequest));
+        LineResponse line = toResponse(lineService.updateLine(id, lineRequest));
         return ResponseEntity.ok().body(line);
     }
 
@@ -53,5 +55,17 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private URI getCreateStatusHeader(LineResponse line) {
+        return URI.create("/lines/" + line.getId());
+    }
+
+    private LineResponse toResponse(Line saveLine) {
+        return LineResponse.from(saveLine);
+    }
+
+    private List<LineResponse> toListResponse(List<Line> allLines) {
+        return allLines.stream().map(this::toResponse).collect(Collectors.toList());
     }
 }

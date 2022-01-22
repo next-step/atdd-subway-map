@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.ui.exception.UniqueKeyExistsException;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,8 +23,15 @@ public class LineService {
     }
 
     @Transactional
-    public Line saveLine(Line request) {
-        return lineRepository.save(new Line(request.getName(), request.getColor()));
+    public Line saveLine(Line line) {
+        if (isLineExists(line)) {
+            throw new UniqueKeyExistsException(line.getName());
+        }
+        return lineRepository.save(new Line(line.getName(), line.getColor()));
+    }
+
+    private boolean isLineExists(Line line) {
+        return lineRepository.findByName(line.getName()).isPresent();
     }
 
     public List<Line> getAllLines() {
