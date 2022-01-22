@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
     /**
+     * Given 생성할 지하쳘역
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
      */
@@ -54,7 +55,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         String 강남역 = "강남역";
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .body(params1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -65,7 +66,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         String 역삼역 = "역삼역";
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .body(params2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
