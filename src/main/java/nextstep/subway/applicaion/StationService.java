@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicateCreationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,16 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        String name = stationRequest.getName();
+
+        stationRepository
+                .findByName(name)
+                .ifPresent(
+                        station -> {
+                            throw new DuplicateCreationException();
+                        });
+
+        Station station = stationRepository.save(new Station(name));
         return createStationResponse(station);
     }
 
