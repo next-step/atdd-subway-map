@@ -2,7 +2,6 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.step.LineStep;
 import nextstep.subway.step.StationStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
