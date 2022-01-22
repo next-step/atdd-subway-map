@@ -38,4 +38,24 @@ public class LineAcceptanceUtil {
                 .put(location)
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_모든_노선_조회_요청() {
+        return RestAssured
+                .given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_특정_노선_조회_요청(String location) {
+        return RestAssured
+                .given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(location)
+                .then().log().all().extract();
+    }
 }

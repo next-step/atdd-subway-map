@@ -6,10 +6,8 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import static nextstep.subway.acceptance.LineAcceptanceUtil.지하철_노선_생성_요청;
-import static nextstep.subway.acceptance.LineAcceptanceUtil.지하철_노선_수정_요청;
+import static nextstep.subway.acceptance.LineAcceptanceUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -45,13 +43,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_요청("2호선", "bg-red-600");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = 지하철_모든_노선_조회_요청();
 
         // then
         assertThat(response.jsonPath().getList("name")).containsExactly("신분당선", "2호선");
@@ -71,13 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String location = response.header("location");
 
         // when
-        ExtractableResponse<Response> response2 = RestAssured
-                .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get(location)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(location);
 
         // then
         assertThat(response2.jsonPath().getString("name")).isEqualTo("신분당선");
@@ -101,13 +87,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 
         // when
-        ExtractableResponse<Response> response2 = RestAssured
-                .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get(location)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(location);
 
         // then
         assertAll(
