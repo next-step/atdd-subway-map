@@ -131,6 +131,35 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        Map<String, String> createParams = new HashMap<>();
+        createParams.put("name", "신분당선");
+        createParams.put("color", "bg-red-600");
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                .body(createParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        assertThat(createResponse.statusCode())
+                .isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.header("Location")).isNotBlank();
+
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "구분당선");
+        params.put("color", "bg-blue-600");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", createResponse.jsonPath().getString("id"))
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
