@@ -20,6 +20,11 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
+        boolean isExists = stationService.existsStationByName(stationRequest.getName());
+        if (isExists) {
+            return ResponseEntity.badRequest().build();
+        }
+
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
