@@ -24,7 +24,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("이미 존재하는 호선입니다.");
+            throw new IllegalArgumentException("이미 존재하는 노선입니다.");
         }
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
