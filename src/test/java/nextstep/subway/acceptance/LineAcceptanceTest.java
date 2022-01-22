@@ -107,11 +107,13 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // when
+        final Long ID = createResponse.jsonPath().getLong("id");
+
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}", createResponse.jsonPath().getString("id"))
+                .when().get("/lines/{id}", ID)
                 .then().log().all().extract();
 
         // then
@@ -143,11 +145,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", "bg-blue-600");
 
         // when
+        final Long ID = createResponse.jsonPath().getLong("id");
+
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", createResponse.jsonPath().getString("id"))
+                .when().put("/lines/{id}", ID)
                 .then().log().all().extract();
 
         // then
@@ -174,10 +178,12 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // when
+        final Long ID = createResponse.jsonPath().getLong("id");
+
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{id}", createResponse.jsonPath().getString("id"))
+                .when().delete("/lines/{id}", ID)
                 .then().log().all().extract();
 
         // then
