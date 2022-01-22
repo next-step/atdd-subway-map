@@ -41,4 +41,8 @@ public class Line extends BaseEntity {
         this.name = name;
         this.color = color;
     }
+
+    public boolean notMatchName(String name) {
+        return this.name.equals(name);
+    }
 }

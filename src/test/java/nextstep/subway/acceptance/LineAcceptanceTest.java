@@ -66,7 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
 
         // then
-        assertThat(createResponse.statusCode()).isNotEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(AcceptanceTestUtils.getLocation(createResponse)).isNull();
     }
 

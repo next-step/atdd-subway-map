@@ -47,7 +47,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
 
         // then
-        assertThat(response.statusCode()).isNotEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(AcceptanceTestUtils.getLocation(response)).isNull();
     }
 

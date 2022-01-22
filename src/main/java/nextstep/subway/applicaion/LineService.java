@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion;
 
+import static nextstep.subway.exception.ColumnName.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicateColumnException;
 import nextstep.subway.exception.EntityNotFoundException;
 
 @Service
@@ -22,8 +25,16 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        validateDuplicationName(request.getName());
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return LineResponse.from(line);
+    }
+
+    private void validateDuplicationName(String name) {
+        if (lineRepository.existsByName(name)) {
+            throw new DuplicateColumnException(LINE_NAME);
+        }
     }
 
     public List<LineResponse> findAllLines() {
@@ -42,6 +53,9 @@ public class LineService {
     public void edit(long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
                                   .orElseThrow(EntityNotFoundException::new);
+        if (line.notMatchName(lineRequest.getName())) {
+            validateDuplicationName(lineRequest.getName());
+        }
         line.edit(lineRequest.getName(), lineRequest.getColor());
     }
 
