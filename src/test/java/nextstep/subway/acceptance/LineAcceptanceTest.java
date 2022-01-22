@@ -158,7 +158,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
