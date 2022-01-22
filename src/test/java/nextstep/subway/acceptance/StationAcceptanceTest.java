@@ -50,8 +50,39 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "뚝섬역");
+        RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all().extract();
 
+        //given
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "연신내역");
+        RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all().extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        List<String> names = response.jsonPath().getList("name");
+        assertThat(names).containsExactly("뚝섬역", "연신내역");
     }
+
 
     /**
      * Given 지하철역 생성을 요청 하고
