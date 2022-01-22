@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +29,14 @@ public class LineService {
                 line.getModifiedDate());
     }
 
+    // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(
                         line ->
+                                // TODO 해당 부분 엔티티/도메인에서 처리할 수 있도록 변경 필요 -> Response 쪽에서 처리하는 것이
+                                // 유리해보임
                                 new LineResponse(
                                         line.getId(),
                                         line.getName(),
@@ -40,5 +44,22 @@ public class LineService {
                                         line.getCreatedDate(),
                                         line.getModifiedDate()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse findSpecificLine(Long id) {
+        return lineRepository
+                .findById(id)
+                .map(
+                        line ->
+                              // TODO 해당 부분 엔티티/도메인에서 처리할 수 있도록 변경 필요 -> Response 쪽에서 처리하는 것이
+                              // 유리해보임
+                                new LineResponse(
+                                        line.getId(),
+                                        line.getName(),
+                                        line.getColor(),
+                                        line.getCreatedDate(),
+                                        line.getModifiedDate()))
+                .orElseThrow(NotFoundException::new);
     }
 }
