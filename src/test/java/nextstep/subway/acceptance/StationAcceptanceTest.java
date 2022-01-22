@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -114,5 +115,38 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    void createStationWithDuplicateName() {
+        // given
+        var params = new HashMap<String, String>();
+        params.put("name", "강남역");
+
+        var createResponse = RestAssured.given().log().all()
+                .body(params)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        // when
+        var response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
