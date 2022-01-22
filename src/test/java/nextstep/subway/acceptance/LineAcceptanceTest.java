@@ -202,4 +202,38 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 생성 중복 체크")
+    @Test
+    void duplicateLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-red-600");
+        params.put("name", "신분당선");
+
+        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract();
+
+        // when
+        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
 }
