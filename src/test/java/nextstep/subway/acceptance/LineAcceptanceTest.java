@@ -79,6 +79,31 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    private long extractId(ExtractableResponse<Response> responseByPost) {
+        return responseByPost.body().jsonPath().getLong("id");
+    }
+
+    private ExtractableResponse<Response> patchOneLine(String lineName, String lineColor, Long id) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL_VALUE)
+                .body(patchRequestBody(lineName, lineColor))
+
+                .when()
+                .patch("/lines/" + id)
+
+                .then().log().all()
+                .extract();
+    }
+
+    private Map<String, String> patchRequestBody(String lineName, String lineColor) {
+        Map<String, String> params = new HashMap<>(1);
+        params.put("name", lineName);
+        params.put("color", lineColor);
+        return params;
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -132,12 +157,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
 
         // when
-        ExtractableResponse<Response> response = getOneLine(responseByPost.body().jsonPath().getLong("id"));
+        ExtractableResponse<Response> response = getOneLine(extractId(responseByPost));
 
         // then
         verifyResponseStatus(response, HttpStatus.OK);
         verifyResponseBodyElement(response, LINE_NEW_BOONDANG);
     }
+
 
     /**
      * Given 지하철 노선 생성을 요청 하고
@@ -147,7 +173,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
+
+        // when
+        ExtractableResponse<Response> response =
+                patchOneLine("구분당선", "bg-blue-600", extractId(responseByPost));
+
+        // then
+        verifyResponseStatus(response, HttpStatus.OK);
     }
+
+
 
     /**
      * Given 지하철 노선 생성을 요청 하고
