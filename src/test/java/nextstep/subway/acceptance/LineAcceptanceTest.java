@@ -14,12 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import io.restassured.path.json.exception.JsonPathException;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.AcceptanceTestUtils;
 import nextstep.subway.utils.DatabaseCleanup;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -64,11 +65,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
 
-        //then
-        ExtractableResponse<Response> inquiryResponse = 지하철_노선_조회(2);
-
-        assertThat(createResponse.statusCode()).isNotEqualTo(HttpStatus.OK.value());
-        assertThat(inquiryResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        // then
+        assertThat(createResponse.statusCode()).isNotEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.header("Location")).isNull();
     }
 
     /**
@@ -108,10 +107,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회(1);
+        ExtractableResponse<Response> response = AcceptanceTestUtils.requestLocation(createResponse, Method.GET);
 
         // then
         String lineName = response.jsonPath()
@@ -130,22 +129,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
 
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", 지하철_생성_수정_요청_Params.삼호선.getName());
         params.put("color", 지하철_생성_수정_요청_Params.삼호선.getColor());
-        ExtractableResponse<Response> editResponse = RestAssured.given().log().all()
-                                                                .body(params)
-                                                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                                .when()
-                                                                .put("/lines/1")
-                                                                .then().log().all()
-                                                                .extract();
+        ExtractableResponse<Response> editResponse = AcceptanceTestUtils.requestLocation(createResponse, Method.PUT, params);
 
         // then
-        ExtractableResponse<Response> findResponse = 지하철_노선_조회(1);
+        ExtractableResponse<Response> findResponse = AcceptanceTestUtils.requestLocation(createResponse, Method.GET);
 
         assertThat(editResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat((String)findResponse.jsonPath()
@@ -163,17 +156,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
 
         // when
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                                                                  .when()
-                                                                  .delete("/lines/1")
-                                                                  .then().log().all()
-                                                                  .extract();
+        ExtractableResponse<Response> deleteResponse = AcceptanceTestUtils.requestLocation(createResponse, Method.DELETE);
 
         // then
-        ExtractableResponse<Response> findResponse = 지하철_노선_조회(1);
+        ExtractableResponse<Response> findResponse = AcceptanceTestUtils.requestLocation(createResponse, Method.GET);
 
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThatThrownBy(() -> findResponse.jsonPath().get("name"))

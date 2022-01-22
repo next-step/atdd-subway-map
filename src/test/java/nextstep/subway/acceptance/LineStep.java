@@ -26,14 +26,6 @@ public class LineStep {
                           .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회(final long id) {
-        return RestAssured.given().log().all()
-                          .when()
-                          .get("/lines/" + id)
-                          .then().log().all()
-                          .extract();
-    }
-
     public enum 지하철_생성_수정_요청_Params {
         이호선("2호선", "bg-red-600"),
         삼호선("3호선", "bg-black-600");
