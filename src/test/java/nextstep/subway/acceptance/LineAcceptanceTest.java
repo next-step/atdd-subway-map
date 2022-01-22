@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.exception.DuplicationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -200,5 +201,43 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성한다.
+     * When 중복된 이름의 지하철 노선 생성을 요청한다.
+     * Then 지하철 노선 생성이 실패한다.
+     */
+
+    @DisplayName("중복된 노선 생성은 실패한다")
+    @Test
+    void duplicationLine() {
+        //given
+        String 기존노선 = "기존 노선";
+        String 기존색상 = "기존 색상";
+        Map<String, String> param = new HashMap<>();
+        param.put("name", 기존노선);
+        param.put("color", 기존색상);
+
+        RestAssured
+                .given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().extract();
+
+        //when
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
     }
 }

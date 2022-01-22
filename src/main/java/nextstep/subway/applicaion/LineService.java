@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.exception.DuplicationException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        lineRepository.findByName(request.getName())
+                .ifPresent(l -> {
+                    throw new DuplicationException();
+                });
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineResponse(
                 line.getId(),
