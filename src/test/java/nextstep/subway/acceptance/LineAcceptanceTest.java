@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -108,10 +109,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().extract();
 
 
+
         //when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/lines/1")
+                .when().get(createResponse.header(HttpHeaders.LOCATION))
                 .then().log().all().extract();
 
         //then
@@ -134,7 +136,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         param.put("name", 기존노선);
         param.put("color", 기존색상);
 
-        RestAssured
+        ExtractableResponse<Response> createResponse = RestAssured
                 .given()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -152,13 +154,13 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .given()
                 .body(updateParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/1")
+                .when().put(createResponse.header(HttpHeaders.LOCATION))
                 .then().extract();
 
         //then
         ExtractableResponse<Response> response = RestAssured
                 .given()
-                .when().get("/lines/1")
+                .when().get(createResponse.header(HttpHeaders.LOCATION))
                 .then().extract();
 
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -183,17 +185,17 @@ class LineAcceptanceTest extends AcceptanceTest {
         param.put("name", 기존노선);
         param.put("color", 기존색상);
 
-        RestAssured
+        ExtractableResponse<Response> createResponse = RestAssured
                 .given()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
-                .then();
+                .then().extract();
 
         //when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/1")
+                .when().delete(createResponse.header(HttpHeaders.LOCATION))
                 .then().log().all().extract();
 
         //then
