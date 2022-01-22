@@ -127,21 +127,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> readLineResponse =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(lineRequestA)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines/" + id)
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+          RestAssured.given().log().all().when().get("/lines/" + id).then().log().all().extract();
 
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = readLineResponse.jsonPath().getList("name");
-        assertThat(stationNames).contains(lineName);
+        String responseLineName = readLineResponse.jsonPath().getString("name");
+        assertThat(responseLineName).isEqualTo(lineName);
     }
 
     /** Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다. */
