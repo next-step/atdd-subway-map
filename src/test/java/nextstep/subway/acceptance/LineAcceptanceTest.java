@@ -79,7 +79,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        Integer id1 = createResponse1.jsonPath().getInt("id");
+        Integer id1 = createResponse1.jsonPath().get("id");
         String createDate1 = createResponse1.jsonPath().get("createdDate");
         String modifiedDate1 = createResponse1.jsonPath().get("modifiedDate");
 
@@ -97,7 +97,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        Integer id2 = createResponse2.jsonPath().getInt("id");
+        Integer id2 = createResponse2.jsonPath().get("id");
         String createDate2 = createResponse2.jsonPath().get("createdDate");
         String modifiedDate2 = createResponse2.jsonPath().get("modifiedDate");
 
@@ -143,7 +143,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        Integer id = createResponse.jsonPath().getInt("id");
+        Integer id = createResponse.jsonPath().get("id");
         String createdDate = createResponse.jsonPath().getString("createdDate");
         String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
 
@@ -189,7 +189,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        Integer id = createResponse.jsonPath().getInt("id");
+        Integer id = createResponse.jsonPath().get("id");
         String createdDate = createResponse.jsonPath().getString("createdDate");
         String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
 
