@@ -39,6 +39,13 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+
+        return createLineResponse(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
