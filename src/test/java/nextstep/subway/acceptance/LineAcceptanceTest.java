@@ -75,7 +75,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
                 .when()
                 .get("/lines")
                 .then().log().all().extract();
@@ -111,8 +112,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/{id}", ID)
                 .then().log().all().extract();
 
@@ -182,7 +181,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/lines/{id}", ID)
                 .then().log().all().extract();
 
