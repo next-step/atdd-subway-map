@@ -56,6 +56,42 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("지하철역 중복이름 생성")
+    @Test
+    void createDuplicateNameLine() {
+        // given
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        Map<String, String> params = new HashMap<>();
+        params.put("color", bgRed600);
+        params.put("name", 신분당선);
+
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
