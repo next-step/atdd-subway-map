@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.HttpRequestTestUtil.*;
+import static nextstep.subway.utils.HttpRequestTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
