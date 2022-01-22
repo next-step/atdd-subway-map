@@ -46,9 +46,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-
         //given
-
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
         Map<String, String> param = new HashMap<>();
@@ -61,14 +59,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         param2.put("name", 새로운노선);
         param2.put("color", 새로운색상);
 
-        //when
         RestAssured
                 .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(param)
                 .when().post("/lines")
                 .then();
-
 
         RestAssured
                 .given()
@@ -78,6 +74,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then();
 
 
+        //when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().get("/lines")
@@ -96,16 +93,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-
         //given
-
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
         Map<String, String> param = new HashMap<>();
         param.put("name", 기존노선);
         param.put("color", 기존색상);
 
-        //when
         ExtractableResponse<Response> createResponse = RestAssured
                 .given()
                 .body(param)
@@ -113,6 +107,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .when().post("/lines")
                 .then().extract();
 
+
+        //when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().get("/lines/1")
@@ -132,26 +128,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
         Map<String, String> param = new HashMap<>();
         param.put("name", 기존노선);
         param.put("color", 기존색상);
 
-        String 수정노선 = "수정 노선";
-        String 수정색상 = "수정 색상";
-        Map<String, String> updateParam = new HashMap<>();
-        updateParam.put("name", 수정노선);
-        updateParam.put("color", 수정색상);
-
-        //when
         RestAssured
                 .given()
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().extract();
+
+        //when
+        String 수정노선 = "수정 노선";
+        String 수정색상 = "수정 색상";
+        Map<String, String> updateParam = new HashMap<>();
+        updateParam.put("name", 수정노선);
+        updateParam.put("color", 수정색상);
 
         ExtractableResponse<Response> updateResponse = RestAssured
                 .given()
@@ -160,6 +155,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .when().put("/lines/1")
                 .then().extract();
 
+        //then
         ExtractableResponse<Response> response = RestAssured
                 .given()
                 .when().get("/lines/1")
@@ -187,7 +183,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         param.put("name", 기존노선);
         param.put("color", 기존색상);
 
-        //when
         RestAssured
                 .given()
                 .body(param)
@@ -195,6 +190,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .when().post("/lines")
                 .then();
 
+        //when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().delete("/lines/1")

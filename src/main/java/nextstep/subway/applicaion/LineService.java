@@ -34,10 +34,6 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8759b5ccf9fe56817fc7d54c4ef532788b64c4be
 
     public LineResponse findById(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
@@ -48,16 +44,8 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
         line.update(request);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     public void delete(Long id) {
         lineRepository.deleteById(id);
     }
-=======
->>>>>>> c2a4b18 (feat : 지하철 노선 목록 조회)
-=======
->>>>>>> af7461e (feat : 노선 업데이트)
-=======
->>>>>>> 8759b5ccf9fe56817fc7d54c4ef532788b64c4be
 }
