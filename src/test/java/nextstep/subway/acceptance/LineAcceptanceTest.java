@@ -1,19 +1,13 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
-import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.step.LineStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -115,5 +109,24 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStep.deleteLine(NUMBER_ONE);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성 요청 한다.
+     * When 같은 이름으로 지하철 역을 생성 요청한다.
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복 지하철 노선 생성 실패")
+    @Test
+    void createLine_duplication() {
+
+        // 노선을 생성한다.
+        LineStep.saveLine("color_1", "name_1");
+
+        // 중복으로 생성할 때
+        ExtractableResponse<Response> response = LineStep.saveLine("color_2", "name_1");
+
+        // 실패를 한다.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }

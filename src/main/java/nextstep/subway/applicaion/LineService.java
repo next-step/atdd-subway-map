@@ -5,8 +5,10 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +25,7 @@ public class LineService {
     }
 
     public LineCreationResponse saveLine(LineRequest request) {
+        verifyDuplication(request.getName());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
         return new LineCreationResponse(
@@ -70,5 +73,13 @@ public class LineService {
                 Collections.EMPTY_LIST,
                 line.getCreatedDate(),
                 line.getModifiedDate());
+    }
+
+    private void verifyDuplication(final String name) {
+        Line line = lineRepository.findByName(name);
+
+        if (!ObjectUtils.isEmpty(line)) {
+            throw new DuplicationException("이미 존재합니다.");
+        }
     }
 }
