@@ -26,7 +26,6 @@ public class LineController {
     }
 
     @GetMapping
-<<<<<<< HEAD
     public ResponseEntity<List<LineResponse>> getLines() {
         return ResponseEntity.ok(lineService.findAll());
     }
@@ -47,9 +46,5 @@ public class LineController {
         lineService.delete(id);
         return ResponseEntity.noContent().build();
     }
-=======
-    public ResponseEntity<List<LineResponse>> getLine() {
-        return ResponseEntity.ok(lineService.findAll());
-    }
->>>>>>> c2a4b18 (feat : 지하철 노선 목록 조회)
+
 }
