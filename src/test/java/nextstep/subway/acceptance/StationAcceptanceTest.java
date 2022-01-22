@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.exception.DuplicationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -114,5 +115,44 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 역을 생성한다.
+     * When 동일한 이름의 지하철 역 생성을 요청한다.
+     * Then 지하철 역 생성이 실패한다.
+     */
+
+    @DisplayName("중복된 지하철 역은 생성이 실패한다")
+    @Test
+    void duplicateStation() {
+        //given
+        String 지하철역 = "지하철역";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 지하철역);
+
+        RestAssured
+                .given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then();
+
+        //when
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .log()
+                .all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
     }
 }
