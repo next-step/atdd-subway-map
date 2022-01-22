@@ -19,18 +19,11 @@ public class LineModifyService {
 
     public LineCreateResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineCreateResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate());
+        return LineCreateResponse.of(line);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(NotFoundException::new);
-
-        // TODO question: Entity에까지 LineRequest DTO를 들고 가는게 맞을까요?
         line.changeLineInformation(lineRequest.getName(), lineRequest.getColor());
     }
 
