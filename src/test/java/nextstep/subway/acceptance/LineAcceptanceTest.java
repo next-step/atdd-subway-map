@@ -186,6 +186,29 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        // given
+        String _1호선 = "1호선";
+        String 파란색 = "bg-blue-600";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", _1호선);
+        params1.put("color", 파란색);
 
+        ExtractableResponse<Response> response1 = RestAssured
+                .given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        int id = response1.jsonPath().getInt("id");
+
+        // when
+        ExtractableResponse<Response> response2 = RestAssured
+                .given().log().all()
+                .when().delete("/lines/" + id)
+                .then().log().all().extract();
+
+        // then
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
