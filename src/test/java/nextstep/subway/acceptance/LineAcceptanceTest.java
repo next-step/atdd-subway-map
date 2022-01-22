@@ -165,4 +165,23 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 삭제된_지하철_노선_조회_response = ID로_지하철_노선_조회(노선_id);
         Assertions.assertThat(삭제된_지하철_노선_조회_response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
+    @Test
+    void createDuplicatedLine() {
+        // given
+        지하철_노선_생성_요청(신분당선_LineRequest);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선_LineRequest);
+
+        // then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        Assertions.assertThat(response.jsonPath().getList("$").size()).isEqualTo(1);
+    }
 }
