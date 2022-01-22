@@ -16,6 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
+    private static final String GANGNAM_STATION_NAME = "강남역";
+    private static final String YEOKSAM_STATION_NAME = "역삼역";
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -24,21 +28,33 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = createGangnamStation();
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = callCreateStation(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    /**
+     * Given 지하철역 생성
+     * When 같은 이름으로 지하철역 생성
+     * Then 400 status code를 응답한다.
+     */
+    @DisplayName("중복 이름의 지하철역을 생성하면 실패한다")
+    @Test
+    void createStation_duplicate_fail() {
+        // given
+        Map<String, String> params = createGangnamStation();
+        callCreateStation(params);
+
+        // when
+        ExtractableResponse<Response> response = callCreateStation(params);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -51,38 +67,18 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> gangnamStationParams = createGangnamStation();
+        callCreateStation(gangnamStationParams);
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> yeoksamStationParams = createYeoksamStation();
+        callCreateStation(yeoksamStationParams);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = callFindAllStation();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        assertThat(stationNames).contains(GANGNAM_STATION_NAME, YEOKSAM_STATION_NAME);
     }
 
     /**
@@ -94,25 +90,57 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> gangnamStationParams = createGangnamStation();
+        ExtractableResponse<Response> createResponse = callCreateStation(gangnamStationParams);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = callDeleteStation(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    private ExtractableResponse<Response> callCreateStation(Map<String, String> StationParams) {
+        return RestAssured.given().log().all()
+            .body(StationParams)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> callFindAllStation() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when()
+            .get("/stations")
+            .then().log().all()
+            .extract();
+        return response;
+    }
+
+    private ExtractableResponse<Response> callDeleteStation(String uri) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when()
+            .delete(uri)
+            .then().log().all()
+            .extract();
+        return response;
+    }
+
+    private Map<String, String> createGangnamStation() {
+        Map<String, String> result = new HashMap();
+        result.put("name", GANGNAM_STATION_NAME);
+
+        return result;
+    }
+
+    private Map<String, String> createYeoksamStation() {
+        Map<String, String> result = new HashMap();
+        result.put("name", YEOKSAM_STATION_NAME);
+
+        return result;
+    }
+
 }
