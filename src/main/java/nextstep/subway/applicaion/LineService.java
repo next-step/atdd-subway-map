@@ -7,6 +7,9 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @Transactional
 public class LineService {
@@ -25,4 +28,9 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate());
     }
+
+    public List<LineResponse> findAllLines(){
+        return Collections.EMPTY_LIST;
+    }
+
 }
