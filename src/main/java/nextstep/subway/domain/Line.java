@@ -7,6 +7,7 @@ import javax.persistence.Id;
 
 @Entity
 public class Line extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,6 +18,11 @@ public class Line extends BaseEntity {
     }
 
     public Line(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public void updateInfo(String name, String color) {
         this.name = name;
         this.color = color;
     }
@@ -32,4 +38,5 @@ public class Line extends BaseEntity {
     public String getColor() {
         return color;
     }
+
 }
