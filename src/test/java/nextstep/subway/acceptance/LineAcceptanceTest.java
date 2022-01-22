@@ -64,6 +64,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         String _2호선 = "2호선";
         String 초록색 = "bg-green-600";
+
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", _2호선);
         params2.put("color", 초록색);
@@ -101,13 +102,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "1호선");
-        params.put("color", "bg-blue-600");
+        String _1호선 = "1호선";
+        String 파란색 = "bg-blue-600";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", _1호선);
+        params1.put("color", 파란색);
 
         ExtractableResponse<Response> response1 = RestAssured
                 .given().log().all()
-                .body(params)
+                .body(params1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all().extract();
@@ -117,11 +120,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response2 = RestAssured
                 .given().log().all()
-                .when().get("/lines/"+id)
+                .when().get("/lines/" + id)
                 .then().log().all().extract();
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String name = response2.jsonPath().getString("name");
+        String color = response2.jsonPath().getString("color");
+        assertThat(name).isEqualTo(_1호선);
+        assertThat(color).isEqualTo(파란색);
 
     }
 
@@ -133,7 +140,42 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        String _1호선 = "1호선";
+        String 파란색 = "bg-blue-600";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", _1호선);
+        params1.put("color", 파란색);
 
+        ExtractableResponse<Response> response1 = RestAssured
+                .given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        int id = response1.jsonPath().getInt("id");
+
+        // when
+        _1호선 = "1호선-수정";
+        파란색 = "bg-blue-600-수정";
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", _1호선);
+        params2.put("color", 파란색);
+
+        ExtractableResponse<Response> response2 = RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + id)
+                .then().log().all().extract();
+
+        // then
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String name = response2.jsonPath().getString("name");
+        String color = response2.jsonPath().getString("color");
+        assertThat(name).isEqualTo(_1호선);
+        assertThat(color).isEqualTo(파란색);
     }
 
     /**
