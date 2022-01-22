@@ -92,6 +92,35 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "뚝섬역");
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all().extract();
 
+        // when
+        Map<String, String> params2 = new HashMap<>();
+        response = RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(response.header("location"))
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //when
+        response = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all().extract();
+
+        //then
+        assertThat(response.jsonPath().getList("name")).isEmpty();
     }
 }
