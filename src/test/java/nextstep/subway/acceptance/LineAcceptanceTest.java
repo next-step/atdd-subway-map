@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 class LineAcceptanceTest extends AcceptanceTest {
     private final String BODY_ELEMENT_NAME = "name";
     private final String BODY_ELEMENT_COLOR = "color";
+    private final String BODY_ELEMENT_ID = "id";
 
     private Map<String, String> createRequestBody(TestLine line) {
         Map<String, String> params = new HashMap<>();
@@ -80,7 +81,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private long extractId(ExtractableResponse<Response> responseByPost) {
-        return responseByPost.body().jsonPath().getLong("id");
+        return responseByPost.body().jsonPath().getLong(BODY_ELEMENT_ID);
     }
 
     private ExtractableResponse<Response> patchOneLine(String lineName, String lineColor, Long id) {
@@ -99,18 +100,18 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private Map<String, String> patchRequestBody(String lineName, String lineColor) {
         Map<String, String> params = new HashMap<>(1);
-        params.put("name", lineName);
-        params.put("color", lineColor);
+        params.put(BODY_ELEMENT_NAME, lineName);
+        params.put(BODY_ELEMENT_COLOR, lineColor);
         return params;
     }
 
-    private ExtractableResponse<Response> deleteLine(ExtractableResponse<Response> responseByPost) {
+    private ExtractableResponse<Response> deleteLine(Long deletedId) {
         ExtractableResponse<Response> response = RestAssured
                 .given()
                 .accept(MediaType.ALL_VALUE)
 
                 .when()
-                .delete("/lines/" + extractId(responseByPost))
+                .delete("/lines/" + deletedId)
 
                 .then().log().all()
                 .extract();
@@ -152,9 +153,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         verifyResponseStatus(response, HttpStatus.OK);
 
-        assertThat(response.body().jsonPath().getList("name"))
+        assertThat(response.body().jsonPath().getList(BODY_ELEMENT_NAME))
                 .containsExactly(LINE_NEW_BOONDANG.getName(), LINE_TWO.getName());
-        assertThat(response.body().jsonPath().getList("color"))
+        assertThat(response.body().jsonPath().getList(BODY_ELEMENT_COLOR))
                 .containsExactly(LINE_NEW_BOONDANG.getColor(), LINE_TWO.getColor());
     }
 
@@ -167,10 +168,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
+        Long lineId = extractId(postOneLine(LINE_NEW_BOONDANG));
 
         // when
-        ExtractableResponse<Response> response = getOneLine(extractId(responseByPost));
+        ExtractableResponse<Response> response = getOneLine(lineId);
 
         // then
         verifyResponseStatus(response, HttpStatus.OK);
@@ -189,18 +190,16 @@ class LineAcceptanceTest extends AcceptanceTest {
         String modifyColor = "bg-blue-600";
 
         // given
-        ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
+        Long modifiedId = extractId(postOneLine(LINE_NEW_BOONDANG));
 
         // when
         ExtractableResponse<Response> response =
-                patchOneLine(modifyName, modifyColor, extractId(responseByPost));
+                patchOneLine(modifyName, modifyColor, modifiedId);
 
         // then
         verifyResponseStatus(response, HttpStatus.OK);
-        verifyResponseBodyElement(getOneLine(extractId(responseByPost)), modifyName, modifyColor);
+        verifyResponseBodyElement(getOneLine(modifiedId), modifyName, modifyColor);
     }
-
-
 
     /**
      * Given 지하철 노선 생성을 요청 하고
@@ -211,10 +210,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
+        Long deletedId = extractId(postOneLine(LINE_NEW_BOONDANG));
 
         // when
-        ExtractableResponse<Response> response = deleteLine(responseByPost);
+        ExtractableResponse<Response> response = deleteLine(deletedId);
 
         // then
         verifyResponseStatus(response, HttpStatus.NO_CONTENT);

@@ -32,18 +32,28 @@ public class LineController {
 
     @GetMapping("/{lineId}")
     public ResponseEntity<LineDetailResponse> getLine(@PathVariable(name = "lineId") Long id) {
-        return ResponseEntity.ok(lineService.getLine(id));
+        LineDetailResponse lineDetailResponse = lineService.getLine(id);
+
+        if (lineDetailResponse == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(lineDetailResponse);
     }
 
     @PatchMapping("/{lineId}")
-    public void patchLine(@PathVariable(name = "lineId") Long id,
-                          @RequestBody LineRequest lineRequest) {
-        lineService.patchLine(id, lineRequest);
+    public ResponseEntity patchLine(@PathVariable(name = "lineId") Long id,
+                                            @RequestBody LineRequest lineRequest) {
+        if (lineService.patchLine(id, lineRequest)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{lineId}")
     public ResponseEntity deleteLine(@PathVariable(name = "lineId") Long id) {
-        lineService.deleteLine(id);
+        if (lineService.deleteLine(id)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.noContent().build();
     }
 }
