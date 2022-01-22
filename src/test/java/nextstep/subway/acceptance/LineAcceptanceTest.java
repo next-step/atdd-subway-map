@@ -79,10 +79,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         lineRequestA.put("color", lineColor);
         ExtractableResponse<Response> createResponse = lineCreateRequest(lineRequestA);
 
-        long id = createResponse.jsonPath().getLong("id");
-
+        String uri = createResponse.header("Location");
         // when
-        ExtractableResponse<Response> readLineResponse = specificLineReadRequest(id);
+        ExtractableResponse<Response> readLineResponse = specificLineReadRequest(uri);
 
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String responseLineName = readLineResponse.jsonPath().getString("name");
@@ -102,8 +101,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         createRequest.put("color", lineColor);
         ExtractableResponse<Response> createResponse = lineCreateRequest(createRequest);
 
-        long id = createResponse.jsonPath().getLong("id");
-
+        String uri = createResponse.header("Location");
         // when
         String updateLineName = "구분당선";
         String updateLineColor = "bg-blue-600";
@@ -117,7 +115,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                         .body(updateRequest)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
-                        .put("/lines/" + id)
+                        .put(uri)
                         .then()
                         .log()
                         .all()
@@ -127,7 +125,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // addition: to verify changed contents
-        ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(id);
+        ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(uri);
         assertThat(readUpdatedLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString("name");
         String readUpdatedLineColor = readUpdatedLineResponse.jsonPath().getString("color");
@@ -149,14 +147,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = lineCreateRequest(createRequest);
 
         // when
-        long id = createResponse.jsonPath().getLong("id");
+        String uri = createResponse.header("Location");
 
         ExtractableResponse<Response> deleteResponse =
                 RestAssured.given()
                         .log()
                         .all()
                         .when()
-                        .delete("/lines/" + id)
+                        .delete(uri)
                         .then()
                         .log()
                         .all()
@@ -165,7 +163,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         // addition: to verify deleted contents
-        ExtractableResponse<Response> readDeletedLineResponse = specificLineReadRequest(id);
+        ExtractableResponse<Response> readDeletedLineResponse = specificLineReadRequest(uri);
         assertThat(readDeletedLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
@@ -184,12 +182,12 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    static ExtractableResponse<Response> specificLineReadRequest(Long id) {
+    static ExtractableResponse<Response> specificLineReadRequest(String url) {
         return RestAssured.given()
                 .log()
                 .all()
                 .when()
-                .get("/lines/" + id)
+                .get(url)
                 .then()
                 .log()
                 .all()
