@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import nextstep.subway.applicaion.dto.LineCreationResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
@@ -21,13 +22,13 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineCreationResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
+
+        return new LineCreationResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                Collections.EMPTY_LIST,
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
