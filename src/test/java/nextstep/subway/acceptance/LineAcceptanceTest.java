@@ -175,6 +175,42 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("color", bgRed600);
+        params1.put("name", 신분당선);
+
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        Integer id = createResponse.jsonPath().getInt("id");
+        String createdDate = createResponse.jsonPath().getString("createdDate");
+        String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
+
+        String path = "/lines/" + id;
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get(path)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Integer lineId = response.jsonPath().get("id");
+        String lineName = response.jsonPath().getString("name");
+        String lineColor = response.jsonPath().getString("color");
+        String lineCreatedDate = response.jsonPath().get("createdDate");
+        String lineModifiedDate = response.jsonPath().getString("modifiedDate");
+        assertThat(lineId).isEqualTo(id);
+        assertThat(lineName).isEqualTo(신분당선);
+        assertThat(lineColor).isEqualTo(bgRed600);
+        assertThat(lineCreatedDate).isEqualTo(createdDate);
+        assertThat(lineModifiedDate).isEqualTo(modifiedDate);
     }
 
     /**
