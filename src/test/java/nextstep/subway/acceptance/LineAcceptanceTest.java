@@ -192,7 +192,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", "GTX-A");
         params.put("color", "bg-red-900");
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -201,7 +201,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // when
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
                 .pathParam("id", 1L)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -210,6 +210,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
