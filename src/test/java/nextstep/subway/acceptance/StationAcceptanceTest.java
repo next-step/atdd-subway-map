@@ -1,16 +1,13 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.common.CommonStationAcceptance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,5 +92,26 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(response.jsonPath().getList("name")).isEmpty();
+    }
+
+    /**
+     * Scenario: 중복이름으로 지하철역 생성
+     *  Given 지하철역 생성을 요청 하고
+     *  When 같은 이름으로 지하철역 생성을 요청 하면
+     *  Then 지하철역 생성이 실패한다.
+     */
+    @Test
+    @DisplayName("지하철역 중복 이름으로 생성 불가")
+    void duplicated_station_name_interdict() {
+        //given
+        Map<String, String> 뚝섬역 = getParamsStationMap("뚝섬역");
+        지하철역_생성_요청(뚝섬역);
+
+        //when
+        ExtractableResponse<Response> response
+                        = 지하철역_생성_요청(뚝섬역);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 }
