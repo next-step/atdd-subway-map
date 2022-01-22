@@ -1,10 +1,6 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.line;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
-import nextstep.subway.applicaion.dto.LineReadResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -14,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class LineService {
+public class LineModifyService {
     private final LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineModifyService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
@@ -29,23 +25,6 @@ public class LineService {
                 line.getColor(),
                 line.getCreatedDate(),
                 line.getModifiedDate());
-    }
-
-    // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
-    @Transactional(readOnly = true)
-    public List<LineReadResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-                .map(line -> LineReadResponse.of(line, Collections.EMPTY_LIST))
-                .collect(Collectors.toList());
-    }
-
-    // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
-    @Transactional(readOnly = true)
-    public LineReadResponse findSpecificLine(Long id) {
-        return lineRepository
-                .findById(id)
-                .map(line -> LineReadResponse.of(line, Collections.EMPTY_LIST))
-                .orElseThrow(NotFoundException::new);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
