@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,10 +45,49 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
+     * @see nextstep.subway.ui.LineController#findAllLines()
      */
-    @DisplayName("지하철 노선 목록 조회")
     @Test
-    void getLines() {
+    void 지하철_노선_목록_조회_테스트() {
+        Map<String, String> gtxALineParams = new HashMap<>();
+        gtxALineParams.put("name", "GTX-A");
+        gtxALineParams.put("color", "bg-red-900");
+
+        Map<String, String> shinbundangLineParams = new HashMap<>();
+        shinbundangLineParams.put("name", "신분당선");
+        shinbundangLineParams.put("color", "bg-red-500");
+
+        // given
+        RestAssured.given().log().all()
+                .body(gtxALineParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        RestAssured.given().log().all()
+                .body(shinbundangLineParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> lines = RestAssured.given().log().all()
+                .params(new HashMap<>())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        List<String> lineNames = lines.body().jsonPath().getList("name");
+
+        assertThat(lines.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineNames).contains("신분당선","GTX-A");
     }
 
     /**
