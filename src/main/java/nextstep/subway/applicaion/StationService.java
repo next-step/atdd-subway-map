@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +21,8 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        checkDuplicated(stationRequest.getName());
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
@@ -45,4 +48,12 @@ public class StationService {
                 station.getModifiedDate()
         );
     }
+
+    private void checkDuplicated(String name) {
+        Optional<Station> findStation = stationRepository.findByName(name);
+        if (findStation.isPresent()) {
+            throw new RuntimeException("해당 지하철역이 이미 존재합니다.");
+        }
+    }
+
 }
