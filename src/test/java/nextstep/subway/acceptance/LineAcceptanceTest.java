@@ -87,7 +87,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         List<String> lineNames = lines.body().jsonPath().getList("name");
 
         assertThat(lines.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).contains("신분당선","GTX-A");
+        assertThat(lineNames).contains("신분당선", "GTX-A");
     }
 
     /**
