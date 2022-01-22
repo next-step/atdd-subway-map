@@ -30,18 +30,18 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLine(long id) {
+    public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
         return createLineResponse(line);
     }
 
-    public LineResponse modifyLine(long id, LineRequest lineRequest) {
+    public LineResponse modifyLine(Long id, LineRequest lineRequest) {
         Line line = lineRequest.toEntity(id);
         Line modifiedLine = lineRepository.save(line);
         return createLineResponse(modifiedLine);
     }
 
-    public void deleteLineById(long id) {
+    public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }
 
