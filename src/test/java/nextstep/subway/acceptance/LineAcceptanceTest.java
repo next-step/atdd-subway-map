@@ -21,7 +21,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         Map<String, String> lineRequest = new HashMap<>();
         lineRequest.put("name", "신분당선");
-        lineRequest.put("color", "red");
+        lineRequest.put("color", "bg-red-600");
 
         // when
         ExtractableResponse<Response> response =
