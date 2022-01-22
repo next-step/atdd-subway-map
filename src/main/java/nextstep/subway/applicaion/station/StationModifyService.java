@@ -1,7 +1,5 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.station;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
@@ -12,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class StationService {
+public class StationModifyService {
     private final StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
+    public StationModifyService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
@@ -28,25 +26,10 @@ public class StationService {
                         });
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
-    }
-
-    @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
-        List<Station> stations = stationRepository.findAll();
-
-        return stations.stream().map(this::createStationResponse).collect(Collectors.toList());
+        return StationResponse.of(station);
     }
 
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate());
     }
 }
