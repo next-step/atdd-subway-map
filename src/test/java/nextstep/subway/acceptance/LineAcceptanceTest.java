@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
@@ -8,7 +7,6 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.utils.AssuredRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("지하철 노선 관리 기능")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private final static String END_POINT = "/lines";
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -139,7 +140,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         return new LineRequest("100호선", "무지개색");
     }
 
-    private final static String END_POINT = "/lines";
     private ExtractableResponse<Response> 지하철_노선_Create(LineRequest lineRequest) {
         return AssuredRequest.doCreate(END_POINT, lineRequest);
     }
