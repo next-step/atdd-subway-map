@@ -200,6 +200,22 @@ HTTP/1.1 204
 Date: Fri, 13 Nov 2020 00:11:51 GMT
 ```
 
+## 알게된 것
+
+---
+
+### @PostMapping의 consumes, produces
+
+- consumes
+  - 요청 Content-Type을 제한할 수 있다.
+  - 기본 값은 `application/json`이다. 어길 시 `415 Unsupported Media Type 에러`
+- produces
+  - 응답 Content-Type을 제한할 수 있다.
+  - 즉, 요청 시 accept와 같다.
+  
+### Content-Type 필수 헤더 아님
+
+- 실제로 신경 써본게 이번이 처음이라 가물가물 했는데 경험함.
 ## 다음 미션에서 고민해볼 것
 
 ---
@@ -210,5 +226,3 @@ Date: Fri, 13 Nov 2020 00:11:51 GMT
 - put하고 왜 응답에 변경된 값을 반환하지 않을까?  
   그리고 왜 200일까? 204가 맞지 않을까? → [이건 팀 규칙으로 생각해야 하나?](https://developer.mozilla.org/ko/docs/Web/HTTP/Methods/PUT#%EC%9D%91%EB%8B%B5)
   예외 처리도 필요 데이터 없을 시 201 응답
-- put은 미디어 타입이 고정인가?? produces를 안했는데도 json말고 다른거 넘기면 415듬.
-  다른 메서드도 확인 해보자.
