@@ -1,7 +1,6 @@
 package nextstep.subway.acceptance;
 
 import static io.restassured.http.Method.*;
-import static java.lang.String.*;
 import static nextstep.subway.utils.AcceptanceTestUtils.*;
 import static org.apache.http.HttpHeaders.*;
 import static org.assertj.core.api.Assertions.*;
@@ -34,7 +33,7 @@ public abstract class AcceptanceTest {
 	int port;
 
 	@Autowired
-	private DatabaseCleanup databaseCleanup;
+	DatabaseCleanup databaseCleanup;
 
 	protected AcceptanceTest(String requestBasePath, String idFieldKey) {
 		this.requestBasePath = requestBasePath;
@@ -53,7 +52,7 @@ public abstract class AcceptanceTest {
 	}
 
 	protected ExtractableResponse<Response> 단건_조회_요청(long id) {
-		return request(GET, createRequestPathWithVariable(id), Collections.emptyMap());
+		return request(GET, createRequestPathWithVariable(requestBasePath, id), Collections.emptyMap());
 	}
 
 	protected ExtractableResponse<Response> 생성_요청(Map<String, String> params) {
@@ -61,11 +60,11 @@ public abstract class AcceptanceTest {
 	}
 
 	protected ExtractableResponse<Response> 삭제_요청(long id) {
-		return request(DELETE, createRequestPathWithVariable(id), Collections.emptyMap());
+		return request(DELETE, createRequestPathWithVariable(requestBasePath, id), Collections.emptyMap());
 	}
 
 	protected ExtractableResponse<Response> 수정_요청(long id, Map<String, String> params) {
-		return request(PUT, createRequestPathWithVariable(id), params);
+		return request(PUT, createRequestPathWithVariable(requestBasePath, id), params);
 	}
 
 	private ExtractableResponse<Response> request(Method method, String path, Map<String, String> params) {
@@ -77,10 +76,6 @@ public abstract class AcceptanceTest {
 			.request(method, path)
 			.then().log().all()
 			.extract();
-	}
-
-	private String createRequestPathWithVariable(long id) {
-		return format("%s/%s", requestBasePath, id);
 	}
 
 	protected long 아이디_추출(ExtractableResponse<Response> response) {

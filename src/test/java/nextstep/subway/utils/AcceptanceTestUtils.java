@@ -1,5 +1,7 @@
 package nextstep.subway.utils;
 
+import static java.lang.String.*;
+
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -13,5 +15,14 @@ public class AcceptanceTestUtils {
 	 */
 	public static long extractId(ExtractableResponse<Response> response, String fieldName) {
 		return response.jsonPath().getLong(fieldName);
+	}
+
+	/**
+	 * Path Variable 형태로 요청 URL 을 생성합니다.
+	 * @param id
+	 * @return
+	 */
+	public static String createRequestPathWithVariable(String requestBasePath, long id) {
+		return format("%s/%s", requestBasePath, id);
 	}
 }
