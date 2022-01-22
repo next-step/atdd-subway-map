@@ -25,18 +25,10 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String uri) {
-        return RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
-    }
-
     public static ExtractableResponse<Response> 지하철_노선_조회_요청(String uri) {
         return RestAssured.given().log().all()
                 .when()
-                .get(DEFAULT_PATH + uri)
+                .get(uri)
                 .then().log().all()
                 .extract();
     }

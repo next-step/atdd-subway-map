@@ -51,7 +51,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 같은 이름으로 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 실패한다.
      */
-    @DisplayName("지하철역 중복이름 생성")
+    @DisplayName("지하철 노선 중복이름 생성")
     @Test
     void createDuplicateNameLine() {
         // given
@@ -94,8 +94,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         String createDate2 = createResponse2.jsonPath().get("createdDate");
         String modifiedDate2 = createResponse2.jsonPath().get("modifiedDate");
 
-
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_조회_요청("");
+        String url = LineSteps.DEFAULT_PATH;
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_조회_요청(url);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> names = response.jsonPath().getList("name");
@@ -203,7 +203,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_삭제_요청(uri);
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
