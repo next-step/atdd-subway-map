@@ -43,11 +43,30 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given, when
-        ExtractableResponse<Response> response =
-            지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 생성 실패 - 중복 이름")
+    @Test
+    void createLineThatFailing() {
+        // given
+        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+
+        //then
+        ExtractableResponse<Response> inquiryResponse = 지하철_노선_조회(2);
+        assertThat(createResponse.statusCode()).isNotEqualTo(HttpStatus.OK.value());
+        assertThat(inquiryResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -71,7 +90,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                                                             .extract();
 
         //then
-        List<String> lineNames = response.jsonPath().getList("name");
+        List<String> lineNames = response.jsonPath()
+                                         .getList("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(lineNames).containsExactly(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.삼호선.getName());
@@ -92,7 +112,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회(1);
 
         // then
-        String lineName = response.jsonPath().get("name");
+        String lineName = response.jsonPath()
+                                  .get("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(lineName).isEqualTo(지하철_생성_수정_요청_Params.이호선.getName());
@@ -114,19 +135,21 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", 지하철_생성_수정_요청_Params.삼호선.getName());
         params.put("color", 지하철_생성_수정_요청_Params.삼호선.getColor());
         ExtractableResponse<Response> editResponse = RestAssured.given().log().all()
-                                                            .body(params)
-                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                            .when()
-                                                            .put("/lines/1")
-                                                            .then().log().all()
-                                                            .extract();
+                                                                .body(params)
+                                                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                .when()
+                                                                .put("/lines/1")
+                                                                .then().log().all()
+                                                                .extract();
 
         // then
         ExtractableResponse<Response> findResponse = 지하철_노선_조회(1);
 
         assertThat(editResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String) findResponse.jsonPath().get("name")).isEqualTo(지하철_생성_수정_요청_Params.삼호선.getName());
-        assertThat((String) findResponse.jsonPath().get("color")).isEqualTo(지하철_생성_수정_요청_Params.삼호선.getColor());
+        assertThat((String)findResponse.jsonPath()
+                                       .get("name")).isEqualTo(지하철_생성_수정_요청_Params.삼호선.getName());
+        assertThat((String)findResponse.jsonPath()
+                                       .get("color")).isEqualTo(지하철_생성_수정_요청_Params.삼호선.getColor());
     }
 
     /**
@@ -142,14 +165,15 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                                                            .when()
-                                                            .delete("/lines/1")
-                                                            .then().log().all()
-                                                            .extract();
+                                                                  .when()
+                                                                  .delete("/lines/1")
+                                                                  .then().log().all()
+                                                                  .extract();
 
         // then
         ExtractableResponse<Response> findResponse = 지하철_노선_조회(1);
-        String deletedName = findResponse.jsonPath().get("name");
+        String deletedName = findResponse.jsonPath()
+                                         .get("name");
 
         assertThat(deletedName).isNull();
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
