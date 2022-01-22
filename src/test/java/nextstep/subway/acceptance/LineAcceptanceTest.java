@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.common.CommonLineAcceptance.*;
+import static nextstep.subway.acceptance.common.CommonStationAcceptance.getParamsStationMap;
+import static nextstep.subway.acceptance.common.CommonStationAcceptance.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -24,16 +26,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        Map<String, String> params = getParamsLineMap("신분당선", "bg-red-600");
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
+        Map<String, String> 신분당선 = getParamsLineMap("신분당선", "bg-red-600");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
         String responseName = response.jsonPath().getString("name");
         String responseColor = response.jsonPath().getString("color");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(responseName).isEqualTo(params.get("name"));
-        assertThat(responseColor).isEqualTo(params.get("color"));
+        assertThat(responseName).isEqualTo(신분당선.get("name"));
+        assertThat(responseColor).isEqualTo(신분당선.get("color"));
         assertThat(response.header("location")).isNotEmpty();
     }
 
@@ -49,12 +51,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
-        지하철_노선_생성_요청(params);
+        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        지하철_노선_생성_요청(신분당선);
 
         //given
-        Map<String, String> params2 = getParamsLineMap("2호선", "bg-green-600");
-        지하철_노선_생성_요청(params2);
+        Map<String, String> _2호선 = getParamsLineMap("2호선", "bg-green-600");
+        지하철_노선_생성_요청(_2호선);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -65,8 +67,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).containsExactly(params.get("name"), params2.get("name"));
-        assertThat(response.jsonPath().getList("color")).containsExactly(params.get("color"), params2.get("color"));
+        assertThat(response.jsonPath().getList("name")).containsExactly(신분당선.get("name"), _2호선.get("name"));
+        assertThat(response.jsonPath().getList("color")).containsExactly(신분당선.get("color"), _2호선.get("color"));
     }
 
     /**
@@ -78,9 +80,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
 
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // when
         response = RestAssured
@@ -91,8 +93,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(params.get("name"));
-        assertThat(response.jsonPath().getString("color")).isEqualTo(params.get("color"));
+        assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선.get("name"));
+        assertThat(response.jsonPath().getString("color")).isEqualTo(신분당선.get("color"));
 
     }
 
@@ -105,9 +107,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
 
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // when
         Map<String, String> modifyParams = getParamsLineMap("구분당선","bg-blue-600");
@@ -136,8 +138,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params = getParamsLineMap("신분당선","bg-red-600");
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
+        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // when
         String location = response.header("location");
@@ -151,4 +153,27 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Scenario: 중복이름으로 지하철 노선 생성
+     *  Given 지하철노선 생성을 요청 하고
+     *  When 같은 이름으로 지하철 노선 생성을 요청 하면
+     *  Then 지하철 노선역 생성이 실패한다.
+     */
+    @Test
+    @DisplayName("지하철노선 중복 이름으로 생성 불가")
+    void duplicated_line_interdict() {
+        //given
+        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        지하철역_생성_요청(신분당선);
+
+        //when
+        ExtractableResponse<Response> response
+                = 지하철역_생성_요청(신분당선);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 이름으로 생성할 수 없습니다.");
+    }
+
 }
