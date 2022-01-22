@@ -24,7 +24,6 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-
         // Entity to LineResponse(DTO)
         return new LineResponse(line);
     }
