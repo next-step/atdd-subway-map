@@ -105,7 +105,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.body().jsonPath().getList("name"))
                 .containsExactly(LINE_NEW_BOONDANG.getName(), LINE_TWO.getName());
         assertThat(response.body().jsonPath().getList("color"))
-                .containsExactly(LINE_NEW_BOONDANG.getName(), LINE_TWO.getName());
+                .containsExactly(LINE_NEW_BOONDANG.getColor(), LINE_TWO.getColor());
     }
 
     /**
