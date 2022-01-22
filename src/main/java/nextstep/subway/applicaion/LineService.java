@@ -7,6 +7,9 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class LineService {
@@ -18,6 +21,45 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        );
+    }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse findLineById(Long id) {
+        var line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + id));
+
+        return createLineResponse(line);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAllLines() {
+        var lines = lineRepository.findAll();
+
+        return lines.stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        var line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + id));
+        line.update(lineRequest.getName(), lineRequest.getColor());
+
+        return createLineResponse(line);
+    }
+
+    private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
