@@ -3,8 +3,9 @@ package nextstep.subway.ui;
 import java.net.URI;
 import java.util.List;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
+import nextstep.subway.applicaion.dto.LineReadResponse;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,25 +25,26 @@ public class LineController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LineCreateResponse>> getAllLines() {
-        List<LineCreateResponse> lines = lineService.findAllLines();
+    public ResponseEntity<List<LineReadResponse>> getAllLines() {
+        List<LineReadResponse> lines = lineService.findAllLines();
         return ResponseEntity.ok().body(lines);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<LineCreateResponse> getLine(@PathVariable Long id) {
-        LineCreateResponse line = lineService.findSpecificLine(id);
+    public ResponseEntity<LineReadResponse> getLine(@PathVariable Long id) {
+        LineReadResponse line = lineService.findSpecificLine(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest){
+    public ResponseEntity<Void> updateLine(
+            @PathVariable Long id, @RequestBody LineRequest lineRequest) {
         lineService.updateLine(id, lineRequest);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id){
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
     }

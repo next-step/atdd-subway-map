@@ -8,8 +8,6 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -112,17 +110,18 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> updateRequest = new HashMap<>();
         updateRequest.put("name", updateLineName);
         updateRequest.put("color", updateLineColor);
-        ExtractableResponse<Response> updateResponse = RestAssured.given()
-          .log()
-          .all()
-          .body(updateRequest)
-          .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .when()
-          .put("/lines/" + id)
-          .then()
-          .log()
-          .all()
-          .extract();
+        ExtractableResponse<Response> updateResponse =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(updateRequest)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .put("/lines/" + id)
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -152,15 +151,16 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         long id = createResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> deleteResponse = RestAssured.given()
-          .log()
-          .all()
-          .when()
-          .delete("/lines/" + id)
-          .then()
-          .log()
-          .all()
-          .extract();
+        ExtractableResponse<Response> deleteResponse =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .when()
+                        .delete("/lines/" + id)
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -170,21 +170,29 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
-    static ExtractableResponse<Response> lineCreateRequest(Map<String, String> lineRequest){
+    static ExtractableResponse<Response> lineCreateRequest(Map<String, String> lineRequest) {
         return RestAssured.given()
-            .log()
-            .all()
-            .body(lineRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then()
-            .log()
-            .all()
-            .extract();
+                .log()
+                .all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
-    static ExtractableResponse<Response> specificLineReadRequest(Long id){
-        return RestAssured.given().log().all().when().get("/lines/" + id).then().log().all().extract();
+    static ExtractableResponse<Response> specificLineReadRequest(Long id) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .get("/lines/" + id)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 }

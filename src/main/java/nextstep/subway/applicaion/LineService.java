@@ -1,9 +1,11 @@
 package nextstep.subway.applicaion;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
+import nextstep.subway.applicaion.dto.LineReadResponse;
+import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.NotFoundException;
@@ -31,36 +33,18 @@ public class LineService {
 
     // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
     @Transactional(readOnly = true)
-    public List<LineCreateResponse> findAllLines() {
+    public List<LineReadResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(
-                        line ->
-                                // TODO 해당 부분 엔티티/도메인에서 처리할 수 있도록 변경 필요 -> Response 쪽에서 처리하는 것이
-                                // 유리해보임
-                                new LineCreateResponse(
-                                        line.getId(),
-                                        line.getName(),
-                                        line.getColor(),
-                                        line.getCreatedDate(),
-                                        line.getModifiedDate()))
+                .map(line -> LineReadResponse.of(line, Collections.EMPTY_LIST))
                 .collect(Collectors.toList());
     }
 
     // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
     @Transactional(readOnly = true)
-    public LineCreateResponse findSpecificLine(Long id) {
+    public LineReadResponse findSpecificLine(Long id) {
         return lineRepository
                 .findById(id)
-                .map(
-                        line ->
-                              // TODO 해당 부분 엔티티/도메인에서 처리할 수 있도록 변경 필요 -> Response 쪽에서 처리하는 것이
-                              // 유리해보임
-                                new LineCreateResponse(
-                                        line.getId(),
-                                        line.getName(),
-                                        line.getColor(),
-                                        line.getCreatedDate(),
-                                        line.getModifiedDate()))
+                .map(line -> LineReadResponse.of(line, Collections.EMPTY_LIST))
                 .orElseThrow(NotFoundException::new);
     }
 
@@ -71,7 +55,7 @@ public class LineService {
         line.changeLineInformation(lineRequest.getName(), lineRequest.getColor());
     }
 
-    public void deleteLine(Long id){
+    public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }
 }
