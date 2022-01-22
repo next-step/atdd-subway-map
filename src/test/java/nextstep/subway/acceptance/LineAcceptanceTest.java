@@ -84,8 +84,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         long id = createResponse.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> readLineResponse =
-          RestAssured.given().log().all().when().get("/lines/" + id).then().log().all().extract();
+        ExtractableResponse<Response> readLineResponse = specificLineReadRequest(id);
 
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String responseLineName = readLineResponse.jsonPath().getString("name");
@@ -130,7 +129,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(id);
         assertThat(readUpdatedLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString("name");
+        String readUpdatedLineColor = readUpdatedLineResponse.jsonPath().getString("color");
         assertThat(readUpdatedLineName).isEqualTo(updateLineName);
+        assertThat(readUpdatedLineColor).isEqualTo(updateLineColor);
     }
 
     /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 삭제를 요청 하면 Then 생성한 지하철 노선 삭제가 성공한다. */
