@@ -7,6 +7,8 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.ui.exception.UniqueKeyExistsException;
@@ -22,27 +24,36 @@ public class LineService {
     }
 
     @Transactional
-    public Line saveLine(Line line) {
+    public LineResponse saveLine(LineRequest line) {
         validateCreateLine(line);
-        return lineRepository.save(new Line(line.getName(), line.getColor()));
+        return LineResponse.from(
+            lineRepository.save(
+                Line.of(line.getName(), line.getColor())));
     }
 
-    public List<Line> getAllLines() {
-        return lineRepository.findAll();
-	}
+    public List<LineResponse> getAllLines() {
+        return LineResponse.fromList(lineRepository.findAll());
+    }
 
-    public Line getLine(long id) {
-        return lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public LineResponse getLine(long id) {
+        final Line line = findLineById(id);
+        return LineResponse.from(line);
+    }
+
+    private Line findLineById(long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
-    public Line updateLine(long id, Line request) {
-        final Line line = getLine(id);
-        line.update(request);
+    public LineResponse updateLine(long id, LineRequest request) {
+        validateUpdateLine(id, request);
 
-        validateUpdateLine(line);
+        final Line line = findLineById(id);
 
-        return line;
+        line.update(request.toEntity());
+
+        return LineResponse.from(line);
     }
 
     @Transactional
@@ -50,13 +61,13 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private void validateUpdateLine(Line line) {
-        if (lineRepository.existsByNameAndIdIsNot(line.getName(), line.getId())) {
+    private void validateUpdateLine(long id, LineRequest line) {
+        if (lineRepository.existsByNameAndIdIsNot(line.getName(), id)) {
             throw new UniqueKeyExistsException(line.getName());
         }
     }
 
-    private void validateCreateLine(Line line) {
+    private void validateCreateLine(LineRequest line) {
         if (lineRepository.existsByName(line.getName())) {
             throw new UniqueKeyExistsException(line.getName());
         }

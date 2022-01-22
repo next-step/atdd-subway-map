@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.exception.UniqueKeyExistsException;
@@ -19,16 +21,17 @@ public class StationService {
 	}
 
 	@Transactional
-	public Station saveStation(Station requestStation) {
+	public StationResponse saveStation(StationRequest requestStation) {
 		if (isStationExists(requestStation)) {
 			throw new UniqueKeyExistsException(requestStation.getName());
 		}
 
-		return stationRepository.save(requestStation);
+		final Station station = stationRepository.save(requestStation.toEntity());
+		return StationResponse.from(station);
 	}
 
-	public List<Station> findAllStations() {
-		return stationRepository.findAll();
+	public List<StationResponse> findAllStations() {
+		return StationResponse.fromList(stationRepository.findAll());
 	}
 
 	@Transactional
@@ -36,7 +39,7 @@ public class StationService {
 		stationRepository.deleteById(id);
 	}
 
-	private boolean isStationExists(Station station) {
+	private boolean isStationExists(StationRequest station) {
 		return stationRepository.findByName(station.getName()).isPresent();
 	}
 }

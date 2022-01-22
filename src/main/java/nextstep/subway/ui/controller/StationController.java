@@ -2,7 +2,6 @@ package nextstep.subway.ui.controller;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
 
 @RestController
 public class StationController {
@@ -28,17 +26,17 @@ public class StationController {
 
 	@PostMapping("/stations")
 	public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-		Station station = stationService.saveStation(stationRequest.toEntity());
+		final StationResponse station = stationService.saveStation(stationRequest);
 		return ResponseEntity
 			.created(getCreateStatusHeader(station))
-			.body(toResponse(station));
+			.body(station);
 	}
 
 	@GetMapping(value = "/stations", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<StationResponse>> showStations() {
 		return ResponseEntity
 			.ok()
-			.body(toListResponse(stationService.findAllStations()));
+			.body(stationService.findAllStations());
 	}
 
 	@DeleteMapping("/stations/{id}")
@@ -47,15 +45,7 @@ public class StationController {
 		return ResponseEntity.noContent().build();
 	}
 
-	private URI getCreateStatusHeader(Station station) {
+	private URI getCreateStatusHeader(StationResponse station) {
 		return URI.create("/stations/" + station.getId());
-	}
-
-	private StationResponse toResponse(Station station) {
-		return StationResponse.from(station);
-	}
-
-	private List<StationResponse> toListResponse(List<Station> allStations) {
-		return allStations.stream().map(this::toResponse).collect(Collectors.toList());
 	}
 }

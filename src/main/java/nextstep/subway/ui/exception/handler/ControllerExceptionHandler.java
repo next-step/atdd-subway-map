@@ -6,15 +6,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import nextstep.subway.ui.error.ErrorResponse;
-import nextstep.subway.ui.exception.UniqueKeyExistsException;
+import nextstep.subway.ui.exception.BadRequestException;
+import nextstep.subway.ui.exception.ConflictRequestException;
 
 @RestControllerAdvice(basePackages = "nextstep.subway")
 public class ControllerExceptionHandler {
 
-	@ExceptionHandler(UniqueKeyExistsException.class)
-	public ResponseEntity<ErrorResponse> uniqueKeyExists(Exception exception) {
+	@ExceptionHandler(ConflictRequestException.class)
+	public ResponseEntity<ErrorResponse> conflictRequest(Exception exception) {
 		return ResponseEntity
 			.status(HttpStatus.CONFLICT)
+			.body(ErrorResponse.from(exception.getMessage()));
+	}
+
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<ErrorResponse> badRequest(Exception exception) {
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
 			.body(ErrorResponse.from(exception.getMessage()));
 	}
 
