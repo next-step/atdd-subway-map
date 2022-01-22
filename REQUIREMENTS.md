@@ -31,12 +31,37 @@ Connection: close
 }
 ```
 
-## [ ] Feature: 지하철 노선 관리 기능
+## [X] Feature: 지하철 노선 관리 기능
 
-### Scenario: 중복이름으로 지하철 노선 생성
+### [X] Scenario: 중복이름으로 지하철 노선 생성
 * Given 지하철 노선 생성을 요청 하고
 * When 같은 이름으로 지하철 노선 생성을 요청 하면
 * Then 지하철 노선 생성이 실패한다.
+```
+Request method:	POST
+Request URI:	http://localhost:3615/lines
+Headers:		Accept=*/*
+				Content-Type=application/json; charset=UTF-8
+Body:
+{
+    "color": "bg-red-600",
+    "name": "신분당선"
+}
+```
+```
+HTTP/1.1 400 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 22 Jan 2022 16:54:15 GMT
+Connection: close
+
+{
+    "timestamp": "2022-01-22T16:54:15.618+00:00",
+    "status": 400,
+    "error": "Bad Request",
+    "path": "/lines"
+}
+```
 
 ### [X] Scenario: 지하철 노선 생성
 * When 지하철 노선 생성을 요청 하면
