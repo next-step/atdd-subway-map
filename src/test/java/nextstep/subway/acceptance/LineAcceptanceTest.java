@@ -151,7 +151,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         Map<String, String> updateParams = new HashMap<>();
-        params.put("color", "bg-red-800");
+        updateParams.put("color", "bg-red-800");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
