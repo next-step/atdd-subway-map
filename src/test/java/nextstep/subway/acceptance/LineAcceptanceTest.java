@@ -33,11 +33,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> request = lineRequest("color_1", "name_1");
 
         // given, when, then
-        ExtractableResponse<Response> extract = RestAssured
-                .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> extract = saveLine(request);
 
         // 상태 코드
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -61,17 +57,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> request2 = lineRequest("color_2", "name_2");
 
         // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().body(request2).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        saveLine(request1);
+        saveLine(request2);
 
         ExtractableResponse<Response> resultResponse = RestAssured
                 .given().log().all()
@@ -98,11 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        saveLine(request1);
 
         // 조회 결과
         ExtractableResponse<Response> resultResponse = RestAssured
@@ -130,16 +113,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        saveLine(request1);
 
         // 수정할 데이터
-        Map<String, String> request2 = new HashMap<>();
-        request2.put("color", "color_1");
-        request2.put("name", "new_name_1");
+        Map<String, String> request2 = lineRequest("color_2", "name_2");
 
         // 수정 요청
         ExtractableResponse<Response> resultResponse = RestAssured
@@ -164,11 +141,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        saveLine(request1);
 
         // 삭제를 한다.
         ExtractableResponse<Response> resultResponse = RestAssured
@@ -187,5 +160,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         request.put("name", name);
 
         return request;
+    }
+
+    // 요청을 하고 생성을 했을 때
+    private ExtractableResponse<Response> saveLine(final Map<String, String> lineRequest) {
+
+        return RestAssured
+                .given().body(lineRequest).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
     }
 }
