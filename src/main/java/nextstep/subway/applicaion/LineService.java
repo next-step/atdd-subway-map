@@ -35,6 +35,12 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public LineResponse modifyLine(long id, LineRequest lineRequest) {
+        Line line = lineRequest.toEntity(id);
+        Line modifiedLine = lineRepository.save(line);
+        return createLineResponse(modifiedLine);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),

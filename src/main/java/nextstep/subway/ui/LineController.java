@@ -26,12 +26,17 @@ public class LineController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> showStations() {
+    public ResponseEntity<List<LineResponse>> getLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> getStation(@PathVariable long id){
+    public ResponseEntity<LineResponse> getLine(@PathVariable long id){
         return ResponseEntity.ok().body(lineService.findLine(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<LineResponse> modifyLine(@PathVariable long id, @RequestBody LineRequest lineRequest){
+        return ResponseEntity.ok().body(lineService.modifyLine(id, lineRequest));
     }
 }
