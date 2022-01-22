@@ -55,7 +55,7 @@ public class LineStep {
 	}
 
 	// 삭제
-	public static ExtractableResponse<Response> removeLine(final Integer id) {
+	public static ExtractableResponse<Response> deleteLine(final Integer id) {
 
 		return RestAssured
 						.given().log().all()

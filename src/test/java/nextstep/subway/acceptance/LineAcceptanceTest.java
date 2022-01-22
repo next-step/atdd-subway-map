@@ -112,7 +112,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         LineStep.saveLine("color_1", "name_1");
 
         // 노선을 삭제하다
-        ExtractableResponse<Response> response = LineStep.removeLine(NUMBER_ONE);
+        ExtractableResponse<Response> response = LineStep.deleteLine(NUMBER_ONE);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
