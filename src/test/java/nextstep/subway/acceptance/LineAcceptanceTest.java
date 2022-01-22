@@ -84,10 +84,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .get("/lines")
+                        .then().log().all()
+                        .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
@@ -109,22 +110,23 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> createResponse =
                 RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .log().all()
-                .extract();
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log().all()
+                        .extract();
 
         // when
         String url = createResponse.header("Location");
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                .when()
-                .get(url)
-                .then().log().all()
-                .extract();
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .get(url)
+                        .then().log().all()
+                        .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         String lineName = response.jsonPath().getString("name");
@@ -146,13 +148,13 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> createResponse =
                 RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .log().all()
-                .extract();
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log().all()
+                        .extract();
 
         // when
         Map<String, String> updateParams = new HashMap<>();
@@ -161,12 +163,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         String url = createResponse.header("Location");
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                .body(updateParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put(url)
-                .then().log().all()
-                .extract();
+                        .body(updateParams)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .put(url)
+                        .then().log().all()
+                        .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
