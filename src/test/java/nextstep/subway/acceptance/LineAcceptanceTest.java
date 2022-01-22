@@ -95,6 +95,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        
     }
 
     /**
