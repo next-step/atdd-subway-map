@@ -30,9 +30,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
 
         // 요청에 대한 데이터
-        Map<String, String> request = new HashMap<>();
-        request.put("color", "color_1");
-        request.put("name", "name_1");
+        Map<String, String> request = lineRequest("color_1", "name_1");
 
         // given, when, then
         ExtractableResponse<Response> extract = RestAssured
@@ -57,14 +55,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
 
         // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
+        Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 지하철 노선 2를 생성
-        Map<String, String> request2 = new HashMap<>();
-        request2.put("color", "color_2");
-        request2.put("name", "name_2");
+        Map<String, String> request2 = lineRequest("color_2", "name_2");
 
         // 요청을 하고 생성을 했을 때
         RestAssured
@@ -101,9 +95,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
 
         // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
+        Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 요청을 하고 생성을 했을 때
         RestAssured
@@ -135,9 +127,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
 
         // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
+        Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 요청을 하고 생성을 했을 때
         RestAssured
@@ -171,9 +161,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
 
         // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
+        Map<String, String> request1 = lineRequest("color_1", "name_1");
 
         // 요청을 하고 생성을 했을 때
         RestAssured
@@ -190,5 +178,14 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    // 노선을 생성하는 Request
+    private Map<String, String> lineRequest(final String color, final String name) {
+        Map<String, String> request = new HashMap<>();
+        request.put("color", color);
+        request.put("name", name);
+
+        return request;
     }
 }
