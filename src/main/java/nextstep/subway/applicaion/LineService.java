@@ -34,6 +34,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
+<<<<<<< HEAD
 
     public LineResponse findById(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
@@ -48,4 +49,6 @@ public class LineService {
     public void delete(Long id) {
         lineRepository.deleteById(id);
     }
+=======
+>>>>>>> c2a4b18 (feat : 지하철 노선 목록 조회)
 }
