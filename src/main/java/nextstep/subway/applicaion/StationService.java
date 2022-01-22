@@ -22,8 +22,9 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        Optional<Station> findStationByName = stationRepository.findByName(stationRequest.getName());
-        if (findStationByName.isPresent()) {
+        boolean existStationByName = stationRepository.findByName(stationRequest.getName())
+            .isPresent();
+        if (existStationByName) {
             throw new DuplicateStationException();
         }
 
