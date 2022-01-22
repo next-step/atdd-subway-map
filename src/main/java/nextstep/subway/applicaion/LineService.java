@@ -38,6 +38,17 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).get();
+
+        return createLineResponse(line);
+    }
+
+    public void updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).get();
+        line.update(lineRequest);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
@@ -46,5 +57,9 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 }
