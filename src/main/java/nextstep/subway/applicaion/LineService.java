@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +22,8 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        checkDuplicated(request.getName());
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
     }
@@ -58,5 +61,12 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    private void checkDuplicated(String name) {
+        Optional<Line> findStation = lineRepository.findByName(name);
+        if (findStation.isPresent()) {
+            throw new RuntimeException("해당 지하철 노선이 이미 존재합니다.");
+        }
     }
 }
