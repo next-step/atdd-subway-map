@@ -171,9 +171,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 역 생성을 요청한다.
-     * When 지하철 역 삭제를 요청한다.
-     * Then 지하철 역이 삭제된다.
+     * Given 지하철 노션을 생성을 요청한다.
+     * When 생성된 지하철 노션을 삭제를 요청한다.
+     * Then 지하철 노션이 삭제된다.
      */
     @DisplayName("지하철 노선 삭제")
     @Test
