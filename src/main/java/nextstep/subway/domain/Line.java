@@ -1,8 +1,11 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-
-import javax.persistence.*;
+import java.util.List;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Line extends BaseEntity {
@@ -37,12 +40,12 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Stations getStations() {
-        return stations;
+    public List<Station> getStations() {
+        return stations.getStations();
     }
 
-    public void update(LineRequest lineInfo) {
-        this.name = lineInfo.getName();
-        this.color = lineInfo.getColor();
+    public void update(String updateName, String updateColor) {
+        this.name = updateName;
+        this.color = updateColor;
     }
 }

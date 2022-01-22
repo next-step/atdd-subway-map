@@ -39,11 +39,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-            station.getId(),
-            station.getName(),
-            station.getCreatedDate(),
-            station.getModifiedDate()
-        );
+        return StationResponse.from(station);
     }
 }
