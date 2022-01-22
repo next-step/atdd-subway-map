@@ -67,4 +67,9 @@ public class LineService {
                 line.getModifiedDate()
         );
     }
+
+    public void deleteLine(Long id) {
+        Line line = lineRepository.getById(id);
+        lineRepository.deleteById(line.getId());
+    }
 }
