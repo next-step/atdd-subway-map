@@ -43,6 +43,6 @@ public class Line extends BaseEntity {
     }
 
     public boolean notMatchName(String name) {
-        return this.name.equals(name);
+        return !this.name.equals(name);
     }
 }
