@@ -20,8 +20,7 @@ public class StationService {
     }
 
     public boolean existsStationByName(String name) {
-        Station station = stationRepository.findByName(name);
-        return station != null;
+        return stationRepository.existsStationByName(name);
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {

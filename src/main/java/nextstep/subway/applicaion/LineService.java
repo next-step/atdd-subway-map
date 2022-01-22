@@ -23,8 +23,7 @@ public class LineService {
     }
 
     public boolean existsLineByName(String name) {
-        Line line = lineRepository.findByName(name);
-        return line != null;
+        return lineRepository.existsLineByName(name);
     }
 
     public LineCreateResponse saveLine(LineCreateRequest request) {
