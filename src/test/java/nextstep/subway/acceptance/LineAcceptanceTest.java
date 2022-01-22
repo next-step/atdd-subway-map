@@ -183,9 +183,33 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * When 생성한 지하철 노선 삭제를 요청 하면
      * Then 생성한 지하철 노선 삭제가 성공한다.
+     * @see nextstep.subway.ui.LineController#deleteLine
      */
-    @DisplayName("지하철 노선 삭제")
     @Test
-    void deleteLine() {
+    void 지하철_노선_삭제_테스트() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "GTX-A");
+        params.put("color", "bg-red-900");
+
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
