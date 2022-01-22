@@ -133,7 +133,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 	 * When 같은 이름으로 지하철 노선 생성을 요청하면
 	 * Then 지하철 노선 생성이 실패한다.
 	 */
-	@DisplayName("지하철 노선 중복 생성")
+	@DisplayName("지하철 노선 중복이름 생성")
 	@ParameterizedTest
 	@CsvSource({"9호선, bg-yellow-600", "신분당선, bg-green-400", "김포골드라인, bg-gold-100"})
 	void createDuplicateLine(String 노선이름, String 노선색상) {
@@ -143,6 +143,27 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 		// when
 		final ExtractableResponse<Response> 요청_응답 = 생성_요청(요청_본문);
+
+		// then
+		중복_생성_요청_실패_검증(요청_응답);
+	}
+
+	/**
+	 * Given 이름이 다른 두 지하철 노선 생성을 요청 하고
+	 * When 하나의 지하철을 다른 지하철의 같은 이름으로 지하철 노선 변경을 요청하면
+	 * Then 지하철 노선 생성이 실패한다.
+	 */
+	@DisplayName("지하철 노선 중복이름 변경")
+	@ParameterizedTest
+	@CsvSource({"9호선, bg-yellow-600, 신분당선, bg-green-400"})
+	void updateDuplicateLine(String 노선이름, String 노선색상, String 다른_노선이름, String 다른_노선색상) {
+		// given
+		생성_요청(노선_요청_본문_생성(노선이름, 노선색상));
+		final ExtractableResponse<Response> 다른_노선_요청_응답 = 생성_요청(노선_요청_본문_생성(다른_노선이름, 다른_노선색상));
+		final long 다른_노선_아이디 = 아이디_추출(다른_노선_요청_응답);
+
+		// when
+		final ExtractableResponse<Response> 요청_응답 = 수정_요청(다른_노선_아이디, 노선_요청_본문_생성(노선이름, 노선색상));
 
 		// then
 		중복_생성_요청_실패_검증(요청_응답);

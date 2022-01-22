@@ -7,7 +7,6 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.ui.exception.UniqueKeyExistsException;
@@ -24,14 +23,8 @@ public class LineService {
 
     @Transactional
     public Line saveLine(Line line) {
-        if (isLineExists(line)) {
-            throw new UniqueKeyExistsException(line.getName());
-        }
+        validateCreateLine(line);
         return lineRepository.save(new Line(line.getName(), line.getColor()));
-    }
-
-    private boolean isLineExists(Line line) {
-        return lineRepository.findByName(line.getName()).isPresent();
     }
 
     public List<Line> getAllLines() {
@@ -43,14 +36,29 @@ public class LineService {
     }
 
     @Transactional
-    public Line updateLine(long id, LineRequest request) {
+    public Line updateLine(long id, Line request) {
         final Line line = getLine(id);
-        line.update(request.toEntity());
+        line.update(request);
+
+        validateUpdateLine(line);
+
         return line;
     }
 
     @Transactional
     public void deleteLine(long id) {
         lineRepository.deleteById(id);
+    }
+
+    private void validateUpdateLine(Line line) {
+        if (lineRepository.existsByNameAndIdIsNot(line.getName(), line.getId())) {
+            throw new UniqueKeyExistsException(line.getName());
+        }
+    }
+
+    private void validateCreateLine(Line line) {
+        if (lineRepository.existsByName(line.getName())) {
+            throw new UniqueKeyExistsException(line.getName());
+        }
     }
 }

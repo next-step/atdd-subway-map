@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
-import static java.util.stream.Collectors.*;
-
 import java.time.LocalDateTime;
-import java.util.List;
 
 import nextstep.subway.domain.Line;
 
@@ -24,10 +21,6 @@ public class LineResponse {
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
-
-	public static List<LineResponse> fromList(List<Line> lines) {
-        return lines.stream().map(LineResponse::from).collect(toList());
-	}
 
     public static LineResponse from(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate());
