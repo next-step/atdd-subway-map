@@ -214,4 +214,44 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+
+    /*
+       Given 지하철 노선 생성을 요청 하고
+       When 같은 이름으로 지하철 노선 생성을 요청 하면
+       Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
+    @Test
+    void duplicatedLine() {
+
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-red-600");
+        params.put("name", "신분당선");
+
+        RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .post("/lines")
+                .then().log().all().extract();
+
+        // when
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "신분당선");
+        params2.put("color", "bg-red-600");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params2)
+                .when()
+                .post("/lines")
+                .then().log().all().extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
 }
