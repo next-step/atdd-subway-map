@@ -67,6 +67,18 @@ class LineAcceptanceTest extends AcceptanceTest {
         return response;
     }
 
+    private ExtractableResponse<Response> getOneLine(Long id) {
+        return RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+
+                .when()
+                .get("/lines/" + id)
+
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -116,6 +128,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
+
+        // when
+        ExtractableResponse<Response> response = getOneLine(responseByPost.body().jsonPath().getLong("id"));
+
+        // then
+        verifyResponseStatus(response, HttpStatus.OK);
+        verifyResponseBodyElement(response, LINE_NEW_BOONDANG);
     }
 
     /**
