@@ -113,6 +113,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 이름으로 생성할 수 없습니다.");
+        assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 지하철역을 생성할 수 없습니다.");
     }
+
 }

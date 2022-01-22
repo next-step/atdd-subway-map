@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicatedStationException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicatedStationNameException(DuplicatedStationException ex){
+    public ResponseEntity<ErrorResponse> handleDuplicatedStationException(DuplicatedStationException ex){
         ErrorResponse body = new ErrorResponse(ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
