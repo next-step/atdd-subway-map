@@ -20,16 +20,14 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        String name = stationRequest.getName();
-
         stationRepository
-                .findByName(name)
+                .findByName(stationRequest.getName())
                 .ifPresent(
                         station -> {
                             throw new DuplicateCreationException();
                         });
 
-        Station station = stationRepository.save(new Station(name));
+        Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 

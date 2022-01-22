@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicateCreationException;
 import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,12 @@ public class LineModifyService {
     }
 
     public LineCreateResponse saveLine(LineRequest request) {
+        lineRepository
+                .findByName(request.getName())
+                .ifPresent(
+                        line -> {
+                            throw new DuplicateCreationException();
+                        });
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return LineCreateResponse.of(line);
     }
