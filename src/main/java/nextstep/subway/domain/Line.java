@@ -32,4 +32,9 @@ public class Line extends BaseEntity {
     public String getColor() {
         return color;
     }
+
+    public void update(Line line) {
+        name = line.name;
+        color = line.color;
+    }
 }
