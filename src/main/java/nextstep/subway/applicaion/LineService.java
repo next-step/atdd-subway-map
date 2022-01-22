@@ -46,6 +46,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
     @Transactional(readOnly = true)
     public LineResponse findSpecificLine(Long id) {
         return lineRepository
@@ -68,5 +69,9 @@ public class LineService {
 
         // TODO question: Entity에까지 LineRequest DTO를 들고 가는게 맞을까요?
         line.changeLineInformation(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    public void deleteLine(Long id){
+        lineRepository.deleteById(id);
     }
 }

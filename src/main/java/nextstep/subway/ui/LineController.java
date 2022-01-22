@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/lines")
+@RequestMapping("lines")
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;
@@ -38,6 +38,12 @@ public class LineController {
     @PutMapping("{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest){
         lineService.updateLine(id, lineRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id){
+        lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
     }
 }
