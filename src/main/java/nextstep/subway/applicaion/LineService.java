@@ -29,13 +29,7 @@ public class LineService {
         }
 
         Line line = lineRepository.save(new Line(requestName, requestColor));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return LineResponse.of(line);
     }
 
     public void deleteLineById(Long id) {
@@ -47,7 +41,7 @@ public class LineService {
         var line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + id));
 
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +49,7 @@ public class LineService {
         var lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -64,21 +58,11 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + id));
         line.update(lineRequest.getName(), lineRequest.getColor());
 
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     private boolean isLineNamePresent(String lineName) {
         return lineRepository.findByName(lineName)
                 .isPresent();
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 }
