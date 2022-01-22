@@ -20,12 +20,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        Map<String, String> lineRequest = new HashMap<>();
-        lineRequest.put("name", "신분당선");
-        lineRequest.put("color", "bg-red-600");
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
 
         // when
-        ExtractableResponse<Response> response = lineCreateRequest(lineRequest);
+        ExtractableResponse<Response> response = lineCreateRequest(lineName, lineColor);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,15 +45,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineNameB = "2호선";
         String lineColorB = "bg-green-600";
 
-        Map<String, String> lineRequestA = new HashMap<>();
-        lineRequestA.put("name", lineNameA);
-        lineRequestA.put("color", lineColorA);
-        ExtractableResponse<Response> responseA = lineCreateRequest(lineRequestA);
-
-        Map<String, String> lineRequestB = new HashMap<>();
-        lineRequestB.put("name", lineNameB);
-        lineRequestB.put("color", lineColorB);
-        ExtractableResponse<Response> responseB = lineCreateRequest(lineRequestB);
+        ExtractableResponse<Response> responseA = lineCreateRequest(lineNameA, lineColorA);
+        ExtractableResponse<Response> responseB = lineCreateRequest(lineNameB, lineColorB);
 
         // when
         ExtractableResponse<Response> response =
@@ -74,10 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineName = "신분당선";
         String lineColor = "bg-red-600";
 
-        Map<String, String> lineRequestA = new HashMap<>();
-        lineRequestA.put("name", lineName);
-        lineRequestA.put("color", lineColor);
-        ExtractableResponse<Response> createResponse = lineCreateRequest(lineRequestA);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
 
         String uri = createResponse.header("Location");
         // when
@@ -96,10 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineName = "신분당선";
         String lineColor = "bg-red-600";
 
-        Map<String, String> createRequest = new HashMap<>();
-        createRequest.put("name", lineName);
-        createRequest.put("color", lineColor);
-        ExtractableResponse<Response> createResponse = lineCreateRequest(createRequest);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
 
         String uri = createResponse.header("Location");
         // when
@@ -141,10 +127,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineName = "신분당선";
         String lineColor = "bg-red-600";
 
-        Map<String, String> createRequest = new HashMap<>();
-        createRequest.put("name", lineName);
-        createRequest.put("color", lineColor);
-        ExtractableResponse<Response> createResponse = lineCreateRequest(createRequest);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
 
         // when
         String uri = createResponse.header("Location");
@@ -159,12 +142,34 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(readDeletedLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
+    /** Given 지하철 노선 생성을 요청 하고 When 같은 이름으로 지하철 노선 생성을 요청 하면 Then 지하철 노선 생성이 실패한다. */
+    @DisplayName("중복된 이름으로 노선을 생성할 수 없다.")
+    @Test
+    void duplicateNameCreationTest() {
+        // given
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
+
+        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
+
+        // when
+        ExtractableResponse<Response> duplicateCreationResponse =
+                lineCreateRequest(lineName, lineColor);
+
+        assertThat(duplicateCreationResponse.statusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
-    static ExtractableResponse<Response> lineCreateRequest(Map<String, String> lineRequest) {
+    static ExtractableResponse<Response> lineCreateRequest(String name, String color) {
+
+        Map<String, String> createRequest = new HashMap<>();
+        createRequest.put("name", name);
+        createRequest.put("color", color);
         return RestAssured.given()
                 .log()
                 .all()
-                .body(lineRequest)
+                .body(createRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
