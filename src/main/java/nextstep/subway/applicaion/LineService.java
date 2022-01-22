@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.responseconverter.LineResponseConverter;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.EntityNotFoundException;
@@ -17,28 +16,26 @@ import nextstep.subway.exception.EntityNotFoundException;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final LineResponseConverter lineResponseConverter;
 
-    public LineService(LineRepository lineRepository, LineResponseConverter lineResponseConverter) {
+    public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
-        this.lineResponseConverter = lineResponseConverter;
     }
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return lineResponseConverter.toResponse(line);
+        return LineResponse.from(line);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll()
                              .stream()
-                             .map(lineResponseConverter::toResponse)
+                             .map(LineResponse::from)
                              .collect(Collectors.toList());
     }
 
     public LineResponse findById(long id) {
         return lineRepository.findById(id)
-                             .map(lineResponseConverter::toResponse)
+                             .map(LineResponse::from)
                              .orElseThrow(EntityNotFoundException::new);
     }
 
