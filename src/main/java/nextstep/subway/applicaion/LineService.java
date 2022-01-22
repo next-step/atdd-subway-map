@@ -24,13 +24,9 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+
+        // Entity to LineResponse(DTO)
+        return new LineResponse(line);
     }
 
     public List<LineResponse> getAllLines() {
@@ -76,6 +72,4 @@ public class LineService {
             throw new IllegalArgumentException("잘못된 요청 입니다.");
         }
     }
-
-
 }

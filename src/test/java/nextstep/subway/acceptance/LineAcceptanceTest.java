@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
+import nextstep.subway.acceptance.common.CommonLineAcceptance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,10 +12,12 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.common.CommonLineAcceptance.*;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -24,25 +26,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .when().post("/lines")
-                .then().log().all().extract();
+        Map<String, String> params = getParamsMap("신분당선", "bg-red-600");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String responseName = response.jsonPath().getString("name");
         String responseColor = response.jsonPath().getString("color");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(responseName).isEqualTo(params.get("name"));
         assertThat(responseColor).isEqualTo(params.get("color"));
         assertThat(response.header("location")).isNotEmpty();
     }
+
+
 
     /**
      * Given 지하철 노선 생성을 요청 하고
@@ -54,28 +51,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
+        지하철_노선_생성_요청(params);
 
-        RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .when().post("/lines")
-                .then().log().all().extract();
         //given
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "2호선");
-        params2.put("color", "bg-green-600");
+        Map<String, String> params2 = getParamsMap("2호선", "bg-green-600");
+        지하철_노선_생성_요청(params2);
 
-        RestAssured
-                .given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .when().post("/lines")
-                .then().log().all().extract();
-        
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -87,7 +69,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).containsExactly(params.get("name"), params2.get("name"));
         assertThat(response.jsonPath().getList("color")).containsExactly(params.get("color"), params2.get("color"));
-
     }
 
     /**
@@ -99,16 +80,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
 
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .when().post("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // when
         response = RestAssured
@@ -133,33 +107,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
 
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .when().post("/lines")
-                .then().log().all().extract();
-
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // when
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "구분당선");
-        params2.put("color", "bg-blue-600");
+        Map<String, String> modifyParams = getParamsMap("구분당선","bg-blue-600");
+        String location = response.header("location");
 
         response = RestAssured
                 .given()
                 .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .body(params2)
-                .when().put(response.header("location"))
+                .body(modifyParams)
+                .when().put(location)
                 .then().log().all().extract();
                 //.header("content-length",45)
                 //질문 : 해당 내용을 추가하면 ClientProtocolException : Content-Length header already present로 Error가 생기는 이유가 뭘까요?
-
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -174,18 +138,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("lines")
-                .then().log().all().extract();
+        Map<String, String> params = getParamsMap("신분당선","bg-red-600");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // when
         String location = response.header("location");
+
         response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -195,5 +153,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+
+
 
 }
