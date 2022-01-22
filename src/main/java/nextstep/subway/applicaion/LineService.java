@@ -43,4 +43,15 @@ public class LineService {
                         )
                 ).collect(Collectors.toList());
     }
+
+    public LineResponse getLine(Long id) {
+        Line line = lineRepository.getById(id);
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        );
+    }
 }
