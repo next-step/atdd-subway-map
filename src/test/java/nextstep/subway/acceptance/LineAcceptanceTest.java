@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -109,11 +108,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String location = response.header("location");
 
         // when
-        ExtractableResponse<Response> response2 = RestAssured
-                .given()
-                .when()
-                .delete(location)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response2 = 지하철_노선_삭제_요청(location);
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
