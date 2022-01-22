@@ -47,6 +47,15 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public void updateLineById(Long id, LineCreateRequest lineCreateRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+        Line updateLine =
+                new Line(line.getId(), lineCreateRequest.getName(), lineCreateRequest.getColor());
+
+        lineRepository.save(updateLine);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
