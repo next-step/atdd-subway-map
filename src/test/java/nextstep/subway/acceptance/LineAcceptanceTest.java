@@ -95,8 +95,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        final Integer ID = 1;
-
         //given
         Map<String, String> params = new HashMap<>();
         params.put("name", "신분당선");
@@ -117,7 +115,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}", ID)
+                .when().get("/lines/{id}", createResponse.jsonPath().getString("id"))
                 .then().log().all().extract();
 
         // then
