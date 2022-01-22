@@ -22,13 +22,8 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)
@@ -36,7 +31,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -44,7 +39,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
@@ -58,15 +53,5 @@ public class LineService {
 
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 }
