@@ -50,11 +50,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
         String lineNameA = "신분당선";
         String lineColorA = "bg-red-600";
 
         String lineNameB = "2호선";
         String lineColorB = "bg-green-600";
+
         Map<String, String> lineRequestA = new HashMap<>();
         lineRequestA.put("name", lineNameA);
         lineRequestA.put("color", lineColorA);
@@ -87,6 +89,7 @@ class LineAcceptanceTest extends AcceptanceTest {
             .all()
             .extract();
 
+        // when
         ExtractableResponse<Response> response =
           RestAssured.given()
             .log()
@@ -98,6 +101,7 @@ class LineAcceptanceTest extends AcceptanceTest {
             .all()
             .extract();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(lineNameA, lineNameB);
