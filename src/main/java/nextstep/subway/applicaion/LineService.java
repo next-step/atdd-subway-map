@@ -49,7 +49,7 @@ public class LineService {
 
     public void update(Long id, LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException("없는 노선"));
-        line.update(request);
+        line.update(request.toEntity());
     }
 
     public void delete(Long id) {
