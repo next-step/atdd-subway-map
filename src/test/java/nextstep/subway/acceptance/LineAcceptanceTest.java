@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.exception.DuplicationException;
@@ -8,11 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.HttpRequestTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -21,23 +20,22 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
      */
+
+    private String defaultUrl = "/lines";
+
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        Map<String, String> map = new HashMap<>();
-        map.put("name", "이름");
-        map.put("color", "컬러");
-
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all().body(map)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract();
+        String 기존노선 = "기존 노선";
+        String 기존색상 = "기존 색상";
+        Map<String, String> param = createParam(기존노선, 기존색상);
+        ExtractableResponse<Response> response = postRequest(defaultUrl, param);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
+
 
     /**
      * Given 지하철 노선을 생성한다.
@@ -51,36 +49,16 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
-        Map<String, String> param = new HashMap<>();
-        param.put("name", 기존노선);
-        param.put("color", 기존색상);
+        Map<String, String> param = createParam(기존노선, 기존색상);
+        postRequest(defaultUrl, param);
 
         String 새로운노선 = "새로운 노선";
         String 새로운색상 = "새로운 색상";
-        Map<String, String> param2 = new HashMap<>();
-        param2.put("name", 새로운노선);
-        param2.put("color", 새로운색상);
-
-        RestAssured
-                .given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(param)
-                .when().post("/lines")
-                .then();
-
-        RestAssured
-                .given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(param2)
-                .when().post("/lines")
-                .then();
-
+        Map<String, String> param2 = createParam(새로운노선, 새로운색상);
+        postRequest(defaultUrl, param2);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = getRequest(defaultUrl);
 
         //then
         assertThat(response.jsonPath().getList("name")).contains(새로운노선, 기존노선);
@@ -98,24 +76,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
-        Map<String, String> param = new HashMap<>();
-        param.put("name", 기존노선);
-        param.put("color", 기존색상);
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
-
-
+        Map<String, String> param = createParam(기존노선, 기존색상);
+        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, param);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get(createResponse.header(HttpHeaders.LOCATION))
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = getRequest(createResponse.header(HttpHeaders.LOCATION));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -133,36 +98,17 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
-        Map<String, String> param = new HashMap<>();
-        param.put("name", 기존노선);
-        param.put("color", 기존색상);
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
+        Map<String, String> param = createParam(기존노선, 기존색상);
+        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, param);
 
         //when
         String 수정노선 = "수정 노선";
         String 수정색상 = "수정 색상";
-        Map<String, String> updateParam = new HashMap<>();
-        updateParam.put("name", 수정노선);
-        updateParam.put("color", 수정색상);
-
-        ExtractableResponse<Response> updateResponse = RestAssured
-                .given()
-                .body(updateParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(createResponse.header(HttpHeaders.LOCATION))
-                .then().extract();
+        Map<String, String> updateParam = createParam(수정노선, 수정색상);
+        ExtractableResponse<Response> updateResponse = putRequest(createResponse.header(HttpHeaders.LOCATION), updateParam);
 
         //then
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .when().get(createResponse.header(HttpHeaders.LOCATION))
-                .then().extract();
+        ExtractableResponse<Response> response = getRequest(createResponse.header(HttpHeaders.LOCATION));
 
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -182,22 +128,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
-        Map<String, String> param = new HashMap<>();
-        param.put("name", 기존노선);
-        param.put("color", 기존색상);
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
+        Map<String, String> param = createParam(기존노선, 기존색상);
+        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, param);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete(createResponse.header(HttpHeaders.LOCATION))
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = deleteRequest(createResponse.header(HttpHeaders.LOCATION));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -215,29 +150,21 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String 기존노선 = "기존 노선";
         String 기존색상 = "기존 색상";
-        Map<String, String> param = new HashMap<>();
-        param.put("name", 기존노선);
-        param.put("color", 기존색상);
-
-        RestAssured
-                .given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().extract();
+        Map<String, String> param = createParam(기존노선, 기존색상);
+        postRequest(defaultUrl, param);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .extract();
+        ExtractableResponse<Response> response = postRequest(defaultUrl, param);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
+    }
+
+    private Map<String, String> createParam(String 기존노선, String 기존색상) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", 기존노선);
+        param.put("color", 기존색상);
+        return param;
     }
 }
