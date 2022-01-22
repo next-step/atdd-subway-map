@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static nextstep.subway.acceptance.testenum.TestLine.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -197,5 +199,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        // given
+        ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .accept(MediaType.ALL_VALUE)
+
+                .when()
+                .delete("/lines/" + extractId(responseByPost))
+
+                .then().log().all()
+                .extract();
+
+        // then
+        verifyResponseStatus(response, HttpStatus.NO_CONTENT);
+        assertThatThrownBy(() -> getOneLine(extractId(responseByPost)))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessageStartingWith("[ERROR]");
     }
 }
