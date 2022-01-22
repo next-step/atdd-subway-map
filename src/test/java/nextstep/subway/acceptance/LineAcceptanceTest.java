@@ -133,10 +133,50 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * When 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선의 정보 수정은 성공한다.
+     * @see nextstep.subway.ui.LineController#updateLine
      */
-    @DisplayName("지하철 노선 수정")
     @Test
-    void updateLine() {
+    void 지하철_노선_수정_테스트() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "GTX-A");
+        params.put("color", "bg-red-900");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> updateParams = new HashMap<>();
+        params.put("color", "bg-red-800");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .body(updateParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        ExtractableResponse<Response> updatedLine = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines/{id}")
+                .then().log().all()
+                .extract();
+        String lineName = updatedLine.body().jsonPath().get("name").toString();
+        String lineColor = updatedLine.body().jsonPath().get("color").toString();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineName).isEqualTo("GTX-A");
+        assertThat(lineColor).isEqualTo("bg-red-800");
     }
 
     /**
