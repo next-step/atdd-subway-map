@@ -51,7 +51,7 @@ public class LineService {
 
     public void updateLine(final Long id, final LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        line.updateLine(request);
+        line.updateLine(request.getColor(), request.getName());
         lineRepository.save(line);
     }
 
