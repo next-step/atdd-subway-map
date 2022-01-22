@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.step.LineStep;
 import nextstep.subway.step.StationStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,5 +72,24 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철을 생성 요청 한다.
+     * When 같은 이름으로 지하철 역을 생성 요청한다.
+     * Then 지하철 생성이 실패한다.
+     */
+    @DisplayName("중복 지하철역 생성 실패")
+    @Test
+    void createStation_duplication() {
+
+        // 노선을 생성한다.
+        StationStep.saveStation("name_1");
+
+        // 중복으로 생성할 때
+        ExtractableResponse<Response> response = StationStep.saveStation("name_1");
+
+        // 실패를 한다.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
