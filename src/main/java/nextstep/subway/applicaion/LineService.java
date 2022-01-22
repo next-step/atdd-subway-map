@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -29,8 +30,13 @@ public class LineService {
                 line.getModifiedDate());
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines(){
-        return Collections.EMPTY_LIST;
+        return lineRepository.findAll().stream().map(line -> new LineResponse(line.getId(),
+          line.getName(),
+          line.getColor(),
+          line.getCreatedDate(),
+          line.getModifiedDate())).collect(Collectors.toList());
     }
 
 }
