@@ -35,25 +35,47 @@ public class LineService {
 
     public List<LineResponse> getAllLines() {
         return lineRepository.findAll()
-                .stream().map(LineResponse::new).collect(toList());
+                .stream()
+                .map(LineResponse::new)
+                .collect(toList());
     }
 
     public LineResponse getLine(Long lineId) {
-        return new LineResponse(lineRepository
+        validateLineId(lineId);
+        Line line = lineRepository
                 .findById(lineId)
-                .orElseThrow(IllegalArgumentException::new));
+                .orElseThrow(IllegalArgumentException::new);
+
+        return new LineResponse(line);
     }
 
     public void modifyLine(Long lineId, LineRequest lineRequest) {
+        validateLineRequest(lineId, lineRequest);
         Line findLine = lineRepository.findById(lineId)
                 .orElseThrow(IllegalArgumentException::new);
-        findLine.chageLine(lineRequest.getName(),lineRequest.getColor());
+        findLine.chageLine(lineRequest.getName(), lineRequest.getColor());
     }
 
     public void deleteLine(Long lineId) {
+        validateLineId(lineId);
         Line findLine = lineRepository.findById(lineId)
                 .orElseThrow(IllegalArgumentException::new);
 
         lineRepository.delete(findLine);
     }
+
+
+    private void validateLineRequest(Long lineId, LineRequest lineRequest) {
+        if (lineRequest == null || lineId == null || lineId <= 0) {
+            throw new IllegalArgumentException("잘못된 요청 입니다.");
+        }
+    }
+
+    private void validateLineId(Long lineId) {
+        if(lineId == null || lineId <= 0){
+            throw new IllegalArgumentException("잘못된 요청 입니다.");
+        }
+    }
+
+
 }
