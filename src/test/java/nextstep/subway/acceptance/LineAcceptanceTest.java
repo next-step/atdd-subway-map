@@ -126,6 +126,8 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // addition: to verify changed contents
         ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(id);
         assertThat(readUpdatedLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString("name");
@@ -137,7 +139,35 @@ class LineAcceptanceTest extends AcceptanceTest {
     /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 삭제를 요청 하면 Then 생성한 지하철 노선 삭제가 성공한다. */
     @DisplayName("지하철 노선 삭제")
     @Test
-    void deleteLine() {}
+    void deleteLine() {
+        // given
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
+
+        Map<String, String> createRequest = new HashMap<>();
+        createRequest.put("name", lineName);
+        createRequest.put("color", lineColor);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(createRequest);
+
+        // when
+        long id = createResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> deleteResponse = RestAssured.given()
+          .log()
+          .all()
+          .when()
+          .delete("/lines/" + id)
+          .then()
+          .log()
+          .all()
+          .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        // addition: to verify deleted contents
+        ExtractableResponse<Response> readDeletedLineResponse = specificLineReadRequest(id);
+        assertThat(readDeletedLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
 
     /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
     static ExtractableResponse<Response> lineCreateRequest(Map<String, String> lineRequest){
