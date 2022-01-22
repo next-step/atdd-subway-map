@@ -41,6 +41,12 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+        return createLineResponse(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
