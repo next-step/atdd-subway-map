@@ -1,7 +1,9 @@
 package nextstep.subway.acceptance.testenum;
 
 public enum TestLine {
-    LINE_NEW_BOONDANG("신분당선", "bg-red-600");
+    LINE_NEW_BOONDANG("신분당선", "bg-red-600"),
+    LINE_TWO("2호선", "bg-green-600"),
+    ;
 
     private String name;
     private String color;
