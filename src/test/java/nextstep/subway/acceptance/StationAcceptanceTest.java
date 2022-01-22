@@ -88,7 +88,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
 
         // when
-        ExtractableResponse<Response> response = AcceptanceTestUtils.requestLocation(createResponse, Method.DELETE);
+        ExtractableResponse<Response> response = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.DELETE);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

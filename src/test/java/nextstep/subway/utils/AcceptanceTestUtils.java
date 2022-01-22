@@ -1,6 +1,5 @@
 package nextstep.subway.utils;
 
-import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.http.MediaType;
@@ -15,7 +14,7 @@ public class AcceptanceTestUtils {
     private AcceptanceTestUtils() {
     }
 
-    public static ExtractableResponse<Response> requestLocation(ExtractableResponse<Response> response, Method method, Object body) {
+    public static ExtractableResponse<Response> requestLocationInHeader(ExtractableResponse<Response> response, Method method, Object body) {
         return given(body)
             .when()
             .request(method, getLocation(response))
@@ -23,8 +22,8 @@ public class AcceptanceTestUtils {
             .extract();
     }
 
-    public static ExtractableResponse<Response> requestLocation(ExtractableResponse<Response> response, Method method) {
-        return requestLocation(response, method, null);
+    public static ExtractableResponse<Response> requestLocationInHeader(ExtractableResponse<Response> response, Method method) {
+        return requestLocationInHeader(response, method, null);
     }
 
     private static RequestSpecification given(Object body) {
