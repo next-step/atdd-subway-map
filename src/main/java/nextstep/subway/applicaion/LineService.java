@@ -22,6 +22,11 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
+    public boolean existsLineByName(String name) {
+        Line line = lineRepository.findByName(name);
+        return line != null;
+    }
+
     public LineCreateResponse saveLine(LineCreateRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineCreateResponse(

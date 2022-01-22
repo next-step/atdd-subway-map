@@ -21,6 +21,10 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineCreateResponse> createLine(@RequestBody LineCreateRequest lineCreateRequest) {
+        boolean isExists = lineService.existsLineByName(lineCreateRequest.getName());
+        if (isExists) {
+            return ResponseEntity.badRequest().build();
+        }
         LineCreateResponse line = lineService.saveLine(lineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
