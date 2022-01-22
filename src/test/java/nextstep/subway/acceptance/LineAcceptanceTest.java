@@ -15,20 +15,26 @@ import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    // 자주 사용되는 문자열 상수로 분리
+    private static final String PATH_PREFIX = "/lines";
+    private static final String LINE_NAME_A = "신분당선";
+    private static final String LINE_COLOR_A = "bg-red-600";
+    private static final String LINE_NAME_B = "2호선";
+    private static final String LINE_COLOR_B = "bg-green-600";
+    private static final String NAME = "name";
+    private static final String COLOR = "color";
+    private static final String LOCATION = "Location";
+
     /** When 지하철 노선 생성을 요청 하면 Then 지하철 노선 생성이 성공한다. */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
-
         // when
-        ExtractableResponse<Response> response = lineCreateRequest(lineName, lineColor);
+        ExtractableResponse<Response> response = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(LOCATION)).isNotBlank();
     }
 
     /**
@@ -39,23 +45,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        String lineNameA = "신분당선";
-        String lineColorA = "bg-red-600";
 
-        String lineNameB = "2호선";
-        String lineColorB = "bg-green-600";
-
-        ExtractableResponse<Response> responseA = lineCreateRequest(lineNameA, lineColorA);
-        ExtractableResponse<Response> responseB = lineCreateRequest(lineNameB, lineColorB);
+        ExtractableResponse<Response> responseA = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+        ExtractableResponse<Response> responseB = lineCreateRequest(LINE_NAME_B, LINE_COLOR_B);
 
         // when
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all().when().get("/lines").then().log().all().extract();
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .when()
+                        .get(PATH_PREFIX)
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(lineNameA, lineNameB);
+        List<String> stationNames = response.jsonPath().getList(NAME);
+        assertThat(stationNames).contains(LINE_NAME_A, LINE_NAME_B);
     }
 
     /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 조회를 요청 하면 Then 생성한 지하철 노선을 응답받는다 */
@@ -63,18 +72,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
-        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
-
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(LOCATION);
         // when
         ExtractableResponse<Response> readLineResponse = specificLineReadRequest(uri);
 
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String responseLineName = readLineResponse.jsonPath().getString("name");
-        assertThat(responseLineName).isEqualTo(lineName);
+        String responseLineName = readLineResponse.jsonPath().getString(NAME);
+        assertThat(responseLineName).isEqualTo(LINE_NAME_A);
     }
 
     /** Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다. */
@@ -82,30 +88,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
-        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
-
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(LOCATION);
         // when
         String updateLineName = "구분당선";
         String updateLineColor = "bg-blue-600";
-        Map<String, String> updateRequest = new HashMap<>();
-        updateRequest.put("name", updateLineName);
-        updateRequest.put("color", updateLineColor);
         ExtractableResponse<Response> updateResponse =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(updateRequest)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .put(uri)
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+                lineUpdateRequest(uri, updateLineName, updateLineColor);
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -113,8 +103,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // addition: to verify changed contents
         ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(uri);
         assertThat(readUpdatedLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString("name");
-        String readUpdatedLineColor = readUpdatedLineResponse.jsonPath().getString("color");
+        String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString(NAME);
+        String readUpdatedLineColor = readUpdatedLineResponse.jsonPath().getString(COLOR);
         assertThat(readUpdatedLineName).isEqualTo(updateLineName);
         assertThat(readUpdatedLineColor).isEqualTo(updateLineColor);
     }
@@ -124,13 +114,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
-
-        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
         // when
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(LOCATION);
 
         ExtractableResponse<Response> deleteResponse =
                 RestAssured.given().log().all().when().delete(uri).then().log().all().extract();
@@ -147,14 +134,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateNameCreationTest() {
         // given
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
-
-        ExtractableResponse<Response> createResponse = lineCreateRequest(lineName, lineColor);
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
         // when
         ExtractableResponse<Response> duplicateCreationResponse =
-                lineCreateRequest(lineName, lineColor);
+                lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
         assertThat(duplicateCreationResponse.statusCode())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -164,15 +148,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     static ExtractableResponse<Response> lineCreateRequest(String name, String color) {
 
         Map<String, String> createRequest = new HashMap<>();
-        createRequest.put("name", name);
-        createRequest.put("color", color);
+        createRequest.put(NAME, name);
+        createRequest.put(COLOR, color);
         return RestAssured.given()
                 .log()
                 .all()
                 .body(createRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines")
+                .post(PATH_PREFIX)
                 .then()
                 .log()
                 .all()
@@ -181,5 +165,24 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     static ExtractableResponse<Response> specificLineReadRequest(String url) {
         return RestAssured.given().log().all().when().get(url).then().log().all().extract();
+    }
+
+    static ExtractableResponse<Response> lineUpdateRequest(String uri, String name, String color) {
+
+        Map<String, String> updateRequest = new HashMap<>();
+        updateRequest.put(NAME, name);
+        updateRequest.put(COLOR, color);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(updateRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 }

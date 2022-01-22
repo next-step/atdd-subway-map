@@ -17,21 +17,21 @@ import org.springframework.http.MediaType;
 class StationAcceptanceTest extends AcceptanceTest {
 
     private static final String PATH_PREFIX = "/stations";
+    private static final String NAME = "name";
+    private static final String LOCATION = "Location";
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
 
     /** When 지하철역 생성을 요청 하면 Then 지하철역 생성이 성공한다. */
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
         // when
-        ExtractableResponse<Response> response = stationCreateRequest(PATH_PREFIX, params);
+        ExtractableResponse<Response> response = stationCreateRequest(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(LOCATION)).isNotBlank();
     }
 
     /**
@@ -42,15 +42,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = stationCreateRequest(PATH_PREFIX, params1);
+        ExtractableResponse<Response> createResponse1 = stationCreateRequest(강남역);
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = stationCreateRequest(PATH_PREFIX, params2);
+        ExtractableResponse<Response> createResponse2 = stationCreateRequest(역삼역);
 
         // when
         ExtractableResponse<Response> response =
@@ -74,12 +68,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = stationCreateRequest(PATH_PREFIX, params);
+        ExtractableResponse<Response> createResponse = stationCreateRequest(강남역);
 
         // when
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(LOCATION);
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all().when().delete(uri).then().log().all().extract();
 
@@ -91,14 +83,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateNameCreationTest() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> creationResponse = stationCreateRequest(PATH_PREFIX, params);
+        ExtractableResponse<Response> creationResponse = stationCreateRequest(강남역);
 
         // when
-        ExtractableResponse<Response> duplicateCreationResponse =
-                stationCreateRequest(PATH_PREFIX, params);
+        ExtractableResponse<Response> duplicateCreationResponse = stationCreateRequest(강남역);
 
         // then
         // TODO question: Bad request vs conflict 어떤 status가 맞을지 애매하네요.
@@ -107,15 +95,18 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    static ExtractableResponse<Response> stationCreateRequest(
-            String path, Map<String, String> params) {
+    static ExtractableResponse<Response> stationCreateRequest(String name) {
+
+        Map<String, String> params = new HashMap<>();
+        params.put(NAME, name);
+
         return RestAssured.given()
                 .log()
                 .all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post(path)
+                .post(PATH_PREFIX)
                 .then()
                 .log()
                 .all()
