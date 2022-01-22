@@ -50,25 +50,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicateNameStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        String 강남역 = "강남역";
+        StationSteps.지하철역_생성_요청(강남역);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -85,26 +71,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        StationSteps.지하철역_생성_요청(강남역);
 
         String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        StationSteps.지하철역_생성_요청(역삼역);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -127,15 +97,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> createResponse = StationSteps.지하철역_생성_요청(강남역);
 
         // when
         String uri = createResponse.header("Location");
