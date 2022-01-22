@@ -48,7 +48,48 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        String _1호선 = "1호선";
+        String 파란색 = "bg-blue-600";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", _1호선);
+        params1.put("color", 파란색);
 
+        RestAssured
+                .given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        String _2호선 = "2호선";
+        String 초록색 = "bg-green-600";
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", _2호선);
+        params2.put("color", 초록색);
+
+        RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> lineNames = response.jsonPath().getList("name");
+        List<String> lineColors = response.jsonPath().getList("color");
+        assertThat(lineNames).contains(_1호선, _2호선);
+        assertThat(lineColors).contains(파란색, 초록색);
     }
 
     /**
@@ -69,6 +110,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+
     }
 
     /**
@@ -79,5 +121,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+
     }
 }
