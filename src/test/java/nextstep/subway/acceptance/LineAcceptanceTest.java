@@ -56,13 +56,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-
         // given
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
-        String location = response.header("location");
-
         // when
-        ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(location);
+        ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(response);
 
         // then
         assertThat(response2.jsonPath().getString("name")).isEqualTo("신분당선");
@@ -79,14 +76,13 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // given
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("2호선", "bg-red-600");
-        String location = response.header("location");
 
         // given
-        지하철_노선_수정_요청(location, "구분당선", "bg-blue-600");
+        지하철_노선_수정_요청(response, "구분당선", "bg-blue-600");
 
 
         // when
-        ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(location);
+        ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(response);
 
         // then
         assertAll(
@@ -105,10 +101,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
-        String location = response.header("location");
 
         // when
-        ExtractableResponse<Response> response2 = 지하철_노선_삭제_요청(location);
+        ExtractableResponse<Response> response2 = 지하철_노선_삭제_요청(response);
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

@@ -25,7 +25,9 @@ public class LineAcceptanceUtil {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String location, String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, String name, String color) {
+        String location = response.header("location");
+
         Map<String, String> params = new HashMap<>();
         params.put("color", color);
         params.put("name", name);
@@ -49,7 +51,9 @@ public class LineAcceptanceUtil {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_특정_노선_조회_요청(String location) {
+    public static ExtractableResponse<Response> 지하철_특정_노선_조회_요청(ExtractableResponse<Response> response) {
+        String location = response.header("location");
+
         return RestAssured
                 .given()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -59,7 +63,9 @@ public class LineAcceptanceUtil {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String location) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(ExtractableResponse<Response> response) {
+        String location = response.header("location");
+
         return RestAssured
                 .given()
                 .when()
