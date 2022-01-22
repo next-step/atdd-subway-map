@@ -41,6 +41,10 @@ public class LineService {
         return createLineResponse(modifiedLine);
     }
 
+    public void deleteLineById(long id) {
+        lineRepository.deleteById(id);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
@@ -50,4 +54,5 @@ public class LineService {
                 line.getModifiedDate()
         );
     }
+
 }
