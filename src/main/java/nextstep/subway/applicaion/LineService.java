@@ -25,24 +25,26 @@ public class LineService {
         checkDuplicated(request.getName());
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
-        return createLineResponse(findById(id));
+        return LineResponse.of(findById(id));
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = findById(id);
         line.edit(lineRequest.getName(), lineRequest.getColor());
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     public void deleteLineById(Long id) {
@@ -51,16 +53,6 @@ public class LineService {
 
     private Line findById(Long id) {
         return lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("지하철 노선을 찾을 수 없습니다."));
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 
     private void checkDuplicated(String name) {
