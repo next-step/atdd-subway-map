@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.exception.JsonPathException;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.utils.DatabaseCleanup;
@@ -65,6 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         ExtractableResponse<Response> inquiryResponse = 지하철_노선_조회(2);
+
         assertThat(createResponse.statusCode()).isNotEqualTo(HttpStatus.OK.value());
         assertThat(inquiryResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
@@ -172,10 +174,9 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         ExtractableResponse<Response> findResponse = 지하철_노선_조회(1);
-        String deletedName = findResponse.jsonPath()
-                                         .get("name");
 
-        assertThat(deletedName).isNull();
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThatThrownBy(() -> findResponse.jsonPath().get("name"))
+            .isInstanceOf(JsonPathException.class);
     }
 }
