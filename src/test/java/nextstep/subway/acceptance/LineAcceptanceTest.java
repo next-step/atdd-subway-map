@@ -147,10 +147,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         String createdDate = createResponse.jsonPath().getString("createdDate");
         String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
 
-        String path = "/lines/" + id;
+        String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
-                .get(path)
+                .get(uri)
                 .then().log().all()
                 .extract();
 
@@ -193,10 +193,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         String createdDate = createResponse.jsonPath().getString("createdDate");
         String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
 
-        String path = "/lines/" + id;
+        String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
-                .get(path)
+                .get(uri)
                 .then().log().all()
                 .extract();
 
