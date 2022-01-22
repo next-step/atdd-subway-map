@@ -11,11 +11,9 @@ import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static nextstep.subway.acceptance.testenum.TestLine.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -104,6 +102,19 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", lineName);
         params.put("color", lineColor);
         return params;
+    }
+
+    private ExtractableResponse<Response> deleteLine(ExtractableResponse<Response> responseByPost) {
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .accept(MediaType.ALL_VALUE)
+
+                .when()
+                .delete("/lines/" + extractId(responseByPost))
+
+                .then().log().all()
+                .extract();
+        return response;
     }
 
     /**
@@ -203,20 +214,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .accept(MediaType.ALL_VALUE)
-
-                .when()
-                .delete("/lines/" + extractId(responseByPost))
-
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = deleteLine(responseByPost);
 
         // then
         verifyResponseStatus(response, HttpStatus.NO_CONTENT);
-        assertThatThrownBy(() -> getOneLine(extractId(responseByPost)))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessageStartingWith("[ERROR]");
     }
 }
