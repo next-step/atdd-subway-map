@@ -127,4 +127,45 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+    /** Given 지하철역 생성을 요청 하고 When 같은 이름으로 지하철역 생성을 요청 하면 Then 지하철역 생성이 실패한다. */
+    @DisplayName("중복된 이름으로 역을 생성할 수 없다.")
+    @Test
+    void duplicateNameCreationTest() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+
+        ExtractableResponse<Response> creationResponse =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/stations")
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
+
+        // when
+        ExtractableResponse<Response> duplicateCreationResponse =
+                RestAssured.given()
+                        .log()
+                        .all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/stations")
+                        .then()
+                        .log()
+                        .all()
+                        .extract();
+
+        // then
+        // TODO question: Bad request vs conflict 어떤 status가 맞을지 애매하네요.
+        // 전 일단 bad_request로...
+        assertThat(duplicateCreationResponse.statusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }

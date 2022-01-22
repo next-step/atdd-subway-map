@@ -150,15 +150,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String uri = createResponse.header("Location");
 
         ExtractableResponse<Response> deleteResponse =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .when()
-                        .delete(uri)
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+                RestAssured.given().log().all().when().delete(uri).then().log().all().extract();
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -183,14 +175,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     static ExtractableResponse<Response> specificLineReadRequest(String url) {
-        return RestAssured.given()
-                .log()
-                .all()
-                .when()
-                .get(url)
-                .then()
-                .log()
-                .all()
-                .extract();
+        return RestAssured.given().log().all().when().get(url).then().log().all().extract();
     }
 }
