@@ -41,6 +41,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String responseColor = response.jsonPath().getString("color");
         assertThat(responseName).isEqualTo(params.get("name"));
         assertThat(responseColor).isEqualTo(params.get("color"));
+        assertThat(response.header("location")).isNotEmpty();
     }
 
     /**
@@ -65,8 +66,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
         //given
         Map<String, String> params2 = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-green-600");
+        params2.put("name", "2호선");
+        params2.put("color", "bg-green-600");
 
         RestAssured
                 .given().log().all()
@@ -78,12 +79,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("lines")
                 .then().log().all().extract();
         
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.header("accept")).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
         assertThat(response.jsonPath().getList("name")).containsExactly(params.get("name"), params2.get("name"));
         assertThat(response.jsonPath().getList("color")).containsExactly(params.get("color"), params2.get("color"));
 
@@ -152,11 +153,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         response = RestAssured
                 .given()
                 .log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
                 .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("content-length",45)
                 .when().put(response.header("location"))
                 .then().log().all().extract();
+                //.header("content-length",45)
+                //질문 : 해당 내용을 추가하면 ClientProtocolException : Content-Length header already present로 Error가 생기는 이유가 뭘까요?
+
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -170,7 +173,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "신분당선");
@@ -183,22 +185,15 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // when
+        String location = response.header("location");
         response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(response.header("location"))
+                .when().delete(location)
                 .then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // when
-        response = RestAssured
-                .given().log().all()
-                .when().get(response.header("location"))
-                .then().log().all().extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
+
 }
