@@ -67,7 +67,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(createResponse.statusCode()).isNotEqualTo(HttpStatus.CREATED.value());
-        assertThat(createResponse.header("Location")).isNull();
+        assertThat(AcceptanceTestUtils.getLocation(createResponse)).isNull();
     }
 
     /**
