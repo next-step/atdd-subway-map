@@ -7,13 +7,14 @@ import javax.persistence.Id;
 
 @Entity
 public class Line extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String color;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color) {
@@ -31,5 +32,10 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public void update(Line other) {
+        this.name = other.name;
+        this.color = other.color;
     }
 }
