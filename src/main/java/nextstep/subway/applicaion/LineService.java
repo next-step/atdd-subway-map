@@ -54,4 +54,17 @@ public class LineService {
                 line.getModifiedDate()
         );
     }
+
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.getById(id);
+        line.modify(lineRequest.getName(), lineRequest.getColor());
+        lineRepository.save(line);
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        );
+    }
 }
