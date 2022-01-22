@@ -28,7 +28,11 @@ public class LineService {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
+    }
 
+    public LineResponse findLine(long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
+        return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
