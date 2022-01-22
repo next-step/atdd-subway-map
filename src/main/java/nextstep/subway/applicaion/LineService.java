@@ -22,6 +22,11 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsLineByName(String name) {
+        return lineRepository.existsLineByName(name);
+    }
+
     public LineCreateResponse saveLine(LineCreateRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineCreateResponse(
@@ -41,6 +46,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));

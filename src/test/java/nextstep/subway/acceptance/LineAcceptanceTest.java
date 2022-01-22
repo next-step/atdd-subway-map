@@ -3,12 +3,13 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineCreateResponse;
+import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,33 +27,39 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String bgRed600 = "bg-red-600";
         String 신분당선 = "신분당선";
-        Map<String, String> params = new HashMap<>();
-        params.put("color", bgRed600);
-        params.put("name", 신분당선);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        Map<String, String> createParams = LineSteps.getParams(신분당선, bgRed600);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(createParams);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        Integer id = response.jsonPath().get("id");
-        String name = response.jsonPath().get("name");
-        String color = response.jsonPath().get("color");
-        String createdDate = response.jsonPath().get("createdDate");
-        String modifiedDate = response.jsonPath().get("modifiedDate");
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        assertThat(id).isNotNull();
-        assertThat(name).isEqualTo(신분당선);
-        assertThat(color).isEqualTo(bgRed600);
-        assertThat(createdDate).isNotNull();
-        assertThat(modifiedDate).isNotNull();
+        LineResponse lineResponse = createResponse.body().as(LineResponse.class);
+        assertThat(lineResponse.getId()).isNotNull();
+        assertThat(lineResponse.getName()).isEqualTo(신분당선);
+        assertThat(lineResponse.getColor()).isEqualTo(bgRed600);
+        assertThat(lineResponse.getModifiedDate()).isNotNull();
+        assertThat(lineResponse.getModifiedDate()).isNotNull();
+    }
 
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 중복이름 생성")
+    @Test
+    void createDuplicateNameLine() {
+        // given
+        Map<String, String> createParams = LineSteps.getParams("신분당선", "bg-red-600");
+        LineSteps.지하철_노선_생성_요청(createParams);
+
+        // when
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(createParams);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -65,60 +72,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("color", bgRed600);
-        params1.put("name", 신분당선);
+        Map<String, String> createParams = LineSteps.getParams("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse1 = LineSteps.지하철_노선_생성_요청(createParams);
 
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        Map<String, String> createParams2 = LineSteps.getParams("2호선", "bg-green-600");
+        ExtractableResponse<Response> createResponse2 = LineSteps.지하철_노선_생성_요청(createParams2);
 
-        Integer id1 = createResponse1.jsonPath().get("id");
-        String createDate1 = createResponse1.jsonPath().get("createdDate");
-        String modifiedDate1 = createResponse1.jsonPath().get("modifiedDate");
+        //when
+        LineCreateResponse firstLine = createResponse1.body().as(LineCreateResponse.class);
+        LineCreateResponse secondLine = createResponse2.body().as(LineCreateResponse.class);
+        String url = LineSteps.DEFAULT_PATH;
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_조회_요청(url);
 
-        String bgGreen600 = "bg-green-600";
-        String line2 = "2호선";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("color", bgGreen600);
-        params2.put("name", line2);
-
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        Integer id2 = createResponse2.jsonPath().get("id");
-        String createDate2 = createResponse2.jsonPath().get("createdDate");
-        String modifiedDate2 = createResponse2.jsonPath().get("modifiedDate");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-
+        //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> names = response.jsonPath().getList("name");
-        List<String> colors = response.jsonPath().getList("color");
-        List<Integer> ids = response.jsonPath().getList("id");
-        List<String> createdDates = response.jsonPath().getList("createdDate");
-        List<String> modifiedDates = response.jsonPath().getList("modifiedDate");
+        List<LineResponse> lineResponses = response.body().jsonPath().getList(".", LineResponse.class);
 
-        assertThat(names).contains(신분당선, line2);
-        assertThat(colors).contains(bgRed600, bgGreen600);
-        assertThat(ids).contains(id1, id2);
-        assertThat(createdDates).contains(createDate1, createDate2);
-        assertThat(modifiedDates).contains(modifiedDate1, modifiedDate2);
+        LineResponse firstLineResponse = LineSteps.lineCreateResponseConvertToLineResponse(firstLine);
+        LineResponse secondLineResponse = LineSteps.lineCreateResponseConvertToLineResponse(secondLine);
+        assertThat(lineResponses).contains(firstLineResponse, secondLineResponse);
     }
 
     /**
@@ -129,42 +101,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("color", bgRed600);
-        params1.put("name", 신분당선);
+        // given
+        Map<String, String> createParams = LineSteps.getParams("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(createParams);
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        Integer id = createResponse.jsonPath().get("id");
-        String createdDate = createResponse.jsonPath().getString("createdDate");
-        String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
-
+        // when
+        LineCreateResponse lineCreateResponse = createResponse.body().as(LineCreateResponse.class);
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_조회_요청(uri);
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        Integer lineId = response.jsonPath().get("id");
-        String lineName = response.jsonPath().getString("name");
-        String lineColor = response.jsonPath().getString("color");
-        String lineCreatedDate = response.jsonPath().get("createdDate");
-        String lineModifiedDate = response.jsonPath().getString("modifiedDate");
-        assertThat(lineId).isEqualTo(id);
-        assertThat(lineName).isEqualTo(신분당선);
-        assertThat(lineColor).isEqualTo(bgRed600);
-        assertThat(lineCreatedDate).isEqualTo(createdDate);
-        assertThat(lineModifiedDate).isEqualTo(modifiedDate);
+        LineResponse createLineResponse = LineSteps.lineCreateResponseConvertToLineResponse(lineCreateResponse);
+        LineResponse lineResponse = response.body().as(LineResponse.class);
+
+        assertThat(createLineResponse).isEqualTo(lineResponse);
     }
 
     /**
@@ -175,42 +126,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("color", bgRed600);
-        params1.put("name", 신분당선);
+        // given
+        Map<String, String> createParams = LineSteps.getParams("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(createParams);
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        Integer id = createResponse.jsonPath().get("id");
-        String createdDate = createResponse.jsonPath().getString("createdDate");
-        String modifiedDate = createResponse.jsonPath().getString("modifiedDate");
-
+        // when
+        Map<String, String> updateParams = LineSteps.getParams("구분당선", "bg-blue-600");
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(updateParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get(uri)
+                .put(uri)
                 .then().log().all()
                 .extract();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        Integer lineId = response.jsonPath().get("id");
-        String lineName = response.jsonPath().getString("name");
-        String lineColor = response.jsonPath().getString("color");
-        String lineCreatedDate = response.jsonPath().get("createdDate");
-        String lineModifiedDate = response.jsonPath().getString("modifiedDate");
-        assertThat(lineId).isEqualTo(id);
-        assertThat(lineName).isEqualTo(신분당선);
-        assertThat(lineColor).isEqualTo(bgRed600);
-        assertThat(lineCreatedDate).isEqualTo(createdDate);
-        assertThat(lineModifiedDate).isEqualTo(modifiedDate);
     }
 
     /**
@@ -221,20 +153,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("color", bgRed600);
-        params1.put("name", 신분당선);
+        // given
+        Map<String, String> createParams = LineSteps.getParams("신분당선", "bg-red-600");
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(createParams);
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
+        // when
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
@@ -242,6 +165,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

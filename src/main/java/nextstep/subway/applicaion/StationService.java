@@ -19,6 +19,10 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
+    public boolean existsStationByName(String name) {
+        return stationRepository.existsStationByName(name);
+    }
+
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
