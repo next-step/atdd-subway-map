@@ -3,7 +3,7 @@ package nextstep.subway.applicaion;
 import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.NotFoundException;
@@ -19,9 +19,9 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineCreateResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
+        return new LineCreateResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
@@ -31,13 +31,13 @@ public class LineService {
 
     // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
     @Transactional(readOnly = true)
-    public List<LineResponse> findAllLines() {
+    public List<LineCreateResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(
                         line ->
                                 // TODO 해당 부분 엔티티/도메인에서 처리할 수 있도록 변경 필요 -> Response 쪽에서 처리하는 것이
                                 // 유리해보임
-                                new LineResponse(
+                                new LineCreateResponse(
                                         line.getId(),
                                         line.getName(),
                                         line.getColor(),
@@ -48,14 +48,14 @@ public class LineService {
 
     // TODO 서비스 분리 필요할 수 있음(Read, Write 분리)
     @Transactional(readOnly = true)
-    public LineResponse findSpecificLine(Long id) {
+    public LineCreateResponse findSpecificLine(Long id) {
         return lineRepository
                 .findById(id)
                 .map(
                         line ->
                               // TODO 해당 부분 엔티티/도메인에서 처리할 수 있도록 변경 필요 -> Response 쪽에서 처리하는 것이
                               // 유리해보임
-                                new LineResponse(
+                                new LineCreateResponse(
                                         line.getId(),
                                         line.getName(),
                                         line.getColor(),
