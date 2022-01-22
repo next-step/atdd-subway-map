@@ -29,4 +29,9 @@ public class LineController {
     public ResponseEntity<List<LineDetailResponse>> getLineList() {
         return ResponseEntity.ok(lineService.getLineList());
     }
+
+    @GetMapping("/{lindId}")
+    public ResponseEntity<LineDetailResponse> getLine(@PathVariable(name = "lindId") Long id) {
+        return ResponseEntity.ok(lineService.getLine(id));
+    }
 }
