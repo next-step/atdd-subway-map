@@ -30,4 +30,23 @@ public class LineService {
                 line.getModifiedDate()
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAllLines() {
+        List<Line> lines = lineRepository.findAll();
+
+        return lines.stream()
+            .map(this::createLineResponse)
+            .collect(Collectors.toList());
+    }
+
+    public LineResponse createLineResponse(Line line) {
+        return new LineResponse(
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            line.getCreatedDate(),
+            line.getModifiedDate()
+        );
+    }
 }

@@ -52,7 +52,41 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("color", "bg-red-600");
+        params.put("name", "신분당선");
 
+        RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            ;
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("color", "bg-green-600");
+        params2.put("name", "2호선");
+
+        RestAssured.given().log().all()
+            .body(params2)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            ;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/lines")
+            .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> lineNames = response.jsonPath().getList("name");
+        assertThat(lineNames).containsExactly("신분당선", "2호선");
     }
 
     /**
