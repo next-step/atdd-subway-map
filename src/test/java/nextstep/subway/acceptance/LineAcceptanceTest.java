@@ -1,10 +1,59 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.acceptance.testenum.TestLine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static nextstep.subway.acceptance.testenum.TestLine.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    private final String BODY_ELEMENT_NAME = "name";
+    private final String BODY_ELEMENT_COLOR = "color";
+
+    private Map<String, String> createRequestBody(TestLine line) {
+        Map<String, String> params = new HashMap<>();
+        params.put(BODY_ELEMENT_NAME, line.getName());
+        params.put(BODY_ELEMENT_COLOR, line.getColor());
+
+        return params;
+    }
+
+    private ExtractableResponse<Response> postOneLine(TestLine line) {
+        Map<String, String> params = createRequestBody(line);
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+
+                .when()
+                .post("/lines")
+
+                .then().log().all()
+                .extract();
+        return response;
+    }
+
+    private void verifyResponseBodyElement(ExtractableResponse<Response> response, TestLine line) {
+        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_NAME)).isEqualTo(line.getName());
+        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_COLOR)).isEqualTo(line.getColor());
+    }
+
+    private void verifyResponseStatus(ExtractableResponse<Response> response, HttpStatus status) {
+        assertThat(response.statusCode()).isEqualTo(status.value());
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -12,6 +61,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        // when
+        ExtractableResponse<Response> response = postOneLine(LINE_NEW_BOONDANG);
+
+        // then
+        verifyResponseStatus(response, HttpStatus.CREATED);
+        verifyResponseBodyElement(response, LINE_NEW_BOONDANG);
     }
 
     /**
