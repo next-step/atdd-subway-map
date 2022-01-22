@@ -149,6 +149,29 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
+     * Given 새로운(수정할) 지하철 노선 생성을 요청 하고
+     * When 이미 존재하는 지하철 노선 이름으로 새로운 지하철 노선의 정보 수정을 요청 하면
+     * Then 지하철 노선의 정보 수정은 실패한다.
+     */
+    @DisplayName("지하철 노선 수정 실패 - 중복 이름")
+    @Test
+    void updateLineThatFailing() {
+        // given
+        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.삼호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 지하철_생성_수정_요청_Params.이호선.getName());
+        params.put("color", 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> editResponse = AcceptanceTestUtils.requestLocation(createResponse, Method.PUT, params);
+
+        // then
+        assertThat(editResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
      * When 생성한 지하철 노선 삭제를 요청 하면
      * Then 생성한 지하철 노선 삭제가 성공한다.
      */
