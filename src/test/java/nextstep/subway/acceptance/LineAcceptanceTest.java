@@ -1,10 +1,24 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.List;
+import java.util.Map;
+
+import static nextstep.subway.acceptance.LineAcceptanceFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private static final String LINES_URI = "/lines";
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -12,7 +26,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        //TODO
+        //given
+        //when
+        ExtractableResponse<Response> response = createLine(FIXTURE_RED);
+
+        int actual = response.statusCode();
+
+        //then
+        assertThat(actual).isEqualTo(HttpStatus.CREATED.value());
+
     }
 
     /**
@@ -24,6 +46,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        //given
+        createLine(FIXTURE_RED);
+        createLine(FIXTURE_BLUE);
+
+        //when
+        ExtractableResponse<Response> response = findLines(LINES_URI);
+
+        List<String> actual = response.jsonPath().getList("name");
+
+        //then
+        assertThat(actual).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME);
     }
 
     /**
@@ -34,6 +67,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        //given
+        ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
+        String uri = redLine.header("Location");
+
+        //when
+        ExtractableResponse<Response> response = findLines(uri);
+
+        String actual = response.jsonPath().get("name");
+
+        //then
+        assertThat(actual).isEqualTo(RED_LINE_NAME);
     }
 
     /**
@@ -44,6 +88,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        //given
+        ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
+        String uri = redLine.header("Location");
+
+        //when
+        ExtractableResponse<Response> response = updateLine(uri, FIXTURE_BLUE);
+
+        String actual = response.jsonPath().get("name");
+
+        //then
+        assertThat(actual).isEqualTo(BLUE_LINE_NAME);
     }
 
     /**
@@ -54,5 +109,52 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        //given
+        ExtractableResponse<Response> redLine = createLine(FIXTURE_RED);
+        String uri = redLine.header("Location");
+
+        //when
+        ExtractableResponse<Response> response = deleteLine(uri);
+
+        int actual = response.statusCode();
+
+        //then
+        assertThat(actual).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> createLine(Map<String, String> param) {
+        return RestAssured.given().log().all()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(LINES_URI)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> findLines(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> updateLine(String uri, Map<String, String> line) {
+        return RestAssured.given().log().all()
+                .body(line)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLine(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
     }
 }
