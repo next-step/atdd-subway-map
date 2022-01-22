@@ -7,6 +7,7 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,15 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
 
         return createLineResponse(line);
+    }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
+
+        line.update(lineRequest.getName(), lineRequest.getColor());
+
+        lineRepository.save(line);
     }
 
     private LineResponse createLineResponse(Line line) {
