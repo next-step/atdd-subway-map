@@ -11,8 +11,6 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.common.CommonLineAcceptance.*;
-import static nextstep.subway.acceptance.common.CommonStationAcceptance.getParamsStationMap;
-import static nextstep.subway.acceptance.common.CommonStationAcceptance.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -165,15 +163,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     void duplicated_line_interdict() {
         //given
         Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
-        지하철역_생성_요청(신분당선);
+        지하철_노선_생성_요청(신분당선);
 
         //when
         ExtractableResponse<Response> response
-                = 지하철역_생성_요청(신분당선);
+                = 지하철_노선_생성_요청(신분당선);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 이름으로 생성할 수 없습니다.");
+        assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 라인을 생성할 수 없습니다.");
     }
-
 }
