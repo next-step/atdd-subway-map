@@ -45,9 +45,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         return response;
     }
 
-    private void verifyResponseBodyElement(ExtractableResponse<Response> response, TestLine line) {
-        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_NAME)).isEqualTo(line.getName());
-        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_COLOR)).isEqualTo(line.getColor());
+    private void verifyResponseBodyElement(ExtractableResponse<Response> response, String name, String color) {
+        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_NAME)).isEqualTo(name);
+        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_COLOR)).isEqualTo(color);
     }
 
     private void verifyResponseStatus(ExtractableResponse<Response> response, HttpStatus status) {
@@ -116,7 +116,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         verifyResponseStatus(response, HttpStatus.CREATED);
-        verifyResponseBodyElement(response, LINE_NEW_BOONDANG);
+        verifyResponseBodyElement(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
     }
 
     /**
@@ -161,9 +161,8 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         verifyResponseStatus(response, HttpStatus.OK);
-        verifyResponseBodyElement(response, LINE_NEW_BOONDANG);
+        verifyResponseBodyElement(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
     }
-
 
     /**
      * Given 지하철 노선 생성을 요청 하고
@@ -173,15 +172,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        String modifyName = "구분당선";
+        String modifyColor = "bg-blue-600";
+
         // given
         ExtractableResponse<Response> responseByPost = postOneLine(LINE_NEW_BOONDANG);
 
         // when
         ExtractableResponse<Response> response =
-                patchOneLine("구분당선", "bg-blue-600", extractId(responseByPost));
+                patchOneLine(modifyName, modifyColor, extractId(responseByPost));
 
         // then
         verifyResponseStatus(response, HttpStatus.OK);
+        verifyResponseBodyElement(getOneLine(extractId(responseByPost)), modifyName, modifyColor);
     }
 
 

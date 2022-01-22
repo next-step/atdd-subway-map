@@ -30,8 +30,14 @@ public class LineController {
         return ResponseEntity.ok(lineService.getLineList());
     }
 
-    @GetMapping("/{lindId}")
-    public ResponseEntity<LineDetailResponse> getLine(@PathVariable(name = "lindId") Long id) {
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineDetailResponse> getLine(@PathVariable(name = "lineId") Long id) {
         return ResponseEntity.ok(lineService.getLine(id));
+    }
+
+    @PatchMapping("/{lineId}")
+    public void patchLine(@PathVariable(name = "lineId") Long id,
+                          @RequestBody LineRequest lineRequest) {
+        lineService.patchLine(id, lineRequest);
     }
 }

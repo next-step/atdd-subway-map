@@ -43,4 +43,11 @@ public class LineService {
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 노선입니다.")
                 ));
     }
+
+    public void patchLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 노선입니다."));
+
+        line.modify(lineRequest.getName(), lineRequest.getColor());
+    }
 }
