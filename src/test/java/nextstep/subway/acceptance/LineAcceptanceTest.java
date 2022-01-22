@@ -94,10 +94,39 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * When 생성한 지하철 노선 조회를 요청 하면
      * Then 생성한 지하철 노선을 응답받는다
+     * @see nextstep.subway.ui.LineController#getLine
      */
-    @DisplayName("지하철 노선 조회")
     @Test
-    void getLine() {
+    void 지하철_노선_조회_테스트() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "GTX-A");
+        params.put("color", "bg-red-900");
+
+        // given
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        String lineName = response.body().jsonPath().get("name").toString();
+        String lineColor = response.body().jsonPath().get("color").toString();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(lineName).isEqualTo("GTX-A");
+        assertThat(lineColor).isEqualTo("bg-red-900");
     }
 
     /**
