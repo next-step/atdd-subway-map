@@ -35,10 +35,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 중복된 지하철역 생성을 요청 하면
+     * When 중복된 지하철 역 생성을 요청 하면
      * Then 지하철역 생성이 실패한다.
      */
-    @DisplayName("중복된 지하철역 생성")
+    @DisplayName("중복된 지하철 역 생성")
     @Test
     void createDuplicateStation() {
         StationSteps.지하철_역_생성_요청(강남역);
