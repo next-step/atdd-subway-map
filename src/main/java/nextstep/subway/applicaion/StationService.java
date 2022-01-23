@@ -20,10 +20,16 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        checkDuplication(stationRequest);
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
+    public void checkDuplication(StationRequest stationRequest) {
+        if (stationRepository.findByName(stationRequest.getName()).isPresent()) {
+            throw new IllegalArgumentException("station name is duplicated");
+        }
+    }
     @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
