@@ -2,8 +2,8 @@ package nextstep.subway.exception;
 
 public class ExceptionResponse {
 
-	private int status;
-	private String message;
+	private final int status;
+	private final String message;
 
 	public ExceptionResponse(int status, String message) {
 		this.status = status;
