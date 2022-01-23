@@ -4,8 +4,10 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +22,9 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        verifyDuplication(stationRequest.getName());
         Station station = stationRepository.save(new Station(stationRequest.getName()));
+
         return createStationResponse(station);
     }
 
@@ -44,5 +48,13 @@ public class StationService {
                 station.getCreatedDate(),
                 station.getModifiedDate()
         );
+    }
+
+    private void verifyDuplication(final String name) {
+        Station station = stationRepository.findByName(name);
+
+        if (!ObjectUtils.isEmpty(station)) {
+            throw new DuplicationException("이미 존재합니다.");
+        }
     }
 }

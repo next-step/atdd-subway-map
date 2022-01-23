@@ -1,16 +1,13 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.step.StationStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,18 +20,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
 
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> response = StationStep.saveStation(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -50,39 +38,19 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        String 강남역 = "강남역";
+        StationStep.saveStation(강남역);
+
+        String 사당역 = "사당역";
+        StationStep.saveStation(사당역);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = StationStep.showStation();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        assertThat(stationNames).contains(강남역, 사당역);
     }
 
     /**
@@ -93,26 +61,34 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> createResponse = StationStep.saveStation(강남역);
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response =
+                StationStep.deleteStation(createResponse.header("Location"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철을 생성 요청 한다.
+     * When 같은 이름으로 지하철 역을 생성 요청한다.
+     * Then 지하철 생성이 실패한다.
+     */
+    @DisplayName("중복 지하철역 생성 실패")
+    @Test
+    void createStation_duplication() {
+
+        // 노선을 생성한다.
+        StationStep.saveStation("name_1");
+
+        // 중복으로 생성할 때
+        ExtractableResponse<Response> response = StationStep.saveStation("name_1");
+
+        // 실패를 한다.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }

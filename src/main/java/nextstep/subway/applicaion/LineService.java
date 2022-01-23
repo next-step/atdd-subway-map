@@ -1,11 +1,14 @@
 package nextstep.subway.applicaion;
 
+import nextstep.subway.applicaion.dto.LineCreationResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,13 +24,14 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineCreationResponse saveLine(LineRequest request) {
+        verifyDuplication(request.getName());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
+
+        return new LineCreationResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                Collections.EMPTY_LIST,
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
@@ -51,7 +55,7 @@ public class LineService {
 
     public void updateLine(final Long id, final LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        line.updateLine(request);
+        line.updateLine(request.getColor(), request.getName());
         lineRepository.save(line);
     }
 
@@ -69,5 +73,13 @@ public class LineService {
                 Collections.EMPTY_LIST,
                 line.getCreatedDate(),
                 line.getModifiedDate());
+    }
+
+    private void verifyDuplication(final String name) {
+        Line line = lineRepository.findByName(name);
+
+        if (!ObjectUtils.isEmpty(line)) {
+            throw new DuplicationException("이미 존재합니다.");
+        }
     }
 }

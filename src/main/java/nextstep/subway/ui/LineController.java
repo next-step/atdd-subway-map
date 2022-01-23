@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.dto.LineCreationResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,8 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineCreationResponse> createLine(@RequestBody LineRequest lineRequest) {
+        LineCreationResponse line = lineService.saveLine(lineRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -42,7 +43,7 @@ public class LineController {
     public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         lineService.updateLine(id, lineRequest);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")

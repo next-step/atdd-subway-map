@@ -1,25 +1,20 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.step.LineStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-
+    private final static Integer NUMBER_ONE = 1;
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -29,17 +24,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
 
-        // 요청에 대한 데이터
-        Map<String, String> request = new HashMap<>();
-        request.put("color", "color_1");
-        request.put("name", "name_1");
-
-        // given, when, then
-        ExtractableResponse<Response> extract = RestAssured
-                .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        // 요청 후, 노선을 생성하다
+        ExtractableResponse<Response> extract = LineStep.saveLine("color_1", "name_1");
 
         // 상태 코드
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -56,38 +42,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
 
-        // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
+        // 요청 후, 노선을 생성하다
+        LineStep.saveLine("color_1", "name_1");
+        LineStep.saveLine("color_2", "name_2");
 
-        // 지하철 노선 2를 생성
-        Map<String, String> request2 = new HashMap<>();
-        request2.put("color", "color_2");
-        request2.put("name", "name_2");
-
-        // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().body(request2).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        ExtractableResponse<Response> resultResponse = RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineStep.showLines();
 
         // 조회 포함 확인
-        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> resultResponseData = resultResponse.jsonPath().getList("color");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> resultResponseData = response.jsonPath().getList("color");
         assertThat(resultResponseData).contains("color_1", "color_2");
     }
 
@@ -100,28 +63,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
 
-        // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
-
-        // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        // 요청 후, 노선을 생성하다
+        LineStep.saveLine("color_1", "name_1");
 
         // 조회 결과
-        ExtractableResponse<Response> resultResponse = RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", 1)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineStep.showLine(NUMBER_ONE);
 
         // then
-        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String responseResultData = resultResponse.jsonPath().get("color");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String responseResultData = response.jsonPath().get("color");
         assertThat(responseResultData).isEqualTo("color_1");
     }
 
@@ -134,31 +84,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
 
-        // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
-
-        // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        // 수정할 데이터
-        Map<String, String> request2 = new HashMap<>();
-        request2.put("color", "color_1");
-        request2.put("name", "new_name_1");
+        // 요청 후, 노선을 생성하다
+        LineStep.saveLine("color_1", "name_1");
 
         // 수정 요청
-        ExtractableResponse<Response> resultResponse = RestAssured
-                .given().body(request2).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().put("/lines/{id}", 1)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineStep.updateLine("color_2", "name_2", 1);
 
-        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -170,25 +102,31 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
 
-        // 지하철 노선 1을 생성
-        Map<String, String> request1 = new HashMap<>();
-        request1.put("color", "color_1");
-        request1.put("name", "name_1");
+        // 요청 후, 노선을 생성하다
+        LineStep.saveLine("color_1", "name_1");
 
-        // 요청을 하고 생성을 했을 때
-        RestAssured
-                .given().body(request1).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        // 노선을 삭제하다
+        ExtractableResponse<Response> response = LineStep.deleteLine(NUMBER_ONE);
 
-        // 삭제를 한다.
-        ExtractableResponse<Response> resultResponse = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{id}", 1)
-                .then().log().all()
-                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 
-        assertThat(resultResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    /**
+     * Given 지하철 노선을 생성 요청 한다.
+     * When 같은 이름으로 지하철 역을 생성 요청한다.
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복 지하철 노선 생성 실패")
+    @Test
+    void createLine_duplication() {
+
+        // 노선을 생성한다.
+        LineStep.saveLine("color_1", "name_1");
+
+        // 중복으로 생성할 때
+        ExtractableResponse<Response> response = LineStep.saveLine("color_2", "name_1");
+
+        // 실패를 한다.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
