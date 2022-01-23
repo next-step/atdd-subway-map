@@ -44,6 +44,17 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    ExtractableResponse<Response> 지하철_노선_수정_API(Long id, Map<String, String> updateParams) {
+        return RestAssured.given().log().all()
+                .pathParam("id", id)
+                .body(updateParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -163,14 +174,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         updateParams.put("color", "bg-red-800");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .body(updateParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_수정_API(1L, updateParams);
 
         // then
         ExtractableResponse<Response> updatedLine = 지하철_노선_단건_조회_API(1L);
