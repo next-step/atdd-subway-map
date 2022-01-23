@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.OutOfSectionDistanceException;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -27,14 +29,8 @@ public class Section extends BaseEntity {
 
     }
     private Section(Long id, Line line, Station upStation, Station downStation, int distance) {
+        validateDistance(distance);
         this.id = id;
-        this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-    }
-
-    private Section(Line line, Station upStation, Station downStation, int distance) {
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -46,7 +42,7 @@ public class Section extends BaseEntity {
     }
 
     public static Section of(Line line, Station upStation, Station downStation, int distance) {
-        return new Section(line, upStation, downStation, distance);
+        return new Section(null, line, upStation, downStation, distance);
     }
 
     public Long getId() {
@@ -67,6 +63,12 @@ public class Section extends BaseEntity {
 
     public int getDistance() {
         return distance;
+    }
+
+    public void validateDistance(int distance) {
+        if (distance < 1) {
+            throw new OutOfSectionDistanceException(distance);
+        }
     }
 
     @Override

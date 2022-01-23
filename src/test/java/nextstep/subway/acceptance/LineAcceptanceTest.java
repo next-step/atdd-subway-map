@@ -30,6 +30,7 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static nextstep.subway.acceptance.StationAcceptanceTest.강남역;
 import static nextstep.subway.acceptance.StationAcceptanceTest.역삼역;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -107,14 +108,14 @@ class LineAcceptanceTest extends AcceptanceTest {
                 _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 7));
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo(_2호선);
-        Assertions.assertThat(isNull(response.jsonPath().get("id"))
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(_2호선);
+        assertThat(isNull(response.jsonPath().get("id"))
                         || isNull(response.jsonPath().get("createdDate"))
                         || isNull(response.jsonPath().get("modifiedDate"))).isFalse();
-        Assertions.assertThat(response.jsonPath().getString("color")).isEqualTo(_2호선_COLOR);
+        assertThat(response.jsonPath().getString("color")).isEqualTo(_2호선_COLOR);
         List<Station> stations = response.jsonPath().get("stations");
-        Assertions.assertThat(stations.size()).isEqualTo(2);
+        assertThat(stations.size()).isEqualTo(2);
     }
 
     /**
@@ -123,16 +124,19 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("지하철 노선 생성 시, 존재하지 않는 지하철역을 등록")
+    @Test
     void createLineAsInvalidStation() {
         // Given
         long invalidUpStationId = 1;
         long invalidDownStationId = 2;
 
-        // When Then
-        assertThatExceptionOfType(NotFoundStationException.class)
-                .isThrownBy(() -> 지하철_노선_생성_요청(LineRequest.of(
-                        _2호선, _2호선_COLOR, invalidUpStationId, invalidDownStationId, 7)));
+        // When
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, invalidUpStationId, invalidDownStationId, 7));
 
+        // Then
+        // NotFoundStationException 이라는 커스텀 에러를 catch 할 수 있으면 좋을텐데 RestAssured 로는 해당 에러를 분별하려면
+        // 에러 코드를 정의해야 할까요? ...
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -142,6 +146,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("지하철 노선 생성 시, 노선의 distance 를 1 미만 으로 입력")
+    @Test
     void createLineAsInvalidDistance() {
         // Given
         long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
@@ -149,9 +154,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         long 역삼역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(역삼역))
                 .jsonPath().getLong("id");
 
-        assertThatExceptionOfType(OutOfSectionDistanceException.class)
-                .isThrownBy(() -> 지하철_노선_생성_요청(LineRequest.of(
-                        _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 0)));
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(
+                _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 0));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -181,9 +186,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
         // then
 
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(response.jsonPath().getList(".").size()).isEqualTo(2);
-        Assertions.assertThat(response.jsonPath().getList("name")).contains("신분당선", "2호선");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList(".").size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList("name")).contains("신분당선", "2호선");
     }
 
 
@@ -202,9 +207,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ID로_지하철_노선_조회(신분당선_노선_id);
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
-        Assertions.assertThat(response.jsonPath().getLong("id")).isEqualTo(신분당선_노선_id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(신분당선_노선_id);
     }
 
     /**
@@ -221,10 +226,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 //                지하철_노선_수정(노선_id);
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         ExtractableResponse<Response> 변경된_노선_response = ID로_지하철_노선_조회(0);
-        Assertions.assertThat(변경된_노선_response.jsonPath().getString("name")).isEqualTo("구분당선");
-        Assertions.assertThat(변경된_노선_response.jsonPath().getString("color")).isEqualTo("bg-blue-600");
+        assertThat(변경된_노선_response.jsonPath().getString("name")).isEqualTo("구분당선");
+        assertThat(변경된_노선_response.jsonPath().getString("color")).isEqualTo("bg-blue-600");
     }
 
 
@@ -244,9 +249,9 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         ExtractableResponse<Response> 삭제된_지하철_노선_조회_response = ID로_지하철_노선_조회(0);
-        Assertions.assertThat(삭제된_지하철_노선_조회_response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(삭제된_지하철_노선_조회_response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -264,8 +269,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(null);
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        Assertions.assertThat(지하철_노선_목록_조회().jsonPath().getList("$").size()).isEqualTo(1);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(지하철_노선_목록_조회().jsonPath().getList("$").size()).isEqualTo(1);
     }
 
     @DisplayName("지하철 노선에 구간 제거")
