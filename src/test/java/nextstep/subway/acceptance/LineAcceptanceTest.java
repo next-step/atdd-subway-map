@@ -39,8 +39,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .log().all().extract();
 
         // then
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -108,11 +107,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // when
-        final Long ID = createResponse.jsonPath().getLong("id");
+        final Long id = createResponse.jsonPath().getLong("id");
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/lines/{id}", ID)
+                .when().get("/lines/{id}", id)
                 .then().log().all().extract();
 
         // then
@@ -144,13 +143,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", "bg-blue-600");
 
         // when
-        final Long ID = createResponse.jsonPath().getLong("id");
+        final Long id = createResponse.jsonPath().getLong("id");
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", ID)
+                .when().put("/lines/{id}", id)
                 .then().log().all().extract();
 
         // then
@@ -177,11 +176,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // when
-        final Long ID = createResponse.jsonPath().getLong("id");
+        final Long id = createResponse.jsonPath().getLong("id");
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/{id}", ID)
+                .when().delete("/lines/{id}", id)
                 .then().log().all().extract();
 
         // then

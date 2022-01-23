@@ -47,8 +47,6 @@ public class LineService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
 
         line.update(lineRequest.getName(), lineRequest.getColor());
-
-        lineRepository.save(line);
     }
 
     public void deleteLine(Long id) {
