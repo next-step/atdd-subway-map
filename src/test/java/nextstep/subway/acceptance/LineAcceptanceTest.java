@@ -39,8 +39,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.body().jsonPath().get("id").equals(1)),
-                () -> assertThat(response.body().jsonPath().get("name").equals(color)),
-                () -> assertThat(response.body().jsonPath().get("color").equals(name))
+                () -> assertThat(response.body().jsonPath().get("name").equals(name)),
+                () -> assertThat(response.body().jsonPath().get("color").equals(color))
                 // 시간과 관련된 테스트는 어떻게 해야할지 궁금합니다!
         );
     }
@@ -92,6 +92,31 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        /// given
+        final String firstLineName = "신분당선";
+        final String firstLineColor = "bg-red-600";
+        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(firstLineName, firstLineColor);
+        final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(ContentType.JSON)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
+                () -> assertThat(response.header("Date")).isNotBlank(),
+                () -> assertThat(response.body().jsonPath().get("id").equals(lineId)),
+                () -> assertThat(response.body().jsonPath().get("name").equals(firstLineName)),
+                () -> assertThat(response.body().jsonPath().get("color").equals(firstLineColor))
+        );
     }
 
     /**
