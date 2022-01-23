@@ -43,12 +43,14 @@ public class LineService {
     public LineResponse findById(Long id) {
         return lineRepository.findById(id)
                 .map(this::createLineResponse)
-                .get();
+                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
     }
 
     // 지하철 노선 수정
     public void modifyLineById(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).get();
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
+
         line.changInfo(lineRequest.getName(), lineRequest.getColor());
     }
 
