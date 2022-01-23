@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,11 +49,41 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
-     * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
+     * Then 두 노선이 포함된 지하철 노선 목록을 응답 받는다.
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        final Map<String, String> requestParams1 = new HashMap<>();
+        requestParams1.put("name", "신분당선");
+        requestParams1.put("color", "bg-red-600");
+
+        final Map<String, String> requestParams2 = new HashMap<>();
+        requestParams2.put("name", "2호선");
+        requestParams2.put("color", "bg-green-600");
+
+        Arrays.asList(requestParams1, requestParams2)
+                .forEach(requestParams -> RestAssured.given().log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .body(requestParams)
+                        .when()
+                        .post("/lines")
+                        .then().log().all()
+                        .extract());
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getList("name")).contains(requestParams1.get("name"), requestParams2.get("name"))
+        );
     }
 
     /**
