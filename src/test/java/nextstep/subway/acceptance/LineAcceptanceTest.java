@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -89,11 +90,38 @@ class LineAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선 생성을 요청 하고
      * When 생성한 지하철 노선 조회를 요청 하면
-     * Then 생성한 지하철 노선을 응답받는다
+     * Then 생성한 지하철 노선을 응답 받는다.
      */
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        final Map<String, String> requestParams = new HashMap<>();
+        requestParams.put("name", "신분당선");
+        requestParams.put("color", "bg-red-600");
+
+        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(requestParams)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get(createResponse.header("Location"))
+                .then().log().all()
+                .extract();
+
+        // then
+        final JsonPath responseBody = response.jsonPath();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(responseBody.getLong("id")).isNotNull(),
+                () -> assertThat(responseBody.getString("name")).isEqualTo(requestParams.get("name"))
+        );
     }
 
     /**
