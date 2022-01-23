@@ -2,8 +2,11 @@ package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +17,7 @@ import org.springframework.http.MediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineResponse;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -50,6 +54,46 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name","신분당선");
+        params.put("color", "bg-red-600");
+
+        // when
+        ExtractableResponse<Response> firstResponse = RestAssured
+            .given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines")
+            .then().log().all().extract();
+
+        Assertions.assertThat(firstResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        Map<String, String> secondParams = new HashMap<>();
+        secondParams.put("name","5호선");
+        secondParams.put("color", "bg-purple-600");
+
+        // when
+        ExtractableResponse<Response> secondResponse = RestAssured
+            .given().log().all()
+            .body(secondParams)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines")
+            .then().log().all().extract();
+
+        Assertions.assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/lines")
+            .then().log().all().extract();
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        System.out.println(response);
+        List<String> lineNames = response.jsonPath().getList(".", LineResponse.class)
+            .stream().map(LineResponse::getName)
+            .collect(Collectors.toList());
+        Assertions.assertThat(lineNames).containsAll(Arrays.asList("신분당선", "5호선"));
     }
 
     /**
