@@ -1,7 +1,18 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -12,7 +23,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        // when
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "9호선");
+        params.put("color", "갈색");
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isEqualTo("/lines/1");
     }
+
 
     /**
      * Given 지하철 노선 생성을 요청 하고
@@ -23,6 +53,46 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", "9호선");
+        params1.put("color", "갈색");
+
+        RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .log().all()
+                .extract();
+
+        // given
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "5호선");
+        params2.put("color", "보라색");
+
+        RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .get("/lines")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> lineNames = response.jsonPath().getList("name");
+        assertThat(lineNames).containsAll(lineNames);
     }
 
     /**
@@ -33,6 +103,34 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "9호선");
+        params.put("color", "갈색");
+
+        ExtractableResponse<Response> createResponse =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log().all()
+                        .extract();
+
+        // when
+        String url = createResponse.header("Location");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .get(url)
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String lineName = response.jsonPath().getString("name");
+        assertThat(lineName).isEqualTo("9호선");
     }
 
     /**
@@ -43,6 +141,36 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "9호선");
+        params.put("color", "갈색");
+
+        ExtractableResponse<Response> createResponse =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log().all()
+                        .extract();
+
+        // when
+        Map<String, String> updateParams = new HashMap<>();
+        updateParams.put("name", "5호선");
+        updateParams.put("color", "보라색");
+        String url = createResponse.header("Location");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(updateParams)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .put(url)
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -53,5 +181,30 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "9호선");
+        params.put("color", "갈색");
+
+        ExtractableResponse<Response> createResponse =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post("/lines")
+                        .then()
+                        .log().all()
+                        .extract();
+
+        // when
+        String url = createResponse.header("Location");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when()
+                        .delete(url)
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
