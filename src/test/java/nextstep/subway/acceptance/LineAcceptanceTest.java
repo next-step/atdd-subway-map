@@ -87,6 +87,13 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선에_구간_삭제(long lineId, long 삭제할_역_id) {
+        return RestAssured
+                .given().log().all()
+                .when().delete(LINE_CONTROLLER_COMMON_PATH + "/" + lineId + "/sections?stationId=" + 삭제할_역_id)
+                .then().log().all().extract();
+    }
+
     /**
      * Given 지하철역이 두개 주어지고
      * When 지하철 노선 생성을 요청 하면
@@ -438,12 +445,25 @@ class LineAcceptanceTest extends AcceptanceTest {
      * given 상행 종점이 주어질 때
      * when 구간 제거를 한다.
      * then 구간 제거가 성공한다.
-     * then 상행 종점이 바뀐다.
+     * then 노선에 역이 사라진다.
      */
     @DisplayName("지하철 노선에 구간 제거, 상행종점 구간 제거")
     @Test
     void removeUpStation() {
 
+        // given
+        long 강남역_id = 지하철역_생성(StationRequest.of(강남역)).jsonPath().getLong("id");
+        long 역삼역_id = 지하철역_생성(StationRequest.of(역삼역)).jsonPath().getLong("id");
+        long 교대역_id = 지하철역_생성(StationRequest.of(교대역)).jsonPath().getLong("id");
+        long _2호선_Line_id = 지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, 강남역_id, 역삼역_id, 7)).jsonPath().getLong("id");
+        지하철_노선에_구간_등록(교대역_id, _2호선_Line_id, 강남역_id);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제(_2호선_Line_id, 교대역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(ID로_지하철_노선_조회(_2호선_Line_id).jsonPath().getList("stations.id").contains((int) 교대역_id)).isFalse();
     }
 
     /**
@@ -456,7 +476,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간 제거, 하행종점 구간 제거")
     @Test
     void removeDownStation() {
+        // given
+        long 강남역_id = 지하철역_생성(StationRequest.of(강남역)).jsonPath().getLong("id");
+        long 역삼역_id = 지하철역_생성(StationRequest.of(역삼역)).jsonPath().getLong("id");
+        long 교대역_id = 지하철역_생성(StationRequest.of(교대역)).jsonPath().getLong("id");
+        long _2호선_Line_id = 지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, 강남역_id, 역삼역_id, 7)).jsonPath().getLong("id");
+        지하철_노선에_구간_등록(교대역_id, _2호선_Line_id, 강남역_id);
 
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제(_2호선_Line_id, 역삼역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(ID로_지하철_노선_조회(_2호선_Line_id).jsonPath().getList("stations.id").contains((int) 역삼역_id)).isFalse();
     }
 
     /**
@@ -467,7 +499,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간 제거, 구간이 1개 일 때")
     @Test
     void removeBiStation() {
+        // given
+        long 강남역_id = 지하철역_생성(StationRequest.of(강남역)).jsonPath().getLong("id");
+        long 역삼역_id = 지하철역_생성(StationRequest.of(역삼역)).jsonPath().getLong("id");
+        long _2호선_Line_id = 지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, 강남역_id, 역삼역_id, 7)).jsonPath().getLong("id");
 
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제(_2호선_Line_id, 역삼역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @DisplayName("지하철 노선에 등록된 구간을 통해 역 목록을 조회")
