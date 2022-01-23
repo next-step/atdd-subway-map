@@ -41,4 +41,10 @@ public class LineService {
         Optional<Line> line = lineRepository.findById(id);
         return LineResponse.of(line.orElseThrow(IllegalArgumentException::new));
     }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).get();
+        line.update(lineRequest.getName(), lineRequest.getColor());
+
+    }
 }

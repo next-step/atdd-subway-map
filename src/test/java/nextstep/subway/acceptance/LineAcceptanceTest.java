@@ -121,6 +121,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        var uri = 지하철_노선_생성_요청("2호선", "green").header("Location");
+        String newName = "신분당선";
+        String newColor = "Red";
+        Map<String, String> params = new HashMap<>();
+        params.put("color", newColor);
+        params.put("name", newName);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
