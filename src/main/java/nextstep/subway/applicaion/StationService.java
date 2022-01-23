@@ -8,10 +8,8 @@ import nextstep.subway.ui.exception.UniqueKeyExistsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class StationService {
 	private final StationRepository stationRepository;
 
@@ -27,10 +25,6 @@ public class StationService {
 
 		final Station station = stationRepository.save(requestStation.toEntity());
 		return StationResponse.from(station);
-	}
-
-	public List<StationResponse> findAllStations() {
-		return StationResponse.fromList(stationRepository.findAll());
 	}
 
 	@Transactional

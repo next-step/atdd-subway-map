@@ -9,10 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class LineService {
 
 	private final LineRepository lineRepository;
@@ -21,7 +20,6 @@ public class LineService {
 		this.lineRepository = lineRepository;
 	}
 
-	@Transactional
 	public LineResponse saveLine(LineRequest line) {
 		validateCreateLine(line);
 		return LineResponse.from(
@@ -29,21 +27,11 @@ public class LineService {
 						Line.of(line.getName(), line.getColor())));
 	}
 
-	public List<LineResponse> getAllLines() {
-		return LineResponse.fromList(lineRepository.findAll());
-	}
-
-	public LineResponse getLine(long id) {
-		final Line line = findLineById(id);
-		return LineResponse.from(line);
-	}
-
 	private Line findLineById(long id) {
 		return lineRepository.findById(id)
 				.orElseThrow(EntityNotFoundException::new);
 	}
 
-	@Transactional
 	public LineResponse updateLine(long id, LineRequest request) {
 		validateUpdateLine(id, request);
 
@@ -54,7 +42,6 @@ public class LineService {
 		return LineResponse.from(line);
 	}
 
-	@Transactional
 	public void deleteLine(long id) {
 		lineRepository.deleteById(id);
 	}

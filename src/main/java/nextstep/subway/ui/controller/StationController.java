@@ -1,5 +1,6 @@
 package nextstep.subway.ui.controller;
 
+import nextstep.subway.applicaion.StationQueryService;
 import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
@@ -13,9 +14,11 @@ import java.util.List;
 @RestController
 public class StationController {
 	private final StationService stationService;
+	private final StationQueryService stationQueryService;
 
-	public StationController(StationService stationService) {
+	public StationController(StationService stationService, StationQueryService stationQueryService) {
 		this.stationService = stationService;
+		this.stationQueryService = stationQueryService;
 	}
 
 	@PostMapping("/stations")
@@ -30,7 +33,7 @@ public class StationController {
 	public ResponseEntity<List<StationResponse>> showStations() {
 		return ResponseEntity
 				.ok()
-				.body(stationService.findAllStations());
+				.body(stationQueryService.findAllStations());
 	}
 
 	@DeleteMapping("/stations/{id}")
