@@ -24,21 +24,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역_응답_상태_검증(response, HttpStatus.CREATED);
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -53,26 +43,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-
         String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        지하철역_생성_요청(강남역);
+        지하철역_생성_요청(역삼역);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -81,7 +54,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철역_응답_상태_검증(response, HttpStatus.OK);
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
@@ -95,15 +68,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청("강남역");
 
         // when
         String uri = createResponse.header("Location");
@@ -114,6 +79,44 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철역_응답_상태_검증(response, HttpStatus.NO_CONTENT);
     }
+
+    /**
+     * Scenario: 중복이름으로 지하철역 생성
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    void createStationWithDuplicateName() {
+        // given
+        String 강남역 = "강남역";
+        지하철역_생성_요청(강남역);
+
+        // when
+        ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
+
+        // then
+        지하철역_응답_상태_검증(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private void 지하철역_응답_상태_검증(ExtractableResponse<Response> response, HttpStatus status) {
+        assertThat(response.statusCode()).isEqualTo(status.value());
+    }
+
 }

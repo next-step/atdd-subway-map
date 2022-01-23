@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,8 +21,10 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        checkDuplicated(stationRequest.getName());
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
@@ -29,7 +32,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -37,12 +40,11 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+    private void checkDuplicated(String name) {
+        Optional<Station> findStation = stationRepository.findByName(name);
+        if (findStation.isPresent()) {
+            throw new RuntimeException("해당 지하철역이 이미 존재합니다.");
+        }
     }
+
 }
