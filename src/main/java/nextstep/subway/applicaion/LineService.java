@@ -1,7 +1,5 @@
 package nextstep.subway.applicaion;
 
-import static nextstep.subway.exception.ColumnName.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,8 +10,10 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.ColumnName;
 import nextstep.subway.exception.DuplicateColumnException;
 import nextstep.subway.exception.EntityNotFoundException;
+import nextstep.subway.utils.ExceptionOptional;
 
 @Service
 @Transactional
@@ -25,16 +25,19 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        validateDuplicationName(request.getName());
+        verifyExistsByName(request.getName()).verify();
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return LineResponse.from(line);
     }
 
-    private void validateDuplicationName(String name) {
+    private ExceptionOptional<DuplicateColumnException> verifyExistsByName(String name) {
         if (lineRepository.existsByName(name)) {
-            throw new DuplicateColumnException(LINE_NAME);
+            return ExceptionOptional.of(
+                new DuplicateColumnException(ColumnName.LINE_NAME)
+            );
         }
+        return ExceptionOptional.empty();
     }
 
     public List<LineResponse> findAllLines() {
@@ -54,7 +57,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                                   .orElseThrow(EntityNotFoundException::new);
         if (line.notMatchName(lineRequest.getName())) {
-            validateDuplicationName(lineRequest.getName());
+            verifyExistsByName(lineRequest.getName()).verify();
         }
         line.edit(lineRequest.getName(), lineRequest.getColor());
     }

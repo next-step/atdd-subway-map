@@ -1,7 +1,5 @@
 package nextstep.subway.applicaion;
 
-import static nextstep.subway.exception.ColumnName.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,24 +10,32 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.ColumnName;
 import nextstep.subway.exception.DuplicateColumnException;
+import nextstep.subway.utils.ExceptionOptional;
 
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        if (stationRepository.existsByName(stationRequest.getName())) {
-            throw new DuplicateColumnException(LINE_NAME);
-        }
-
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+    public StationResponse saveStation(StationRequest request) {
+        verifyExistsByName(request.getName()).verify();
+        Station station = stationRepository.save(new Station(request.getName()));
         return StationResponse.from(station);
+    }
+
+    private ExceptionOptional<DuplicateColumnException> verifyExistsByName(String name) {
+        if (stationRepository.existsByName(name)) {
+            return ExceptionOptional.of(
+                new DuplicateColumnException(ColumnName.STATION_NAME)
+            );
+        }
+        return ExceptionOptional.empty();
     }
 
     @Transactional(readOnly = true)
