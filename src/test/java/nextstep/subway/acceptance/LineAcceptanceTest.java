@@ -25,26 +25,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         /// given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
+        final String name = "신분당선";
+        final String color = "bg-red-600";
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .accept(ContentType.ANY)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다(name, color);
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.header("Location")).isNotBlank(),
                 () -> assertThat(response.header("Date")).isNotBlank(),
-                () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE)
+                () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
+                () -> assertThat(response.body().jsonPath().get("id").equals(1)),
+                () -> assertThat(response.body().jsonPath().get("name").equals(color)),
+                () -> assertThat(response.body().jsonPath().get("color").equals(name))
+                // 시간과 관련된 테스트는 어떻게 해야할지 궁금합니다!
         );
     }
 
@@ -57,6 +53,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+
     }
 
     /**
@@ -87,5 +84,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+    }
+
+    private ExtractableResponse<Response> 정상적인_지하철_노선_생성을_요청한다(final String name, final String color) {
+        final Map<String, String> params = 정상적인_지하철_노선_생성_데이터를_만든다(name, color);
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .accept(ContentType.ANY)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+        return response;
+    }
+
+    private Map<String, String> 정상적인_지하철_노선_생성_데이터를_만든다(final String name, final String color) {
+        final Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        return params;
     }
 }
