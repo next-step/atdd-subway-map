@@ -3,23 +3,19 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-
-    private static final String 신분당선 = "신분당선";
-    private static final String 신분당선_색상 = "bg-red-600";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -29,9 +25,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
+        LineRequest params = LineSteps.신분당선_요청_생성();
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -59,11 +53,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        String 이호선 = "2호선";
-        String 이호선_색상 = "bg-green-600";
-
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(신분당선, 신분당선_색상);
-        ExtractableResponse<Response> createResponse2 = LineSteps.지하철_노선_생성(이호선, 이호선_색상);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
+        ExtractableResponse<Response> createResponse2 = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성());
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -91,7 +82,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(신분당선, 신분당선_색상);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -117,11 +108,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(신분당선, 신분당선_색상);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
 
-        Map<String, String> editParams = new HashMap<>();
-        editParams.put("color", "bg-blue-600");
-        editParams.put("name", "구분당선");
+        LineRequest editParams = LineRequest.of(
+            "구분당선",
+            "bg-blue-600"
+        );
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -145,7 +137,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(신분당선, 신분당선_색상);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -168,10 +160,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateLine() {
         // given
-        LineSteps.지하철_노선_생성(신분당선, 신분당선_색상);
+        LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
 
         // when
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(신분당선, 신분당선_색상);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
