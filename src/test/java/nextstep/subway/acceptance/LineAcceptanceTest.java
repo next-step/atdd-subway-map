@@ -17,15 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    final Map<String, String> 신분당선 = Map.of(
-            "name", "신분당선",
-            "color", "bg-red-600"
-    );
+    final String 아이디 = "id";
+    final String 이름 = "name";
+    final String 색상 = "color";
 
-    final Map<String, String> 이호선 = Map.of(
-            "name", "2호선",
-            "color", "bg-green-600"
-    );
+    final Map<String, String> 신분당선 = Map.of(이름, "신분당선", 색상, "bg-red-600");
+    final Map<String, String> 이호선 = Map.of(이름, "2호선", 색상, "bg-green-600");
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -56,17 +53,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         LineSteps.지하철_노선_생성_요청(이호선);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> searchResponse = LineSteps.지하철_노선_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).contains(신분당선.get("name"), 이호선.get("name"));
+        List<String> lineNames = searchResponse.jsonPath().getList(이름);
+        assertThat(lineNames).contains(신분당선.get(이름), 이호선.get(이름));
     }
 
     /**
@@ -81,15 +74,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
 
         // when
-        final Long createdId = createResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", createdId)
-                .then().log().all().extract();
+        final Long createdId = createResponse.jsonPath().getLong(아이디);
+        ExtractableResponse<Response> searchResponse = LineSteps.지하철_노선_조회_요청(createdId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
@@ -109,7 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", "bg-blue-600");
 
         // when
-        final Long createdId = createResponse.jsonPath().getLong("id");
+        final Long createdId = createResponse.jsonPath().getLong(아이디);
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -134,7 +123,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
 
         // when
-        final Long createdId = createResponse.jsonPath().getLong("id");
+        final Long createdId = createResponse.jsonPath().getLong(아이디);
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()

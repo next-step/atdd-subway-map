@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 public class LineSteps {
+
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> 요청_노선) {
 
         return RestAssured
@@ -18,6 +19,22 @@ public class LineSteps {
                 .post("/lines")
                 .then()
                 .log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청() {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines/{id}", id)
+                .then().log().all().extract();
     }
 
 }
