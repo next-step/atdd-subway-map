@@ -1,41 +1,42 @@
 package nextstep.subway.applicaion;
 
+import javassist.NotFoundException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.*;
-import nextstep.subway.exception.NotFoundStationException;
+import nextstep.subway.exception.NotFoundLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
     private final StationService stationService;
 
     public LineService(LineRepository lineRepository,
-                       SectionRepository sectionRepository,
                        StationService stationService) {
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
         this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(Line.of(request));
-        Station upStation = stationService.findById(request.getUpStationId());
-        Station downStation = stationService.findById(request.getDownStationId());
-        line.addSection(sectionRepository.save(Section.of(line,
+        return addSectionToLine(
+                lineRepository.save(Line.of(request)),
+                request.toSectionRequest()
+        );
+    }
+
+    public LineResponse addSectionToLine(Line line, SectionRequest sectionRequest) {
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        line.addSection(Section.of(line,
                 upStation,
                 downStation,
-                request.getDistance())));
+                sectionRequest.getDistance()));
         return LineResponse.of(lineRepository.save(line));
     }
 
@@ -45,13 +46,8 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<LineResponse> getLine(long lineId) {
-        Optional<Line> lineOptional = lineRepository.findById(lineId);
-        if (lineOptional.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(LineResponse.of(lineOptional.get()));
+    public LineResponse getLine(long lineId) {
+        return LineResponse.of(findLineById(lineId));
     }
 
     public void updateLine(long lineId, LineRequest lineRequest) {
@@ -60,5 +56,14 @@ public class LineService {
 
     public void deleteLine(long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    public LineResponse addSectionToLine(long lineId, SectionRequest sectionRequest) {
+        return addSectionToLine(findLineById(lineId), sectionRequest);
+    }
+
+    public Line findLineById(long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundLineException(lineId));
     }
 }

@@ -7,6 +7,7 @@ import nextstep.subway.domain.Stations;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class LineResponse {
     private Long id;
@@ -63,7 +64,7 @@ public class LineResponse {
         return modifiedDate;
     }
 
-    public List<Station> getStations() {
+    public Set<Station> getStations() {
         return stations.getStations();
     }
 

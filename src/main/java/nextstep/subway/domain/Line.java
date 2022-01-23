@@ -1,11 +1,13 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.enums.Direction;
+import nextstep.subway.exception.InvalidSectionException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line extends BaseEntity {
@@ -61,11 +63,47 @@ public class Line extends BaseEntity {
     }
 
     public boolean addSection(Section section) {
-        return this.sections.add(section);
+        // section 이 상행종점인지, 하행 종목인지를 구분한다.
+        Direction direction = getStations()
+                                .getDirection(section);
+        if (direction.equals(Direction.NEW)
+        || (direction.equals(Direction.DOWN) && validateDownEnd(section.getUpStation()))
+        || (direction.equals(Direction.UP) && validateUpEnd(section.getDownStation()))) {
+            return this.sections.add(section);
+        }
+
+        return false;
+    }
+
+    private boolean validateUpEnd(Station downStation) {
+        boolean a = sections.stream()
+                .filter(section -> section.getUpStation().equals(downStation))
+                .count() == 1L;
+        boolean b = sections.stream()
+                .noneMatch(section -> section.getDownStation().equals(downStation));
+        if (!a || !b) {
+            throw new InvalidSectionException();
+        }
+
+        return true;
+    }
+
+    private boolean validateDownEnd(Station upStation) {
+        boolean a = sections.stream()
+                .filter(section -> section.getDownStation().equals(upStation))
+                .count() == 1L;
+        boolean b = sections.stream()
+                .noneMatch(section -> section.getUpStation().equals(upStation));
+
+        if (!a || !b) {
+            throw new InvalidSectionException();
+        }
+
+        return true;
     }
 
     public Stations getStations() {
-        List<Station> stations = new ArrayList<>();
+        Set<Station> stations = new HashSet<>();
         for (Section section : sections) {
             stations.add(section.getUpStation());
             stations.add(section.getDownStation());

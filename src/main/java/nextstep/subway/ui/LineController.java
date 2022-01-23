@@ -1,9 +1,12 @@
 package nextstep.subway.ui;
 
+import javassist.NotFoundException;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.domain.SectionRequest;
+import nextstep.subway.exception.NotFoundStationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +44,7 @@ public class LineController {
     public ResponseEntity<?> getLine(
             @PathVariable long lineId
     ) {
-        Optional<LineResponse> lineResponseOptional = lineService.getLine(lineId);
-        if (lineResponseOptional.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return ResponseEntity.ok(lineResponseOptional);
+        return ResponseEntity.ok(lineService.getLine(lineId));
     }
 
     @PutMapping("/{lineId}")
@@ -65,4 +63,13 @@ public class LineController {
         lineService.deleteLine(lineId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<LineResponse> addSectionToLine(
+            @PathVariable long lineId,
+            @RequestBody SectionRequest sectionRequest
+            ) {
+        return new ResponseEntity<>(lineService.addSectionToLine(lineId, sectionRequest), HttpStatus.CREATED);
+    }
+
 }

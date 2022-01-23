@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
+import nextstep.subway.domain.SectionRequest;
+
 public class LineRequest {
     private String name;
     private String color;
@@ -45,6 +47,10 @@ public class LineRequest {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public SectionRequest toSectionRequest() {
+        return SectionRequest.of(upStationId, downStationId, distance);
     }
 
 }
