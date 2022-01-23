@@ -1,13 +1,11 @@
 package nextstep.subway.acceptance.line;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.line.domain.dto.LineRequest;
 
 public class LineStep {
     private static int dummyCounter = 0;
@@ -16,13 +14,9 @@ public class LineStep {
 
     private LineStep() {}
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(final LineRequest request) {
         return RestAssured.given().log().all()
-                          .body(params)
+                          .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when()
                           .post("/lines")
@@ -30,11 +24,17 @@ public class LineStep {
                           .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청() {
-        return 지하철_노선_생성_요청(nextName(), nextColor());
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(int distance) {
+        LineRequest request = LineRequest.builder()
+            .name(nextRequest())
+            .color(nextColor())
+            .upStationId((long) 1)
+            .downStationId((long) 2)
+            .build();
+        return 지하철_노선_생성_요청(request);
     }
 
-    public static String nextName() {
+    public static String nextRequest() {
         return String.format(NAME_FORMAT, ++dummyCounter);
     }
 
