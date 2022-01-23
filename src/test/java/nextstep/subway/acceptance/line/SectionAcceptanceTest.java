@@ -60,7 +60,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.NO_CONTENT)
+                          .equalsHttpStatus(HttpStatus.CREATED)
                           .hasLocation();
     }
 

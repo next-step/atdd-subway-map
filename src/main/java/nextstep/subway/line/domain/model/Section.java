@@ -45,6 +45,10 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
+    public long getId() {
+        return id;
+    }
+
     public Line getLine() {
         return line;
     }
