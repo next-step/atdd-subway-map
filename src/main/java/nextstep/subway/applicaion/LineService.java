@@ -11,6 +11,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.common.ErrorMessages.DUPLICATE_LINE_NAME;
+import static nextstep.subway.common.ErrorMessages.NOT_FOUND_LINE;
+
 @Service
 @Transactional
 public class LineService {
@@ -21,7 +24,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        checkExistsName(request.getName());
+        checkExistsLineName(request.getName());
 
         Line line = lineRepository.save(request.toLine());
         return LineResponse.of(line);
@@ -30,7 +33,7 @@ public class LineService {
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(line -> LineResponse.of(line)).collect(Collectors.toList());
+                .map(LineResponse::of).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -40,7 +43,7 @@ public class LineService {
     }
 
     public void updateLine(Long id, LineRequest updateRequest) {
-        checkExistsName(updateRequest.getName());
+        checkExistsLineName(updateRequest.getName());
 
         Line line = getLine(id);
         line.update(updateRequest);
@@ -54,11 +57,11 @@ public class LineService {
 
     private Line getLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("노선이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalStateException(NOT_FOUND_LINE.getMessage()));
         return line;
     }
 
-    private void checkExistsName(String name) {
-        Assert.isTrue(!lineRepository.existsByName(name), "동일한 노선 이름이 존재 합니다.");
+    private void checkExistsLineName(String name) {
+        Assert.isTrue(!lineRepository.existsByName(name), DUPLICATE_LINE_NAME.getMessage());
     }
 }

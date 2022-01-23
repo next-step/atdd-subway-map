@@ -18,13 +18,13 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
-        logger.error("IllegalStateException", e);
+        logger.warn("IllegalStateException", e);
         return makeErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(IllegalArgumentException e) {
-        logger.error("IllegalArgumentException", e);
+        logger.warn("IllegalArgumentException", e);
         return makeErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -36,7 +36,7 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
-        logger.error("MethodArgumentNotValidException url:{}, trace:{}", request.getRequestURI(), e.getStackTrace());
+        logger.warn("MethodArgumentNotValidException url:{}, trace:{}", request.getRequestURI(), e.getStackTrace());
         return makeValidErrorResponse(e.getBindingResult());
     }
 

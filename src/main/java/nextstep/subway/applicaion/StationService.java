@@ -6,22 +6,27 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.common.ErrorMessages.DUPLICATE_STATION_NAME;
+
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        checkExistsStationName(stationRequest.getName());
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
@@ -29,7 +34,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -37,12 +42,8 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+
+    private void checkExistsStationName(String name) {
+        Assert.isTrue(!stationRepository.existsByName(name), DUPLICATE_STATION_NAME.getMessage());
     }
 }

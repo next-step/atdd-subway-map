@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.common.ErrorMessages.DUPLICATE_LINE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LineAcceptanceTest extends AcceptanceTest {
 
-    private final static String END_POINT = "/lines";
+    private static final String END_POINT = "/lines";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -29,10 +30,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @Order(1)
     void createLine() {
+        // given
         LineRequest lineRequest = 노선_요청_정보_Sample1();
 
+        // when
         ExtractableResponse<Response> response = 지하철_노선_Create(lineRequest);
 
+        // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getString("name")).isEqualTo(lineRequest.getName()),
@@ -50,21 +54,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @Order(3)
     void getLines() {
+        // given
         LineRequest lineRequest = 노선_요청_정보_Sample1();
         지하철_노선_Create(lineRequest);
+
         LineRequest newLineRequest = 노선_요청_정보_Sample2();
         지하철_노선_Create(newLineRequest);
+
         List<LineRequest> requestList = Arrays.asList(lineRequest, newLineRequest);
 
+        // when
         ExtractableResponse<Response> response = 지하철_노선_목록_FindAll();
 
+        // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> {
                     List<LineResponse> responseList = response.jsonPath().getList(".", LineResponse.class);
                     assertThat(responseList.size()).isEqualTo(requestList.size());
-                    assertThat(responseList.stream().map(it -> it.getName()).collect(Collectors.toList()))
-                            .isEqualTo(requestList.stream().map(it -> it.getName()).collect(Collectors.toList()));
+                    assertThat(responseList.stream().map(LineResponse::getName).collect(Collectors.toList()))
+                            .isEqualTo(requestList.stream().map(LineRequest::getName).collect(Collectors.toList()));
                 }
         );
     }
@@ -78,12 +87,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @Order(5)
     void getLine() {
+        // given
         LineRequest lineRequest = 노선_요청_정보_Sample1();
         ExtractableResponse<Response> givenResponse = 지하철_노선_Create(lineRequest);
         String searchUri = givenResponse.header("Location");
 
+        // when
         ExtractableResponse<Response> response = 지하철_노선_Find(searchUri);
 
+        // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getString("name")).isEqualTo(lineRequest.getName()),
@@ -100,13 +112,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @Order(7)
     void updateLine() {
+        // given
         LineRequest lineRequest = 노선_요청_정보_Sample1();
         ExtractableResponse<Response> givenResponse = 지하철_노선_Create(lineRequest);
+
         String updateUri = givenResponse.header("Location");
         LineRequest updateLineRequest = 노선_요청_정보_Modify_Sample1();
 
+        // when
         ExtractableResponse<Response> response = 지하철_노선_Update(updateUri, updateLineRequest);
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -119,13 +135,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @Order(9)
     void deleteLine() {
+        // given
         LineRequest lineRequest = 노선_요청_정보_Sample1();
         ExtractableResponse<Response> givenResponse = 지하철_노선_Create(lineRequest);
         String deleteUri = givenResponse.header("Location");
 
+        // when
         ExtractableResponse<Response> response = 지하철_노선_Delete(deleteUri);
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    @Order(11)
+    void duplicateLine() {
+        // given
+        LineRequest lineRequest = 노선_요청_정보_Sample1();
+        지하철_노선_Create(lineRequest);
+        LineRequest duplicateRequest = 노선_요청_정보_duplicate_Sample1();
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_Create(duplicateRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("errorMessage")).isEqualTo(DUPLICATE_LINE_NAME.getMessage())
+        );
     }
 
     private LineRequest 노선_요청_정보_Sample1() {
@@ -138,6 +181,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private LineRequest 노선_요청_정보_Modify_Sample1() {
         return new LineRequest("100호선", "무지개색");
+    }
+
+    private LineRequest 노선_요청_정보_duplicate_Sample1() {
+        return new LineRequest("1호선", "발간색");
     }
 
     private ExtractableResponse<Response> 지하철_노선_Create(LineRequest lineRequest) {
