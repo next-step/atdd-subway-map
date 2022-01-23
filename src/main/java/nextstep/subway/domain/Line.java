@@ -38,7 +38,10 @@ public class Line extends BaseEntity {
     }
 
     public static Line of(LineRequest lineRequest) {
-        return new Line(lineRequest.getName(), lineRequest.getColor());
+        return new Line(
+                lineRequest.getName(),
+                lineRequest.getColor()
+        );
     }
 
     public Long getId() {
@@ -51,6 +54,24 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public boolean addSection(Section section) {
+        return this.sections.add(section);
+    }
+
+    public Stations getStations() {
+        List<Station> stations = new ArrayList<>();
+        for (Section section : sections) {
+            stations.add(section.getUpStation());
+            stations.add(section.getDownStation());
+        }
+
+        return Stations.of(stations);
     }
 
     @Override

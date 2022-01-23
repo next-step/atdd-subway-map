@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.NotFoundStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,4 +38,8 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public Station findById(long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundStationException(id));
+    }
 }

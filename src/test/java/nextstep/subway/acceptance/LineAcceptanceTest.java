@@ -8,6 +8,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
+import nextstep.subway.domain.Stations;
 import nextstep.subway.exception.NotFoundStationException;
 import nextstep.subway.exception.OutOfSectionDistanceException;
 import nextstep.subway.utils.DatabaseCleanup;
@@ -23,6 +24,7 @@ import org.springframework.http.MediaType;
 
 import javax.transaction.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -102,7 +104,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(
-                _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 700));
+                _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 7));
 
         // then
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -111,15 +113,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                         || isNull(response.jsonPath().get("createdDate"))
                         || isNull(response.jsonPath().get("modifiedDate"))).isFalse();
         Assertions.assertThat(response.jsonPath().getString("color")).isEqualTo(_2호선_COLOR);
-        List<Section> sections = response.jsonPath().getList("sections", Section.class);
-        Assertions.assertThat(sections.size()).isEqualTo(1);
-        Assertions.assertThat(sections.get(0)).isEqualTo(Section.of(
-                sections.get(0).getId(),
-                Line.of(response.jsonPath().get()),
-                Station.of(역삼역_id, 역삼역),
-                Station.of(강남역_id, 강남역),
-                700
-        ));
+        List<Station> stations = response.jsonPath().get("stations");
+        Assertions.assertThat(stations.size()).isEqualTo(2);
     }
 
     /**
@@ -136,7 +131,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // When Then
         assertThatExceptionOfType(NotFoundStationException.class)
                 .isThrownBy(() -> 지하철_노선_생성_요청(LineRequest.of(
-                        _2호선, _2호선_COLOR, invalidUpStationId, invalidDownStationId, 700)));
+                        _2호선, _2호선_COLOR, invalidUpStationId, invalidDownStationId, 7)));
 
     }
 

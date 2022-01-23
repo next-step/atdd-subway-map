@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class Section {
+public class Section extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,7 +23,10 @@ public class Section {
 
     private int distance;
 
-    private Section(long id, Line line, Station upStation, Station downStation, int distance) {
+    public Section() {
+
+    }
+    private Section(Long id, Line line, Station upStation, Station downStation, int distance) {
         this.id = id;
         this.line = line;
         this.upStation = upStation;
@@ -31,15 +34,39 @@ public class Section {
         this.distance = distance;
     }
 
-    private Section() {
+    private Section(Line line, Station upStation, Station downStation, int distance) {
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
     }
 
-    public static Section of(long id, Line line, Station upStation, Station downStation, int distance) {
+    public static Section of(Long id, Line line, Station upStation, Station downStation, int distance) {
         return new Section(id, line, upStation, downStation, distance);
     }
 
-    public long getId() {
+    public static Section of(Line line, Station upStation, Station downStation, int distance) {
+        return new Section(line, upStation, downStation, distance);
+    }
+
+    public Long getId() {
         return this.id;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     @Override

@@ -25,6 +25,10 @@ public class Station extends BaseEntity {
         return new Station(null, name);
     }
 
+    public static Station of(long id) {
+        return new Station(id, null);
+    }
+
     public static Station of(long id, String name) {
         return new Station(id, name);
     }
