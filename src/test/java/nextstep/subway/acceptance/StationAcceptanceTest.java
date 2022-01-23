@@ -14,9 +14,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationAcceptanceTest extends AcceptanceTest {
     private static final String STATION_API_PATH = "/stations";
-    private static final String 강남역 = "강남역";
-    private static final String 역삼역 = "역삼역";
+    public static final String 강남역 = "강남역";
+    public static final String 역삼역 = "역삼역";
     @Autowired
     DatabaseCleanup databaseCleanup;
 
