@@ -73,6 +73,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        String 신분당선_색 = "bg-red-600";
+        String 신분당선_이름 = "신분당선";
+        ExtractableResponse<Response> 신분당선_생성_응답 = LineTestStep.지하철_노선을_생성한다(신분당선_색, 신분당선_이름);
+        Integer responseIntegerId = 신분당선_생성_응답.jsonPath().get("id");
+        Long 신분당선_생성_아이디 = responseIntegerId.longValue();
+
+        // when
+        ExtractableResponse<Response> response = LineTestStep.지하철_노선을_조회한다(신분당선_생성_아이디);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Integer receivedId = response.jsonPath().get("id");
+        assertThat(receivedId.longValue()).isEqualTo(신분당선_생성_아이디);
+        String receivedColor = response.jsonPath().get("color");
+        assertThat(receivedColor).isEqualTo(신분당선_색);
+        String receivedName = response.jsonPath().get("name");
+        assertThat(receivedName).isEqualTo(신분당선_이름);
     }
 
     /**
