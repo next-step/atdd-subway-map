@@ -39,23 +39,23 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
-        line.changeName(lineRequest.getName());
-        line.changeColor(lineRequest.getColor());
+        line.update(lineRequest.getName(), lineRequest.getColor());
 
-        return createLineResponse(lineRepository.save(line));
+        createLineResponse(lineRepository.save(line));
     }
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }
 
-    public LineResponse createLineResponse(Line line) {
+    private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(),
                 line.getName(),
                 line.getColor(),
                 line.getCreatedDate(),
-                line.getModifiedDate());
+                line.getModifiedDate()
+        );
     }
 }
