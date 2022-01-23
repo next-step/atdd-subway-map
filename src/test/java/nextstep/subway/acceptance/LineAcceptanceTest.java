@@ -41,6 +41,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 노선을 생성한다.
+     * When 같은 이름의 지하철 노선 생성을 요청 하면
+     * Then 400 status code를 응답한다.
+     */
+    @DisplayName("중복된 이름의 지하철 노선 생성은 실패한다")
+    @Test
+    void createLine_duplicate_fail() {
+        // given
+        Map<String, String> shinbundangLine = createShinbundangLine();
+        callCreateLines(shinbundangLine);
+
+        // when
+        ExtractableResponse<Response> response = callCreateLines(shinbundangLine);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
