@@ -41,6 +41,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     * @see nextstep.subway.ui.LineController#createLine
+     */
+    @Test
+    void 지하철_노선_이름_중복_생성_방지_테스트() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "GTX-A");
+        params.put("color", "bg-red-900");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
