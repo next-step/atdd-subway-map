@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공 한다.
@@ -127,11 +128,51 @@ class LineAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선 생성을 요청 하고
      * When 지하철 노선의 정보 수정을 요청 하면
-     * Then 지하철 노선의 정보 수정은 성공한다.
+     * Then 지하철 노선의 정보 수정은 성공 한다.
      */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        final Map<String, String> createRequestParams = new HashMap<>();
+        createRequestParams.put("name", "신분당선");
+        createRequestParams.put("color", "bg-red-600");
+
+        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(createRequestParams)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // when
+        final String location = createResponse.header("Location");
+        final Map<String, String> updateRequestParams = new HashMap<>();
+        updateRequestParams.put("name", "구분당선");
+        updateRequestParams.put("color", "bg-blue-600");
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(updateRequestParams)
+                .when()
+                .put(location)
+                .then().log().all()
+                .extract();
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get(location)
+                .then().log().all()
+                .extract();
+
+        // then
+        final JsonPath responseBody = response.jsonPath();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(responseBody.getString("name")).isEqualTo(updateRequestParams.get("name")),
+                () -> assertThat(responseBody.getString("color")).isEqualTo(updateRequestParams.get("color"))
+        );
     }
 
     /**
