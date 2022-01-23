@@ -21,42 +21,26 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return LineResponse.createLineResponse(line);
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::createLineResponse)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id).get();
 
-        return createLineResponse(line);
+        return LineResponse.createLineResponse(line);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
         line.update(lineRequest);
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 
     public void deleteLineById(Long id) {
