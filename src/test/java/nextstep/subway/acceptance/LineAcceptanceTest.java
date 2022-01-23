@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.utils.RestAssuredCRUD;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,179 +18,119 @@ import org.springframework.http.HttpStatus;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    /**
-     * When 지하철 노선 1개 생성 요청한다.
-     * Then 지하철 노선 1개 생성된다.
-     *
-     * When 지하철 노선 목록 조회한다.
-     * Then 지하철 노선 목록 1개 확인한다.
-     *
-     * When 지하철 노선 1개 있는 것 조회한다.
-     * Then 지하철 노선 1개 확인한다.
-     *
-     * When 지하철 노선 1개 있는 것 수정한다.
-     * Then 지하철 노선 1개 수정된다.
-     *
-     * When 지하철 노선 1개 있는 것 조회한다.
-     * Then 지하철 노선 1개 수정된 것 확인한다.
-     *
-     * When 지하철 노선 1개 있는 것 삭제한다.
-     * Then 지하철 노선 1개 삭제된다.
-     *
-     * When 지하철 노선 목록 조회한다.
-     * Then 지하철 노선 목록이 없다.
-     */
+    private LineRequest 일호선1;
+    private LineRequest 이호선2;
+    private LineRequest 칠호선7;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+
+        일호선1 = LineRequest.of("1호선", "bg-red-600");
+        이호선2 = LineRequest.of("2호선", "bg-green-600");
+        칠호선7 = LineRequest.of("7호선", "bg-darkgreen-600");
+    }
+
+    @DisplayName("지하철 노선 관련 CRUD 인수테스트")
     @Test
     void lineAcceptanceTest() {
-        // given
-        LineRequest 라인요청테스트 = LineRequest.of("1호선", "bg-red-600");
-        LineRequest 라인수정요청테스트 = LineRequest.of("2호선", "bg-blue-600");
-
         // when
-        ExtractableResponse<Response> 노선등록결과 = 지하철_노선을_등록한다(라인요청테스트);
+        ExtractableResponse<Response> 노선등록결과 = 지하철_노선을_등록한다(일호선1);
         // then
-        assertThat(노선등록결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(노선등록결과.header("Location")).isNotBlank();
+        지하철_노선_생성된다(노선등록결과);
 
         // when
         ExtractableResponse<Response> 노선목록조회결과 = 지하철_노선_목록을_조회한다();
         // then
-        assertThat(노선목록조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> lineNames = 노선목록조회결과.jsonPath().getList("name");
-        assertThat(lineNames).contains(라인요청테스트.getName());
+        지하철_노선목록조회_결과에_원하는_라인이_있다(노선목록조회결과, Arrays.asList(일호선1));
 
         // when
         ExtractableResponse<Response> 노선조회결과 = 지하철_노선을_조회한다(노선등록결과.as(LineResponse.class).getId());
         // then
-        assertThat(노선조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(노선조회결과.as(LineResponse.class).getName()).isEqualTo(라인요청테스트.getName());
+        지하철_노선조회_결과에_원하는_정보가_있다(노선조회결과, 일호선1);
 
         // when
-        ExtractableResponse<Response> 노선수정결과 = 지하철_노선을_수정한다(
-            노선등록결과.as(LineResponse.class).getId(), 라인수정요청테스트);
+        ExtractableResponse<Response> 노선수정결과 = 지하철_노선을_수정한다(노선등록결과.as(LineResponse.class).getId(), 이호선2);
         // then
-        assertThat(노선수정결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(노선수정결과.as(LineResponse.class).getName()).isEqualTo(라인수정요청테스트.getName());
+        지하철_노선수정_결과에_원하는_정보가_있다(노선수정결과, 이호선2);
 
         // when
         노선조회결과 = 지하철_노선을_조회한다(노선수정결과.as(LineResponse.class).getId());
         // then
-        assertThat(노선조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(노선조회결과.as(LineResponse.class).getName()).isEqualTo(라인수정요청테스트.getName());
+        지하철_노선조회_결과에_원하는_정보가_있다(노선조회결과, 이호선2);
 
         // when
         ExtractableResponse<Response> 노선삭제결과 = 지하철_노선을_삭제한다(노선수정결과.as(LineResponse.class).getId());
         // then
-        assertThat(노선삭제결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_노선삭제_되었다(노선삭제결과);
 
         // when
         노선목록조회결과 = 지하철_노선_목록을_조회한다();
         // then
-        assertThat(노선목록조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        lineNames = 노선목록조회결과.jsonPath().getList("name");
-        assertThat(lineNames).isEmpty();
+        지하철_노선삭제_결과가_비어있다(노선목록조회결과);
     }
 
-    /**
-     * When 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 성공한다.
-     */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선을_등록한다(
-            LineRequest.of("1호선", "bg-red-600")
-        );
+        ExtractableResponse<Response> response = 지하철_노선을_등록한다(일호선1);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        지하철_노선_생성된다(response);
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * Given 새로운 지하철 노선 생성을 요청 하고
-     * When 지하철 노선 목록 조회를 요청 하면
-     * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
-     */
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
         // given
-        지하철_노선을_등록한다(LineRequest.of("1호선", "bg-red-600"));
-        지하철_노선을_등록한다(LineRequest.of("7호선", "bg-green-600"));
+        지하철_노선을_등록한다(일호선1);
+        지하철_노선을_등록한다(칠호선7);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록을_조회한다();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).contains("1호선", "7호선");
+        지하철_노선목록조회_결과에_원하는_라인이_있다(response, Arrays.asList(일호선1, 칠호선7));
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 조회를 요청 하면
-     * Then 생성한 지하철 노선을 응답받는다
-     */
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
         // given
-        LineResponse 노선등록결과 = 지하철_노선을_등록한다(
-            LineRequest.of("2호선", "bg-green-600")
-        ).as(LineResponse.class);
+        LineResponse 노선등록결과 = 지하철_노선을_등록한다(이호선2).as(LineResponse.class);
 
         // when
         ExtractableResponse<Response> 노선조회결과 = 지하철_노선을_조회한다(노선등록결과.getId());
 
         // then
-        assertThat(노선조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(노선조회결과.as(LineResponse.class).getName()).isEqualTo("2호선");
+        지하철_노선조회_결과에_원하는_정보가_있다(노선조회결과, 이호선2);
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 지하철 노선의 정보 수정을 요청 하면
-     * Then 지하철 노선의 정보 수정은 성공한다.
-     */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
         // given
-        LineResponse 노선등록결과 = 지하철_노선을_등록한다(
-            LineRequest.of("5호선", "bg-black-600")
-        ).as(LineResponse.class);
+        LineResponse 노선등록결과 = 지하철_노선을_등록한다(일호선1).as(LineResponse.class);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선을_수정한다(노선등록결과.getId(),
-            LineRequest.of("5.5호선", "bg-black-100"));
+        ExtractableResponse<Response> response = 지하철_노선을_수정한다(노선등록결과.getId(), 이호선2);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(LineResponse.class).getName()).isEqualTo("5.5호선");
+        지하철_노선수정_결과에_원하는_정보가_있다(response, 이호선2);
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 삭제를 요청 하면
-     * Then 생성한 지하철 노선 삭제가 성공한다.
-     */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
         // given
-        LineResponse 노선등록결과 = 지하철_노선을_등록한다(
-            LineRequest.of("1호선", "bg-black-600")
-        ).as(LineResponse.class);
+        LineResponse 노선등록결과 = 지하철_노선을_등록한다(일호선1).as(LineResponse.class);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선을_삭제한다(노선등록결과.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_노선삭제_되었다(response);
     }
 
     private ExtractableResponse<Response> 지하철_노선을_등록한다(LineRequest request) {
@@ -208,5 +151,42 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 지하철_노선을_삭제한다(Long lineId) {
         return RestAssuredCRUD.delete("/lines/"+lineId);
+    }
+
+    private void 지하철_노선_생성된다(ExtractableResponse<Response> 노선등록결과) {
+        assertThat(노선등록결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(노선등록결과.header("Location")).isNotBlank();
+    }
+
+    private void 지하철_노선목록조회_결과에_원하는_라인이_있다(ExtractableResponse<Response> 노선목록조회결과, List<LineRequest> 라인요청테스트) {
+        assertThat(노선목록조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<String> lineNames = 노선목록조회결과.jsonPath().getList("name");
+        List<String> names = 라인요청테스트.stream()
+            .map(LineRequest::getName)
+            .collect(Collectors.toList());
+        assertThat(lineNames).containsAll(names);
+    }
+
+    private void 지하철_노선조회_결과에_원하는_정보가_있다(ExtractableResponse<Response> 노선조회결과, LineRequest 라인요청테스트) {
+        assertThat(노선조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(노선조회결과.as(LineResponse.class).getName()).isEqualTo(라인요청테스트.getName());
+    }
+
+    private void 지하철_노선수정_결과에_원하는_정보가_있다(ExtractableResponse<Response> 노선수정결과, LineRequest 라인수정요청테스트) {
+        assertThat(노선수정결과.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(노선수정결과.as(LineResponse.class).getName()).isEqualTo(라인수정요청테스트.getName());
+    }
+
+    private void 지하철_노선삭제_되었다(ExtractableResponse<Response> 노선삭제결과) {
+        assertThat(노선삭제결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void 지하철_노선삭제_결과가_비어있다(ExtractableResponse<Response> 노선삭제결과) {
+        assertThat(노선삭제결과.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<Long> lineIds = 노선삭제결과.jsonPath().getList(".", LineResponse.class).stream()
+            .map(LineResponse::getId)
+            .collect(Collectors.toList());
+        assertThat(lineIds).isEmpty();
     }
 }
