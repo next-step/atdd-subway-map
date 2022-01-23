@@ -55,6 +55,16 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    ExtractableResponse<Response> 지하철_노선_삭제_API(Long id) {
+        return RestAssured.given().log().all()
+                .pathParam("id", id)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -202,13 +212,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_API(params);
 
         // when
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제_API(1L);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
