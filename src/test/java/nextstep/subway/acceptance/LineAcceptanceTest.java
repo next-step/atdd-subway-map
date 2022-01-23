@@ -53,7 +53,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         새로운노선생성();
 
         //when
-        ExtractableResponse<Response> response = getRequest(기본주소);
+        ExtractableResponse<Response> response = 겟_요청(기본주소);
 
         //then
         assertThat(response.jsonPath().getList("name")).contains(새로운노선, 기존노선);
@@ -72,7 +72,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
-        ExtractableResponse<Response> response = getRequest(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 겟_요청(createResponse.header(HttpHeaders.LOCATION));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -94,7 +94,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> updateResponse = 노선수정(createResponse);
 
         //then
-        ExtractableResponse<Response> response = getRequest(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 겟_요청(createResponse.header(HttpHeaders.LOCATION));
 
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -114,7 +114,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
-        ExtractableResponse<Response> response = deleteRequest(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 딜리트_요청(createResponse.header(HttpHeaders.LOCATION));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -142,17 +142,17 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 기존노선생성() {
         Map<String, String> param = 노선파라미터생성(기존노선, 기존색상);
-        return postRequest(기본주소, param);
+        return 포스트_요청(기본주소, param);
     }
 
     private ExtractableResponse<Response> 새로운노선생성() {
         Map<String, String> param = 노선파라미터생성(새로운노선, 새로운색상);
-        return postRequest(기본주소, param);
+        return 포스트_요청(기본주소, param);
     }
 
     private ExtractableResponse<Response> 노선수정(ExtractableResponse<Response> createResponse) {
         Map<String, String> updateParam = 노선파라미터생성(수정노선, 수정색상);
-        ExtractableResponse<Response> updateResponse = putRequest(createResponse.header(HttpHeaders.LOCATION), updateParam);
+        ExtractableResponse<Response> updateResponse = 풋_요청(createResponse.header(HttpHeaders.LOCATION), updateParam);
         return updateResponse;
     }
 

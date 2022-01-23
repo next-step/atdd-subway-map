@@ -52,7 +52,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         새로운지하철역생성();
 
         // when
-        ExtractableResponse<Response> response = getRequest(기본주소);
+        ExtractableResponse<Response> response = 겟_요청(기본주소);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).contains(기존지하철, 새로운지하철);
@@ -70,7 +70,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 기존지하철역생성();
 
         // when
-        ExtractableResponse<Response> response = deleteRequest(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 딜리트_요청(createResponse.header(HttpHeaders.LOCATION));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -96,16 +96,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 기존지하철역생성() {
-        Map<String, String> params = createParams(기존지하철);
-        return postRequest(기본주소, params);
+        Map<String, String> params = 지하철역파라미터생성(기존지하철);
+        return 포스트_요청(기본주소, params);
     }
 
     private ExtractableResponse<Response> 새로운지하철역생성() {
-        Map<String, String> params = createParams(새로운지하철);
-        return postRequest(기본주소, params);
+        Map<String, String> params = 지하철역파라미터생성(새로운지하철);
+        return 포스트_요청(기본주소, params);
     }
 
-    private Map<String, String> createParams(String 지하철역) {
+    private Map<String, String> 지하철역파라미터생성(String 지하철역) {
         Map<String, String> params = new HashMap<>();
         params.put("name", 지하철역);
         return params;
