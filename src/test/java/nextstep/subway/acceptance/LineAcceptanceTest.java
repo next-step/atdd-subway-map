@@ -37,6 +37,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * When 중복된 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복된 지하철 노선 생성")
+    @Test
+    void createDuplicateStation() {
+        LineSteps.지하철_노선_생성_요청(신분당선);
+
+        // given & when
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
