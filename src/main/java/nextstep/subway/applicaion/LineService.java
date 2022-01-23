@@ -41,4 +41,9 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
         return LineResponse.of(line);
     }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+        line.update(lineRequest);
+    }
 }

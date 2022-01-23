@@ -91,6 +91,33 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        지하철_노선_생성("신분당선", "bg-red-600");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "구분당선");
+        params.put("color", "bg-blue-600");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines/{id}", 1L)
+            .then().log().all().extract();
+
+        // then
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> selectResponse = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines/{id}", 1L)
+            .then().log().all().extract();
+
+        LineResponse lineResponse = selectResponse.jsonPath().getObject(".", LineResponse.class);
+        Assertions.assertThat(lineResponse.getName()).isEqualTo("구분당선");
+        Assertions.assertThat(lineResponse.getColor()).isEqualTo("bg-blue-600");
     }
 
     /**
