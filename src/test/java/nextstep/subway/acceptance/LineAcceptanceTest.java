@@ -11,11 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static nextstep.subway.utils.ResponseUtils.*;
+import static nextstep.subway.utils.LineUtils.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -27,19 +27,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", "1호선");
-        param.put("color", "blue darken-4");
+        // given
+        final Map<String, Object> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
 
-        final ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(param)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/lines")
-                        .then().log().all()
-                        .extract();
+        // when
+        final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
 
+        // then
         httpStatus가_CREATED면서_Location이_존재함(response);
     }
 
