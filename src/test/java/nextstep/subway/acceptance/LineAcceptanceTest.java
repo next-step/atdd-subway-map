@@ -44,11 +44,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_이름_중복_생성_방지_테스트() {
         // given
+        지하철_노선_생성("GTX-A", "bg-red-900");
+
         Map<String, String> params = new HashMap<>();
         params.put("name", "GTX-A");
         params.put("color", "bg-red-900");
-
-        지하철_노선_생성_API(params);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
@@ -66,17 +66,9 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 지하철_노선_목록_조회_테스트() {
-        Map<String, String> gtxALineParams = new HashMap<>();
-        gtxALineParams.put("name", "GTX-A");
-        gtxALineParams.put("color", "bg-red-900");
-
-        Map<String, String> shinbundangLineParams = new HashMap<>();
-        shinbundangLineParams.put("name", "신분당선");
-        shinbundangLineParams.put("color", "bg-red-500");
-
         // given
-        지하철_노선_생성_API(gtxALineParams);
-        지하철_노선_생성_API(shinbundangLineParams);
+        지하철_노선_생성("GTX-A", "bg-red-900");
+        지하철_노선_생성("신분당선", "bg-red-500");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
@@ -97,11 +89,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회_테스트() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "GTX-A");
-        params.put("color", "bg-red-900");
-
-        지하철_노선_생성_API(params);
+        String 노선  = "GTX-A";
+        String 노선색  = "bg-red-900";
+        지하철_노선_생성(노선, 노선색);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_단건_조회_API(1L);
@@ -111,8 +101,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineColor = response.body().jsonPath().get("color").toString();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineName).isEqualTo("GTX-A");
-        assertThat(lineColor).isEqualTo("bg-red-900");
+        assertThat(lineName).isEqualTo(노선);
+        assertThat(lineColor).isEqualTo(노선색);
     }
 
     /**
@@ -124,14 +114,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정_테스트() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "GTX-A");
-        params.put("color", "bg-red-900");
-
-        지하철_노선_생성_API(params);
+        String 노선  = "GTX-A";
+        String 노선색  = "bg-red-800";
+        지하철_노선_생성(노선, "bg-red-900");
 
         Map<String, String> updateParams = new HashMap<>();
-        updateParams.put("color", "bg-red-800");
+        updateParams.put("color", 노선색);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_수정_API(1L, updateParams);
@@ -142,8 +130,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineColor = updatedLine.body().jsonPath().get("color").toString();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineName).isEqualTo("GTX-A");
-        assertThat(lineColor).isEqualTo("bg-red-800");
+        assertThat(lineName).isEqualTo(노선);
+        assertThat(lineColor).isEqualTo(노선색);
     }
 
     /**
@@ -155,17 +143,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제_테스트() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "GTX-A");
-        params.put("color", "bg-red-900");
-
-        지하철_노선_생성_API(params);
+        지하철_노선_생성("GTX-A", "bg-red-900");
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제_API(1L);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    ExtractableResponse<Response> 지하철_노선_생성(String 노선, String 노선색) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 노선);
+        params.put("color", 노선색);
+
+        return 지하철_노선_생성_API(params);
     }
 
     ExtractableResponse<Response> 지하철_노선_생성_API(Map<String, String> params) {
