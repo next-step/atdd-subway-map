@@ -14,6 +14,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    ExtractableResponse<Response> 지하철_노선_생성_API(Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -27,13 +38,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("color", "bg-red-900");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -53,22 +58,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", "GTX-A");
         params.put("color", "bg-red-900");
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_생성_API(params);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -92,21 +85,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         shinbundangLineParams.put("color", "bg-red-500");
 
         // given
-        RestAssured.given().log().all()
-                .body(gtxALineParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        RestAssured.given().log().all()
-                .body(shinbundangLineParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_생성_API(gtxALineParams);
+        지하철_노선_생성_API(shinbundangLineParams);
 
         // when
         ExtractableResponse<Response> lines = RestAssured.given().log().all()
@@ -132,18 +112,12 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @Test
     void 지하철_노선_조회_테스트() {
+        // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "GTX-A");
         params.put("color", "bg-red-900");
 
-        // given
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_생성_API(params);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -176,13 +150,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", "GTX-A");
         params.put("color", "bg-red-900");
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_생성_API(params);
 
         Map<String, String> updateParams = new HashMap<>();
         updateParams.put("color", "bg-red-800");
@@ -226,13 +194,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", "GTX-A");
         params.put("color", "bg-red-900");
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_생성_API(params);
 
         // when
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
