@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/lines")
 @RestController
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;
