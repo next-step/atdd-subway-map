@@ -129,9 +129,25 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * When 생성한 지하철 노선 삭제를 요청 하면
      * Then 생성한 지하철 노선 삭제가 성공한다.
+     * Then 지하철 노선 목록 조회를 하면 empty list가 온다.
      */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        // given
+        String 신분당선_색 = "bg-red-600";
+        String 신분당선_이름 = "신분당선";
+        ExtractableResponse<Response> 신분당선_생성_응답 = LineTestStep.지하철_노선을_생성한다(신분당선_색, 신분당선_이름);
+        Integer responseIntegerId = 신분당선_생성_응답.jsonPath().get("id");
+        Long 신분당선_생성_아이디 = responseIntegerId.longValue();
+
+        // when
+        ExtractableResponse<Response> response = LineTestStep.지하철_노선을_삭제한다(신분당선_생성_아이디);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> linesResponse = LineTestStep.지하철_노선_목록을_조회한다();
+        List<Object> lines = linesResponse.jsonPath().getList("$");
+        assertThat(lines).hasSize(0);
     }
 }

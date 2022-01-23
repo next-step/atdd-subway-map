@@ -44,4 +44,8 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("지하철 역을 찾을 수 없습니다. id = " + id));
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

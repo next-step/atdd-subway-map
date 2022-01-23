@@ -59,4 +59,13 @@ public class LineTestStep {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선을_삭제한다(Long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+    }
 }
