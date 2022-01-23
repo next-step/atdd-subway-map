@@ -1,5 +1,6 @@
 package nextstep.subway.line.domain.model;
 
+import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,13 +10,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import nextstep.subway.common.domain.model.BaseEntity;
 import nextstep.subway.station.domain.model.Station;
 
 @Entity
-public class Section {
+public class Section extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Line line;
@@ -27,6 +29,10 @@ public class Section {
     private Station downStation;
 
     @Column
+    @AttributeOverride(
+        name = "value",
+        column = @Column(name = "distance")
+    )
     private Distance distance;
 
     protected Section() {

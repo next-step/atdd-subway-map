@@ -1,21 +1,37 @@
 package nextstep.subway.acceptance.line;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.model.Distance;
 
 public class LineStep {
-    private static int dummyCounter = 0;
     private static final String NAME_FORMAT = "%d호선";
-    private static final String COLOR_FORMANT = "bg-red-%d";
+    private static final String COLOR = "bg-red-600";
 
-    private LineStep() {}
+    private static int dummyCounter = 0;
+    private long stationIdCounter = 0;
+    private final StationStep stationStepRefactor;
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(final LineRequest request) {
+    public LineStep() {
+        stationStepRefactor = new StationStep();
+    }
+
+    public ExtractableResponse<Response> 지하철_노선_생성_요청(final Consumer<LineRequest> custom) {
+        LineRequest request = dummyRequest();
+        if (Objects.nonNull(custom)) {
+            custom.accept(request);
+        }
+
+        stationStepRefactor.지하철역_생성_요청();
+        stationStepRefactor.지하철역_생성_요청();
         return RestAssured.given().log().all()
                           .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -25,22 +41,29 @@ public class LineStep {
                           .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Distance distance) {
-        LineRequest request = LineRequest.builder()
-            .name(nextName())
-            .color(nextColor())
-            .upStationId((long) 1)
-            .downStationId((long) 2)
-            .distance(distance)
-            .build();
-        return 지하철_노선_생성_요청(request);
+    public ExtractableResponse<Response> 지하철_노선_생성_요청() {
+        return 지하철_노선_생성_요청(null);
     }
 
-    public static String nextName() {
+    public LineRequest dummyRequest() {
+        return LineRequest.builder()
+            .name(nextName())
+            .color(nextColor())
+            .upStationId(++stationIdCounter)
+            .downStationId(++stationIdCounter)
+            .distance(nextDistance())
+            .build();
+    }
+
+    public synchronized String nextName() {
         return String.format(NAME_FORMAT, ++dummyCounter);
     }
 
-    public static String nextColor() {
-        return String.format(COLOR_FORMANT, ++dummyCounter);
+    public String nextColor() {
+        return COLOR;
+    }
+
+    private Distance nextDistance() {
+        return new Distance(2);
     }
 }

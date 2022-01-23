@@ -3,11 +3,11 @@ package nextstep.subway.line.domain.dto;
 import nextstep.subway.line.domain.model.Distance;
 
 public class LineRequest {
-    private final String name;
-    private final String color;
-    private final Long upStationId;
-    private final Long downStationId;
-    private final Distance distance;
+    private String name;
+    private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private Distance distance;
 
     private LineRequest(String name, String color, Long upStationId, Long downStationId, Distance distance) {
         this.name = name;
@@ -39,6 +39,26 @@ public class LineRequest {
 
     public Distance getDistance() {
         return distance;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setUpStationId(Long upStationId) {
+        this.upStationId = upStationId;
+    }
+
+    public void setDownStationId(Long downStationId) {
+        this.downStationId = downStationId;
+    }
+
+    public void setDistance(Distance distance) {
+        this.distance = distance;
     }
 
     public static class Builder {

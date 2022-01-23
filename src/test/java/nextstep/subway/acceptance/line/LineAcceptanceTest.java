@@ -1,27 +1,35 @@
 package nextstep.subway.acceptance.line;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import com.sun.tools.javac.util.List;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.station.StationStep;
-import nextstep.subway.line.domain.dto.LineRequest;
-import nextstep.subway.line.domain.model.Distance;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    private LineStep lineStep;
+
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        lineStep = new LineStep();
+    }
+
     /**
      * Given 노션에 등록할 지하철 역을 등록하고
      * When 지하철 노선 생성을 요청 하면
@@ -30,12 +38,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-
         // given, when
-        ExtractableResponse<Response> response = LineStep.지하철_노선_생성_요청(new Distance(100));
+        ExtractableResponse<Response> response = lineStep.지하철_노선_생성_요청();
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -53,29 +57,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineThatFailing() {
         // given
-        LineRequest preCreateRequest = LineRequest.builder()
-            .name(LineStep.nextName())
-            .color(LineStep.nextColor())
-            .upStationId((long) 1)
-            .upStationId((long) 2)
-            .distance(new Distance(100))
-            .build();
-
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        LineStep.지하철_노선_생성_요청(preCreateRequest);
-
-        // when
-        LineRequest postCreateRequest = LineRequest.builder()
-            .name(preCreateRequest.getName())
-            .color(LineStep.nextColor())
-            .upStationId((long) 3)
-            .upStationId((long) 4)
-            .distance(new Distance(100))
-            .build();
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(postCreateRequest);
+        String name = lineStep.nextName();
+        lineStep.지하철_노선_생성_요청(request -> request.setName(name));
+        ExtractableResponse<Response> createResponse =
+            lineStep.지하철_노선_생성_요청(request -> request.setName(name));
 
         // then
         AcceptanceTestThen.fromWhen(createResponse)
@@ -93,27 +78,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        LineRequest lineRequest1 = LineRequest.builder()
-            .name(LineStep.nextName())
-            .color(LineStep.nextColor())
-            .upStationId((long) 1)
-            .upStationId((long) 2)
-            .distance(new Distance(100))
-            .build();
-        LineStep.지하철_노선_생성_요청(lineRequest1);
-
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        LineRequest lineRequest2 = LineRequest.builder()
-            .name(LineStep.nextName())
-            .color(LineStep.nextColor())
-            .upStationId((long) 3)
-            .upStationId((long) 4)
-            .distance(new Distance(100))
-            .build();
-        LineStep.지하철_노선_생성_요청(lineRequest2);
+        List<String> names = Stream.generate(lineStep::nextName)
+                                   .limit(5)
+                                   .collect(Collectors.toList());
+        for (String iName : names) {
+            lineStep.지하철_노선_생성_요청(request -> request.setName(iName));
+        }
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -125,9 +95,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
-                          .containsAll("name",
-                                       List.of(lineRequest1.getName(), lineRequest2.getName())
-                          );
+                          .containsAll("name", names);
     }
 
     /**
@@ -140,9 +108,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
 
         // when
         ExtractableResponse<Response> response =
@@ -164,14 +130,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", LineStep.nextName());
-        params.put("color", LineStep.nextColor());
+        params.put("name", lineStep.nextName());
+        params.put("color", lineStep.nextColor());
 
         ExtractableResponse<Response> editResponse =
             AcceptanceTestWhen.fromGiven(createResponse)
@@ -194,32 +158,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLineThatFailing() {
         // given
-        LineRequest preCreateRequest = LineRequest.builder()
-            .name(LineStep.nextName())
-            .color(LineStep.nextColor())
-            .upStationId((long) 1)
-            .upStationId((long) 2)
-            .distance(new Distance(100))
-            .build();
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        LineStep.지하철_노선_생성_요청(preCreateRequest);
-
-        LineRequest postCreateRequest = LineRequest.builder()
-            .name(LineStep.nextName())
-            .color(LineStep.nextColor())
-            .upStationId((long) 3)
-            .upStationId((long) 4)
-            .distance(new Distance(100))
-            .build();
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(postCreateRequest);
+        String name = lineStep.nextName();
+        lineStep.지하철_노선_생성_요청(request -> request.setName(name));
+        ExtractableResponse<Response> createResponse =
+            lineStep.지하철_노선_생성_요청();
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", preCreateRequest.getName());
-        params.put("color", LineStep.nextColor());
+        params.put("name", name);
+        params.put("color", lineStep.nextColor());
 
         ExtractableResponse<Response> editResponse =
             AcceptanceTestWhen.fromGiven(createResponse)
@@ -240,9 +187,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        StationStep.지하철역_생성_요청();
-        StationStep.지하철역_생성_요청();
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
 
         // when
         AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);

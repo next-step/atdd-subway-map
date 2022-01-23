@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,15 @@ import nextstep.subway.utils.AcceptanceTestWhen;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+    private StationStep stationStep;
+
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        stationStep = new StationStep();
+    }
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -26,7 +36,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given, when
-        ExtractableResponse<Response> response = StationStep.지하철역_생성_요청();
+        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청();
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -43,11 +53,12 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationThatFailing() {
         // given
-        String name = StationStep.nextName();
-        StationStep.지하철역_생성_요청(name);
+        String name = stationStep.nextName();
+        stationStep.지하철역_생성_요청(request -> request.setName(name));
 
         // when
-        ExtractableResponse<Response> response = StationStep.지하철역_생성_요청(name);
+        ExtractableResponse<Response> response =
+            stationStep.지하철역_생성_요청(request -> request.setName(name));
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -65,10 +76,12 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        List<String> names = Stream.generate(StationStep::nextName)
+        List<String> names = Stream.generate(stationStep::nextName)
                                    .limit(5)
                                    .collect(Collectors.toList());
-        names.forEach(StationStep::지하철역_생성_요청);
+        for (String iName : names) {
+            stationStep.지하철역_생성_요청(request -> request.setName(iName));
+        }
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -92,7 +105,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = StationStep.지하철역_생성_요청();
+        ExtractableResponse<Response> createResponse = stationStep.지하철역_생성_요청();
 
         // when
         AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);

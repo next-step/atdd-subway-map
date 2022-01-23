@@ -1,27 +1,28 @@
 package nextstep.subway.acceptance.station;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.station.domain.dto.StationRequest;
 
 public class StationStep {
-    private static int dummyCounter = 0;
     private static final String NAME_FORMAT = "%d역";
 
-    private StationStep() {
-    }
+    private static int dummyCounter = 0;
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
+    public ExtractableResponse<Response> 지하철역_생성_요청(Consumer<StationRequest> custom) {
+        StationRequest request = dummyRequest();
+        if (Objects.nonNull(custom)) {
+            custom.accept(request);
+        }
 
         return RestAssured.given().log().all()
-                          .body(params)
+                          .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when()
                           .post("/stations")
@@ -29,11 +30,15 @@ public class StationStep {
                           .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청() {
-        return 지하철역_생성_요청(nextName());
+    public ExtractableResponse<Response> 지하철역_생성_요청() {
+        return 지하철역_생성_요청(null);
     }
 
-    public static String nextName() {
+    private StationRequest dummyRequest() {
+        return new StationRequest(nextName());
+    }
+
+    public synchronized String nextName() {
         return String.format(NAME_FORMAT, dummyCounter++);
     }
 }
