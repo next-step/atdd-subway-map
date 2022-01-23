@@ -23,11 +23,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> 강남역 = StationSteps.getParams("강남역");
-
         // when
-        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -43,11 +40,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicateNameStation() {
         // given
-        Map<String, String> 강남역 = StationSteps.getParams("강남역");
-        StationSteps.지하철역_생성_요청(강남역);
+        StationSteps.지하철역_생성_요청("강남역");
 
         // when
-        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> response = StationSteps.지하철역_생성_요청("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -63,10 +59,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> 강남역 = StationSteps.getParams("강남역");
+        String 강남역 = "강남역";
+        String 역삼역 = "역삼역";
         StationSteps.지하철역_생성_요청(강남역);
-
-        Map<String, String> 역삼역 = StationSteps.getParams("역삼역");
         StationSteps.지하철역_생성_요청(역삼역);
 
         // when
@@ -78,7 +73,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역.get("name"), 역삼역.get("name"));
+        assertThat(stationNames).contains(강남역, 역삼역);
     }
 
     /**
@@ -90,8 +85,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> 강남역 = StationSteps.getParams("강남역");
-        ExtractableResponse<Response> createResponse = StationSteps.지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> createResponse = StationSteps.지하철역_생성_요청("강남역");
 
         // when
         String uri = createResponse.header("Location");
