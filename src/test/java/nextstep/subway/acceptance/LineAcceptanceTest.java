@@ -134,7 +134,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String uri = response.header("Location");
 
         LineRequest editedLineRequest = new LineRequest("7호선", "green darken-3");
-        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+        final ExtractableResponse<Response> editReponse = RestAssured.given().log().all()
                 .body(editedLineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -142,8 +142,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        // todo assert
-
+        final String name = editReponse.jsonPath().get("name");
+        final String color = editReponse.jsonPath().get("color");
+        assertThat(name).contains("7호선");
+        assertThat(color).contains("green darken-3");
     }
 
     /**
