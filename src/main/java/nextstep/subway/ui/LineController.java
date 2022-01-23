@@ -7,15 +7,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.awt.*;
 import java.net.URI;
 import java.util.List;
 
@@ -40,12 +37,20 @@ public class LineController {
 
     @GetMapping(value = "/lines/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+        LineResponse response = lineService.findLineById(id);
+        if (response.getId() == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok().body(response);
     }
 
     @PutMapping(value = "/lines/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        lineService.updateLineById(id, lineRequest);
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        LineResponse response = lineService.updateLineById(id, lineRequest);
+        if (response.getId() == null) {
+            response = lineService.saveLine(lineRequest);
+            return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+        }
         return ResponseEntity.ok().build();
     }
 

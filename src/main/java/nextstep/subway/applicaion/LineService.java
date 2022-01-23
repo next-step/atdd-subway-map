@@ -6,6 +6,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,14 +34,18 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).get();
+        Line line = lineRepository.findById(id)
+                .orElse(new Line());
 
         return LineResponse.createLineResponse(line);
     }
 
-    public void updateLineById(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).get();
+    public LineResponse updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElse(new Line());
+
         line.update(lineRequest);
+        return LineResponse.createLineResponse(line);
     }
 
     public void deleteLineById(Long id) {

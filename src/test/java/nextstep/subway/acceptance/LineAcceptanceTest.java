@@ -135,6 +135,40 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
+     * When 생성하지 않은 지하철 노선도를 조회하면
+     * Then 빈 값을 응답한다.
+     */
+    @DisplayName("지하철 노선 조회 실패")
+    @Test
+    void getNoneLine() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "9호선");
+        params.put("color", "갈색");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .get("/lines/2")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
      * When 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선의 정보 수정은 성공한다.
      */
@@ -171,6 +205,29 @@ class LineAcceptanceTest extends AcceptanceTest {
                         .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * When 지하철 노선의 정보 수정을 요청 하면
+     * Then 지하철 노선의 정보가 없어 신규 생성한다.
+     */
+    @DisplayName("지하철 노선 수정 실패")
+    @Test
+    void updateNoneLine() {
+        // when
+        Map<String, String> updateParams = new HashMap<>();
+        updateParams.put("name", "5호선");
+        updateParams.put("color", "보라색");
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(updateParams)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .put("/lines/" + 1)
+                        .then().log().all()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
