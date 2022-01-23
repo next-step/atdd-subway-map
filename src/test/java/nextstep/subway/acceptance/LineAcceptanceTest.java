@@ -28,8 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Objects.isNull;
-import static nextstep.subway.acceptance.StationAcceptanceTest.강남역;
-import static nextstep.subway.acceptance.StationAcceptanceTest.역삼역;
+import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
@@ -79,7 +78,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정(LineRequest params, int 수정할_노선_id) {
+    public static ExtractableResponse<Response> 지하철_노선_수정(LineRequest params, long 수정할_노선_id) {
         return RestAssured
                 .given().log().all()
                 .body(params)
@@ -106,7 +105,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(
                 _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 7));
-
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(_2호선);
@@ -117,6 +115,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         List<Station> stations = response.jsonPath().get("stations");
         assertThat(stations.size()).isEqualTo(2);
     }
+
 
     /**
      * Given 존재하지 않는 지하철역으로
@@ -167,7 +166,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성 시, 동일한 상행/하행 지하철역의 Id 입력")
     @Test
     void createLineAsSameUpAndDownStation() {
+        // Given
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
 
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(
+                _2호선, _2호선_COLOR, 강남역_id, 강남역_id, 7));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**
@@ -179,8 +184,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-//        지하철_노선_생성_요청(신분당선_LineRequest);
-//        지하철_노선_생성_요청(_2호선_LineRequest);
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
+        long 역삼역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(역삼역))
+                .jsonPath().getLong("id");
+        long 경기중앙역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(경기중앙역))
+                .jsonPath().getLong("id");
+
+        // when
+        지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30));
+        // when
+        지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 7));
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
@@ -200,8 +214,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-//        long 신분당선_노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
-        long 신분당선_노선_id = 0;
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
+        long 경기중앙역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(경기중앙역))
+                .jsonPath().getLong("id");
+
+        // when
+        long 신분당선_노선_id = 지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30))
+                .jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = ID로_지하철_노선_조회(신분당선_노선_id);
@@ -220,16 +240,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // Given
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
+        long 경기중앙역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(경기중앙역))
+                .jsonPath().getLong("id");
+
+        Long 신분당선_노선_id = 지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30))
+                .jsonPath().getLong("id");
+
         // when
-//        Long 노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
-        ExtractableResponse<Response> response = null;
-//                지하철_노선_수정(노선_id);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(LineRequest.of(분당선, 분당선_COLOR))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(LINE_CONTROLLER_COMMON_PATH + "/" + 신분당선_노선_id)
+                .then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        ExtractableResponse<Response> 변경된_노선_response = ID로_지하철_노선_조회(0);
-        assertThat(변경된_노선_response.jsonPath().getString("name")).isEqualTo("구분당선");
-        assertThat(변경된_노선_response.jsonPath().getString("color")).isEqualTo("bg-blue-600");
+        ExtractableResponse<Response> 변경된_노선_response = ID로_지하철_노선_조회(신분당선_노선_id);
+        assertThat(변경된_노선_response.jsonPath().getString("name")).isEqualTo(분당선);
+        assertThat(변경된_노선_response.jsonPath().getString("color")).isEqualTo(분당선_COLOR);
     }
 
 
@@ -241,16 +273,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-//        long 노선_id = 지하철_노선_생성_요청(신분당선_LineRequest).jsonPath().getLong("id");
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
+        long 경기중앙역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(경기중앙역))
+                .jsonPath().getLong("id");
+        long 신분당선_노선_id = 지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30))
+                .jsonPath().getLong("id");
+
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete(LINE_CONTROLLER_COMMON_PATH + "/" + 0)
+                .when().delete(LINE_CONTROLLER_COMMON_PATH + "/" + 신분당선_노선_id)
                 .then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        ExtractableResponse<Response> 삭제된_지하철_노선_조회_response = ID로_지하철_노선_조회(0);
+        ExtractableResponse<Response> 삭제된_지하철_노선_조회_response = ID로_지하철_노선_조회(신분당선_노선_id);
         assertThat(삭제된_지하철_노선_조회_response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
@@ -262,11 +300,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
     void createDuplicatedLine() {
-        // given
-//        지하철_노선_생성_요청(신분당선_LineRequest);
+
+        // Given
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
+        long 경기중앙역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(경기중앙역))
+                .jsonPath().getLong("id");
+        지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30))
+                .jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(null);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());

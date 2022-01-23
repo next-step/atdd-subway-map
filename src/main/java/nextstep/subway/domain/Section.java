@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.DuplicatedStationsOfLineException;
 import nextstep.subway.exception.OutOfSectionDistanceException;
 
 import javax.persistence.*;
@@ -30,6 +31,7 @@ public class Section extends BaseEntity {
     }
     private Section(Long id, Line line, Station upStation, Station downStation, int distance) {
         validateDistance(distance);
+        validateStation(upStation, downStation);
         this.id = id;
         this.line = line;
         this.upStation = upStation;
@@ -68,6 +70,12 @@ public class Section extends BaseEntity {
     public void validateDistance(int distance) {
         if (distance < 1) {
             throw new OutOfSectionDistanceException(distance);
+        }
+    }
+
+    public void validateStation(Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new DuplicatedStationsOfLineException(upStation, downStation);
         }
     }
 

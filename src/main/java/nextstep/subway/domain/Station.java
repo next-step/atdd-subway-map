@@ -3,10 +3,13 @@ package nextstep.subway.domain;
 import nextstep.subway.applicaion.dto.StationRequest;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
 public class Station extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
