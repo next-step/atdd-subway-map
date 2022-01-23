@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.steps.LineSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-
         // when
         ExtractableResponse<Response> response = LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
@@ -39,9 +39,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        // when
+        // given
         LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
+        // when
         ExtractableResponse<Response> response = LineSteps.get();
 
         // then

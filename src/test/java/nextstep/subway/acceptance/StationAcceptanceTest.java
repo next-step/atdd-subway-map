@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.steps.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given, when
+        // when
         ExtractableResponse<Response> response = StationSteps.post(FIRST_NAME);
 
         // then
@@ -41,13 +42,13 @@ class StationAcceptanceTest extends AcceptanceTest {
         /// given
         String name = "역삼역";
 
-        // then
         StationSteps.post(FIRST_NAME);
         StationSteps.post(name);
 
         // when
         ExtractableResponse<Response> response = StationSteps.get();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(FIRST_NAME, name);
