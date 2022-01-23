@@ -128,4 +128,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 실패를 한다.
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
+
+    // 섹션에 대한 코드
 }

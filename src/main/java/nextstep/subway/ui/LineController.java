@@ -1,9 +1,8 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineCreationResponse;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.SectionService;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.ui.path.LinePath;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +16,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -53,5 +54,12 @@ public class LineController {
         lineService.deleteLine(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping(LinePath.ID + "/sections")
+    public ResponseEntity<?> createSection(@PathVariable Long id, @RequestBody LineSectionRequest lineSectionRequest) {
+        SectionResponse section = sectionService.createSection(id, lineSectionRequest);
+
+        return ResponseEntity.created(URI.create(LinePath.ROOT + "/"+ id + "/sections/" + section.getId())).body(section);
     }
 }
