@@ -23,7 +23,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // then
-        assertThat(지하철_노선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(지하철_노선_생성_응답.statusCode()).isEqualTo(HttpStatus.FOUND.value());
         assertThat(지하철_노선_생성_응답.header("Location")).isEqualTo("/lines/1");
     }
 
@@ -139,5 +139,22 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(url);
         assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청하고,
+     * When 같은 이름으로 지하철 노선 생성을 요청하면,
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @Test
+    void 중복_이름으로_지하철_노선_생성() {
+        // given
+        LineSteps.지하철_노선_생성_요청("9호선", "갈색");
+
+        // when
+        ExtractableResponse<Response> 지하철_노선_중복_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
+
+        // then
+
     }
 }
