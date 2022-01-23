@@ -38,6 +38,6 @@ public class LineController {
     public ResponseEntity<Void> updateLine(@RequestBody final LineUpdateRequest lineUpdateRequest,
                                            @PathVariable final Long id) {
         lineService.updateLine(id, lineUpdateRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

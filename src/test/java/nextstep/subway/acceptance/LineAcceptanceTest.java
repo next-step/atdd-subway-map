@@ -143,7 +143,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(updateResponse.header("Date")).isNotBlank()
         );
 
@@ -166,6 +166,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        /// given
+        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
+        final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(ContentType.ANY)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .when()
+                .delete("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(response.header("Date")).isNotBlank()
+        );
     }
 
     private ExtractableResponse<Response> 정상적인_지하철_노선_생성을_요청한다(final String name, final String color) {
