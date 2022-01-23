@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.utils.HttpRequestTestUtil.*;
@@ -18,7 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
-    private String defaultUrl = "/stations";
+    private static final String 기본주소 = "/stations";
+    private static final String 기존지하철 = "기존지하철";
+    private static final String 새로운지하철 = "새로운지하철";
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -26,17 +27,15 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 생성")
     @Test
-    void createParams() {
-        // given
-        Map<String, String> params = createParams("강남역");
-
+    void 지하철역생성_테스트() {
         // when
-        ExtractableResponse<Response> response = postRequest(defaultUrl, params);
+        ExtractableResponse<Response> response = 기존지하철역생성();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
+
 
     /**
      * Given 지하철역 생성을 요청 하고
@@ -46,22 +45,17 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 목록 조회")
     @Test
-    void getStations() {
+    void 지하철역목록조회_테스트() {
         /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = createParams(강남역);
-        postRequest(defaultUrl, params1);
+        기존지하철역생성();
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = createParams(역삼역);
-        postRequest(defaultUrl, params2);
+        새로운지하철역생성();
 
         // when
-        ExtractableResponse<Response> response = getRequest(defaultUrl);
+        ExtractableResponse<Response> response = getRequest(기본주소);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        assertThat(response.jsonPath().getList("name")).contains(기존지하철, 새로운지하철);
     }
 
     /**
@@ -71,10 +65,9 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 삭제")
     @Test
-    void deleteStation() {
+    void 지하철역삭제_테스트() {
         // given
-        Map<String, String> params = createParams("강남역");
-        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, params);
+        ExtractableResponse<Response> createResponse = 기존지하철역생성();
 
         // when
         ExtractableResponse<Response> response = deleteRequest(createResponse.header(HttpHeaders.LOCATION));
@@ -90,18 +83,26 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("중복된 지하철 역은 생성이 실패한다")
     @Test
-    void duplicateStation() {
+    void 중복된지하철역생성_테스트() {
         //given
-        String 지하철역 = "지하철역";
-        Map<String, String> params = createParams(지하철역);
-        postRequest(defaultUrl, params);
+        기존지하철역생성();
 
         //when
-        ExtractableResponse<Response> response = postRequest(defaultUrl, params);
+        ExtractableResponse<Response> response = 기존지하철역생성();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
+    }
+
+    private ExtractableResponse<Response> 기존지하철역생성() {
+        Map<String, String> params = createParams(기존지하철);
+        return postRequest(기본주소, params);
+    }
+
+    private ExtractableResponse<Response> 새로운지하철역생성() {
+        Map<String, String> params = createParams(새로운지하철);
+        return postRequest(기본주소, params);
     }
 
     private Map<String, String> createParams(String 지하철역) {
