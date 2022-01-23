@@ -22,6 +22,10 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
+    public static Line of(String name, String color) {
+        return new Line(name, color);
+    }
+
     public Long getId() {
         return id;
     }
@@ -34,8 +38,8 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public void update(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
+    public void update(Line line) {
+        this.name = line.getName();
+        this.color = line.getColor();
     }
 }

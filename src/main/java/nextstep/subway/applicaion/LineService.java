@@ -20,7 +20,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(request.toEntity());
         return new LineResponse(
                 line.getId(),
                 line.getName(),
@@ -33,20 +33,23 @@ public class LineService {
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-            .map(line -> LineResponse.of(line))
+            .map(LineResponse::of)
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long lineId) {
         Line line = lineRepository.findById(lineId)
             .orElseThrow(NoSuchElementException::new);
+
         return LineResponse.of(line);
     }
 
     public LineResponse updateLine(Long lineId, LineRequest lineRequest) {
         Line savedLine = lineRepository.findById(lineId)
             .orElseThrow(NoSuchElementException::new);
-        savedLine.update(lineRequest);
+        savedLine.update(lineRequest.toEntity());
+
         return LineResponse.of(savedLine);
     }
 
