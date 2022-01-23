@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import nextstep.subway.domain.Station;
 
 public class StationResponse {
-    private Long id;
-    private String name;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
     private StationResponse(Long id, String name, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
@@ -17,13 +17,17 @@ public class StationResponse {
         this.modifiedDate = modifiedDate;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static StationResponse from(Station station) {
-        return new StationResponse(
-            station.getId(),
-            station.getName(),
-            station.getCreatedDate(),
-            station.getModifiedDate()
-        );
+        return builder()
+            .id(station.getId())
+            .name(station.getName())
+            .createdDate(station.getCreatedDate())
+            .modifiedDate(station.getModifiedDate())
+            .build();
     }
 
     public Long getId() {
@@ -40,5 +44,38 @@ public class StationResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    public static class Builder {
+        private Long id;
+        private String name;
+        private LocalDateTime createdDate;
+        private LocalDateTime modifiedDate;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder createdDate(LocalDateTime createdDate) {
+            this.createdDate = createdDate;
+            return this;
+        }
+
+        public Builder modifiedDate(LocalDateTime modifiedDate) {
+            this.modifiedDate = modifiedDate;
+            return this;
+        }
+
+        public StationResponse build() {
+            return new StationResponse(
+                id, name, createdDate, modifiedDate
+            );
+        }
     }
 }
