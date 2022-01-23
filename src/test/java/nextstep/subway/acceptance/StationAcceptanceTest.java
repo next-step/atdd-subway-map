@@ -99,11 +99,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_삭제_API(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -123,6 +119,14 @@ class StationAcceptanceTest extends AcceptanceTest {
         return RestAssured.given().log().all()
                 .when()
                 .get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    ExtractableResponse<Response> 지하철_노선_삭제_API(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
                 .then().log().all()
                 .extract();
     }
