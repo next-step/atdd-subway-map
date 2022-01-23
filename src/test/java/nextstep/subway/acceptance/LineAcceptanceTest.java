@@ -16,26 +16,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private static final String 기본주소 = "/lines";
+    private static final String 기존노선 = "기존노선";
+    private static final String 기존색상 = "기존색상";
+    private static final String 새로운노선 = "새로운노선";
+    private static final String 새로운색상 = "새로운색상";
+    private static final String 수정노선 = "수정 노선";
+    private static final String 수정색상 = "수정 색상";
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
      */
-
-    private String defaultUrl = "/lines";
-
     @DisplayName("지하철 노선 생성")
     @Test
-    void createLine() {
+    void 노선생성_테스트() {
         //when
-        String 기존노선 = "기존 노선";
-        String 기존색상 = "기존 색상";
-        Map<String, String> param = createParam(기존노선, 기존색상);
-        ExtractableResponse<Response> response = postRequest(defaultUrl, param);
+        ExtractableResponse<Response> response = 기존노선생성();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
-
 
     /**
      * Given 지하철 노선을 생성한다.
@@ -45,20 +47,13 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
-    void getLines() {
+    void 노선목록조회_테스트() {
         //given
-        String 기존노선 = "기존 노선";
-        String 기존색상 = "기존 색상";
-        Map<String, String> param = createParam(기존노선, 기존색상);
-        postRequest(defaultUrl, param);
-
-        String 새로운노선 = "새로운 노선";
-        String 새로운색상 = "새로운 색상";
-        Map<String, String> param2 = createParam(새로운노선, 새로운색상);
-        postRequest(defaultUrl, param2);
+        기존노선생성();
+        새로운노선생성();
 
         //when
-        ExtractableResponse<Response> response = getRequest(defaultUrl);
+        ExtractableResponse<Response> response = getRequest(기본주소);
 
         //then
         assertThat(response.jsonPath().getList("name")).contains(새로운노선, 기존노선);
@@ -72,12 +67,9 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 조회")
     @Test
-    void getLine() {
+    void 노선조회_테스트() {
         //given
-        String 기존노선 = "기존 노선";
-        String 기존색상 = "기존 색상";
-        Map<String, String> param = createParam(기존노선, 기존색상);
-        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, param);
+        ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
         ExtractableResponse<Response> response = getRequest(createResponse.header(HttpHeaders.LOCATION));
@@ -94,18 +86,12 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 수정")
     @Test
-    void updateLine() {
+    void 노선업데이트_테스트() {
         //given
-        String 기존노선 = "기존 노선";
-        String 기존색상 = "기존 색상";
-        Map<String, String> param = createParam(기존노선, 기존색상);
-        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, param);
+        ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
-        String 수정노선 = "수정 노선";
-        String 수정색상 = "수정 색상";
-        Map<String, String> updateParam = createParam(수정노선, 수정색상);
-        ExtractableResponse<Response> updateResponse = putRequest(createResponse.header(HttpHeaders.LOCATION), updateParam);
+        ExtractableResponse<Response> updateResponse = 노선수정(createResponse);
 
         //then
         ExtractableResponse<Response> response = getRequest(createResponse.header(HttpHeaders.LOCATION));
@@ -113,9 +99,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(수정노선);
-
-
     }
+
 
     /**
      * Given 지하철 노션을 생성을 요청한다.
@@ -124,12 +109,9 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 삭제")
     @Test
-    void deleteLine() {
+    void 노선삭제_테스트() {
         //given
-        String 기존노선 = "기존 노선";
-        String 기존색상 = "기존 색상";
-        Map<String, String> param = createParam(기존노선, 기존색상);
-        ExtractableResponse<Response> createResponse = postRequest(defaultUrl, param);
+        ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
         ExtractableResponse<Response> response = deleteRequest(createResponse.header(HttpHeaders.LOCATION));
@@ -148,23 +130,36 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicationLine() {
         //given
-        String 기존노선 = "기존 노선";
-        String 기존색상 = "기존 색상";
-        Map<String, String> param = createParam(기존노선, 기존색상);
-        postRequest(defaultUrl, param);
+        기존노선생성();
 
         //when
-        ExtractableResponse<Response> response = postRequest(defaultUrl, param);
+        ExtractableResponse<Response> response = 기존노선생성();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
     }
 
-    private Map<String, String> createParam(String 기존노선, String 기존색상) {
+    private ExtractableResponse<Response> 기존노선생성() {
+        Map<String, String> param = 노선파라미터생성(기존노선, 기존색상);
+        return postRequest(기본주소, param);
+    }
+
+    private ExtractableResponse<Response> 새로운노선생성() {
+        Map<String, String> param = 노선파라미터생성(새로운노선, 새로운색상);
+        return postRequest(기본주소, param);
+    }
+
+    private ExtractableResponse<Response> 노선수정(ExtractableResponse<Response> createResponse) {
+        Map<String, String> updateParam = 노선파라미터생성(수정노선, 수정색상);
+        ExtractableResponse<Response> updateResponse = putRequest(createResponse.header(HttpHeaders.LOCATION), updateParam);
+        return updateResponse;
+    }
+
+    private Map<String, String> 노선파라미터생성(String 노선, String 색상) {
         Map<String, String> param = new HashMap<>();
-        param.put("name", 기존노선);
-        param.put("color", 기존색상);
+        param.put("name", 노선);
+        param.put("color", 색상);
         return param;
     }
 }
