@@ -22,6 +22,14 @@ public class RequestBodyBuilder {
 		return new RequestBodyBuilder();
 	}
 
+	public RequestBodyBuilder put(String fieldName, int fieldValue) {
+		return put(fieldName, String.valueOf(fieldValue));
+	}
+
+	public RequestBodyBuilder put(String fieldName, long fieldValue) {
+		return put(fieldName, String.valueOf(fieldValue));
+	}
+
 	public RequestBodyBuilder put(String fieldName, String fieldValue) {
 		final Map<String, String> body = new HashMap<>(this.body);
 		body.put(fieldName, fieldValue);
