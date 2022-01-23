@@ -23,8 +23,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineCreateRequest request) {
-        boolean isExistLineName = lineRepository.existsByName(request.getName());
-        if (isExistLineName) {
+        boolean existLineName = lineRepository.existsByName(request.getName());
+        if (existLineName) {
             throw new IllegalArgumentException();
         }
 
@@ -49,10 +49,10 @@ public class LineService {
 
     @Transactional
     public void updateLine(final LineUpdateRequest request) {
-        boolean isExistLineName = lineRepository.existsByName(request.getName());
+        boolean existLineName = lineRepository.existsByName(request.getName());
         Line line = lineRepository.findById(request.getId()).orElseThrow(IllegalArgumentException::new);
 
-        if (isExistLineName && !line.getName().equals(request.getName())) {
+        if (existLineName && !line.getName().equals(request.getName())) {
             throw new IllegalArgumentException();
         }
 

@@ -20,7 +20,8 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        if (stationRepository.existsByName(stationRequest.getName())) {
+        boolean existStationName = stationRepository.existsByName(stationRequest.getName());
+        if (existStationName) {
             throw new IllegalArgumentException();
         }
 
