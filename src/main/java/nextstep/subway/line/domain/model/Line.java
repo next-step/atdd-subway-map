@@ -13,8 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import nextstep.subway.common.domain.model.BaseEntity;
-import nextstep.subway.section.domain.model.Distance;
-import nextstep.subway.section.domain.model.Section;
 import nextstep.subway.station.domain.model.Station;
 
 @Entity

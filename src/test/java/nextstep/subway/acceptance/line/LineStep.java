@@ -6,7 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.domain.dto.LineRequest;
-import nextstep.subway.section.domain.model.Distance;
+import nextstep.subway.line.domain.model.Distance;
 
 public class LineStep {
     private static int dummyCounter = 0;

@@ -1,4 +1,4 @@
-package nextstep.subway.section.domain.model;
+package nextstep.subway.line.domain.model;
 
 import java.util.Objects;
 

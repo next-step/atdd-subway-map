@@ -1,6 +1,6 @@
 package nextstep.subway.line.domain.dto;
 
-import nextstep.subway.section.domain.model.Distance;
+import nextstep.subway.line.domain.model.Distance;
 
 public class LineRequest {
     private final String name;

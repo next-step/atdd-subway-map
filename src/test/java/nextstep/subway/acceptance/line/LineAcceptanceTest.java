@@ -18,7 +18,7 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.line.domain.dto.LineRequest;
-import nextstep.subway.section.domain.model.Distance;
+import nextstep.subway.line.domain.model.Distance;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 import nextstep.subway.utils.DatabaseCleanup;
