@@ -44,8 +44,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId((long) 1)
-            .downStationId((long) 2)
+            .upStationId((long) 3)
+            .downStationId((long) 4)
             .distance(new Distance(100))
             .build();
 
@@ -73,8 +73,31 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then  구간 등록은 실패한다.
      */
     @DisplayName("구간 등록 실패 - 등록할 구간의 하행역이 새로운 지하철역의 상행역이 아닐때")
+    @Test
     void addSectionThatFailing1() {
+        lineStep.지하철_노선_생성_요청();
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
 
+        SectionRequest sectionRequest = SectionRequest.builder()
+            .upStationId((long) 4)
+            .downStationId((long) 3)
+            .distance(new Distance(100))
+            .build();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                            .body(sectionRequest)
+                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                            .when()
+                                                            .post("/lines/1/sections")
+                                                            .then().log().all()
+                                                            .extract();
+
+        // then
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.BAD_REQUEST)
+                          .hasLocation();
     }
 
     /**
@@ -86,7 +109,30 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then  구간 등록은 실패한다.
      */
     @DisplayName("구간 등록 실패 - 등록할 구간의 하행역이 구간에 이미 등록되있는 역일때 ")
+    @Test
     void addSectionThatFailing2() {
+        lineStep.지하철_노선_생성_요청();
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
 
+        SectionRequest sectionRequest = SectionRequest.builder()
+            .upStationId((long) 3)
+            .downStationId((long) 1)
+            .distance(new Distance(100))
+            .build();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                                                            .body(sectionRequest)
+                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                            .when()
+                                                            .post("/lines/1/sections")
+                                                            .then().log().all()
+                                                            .extract();
+
+        // then
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.BAD_REQUEST)
+                          .hasLocation();
     }
 }

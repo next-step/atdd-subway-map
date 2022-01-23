@@ -18,10 +18,10 @@ public class LineStep {
 
     private int dummyCounter = 0;
     private long stationIdCounter = 0;
-    private final StationStep stationStepRefactor;
+    private final StationStep stationStep;
 
     public LineStep(StationStep stationStep) {
-        stationStepRefactor = new StationStep();
+        this.stationStep = stationStep;
     }
 
     public LineStep() {
@@ -34,8 +34,8 @@ public class LineStep {
             custom.accept(request);
         }
 
-        stationStepRefactor.지하철역_생성_요청();
-        stationStepRefactor.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
         return RestAssured.given().log().all()
                           .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
