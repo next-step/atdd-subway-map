@@ -23,7 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationAcceptanceTest extends AcceptanceTest {
-
+    private static final String STATION_API_PATH = "/stations";
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
     @Autowired
     DatabaseCleanup databaseCleanup;
 
@@ -36,12 +38,12 @@ class StationAcceptanceTest extends AcceptanceTest {
         databaseCleanup.execute();
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철역_생성(StationRequest params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/stations")
+                .post(STATION_API_PATH)
                 .then().log().all()
                 .extract();
     }
@@ -49,7 +51,15 @@ class StationAcceptanceTest extends AcceptanceTest {
     public static ExtractableResponse<Response> 지하철_목록_조회() {
         return RestAssured.given().log().all()
                 .when()
-                .get("/stations")
+                .get(STATION_API_PATH)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철역_삭제(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
                 .then().log().all()
                 .extract();
     }
@@ -61,13 +71,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        String 강남역 = "강남역";
-        Map<String, String> params = new HashMap<>();
-        params.put("name", 강남역);
         // when
-        ExtractableResponse<Response> response = 지하철역_생성(params);
-
+        ExtractableResponse<Response> response = 지하철역_생성(StationRequest.of(강남역));
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
@@ -85,27 +90,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        지하철역_생성(StationRequest.of(강남역));
+        지하철역_생성(StationRequest.of(역삼역));
 
         // when
         ExtractableResponse<Response> response = 지하철_목록_조회();
@@ -124,23 +110,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = 지하철역_생성(StationRequest.of(강남역));
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_삭제(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -155,13 +129,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationAsSameName() {
         // given
-        String 강남역 = "강남역";
-        Map<String, String> params = new HashMap<>();
-        params.put("name", 강남역);
-        지하철역_생성(params);
+        지하철역_생성(StationRequest.of(강남역));
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성(params);
+        ExtractableResponse<Response> response = 지하철역_생성(StationRequest.of(강남역));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());

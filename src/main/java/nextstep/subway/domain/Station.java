@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.StationRequest;
+
 import javax.persistence.*;
 
 @Entity
@@ -16,6 +18,15 @@ public class Station extends BaseEntity {
     public Station(String name) {
         this.name = name;
     }
+
+    public static Station of(String name) {
+        return new Station(name);
+    }
+
+    public static Station of(StationRequest stationRequest) {
+        return new Station(stationRequest.getName());
+    }
+
 
     public Long getId() {
         return id;
