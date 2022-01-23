@@ -116,7 +116,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(stations.size()).isEqualTo(2);
     }
 
-
     /**
      * Given 존재하지 않는 지하철역으로
      * When 지하철 노선 생성 요청 하면
@@ -315,6 +314,65 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(지하철_노선_목록_조회().jsonPath().getList("$").size()).isEqualTo(1);
+    }
+
+    /**
+     * when 지하철 노선에 구간을 등록 요청을 하면
+     * then 지하철 노선에 구간을 등록이 성공한다.
+     */
+    @DisplayName("지하철 노선에 구간 등록")
+    @Test
+    void addSectionToLine() {
+
+    }
+
+
+    /**
+     * given 상행과 하행역이 있는 지하철의 노선이 주어지고
+     * given 새로운 상행종점을 등록할 때, 등록할 구간의 하행역은, 기존 노선의 상행 종점이다
+     * when 지하철 노선에 구간을 등록 요청을 하면
+     * then 지하철 노선에 구간을 등록이 성공한다
+     */
+    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @Test
+    void addSectionToLine() {
+
+    }
+
+    /**
+     * given 상행과 하행역이 있는 지하철의 노선이 주어지고
+     * given 새로운 하행종점을 등록할 때, 구간의 상행역은, 기존 노선의 하행 종점이다
+     * when 지하철 노선에 구간을 등록 요청을 하면
+     * then 지하철 노선에 구간을 등록이 성공한다
+     */
+    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @Test
+    void addSectionToLine() {
+
+    }
+
+    /**
+     * given 상행과 하행역이 있는 지하철의 노선이 주어지고
+     * given 새로운 하행종점을 등록할 때, 현재 등록되어있는 역이면
+     * when 지하철 노선에 구간을 등록 요청을 하면
+     * then 지하철 노선에 구간을 등록이 실패한다
+     */
+    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @Test
+    void addSectionToLine() {
+
+    }
+
+    /**
+     * given 상행과 하행역이 있는 지하철의 노선이 주어지고
+     * given 새로운 상행종점을 등록할 때, 현재 등록되어있는 역이면
+     * when 지하철 노선에 구간을 등록 요청을 하면
+     * then 지하철 노선에 구간을 등록이 실패한다
+     */
+    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @Test
+    void addSectionToLine() {
+
     }
 
     @DisplayName("지하철 노선에 구간 제거")
