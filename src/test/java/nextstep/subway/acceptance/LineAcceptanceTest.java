@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.exception.DuplicatedElementException;
 import nextstep.subway.utils.RestAssuredCRUD;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -133,6 +135,19 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선삭제_되었다(response);
     }
 
+    @DisplayName("중복된 이름으로 지하철노선 생성 요청하면 실패한다.")
+    @Test
+    void duplicatedLine() {
+        // given
+        지하철_노선을_등록한다(일호선1);
+
+        // when
+        ExtractableResponse<Response> 노선등록결과 = 지하철_노선을_등록한다(일호선1);
+
+        // then
+        지하철_노선_등록_실패한다(노선등록결과);
+    }
+
     private ExtractableResponse<Response> 지하철_노선을_등록한다(LineRequest request) {
         return RestAssuredCRUD.postRequest("/lines", request);
     }
@@ -156,6 +171,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_생성된다(ExtractableResponse<Response> 노선등록결과) {
         assertThat(노선등록결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(노선등록결과.header("Location")).isNotBlank();
+    }
+
+    private void 지하철_노선_등록_실패한다(ExtractableResponse<Response> 노선등록결과) {
+        assertThat(노선등록결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private void 지하철_노선목록조회_결과에_원하는_라인이_있다(ExtractableResponse<Response> 노선목록조회결과, List<LineRequest> 라인요청테스트) {
@@ -189,4 +208,5 @@ class LineAcceptanceTest extends AcceptanceTest {
             .collect(Collectors.toList());
         assertThat(lineIds).isEmpty();
     }
+
 }
