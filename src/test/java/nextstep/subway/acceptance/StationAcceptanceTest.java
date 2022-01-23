@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.step.StationSteps;
@@ -15,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-    final String 아이디 = "id";
     final String 이름 = "name";
 
     final Map<String, String> 강남역 = Map.of(이름, "강남역");
@@ -69,14 +67,10 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = StationSteps.지하철_역_생성_요청(강남역);
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        final String uri = createResponse.header("Location");
+        ExtractableResponse<Response> deleteResponse = StationSteps.지하철_역_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

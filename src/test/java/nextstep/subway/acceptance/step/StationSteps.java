@@ -25,4 +25,12 @@ public class StationSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_역_삭제_요청(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
 }
