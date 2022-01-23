@@ -3,12 +3,13 @@ package nextstep.subway.line.application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.DuplicateColumnException;
-import nextstep.subway.common.exception.EntityNotFoundException;
 import nextstep.subway.common.exception.OptionalException;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.dto.LineResponse;
@@ -35,7 +36,7 @@ public class LineService {
         Line line = new Line(request.getName(), request.getColor());
         Station upStation = stationRepository.findById(request.getUpStationId())
                                              .orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(request.getUpStationId())
+        Station downStation = stationRepository.findById(request.getDownStationId())
                                              .orElseThrow(EntityNotFoundException::new);
         line.createSection(upStation, downStation, request.getDistance());
 

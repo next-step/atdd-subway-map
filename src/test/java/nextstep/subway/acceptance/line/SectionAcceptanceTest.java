@@ -65,8 +65,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선이 존재하고
      * And   새로운 지하철역을 등록하고
-     * And   등록할 구간의 상행역이 등록되어있는 구간의 하행역이 아닐때
-     * When  구간 등록을 요청한다.
+     * When  등록할 구간의 상행역을 등록되어있는 구간의 하행역이 아니도록 구간 등록을 요청한다.
      * Then  구간 등록은 실패한다.
      */
     @DisplayName("구간 등록 실패 - 등록할 구간의 상행역이 등록되어있는 구간의 하행역이 아닐때")
@@ -92,15 +91,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .hasLocation();
+                          .equalsHttpStatus(HttpStatus.NOT_IMPLEMENTED)
+                          .hasNotLocation();
     }
 
     /**
      * Given 지하철 노선이 존재하고
      * And   새로운 지하철역을 등록하고
-     * And   등록할 구간의 하행역이 구간에 이미 등록되있는 역일때
-     * When  구간 등록을 요청한다.
+     * When  등록할 구간의 하행역을 구간에 이미 등록되있는 역으로 구간 등록을 요청한다.
      * Then  구간 등록은 실패한다.
      */
     @DisplayName("구간 등록 실패 - 등록할 구간의 하행역이 구간에 이미 등록되있는 역일때 ")

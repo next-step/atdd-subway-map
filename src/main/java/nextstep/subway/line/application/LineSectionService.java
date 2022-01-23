@@ -1,9 +1,10 @@
 package nextstep.subway.line.application;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import nextstep.subway.common.exception.EntityNotFoundException;
 import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.dto.SectionResponse;
 import nextstep.subway.line.domain.model.Line;

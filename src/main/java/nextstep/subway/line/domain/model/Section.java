@@ -11,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import nextstep.subway.common.domain.model.BaseEntity;
+import nextstep.subway.common.exception.ErrorMessage;
+import nextstep.subway.common.exception.InvalidArgumentException;
+import nextstep.subway.common.exception.OptionalException;
 import nextstep.subway.station.domain.model.Station;
 
 @Entity
@@ -63,6 +66,10 @@ public class Section extends BaseEntity {
 
     public Distance getDistance() {
         return distance;
+    }
+
+    public boolean matchDownStation(Station thatStation) {
+        return downStation.matchId(thatStation);
     }
 
     public static Builder builder() {

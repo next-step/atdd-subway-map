@@ -2,10 +2,12 @@ package nextstep.subway.line.domain.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -71,6 +73,10 @@ public class Line extends BaseEntity {
     }
 
     public Section createSection(Station upStation, Station downStation, Distance distance) {
+        if (!sections.isEmpty()) {
+            findHeadSection(upStation).orElseThrow(EntityNotFoundException::new);
+        }
+
         Section section = Section.builder()
             .line(this)
             .upStation(upStation)
@@ -79,5 +85,11 @@ public class Line extends BaseEntity {
             .build();
         this.sections.add(section);
         return section;
+    }
+
+    private Optional<Section> findHeadSection(Station upStation) {
+        return sections.stream()
+                       .filter(iSection -> iSection.matchDownStation(upStation))
+                       .findFirst();
     }
 }
