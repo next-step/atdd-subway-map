@@ -7,7 +7,6 @@ import nextstep.subway.acceptance.step.LineSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -99,13 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         final Long createdId = createResponse.jsonPath().getLong(아이디);
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", createdId)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_수정_요청(createdId, params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());

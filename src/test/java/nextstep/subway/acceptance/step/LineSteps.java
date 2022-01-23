@@ -9,11 +9,11 @@ import java.util.Map;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> 요청_노선) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> line) {
 
         return RestAssured
                 .given().log().all()
-                .body(요청_노선)
+                .body(line)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -37,4 +37,12 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, Map<String, String> line) {
+        return RestAssured
+                .given().log().all()
+                .body(line)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", id)
+                .then().log().all().extract();
+    }
 }
