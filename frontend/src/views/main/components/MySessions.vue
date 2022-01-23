@@ -13,8 +13,8 @@
 
 <script>
 import MySessionsView from '@/views/main/components/MySessionsView'
-import { FETCH_MY_SESSIONS } from '@/store/shared/actionTypes'
-import { mapActions, mapGetters } from 'vuex'
+import {FETCH_MY_SESSIONS} from '@/store/shared/actionTypes'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
   name: 'MySessions',

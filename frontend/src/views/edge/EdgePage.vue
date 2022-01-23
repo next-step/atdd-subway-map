@@ -57,11 +57,11 @@
 
 <script>
 import EdgeCreateButton from '@/views/edge/components/EdgeCreateButton'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { FETCH_LINE, FETCH_LINES } from '@/store/shared/actionTypes'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {FETCH_LINE, FETCH_LINES} from '@/store/shared/actionTypes'
 import EdgeDeleteButton from '@/views/edge/components/EdgeDeleteButton'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
 
 export default {
   name: 'EdgePage',

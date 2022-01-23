@@ -1,5 +1,13 @@
-import { SET_LINE, SET_LINES } from '@/store/shared/mutationTypes'
-import { CREATE_LINE, DELETE_LINE, FETCH_LINES, EDIT_LINE, DELETE_SECTION, CREATE_SECTION, FETCH_LINE } from '@/store/shared/actionTypes'
+import {SET_LINE, SET_LINES} from '@/store/shared/mutationTypes'
+import {
+    CREATE_LINE,
+    CREATE_SECTION,
+    DELETE_LINE,
+    DELETE_SECTION,
+    EDIT_LINE,
+    FETCH_LINE,
+    FETCH_LINES
+} from '@/store/shared/actionTypes'
 import LineService from '@/api/modules/line'
 
 const state = {

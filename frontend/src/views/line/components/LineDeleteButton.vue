@@ -5,10 +5,10 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex'
-import { DELETE_LINE, FETCH_LINES } from '@/store/shared/actionTypes'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
+import {mapActions, mapMutations} from 'vuex'
+import {DELETE_LINE, FETCH_LINES} from '@/store/shared/actionTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
 
 export default {
   name: 'LineDeleteButton',

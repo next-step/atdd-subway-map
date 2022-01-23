@@ -33,11 +33,11 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import LineDeleteButton from '@/views/line/components/LineDeleteButton'
 import LineEditButton from '@/views/line/components/LineEditButton'
 import LineCreateButton from '@/views/line/components/LineCreateButton'
-import { FETCH_LINES } from '@/store/shared/actionTypes'
+import {FETCH_LINES} from '@/store/shared/actionTypes'
 
 export default {
   name: 'LinePage',

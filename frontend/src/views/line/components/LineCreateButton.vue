@@ -78,12 +78,12 @@
 
 <script>
 import Dialog from '@/components/dialogs/Dialog'
-import { LINE_COLORS, SNACKBAR_MESSAGES } from '@/utils/constants'
+import {LINE_COLORS, SNACKBAR_MESSAGES} from '@/utils/constants'
 import dialog from '@/mixins/dialog'
 import validator from '@/utils/validator'
 import {mapActions, mapGetters, mapMutations} from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { CREATE_LINE, DELETE_LINE, EDIT_LINE, FETCH_LINES, FETCH_STATIONS } from '@/store/shared/actionTypes'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {CREATE_LINE, DELETE_LINE, EDIT_LINE, FETCH_LINES, FETCH_STATIONS} from '@/store/shared/actionTypes'
 
 export default {
   name: 'LineCreateButton',

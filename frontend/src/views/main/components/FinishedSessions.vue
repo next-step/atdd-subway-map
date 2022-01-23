@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import { SESSION_STATUS } from '@/utils/constants'
+import {SESSION_STATUS} from '@/utils/constants'
 import SessionList from '@/views/main/components/SessionList'
-import { mapMutations } from 'vuex'
-import { SET_FINISHED_SESSIONS } from '@/store/shared/mutationTypes'
+import {mapMutations} from 'vuex'
+import {SET_FINISHED_SESSIONS} from '@/store/shared/mutationTypes'
 
 export default {
   name: 'FinishedSessions',

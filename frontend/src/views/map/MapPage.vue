@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import { FETCH_MAP } from '@/store/shared/actionTypes'
+import {mapActions, mapGetters} from 'vuex'
+import {FETCH_MAP} from '@/store/shared/actionTypes'
 
 export default {
   name: 'MapPage',

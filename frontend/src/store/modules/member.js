@@ -1,6 +1,6 @@
-import { CREATE_MEMBER, DELETE_MEMBER, FETCH_MEMBER, UPDATE_MEMBER } from '@/store/shared/actionTypes'
+import {CREATE_MEMBER, DELETE_MEMBER, FETCH_MEMBER, UPDATE_MEMBER} from '@/store/shared/actionTypes'
 import MemberService from '@/api/modules/member'
-import { SET_MEMBER } from '@/store/shared/mutationTypes'
+import {SET_MEMBER} from '@/store/shared/mutationTypes'
 
 const state = {
   member: null

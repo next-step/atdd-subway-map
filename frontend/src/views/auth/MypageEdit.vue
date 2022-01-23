@@ -71,10 +71,10 @@
 
 <script>
 import validator from '@/utils/validator'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { FETCH_MEMBER, UPDATE_MEMBER } from '@/store/shared/actionTypes'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {FETCH_MEMBER, UPDATE_MEMBER} from '@/store/shared/actionTypes'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
 
 export default {
   name: 'MypageEdit',

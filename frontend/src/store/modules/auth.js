@@ -1,5 +1,5 @@
-import { SET_ACCESS_TOKEN } from '@/store/shared/mutationTypes'
-import { FETCH_MEMBER, LOGIN } from '@/store/shared/actionTypes'
+import {SET_ACCESS_TOKEN} from '@/store/shared/mutationTypes'
+import {FETCH_MEMBER, LOGIN} from '@/store/shared/actionTypes'
 import AuthService from '@/api/modules/auth'
 
 const state = {
