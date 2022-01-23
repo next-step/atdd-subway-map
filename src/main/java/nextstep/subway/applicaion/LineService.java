@@ -20,6 +20,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        checkDuplication(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineResponse(
                 line.getId(),
@@ -28,6 +29,12 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    private void checkDuplication(LineRequest request) {
+        if (lineRepository.findByName(request.getName()).isPresent()) {
+            throw new IllegalArgumentException("[duplication]:name");
+        }
     }
 
     public List<LineResponse> findAllLines() {
