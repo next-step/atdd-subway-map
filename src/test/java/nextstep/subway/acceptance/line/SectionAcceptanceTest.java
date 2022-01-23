@@ -31,7 +31,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선이 존재하고
      * And   새로운 지하철역을 등록하고
-     * And   새로운 지하철역을 등록하고
      * When  구간 등록을 요청한다.
      * Then  구간 등록이 성공한다.
      */
@@ -41,11 +40,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // given
         lineStep.지하철_노선_생성_요청();
         stationStep.지하철역_생성_요청();
-        stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId((long) 3)
-            .downStationId((long) 4)
+            .upStationId((long) 2)
+            .downStationId((long) 3)
             .distance(new Distance(100))
             .build();
 
@@ -67,7 +65,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선이 존재하고
      * And   새로운 지하철역을 등록하고
-     * And   새로운 지하철역을 등록하고
      * And   등록할 구간의 상행역이 등록되어있는 구간의 하행역이 아닐때
      * When  구간 등록을 요청한다.
      * Then  구간 등록은 실패한다.
@@ -77,11 +74,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void addSectionThatFailing1() {
         lineStep.지하철_노선_생성_요청();
         stationStep.지하철역_생성_요청();
-        stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId((long) 4)
-            .downStationId((long) 3)
+            .upStationId((long) 3)
+            .downStationId((long) 2)
             .distance(new Distance(100))
             .build();
 
@@ -103,7 +99,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given 지하철 노선이 존재하고
      * And   새로운 지하철역을 등록하고
-     * And   새로운 지하철역을 등록하고
      * And   등록할 구간의 하행역이 구간에 이미 등록되있는 역일때
      * When  구간 등록을 요청한다.
      * Then  구간 등록은 실패한다.
@@ -112,7 +107,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing2() {
         lineStep.지하철_노선_생성_요청();
-        stationStep.지하철역_생성_요청();
         stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
