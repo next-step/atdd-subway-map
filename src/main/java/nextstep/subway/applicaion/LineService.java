@@ -57,12 +57,16 @@ public class LineService {
         );
     }
 
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public void updateLineById(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("해당 노선에 대한 정보가 없습니다."));
 
         line.of(lineRequest.getName(), lineRequest.getColor());
 
         lineRepository.save(line);
+    }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 }
