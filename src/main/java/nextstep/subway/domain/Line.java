@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -31,5 +32,26 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public List<?> getStations() {
+        return null;
+    }
+
+    public void modify(String name, String color) {
+        modifyName(name);
+        modifyColor(color);
+    }
+
+    private void modifyName(String name) {
+        if (name != null && !this.name.equals(name)) {
+            this.name = name;
+        }
+    }
+
+    private void modifyColor(String color) {
+        if (color != null && !this.color.equals(color)) {
+            this.color = color;
+        }
     }
 }

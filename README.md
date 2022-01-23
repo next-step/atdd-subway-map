@@ -10,28 +10,19 @@
 </p>
 
 <br>
-
-# 지하철 노선도 미션
-[ATDD 강의](https://edu.nextstep.camp/c/R89PYi5H) 실습을 위한 지하철 노선도 애플리케이션
-
 <br>
 
-## 🚀 Getting Started
+## 🚀 화이팅
 
-### Install
-#### npm 설치
-```
-cd frontend
-npm install
-```
-> `frontend` 디렉토리에서 수행해야 합니다.
+|주차|실습|날짜|
+|:---:|:---:|:---:|
+|1주차|노선 관리 기능|22/01/22|
+||||
 
-### Usage
-#### webpack server 구동
-```
-npm run dev
-```
-#### application 구동
-```
-./gradlew bootRun
-```
+# 1주차
+## 시나리오
+- [x] 지하철 노선 생성
+- [x] 지하철 노선 목록 조회
+- [x] 지하철 노선 조회
+- [x] 지하철 노선 수정
+- [x] 지하철 노선 삭제
