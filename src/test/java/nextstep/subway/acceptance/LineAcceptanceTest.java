@@ -80,6 +80,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).contains("1호선");
         assertThat(response.jsonPath().getList("name")).contains("7호선");
+        // todo 리팩토링, jsonpath
     }
 
     /**
@@ -92,7 +93,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
 
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -100,18 +101,16 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        final String uri = response.header("Location");
+        final String uri = createResponse.header("Location");
 
-        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+        final ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
                 .when()
                 .get(uri)
                 .then().log().all()
                 .extract();
 
-        final List<String> name = extract.jsonPath().getList("name");
-        assertThat(name).contains("1호선");
-
-        // todo assert
+        final String name = getResponse.jsonPath().get("name");
+        assertThat(name).isEqualTo("1호선");
     }
 
     /**

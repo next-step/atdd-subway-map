@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,5 +48,11 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public LineResponse findLineById(long id) {
+        final Line foundLine = lineRepository.findById(id).orElseThrow(
+                () -> new RuntimeException(String.format("해당하는 노선을 찾을 수 없습니다. id : %s", id)));
+        return createLineResponse(foundLine);
     }
 }
