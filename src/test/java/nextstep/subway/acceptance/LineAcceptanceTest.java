@@ -129,4 +129,24 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     *     Given 지하철 노선 생성을 요청 하고
+     *     When 같은 이름으로 지하철 노선 생성을 요청 하면
+     *     Then 지하철 노선 생성이 실패한다.
+     */
+    @Test
+    @DisplayName("중복이름으로 지하철 노선 생성 실패")
+    void duplicationLineNameExceptionTest() {
+        // given
+        RequestParams params = new RequestParams("name", "신분당선");
+        params.addParams("color", "bg-red-600");
+
+        RequestMethod.post("/lines", params);
+        // when
+        ExtractableResponse<Response> response = RequestMethod.post("/lines", params);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+    }
 }
