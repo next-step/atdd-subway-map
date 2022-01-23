@@ -433,9 +433,40 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    @DisplayName("지하철 노선에 구간 제거")
+    /**
+     * given 2개의 구간이 있는 지하철 노선이 존재하고
+     * given 상행 종점이 주어질 때
+     * when 구간 제거를 한다.
+     * then 구간 제거가 성공한다.
+     * then 상행 종점이 바뀐다.
+     */
+    @DisplayName("지하철 노선에 구간 제거, 상행종점 구간 제거")
     @Test
-    void removeStation() {
+    void removeUpStation() {
+
+    }
+
+    /**
+     * given 2개의 구간이 있는 지하철 노선이 존재하고
+     * given 하행 종점이 주어질 때
+     * when 구간 제거를 한다.
+     * then 구간 제거가 성공한다.
+     * then 하행 종점이 바뀐다.
+     */
+    @DisplayName("지하철 노선에 구간 제거, 하행종점 구간 제거")
+    @Test
+    void removeDownStation() {
+
+    }
+
+    /**
+     * given 1개의 구간이 있는 지하철 노선이 존재하고
+     * when 구간 제거를 한다.
+     * then 구간 제거가 실패한다.
+     */
+    @DisplayName("지하철 노선에 구간 제거, 구간이 1개 일 때")
+    @Test
+    void removeBiStation() {
 
     }
 
