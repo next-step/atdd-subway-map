@@ -41,9 +41,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철역 생성을 요청 하고
-     * When 같은 이름으로 지하철역 생성을 요청 하면
-     * Then 지하철역 생성이 실패한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
      * @see nextstep.subway.ui.LineController#createLine
      */
     @Test
