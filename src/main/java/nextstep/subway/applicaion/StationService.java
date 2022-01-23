@@ -4,45 +4,46 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicateException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional
 @Service
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(final StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+    public StationResponse saveStation(final StationRequest stationRequest) {
+        final String stationName = stationRequest.getName();
+        if (isDuplicate(stationName)) {
+            throw new DuplicateException();
+        }
+        final Station station = stationRepository.save(new Station(stationName));
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
-        List<Station> stations = stationRepository.findAll();
-
+        final List<Station> stations = stationRepository.findAll();
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStationById(final Long id) {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+    private boolean isDuplicate(final String stationName) {
+        final Optional<Station> station = stationRepository.findByName(stationName);
+        return station.isPresent();
     }
 }
