@@ -22,7 +22,7 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
         checkDuplication(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
+        return LineResponse.of(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
@@ -41,7 +41,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
                 .map( line ->
-                        new LineResponse(
+                        LineResponse.of(
                                 line.getId(),
                                 line.getName(),
                                 line.getColor(),
@@ -53,7 +53,7 @@ public class LineService {
 
     public LineResponse getLine(Long id) {
         Line line = lineRepository.getById(id);
-        return new LineResponse(
+        return LineResponse.of(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
