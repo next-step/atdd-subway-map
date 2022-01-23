@@ -23,9 +23,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_생성_테스트() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "GTX-A");
-        params.put("color", "bg-red-900");
+        Map<String, String> params = 파라미터_생성("GTX-A", "bg-red-900");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
@@ -44,11 +42,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_이름_중복_생성_방지_테스트() {
         // given
-        지하철_노선_생성("GTX-A", "bg-red-900");
+        String 노선 = "GTX-A";
+        String 노선색 = "bg-red-900";
+        지하철_노선_생성(노선, 노선색);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "GTX-A");
-        params.put("color", "bg-red-900");
+        Map<String, String> params = 파라미터_생성(노선, 노선색);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
@@ -67,6 +65,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
+        String 노선1 = "GTX-A";
+        String 노선2 = "신분당선";
         지하철_노선_생성("GTX-A", "bg-red-900");
         지하철_노선_생성("신분당선", "bg-red-500");
 
@@ -77,7 +77,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         List<String> lineNames = response.body().jsonPath().getList("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).contains("신분당선", "GTX-A");
+        assertThat(lineNames).contains(노선1, 노선2);
     }
 
     /**
@@ -152,10 +152,16 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    ExtractableResponse<Response> 지하철_노선_생성(String 노선, String 노선색) {
+    Map<String, String> 파라미터_생성(String 노선, String 노선색) {
         Map<String, String> params = new HashMap<>();
         params.put("name", 노선);
         params.put("color", 노선색);
+
+        return params;
+    }
+
+    ExtractableResponse<Response> 지하철_노선_생성(String 노선, String 노선색) {
+        Map<String, String> params = 파라미터_생성(노선, 노선색);
 
         return 지하철_노선_생성_API(params);
     }
