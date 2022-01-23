@@ -38,3 +38,29 @@ Given 지하철 노선 생성을 요청 하고 <br>
 When 같은 이름으로 지하철 노선 생성을 요청 하면 <br>
 Then 지하철 노선 생성이 실패한다. <br>
     
+- 2022-01-23
+
+- [ ] Feature: 지하철 노선 생성 시 필요한 인자 추가하기 <br>
+  Given <br>
+  When  <br>
+  Then  <br>
+  
+- [ ] Feature: 지하철 노선에 구간을 등록하는 기능 구현<br>
+  Given <br>
+  When  <br>
+  Then  <br>
+  
+- [ ] Feature: 지하철 노선에 구간을 제거하는 기능 구현<br>
+  Given <br>
+  When  <br>
+  Then  <br>
+  
+- [ ] Feature: 지하철 노선에 등록된 구간을 통해 역 목록을 조회하는 기능 구현<br>
+  Given <br>
+  When  <br>
+  Then  <br>
+  
+- [ ] Feature: 구간 등록 / 제거 시 예외 케이스에 대한 인수 테스트 작성<br>
+  Given <br>
+  When  <br>
+  Then  <br>
