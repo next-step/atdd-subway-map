@@ -43,11 +43,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_이름_중복_생성_방지_테스트() {
         // given
-        Map<String, String> params = 파라미터_생성("강남역");
-        지하철역_생성_API(params);
+        String 강남역 = "강남역";
+        지하철역_생성(강남역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_API(params);
+        ExtractableResponse<Response> response = 지하철역_생성(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -64,12 +64,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         String 강남역 = "강남역";
-        Map<String, String> params1 = 파라미터_생성(강남역);
-        지하철역_생성_API(params1);
+        지하철역_생성(강남역);
 
         String 역삼역 = "역삼역";
-        Map<String, String> params2 = 파라미터_생성(역삼역);
-        지하철역_생성_API(params2);
+        지하철역_생성(역삼역);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
@@ -88,8 +86,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = 파라미터_생성("강남역");
-        ExtractableResponse<Response> createResponse = 지하철역_생성_API(params);
+        ExtractableResponse<Response> createResponse = 지하철역_생성("강남역");
 
         // when
         String uri = createResponse.header("Location");
@@ -104,6 +101,12 @@ class StationAcceptanceTest extends AcceptanceTest {
         params.put("name", 지하철역명);
 
         return params;
+    }
+
+    ExtractableResponse<Response> 지하철역_생성(String 지하철역명) {
+        Map<String, String> params = 파라미터_생성(지하철역명);
+
+        return 지하철역_생성_API(params);
     }
 
     ExtractableResponse<Response> 지하철역_생성_API(Map<String, String> params) {
