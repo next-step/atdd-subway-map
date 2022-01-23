@@ -43,7 +43,7 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("아이디에 해당하는 정보가 없습니다."));
+            .orElseThrow(() -> new IllegalArgumentException("해당 노선에 대한 정보가 없습니다."));
         return createLineResponse(line);
     }
 
@@ -55,5 +55,14 @@ public class LineService {
             line.getCreatedDate(),
             line.getModifiedDate()
         );
+    }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 노선에 대한 정보가 없습니다."));
+
+        line.of(lineRequest.getName(), lineRequest.getColor());
+
+        lineRepository.save(line);
     }
 }
