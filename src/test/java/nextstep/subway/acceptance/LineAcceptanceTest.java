@@ -188,7 +188,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> findResponse = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.GET);
 
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThatThrownBy(() -> findResponse.jsonPath().get("name"))
-            .isInstanceOf(JsonPathException.class);
+        assertThat(findResponse.statusCode()).isEqualTo(HttpStatus.NOT_IMPLEMENTED.value());
     }
 }

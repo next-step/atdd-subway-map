@@ -13,7 +13,7 @@ import nextstep.subway.exception.ErrorResponse;
 @ControllerAdvice
 @RestController
 public class ExceptionControllerAdvice {
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
     @ExceptionHandler(EntityNotFoundException.class)
     public ErrorResponse entityNotFound(Exception e) {
         return new ErrorResponse(e.getMessage());
