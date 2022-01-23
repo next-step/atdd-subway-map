@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-
 @Service
 @Transactional
 public class LineService {
@@ -37,8 +35,7 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineReadResponse findLine(final Long id) {
-        final Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(format("식별자가 %s인 Line 엔티티를 찾을 수 없습니다.", id)));
+        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         return new LineReadResponse(line, Collections.EMPTY_LIST);
     }
 
@@ -46,8 +43,11 @@ public class LineService {
         if (lineRepository.existsByName(lineUpdateRequest.getName())) {
             return;
         }
-        final Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(format("식별자가 %s인 Line 엔티티를 찾을 수 없습니다.", id)));
+        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+    }
+
+    public void delete(final Long id) {
+        lineRepository.deleteById(id);
     }
 }
