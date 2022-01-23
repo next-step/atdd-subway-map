@@ -29,4 +29,13 @@ public class LineController {
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
+        try{
+            return ResponseEntity.ok().body(lineService.findLineById(id));
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

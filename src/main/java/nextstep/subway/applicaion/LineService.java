@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -34,5 +35,10 @@ public class LineService {
         return lineRepository.findAll().stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    public LineResponse findLineById(Long id) {
+        Optional<Line> line = lineRepository.findById(id);
+        return LineResponse.of(line.orElseThrow(IllegalArgumentException::new));
     }
 }
