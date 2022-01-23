@@ -27,7 +27,12 @@ public class Line extends BaseEntity {
     @Column
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
+    @OneToMany(
+        fetch = FetchType.LAZY,
+        cascade = { CascadeType.PERSIST, CascadeType.MERGE },
+        orphanRemoval = true,
+        mappedBy = "line"
+    )
     private List<Section> sections;
 
     protected Line() {
@@ -67,6 +72,7 @@ public class Line extends BaseEntity {
 
     public Section createSection(Station upStation, Station downStation, Distance distance) {
         Section section = Section.builder()
+            .line(this)
             .upStation(upStation)
             .downStation(downStation)
             .distance(distance)
