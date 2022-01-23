@@ -27,7 +27,8 @@ public class LineService {
             throw new IllegalArgumentException("이미 존재하는 노선입니다.");
         }
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(request.toEntity());
+
         return new LineResponse(
             line.getId(),
             line.getName(),
