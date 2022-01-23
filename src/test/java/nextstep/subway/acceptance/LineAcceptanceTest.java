@@ -317,17 +317,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * when 지하철 노선에 구간을 등록 요청을 하면
-     * then 지하철 노선에 구간을 등록이 성공한다.
-     */
-    @DisplayName("지하철 노선에 구간 등록")
-    @Test
-    void addSectionToLine() {
-
-    }
-
-
-    /**
      * given 상행과 하행역이 있는 지하철의 노선이 주어지고
      * given 새로운 상행종점을 등록할 때, 등록할 구간의 하행역은, 기존 노선의 상행 종점이다
      * when 지하철 노선에 구간을 등록 요청을 하면
@@ -345,7 +334,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * when 지하철 노선에 구간을 등록 요청을 하면
      * then 지하철 노선에 구간을 등록이 성공한다
      */
-    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @DisplayName("지하철 노선에 하행역 종점 구간 등록")
     @Test
     void addSectionToLine() {
 
@@ -357,7 +346,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * when 지하철 노선에 구간을 등록 요청을 하면
      * then 지하철 노선에 구간을 등록이 실패한다
      */
-    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @DisplayName("지하철 노선에 하행역 종점 구간 등록시, 이미 등록된 역을 하행역으로 등록")
     @Test
     void addSectionToLine() {
 
@@ -369,7 +358,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * when 지하철 노선에 구간을 등록 요청을 하면
      * then 지하철 노선에 구간을 등록이 실패한다
      */
-    @DisplayName("지하철 노선에 상행역 종점 구간 등록")
+    @DisplayName("지하철 노선에 상행역 종점 구간 등록, 이미 등록된 역을 상행역으로 등록")
     @Test
     void addSectionToLine() {
 
