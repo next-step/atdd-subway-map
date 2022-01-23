@@ -8,6 +8,8 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import nextstep.subway.utils.RequestMethod;
+import nextstep.subway.utils.RequestParams;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -109,5 +111,24 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     *     Given 지하철역 생성을 요청 하고
+     *     When 같은 이름으로 지하철역 생성을 요청 하면
+     *     Then 지하철역 생성이 실패한다.
+     */
+    @Test
+    @DisplayName("중복이름으로 지하철역 생성시 실패")
+    void duplicationStationNameExceptionTest() {
+        RequestParams params = new RequestParams("name", "신분당선");
+
+        //given
+        RequestMethod.post("/stations", params);
+        ExtractableResponse<Response> response = RequestMethod.post("/stations", params);
+
+        //when
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
     }
 }
