@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -97,7 +99,44 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        String 신분당선 = "신분당선";
+        String 색깔 = "bg-red-600";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 신분당선);
+        params.put("color", 색깔);
 
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract()
+        ;
+
+        // when
+        JsonPath jsonPath = createResponse.jsonPath();
+        String createdDate = jsonPath.getString("createdDate");
+        String modifiedDate = jsonPath.getString("modifiedDate");
+        String uri = createResponse.header("Location");
+
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get(uri)
+            .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String name = response.jsonPath().getString("name");
+        String color = response.jsonPath().getString("color");
+        String responseCreatedDate = response.jsonPath().getString("createdDate");
+        String responseModifiedDate = response.jsonPath().getString("modifiedDate");
+        assertThat(name).isEqualTo(신분당선);
+        assertThat(color).isEqualTo(색깔);
+        assertThat(responseCreatedDate).isEqualTo(createdDate);
+        assertThat(responseModifiedDate).isEqualTo(modifiedDate);
     }
 
     /**

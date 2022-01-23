@@ -40,6 +40,13 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("아이디에 해당하는 정보가 없습니다."));
+        return createLineResponse(line);
+    }
+
     public LineResponse createLineResponse(Line line) {
         return new LineResponse(
             line.getId(),
