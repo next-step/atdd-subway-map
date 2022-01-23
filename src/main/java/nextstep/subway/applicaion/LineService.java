@@ -43,7 +43,7 @@ public class LineService {
     @Modifying
     public void updateLine(Long id, LineRequest request) {
         Line line = findLineById(id);
-        line.update(new Line(request.getName(), request.getColor()));
+        line.update(request.getName(), request.getColor());
     }
 
     public void deleteLine(Long id) {

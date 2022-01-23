@@ -35,3 +35,6 @@ npm run dev
 ```
 ./gradlew bootRun
 ```
+
+### Step1 피드백
+엔티티를 update할 때, 인자를 직접 받아서 해당 상태를 변경하도록 한다.
