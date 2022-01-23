@@ -24,19 +24,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
+        Map<String, String> params = createLineParam("bg-red-600", "신분당선");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = createLineResponse(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -53,31 +44,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
-        Map<String, String> param2 = new HashMap<>();
-        param2.put("color", "bg-green-600");
-        param2.put("name", "2호선");
-
-        RestAssured
-                .given().log().all()
-                .body(param2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        createLineResponse(createLineParam("bg-red-600", "신분당선"));
+        createLineResponse(createLineParam("bg-green-600", "2호선"));
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -102,18 +70,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = createLineResponse(createLineParam("bg-red-600", "신분당선"));
 
         // when
         String uri = createResponse.header("Location");
@@ -139,28 +96,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
+        ExtractableResponse<Response> createResponse = createLineResponse(createLineParam("bg-red-600", "신분당선"));
 
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-        
         // when
-        Map<String, String> targets = new HashMap<>();
-        targets.put("color", "bg-blue-600");
-        targets.put("name", "구분당선");
+        Map<String, String> newParam = createLineParam("bg-blue-600", "구분당선");
 
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .body(targets)
+                .body(newParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(uri)
@@ -182,18 +126,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = createLineResponse(createLineParam("bg-red-600", "신분당선"));
 
         // when
         String uri = createResponse.header("Location");
@@ -206,5 +139,23 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private Map<String, String> createLineParam(String color, String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("color", color);
+        params.put("name", name);
+        return params;
+    }
+
+    private ExtractableResponse<Response> createLineResponse(Map<String, String> params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
     }
 }
