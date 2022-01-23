@@ -46,7 +46,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    //TODO: Transactional 추가할 것
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노선입니다."));
