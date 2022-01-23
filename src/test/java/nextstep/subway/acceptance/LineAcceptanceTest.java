@@ -1,16 +1,12 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LineAcceptanceTest extends AcceptanceTest {
     private static final String FIRST_NAME = "신분당선";
     private static final String FIRST_COLOR = "bg-red-700";
-    private static final Long FRIST_ID = 1L;
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -29,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
 
         // when
-        ExtractableResponse<Response> response = saveLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> response = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -45,9 +40,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // when
-        saveLine(FIRST_NAME, FIRST_COLOR);
+        LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
 
-        ExtractableResponse<Response> response = findLines();
+        ExtractableResponse<Response> response = LineSteps.getLines();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -68,11 +63,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         String name = "2호선";
         String color = "bg-green-600";
 
-        saveLine(FIRST_NAME, FIRST_COLOR);
-        saveLine(name, color);
+        LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        LineSteps.postLine(name, color);
 
         // when
-        ExtractableResponse<Response> response = findLines();
+        ExtractableResponse<Response> response = LineSteps.getLines();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -89,10 +84,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        saveLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> createLine = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
 
         // when
-        ExtractableResponse<Response> response = updateLine(FRIST_ID, "구분당선", "bg-red-600");
+        ExtractableResponse<Response> response = LineSteps.putLine(createLine.header("Location"), "구분당선", "bg-red-600");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -107,57 +102,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        saveLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> createLine = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
 
         // when
-        ExtractableResponse<Response> response = removeLine(FRIST_ID);
+        ExtractableResponse<Response> response = LineSteps.deleteLine(createLine.header("Location"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    private ExtractableResponse<Response> removeLine(Long id) {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/lines/" + id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> updateLine(Long id, String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/" + id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> saveLine(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> findLines() {
-        return RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
     }
 }
