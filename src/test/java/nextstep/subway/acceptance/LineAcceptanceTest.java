@@ -54,6 +54,36 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        지하철_노선_생성_요청("신분당선", "bg-red-600");
+        지하철_노선_생성_요청("2호선", "bg-green-600");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("").size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList("name")).containsExactly("신분당선", "2호선");
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured.given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .extract();
     }
 
     /**
