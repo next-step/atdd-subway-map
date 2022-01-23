@@ -97,10 +97,32 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * When 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선의 정보 수정은 성공한다.
+     * Then 수정된 지하철 노선 정보 조회를 요청하여 수정되었는지 확인한다.
      */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        String 신분당선_색 = "bg-red-600";
+        String 신분당선_이름 = "신분당선";
+        ExtractableResponse<Response> 신분당선_생성_응답 = LineTestStep.지하철_노선을_생성한다(신분당선_색, 신분당선_이름);
+        Integer responseIntegerId = 신분당선_생성_응답.jsonPath().get("id");
+        Long 신분당선_생성_아이디 = responseIntegerId.longValue();
+
+        String 수정_색 = "bg-red-400";
+        String 수정_이름 = "신분당선_연장";
+
+        // when
+        ExtractableResponse<Response> response = LineTestStep.지하철_노선을_수정한다(신분당선_생성_아이디, 수정_색, 수정_이름);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> updatedResponse = LineTestStep.지하철_노선을_조회한다(신분당선_생성_아이디);
+        String receivedColor = updatedResponse.jsonPath().get("color");
+        assertThat(receivedColor).isEqualTo(수정_색);
+        String receivedName = updatedResponse.jsonPath().get("name");
+        assertThat(receivedName).isEqualTo(수정_이름);
     }
 
     /**

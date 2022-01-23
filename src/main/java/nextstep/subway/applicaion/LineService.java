@@ -38,4 +38,10 @@ public class LineService {
         return new LineIncludingStationsResponse(lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("지하철 역을 찾을 수 없습니다. id = " + id)));
     }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("지하철 역을 찾을 수 없습니다. id = " + id));
+        line.update(lineRequest.getName(), lineRequest.getColor());
+    }
 }
