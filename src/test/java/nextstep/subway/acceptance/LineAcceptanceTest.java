@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.step.LineSteps;
@@ -117,11 +116,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         final Long createdId = createResponse.jsonPath().getLong(아이디);
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{id}", createdId)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_삭제_요청(createdId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
