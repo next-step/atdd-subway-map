@@ -34,6 +34,16 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    ExtractableResponse<Response> 지하철_노선_단건_조회_API(Long id) {
+        return RestAssured.given().log().all()
+                .pathParam("id", id)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -123,13 +133,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_API(params);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_단건_조회_API(1L);
 
         // then
         String lineName = response.body().jsonPath().get("name").toString();
@@ -169,13 +173,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        ExtractableResponse<Response> updatedLine = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> updatedLine = 지하철_노선_단건_조회_API(1L);
         String lineName = updatedLine.body().jsonPath().get("name").toString();
         String lineColor = updatedLine.body().jsonPath().get("color").toString();
 
