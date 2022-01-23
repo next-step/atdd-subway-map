@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.domain.dto.LineRequest;
+import nextstep.subway.section.domain.model.Distance;
 
 public class LineStep {
     private static int dummyCounter = 0;
@@ -24,12 +25,13 @@ public class LineStep {
                           .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(int distance) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Distance distance) {
         LineRequest request = LineRequest.builder()
             .name(nextRequest())
             .color(nextColor())
             .upStationId((long) 1)
             .downStationId((long) 2)
+            .distance(distance)
             .build();
         return 지하철_노선_생성_요청(request);
     }

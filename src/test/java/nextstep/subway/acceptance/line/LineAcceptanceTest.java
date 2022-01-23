@@ -18,6 +18,7 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.line.domain.dto.LineRequest;
+import nextstep.subway.section.domain.model.Distance;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 import nextstep.subway.utils.DatabaseCleanup;
@@ -49,7 +50,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         StationStep.지하철역_생성_요청();
 
         // given, when
-        ExtractableResponse<Response> response = LineStep.지하철_노선_생성_요청(100);
+        ExtractableResponse<Response> response = LineStep.지하철_노선_생성_요청(new Distance(100));
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -92,8 +93,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        LineStep.지하철_노선_생성_요청(100);
-        LineStep.지하철_노선_생성_요청(100);
+        LineStep.지하철_노선_생성_요청(new Distance(100));
+        LineStep.지하철_노선_생성_요청(new Distance(100));
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -116,7 +117,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(100);
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
 
         // when
         ExtractableResponse<Response> response =
@@ -137,7 +138,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(100);
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
 
         // when
         Map<String, String> params = new HashMap<>();
@@ -169,7 +170,7 @@ class LineAcceptanceTest extends AcceptanceTest {
             .build();
 
         LineStep.지하철_노선_생성_요청(request);
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(100);
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
 
         // when
         Map<String, String> params = new HashMap<>();
@@ -194,7 +195,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(100);
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청(new Distance(100));
 
         // when
         AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);

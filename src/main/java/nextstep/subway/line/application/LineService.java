@@ -6,28 +6,40 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import nextstep.subway.line.domain.dto.LineRequest;
-import nextstep.subway.line.domain.dto.LineResponse;
-import nextstep.subway.line.domain.model.Line;
-import nextstep.subway.line.domain.repository.LineRepository;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.DuplicateColumnException;
 import nextstep.subway.common.exception.EntityNotFoundException;
 import nextstep.subway.common.exception.OptionalException;
+import nextstep.subway.line.domain.dto.LineRequest;
+import nextstep.subway.line.domain.dto.LineResponse;
+import nextstep.subway.line.domain.model.Line;
+import nextstep.subway.line.domain.repository.LineRepository;
+import nextstep.subway.station.domain.model.Station;
+import nextstep.subway.station.domain.repository.StationRepository;
 
 @Service
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository,
+                       StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
         verifyExistsByName(request.getName()).verify();
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = new Line(request.getName(), request.getColor());
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                                             .orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(request.getUpStationId())
+                                             .orElseThrow(EntityNotFoundException::new);
+        line.createSection(upStation, downStation, request.getDistance());
+
+        lineRepository.save(line);
         return LineResponse.from(line);
     }
 
