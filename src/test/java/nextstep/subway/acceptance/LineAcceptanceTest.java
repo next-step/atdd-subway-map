@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LineAcceptanceTest extends AcceptanceTest {
 
     private final static Integer NUMBER_ONE = 1;
-
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -25,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
 
         // 요청 후, 노선을 생성하다
-        ExtractableResponse<Response> extract = LineStep.saveLine("color_1", "name_1");
+        ExtractableResponse<Response> extract = LineStep.saveLine("하늘색", "4호선");
 
         // 상태 코드
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -43,15 +42,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("color_1", "name_1");
-        LineStep.saveLine("color_2", "name_2");
+        LineStep.saveLine("하늘색", "4호선");
+        LineStep.saveLine("파란색", "1호선");
 
         ExtractableResponse<Response> response = LineStep.showLines();
 
         // 조회 포함 확인
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> resultResponseData = response.jsonPath().getList("color");
-        assertThat(resultResponseData).contains("color_1", "color_2");
+        assertThat(resultResponseData).contains("하늘색", "파란색");
     }
 
     /**
@@ -64,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("color_1", "name_1");
+        LineStep.saveLine("하늘색", "4호선");
 
         // 조회 결과
         ExtractableResponse<Response> response = LineStep.showLine(NUMBER_ONE);
@@ -72,7 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         String responseResultData = response.jsonPath().get("color");
-        assertThat(responseResultData).isEqualTo("color_1");
+        assertThat(responseResultData).isEqualTo("하늘색");
     }
 
     /**
@@ -85,10 +84,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("color_1", "name_1");
+        LineStep.saveLine("하늘색", "4호선");
 
         // 수정 요청
-        ExtractableResponse<Response> response = LineStep.updateLine("color_2", "name_2", 1);
+        ExtractableResponse<Response> response = LineStep.updateLine("파란색", "1호선", 1);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
@@ -103,7 +102,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("color_1", "name_1");
+        LineStep.saveLine("하늘색", "4호선");
 
         // 노선을 삭제하다
         ExtractableResponse<Response> response = LineStep.deleteLine(NUMBER_ONE);
@@ -121,10 +120,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine_duplication() {
 
         // 노선을 생성한다.
-        LineStep.saveLine("color_1", "name_1");
+        LineStep.saveLine("하늘색", "4호선");
 
         // 중복으로 생성할 때
-        ExtractableResponse<Response> response = LineStep.saveLine("color_2", "name_1");
+        ExtractableResponse<Response> response = LineStep.saveLine("파란색", "4호선");
 
         // 실패를 한다.
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
