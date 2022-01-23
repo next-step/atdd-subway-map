@@ -120,6 +120,16 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@DisplayName("지하철 노선 삭제")
 	@Test
 	void deleteLine() {
+		// given
+		지하철_노선_생성("신분당선", "bg-red-600");
+
+		// when
+		ExtractableResponse<Response> response =RestAssured
+			.given().log().all()
+			.when().delete("/lines/{id}", 1L)
+			.then().log().all().extract();
+
+		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 	}
 
 	private void 지하철_노선_생성(String name, String color) {

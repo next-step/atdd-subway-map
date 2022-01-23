@@ -7,43 +7,48 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+	private LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
-        this.lineRepository = lineRepository;
-    }
+	public LineService(LineRepository lineRepository) {
+		this.lineRepository = lineRepository;
+	}
 
-    public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
-    }
+	public LineResponse saveLine(LineRequest request) {
+		Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+		return new LineResponse(
+			line.getId(),
+			line.getName(),
+			line.getColor(),
+			line.getCreatedDate(),
+			line.getModifiedDate()
+		);
+	}
 
-    public List<LineResponse> findAllLines() {
-        List<Line> lines = lineRepository.findAll();
-        return lines.stream()
-            .map(LineResponse::of)
-            .collect(Collectors.toList());
-    }
+	public List<LineResponse> findAllLines() {
+		List<Line> lines = lineRepository.findAll();
+		return lines.stream()
+			.map(LineResponse::of)
+			.collect(Collectors.toList());
+	}
 
-    public LineResponse findById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
-        return LineResponse.of(line);
-    }
+	public LineResponse findById(Long id) {
+		Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+		return LineResponse.of(line);
+	}
 
-    public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
-        line.update(lineRequest);
-    }
+	public void updateLine(Long id, LineRequest lineRequest) {
+		Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+		line.update(lineRequest);
+	}
+
+	public void deleteLine(Long id) {
+		lineRepository.deleteById(id);
+	}
 }
