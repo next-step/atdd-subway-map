@@ -15,31 +15,23 @@ import org.springframework.http.MediaType;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
+    private static final String PATH_PREFIX = "/stations";
+    private static final String NAME = "name";
+    private static final String LOCATION = "Location";
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
+
     /** When 지하철역 생성을 요청 하면 Then 지하철역 생성이 성공한다. */
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/stations")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> response = stationCreateRequest(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(LOCATION)).isNotBlank();
     }
 
     /**
@@ -50,37 +42,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(params1)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/stations")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> createResponse1 = stationCreateRequest(강남역);
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(params2)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/stations")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> createResponse2 = stationCreateRequest(역삼역);
 
         // when
         ExtractableResponse<Response> response =
@@ -88,7 +52,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                         .log()
                         .all()
                         .when()
-                        .get("/stations")
+                        .get(PATH_PREFIX)
                         .then()
                         .log()
                         .all()
@@ -104,27 +68,48 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when()
-                        .post("/stations")
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> createResponse = stationCreateRequest(강남역);
 
         // when
-        String uri = createResponse.header("Location");
+        String uri = createResponse.header(LOCATION);
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all().when().delete(uri).then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+    /** Given 지하철역 생성을 요청 하고 When 같은 이름으로 지하철역 생성을 요청 하면 Then 지하철역 생성이 실패한다. */
+    @DisplayName("중복된 이름으로 역을 생성할 수 없다.")
+    @Test
+    void duplicateNameCreationTest() {
+        // given
+        ExtractableResponse<Response> creationResponse = stationCreateRequest(강남역);
+
+        // when
+        ExtractableResponse<Response> duplicateCreationResponse = stationCreateRequest(강남역);
+
+        // then
+        // TODO question: Bad request vs conflict 어떤 status가 맞을지 애매하네요.
+        // 전 일단 bad_request로...
+        assertThat(duplicateCreationResponse.statusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    static ExtractableResponse<Response> stationCreateRequest(String name) {
+
+        Map<String, String> params = new HashMap<>();
+        params.put(NAME, name);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(PATH_PREFIX)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 }
