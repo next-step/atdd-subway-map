@@ -2,6 +2,7 @@ package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineReadAllResponse;
+import nextstep.subway.applicaion.dto.LineReadResponse;
 import nextstep.subway.applicaion.dto.LineSaveRequest;
 import nextstep.subway.applicaion.dto.LineSaveResponse;
 import org.springframework.http.MediaType;
@@ -29,5 +30,10 @@ public class LineController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineReadAllResponse>> findAllLine() {
         return ResponseEntity.ok(lineService.findAllLine());
+    }
+
+    @GetMapping(value = {"{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LineReadResponse> findLine(@PathVariable final Long id) {
+        return ResponseEntity.ok(lineService.findLine(id));
     }
 }
