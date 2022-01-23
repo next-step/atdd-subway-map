@@ -3,10 +3,10 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.step.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -29,13 +29,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given & when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(강남역)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = StationSteps.지하철_역_생성_요청(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,21 +46,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(강남역)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(역삼역)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        StationSteps.지하철_역_생성_요청(강남역);
+        StationSteps.지하철_역_생성_요청(역삼역);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -76,7 +57,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
+        List<String> stationNames = response.jsonPath().getList(이름);
         assertThat(stationNames).contains(강남역.get(이름), 역삼역.get(이름));
     }
 
@@ -89,13 +70,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(강남역)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = StationSteps.지하철_역_생성_요청(강남역);
 
         // when
         String uri = createResponse.header("Location");
