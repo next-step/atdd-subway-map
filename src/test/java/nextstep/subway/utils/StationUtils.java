@@ -3,15 +3,13 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class StationUtils {
     public static List<Map<String, String>> Station_데이터_생성(List<String> names) {
@@ -26,6 +24,14 @@ public class StationUtils {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         return params;
+    }
+
+    public static List<ExtractableResponse<Response>> Station_생성_요청(List<Map<String, String>> params) {
+        List<ExtractableResponse<Response>> responseList = new ArrayList<>();
+        for (Map<String, String> param : params) {
+            responseList.add(Station_생성_요청(param));
+        }
+        return responseList;
     }
 
     public static ExtractableResponse<Response> Station_생성_요청(Map<String, String> params) {
@@ -52,5 +58,20 @@ public class StationUtils {
                 .delete(uri)
                 .then().log().all()
                 .extract();
+    }
+
+    public static void 생성요청_Station_name_list와_생성된_Station_name_list가_동일함(List<ExtractableResponse<Response>> requestList, ExtractableResponse<Response> responseList) {
+        final List<String> requestNames = requestList.stream()
+                .map(r -> r.body())
+                .map(r -> r.jsonPath().get("name"))
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        final List<String> responseName = responseList.jsonPath()
+                .getList("name")
+                .stream()
+                .map(Objects::toString)
+                .collect(Collectors.toList());
+        assertThat(requestNames).contains(responseName.toString());
     }
 }

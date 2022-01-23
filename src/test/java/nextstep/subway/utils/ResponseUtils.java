@@ -14,10 +14,9 @@ public class ResponseUtils {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    // todo
-    public static void httpStatus가_OK면서_Station의_name_list가_일치함(ExtractableResponse<Response> response, List<String> names) {
+    public static void httpStatus가_OK면서_ResponseBody가_존재함(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).isEqualTo(names);
+        assertThat(response.body()).isNotNull();
     }
 
     public static void httpStatus가_NO_CONTENT(ExtractableResponse<Response> response) {

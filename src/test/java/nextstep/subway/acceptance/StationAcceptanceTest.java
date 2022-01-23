@@ -46,18 +46,15 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        final List<String> names = Arrays.asList(강남역, 역삼역);
-        final List<Map<String, String>> params = Station_데이터_생성(names);
-
-        for (Map<String, String> param : params ) {
-            Station_생성_요청(param);
-        }
+        final List<Map<String, String>> params = Station_데이터_생성(Arrays.asList(강남역, 역삼역));
+        final List<ExtractableResponse<Response>> requestList = Station_생성_요청(params);
 
         // when
-        ExtractableResponse<Response> response = Station_목록_요청();
+        ExtractableResponse<Response> responseList = Station_목록_요청();
 
         // then
-        httpStatus가_OK면서_Station의_name_list가_일치함(response, names);
+        httpStatus가_OK면서_ResponseBody가_존재함(responseList);
+        생성요청_Station_name_list와_생성된_Station_name_list가_동일함(requestList, responseList);
     }
 
     /**
