@@ -77,11 +77,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성_API(params2);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
@@ -119,6 +115,14 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    ExtractableResponse<Response> 지하철_노선_전체_리스트_조회_API() {
+        return RestAssured.given().log().all()
+                .when()
+                .get("/stations")
                 .then().log().all()
                 .extract();
     }
