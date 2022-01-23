@@ -11,12 +11,18 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
+import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.model.Distance;
 import nextstep.subway.utils.AcceptanceTestThen;
 
 @DisplayName("구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
+    private static final long FIRST_SECTION_UP_STATION = 1;
+    private static final long FIRST_SECTION_DOWN_STATION = 2;
+    private static final long NEW_SECTION_UP_STATION = FIRST_SECTION_DOWN_STATION;
+    private static final long NEW_SECTION_DOWN_STATION = 3;
+
     private LineStep lineStep;
     private StationStep stationStep;
 
@@ -42,8 +48,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId((long) 2)
-            .downStationId((long) 3)
+            .upStationId(NEW_SECTION_UP_STATION)
+            .downStationId(NEW_SECTION_DOWN_STATION)
             .distance(new Distance(100))
             .build();
 
@@ -75,8 +81,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId((long) 3)
-            .downStationId((long) 2)
+            .upStationId(FIRST_SECTION_UP_STATION)
+            .downStationId(NEW_SECTION_UP_STATION)
             .distance(new Distance(100))
             .build();
 
@@ -91,7 +97,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.NOT_IMPLEMENTED)
+                          .equalsHttpStatus(HttpStatus.BAD_REQUEST)
+                          .equalsErrorMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
                           .hasNotLocation();
     }
 
@@ -108,8 +115,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         stationStep.지하철역_생성_요청();
 
         SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId((long) 3)
-            .downStationId((long) 1)
+            .upStationId(NEW_SECTION_UP_STATION)
+            .downStationId(FIRST_SECTION_DOWN_STATION)
             .distance(new Distance(100))
             .build();
 
@@ -125,6 +132,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .hasLocation();
+                          .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
+                          .hasNotLocation();
     }
 }

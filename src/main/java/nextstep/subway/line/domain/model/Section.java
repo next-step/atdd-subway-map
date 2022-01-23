@@ -68,6 +68,10 @@ public class Section extends BaseEntity {
         return distance;
     }
 
+    public boolean matchUpStation(Station thatStation) {
+        return upStation.matchId(thatStation);
+    }
+
     public boolean matchDownStation(Station thatStation) {
         return downStation.matchId(thatStation);
     }

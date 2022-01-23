@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import nextstep.subway.common.domain.model.BaseEntity;
+import nextstep.subway.common.exception.ErrorMessage;
+import nextstep.subway.common.exception.InvalidArgumentException;
+import nextstep.subway.common.exception.OptionalException;
 import nextstep.subway.station.domain.model.Station;
 
 @Entity
@@ -73,9 +75,8 @@ public class Line extends BaseEntity {
     }
 
     public Section createSection(Station upStation, Station downStation, Distance distance) {
-        if (!sections.isEmpty()) {
-            findHeadSection(upStation).orElseThrow(EntityNotFoundException::new);
-        }
+        verifySectionDockingPoint(upStation).verify();
+        verifyAlreadyRegisteredStationInSection(downStation).verify();
 
         Section section = Section.builder()
             .line(this)
@@ -87,9 +88,39 @@ public class Line extends BaseEntity {
         return section;
     }
 
-    private Optional<Section> findHeadSection(Station upStation) {
+    private OptionalException<InvalidArgumentException> verifySectionDockingPoint(Station upStation) {
+        if (sections.isEmpty()) {
+            return OptionalException.empty();
+        }
+        Optional<Section> optionalSection =
+            sections.stream()
+                    .filter(
+                        iSection -> iSection.matchDownStation(upStation)
+                    )
+                    .findFirst();
+        return OptionalException.ifEmpty(
+            optionalSection,
+            () -> new InvalidArgumentException(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
+        );
+    }
+
+    private OptionalException<InvalidArgumentException> verifyAlreadyRegisteredStationInSection(Station downStation) {
+        Optional<Section> optionalSection =
+            sections.stream()
+                    .filter(
+                        iSection -> iSection.matchUpStation(downStation) || iSection.matchDownStation(downStation)
+                    )
+                    .findFirst();
+        return OptionalException.ifPresent(
+            optionalSection,
+            () -> new InvalidArgumentException(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
+        );
+    }
+
+
+    private Optional<Section> findSectionHasDownStation(Station station) {
         return sections.stream()
-                       .filter(iSection -> iSection.matchDownStation(upStation))
+                       .filter(iSection -> iSection.matchDownStation(station))
                        .findFirst();
     }
 }

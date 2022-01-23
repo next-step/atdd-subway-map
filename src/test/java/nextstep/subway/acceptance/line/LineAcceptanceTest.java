@@ -16,6 +16,8 @@ import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.common.exception.ColumnName;
+import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
@@ -174,7 +176,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         AcceptanceTestThen.fromWhen(editResponse)
-                          .equalsHttpStatus(HttpStatus.CONFLICT);
+                          .equalsHttpStatus(HttpStatus.CONFLICT)
+                          .equalsErrorMessage(
+                              ErrorMessage.DUPLICATE_COLUMN.getMessage(ColumnName.LINE_NAME.getName())
+                          );
     }
 
     /**

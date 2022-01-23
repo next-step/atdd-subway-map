@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
@@ -14,6 +17,8 @@ import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.common.exception.ColumnName;
+import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
@@ -63,6 +68,9 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.CONFLICT)
+                          .equalsErrorMessage(
+                              ErrorMessage.DUPLICATE_COLUMN.getMessage(ColumnName.STATION_NAME.getName())
+                          )
                           .hasNotLocation();
     }
 
@@ -72,12 +80,15 @@ class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록 조회를 요청 하면
      * Then 두 지하철역이 포함된 지하철역 목록을 응답받는다
      */
+    @ValueSource(ints = {
+        5, 10
+    })
     @DisplayName("지하철역 목록 조회")
-    @Test
-    void getStations() {
+    @ParameterizedTest
+    void getStations(int nameSize) {
         /// given
         List<String> names = Stream.generate(stationStep::nextName)
-                                   .limit(5)
+                                   .limit(nameSize)
                                    .collect(Collectors.toList());
         for (String iName : names) {
             stationStep.지하철역_생성_요청(request -> request.setName(iName));

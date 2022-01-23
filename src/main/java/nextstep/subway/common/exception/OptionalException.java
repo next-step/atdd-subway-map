@@ -1,6 +1,8 @@
 package nextstep.subway.common.exception;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class OptionalException<T extends Exception> {
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -19,6 +21,22 @@ public class OptionalException<T extends Exception> {
 
     public static <T extends Exception> OptionalException<T> of(T exception) {
         return new OptionalException<>(exception);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static <T extends Exception> OptionalException<T> ifPresent(Optional<?> optional, Supplier<T> exception) {
+        if (optional.isPresent()) {
+            return of(exception.get());
+        }
+        return empty();
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static <T extends Exception> OptionalException<T> ifEmpty(Optional<?> optional, Supplier<T> exception) {
+        if (optional.isPresent()) {
+            return empty();
+        }
+        return of(exception.get());
     }
 
     public void verify() {
