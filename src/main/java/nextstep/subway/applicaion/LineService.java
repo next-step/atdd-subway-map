@@ -7,6 +7,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicatedElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,10 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new DuplicatedElementException("중복된 지하철 라인 이름은 넣을 수 없습니다.");
+        }
+
         Line line = lineRepository.save(request.toEntity());
         return new LineResponse(
                 line.getId(),

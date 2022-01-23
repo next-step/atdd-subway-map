@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicatedElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,11 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new DuplicatedElementException("중복된 지하철 역 이름은 넣을 수 없습니다.");
+        }
+
+        Station station = stationRepository.save(stationRequest.toEntity());
         return createStationResponse(station);
     }
 
