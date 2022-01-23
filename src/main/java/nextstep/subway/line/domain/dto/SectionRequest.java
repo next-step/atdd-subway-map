@@ -29,7 +29,7 @@ public class SectionRequest {
         return distance;
     }
 
-    private static class Builder {
+    public static class Builder {
         private Long upStationId;
         private Long downStationId;
         private Distance distance;

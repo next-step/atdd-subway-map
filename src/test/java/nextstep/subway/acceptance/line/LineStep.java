@@ -16,12 +16,16 @@ public class LineStep {
     private static final String NAME_FORMAT = "%d호선";
     private static final String COLOR = "bg-red-600";
 
-    private static int dummyCounter = 0;
+    private int dummyCounter = 0;
     private long stationIdCounter = 0;
     private final StationStep stationStepRefactor;
 
-    public LineStep() {
+    public LineStep(StationStep stationStep) {
         stationStepRefactor = new StationStep();
+    }
+
+    public LineStep() {
+        this(new StationStep());
     }
 
     public ExtractableResponse<Response> 지하철_노선_생성_요청(final Consumer<LineRequest> custom) {

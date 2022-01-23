@@ -13,7 +13,7 @@ import nextstep.subway.station.domain.dto.StationRequest;
 public class StationStep {
     private static final String NAME_FORMAT = "%d역";
 
-    private static int dummyCounter = 0;
+    private int dummyCounter = 0;
 
     public ExtractableResponse<Response> 지하철역_생성_요청(Consumer<StationRequest> custom) {
         StationRequest request = dummyRequest();
