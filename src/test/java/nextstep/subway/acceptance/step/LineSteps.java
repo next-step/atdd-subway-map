@@ -29,27 +29,27 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(String uri) {
         return RestAssured
                 .given().log().all()
                 .when()
-                .get("/lines/{id}", id)
+                .get(uri)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long id, Map<String, String> line) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String uri, Map<String, String> line) {
         return RestAssured
                 .given().log().all()
                 .body(line)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", id)
+                .when().put(uri)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(Long id) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String uri) {
         return RestAssured
                 .given().log().all()
-                .when().delete("/lines/{id}", id)
+                .when().delete(uri)
                 .then().log().all().extract();
     }
 }
