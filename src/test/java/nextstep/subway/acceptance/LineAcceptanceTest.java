@@ -120,23 +120,45 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 존재하지 않는 지하철역으로 지하철 노선 생성 요청 하면
+     * Given 존재하지 않는 지하철역으로
+     * When 지하철 노선 생성 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("지하철 노선 생성 시, 존재하지 않는 지하철역을 등록")
     void createLineAsInvalidStation() {
 
+        // Given
+        long invalidUpStationId = 1;
+        long invalidDownStationId = 2;
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(
+                _2호선, _2호선_COLOR, 1, 1, 700));
+
     }
 
     /**
      * Given 지하철역이 두개 주어지고
-     * When 노선의 distance 를 1 미만 으로 입력하여 지하철 노선 생성 요청 하면
+     * Given 노선의 distance 를 1 미만 으로 주어질 때
+     * When 지하철 노선 생성 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("지하철 노선 생성 시, 노선의 distance 를 1 미만 으로 입력")
     void createLineAsInvalidDistance() {
 
     }
+
+    /**
+     * Given 동일한 상행/하행 지하철역의 Id 가 주어질 때
+     * When 지하철 노선 생성 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 생성 시, 동일한 상행/하행 지하철역의 Id 입력")
+    @Test
+    void createLineAsSameUpAndDownStation() {
+
+    }
+
     /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
