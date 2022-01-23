@@ -24,8 +24,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = 파라미터_생성("강남역");
 
         // when
         ExtractableResponse<Response> response = 지하철역_생성_API(params);
@@ -44,9 +43,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_이름_중복_생성_방지_테스트() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
+        Map<String, String> params = 파라미터_생성("강남역");
         지하철역_생성_API(params);
 
         // when
@@ -67,13 +64,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
+        Map<String, String> params1 = 파라미터_생성(강남역);
         지하철역_생성_API(params1);
 
         String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
+        Map<String, String> params2 = 파라미터_생성(역삼역);
         지하철역_생성_API(params2);
 
         // when
@@ -93,8 +88,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = 파라미터_생성("강남역");
         ExtractableResponse<Response> createResponse = 지하철역_생성_API(params);
 
         // when
@@ -103,6 +97,13 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    Map<String, String> 파라미터_생성(String 지하철역명) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 지하철역명);
+
+        return params;
     }
 
     ExtractableResponse<Response> 지하철역_생성_API(Map<String, String> params) {
