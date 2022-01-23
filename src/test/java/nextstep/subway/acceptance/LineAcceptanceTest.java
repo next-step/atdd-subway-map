@@ -134,11 +134,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성하지 않은 지하철 노선도를 조회하면
-     * Then 빈 값을 응답한다.
+     * When 지하철 노선도를 조회하면
+     * Then 지하철 노선 조회가 실패한다.
      */
-    @DisplayName("지하철 노선 조회 실패")
+    @DisplayName("존재하지 않는 지하철 노선 조회")
     @Test
     void getNoneLine() {
         // given
@@ -211,7 +210,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선의 정보가 없어 신규 생성한다.
      */
-    @DisplayName("지하철 노선 수정 실패")
+    @DisplayName("존재하지 않는 지하철 노선 수정")
     @Test
     void updateNoneLine() {
         // when
