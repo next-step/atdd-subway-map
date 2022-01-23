@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.LineSteps;
 import nextstep.subway.utils.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("/stations", "강남역");
+        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("강남역");
 
         // then
         assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -40,11 +41,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         /// given
-        StationSteps.지하철역_생성_요청("/stations", "강남역");
-        StationSteps.지하철역_생성_요청("/stations", "역삼역");
+        StationSteps.지하철역_생성_요청("강남역");
+        StationSteps.지하철역_생성_요청("역삼역");
 
         // when
-        ExtractableResponse<Response> 지하철역_목록_조회_응답 = StationSteps.지하철역_목록_조회_요청("/stations");
+        ExtractableResponse<Response> 지하철역_목록_조회_응답 = StationSteps.지하철역_목록_조회_요청();
 
         assertThat(지하철역_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = 지하철역_목록_조회_응답.jsonPath().getList("name");
@@ -59,13 +60,19 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_삭제() {
         // given
-        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("/stations", "강남역");
+        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("강남역");
 
         // when
-        String url = 지하철역_생성_응답.header("Location");
-        ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(url);
+        String stationId = getStationId(지하철역_생성_응답.header("Location"));
+        ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
 
         // then
         assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private String getStationId(String locations) {
+        String[] split = locations.split("/");
+
+        return split[split.length - 1];
     }
 }

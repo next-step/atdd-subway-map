@@ -45,6 +45,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(지하철_노선_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         List<String> lineNames = 지하철_노선_목록_조회_응답.jsonPath().getList("name");
         assertThat(lineNames).containsAll(lineNames);
     }
@@ -60,11 +61,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        String url = 지하철_노선_생성_응답.header("Location");
-        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(url);
+        String lineId = getLineId(지하철_노선_생성_응답.header("Location"));
+        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
 
         // then
         assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         String lineName = 지하철_노선_조회_응답.jsonPath().getString("name");
         assertThat(lineName).isEqualTo("9호선");
     }
@@ -79,7 +81,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청("lines/2");
+        String lineId = "2";
+        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
 
         // then
         assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -96,12 +99,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        String url = 지하철_노선_생성_응답.header("Location");
-        ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청(url, "5호선", "보라색");
+        String lineId = getLineId(지하철_노선_생성_응답.header("Location"));
+        ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청(lineId, "5호선", "보라색");
 
         // then
         assertThat(지하철_노선_수정_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
-        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(url);
+
+        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
         String lineName = 지하철_노선_조회_응답.jsonPath().getString("name");
         assertThat(lineName).isEqualTo("5호선");
     }
@@ -113,10 +117,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 존재하지_않는_노선_수정() {
         // when
-        ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청("lines/2", "5호선", "보라색");
+        ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청("2", "5호선", "보라색");
 
         // then
         assertThat(지하철_노선_수정_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
         String lineName = 지하철_노선_수정_응답.jsonPath().getString("name");
         assertThat(lineName).isEqualTo("5호선");
     }
@@ -132,12 +137,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        String url = 지하철_노선_생성_응답.header("Location");
-        ExtractableResponse<Response> 지하철_노선_삭제_응답 = LineSteps.지하철_노선_삭제_요청(url);
+        String lineId = getLineId(지하철_노선_생성_응답.header("Location"));
+        ExtractableResponse<Response> 지하철_노선_삭제_응답 = LineSteps.지하철_노선_삭제_요청(lineId);
 
         // then
         assertThat(지하철_노선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(url);
+
+        ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
         assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
@@ -157,5 +163,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(지하철_노선_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(지하철_노선_중복_생성_응답.jsonPath().getString("errorMessage")).isEqualTo("이미 등록된 노선입니다. 노선 이름 = " + "9호선");
+    }
+
+    private String getLineId(String location) {
+        String[] split = location.split("/");
+
+        return split[split.length - 1];
     }
 }

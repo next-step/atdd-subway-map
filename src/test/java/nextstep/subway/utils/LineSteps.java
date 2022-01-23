@@ -23,11 +23,11 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(String url) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(String lindId) {
         return RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get(url)
+                .when().get("/lines/" + lindId)
                 .then().log().all()
                 .extract();
     }
@@ -41,15 +41,15 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String url) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String lineId) {
         return RestAssured
                 .given().log().all()
-                .when().delete(url)
+                .when().delete("/lines/" + lineId)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String url, String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String lineId, String name, String color) {
         Map<String, String> updateParams = new HashMap<>();
         updateParams.put("name", name);
         updateParams.put("color", color);
@@ -57,7 +57,7 @@ public class LineSteps {
         return RestAssured
                 .given().log().all()
                 .body(updateParams).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(url)
+                .when().put("/lines/" + lineId)
                 .then().log().all()
                 .extract();
     }

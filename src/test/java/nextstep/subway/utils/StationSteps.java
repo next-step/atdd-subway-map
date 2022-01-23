@@ -9,29 +9,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationSteps {
-    public static ExtractableResponse<Response> 지하철역_생성_요청(String url, String name) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
         return RestAssured.given().log().all()
                 .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(url)
+                .when().post("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역_목록_조회_요청(String url) {
+    public static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return RestAssured
                 .given().log().all()
-                .when().get(url)
+                .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역_삭제_요청(String url) {
+    public static ExtractableResponse<Response> 지하철역_삭제_요청(String stationId) {
         return RestAssured
                 .given().log().all()
-                .when().delete(url)
+                .when().delete("/stations/" + stationId)
                 .then().log().all()
                 .extract();
     }
