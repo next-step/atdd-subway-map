@@ -27,7 +27,7 @@ public class LineStep {
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(Distance distance) {
         LineRequest request = LineRequest.builder()
-            .name(nextRequest())
+            .name(nextName())
             .color(nextColor())
             .upStationId((long) 1)
             .downStationId((long) 2)
@@ -36,7 +36,7 @@ public class LineStep {
         return 지하철_노선_생성_요청(request);
     }
 
-    public static String nextRequest() {
+    public static String nextName() {
         return String.format(NAME_FORMAT, ++dummyCounter);
     }
 
