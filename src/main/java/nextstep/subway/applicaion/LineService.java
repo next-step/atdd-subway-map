@@ -64,4 +64,8 @@ public class LineService {
         final Line savedLine = lineRepository.save(foundLine);
         return createLineResponse(savedLine);
     }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
