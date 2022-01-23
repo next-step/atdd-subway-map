@@ -12,7 +12,7 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.ColumnName;
 import nextstep.subway.exception.DuplicateColumnException;
-import nextstep.subway.utils.ExceptionOptional;
+import nextstep.subway.exception.OptionalException;
 
 @Service
 @Transactional
@@ -29,13 +29,13 @@ public class StationService {
         return StationResponse.from(station);
     }
 
-    private ExceptionOptional<DuplicateColumnException> verifyExistsByName(String name) {
+    private OptionalException<DuplicateColumnException> verifyExistsByName(String name) {
         if (stationRepository.existsByName(name)) {
-            return ExceptionOptional.of(
+            return OptionalException.of(
                 new DuplicateColumnException(ColumnName.STATION_NAME)
             );
         }
-        return ExceptionOptional.empty();
+        return OptionalException.empty();
     }
 
     @Transactional(readOnly = true)

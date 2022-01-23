@@ -13,7 +13,7 @@ import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.ColumnName;
 import nextstep.subway.exception.DuplicateColumnException;
 import nextstep.subway.exception.EntityNotFoundException;
-import nextstep.subway.utils.ExceptionOptional;
+import nextstep.subway.exception.OptionalException;
 
 @Service
 @Transactional
@@ -31,13 +31,13 @@ public class LineService {
         return LineResponse.from(line);
     }
 
-    private ExceptionOptional<DuplicateColumnException> verifyExistsByName(String name) {
+    private OptionalException<DuplicateColumnException> verifyExistsByName(String name) {
         if (lineRepository.existsByName(name)) {
-            return ExceptionOptional.of(
+            return OptionalException.of(
                 new DuplicateColumnException(ColumnName.LINE_NAME)
             );
         }
-        return ExceptionOptional.empty();
+        return OptionalException.empty();
     }
 
     public List<LineResponse> findAllLines() {
