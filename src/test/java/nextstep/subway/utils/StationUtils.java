@@ -53,19 +53,4 @@ public class StationUtils {
                 .then().log().all()
                 .extract();
     }
-
-    public static void Status가_CREATED면서_Location이_존재함(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
-    }
-
-    public static void Status가_OK면서_Station의_name_list가_일치함(ExtractableResponse<Response> response, List<String> names) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).isEqualTo(names);
-    }
-
-    public static void Status가_NO_CONTENT(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
 }

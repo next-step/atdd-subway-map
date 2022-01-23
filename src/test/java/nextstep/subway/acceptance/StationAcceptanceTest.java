@@ -9,10 +9,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.utils.ResponseUtils.*;
 import static nextstep.subway.utils.StationUtils.*;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
+
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -22,13 +27,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        final Map<String, String> params = Station_데이터_생성("강남역");
+        final Map<String, String> params = Station_데이터_생성(강남역);
 
         // when
         ExtractableResponse<Response> response = Station_생성_요청(params);
 
         // then
-        Status가_CREATED면서_Location이_존재함(response);
+        httpStatus가_CREATED면서_Location이_존재함(response);
     }
 
     /**
@@ -41,7 +46,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        final List<String> names = Arrays.asList("강남역", "역삼역");
+        final List<String> names = Arrays.asList(강남역, 역삼역);
         final List<Map<String, String>> params = Station_데이터_생성(names);
 
         for (Map<String, String> param : params ) {
@@ -52,7 +57,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = Station_목록_요청();
 
         // then
-        Status가_OK면서_Station의_name_list가_일치함(response, names);
+        httpStatus가_OK면서_Station의_name_list가_일치함(response, names);
     }
 
     /**
@@ -64,7 +69,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = Station_데이터_생성("강남역");
+        Map<String, String> params = Station_데이터_생성(강남역);
         ExtractableResponse<Response> createResponse = Station_생성_요청(params);
 
         // when
@@ -72,6 +77,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = Station_삭제_요청(uri);
 
         // then
-        Status가_NO_CONTENT(deleteResponse);
+        httpStatus가_NO_CONTENT(deleteResponse);
     }
 }
