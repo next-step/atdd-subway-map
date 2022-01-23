@@ -142,6 +142,25 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
+    @Test
+    void createDuplicateLine() {
+        // given
+        Map<String, String> params = createLineParam(RED_COLOR_LINE, 신분당선);
+        createLineResponse(params);
+
+        // when
+        ExtractableResponse<Response> responseFail = createLineResponse(params);
+
+        // then
+        assertThat(responseFail.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private Map<String, String> createLineParam(String color, String name) {
         Map<String, String> params = new HashMap<>();
         params.put(COLOR_PARAMETER, color);

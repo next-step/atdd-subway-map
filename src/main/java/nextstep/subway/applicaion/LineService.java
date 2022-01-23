@@ -22,13 +22,11 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    // 지하철 노선 생성
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
     }
 
-    // 지하철 목록 조회
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
@@ -38,7 +36,6 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    // 지하철 노선 조회
     @Transactional(readOnly = true)
     public LineResponse findById(Long id) {
         return lineRepository.findById(id)
@@ -46,7 +43,12 @@ public class LineService {
                 .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
     }
 
-    // 지하철 노선 수정
+    @Transactional(readOnly = true)
+    public Optional<LineResponse> findByName(String name) {
+        return lineRepository.findByName(name)
+                .map(this::createLineResponse);
+    }
+
     public void modifyLineById(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
@@ -54,7 +56,6 @@ public class LineService {
         line.changInfo(lineRequest.getName(), lineRequest.getColor());
     }
 
-    // 지하철 노선 삭제
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }

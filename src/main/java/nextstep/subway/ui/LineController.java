@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/lines")
@@ -30,6 +32,12 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+        Optional<LineResponse> existLine = lineService.findByName(lineRequest.getName());
+
+        if (existLine.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
