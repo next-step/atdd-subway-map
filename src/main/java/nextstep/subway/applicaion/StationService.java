@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
+    private static String DUPLICATE_NAME_ERROR_MASSAGE = "사용중인 역 이름입니다.";
+
     private StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
@@ -20,6 +22,10 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new IllegalArgumentException(DUPLICATE_NAME_ERROR_MASSAGE);
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }

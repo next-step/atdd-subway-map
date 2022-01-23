@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -109,5 +109,23 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 생성한 지하철 노선 삭제가 성공한다.
+     */
+    @DisplayName("지하철 노선 이름 중복 확인")
+    @Test
+    void duplicateLineName() {
+        // given
+        LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+
+        // when
+        ExtractableResponse<Response> response = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

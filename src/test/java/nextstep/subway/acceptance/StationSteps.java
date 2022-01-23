@@ -8,31 +8,22 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LineSteps {
+public class StationSteps {
 
-    public static ExtractableResponse<Response> postLine(String name, String color) {
+    public static ExtractableResponse<Response> postStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
-        params.put("color", color);
 
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines")
+                .post("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> getLines() {
-        return RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    public static ExtractableResponse<Response> deleteLine(String url) {
+    public static ExtractableResponse<Response> deleteStation(String url) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -41,16 +32,10 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> putLine(String url, String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
+    public static ExtractableResponse<Response> getStations() {
         return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put(url)
+                .get("/stations")
                 .then().log().all()
                 .extract();
     }

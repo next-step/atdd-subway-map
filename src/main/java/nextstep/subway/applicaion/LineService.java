@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+    private static String DUPLICATE_NAME_ERROR_MASSAGE = "사용중인 노선 이름입니다.";
+
     private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -20,7 +22,12 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new IllegalArgumentException(DUPLICATE_NAME_ERROR_MASSAGE);
+        }
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
