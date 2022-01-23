@@ -1,7 +1,12 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -12,6 +17,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        // given
+        String color = "bg-red-600";
+        String name = "신분당선";
+
+        // when
+        ExtractableResponse<Response> response = LineTestStep.지하철_노선_생성한다(color, name);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+        Integer responseIntegerId = response.jsonPath().get("id");
+        Long createdId = responseIntegerId.longValue();
+        assertThat(createdId).isGreaterThan(0L);
     }
 
     /**
