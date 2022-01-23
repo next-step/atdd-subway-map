@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -36,11 +38,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         LineResponse lineResponse = createResponse.body().as(LineResponse.class);
-        assertThat(lineResponse.getId()).isNotNull();
-        assertThat(lineResponse.getName()).isEqualTo(신분당선);
-        assertThat(lineResponse.getColor()).isEqualTo(bgRed600);
-        assertThat(lineResponse.getModifiedDate()).isNotNull();
-        assertThat(lineResponse.getModifiedDate()).isNotNull();
+        assertAll(
+                () -> assertNotNull(lineResponse.getId()),
+                () -> assertEquals(lineResponse.getName(), 신분당선),
+                () -> assertEquals(lineResponse.getColor(), bgRed600),
+                () -> assertNotNull(lineResponse.getCreatedDate()),
+                () -> assertNotNull(lineResponse.getModifiedDate()));
     }
 
     /**
