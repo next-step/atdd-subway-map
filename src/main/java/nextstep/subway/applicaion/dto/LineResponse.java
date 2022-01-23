@@ -10,6 +10,7 @@ public class LineResponse {
     private String color;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private String errorMessage;
 
     public LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
@@ -17,6 +18,10 @@ public class LineResponse {
         this.color = color;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+    }
+
+    public LineResponse(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     public static LineResponse createLineResponse(Line line) {
@@ -47,5 +52,9 @@ public class LineResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

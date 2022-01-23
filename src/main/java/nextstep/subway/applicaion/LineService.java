@@ -20,9 +20,14 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return LineResponse.createLineResponse(line);
+    public LineResponse saveLine(LineRequest request) throws IllegalArgumentException{
+        Line findLine = lineRepository.findByName(request.getName());
+        if (ObjectUtils.isEmpty(findLine)) {
+            Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+            return LineResponse.createLineResponse(line);
+        }
+
+        throw new IllegalArgumentException("이미 등록된 노선입니다. 노선 이름 = " + request.getName());
     }
 
     public List<LineResponse> findAllLines() {

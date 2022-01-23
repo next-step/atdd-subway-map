@@ -29,9 +29,14 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse response = null;
+        try {
+            response = lineService.saveLine(lineRequest);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok().body(new LineResponse(e.getMessage()));
+        }
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/lines/" + line.getId())).build();
+                .location(URI.create("/lines/" + response.getId())).build();
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

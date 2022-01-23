@@ -155,6 +155,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_중복_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // then
-
+        assertThat(지하철_노선_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(지하철_노선_중복_생성_응답.jsonPath().getString("errorMessage")).isEqualTo("이미 등록된 노선입니다. 노선 이름 = " + "9호선");
     }
 }
