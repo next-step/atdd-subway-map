@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
-public class LineRequest {
+public class LineSaveRequest {
     private String name;
     private String color;
 

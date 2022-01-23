@@ -6,16 +6,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.HttpHeaders.HOST;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -67,7 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .accept(ContentType.JSON)
-                .header(HOST, "localhost:" + port)
+                .header(HttpHeaders.HOST, "localhost:" + port)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .get("/lines")
@@ -78,16 +77,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
-                () -> assertThat(response.header("Date")).isNotBlank()
+                () -> assertThat(response.header("Date")).isNotBlank(),
+                () -> assertThat(response.jsonPath().getList("id")).contains(1, 2),
+                () -> assertThat(response.jsonPath().getList("name")).contains(firstLineName, secondLieName),
+                () -> assertThat(response.jsonPath().getList("color")).contains(firstLineColor, secondLineColor)
         );
-        final List<Integer> ids = response.jsonPath().getList("id");
-        assertThat(ids).contains(1, 2);
-
-        final List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).contains(firstLineName, secondLieName);
-
-        final List<String> colors = response.jsonPath().getList("color");
-        assertThat(colors).contains(firstLineColor, secondLineColor);
     }
 
     /**
