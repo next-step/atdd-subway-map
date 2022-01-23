@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineReadAllResponse;
-import nextstep.subway.applicaion.dto.LineReadResponse;
-import nextstep.subway.applicaion.dto.LineSaveRequest;
-import nextstep.subway.applicaion.dto.LineSaveResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
@@ -21,11 +18,11 @@ import static java.lang.String.format;
 public class LineService {
     private LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(final LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
-    public LineSaveResponse saveLine(LineSaveRequest request) {
+    public LineSaveResponse saveLine(final LineSaveRequest request) {
         final Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineSaveResponse(line);
     }
@@ -43,5 +40,14 @@ public class LineService {
         final Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(format("식별자가 %s인 Line 엔티티를 찾을 수 없습니다.", id)));
         return new LineReadResponse(line, Collections.EMPTY_LIST);
+    }
+
+    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
+        if (lineRepository.existsByName(lineUpdateRequest.getName())) {
+            return;
+        }
+        final Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(format("식별자가 %s인 Line 엔티티를 찾을 수 없습니다.", id)));
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 }

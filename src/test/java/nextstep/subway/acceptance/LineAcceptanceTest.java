@@ -99,14 +99,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .accept(ContentType.JSON)
-                .header(HttpHeaders.HOST, "localhost:" + port)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 정상적인_지하철_노선_조회를_요청한다(lineId);
 
         // then
         assertAll(
@@ -128,30 +121,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         /// given
-        final String firstLineName = "신분당선";
-        final String firstLineColor = "bg-red-600";
-        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(firstLineName, firstLineColor);
+        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
         final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         final Map<String, String> params = new HashMap<>();
-        params.put("name", "구분당선");
-        params.put("color", "bg-blue-600");
+        final String updatedName = "구분당선";
+        final String updatedColor = "bg-blue-600";
+        params.put("name", updatedName);
+        params.put("color", updatedColor);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+        final ExtractableResponse<Response> updateResponse = RestAssured.given().log().all()
                 .accept(ContentType.ANY)
                 .header(HttpHeaders.HOST, "localhost:" + port)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
                 .when()
-                .patch("/lines/" + lineId)
+                .put("/lines/" + lineId) // 모든 데이터를 변경하고 있어서 put 으로 했습니다.
                 .then().log().all()
                 .extract();
 
         // then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.header("Date")).isNotBlank()
+                () -> assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(updateResponse.header("Date")).isNotBlank()
+        );
+
+        final ExtractableResponse<Response> findResponse = 정상적인_지하철_노선_조회를_요청한다(lineId);
+        assertAll(
+                () -> assertThat(findResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(findResponse.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
+                () -> assertThat(findResponse.header("Date")).isNotBlank(),
+                () -> assertThat(findResponse.body().jsonPath().get("id").equals(lineId)),
+                () -> assertThat(findResponse.body().jsonPath().get("name").equals(updatedName)),
+                () -> assertThat(findResponse.body().jsonPath().get("color").equals(updatedColor))
         );
     }
 
@@ -183,5 +186,16 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", name);
         params.put("color", color);
         return params;
+    }
+
+    private ExtractableResponse<Response> 정상적인_지하철_노선_조회를_요청한다(final Long lineId) {
+        return RestAssured.given().log().all()
+                .accept(ContentType.JSON)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
     }
 }
