@@ -32,7 +32,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         params.put("name", "강남역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_Create(params);
+        ExtractableResponse<Response> response = 지하철역_생성_요청(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,15 +52,15 @@ class StationAcceptanceTest extends AcceptanceTest {
         String 강남역 = "강남역";
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", 강남역);
-        지하철역_Create(params1);
+        지하철역_생성_요청(params1);
 
         String 역삼역 = "역삼역";
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", 역삼역);
-        지하철역_Create(params2);
+        지하철역_생성_요청(params2);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_목록_FindAll();
+        ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
@@ -78,11 +78,11 @@ class StationAcceptanceTest extends AcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = 지하철역_Create(params);
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(params);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철역_Delete(uri);
+        ExtractableResponse<Response> response = 지하철역_삭제_요청(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -95,18 +95,18 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("중복이름으로 지하철역 생성")
     @Test
-    void duplicatStation() {
+    void duplicateStation() {
         // given
         String 강남역 = "강남역";
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", 강남역);
-        지하철역_Create(params1);
+        지하철역_생성_요청(params1);
 
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", 강남역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_Create(params2);
+        ExtractableResponse<Response> response = 지하철역_생성_요청(params2);
 
         // then
         assertAll(
@@ -115,15 +115,15 @@ class StationAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> 지하철역_Create(Map<String, String> map) {
+    private ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> map) {
         return AssuredRequest.doCreate(END_POINT, map);
     }
 
-    private ExtractableResponse<Response> 지하철역_목록_FindAll() {
+    private ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return AssuredRequest.doFind(END_POINT);
     }
 
-    private ExtractableResponse<Response> 지하철역_Delete(String uri) {
+    private ExtractableResponse<Response> 지하철역_삭제_요청(String uri) {
         return AssuredRequest.doDelete(uri);
     }
 }

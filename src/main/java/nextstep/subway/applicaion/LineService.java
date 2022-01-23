@@ -57,7 +57,7 @@ public class LineService {
 
     private Line getLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException(NOT_FOUND_LINE.getMessage()));
+                .orElseThrow(() -> new LineNotFoundException());
         return line;
     }
 

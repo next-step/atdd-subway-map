@@ -31,10 +31,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Order(1)
     void createLine() {
         // given
-        LineRequest lineRequest = 노선_요청_정보_Sample1();
+        LineRequest lineRequest = 노선_요청_정보_샘플1();
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_Create(lineRequest);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(lineRequest);
 
         // then
         assertAll(
@@ -55,16 +55,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Order(3)
     void getLines() {
         // given
-        LineRequest lineRequest = 노선_요청_정보_Sample1();
-        지하철_노선_Create(lineRequest);
+        LineRequest lineRequest = 노선_요청_정보_샘플1();
+        지하철_노선_생성_요청(lineRequest);
 
-        LineRequest newLineRequest = 노선_요청_정보_Sample2();
-        지하철_노선_Create(newLineRequest);
+        LineRequest newLineRequest = 노선_요청_정보_샘플2();
+        지하철_노선_생성_요청(newLineRequest);
 
         List<LineRequest> requestList = Arrays.asList(lineRequest, newLineRequest);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_목록_FindAll();
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
         assertAll(
@@ -88,12 +88,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Order(5)
     void getLine() {
         // given
-        LineRequest lineRequest = 노선_요청_정보_Sample1();
-        ExtractableResponse<Response> givenResponse = 지하철_노선_Create(lineRequest);
+        LineRequest lineRequest = 노선_요청_정보_샘플1();
+        ExtractableResponse<Response> givenResponse = 지하철_노선_생성_요청(lineRequest);
         String searchUri = givenResponse.header("Location");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_Find(searchUri);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(searchUri);
 
         // then
         assertAll(
@@ -113,14 +113,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Order(7)
     void updateLine() {
         // given
-        LineRequest lineRequest = 노선_요청_정보_Sample1();
-        ExtractableResponse<Response> givenResponse = 지하철_노선_Create(lineRequest);
+        LineRequest lineRequest = 노선_요청_정보_샘플1();
+        ExtractableResponse<Response> givenResponse = 지하철_노선_생성_요청(lineRequest);
 
         String updateUri = givenResponse.header("Location");
-        LineRequest updateLineRequest = 노선_요청_정보_Modify_Sample1();
+        LineRequest updateLineRequest = 노선_요청_정보_수정_샘플1();
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_Update(updateUri, updateLineRequest);
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청(updateUri, updateLineRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -136,33 +136,33 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Order(9)
     void deleteLine() {
         // given
-        LineRequest lineRequest = 노선_요청_정보_Sample1();
-        ExtractableResponse<Response> givenResponse = 지하철_노선_Create(lineRequest);
+        LineRequest lineRequest = 노선_요청_정보_샘플1();
+        ExtractableResponse<Response> givenResponse = 지하철_노선_생성_요청(lineRequest);
         String deleteUri = givenResponse.header("Location");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_Delete(deleteUri);
+        ExtractableResponse<Response> response = 지하철_노선_삭제_요청(deleteUri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
-     * Given 지하철역 생성을 요청 하고
-     * When 같은 이름으로 지하철역 생성을 요청 하면
-     * Then 지하철역 생성이 실패한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
      */
-    @DisplayName("중복이름으로 지하철역 생성")
+    @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
     @Order(11)
     void duplicateLine() {
         // given
-        LineRequest lineRequest = 노선_요청_정보_Sample1();
-        지하철_노선_Create(lineRequest);
-        LineRequest duplicateRequest = 노선_요청_정보_duplicate_Sample1();
+        LineRequest lineRequest = 노선_요청_정보_샘플1();
+        지하철_노선_생성_요청(lineRequest);
+        LineRequest duplicateRequest = 노선_요청_정보_중복_샘플1();
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_Create(duplicateRequest);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(duplicateRequest);
 
         // then
         assertAll(
@@ -171,39 +171,39 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private LineRequest 노선_요청_정보_Sample1() {
+    private LineRequest 노선_요청_정보_샘플1() {
         return new LineRequest("1호선", "파란색");
     }
 
-    private LineRequest 노선_요청_정보_Sample2() {
+    private LineRequest 노선_요청_정보_샘플2() {
         return new LineRequest("2호선", "연두색");
     }
 
-    private LineRequest 노선_요청_정보_Modify_Sample1() {
+    private LineRequest 노선_요청_정보_수정_샘플1() {
         return new LineRequest("100호선", "무지개색");
     }
 
-    private LineRequest 노선_요청_정보_duplicate_Sample1() {
+    private LineRequest 노선_요청_정보_중복_샘플1() {
         return new LineRequest("1호선", "발간색");
     }
 
-    private ExtractableResponse<Response> 지하철_노선_Create(LineRequest lineRequest) {
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
         return AssuredRequest.doCreate(END_POINT, lineRequest);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_목록_FindAll() {
+    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return AssuredRequest.doFind(END_POINT);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_Find(String uri) {
+    private ExtractableResponse<Response> 지하철_노선_조회_요청(String uri) {
         return AssuredRequest.doFind(uri);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_Update(String uri, LineRequest lineRequest) {
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(String uri, LineRequest lineRequest) {
         return AssuredRequest.doUpdate(uri, lineRequest);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_Delete(String uri) {
+    private ExtractableResponse<Response> 지하철_노선_삭제_요청(String uri) {
         return AssuredRequest.doDelete(uri);
     }
 }
