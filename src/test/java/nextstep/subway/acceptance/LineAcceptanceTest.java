@@ -1,17 +1,19 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import nextstep.subway.acceptance.rest.BaseCrudStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private final String LINE_PATH = "/lines";
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -20,18 +22,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        var params = new HashMap<String, String>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
+        var params = giveMeLineRequest("신분당선", "bg-red-600");
 
         // when
-        var response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var response = BaseCrudStep.createResponse(LINE_PATH, params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -48,36 +42,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        var params1 = new HashMap<String, String>();
-        params1.put("color", "bg-red-600");
-        params1.put("name", "신분당선");
-        var createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var params1 = giveMeLineRequest("신분당선", "bg-red-600");
+        var createResponse1 = BaseCrudStep.createResponse(LINE_PATH, params1);
 
-        var params2 = new HashMap<String, String>();
-        params2.put("color", "bg-green-600");
-        params2.put("name", "2호선");
-
-        var createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var params2 = giveMeLineRequest("2호선", "bg-green-600");
+        var createResponse2 = BaseCrudStep.createResponse(LINE_PATH, params2);
 
         // when
-        var response = RestAssured.given().log().all()
-                .accept(ContentType.JSON)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        var response = BaseCrudStep.readResponse(LINE_PATH);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -94,26 +66,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        var params = new HashMap<String, String>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        var createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var params = giveMeLineRequest("신분당선", "bg-red-600");
+        var createResponse = BaseCrudStep.createResponse(LINE_PATH, params);
 
         // when
         var uri = createResponse.header("Location");
-        var response = RestAssured.given().log().all()
-                .accept(ContentType.JSON)
-                .when()
-                .get(uri)
-                .then().log().all()
-                .extract();
+        var response = BaseCrudStep.readResponse(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -129,31 +87,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var params = new HashMap<String, String>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        var createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var params = giveMeLineRequest("신분당선", "bg-red-600");
+        var createResponse = BaseCrudStep.createResponse(LINE_PATH, params);
 
         // when
-        var modifyParams = new HashMap<String, String>();
-        modifyParams.put("color", "bg-blue-600");
-        modifyParams.put("name", "구분당선");
+        var modifyParams = giveMeLineRequest("구분당선", "bg-blue-600");
 
         var uri = createResponse.header("Location");
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(modifyParams)
-                .when()
-                .put(uri)
-                .then().log().all()
-                .extract();
+        var response = BaseCrudStep.updateResponse(uri, modifyParams);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -170,25 +111,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        var params = new HashMap<String, String>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        var createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var params = giveMeLineRequest("신분당선", "bg-red-600");
+        var createResponse = BaseCrudStep.createResponse(LINE_PATH, params);
 
         // when
         var uri = createResponse.header("Location");
-        var response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        var response = BaseCrudStep.deleteResponse(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -203,28 +131,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        var params = new HashMap<String, String>();
-        params.put("color", "bg-red-600");
-        params.put("name", "신분당선");
-
-        var createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var params = giveMeLineRequest("신분당선", "bg-red-600");
+        var createResponse = BaseCrudStep.createResponse(LINE_PATH, params);
 
         // when
-        var response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var response = BaseCrudStep.createResponse(LINE_PATH, params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    private Map<String, String> giveMeLineRequest(
+            String name,
+            String color
+    ) {
+        return Map.of(
+                "name", name,
+                "color", color
+        );
     }
 }
