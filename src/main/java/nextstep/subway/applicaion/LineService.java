@@ -44,7 +44,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElse(new Line());
 
-        line.update(lineRequest);
+        line.update(lineRequest.getName(), lineRequest.getColor());
         return LineResponse.createLineResponse(line);
     }
 
