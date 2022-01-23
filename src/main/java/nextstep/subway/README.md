@@ -40,10 +40,10 @@ Then 지하철 노선 생성이 실패한다. <br>
     
 - 2022-01-23
 
-- [ ] Feature: 지하철 노선 생성 시 필요한 인자 추가하기 <br>
-  Given <br>
-  When  <br>
-  Then  <br>
+- [X] Feature: 지하철 노선 생성 시 필요한 인자 추가하기 <br>
+  Given 추가된 필드로 지하철 노선 요청<br>
+  When  생성 요청하면 <br>
+  Then  기존에 있었던 모든 테스트가 통과해야한다.<br>
   
 - [ ] Feature: 지하철 노선에 구간을 등록하는 기능 구현<br>
   Given <br>

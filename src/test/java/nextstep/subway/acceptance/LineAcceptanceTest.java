@@ -24,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
 
         // 요청 후, 노선을 생성하다
-        ExtractableResponse<Response> extract = LineStep.saveLine("하늘색", "4호선");
+        ExtractableResponse<Response> extract = LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
 
         // 상태 코드
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -42,8 +42,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선");
-        LineStep.saveLine("파란색", "1호선");
+        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
+        LineStep.saveLine("파란색", "1호선", 1L,2L,3);
 
         ExtractableResponse<Response> response = LineStep.showLines();
 
@@ -63,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선");
+        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
 
         // 조회 결과
         ExtractableResponse<Response> response = LineStep.showLine(NUMBER_ONE);
@@ -84,10 +84,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선");
+        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
 
         // 수정 요청
-        ExtractableResponse<Response> response = LineStep.updateLine("파란색", "1호선", 1);
+        ExtractableResponse<Response> response = LineStep.updateLine("파란색", "1호선", 1, 1L,2L,3);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
@@ -102,7 +102,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
 
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선");
+        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
 
         // 노선을 삭제하다
         ExtractableResponse<Response> response = LineStep.deleteLine(NUMBER_ONE);
@@ -120,10 +120,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine_duplication() {
 
         // 노선을 생성한다.
-        LineStep.saveLine("하늘색", "4호선");
+        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
 
         // 중복으로 생성할 때
-        ExtractableResponse<Response> response = LineStep.saveLine("파란색", "4호선");
+        ExtractableResponse<Response> response = LineStep.saveLine("파란색", "4호선", 1L,2L,3);
 
         // 실패를 한다.
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());

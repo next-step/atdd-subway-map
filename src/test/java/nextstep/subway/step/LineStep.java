@@ -3,6 +3,7 @@ package nextstep.subway.step;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.ui.path.LinePath;
 import org.springframework.http.MediaType;
 
@@ -12,8 +13,14 @@ import java.util.Map;
 public class LineStep {
 
 	// 생성
-	public static ExtractableResponse<Response> saveLine(final String color, final String name) {
-		Map<String, String> request = request(color, name);
+	public static ExtractableResponse<Response> saveLine(
+					final String color,
+					final String name,
+					final Long upStationId,
+					final Long downStationId,
+					final int distance
+	) {
+		LineRequest request = request(color, name, upStationId, downStationId, distance);
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
@@ -45,8 +52,15 @@ public class LineStep {
 
 
 	// 수정
-	public static ExtractableResponse<Response> updateLine(final String color, final String name, final Integer id) {
-		Map<String, String> request = request(color, name);
+	public static ExtractableResponse<Response> updateLine(
+					final String color,
+					final String name,
+					final Integer id,
+					final Long upStationId,
+					final Long downStationId,
+					final int distance
+	) {
+		LineRequest request = request(color, name, upStationId, downStationId, distance);
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
@@ -66,11 +80,14 @@ public class LineStep {
 	}
 
 	// 요청을 생성하는 메소드
-	public static Map<String, String> request(final String color, final String name) {
-		Map<String, String> request = new HashMap<>();
-		request.put("color", color);
-		request.put("name", name);
+	public static LineRequest request(
+					final String color,
+					final String name,
+					final Long upStationId,
+					final Long downStationId,
+					final int distance
+	) {
 
-		return request;
+		return new LineRequest(color, name, upStationId, downStationId, distance);
 	}
 }
