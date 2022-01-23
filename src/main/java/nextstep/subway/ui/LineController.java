@@ -39,13 +39,13 @@ public class LineController {
 
 	@GetMapping(value = "/{id}")
 	public ResponseEntity getLine(@PathVariable("id") Long id) {
-        LineResponse lineResponse = lineService.findById(id);
-        return ResponseEntity.ok().body(lineResponse);
+		LineResponse lineResponse = lineService.findById(id);
+		return ResponseEntity.ok().body(lineResponse);
 	}
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity updateLine(@PathVariable("id") Long id, @RequestBody LineRequest lineRequest) {
-        lineService.updateLine(id, lineRequest);
-        return ResponseEntity.ok().build();
-    }
+	@PutMapping(value = "/{id}")
+	public ResponseEntity updateLine(@PathVariable("id") Long id, @RequestBody LineRequest lineRequest) {
+		lineService.updateLine(id, lineRequest);
+		return ResponseEntity.ok().build();
+	}
 }
