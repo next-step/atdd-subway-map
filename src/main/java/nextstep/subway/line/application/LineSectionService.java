@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.line.domain.dto.SectionRequest;
-import nextstep.subway.line.domain.dto.SectionResponse;
 import nextstep.subway.line.domain.model.Line;
 import nextstep.subway.line.domain.model.Section;
 import nextstep.subway.line.domain.repository.LineRepository;
@@ -25,7 +24,7 @@ public class LineSectionService {
         this.stationRepository = stationRepository;
     }
 
-    public SectionResponse addSection(Long lineId, SectionRequest request) {
+    public void addSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findByIdWithSections(lineId)
                                   .orElseThrow(EntityNotFoundException::new);
         Station upStation = stationRepository.findById(request.getUpStationId())
@@ -33,7 +32,6 @@ public class LineSectionService {
         Station downStation = stationRepository.findById(request.getDownStationId())
                                                .orElseThrow(EntityNotFoundException::new);
 
-        Section section = line.createSection(upStation, downStation, request.getDistance());
-        return SectionResponse.from(section);
+        line.createSection(upStation, downStation, request.getDistance());
     }
 }

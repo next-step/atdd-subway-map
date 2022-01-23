@@ -64,8 +64,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.CREATED)
-                          .hasLocation();
+                          .equalsHttpStatus(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -98,8 +97,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
-                          .hasNotLocation();
+                          .equalsErrorMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage());
     }
 
     /**
@@ -132,7 +130,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
-                          .hasNotLocation();
+                          .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage());
     }
 }
