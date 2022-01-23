@@ -58,7 +58,6 @@ public class LineService {
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.getById(id);
         line.modify(lineRequest.getName(), lineRequest.getColor());
-        lineRepository.save(line);
         return new LineResponse(
                 line.getId(),
                 line.getName(),
