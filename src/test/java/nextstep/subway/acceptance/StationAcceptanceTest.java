@@ -50,13 +50,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성_API(params);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_생성_API(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
