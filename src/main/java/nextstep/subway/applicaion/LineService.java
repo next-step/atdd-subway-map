@@ -24,8 +24,6 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        validateDuplicatedLine(request);
-
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         // Entity to LineResponse(DTO)
         return new LineResponse(line);
@@ -39,47 +37,24 @@ public class LineService {
     }
 
     public LineResponse getLine(Long lineId) {
-        validateLineId(lineId);
-        Line line = lineRepository
-                .findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
-
-        return new LineResponse(line);
+        Line findLine = getLineById(lineRepository, lineId);
+        return new LineResponse(findLine);
     }
 
     public void modifyLine(Long lineId, LineRequest lineRequest) {
-        validateLineRequest(lineId, lineRequest);
-        Line findLine = lineRepository.findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
+        Line findLine = getLineById(lineRepository, lineId);
         findLine.chageLine(lineRequest.getName(), lineRequest.getColor());
     }
 
     public void deleteLine(Long lineId) {
-        validateLineId(lineId);
-        Line findLine = lineRepository.findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
-
+        Line findLine = getLineById(lineRepository, lineId);
         lineRepository.delete(findLine);
     }
 
-
-    private void validateLineRequest(Long lineId, LineRequest lineRequest) {
-        if (lineRequest == null || lineId == null || lineId <= 0) {
-            throw new IllegalArgumentException("잘못된 요청 입니다.");
-        }
-    }
-
-    private void validateLineId(Long lineId) {
-        if(lineId == null || lineId <= 0){
-            throw new IllegalArgumentException("잘못된 요청 입니다.");
-        }
-    }
-
-    private void validateDuplicatedLine(LineRequest request) {
-        boolean existsLine = lineRepository.existsLineByName(request.getName());
-        if(existsLine){
-            throw new DuplicatedLineException("중복된 라인을 생성할 수 없습니다.");
-        }
+    private Line getLineById(LineRepository lineRepository, Long lineId) {
+        return lineRepository
+                .findById(lineId)
+                .orElseThrow(IllegalArgumentException::new);
     }
 
 }
