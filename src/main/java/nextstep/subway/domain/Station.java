@@ -16,11 +16,15 @@ public class Station extends BaseEntity {
     protected Station() {
     }
 
-    public Station(String name) {
+    protected Station(String name) {
         this.name = name;
     }
 
-    public Long getId() {
+	public static Station from(String name) {
+        return new Station(name);
+	}
+
+	public Long getId() {
         return id;
     }
 

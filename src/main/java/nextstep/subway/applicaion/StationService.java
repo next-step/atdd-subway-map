@@ -1,48 +1,45 @@
 package nextstep.subway.applicaion;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import nextstep.subway.ui.exception.UniqueKeyExistsException;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+	private final StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+	public StationService(StationRepository stationRepository) {
+		this.stationRepository = stationRepository;
+	}
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
-    }
+	@Transactional
+	public StationResponse saveStation(StationRequest requestStation) {
+		if (isStationExists(requestStation)) {
+			throw new UniqueKeyExistsException(requestStation.getName());
+		}
 
-    @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
-        List<Station> stations = stationRepository.findAll();
+		final Station station = stationRepository.save(requestStation.toEntity());
+		return StationResponse.from(station);
+	}
 
-        return stations.stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
-    }
+	public List<StationResponse> findAllStations() {
+		return StationResponse.fromList(stationRepository.findAll());
+	}
 
-    public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
-    }
+	@Transactional
+	public void deleteStationById(Long id) {
+		stationRepository.deleteById(id);
+	}
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
-    }
+	private boolean isStationExists(StationRequest station) {
+		return stationRepository.findByName(station.getName()).isPresent();
+	}
 }

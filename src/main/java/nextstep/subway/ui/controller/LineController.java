@@ -1,4 +1,4 @@
-package nextstep.subway.ui;
+package nextstep.subway.ui.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -27,31 +27,47 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = LineResponse.from(lineService.saveLine(lineRequest.toEntity()));
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        final LineResponse line = lineService.saveLine(lineRequest);
+
+        return ResponseEntity
+            .created(getCreateStatusHeader(line))
+            .body(line);
     }
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getAllLines() {
-        List<LineResponse> lines = LineResponse.fromList(lineService.getAllLines());
-        return ResponseEntity.ok().body(lines);
+        final List<LineResponse> allLines = lineService.getAllLines();
+        return ResponseEntity
+            .ok()
+            .body(allLines);
     }
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable long id) {
-        LineResponse line = LineResponse.from(lineService.getLine(id));
-        return ResponseEntity.ok().body(line);
+        final LineResponse line = lineService.getLine(id);
+        return ResponseEntity
+            .ok()
+            .body(line);
     }
 
     @PutMapping("/lines/{id}")
     public ResponseEntity<LineResponse> updateLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
-        LineResponse line = LineResponse.from(lineService.updateLine(id, lineRequest));
-        return ResponseEntity.ok().body(line);
+        final LineResponse line = lineService.updateLine(id, lineRequest);
+        return ResponseEntity
+            .ok()
+            .body(line);
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable long id) {
         lineService.deleteLine(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+            .noContent()
+            .build();
     }
+
+    private URI getCreateStatusHeader(LineResponse line) {
+        return URI.create("/lines/" + line.getId());
+    }
+
 }

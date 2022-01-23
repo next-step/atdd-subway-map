@@ -6,7 +6,15 @@ public class LineRequest {
     private String name;
     private String color;
 
-    public String getName() {
+	private LineRequest() {
+	}
+
+	private LineRequest(String name, String color) {
+		this.name = name;
+		this.color = color;
+	}
+
+	public String getName() {
         return name;
     }
 
@@ -15,6 +23,6 @@ public class LineRequest {
     }
 
 	public Line toEntity() {
-    	return new Line(name, color);
+		return Line.of(name, color);
 	}
 }

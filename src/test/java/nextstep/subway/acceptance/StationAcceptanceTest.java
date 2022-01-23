@@ -1,118 +1,113 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import static java.util.Arrays.*;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.utils.RequestBodyBuilder;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-    /**
-     * When 지하철역 생성을 요청 하면
-     * Then 지하철역 생성이 성공한다.
-     */
-    @DisplayName("지하철역 생성")
-    @Test
-    void createStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
 
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+	static final String 요청_주소 = "/stations";
+	static final String 역이름_필드 = "name";
+	static final String 역아이디_필드 = "id";
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
-    }
+	StationAcceptanceTest() {
+		super(요청_주소, 역아이디_필드);
+	}
 
-    /**
-     * Given 지하철역 생성을 요청 하고
-     * Given 새로운 지하철역 생성을 요청 하고
-     * When 지하철역 목록 조회를 요청 하면
-     * Then 두 지하철역이 포함된 지하철역 목록을 응답받는다
-     */
-    @DisplayName("지하철역 목록 조회")
-    @Test
-    void getStations() {
-        /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+	/**
+	 * When 지하철역 생성을 요청 하면
+	 * Then 지하철역 생성이 성공한다.
+	 */
+	@DisplayName("지하철역 생성")
+	@CsvSource({"강남역", "기양역", "분당역"})
+	@ParameterizedTest
+	void createStation(String 역_이름) {
+		// given
+		Map<String, String> 역_생성_요청_본문 = 역_요청_본문_생성(역_이름);
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+		// when
+		ExtractableResponse<Response> 생성_응답 = 생성_요청(역_생성_요청_본문);
 
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+		// then
+		생성_요청_검증(생성_응답);
+	}
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
-    }
+	/**
+	 * Given 지하철역 생성을 요청 하고
+	 * Given 새로운 지하철역 생성을 요청 하고
+	 * When 지하철역 목록 조회를 요청 하면
+	 * Then 두 지하철역이 포함된 지하철역 목록을 응답받는다
+	 */
+	@DisplayName("지하철역 목록 조회")
+	@CsvSource({"강남역, 역삼역"})
+	@ParameterizedTest
+	void getStations(String 역_이름, String 새로운_역_이름) {
+		/// given
+		Map<String, String> 역_생성_요청_본문 = 역_요청_본문_생성(역_이름);
+		생성_요청(역_생성_요청_본문);
 
-    /**
-     * Given 지하철역 생성을 요청 하고
-     * When 생성한 지하철역 삭제를 요청 하면
-     * Then 생성한 지하철역 삭제가 성공한다.
-     */
-    @DisplayName("지하철역 삭제")
-    @Test
-    void deleteStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+		Map<String, String> 새_역_생성_요청_본문 = 역_요청_본문_생성(새로운_역_이름);
+		생성_요청(새_역_생성_요청_본문);
 
-        // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+		// when
+		ExtractableResponse<Response> 목록_조회_응답 = 목록_조회_요청();
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
+		조회_요청_목록_검증(목록_조회_응답, 역이름_필드, asList(역_이름, 새로운_역_이름));
+	}
+
+	/**
+	 * Given 지하철역 생성을 요청 하고
+	 * When 생성한 지하철역 삭제를 요청 하면
+	 * Then 생성한 지하철역 삭제가 성공한다.
+	 */
+	@DisplayName("지하철역 삭제")
+	@CsvSource({"강남역", "역삼역"})
+	@ParameterizedTest
+	void deleteStation(String 역_이름) {
+		// given
+		final Map<String, String> 역_요청_본문 = 역_요청_본문_생성(역_이름);
+		ExtractableResponse<Response> 생성_응답 = 생성_요청(역_요청_본문);
+
+		// when
+		final ExtractableResponse<Response> 삭제_응답 = 삭제_요청(아이디_추출(생성_응답));
+
+		// then
+		삭제_요청_검증(삭제_응답);
+	}
+
+	/**
+	 * Given 지하철역 생성을 요청하고
+	 * When 같은 이름으로 지하역 생성을 요청하면
+	 * Then 지하철 생성이 실패한다.
+	 */
+	@DisplayName("지하철 역 중복 생성")
+	@CsvSource({"강남역", "판교역", "가양역"})
+	@ParameterizedTest
+	public void createDuplicateStation(String 역_이름) {
+		// given
+		final Map<String, String> 요청_본문 = 역_요청_본문_생성(역_이름);
+		생성_요청(요청_본문);
+
+		// when
+		final ExtractableResponse<Response> 중복_생성_응답 = 생성_요청(요청_본문);
+
+		// then
+		중복_생성_요청_실패_검증(중복_생성_응답);
+	}
+
+	Map<String, String> 역_요청_본문_생성(String stationName) {
+		return RequestBodyBuilder.builder()
+			.put(역이름_필드, stationName)
+			.build();
+	}
+
 }
