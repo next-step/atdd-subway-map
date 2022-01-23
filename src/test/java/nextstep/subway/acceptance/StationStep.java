@@ -10,6 +10,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 public class StationStep {
+    private static int dummyCounter = 0;
+    private static final String NAME_FORMAT = "%d역";
+
     private StationStep() {
     }
 
@@ -26,18 +29,11 @@ public class StationStep {
                           .extract();
     }
 
-    public enum 지하철역_생성_수정_Params {
-        강남역("강남역"),
-        역삼역("역삼역");
+    public static ExtractableResponse<Response> 지하철역_생성_요청() {
+        return 지하철역_생성_요청(nextName());
+    }
 
-        지하철역_생성_수정_Params(String name) {
-            this.name = name;
-        }
-
-        private final String name;
-
-        public String getName() {
-            return name;
-        }
+    public static String nextName() {
+        return String.format(NAME_FORMAT, dummyCounter++);
     }
 }

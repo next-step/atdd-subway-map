@@ -10,23 +10,32 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class AcceptanceTestUtils {
-    private AcceptanceTestUtils() {
+public class AcceptanceTestWhen {
+    private static final String LOCATION_KEY_IN_HEADER = "Location";
+
+    private final ExtractableResponse<Response> response;
+
+    private AcceptanceTestWhen(ExtractableResponse<Response> response) {
+        this.response = response;
     }
 
-    public static ExtractableResponse<Response> requestLocationInHeader(ExtractableResponse<Response> response, Method method, Object body) {
-        return given(body)
+    public static AcceptanceTestWhen fromGiven(ExtractableResponse<Response> response) {
+        return new AcceptanceTestWhen(response);
+    }
+
+    public ExtractableResponse<Response> requestLocation(Method method, Object body) {
+        return requestGiven(body)
             .when()
             .request(method, getLocation(response))
             .then().log().all()
             .extract();
     }
 
-    public static ExtractableResponse<Response> requestLocationInHeader(ExtractableResponse<Response> response, Method method) {
-        return requestLocationInHeader(response, method, null);
+    public ExtractableResponse<Response> requestLocation(Method method) {
+        return requestLocation(method, null);
     }
 
-    private static RequestSpecification given(Object body) {
+    private static RequestSpecification requestGiven(Object body) {
         RequestSpecification given = RestAssured.given().log().all();
         if (Objects.isNull(body)) {
             return given;
@@ -36,6 +45,6 @@ public class AcceptanceTestUtils {
     }
 
     public static String getLocation(ExtractableResponse<Response> response) {
-        return response.header("Location");
+        return response.header(LOCATION_KEY_IN_HEADER);
     }
 }

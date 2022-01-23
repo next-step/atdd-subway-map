@@ -1,9 +1,10 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.StationStep.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.utils.AcceptanceTestUtils;
+import nextstep.subway.utils.AcceptanceTestThen;
+import nextstep.subway.utils.AcceptanceTestWhen;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -25,11 +27,12 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given, when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
+        ExtractableResponse<Response> response = StationStep.지하철역_생성_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(AcceptanceTestUtils.getLocation(response)).isNotBlank();
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.CREATED)
+                          .hasLocation();
     }
 
     /**
@@ -41,14 +44,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationThatFailing() {
         // given
-        지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
+        String name = StationStep.nextName();
+        StationStep.지하철역_생성_요청(name);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
+        ExtractableResponse<Response> response = StationStep.지하철역_생성_요청(name);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(AcceptanceTestUtils.getLocation(response)).isNull();
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.CONFLICT)
+                          .hasNotLocation();
     }
 
     /**
@@ -61,8 +66,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
-        지하철역_생성_요청(지하철역_생성_수정_Params.역삼역.getName());
+        List<String> names = Stream.generate(StationStep::nextName)
+                                   .limit(5)
+                                   .collect(Collectors.toList());
+        names.forEach(StationStep::지하철역_생성_요청);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -71,9 +78,10 @@ class StationAcceptanceTest extends AcceptanceTest {
                                                             .then().log().all()
                                                             .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(지하철역_생성_수정_Params.강남역.getName(), 지하철역_생성_수정_Params.역삼역.getName());
+        // then
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.OK)
+                          .containsAll("name", names);
     }
 
     /**
@@ -85,12 +93,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(지하철역_생성_수정_Params.강남역.getName());
+        ExtractableResponse<Response> createResponse = StationStep.지하철역_생성_요청();
 
         // when
-        ExtractableResponse<Response> response = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.DELETE);
+        AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
+        ExtractableResponse<Response> deleteResponse = when.requestLocation(Method.DELETE);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        AcceptanceTestThen.fromWhen(deleteResponse)
+                          .equalsHttpStatus(HttpStatus.NO_CONTENT);
     }
 }

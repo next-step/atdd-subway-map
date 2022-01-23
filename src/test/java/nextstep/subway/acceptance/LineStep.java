@@ -10,6 +10,10 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 public class LineStep {
+    private static int dummyCounter = 0;
+    private static final String NAME_FORMAT = "%d호선";
+    private static final String COLOR_FORMANT = "bg-red-%d";
+
     private LineStep() {}
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
@@ -26,24 +30,15 @@ public class LineStep {
                           .extract();
     }
 
-    public enum 지하철_생성_수정_요청_Params {
-        이호선("2호선", "bg-red-600"),
-        삼호선("3호선", "bg-black-600");
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청() {
+        return 지하철_노선_생성_요청(nextName(), nextColor());
+    }
 
-        지하철_생성_수정_요청_Params(String name, String color) {
-            this.name = name;
-            this.color = color;
-        }
+    public static String nextName() {
+        return String.format(NAME_FORMAT, ++dummyCounter);
+    }
 
-        private final String name;
-        private final String color;
-
-        public String getName() {
-            return name;
-        }
-
-        public String getColor() {
-            return color;
-        }
+    public static String nextColor() {
+        return String.format(COLOR_FORMANT, ++dummyCounter);
     }
 }

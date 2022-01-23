@@ -1,10 +1,6 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.LineStep.*;
-import static org.assertj.core.api.Assertions.*;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +13,10 @@ import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
-import io.restassured.path.json.exception.JsonPathException;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.utils.AcceptanceTestUtils;
+import nextstep.subway.utils.AcceptanceTestThen;
+import nextstep.subway.utils.AcceptanceTestWhen;
 import nextstep.subway.utils.DatabaseCleanup;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -45,10 +41,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given, when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> response = LineStep.지하철_노선_생성_요청();
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.CREATED)
+                          .hasLocation();
     }
 
     /**
@@ -59,15 +57,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성 실패 - 중복 이름")
     @Test
     void createLineThatFailing() {
+        String name = LineStep.nextName();
+
         // given
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        LineStep.지하철_노선_생성_요청(name, LineStep.nextColor());
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse =
+            LineStep.지하철_노선_생성_요청(name, LineStep.nextColor());
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(AcceptanceTestUtils.getLocation(createResponse)).isNull();
+        AcceptanceTestThen.fromWhen(createResponse)
+                          .equalsHttpStatus(HttpStatus.CONFLICT)
+                          .hasNotLocation();
     }
 
     /**
@@ -80,8 +82,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.삼호선.getName(), 지하철_생성_수정_요청_Params.삼호선.getColor());
+        LineStep.지하철_노선_생성_요청();
+        LineStep.지하철_노선_생성_요청();
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -91,11 +93,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                                                             .extract();
 
         //then
-        List<String> lineNames = response.jsonPath()
-                                         .getList("name");
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).containsExactly(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.삼호선.getName());
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.OK);
     }
 
     /**
@@ -107,17 +106,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청();
 
         // when
-        ExtractableResponse<Response> response = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.GET);
+        ExtractableResponse<Response> response =
+            AcceptanceTestWhen.fromGiven(createResponse)
+                              .requestLocation(Method.GET);
 
         // then
-        String lineName = response.jsonPath()
-                                  .get("name");
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineName).isEqualTo(지하철_생성_수정_요청_Params.이호선.getName());
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.OK);
     }
 
     /**
@@ -129,22 +127,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청();
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", 지하철_생성_수정_요청_Params.삼호선.getName());
-        params.put("color", 지하철_생성_수정_요청_Params.삼호선.getColor());
-        ExtractableResponse<Response> editResponse = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.PUT, params);
+        params.put("name", LineStep.nextName());
+        params.put("color", LineStep.nextColor());
+
+        ExtractableResponse<Response> editResponse =
+            AcceptanceTestWhen.fromGiven(createResponse)
+                              .requestLocation(Method.PUT, params);
 
         // then
-        ExtractableResponse<Response> findResponse = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.GET);
-
-        assertThat(editResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat((String)findResponse.jsonPath()
-                                       .get("name")).isEqualTo(지하철_생성_수정_요청_Params.삼호선.getName());
-        assertThat((String)findResponse.jsonPath()
-                                       .get("color")).isEqualTo(지하철_생성_수정_요청_Params.삼호선.getColor());
+        AcceptanceTestThen.fromWhen(editResponse)
+                          .equalsHttpStatus(HttpStatus.OK);
     }
 
     /**
@@ -157,17 +153,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLineThatFailing() {
         // given
-        지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.삼호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        String name = LineStep.nextName();
+
+        LineStep.지하철_노선_생성_요청(name, LineStep.nextColor());
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청();
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", 지하철_생성_수정_요청_Params.이호선.getName());
-        params.put("color", 지하철_생성_수정_요청_Params.이호선.getColor());
-        ExtractableResponse<Response> editResponse = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.PUT, params);
+        params.put("name", name);
+        params.put("color", LineStep.nextColor());
+
+        ExtractableResponse<Response> editResponse =
+            AcceptanceTestWhen.fromGiven(createResponse)
+                              .requestLocation(Method.PUT, params);
 
         // then
-        assertThat(editResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        AcceptanceTestThen.fromWhen(editResponse)
+                          .equalsHttpStatus(HttpStatus.CONFLICT);
     }
 
     /**
@@ -179,15 +181,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(지하철_생성_수정_요청_Params.이호선.getName(), 지하철_생성_수정_요청_Params.이호선.getColor());
+        ExtractableResponse<Response> createResponse = LineStep.지하철_노선_생성_요청();
 
         // when
-        ExtractableResponse<Response> deleteResponse = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.DELETE);
+        AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
+        ExtractableResponse<Response> deleteResponse = when.requestLocation(Method.DELETE);
+        ExtractableResponse<Response> findResponse = when.requestLocation(Method.GET);
 
         // then
-        ExtractableResponse<Response> findResponse = AcceptanceTestUtils.requestLocationInHeader(createResponse, Method.GET);
-
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(findResponse.statusCode()).isEqualTo(HttpStatus.NOT_IMPLEMENTED.value());
+        AcceptanceTestThen.fromWhen(deleteResponse)
+                          .equalsHttpStatus(HttpStatus.NO_CONTENT);
+        AcceptanceTestThen.fromWhen(findResponse)
+                          .equalsHttpStatus(HttpStatus.NOT_IMPLEMENTED);
     }
 }
