@@ -23,13 +23,21 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineCreateRequest request) {
+        boolean isExists = lineRepository.existsByName(request.getName());
+        if (isExists) {
+            throw new IllegalArgumentException();
+        }
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineResponse(line);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> searchAllLines() {
-        return lineRepository.findAll().stream().map(LineResponse::new).collect(Collectors.toList());
+        return lineRepository.findAll()
+                .stream()
+                .map(LineResponse::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -40,9 +48,15 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(final LineUpdateRequest lineUpdateRequest) {
-        Line line = lineRepository.findById(lineUpdateRequest.getId()).orElseThrow(IllegalArgumentException::new);
-        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+    public void updateLine(final LineUpdateRequest request) {
+        boolean isExists = lineRepository.existsByName(request.getName());
+        Line line = lineRepository.findById(request.getId()).orElseThrow(IllegalArgumentException::new);
+
+        if (isExists && !line.getName().equals(request.getName())) {
+            throw new IllegalArgumentException();
+        }
+
+        line.update(request.getName(), request.getColor());
     }
 
     @Transactional

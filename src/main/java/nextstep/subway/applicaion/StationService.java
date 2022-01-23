@@ -20,6 +20,10 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new IllegalArgumentException();
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
@@ -38,11 +42,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+        return new StationResponse(station);
     }
 }
