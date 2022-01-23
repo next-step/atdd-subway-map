@@ -28,7 +28,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("강남역");
 
         // then
-        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.FOUND.value());
         assertThat(지하철역_생성_응답.header("Location")).isNotBlank();
     }
 
@@ -68,6 +68,24 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철역 생성을 요청하고,
+     * When 같은 이름으로 지하철약 생성을 요청하면,
+     * Then 지하철역 생성이 실패한다.
+     */
+    @Test
+    void 중복_이름으로_지하철역_생성() {
+        // given
+        StationSteps.지하철역_생성_요청("가양역");
+
+        // when
+        ExtractableResponse<Response> 지하철역_중복_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+
+        // then
+        assertThat(지하철역_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(지하철역_중복_생성_응답.jsonPath().getString("errorMessage")).isEqualTo("이미 등록된 역입니다. 역 이름 = " + "가양역");
     }
 
     private String getStationId(String locations) {

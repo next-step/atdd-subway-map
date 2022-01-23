@@ -6,6 +6,7 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,15 +14,20 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+    public StationResponse saveStation(StationRequest request) throws IllegalArgumentException {
+        Station findStation = stationRepository.findByName(request.getName());
+        if (ObjectUtils.isEmpty(findStation)) {
+            Station station = stationRepository.save(new Station(request.getName()));
+            return createStationResponse(station);
+        }
+
+        throw new IllegalArgumentException("이미 등록된 역입니다. 역 이름 = " + request.getName());
     }
 
     @Transactional(readOnly = true)

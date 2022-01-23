@@ -20,7 +20,7 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) throws IllegalArgumentException{
+    public LineResponse saveLine(LineRequest request) throws IllegalArgumentException {
         Line findLine = lineRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findLine)) {
             Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
