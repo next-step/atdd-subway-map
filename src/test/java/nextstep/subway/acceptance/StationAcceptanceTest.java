@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.utils.Constant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
@@ -24,7 +25,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        Map<String, String> params = createStationParam("강남역");
+        Map<String, String> params = createStationParam(강남역);
 
         // when
         ExtractableResponse<Response> response = createStationResponse(params);
@@ -44,8 +45,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        createStationResponse(createStationParam("강남역"));
-        createStationResponse(createStationParam("역삼역"));
+        createStationResponse(createStationParam(강남역));
+        createStationResponse(createStationParam(역삼역));
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -56,7 +57,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList(NAME_PARAMETER);
-        assertThat(stationNames).contains("강남역", "역삼역");
+        assertThat(stationNames).contains(강남역, 역삼역);
     }
 
     /**
@@ -68,7 +69,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = createStationResponse(createStationParam("강남역"));
+        ExtractableResponse<Response> createResponse = createStationResponse(createStationParam(강남역));
 
         // when
         String uri = createResponse.header(LOCATION_HEADER);

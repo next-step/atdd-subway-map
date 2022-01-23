@@ -9,14 +9,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AcceptanceTest {
-    public static String COLOR_PARAMETER = "color";
-    public static String NAME_PARAMETER = "name";
-    public static String LOCATION_HEADER = "Location";
-    public static String STATION_PATH = "/stations";
-    public static String LINE_PATH = "/lines";
-
-
-
     @LocalServerPort
     int port;
 
