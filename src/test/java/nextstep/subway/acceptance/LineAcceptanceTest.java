@@ -10,10 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.http.HttpHeaders.HOST;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -53,7 +55,39 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        /// given
+        final String firstLineName = "신분당선";
+        final String firstLineColor = "bg-red-600";
+        정상적인_지하철_노선_생성을_요청한다(firstLineName, firstLineColor);
 
+        final String secondLieName = "2호선";
+        final String secondLineColor = "bg-green-600";
+        정상적인_지하철_노선_생성을_요청한다(secondLieName, secondLineColor);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(ContentType.JSON)
+                .header(HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
+                () -> assertThat(response.header("Date")).isNotBlank()
+        );
+        final List<Integer> ids = response.jsonPath().getList("id");
+        assertThat(ids).contains(1, 2);
+
+        final List<String> lineNames = response.jsonPath().getList("name");
+        assertThat(lineNames).contains(firstLineName, secondLieName);
+
+        final List<String> colors = response.jsonPath().getList("color");
+        assertThat(colors).contains(firstLineColor, secondLineColor);
     }
 
     /**
