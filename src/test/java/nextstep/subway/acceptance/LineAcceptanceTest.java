@@ -8,6 +8,8 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
+import nextstep.subway.exception.NotFoundStationException;
+import nextstep.subway.exception.OutOfSectionDistanceException;
 import nextstep.subway.utils.DatabaseCleanup;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +28,7 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static nextstep.subway.acceptance.StationAcceptanceTest.강남역;
 import static nextstep.subway.acceptance.StationAcceptanceTest.역삼역;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -126,14 +129,14 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 생성 시, 존재하지 않는 지하철역을 등록")
     void createLineAsInvalidStation() {
-
         // Given
         long invalidUpStationId = 1;
         long invalidDownStationId = 2;
 
-        // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(LineRequest.of(
-                _2호선, _2호선_COLOR, 1, 1, 700));
+        // When Then
+        assertThatExceptionOfType(NotFoundStationException.class)
+                .isThrownBy(() -> 지하철_노선_생성_요청(LineRequest.of(
+                        _2호선, _2호선_COLOR, invalidUpStationId, invalidDownStationId, 700)));
 
     }
 
@@ -145,7 +148,15 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 생성 시, 노선의 distance 를 1 미만 으로 입력")
     void createLineAsInvalidDistance() {
+        // Given
+        long 강남역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(StationAcceptanceTest.강남역))
+                .jsonPath().getLong("id");
+        long 역삼역_id = StationAcceptanceTest.지하철역_생성(StationRequest.of(역삼역))
+                .jsonPath().getLong("id");
 
+        assertThatExceptionOfType(OutOfSectionDistanceException.class)
+                .isThrownBy(() -> 지하철_노선_생성_요청(LineRequest.of(
+                        _2호선, _2호선_COLOR, 역삼역_id, 강남역_id, 0)));
     }
 
     /**
