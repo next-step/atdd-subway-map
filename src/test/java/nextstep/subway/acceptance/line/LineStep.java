@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.line;
 
 import java.util.HashMap;
 import java.util.Map;

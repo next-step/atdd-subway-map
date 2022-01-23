@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.line;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 import nextstep.subway.utils.DatabaseCleanup;

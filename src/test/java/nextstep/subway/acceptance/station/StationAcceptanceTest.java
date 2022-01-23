@@ -1,6 +1,4 @@
-package nextstep.subway.acceptance;
-
-import static org.assertj.core.api.Assertions.*;
+package nextstep.subway.acceptance.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +12,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
