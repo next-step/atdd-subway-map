@@ -3,7 +3,7 @@ package nextstep.subway.applicaion.dto;
 import nextstep.subway.domain.Station;
 
 public class StationRequest {
-    private String name;
+	private String name;
 
 	private StationRequest() {
 	}
@@ -13,10 +13,10 @@ public class StationRequest {
 	}
 
 	public String getName() {
-        return name;
-    }
+		return name;
+	}
 
 	public Station toEntity() {
-    	return Station.from(name);
+		return Station.from(name);
 	}
 }

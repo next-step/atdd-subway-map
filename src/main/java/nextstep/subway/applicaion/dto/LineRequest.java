@@ -3,8 +3,8 @@ package nextstep.subway.applicaion.dto;
 import nextstep.subway.domain.Line;
 
 public class LineRequest {
-    private String name;
-    private String color;
+	private String name;
+	private String color;
 
 	private LineRequest() {
 	}
@@ -15,12 +15,12 @@ public class LineRequest {
 	}
 
 	public String getName() {
-        return name;
-    }
+		return name;
+	}
 
-    public String getColor() {
-        return color;
-    }
+	public String getColor() {
+		return color;
+	}
 
 	public Line toEntity() {
 		return Line.of(name, color);

@@ -1,27 +1,27 @@
 package nextstep.subway.acceptance;
 
-import static io.restassured.http.Method.*;
-import static nextstep.subway.utils.AcceptanceTestUtils.*;
-import static org.apache.http.HttpHeaders.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.*;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import io.restassured.RestAssured;
+import io.restassured.http.Method;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import io.restassured.RestAssured;
-import io.restassured.http.Method;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import nextstep.subway.utils.DatabaseCleanup;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static io.restassured.http.Method.*;
+import static nextstep.subway.utils.AcceptanceTestUtils.createRequestPathWithVariable;
+import static nextstep.subway.utils.AcceptanceTestUtils.extractId;
+import static org.apache.http.HttpHeaders.LOCATION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
@@ -69,13 +69,13 @@ public abstract class AcceptanceTest {
 
 	private ExtractableResponse<Response> request(Method method, String path, Map<String, String> params) {
 		return RestAssured
-			.given().log().all()
-			.contentType(APPLICATION_JSON_VALUE)
-			.body(params)
-			.when()
-			.request(method, path)
-			.then().log().all()
-			.extract();
+				.given().log().all()
+				.contentType(APPLICATION_JSON_VALUE)
+				.body(params)
+				.when()
+				.request(method, path)
+				.then().log().all()
+				.extract();
 	}
 
 	protected long 아이디_추출(ExtractableResponse<Response> response) {

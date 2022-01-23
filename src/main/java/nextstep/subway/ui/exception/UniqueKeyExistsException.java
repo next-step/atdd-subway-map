@@ -1,6 +1,6 @@
 package nextstep.subway.ui.exception;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 public class UniqueKeyExistsException extends ConflictRequestException {
 

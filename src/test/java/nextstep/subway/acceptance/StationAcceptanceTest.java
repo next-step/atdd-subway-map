@@ -1,16 +1,15 @@
 package nextstep.subway.acceptance;
 
-import static java.util.Arrays.*;
-
-import java.util.Map;
-
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.utils.RequestBodyBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import nextstep.subway.utils.RequestBodyBuilder;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -106,8 +105,8 @@ class StationAcceptanceTest extends AcceptanceTest {
 
 	Map<String, String> 역_요청_본문_생성(String stationName) {
 		return RequestBodyBuilder.builder()
-			.put(역이름_필드, stationName)
-			.build();
+				.put(역이름_필드, stationName)
+				.build();
 	}
 
 }
