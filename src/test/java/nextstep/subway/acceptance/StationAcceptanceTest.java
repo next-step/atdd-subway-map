@@ -50,14 +50,10 @@ class StationAcceptanceTest extends AcceptanceTest {
         StationSteps.지하철_역_생성_요청(역삼역);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> searchResponse = StationSteps.지하철_역_조회_요청();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList(이름);
+        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> stationNames = searchResponse.jsonPath().getList(이름);
         assertThat(stationNames).contains(강남역.get(이름), 역삼역.get(이름));
     }
 
