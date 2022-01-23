@@ -68,11 +68,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선이 존재하고
      * And   새로운 지하철역을 등록하고
      * And   새로운 지하철역을 등록하고
-     * And   등록할 구간의 하행역이 새로운 지하철역의 상행역이 아닐때
+     * And   등록할 구간의 상행역이 등록되어있는 구간의 하행역이 아닐때
      * When  구간 등록을 요청한다.
      * Then  구간 등록은 실패한다.
      */
-    @DisplayName("구간 등록 실패 - 등록할 구간의 하행역이 새로운 지하철역의 상행역이 아닐때")
+    @DisplayName("구간 등록 실패 - 등록할 구간의 상행역이 등록되어있는 구간의 하행역이 아닐때")
     @Test
     void addSectionThatFailing1() {
         lineStep.지하철_노선_생성_요청();
