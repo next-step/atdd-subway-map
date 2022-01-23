@@ -40,6 +40,22 @@ public class Section {
         this.distance = distance;
     }
 
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Distance getDistance() {
+        return distance;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

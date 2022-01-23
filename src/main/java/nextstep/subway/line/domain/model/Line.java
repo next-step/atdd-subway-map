@@ -33,6 +33,7 @@ public class Line extends BaseEntity {
     private List<Section> sections;
 
     protected Line() {
+        this.sections = new ArrayList<>();
     }
 
     public Line(String name, String color) {
@@ -56,6 +57,10 @@ public class Line extends BaseEntity {
     public void edit(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public boolean matchSectionsSize(int size) {
+        return this.sections.size() == size;
     }
 
     public boolean notMatchName(String name) {
