@@ -38,7 +38,7 @@ public class StationService {
             .collect(Collectors.toList());
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStation(Long id) {
         stationRepository.deleteById(id);
     }
 
