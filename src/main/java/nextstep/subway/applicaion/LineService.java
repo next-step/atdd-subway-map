@@ -4,13 +4,11 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.exception.DuplicatedLineException;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -24,8 +22,8 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        validateDuplicatedLine(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        // Entity to LineResponse(DTO)
         return new LineResponse(line);
     }
 
@@ -57,4 +55,10 @@ public class LineService {
                 .orElseThrow(IllegalArgumentException::new);
     }
 
+    private void validateDuplicatedLine(LineRequest request) {
+        boolean existsLine = lineRepository.existsLineByName(request.getName());
+        if(existsLine) {
+            throw new DuplicatedException("중복된 라인을 생성할 수 없습니다.");
+        }
+    }
 }

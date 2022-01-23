@@ -112,7 +112,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                         = 지하철역_생성_요청(뚝섬역);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 지하철역을 생성할 수 없습니다.");
     }
 

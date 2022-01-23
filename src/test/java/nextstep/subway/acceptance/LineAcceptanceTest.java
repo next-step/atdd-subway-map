@@ -170,7 +170,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 = 지하철_노선_생성_요청(신분당선);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 라인을 생성할 수 없습니다.");
     }
+
 }

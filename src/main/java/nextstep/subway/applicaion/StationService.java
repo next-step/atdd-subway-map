@@ -4,7 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
-import nextstep.subway.exception.DuplicatedStationException;
+import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +49,7 @@ public class StationService {
     private void validateDuplicatedStation(StationRequest stationRequest) {
         boolean existsStation = stationRepository.existsStationByName(stationRequest.getName());
         if (existsStation) {
-            throw new DuplicatedStationException("중복된 지하철역을 생성할 수 없습니다.");
+            throw new DuplicatedException("중복된 지하철역을 생성할 수 없습니다.");
         }
     }
 }
