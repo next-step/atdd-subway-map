@@ -4,12 +4,14 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.utils.ResponseUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,6 +90,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        final String uri = response.header("Location");
+
+        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
+
+        final List<String> name = extract.jsonPath().getList("name");
+        assertThat(name).contains("1호선");
+
+        // todo assert
     }
 
     /**
@@ -98,6 +122,29 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        final String uri = response.header("Location");
+
+        LineRequest editedLineRequest = new LineRequest("7호선", "green darken-3");
+        final ExtractableResponse<Response> extract = RestAssured.given().log().all()
+                .body(editedLineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .patch(uri)
+                .then().log().all()
+                .extract();
+
+        // todo assert
+
     }
 
     /**
@@ -108,5 +155,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        final String uri = response.header("Location");
+
+        final ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        ResponseUtils.httpStatus가_NO_CONTENT(deleteResponse);
     }
 }
