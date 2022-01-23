@@ -62,17 +62,10 @@ public class LineService {
         );
     }
 
-    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.getById(id);
         line.setName(lineRequest.getName());
         line.setColor(lineRequest.getColor());
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
     }
 
     public void deleteLine(Long id) {
