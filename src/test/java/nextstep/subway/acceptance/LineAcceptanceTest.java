@@ -25,6 +25,15 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    ExtractableResponse<Response> 지하철_노선_전체_리스트_조회_API() {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -89,18 +98,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_API(shinbundangLineParams);
 
         // when
-        ExtractableResponse<Response> lines = RestAssured.given().log().all()
-                .params(new HashMap<>())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
 
         // then
-        List<String> lineNames = lines.body().jsonPath().getList("name");
+        List<String> lineNames = response.body().jsonPath().getList("name");
 
-        assertThat(lines.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(lineNames).contains("신분당선", "GTX-A");
     }
 
