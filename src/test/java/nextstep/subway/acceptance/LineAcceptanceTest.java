@@ -24,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
 
         // when
-        ExtractableResponse<Response> response = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> response = LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -40,9 +40,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // when
-        LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
-        ExtractableResponse<Response> response = LineSteps.getLines();
+        ExtractableResponse<Response> response = LineSteps.get();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -63,11 +63,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         String name = "2호선";
         String color = "bg-green-600";
 
-        LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
-        LineSteps.postLine(name, color);
+        LineSteps.post(FIRST_NAME, FIRST_COLOR);
+        LineSteps.post(name, color);
 
         // when
-        ExtractableResponse<Response> response = LineSteps.getLines();
+        ExtractableResponse<Response> response = LineSteps.get();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -84,10 +84,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createLine = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> createLine = LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
         // when
-        ExtractableResponse<Response> response = LineSteps.putLine(createLine.header("Location"), "구분당선", "bg-red-600");
+        ExtractableResponse<Response> response = LineSteps.put(createLine.header("Location"), "구분당선", "bg-red-600");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -102,10 +102,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createLine = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> createLine = LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
         // when
-        ExtractableResponse<Response> response = LineSteps.deleteLine(createLine.header("Location"));
+        ExtractableResponse<Response> response = LineSteps.delete(createLine.header("Location"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -120,10 +120,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateLineName() {
         // given
-        LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
         // when
-        ExtractableResponse<Response> response = LineSteps.postLine(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> response = LineSteps.post(FIRST_NAME, FIRST_COLOR);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

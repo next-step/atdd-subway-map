@@ -1,22 +1,18 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-    private static String FRIST_NAME = "강남역";
+    private static String FIRST_NAME = "강남역";
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -26,7 +22,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given, when
-        ExtractableResponse<Response> response = StationSteps.postStation(FRIST_NAME);
+        ExtractableResponse<Response> response = StationSteps.post(FIRST_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,15 +42,15 @@ class StationAcceptanceTest extends AcceptanceTest {
         String name = "역삼역";
 
         // then
-        StationSteps.postStation(FRIST_NAME);
-        StationSteps.postStation(name);
+        StationSteps.post(FIRST_NAME);
+        StationSteps.post(name);
 
         // when
-        ExtractableResponse<Response> response = StationSteps.getStations();
+        ExtractableResponse<Response> response = StationSteps.get();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(FRIST_NAME, name);
+        assertThat(stationNames).contains(FIRST_NAME, name);
     }
 
     /**
@@ -66,11 +62,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = StationSteps.postStation("강남역");
+        ExtractableResponse<Response> createResponse = StationSteps.post("강남역");
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = StationSteps.deleteStation(uri);
+        ExtractableResponse<Response> response = StationSteps.delete(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -86,10 +82,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateStationName() {
         // given
-        StationSteps.postStation(FRIST_NAME);
+        StationSteps.post(FIRST_NAME);
 
         // when
-        ExtractableResponse<Response> response = StationSteps.postStation(FRIST_NAME);
+        ExtractableResponse<Response> response = StationSteps.post(FIRST_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

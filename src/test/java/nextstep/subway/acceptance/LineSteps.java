@@ -1,57 +1,35 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LineSteps {
+    private static String URL = "/lines";
 
-    public static ExtractableResponse<Response> postLine(String name, String color) {
+    public static ExtractableResponse<Response> post(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
 
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        return CommonRestAssured.post(URL, params);
     }
 
-    public static ExtractableResponse<Response> getLines() {
-        return RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+    public static ExtractableResponse<Response> get() {
+        return CommonRestAssured.get(URL);
     }
 
-    public static ExtractableResponse<Response> deleteLine(String url) {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete(url)
-                .then().log().all()
-                .extract();
+    public static ExtractableResponse<Response> delete(String url) {
+        return CommonRestAssured.delete(url);
     }
 
-    public static ExtractableResponse<Response> putLine(String url, String name, String color) {
+    public static ExtractableResponse<Response> put(String url, String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
 
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put(url)
-                .then().log().all()
-                .extract();
+        return CommonRestAssured.put(url, params);
     }
 }
