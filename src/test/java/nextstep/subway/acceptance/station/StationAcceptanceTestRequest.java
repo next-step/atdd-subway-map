@@ -26,9 +26,9 @@ public class StationAcceptanceTestRequest extends AcceptanceTestRequest {
 		return 생성_요청(역_요청_본문_생성(역_이름));
 	}
 
-	private Map<String, String> 역_요청_본문_생성(String stationName) {
+	private Map<String, String> 역_요청_본문_생성(String 역_이름) {
 		return RequestBodyBuilder.builder()
-				.put(역이름_필드, stationName)
+				.put(역이름_필드, 역_이름)
 				.build();
 	}
 }
