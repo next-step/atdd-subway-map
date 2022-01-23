@@ -127,6 +127,32 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        /// given
+        final String firstLineName = "신분당선";
+        final String firstLineColor = "bg-red-600";
+        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(firstLineName, firstLineColor);
+        final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("name", "구분당선");
+        params.put("color", "bg-blue-600");
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(ContentType.ANY)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .patch("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.header("Date")).isNotBlank()
+        );
     }
 
     /**
