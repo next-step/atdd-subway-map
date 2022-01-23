@@ -33,6 +33,29 @@ public class LineSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청2(
+            String name,
+            String color,
+            String upStationId,
+            String downStationId,
+            String distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(DEFAULT_PATH)
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> 지하철_노선_조회_요청(String uri) {
         return RestAssured.given().log().all()
                 .when()

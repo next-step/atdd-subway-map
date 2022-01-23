@@ -5,21 +5,23 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineResponse;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -28,12 +30,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
+        지하철역들_생성_요청(10);
         String bgRed600 = "bg-red-600";
         String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
 
         // when
-        Map<String, String> createParams = getParams(신분당선, bgRed600);
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createParams);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -48,6 +58,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철 노선의 상행이 존재하지 않는 역이고
+     * When 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("상행이 존재하지 않는 지하철 역인 지하철 노선 생성")
+    @Test
+    void createLineWithNotExistUpStation() {
+
+    }
+
+    /**
+     * Given 지하철 노선의 하행이 존재하지 않는 역이고
+     * When 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("하이 존재하지 않는 지하철 역인 지하철 노선 생성")
+    @Test
+    void createLineWithNotExistDownStation() {
+
+    }
+
+    /**
      * Given 지하철역 생성을 요청 하고
      * When 같은 이름으로 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 실패한다.
@@ -56,11 +88,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicateNameLine() {
         // given
-        Map<String, String> createParams = getParams("신분당선", "bg-red-600");
-        지하철_노선_생성_요청(createParams);
+        지하철역들_생성_요청(10);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createParams);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -85,7 +132,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         LineCreateResponse firstLine = createResponse1.body().as(LineCreateResponse.class);
         LineCreateResponse secondLine = createResponse2.body().as(LineCreateResponse.class);
-        String url = DEFAULT_PATH;
+        String url = LineSteps.DEFAULT_PATH;
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(url);
 
         //then

@@ -3,8 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineCreateRequest;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +16,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+    private SectionRepository sectionRepository;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -29,6 +32,14 @@ public class LineService {
 
     public LineCreateResponse saveLine(LineCreateRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상행 지하철역 입니다."));
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 하행 지하철역 입니다."));
+
+        Section section = Section.createOf(line, upStation, downStation, request.getDistance());
+        line.updateSection(section);
+
         return new LineCreateResponse(
                 line.getId(),
                 line.getName(),

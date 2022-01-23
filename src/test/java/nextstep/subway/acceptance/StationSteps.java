@@ -23,4 +23,10 @@ public class StationSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static void 지하철역들_생성_요청(int count) {
+        for (int i = 1; i <= count; i++) {
+            지하철역_생성_요청(i + "역");
+        }
+    }
 }
