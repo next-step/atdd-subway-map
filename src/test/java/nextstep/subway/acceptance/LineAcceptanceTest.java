@@ -20,6 +20,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 생성이 성공한다.
      * @see nextstep.subway.ui.LineController#createLine
      */
+    @DisplayName("지하철 노선 생성 테스트")
     @Test
     void 지하철_노선_생성_테스트() {
         // given
@@ -39,6 +40,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 생성이 실패한다.
      * @see nextstep.subway.ui.LineController#createLine
      */
+    @DisplayName("지하철 노선 이름 중복 생성 방지 테스트")
     @Test
     void 지하철_노선_이름_중복_생성_방지_테스트() {
         // given
@@ -62,6 +64,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
      * @see nextstep.subway.ui.LineController#findAllLines()
      */
+    @DisplayName("지하철 노선 목록 조회 테스트")
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
@@ -86,6 +89,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 생성한 지하철 노선을 응답받는다
      * @see nextstep.subway.ui.LineController#getLine
      */
+    @DisplayName("지하철 노선 조회 테스트")
     @Test
     void 지하철_노선_조회_테스트() {
         // given
@@ -111,6 +115,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선의 정보 수정은 성공한다.
      * @see nextstep.subway.ui.LineController#updateLine
      */
+    @DisplayName("지하철 노선 수정 테스트")
     @Test
     void 지하철_노선_수정_테스트() {
         // given
@@ -140,6 +145,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 생성한 지하철 노선 삭제가 성공한다.
      * @see nextstep.subway.ui.LineController#deleteLine
      */
+    @DisplayName("지하철 노선 삭제 테스트")
     @Test
     void 지하철_노선_삭제_테스트() {
         // given

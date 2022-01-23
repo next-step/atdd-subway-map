@@ -40,6 +40,7 @@ class StationAcceptanceTest extends AcceptanceTest {
      * Then 지하철역 생성이 실패한다.
      * @see nextstep.subway.ui.StationController#createStation
      */
+    @DisplayName("지하철역 이름 중복 생성 방지 테스트")
     @Test
     void 지하철역_이름_중복_생성_방지_테스트() {
         // given
