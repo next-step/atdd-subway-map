@@ -38,12 +38,12 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Optional<Line> line = lineRepository.findById(id);
-        return LineResponse.of(line.orElseThrow(IllegalArgumentException::new));
+        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        return LineResponse.of(line);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).get();
+        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
