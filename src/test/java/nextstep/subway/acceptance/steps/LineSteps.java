@@ -27,27 +27,6 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
-    public static LineResponse 지하철노선_생성요청2(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract();
-
-        return new LineResponse(
-                response.jsonPath().getLong("id"),
-                response.jsonPath().getString("name"),
-                response.jsonPath().getString("color"),
-                LocalDateTime.parse(response.jsonPath().getString("createdDate")),
-                LocalDateTime.parse(response.jsonPath().getString("modifiedDate"))
-        );
-    }
-
     public static ExtractableResponse<Response> 지하철노선_단건조회(Long lineId) {
         return RestAssured
                 .given().log().all()

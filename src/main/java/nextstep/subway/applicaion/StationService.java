@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
@@ -20,8 +21,15 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateDuplicateStationName(stationRequest.getName());
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
+    }
+
+    private void validateDuplicateStationName(String name) {
+       if(stationRepository.findByName(name) != null) {
+           throw new RuntimeException("중복된 이름입니다.");
+       }
     }
 
     @Transactional(readOnly = true)

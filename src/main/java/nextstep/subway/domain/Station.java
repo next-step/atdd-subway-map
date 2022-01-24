@@ -12,8 +12,7 @@ public class Station extends BaseEntity {
     private Long id;
     private String name;
 
-    public Station() {
-    }
+    public Station() {}
 
     public Station(String name) {
         this.name = name;
@@ -22,7 +21,6 @@ public class Station extends BaseEntity {
     public Long getId() {
         return id;
     }
-
     public String getName() {
         return name;
     }
