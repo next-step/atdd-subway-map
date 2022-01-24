@@ -1,21 +1,15 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.utils.ResponseUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static nextstep.subway.utils.ResponseUtils.*;
 import static nextstep.subway.utils.LineUtils.*;
+import static nextstep.subway.utils.ResponseUtils.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -28,7 +22,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        final Map<String, Object> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
 
         // when
         final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
@@ -46,35 +40,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        LineRequest lineRequest1 = new LineRequest("1호선", "blue darken-4");
-        LineRequest lineRequest2 = new LineRequest("7호선", "green darken-3");
+        // given
+        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final Map<String, String> line7 = 지하철_노선_데이터_생성("7호선", "green darken-3");
 
-        RestAssured.given().log().all()
-                .body(lineRequest1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_생성요청(Arrays.asList(line1, line7));
 
-        RestAssured.given().log().all()
-                .body(lineRequest2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        // when
+        final ExtractableResponse<Response> responseList = 지하철_노선_목록요청();
 
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).contains("1호선");
-        assertThat(response.jsonPath().getList("name")).contains("7호선");
-        // todo 리팩토링, jsonpath
+        // then
+        httpStatus가_OK면서_ResponseBody가_존재함(responseList);
+        responseList에_호선이_존재함(responseList, Arrays.asList("1호선", "7호선"));
     }
 
     /**
@@ -85,26 +62,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
+        // given
+        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성요청(line1);
 
-        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
+        // when
         final String uri = createResponse.header("Location");
+        final ExtractableResponse<Response> getResponse = 지하철_노선_목록요청(uri);
 
-        final ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-                .when()
-                .get(uri)
-                .then().log().all()
-                .extract();
-
-        final String name = getResponse.jsonPath().get("name");
-        assertThat(name).isEqualTo("1호선");
+        // then
+        httpStatus가_OK면서_ResponseBody가_존재함(getResponse);
+        responseList에_호선이_존재함(getResponse, "1호선");
     }
 
     /**
@@ -115,31 +83,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
+        // given
+        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
 
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
+        // when
         final String uri = response.header("Location");
+        final Map<String, String> editedLine = 지하철_노선_데이터_생성("7호선", "green darken-3");
 
-        LineRequest editedLineRequest = new LineRequest("7호선", "green darken-3");
-        final ExtractableResponse<Response> editReponse = RestAssured.given().log().all()
-                .body(editedLineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .patch(uri)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> editResponse = 지하철_노선_수정요청(editedLine, uri);
 
-        final String name = editReponse.jsonPath().get("name");
-        final String color = editReponse.jsonPath().get("color");
-        assertThat(name).contains("7호선");
-        assertThat(color).contains("green darken-3");
+        // then
+        httpStatus가_OK면서_ResponseBody가_존재함(editResponse);
+        responseList에_호선이_존재함(editResponse, "7호선");
     }
 
     /**
@@ -150,24 +106,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        LineRequest lineRequest = new LineRequest("1호선", "blue darken-4");
+        // given
+        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
 
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-
+        // when
         final String uri = response.header("Location");
+        final ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제요청(uri);
 
-        final ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
-
-        ResponseUtils.httpStatus가_NO_CONTENT(deleteResponse);
+        // then
+        httpStatus가_NO_CONTENT(deleteResponse);
     }
 }

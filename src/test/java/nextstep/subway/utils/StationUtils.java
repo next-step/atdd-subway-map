@@ -72,6 +72,6 @@ public class StationUtils {
                 .stream()
                 .map(Objects::toString)
                 .collect(Collectors.toList());
-        assertThat(requestNames).contains(responseName.toString());
+        assertThat(requestNames).isEqualTo(responseName);
     }
 }
