@@ -25,7 +25,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "분당선");
+        params.put("name", "신분당선");
+        params.put("color", "bg-red-600");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -51,9 +52,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        String 분당선 = "분당선";
+        String 신분당선 = "신분당선";
         Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 분당선);
+        params1.put("name", 신분당선);
+        params1.put("color", "bg-red-600");
         ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
                 .body(params1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -62,9 +64,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        String 신분당선 = "신분당선";
+        String 이호선 = "2호선";
         Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 신분당선);
+        params2.put("name", 이호선);
+        params2.put("color", "bg-green-600");
         ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
                 .body(params2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -82,7 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).contains(분당선, 신분당선);
+        assertThat(lineNames).contains(신분당선, 이호선);
     }
 
     /**
@@ -108,9 +111,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // when
+        String uri = createResponse1.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
-                .get("/lines/{id}", createResponse1.jsonPath().getLong("id"))
+                .get(uri)
                 .then().log().all()
                 .extract();
 
