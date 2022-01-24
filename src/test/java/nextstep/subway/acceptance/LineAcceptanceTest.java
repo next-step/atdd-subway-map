@@ -85,7 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
 
         // then
-        assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -112,7 +112,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철 노선의 정보 수정을 요청 하면
-     * Then 지하철 노선의 정보가 없어 신규 생성한다.
+     * Then 지하철 노선의 정보가 수정되지 않는다.
      */
     @Test
     void 존재하지_않는_노선_수정() {
@@ -120,10 +120,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청("2", "5호선", "보라색");
 
         // then
-        assertThat(지하철_노선_수정_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        String lineName = 지하철_노선_수정_응답.jsonPath().getString("name");
-        assertThat(lineName).isEqualTo("5호선");
+        assertThat(지하철_노선_수정_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -144,7 +141,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
-        assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(지하철_노선_조회_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -161,8 +158,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_중복_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // then
-        assertThat(지하철_노선_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(지하철_노선_중복_생성_응답.jsonPath().getString("errorMessage")).isEqualTo("이미 등록된 노선입니다. 노선 이름 = " + "9호선");
+        assertThat(지하철_노선_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(지하철_노선_중복_생성_응답.jsonPath().getString("message")).isEqualTo("이미 등록된 노선입니다. 노선 이름 = " + "9호선");
     }
 
     private String getLineId(String location) {

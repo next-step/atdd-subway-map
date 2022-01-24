@@ -22,12 +22,7 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse response = null;
-        try {
-            response = stationService.saveStation(stationRequest);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.ok().body(new StationResponse(e.getMessage()));
-        }
+        StationResponse response = stationService.saveStation(stationRequest);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/stations/" + response.getId())).build();
     }

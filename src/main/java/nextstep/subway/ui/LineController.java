@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.util.List;
 
-@RequestMapping("/lines")
 @RestController
+@RequestMapping("/lines")
 public class LineController {
+
     private final LineService lineService;
 
     public LineController(LineService lineService) {
@@ -29,12 +30,7 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse response = null;
-        try {
-            response = lineService.saveLine(lineRequest);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.ok().body(new LineResponse(e.getMessage()));
-        }
+        LineResponse response = lineService.saveLine(lineRequest);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/lines/" + response.getId())).build();
     }
@@ -47,19 +43,12 @@ public class LineController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
         LineResponse response = lineService.findLineById(id);
-        if (response.getId() == null) {
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        LineResponse response = lineService.updateLineById(id, lineRequest);
-        if (response.getId() == null) {
-            response = lineService.saveLine(lineRequest);
-            return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
-        }
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        lineService.updateLineById(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 

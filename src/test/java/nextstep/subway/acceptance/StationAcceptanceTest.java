@@ -84,8 +84,8 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철역_중복_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
 
         // then
-        assertThat(지하철역_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(지하철역_중복_생성_응답.jsonPath().getString("errorMessage")).isEqualTo("이미 등록된 역입니다. 역 이름 = " + "가양역");
+        assertThat(지하철역_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(지하철역_중복_생성_응답.jsonPath().getString("message")).isEqualTo("이미 등록된 역입니다. 역 이름 = " + "가양역");
     }
 
     private String getStationId(String locations) {

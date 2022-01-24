@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicateRegistrationRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -20,14 +21,14 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest request) throws IllegalArgumentException {
+    public StationResponse saveStation(StationRequest request) throws DuplicateRegistrationRequestException {
         Station findStation = stationRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findStation)) {
             Station station = stationRepository.save(new Station(request.getName()));
-            return createStationResponse(station);
+            return StationResponse.createStationResponse(station);
         }
 
-        throw new IllegalArgumentException("이미 등록된 역입니다. 역 이름 = " + request.getName());
+        throw new DuplicateRegistrationRequestException("이미 등록된 역입니다. 역 이름 = " + request.getName());
     }
 
     @Transactional(readOnly = true)
@@ -35,20 +36,11 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::createStationResponse)
                 .collect(Collectors.toList());
     }
 
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
     }
 }
