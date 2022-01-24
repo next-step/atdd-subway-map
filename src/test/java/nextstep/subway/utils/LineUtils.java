@@ -51,7 +51,7 @@ public class LineUtils {
                 .body(param)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .patch(uri)
+                .put(uri)
                 .then().log().all()
                 .extract();
     }
