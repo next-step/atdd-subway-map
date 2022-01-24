@@ -76,9 +76,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String 신분당선_색 = "bg-red-600";
         String 신분당선_이름 = "신분당선";
-        ExtractableResponse<Response> 신분당선_생성_응답 = LineTestStep.지하철_노선을_생성한다(신분당선_색, 신분당선_이름);
-        Integer responseIntegerId = 신분당선_생성_응답.jsonPath().get("id");
-        Long 신분당선_생성_아이디 = responseIntegerId.longValue();
+        Long 신분당선_생성_아이디 = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(신분당선_색, 신분당선_이름);
 
         // when
         ExtractableResponse<Response> response = LineTestStep.지하철_노선을_조회한다(신분당선_생성_아이디);
@@ -105,9 +103,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String 신분당선_색 = "bg-red-600";
         String 신분당선_이름 = "신분당선";
-        ExtractableResponse<Response> 신분당선_생성_응답 = LineTestStep.지하철_노선을_생성한다(신분당선_색, 신분당선_이름);
-        Integer responseIntegerId = 신분당선_생성_응답.jsonPath().get("id");
-        Long 신분당선_생성_아이디 = responseIntegerId.longValue();
+        Long 신분당선_생성_아이디 = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(신분당선_색, 신분당선_이름);
 
         String 수정_색 = "bg-red-400";
         String 수정_이름 = "신분당선_연장";
@@ -137,9 +133,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String 신분당선_색 = "bg-red-600";
         String 신분당선_이름 = "신분당선";
-        ExtractableResponse<Response> 신분당선_생성_응답 = LineTestStep.지하철_노선을_생성한다(신분당선_색, 신분당선_이름);
-        Integer responseIntegerId = 신분당선_생성_응답.jsonPath().get("id");
-        Long 신분당선_생성_아이디 = responseIntegerId.longValue();
+        Long 신분당선_생성_아이디 = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(신분당선_색, 신분당선_이름);
 
         // when
         ExtractableResponse<Response> response = LineTestStep.지하철_노선을_삭제한다(신분당선_생성_아이디);
