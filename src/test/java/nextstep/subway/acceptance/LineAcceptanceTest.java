@@ -275,11 +275,4 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 라인을 생성할 수 없습니다.");
     }
 
-    @Test
-    @DisplayName("지하철 구간 등록")
-    void createSection(){
-
-    }
-
-
 }
