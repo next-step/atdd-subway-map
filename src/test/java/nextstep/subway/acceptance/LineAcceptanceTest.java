@@ -127,6 +127,26 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 노선 생성")
+    @Test
+    void 중복이름으로_지하철노선을_생성하면_실패한다() {
+        //given
+        String fixtureLineName = "신분당선";
+        ExtractableResponse<Response> fixtureResponse = 노선_생성_요청(fixtureLineName, "bg-red-600");
+
+        //when
+        ExtractableResponse<Response> response = 노선_생성_요청(fixtureLineName, "bg-red-600");
+
+        //then
+        assertThat(fixtureResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
     private ExtractableResponse<Response> 노선_생성_요청(String 노선이름, String 노선색) {
         return RestTestUtils.요청_테스트(URI.create("/lines"), RequestParamsBuilder.<String>builder()
                 .addParam("name", 노선이름)
