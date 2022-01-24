@@ -26,11 +26,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         /// given
-        final String name = "신분당선";
-        final String color = "bg-red-600";
+        final String 신분당선 = "신분당선";
+        final String 빨강색 = "bg-red-600";
 
         // when
-        ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다(name, color);
+        ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
 
         // then
         assertAll(
@@ -39,8 +39,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.body().jsonPath().get("id").equals(1)),
-                () -> assertThat(response.body().jsonPath().get("name").equals(name)),
-                () -> assertThat(response.body().jsonPath().get("color").equals(color))
+                () -> assertThat(response.body().jsonPath().get("name").equals(신분당선)),
+                () -> assertThat(response.body().jsonPath().get("color").equals(빨강색))
                 // 시간과 관련된 테스트는 어떻게 해야할지 궁금합니다!
         );
     }
@@ -55,13 +55,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         /// given
-        final String firstLineName = "신분당선";
-        final String firstLineColor = "bg-red-600";
-        정상적인_지하철_노선_생성을_요청한다(firstLineName, firstLineColor);
+        final String 신분당선 = "신분당선";
+        final String 빨강색 = "bg-red-600";
+        정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
 
-        final String secondLieName = "2호선";
-        final String secondLineColor = "bg-green-600";
-        정상적인_지하철_노선_생성을_요청한다(secondLieName, secondLineColor);
+        final String 이호선 = "2호선";
+        final String 초록색 = "bg-green-600";
+        정상적인_지하철_노선_생성을_요청한다(이호선, 초록색);
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -79,8 +79,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.jsonPath().getList("id")).contains(1, 2),
-                () -> assertThat(response.jsonPath().getList("name")).contains(firstLineName, secondLieName),
-                () -> assertThat(response.jsonPath().getList("color")).contains(firstLineColor, secondLineColor)
+                () -> assertThat(response.jsonPath().getList("name")).contains(신분당선, 이호선),
+                () -> assertThat(response.jsonPath().getList("color")).contains(빨강색, 초록색)
         );
     }
 
@@ -93,13 +93,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         /// given
-        final String firstLineName = "신분당선";
-        final String firstLineColor = "bg-red-600";
-        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(firstLineName, firstLineColor);
+        final String 신분당선 = "신분당선";
+        final String 빨강색 = "bg-red-600";
+        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
         final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         // when
-        final ExtractableResponse<Response> response = 정상적인_지하철_노선_조회를_요청한다(lineId);
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(ContentType.JSON)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(saveResponse.header("Location"))
+                .then().log().all()
+                .extract();
 
         // then
         assertAll(
@@ -107,8 +114,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.body().jsonPath().get("id").equals(lineId)),
-                () -> assertThat(response.body().jsonPath().get("name").equals(firstLineName)),
-                () -> assertThat(response.body().jsonPath().get("color").equals(firstLineColor))
+                () -> assertThat(response.body().jsonPath().get("name").equals(신분당선)),
+                () -> assertThat(response.body().jsonPath().get("color").equals(빨강색))
         );
     }
 
@@ -122,7 +129,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         /// given
         final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
-        final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         final Map<String, String> params = new HashMap<>();
         final String updatedName = "구분당선";
@@ -137,7 +143,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
                 .when()
-                .put("/lines/" + lineId) // 모든 데이터를 변경하고 있어서 put 으로 했습니다.
+                .put(saveResponse.header("Location")) // 모든 데이터를 변경하고 있어서 put 으로 했습니다.
                 .then().log().all()
                 .extract();
 
@@ -145,16 +151,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(updateResponse.header("Date")).isNotBlank()
-        );
-
-        final ExtractableResponse<Response> findResponse = 정상적인_지하철_노선_조회를_요청한다(lineId);
-        assertAll(
-                () -> assertThat(findResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(findResponse.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
-                () -> assertThat(findResponse.header("Date")).isNotBlank(),
-                () -> assertThat(findResponse.body().jsonPath().get("id").equals(lineId)),
-                () -> assertThat(findResponse.body().jsonPath().get("name").equals(updatedName)),
-                () -> assertThat(findResponse.body().jsonPath().get("color").equals(updatedColor))
         );
     }
 
@@ -166,16 +162,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        /// given
+        // given
         final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
-        final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .accept(ContentType.ANY)
                 .header(HttpHeaders.HOST, "localhost:" + port)
                 .when()
-                .delete("/lines/" + lineId)
+                .delete(saveResponse.header("Location"))
                 .then().log().all()
                 .extract();
 
@@ -204,16 +199,5 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", name);
         params.put("color", color);
         return params;
-    }
-
-    private ExtractableResponse<Response> 정상적인_지하철_노선_조회를_요청한다(final Long lineId) {
-        return RestAssured.given().log().all()
-                .accept(ContentType.JSON)
-                .header(HttpHeaders.HOST, "localhost:" + port)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
     }
 }

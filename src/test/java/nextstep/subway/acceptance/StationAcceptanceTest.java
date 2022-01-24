@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,11 +24,35 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 정상적인_지하철_역_생성_요청한다("강남역");
+        final ExtractableResponse<Response> response = 정상적인_지하철_역_생성_요청한다("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.header("Location")).isNotBlank()
+        );
+    }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("지하철역 중복 이름")
+    @Test
+    void createDuplicateStation() {
+        // given
+        final String 강남역 = "강남역";
+        정상적인_지하철_역_생성_요청한다(강남역);
+
+        // when
+        final ExtractableResponse<Response> response = 정상적인_지하철_역_생성_요청한다(강남역);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()),
+                () -> assertThat(response.body().jsonPath().get("message").equals("duplicate station name occurred"))
+        );
     }
 
     /**
@@ -42,38 +65,24 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", 강남역);
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        final String 강남역 = "강남역";
+        final String 역삼역 = "역삼역";
 
-        String 역삼역 = "역삼역";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", 역삼역);
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        정상적인_지하철_역_생성_요청한다(강남역);
+        정상적인_지하철_역_생성_요청한다(역삼역);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
                 .get("/stations")
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getList("name")).contains(강남역, 역삼역)
+        );
     }
 
     /**
@@ -85,19 +94,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> createResponse = 정상적인_지하철_역_생성_요청한다("강남역");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        final String uri = createResponse.header("Location");
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
                 .delete(uri)
                 .then().log().all()
@@ -105,28 +106,6 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    /**
-     * Given 지하철역 생성을 요청 하고
-     * When 같은 이름으로 지하철역 생성을 요청 하면
-     * Then 지하철역 생성이 실패한다.
-     */
-    @DisplayName("지하철역 중복 이름")
-    @Test
-    void duplicateStationName() {
-        // given
-        final String stationName = "강남역";
-        정상적인_지하철_역_생성_요청한다(stationName);
-
-        // when
-        final ExtractableResponse<Response> response = 정상적인_지하철_역_생성_요청한다(stationName);
-
-        // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT),
-                () -> assertThat(response.body().jsonPath().get("errorMessage").equals("duplicate station name occurred"))
-        );
     }
 
     private ExtractableResponse<Response> 정상적인_지하철_역_생성_요청한다(final String name) {
