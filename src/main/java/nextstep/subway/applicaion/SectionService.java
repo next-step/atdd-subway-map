@@ -1,8 +1,10 @@
 package nextstep.subway.applicaion;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.*;
+import nextstep.subway.exception.DuplicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +31,14 @@ public class SectionService {
 						stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(RuntimeException::new);
 		Station downStation =
 						stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(RuntimeException::new);
+		verifyStationsRelation(upStation);
 		Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
 
 		return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());
 	}
 
-	// 새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.
-	private void verifyStationsRelation() {
-
+	private void verifyStationsRelation(final Station upStation) {
+		sectionRepository.findSectionByUpStation(upStation)
+						.orElseThrow(()-> new DuplicationException("새로운 구간의 상행역은 이미 등록되어있습니다."));
 	}
-
 }

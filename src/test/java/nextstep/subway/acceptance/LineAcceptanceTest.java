@@ -169,6 +169,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 새로운 구간 생성
         ExtractableResponse<Response> extract_2 = SectionStep.saveSection(1L, 3L, 1, 1L);
 
-        assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
