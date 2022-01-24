@@ -194,4 +194,23 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
+    @DisplayName("지하철 구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+
+        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
+        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
+
+        // 노선 생성
+        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+
+        // 구간 생성
+        SectionStep.saveSection(1L, 2L, 10, 1L);
+        SectionStep.saveSection(2L, 3L, 10, 1L);
+
+        ExtractableResponse<Response> response = SectionStep.deleteSection(1L, 2L);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }

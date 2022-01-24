@@ -34,7 +34,7 @@ public class SectionService {
 		Station downStation =
 						stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(RuntimeException::new);
 		verifyStationsRelation(upStation);
-		newUpStationMustBeDownStation(downStation);
+		newUpStationMustBeDownStation(upStation);
 		Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
 
 		return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());

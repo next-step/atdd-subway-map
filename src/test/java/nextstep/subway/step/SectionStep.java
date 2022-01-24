@@ -24,6 +24,15 @@ public class SectionStep {
 						.extract();
 	}
 
+	public static ExtractableResponse<Response> deleteSection(final Long lineId, final Long sectionId) {
+
+		return RestAssured
+						.given().queryParam("stationId",sectionId).log().all()
+						.when().delete(LinePath.ROOT + LinePath.ID + "/sections", lineId)
+						.then().log().all()
+						.extract();
+	}
+
 	public static SectionRequest request(final Long upStationId, final Long downStationId, final int distance) {
 
 		return new SectionRequest(upStationId, downStationId, distance);
