@@ -31,18 +31,23 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new RuntimeException());
+        Line line = findById(id);
         return LineResponse.of(line);
     }
 
     public LineResponse modifyLine(Long id, LineRequest lineRequest) {
+        findById(id);
         Line line = lineRequest.toEntity(id);
         Line modifiedLine = lineRepository.save(line);
         return LineResponse.of(modifiedLine);
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }
 
+    public Line findById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException());
+    }
 }
