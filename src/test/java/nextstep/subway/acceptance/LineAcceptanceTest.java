@@ -4,14 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.stream.Stream;
 import nextstep.subway.utils.RequestMethod;
 import nextstep.subway.utils.RequestParams;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -84,13 +80,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * When 지하철 노선의 정보 수정을 요청 하면
+     * Then 지하철 노선의 정보 수정은 성공한다.
      */
     @DisplayName("지하철 노선 수정")
-    @ParameterizedTest
-    @MethodSource
-    void updateLine(RequestParams params) {
+    @Test
+    void updateLine() {
         //given
+        RequestParams params = createDefaultParams();
         ExtractableResponse<Response> createResponse = RequestMethod.post(DEFAULT_PATH, params);
 
         // when
@@ -101,15 +99,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    static Stream<Arguments> updateLine() {
-        RequestParams params = createDefaultParams();
-        return Stream.of(
-            Arguments.of(
-                params
-            )
-        );
     }
 
     /**
