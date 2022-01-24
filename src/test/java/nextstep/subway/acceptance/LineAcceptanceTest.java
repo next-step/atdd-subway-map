@@ -33,6 +33,25 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름 으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패 한다.
+     */
+    @DisplayName("중복 이름 으로 지하철 노선 생성")
+    @Test
+    void createLineWithDuplicateName() {
+        // given
+        final String name = "신분당선";
+        지하철_노선_생성_요청(name, "bg-red-600");
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청(name, "bg-green-600");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답 받는다.
