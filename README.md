@@ -35,5 +35,3 @@ npm run dev
 ```
 ./gradlew bootRun
 ```
-
-push test
