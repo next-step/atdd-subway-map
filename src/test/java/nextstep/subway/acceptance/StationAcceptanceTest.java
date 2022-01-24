@@ -47,7 +47,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ApiUtil.지하철역_생성_API(강남역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     /**
