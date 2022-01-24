@@ -1,8 +1,10 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.mapper.ObjectMapper;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.steps.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 import static nextstep.subway.acceptance.steps.LineSteps.지하철노선_단건조회;
 import static nextstep.subway.acceptance.steps.LineSteps.지하철노선_생성요청;
+import static nextstep.subway.acceptance.steps.StationSteps.지하철역_생성요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,16 +24,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
     /**
+     * Given 상행 종점역 생성을 요청하고
+     * Given 하행 종점역 생성을 요청하고
      * When 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 성공한다.
+     * Then 지하철 노선 및 구간 생성이 성공한다.
      */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
         // given
+        long upStationId = 지하철역_생성요청("신도림").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성요청("문래").jsonPath().getLong("id");
+
         Map<String, String> params = new HashMap<>();
-        params.put("color", "bg-green");
         params.put("name", "2호선");
+        params.put("color", "bg-green");
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", "7");
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -42,8 +53,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(jsonPath("$.color", is(params.get("color"))));
-        assertThat(jsonPath("$.name", is(params.get("name"))));
     }
 
     /**
