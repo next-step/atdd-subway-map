@@ -35,4 +35,11 @@ public class LineSectionService {
         Section createdSection = line.createSection(upStation, downStation, request.getDistance());
         return createdSection.getId();
     }
+
+    public void deleteSection(Long lineId, Long sectionId) {
+        Line line = lineRepository.findByIdWithSections(lineId)
+                                  .orElseThrow(EntityNotFoundException::new);
+
+        line.deleteSection(sectionId);
+    }
 }

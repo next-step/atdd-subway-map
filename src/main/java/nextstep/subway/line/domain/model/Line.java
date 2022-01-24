@@ -112,4 +112,17 @@ public class Line extends BaseEntity {
             () -> new InvalidArgumentException(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
         );
     }
+    public void deleteSection(Long sectionId) {
+        verifySectionSize().verify();
+
+    }
+
+    private OptionalException<InvalidArgumentException> verifySectionSize() {
+        if (sections.size() <= 1) {
+            return OptionalException.of(
+                new InvalidArgumentException(ErrorMessage.BELOW_MIN_SECTION_SIZE.getMessage())
+            );
+        }
+        return OptionalException.empty();
+    }
 }

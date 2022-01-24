@@ -65,4 +65,8 @@ public class LineStep {
     private Distance nextDistance() {
         return new Distance(2);
     }
+
+    public StationStep getStationStep() {
+        return stationStep;
+    }
 }

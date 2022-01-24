@@ -4,25 +4,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.line.domain.dto.SectionRequest;
-import nextstep.subway.line.domain.model.Distance;
 import nextstep.subway.utils.AcceptanceTestThen;
+import nextstep.subway.utils.AcceptanceTestWhen;
 
-@DisplayName("구간 추가 기능")
+@DisplayName("지하철 구간 관리")
 public class SectionAcceptanceTest extends AcceptanceTest {
-    private static final long FIRST_SECTION_UP_STATION = 1;
-    private static final long FIRST_SECTION_DOWN_STATION = 2;
-    private static final long NEW_SECTION_UP_STATION = FIRST_SECTION_DOWN_STATION;
-    private static final long NEW_SECTION_DOWN_STATION = 3;
-
     private LineStep lineStep;
     private StationStep stationStep;
     private SectionStep sectionStep;
@@ -33,7 +28,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         super.setUp();
         stationStep = new StationStep();
         lineStep = new LineStep(stationStep);
-        sectionStep = new SectionStep();
+        sectionStep = new SectionStep(lineStep);
     }
 
     /**
@@ -49,20 +44,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         lineStep.지하철_노선_생성_요청();
         stationStep.지하철역_생성_요청();
 
-        SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId(NEW_SECTION_UP_STATION)
-            .downStationId(NEW_SECTION_DOWN_STATION)
-            .distance(new Distance(100))
-            .build();
-
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .body(sectionRequest)
-                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                            .when()
-                                                            .post("/lines/1/sections")
-                                                            .then().log().all()
-                                                            .extract();
+        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청();
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -79,23 +62,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록 실패 - 등록할 구간의 상행역이 등록되어있는 구간의 하행역이 아닐때")
     @Test
     void addSectionThatFailing1() {
-        lineStep.지하철_노선_생성_요청();
-        stationStep.지하철역_생성_요청();
-
-        SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId(FIRST_SECTION_UP_STATION)
-            .downStationId(NEW_SECTION_UP_STATION)
-            .distance(new Distance(100))
-            .build();
+        // given
+        SectionRequest request = sectionStep.dummyRequest();
+        long upStationInFirstSection = 1;
+        request.setUpStationId(upStationInFirstSection);
+        long downStationInNewSection = 3;
+        request.setDownStationId(downStationInNewSection);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .body(sectionRequest)
-                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                            .when()
-                                                            .post("/lines/1/sections")
-                                                            .then().log().all()
-                                                            .extract();
+        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(request);
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -113,28 +88,86 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록 실패 - 등록할 구간의 하행역이 구간에 이미 등록되있는 역일때 ")
     @Test
     void addSectionThatFailing2() {
-        lineStep.지하철_노선_생성_요청();
-        stationStep.지하철역_생성_요청();
-
-        SectionRequest sectionRequest = SectionRequest.builder()
-            .upStationId(NEW_SECTION_UP_STATION)
-            .downStationId(FIRST_SECTION_DOWN_STATION)
-            .distance(new Distance(100))
-            .build();
+        // given
+        SectionRequest request = sectionStep.dummyRequest();
+        long downStationInFirstSection = 2;
+        request.setUpStationId(downStationInFirstSection);
+        long upStationInFirstSection = 1;
+        request.setDownStationId(upStationInFirstSection);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .body(sectionRequest)
-                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                            .when()
-                                                            .post("/lines/1/sections")
-                                                            .then().log().all()
-                                                            .extract();
+        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(request);
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
                           .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
                           .hasNotLocation();
+    }
+
+    /**
+     * Given 지하철 구간이 존재하고
+     * When  구간 삭제를 요청한다.
+     * Then  구간 삭제는 성공한다.
+     */
+    @DisplayName("구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        ExtractableResponse<Response> createResponse = sectionStep.지하철_구간_생성_요청();
+
+        // when
+        AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
+        ExtractableResponse<Response> deleteResponse = when.requestLocation(Method.DELETE);
+
+        // then
+        AcceptanceTestThen.fromWhen(deleteResponse)
+                          .equalsHttpStatus(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Given 지하철 구간이 존재하고
+     * When  종점이 아닌 구간 삭제를 요청한다.
+     * Then  구간 삭제는 실패한다.
+     */
+    @DisplayName("구간 삭제 실패 - 삭제할 구간이 종점이 아닐때")
+    @Test
+    void deleteSectionThatFailing1() {
+        // given
+        ExtractableResponse<Response> preCreateResponse = sectionStep.지하철_구간_생성_요청();
+        sectionStep.지하철_구간_생성_요청();
+
+        // when
+        ExtractableResponse<Response> deleteResponse = AcceptanceTestWhen.fromGiven(preCreateResponse)
+                                                    .requestLocation(Method.DELETE);
+
+        // then
+        AcceptanceTestThen.fromWhen(deleteResponse)
+                          .equalsHttpStatus(HttpStatus.BAD_REQUEST)
+                          .equalsErrorMessage("종점역의 구간만 삭제할 수 있습니다.");
+    }
+
+    /**
+     * Given 지하철 구간이 존재하고
+     * When  구간이 1개만 있을때 삭제를 요청한다.
+     * Then  구간 삭제는 실패한다.
+     */
+    @DisplayName("구간 삭제 실패 - 구간이 1개만 있을때")
+    @Test
+    void deleteSectionThatFailing2() {
+        // given
+        lineStep.지하철_노선_생성_요청();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log() .all()
+                                                            .when()
+                                                            .delete("/lines/1/sections/1")
+                                                            .then().log().all()
+                                                            .extract();
+
+        // then
+        AcceptanceTestThen.fromWhen(response)
+                          .equalsHttpStatus(HttpStatus.BAD_REQUEST)
+                          .equalsErrorMessage(ErrorMessage.BELOW_MIN_SECTION_SIZE.getMessage());
     }
 }

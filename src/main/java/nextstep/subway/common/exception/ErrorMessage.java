@@ -4,7 +4,8 @@ public enum ErrorMessage {
     ENTITY_NOT_FOUND("요청하신 데이터를 찾을 수 없습니다."),
     DUPLICATE_COLUMN("이미 존재하는 %s 입니다."),
     NOT_FOUND_SECTION_DOCKING_POINT("새로운 구간의 상행역은 현재 등록되어있는 하행의 종점역이어야 합니다."),
-    ALREADY_REGISTERED_STATION_IN_SECTION("새로운 구간의 하행역이 이미 등록되어 있습니다.");
+    ALREADY_REGISTERED_STATION_IN_SECTION("새로운 구간의 하행역이 이미 등록되어 있습니다."),
+    BELOW_MIN_SECTION_SIZE("구간은 최소 1개 이상 이어야 합니다.");
 
     private final String message;
 

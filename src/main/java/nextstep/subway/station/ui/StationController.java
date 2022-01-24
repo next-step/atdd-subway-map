@@ -17,7 +17,7 @@ import nextstep.subway.station.applicaion.StationService;
 import nextstep.subway.station.domain.dto.StationRequest;
 import nextstep.subway.station.domain.dto.StationResponse;
 
-@RequestMapping(path = "/stations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/stations")
 @RestController
 public class StationController {
     private final StationService stationService;
@@ -26,7 +26,7 @@ public class StationController {
         this.stationService = stationService;
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);

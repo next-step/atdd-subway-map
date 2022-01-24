@@ -19,7 +19,7 @@ import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.dto.LineResponse;
 
 @RestController
-@RequestMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/lines")
 public class LineController {
     private final LineService lineService;
 
@@ -27,7 +27,7 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
@@ -45,7 +45,7 @@ public class LineController {
         return ResponseEntity.ok().body(responses);
     }
 
-    @PutMapping("{id}")
+    @PutMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> editLine(@PathVariable("id") long id, @RequestBody LineRequest lineRequest) {
         lineService.edit(id, lineRequest);
         return ResponseEntity.ok().build();
