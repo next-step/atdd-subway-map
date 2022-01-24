@@ -30,6 +30,7 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
@@ -38,7 +39,7 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
-
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
             .orElseThrow(() -> new NotFoundLineException(id));

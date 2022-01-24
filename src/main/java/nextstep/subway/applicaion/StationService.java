@@ -42,7 +42,6 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     private StationResponse createStationResponse(Station station) {
         return StationResponse.from(station);
     }
