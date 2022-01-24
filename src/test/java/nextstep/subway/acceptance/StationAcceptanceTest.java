@@ -28,7 +28,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
 
         // then
-        지하철역_응답_상태_검증(response, HttpStatus.CREATED);
+        지하철역_생성_완료(response);
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -48,13 +48,9 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성_요청(역삼역);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_조회_요청("/stations");
 
-        지하철역_응답_상태_검증(response, HttpStatus.OK);
+        지하철역_조회_완료(response);
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
@@ -72,14 +68,10 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_삭제_요청(uri);
 
         // then
-        지하철역_응답_상태_검증(response, HttpStatus.NO_CONTENT);
+        지하철역_삭제_완료(response);
     }
 
     /**
@@ -99,7 +91,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
 
         // then
-        지하철역_응답_상태_검증(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        지하철역_생성_실패(response);
     }
 
     private ExtractableResponse<Response> 지하철역_생성_요청(String name) {
@@ -115,8 +107,39 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    private ExtractableResponse<Response> 지하철역_조회_요청(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철역_삭제_요청(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
     private void 지하철역_응답_상태_검증(ExtractableResponse<Response> response, HttpStatus status) {
         assertThat(response.statusCode()).isEqualTo(status.value());
     }
 
+    private void 지하철역_생성_완료(ExtractableResponse<Response> response) {
+        지하철역_응답_상태_검증(response, HttpStatus.CREATED);
+    }
+
+    private void 지하철역_조회_완료(ExtractableResponse<Response> response) {
+        지하철역_응답_상태_검증(response, HttpStatus.OK);
+    }
+
+    private void 지하철역_삭제_완료(ExtractableResponse<Response> response) {
+        지하철역_응답_상태_검증(response, HttpStatus.NO_CONTENT);
+    }
+
+    private void 지하철역_생성_실패(ExtractableResponse<Response> response) {
+        지하철역_응답_상태_검증(response, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.error.exception.EntityDuplicateException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -52,13 +53,13 @@ public class LineService {
     }
 
     private Line findById(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("지하철 노선을 찾을 수 없습니다."));
+        return lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     private void checkDuplicated(String name) {
-        Optional<Line> findStation = lineRepository.findByName(name);
-        if (findStation.isPresent()) {
-            throw new RuntimeException("해당 지하철 노선이 이미 존재합니다.");
-        }
+        lineRepository.findByName(name).ifPresent(l -> {
+            throw new EntityDuplicateException();
+        });
     }
 }
