@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
@@ -22,9 +21,8 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        boolean existStationByName = stationRepository.findByName(stationRequest.getName())
-            .isPresent();
-        if (existStationByName) {
+        boolean existsStationByName = stationRepository.existsByName(stationRequest.getName());
+        if (existsStationByName) {
             throw new DuplicateStationException(stationRequest.getName());
         }
 
