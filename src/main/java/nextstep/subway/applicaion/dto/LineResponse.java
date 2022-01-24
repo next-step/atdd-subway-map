@@ -21,7 +21,7 @@ public class LineResponse {
         );
     }
 
-    private LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(final Long id, final String name, final String color, final LocalDateTime createdDate, final LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
