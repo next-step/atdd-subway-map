@@ -79,6 +79,11 @@ public class Section extends BaseEntity {
         }
     }
 
+    public boolean hasStation(Station station) {
+        return getDownStation().equals(station) || getUpStation().equals(station);
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -511,6 +511,29 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * given 2개의 구간이 있는 지하철 노선이 존재하고
+     * given 존재하지 않는 역이 주어진다.
+     * when 구간 제거를 한다.
+     * then 구간 제거가 실패한다.
+     */
+    @DisplayName("지하철 노선에 구간 제거, 구간이 1개 일 때")
+    @Test
+    void removeNotExistedStation() {
+        // given
+        long 강남역_id = 지하철역_생성(StationRequest.of(강남역)).jsonPath().getLong("id");
+        long 역삼역_id = 지하철역_생성(StationRequest.of(역삼역)).jsonPath().getLong("id");
+        long 교대역_id = 지하철역_생성(StationRequest.of(교대역)).jsonPath().getLong("id");
+        long _2호선_Line_id = 지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, 강남역_id, 역삼역_id, 7)).jsonPath().getLong("id");
+        지하철_노선에_구간_등록(교대역_id, _2호선_Line_id, 강남역_id);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선에_구간_삭제(_2호선_Line_id, 9999);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     @DisplayName("지하철 노선에 등록된 구간을 통해 역 목록을 조회")
     @Test
     void getStations() {

@@ -2,12 +2,13 @@ package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.enums.Direction;
-import nextstep.subway.exception.InvalidSectionException;
+import nextstep.subway.exception.InvalidEndSectionException;
+import nextstep.subway.exception.NotFoundStationException;
+import nextstep.subway.exception.OutOfSectionSizeException;
 
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 public class Line extends BaseEntity {
@@ -75,28 +76,92 @@ public class Line extends BaseEntity {
         return false;
     }
 
-    private boolean validateUpEnd(Station downStation) {
-        boolean a = sections.stream()
-                .filter(section -> section.getUpStation().equals(downStation))
-                .count() == 1L;
+    public void deleteSection(Station station) {
+        validateDeleteMinSize();
+        validateStationExist(station);
+        Optional<Section> endSectionByStation = getEndSectionByStation(station);
+
+        if (endSectionByStation.isEmpty()) {
+            throw new InvalidEndSectionException();
+        }
+
+         // 삭제
+        this.sections.stream()
+                .filter(section -> section.hasStation(station))
+                .findAny()
+                .ifPresent(sections::remove);
+    }
+
+    /**
+     * station 이 상행 혹은 하행종점이 아니면 에러
+     * @param station
+     */
+    private Optional<Section> getEndSectionByStation(Station station) {
+        Optional<Section> upEndByStation = getUpEndByStation(station);
+        if (upEndByStation.isPresent()) {
+            return upEndByStation;
+        }
+
+        return getDownEndByStation(station);
+    }
+
+    /**
+     * station 이 있는지 조사 없으면 에러
+     */
+    private void validateStationExist(Station station) {
+        if (!getStations().contains(station)) {
+            throw new NotFoundStationException(station);
+        }
+    }
+
+    /**
+     * sections 이 size 가 1 이면 에러
+     */
+    public void validateDeleteMinSize() {
+        if (this.sections.size() == 1) {
+            throw new OutOfSectionSizeException();
+        }
+    }
+
+    private Optional<Section> getUpEndByStation(Station station) {
+        List<Section> stations = sections.stream()
+                .filter(section -> section.getUpStation().equals(station))
+                .collect(Collectors.toList());
         boolean b = sections.stream()
-                .noneMatch(section -> section.getDownStation().equals(downStation));
-        if (!a || !b) {
-            throw new InvalidSectionException();
+                .noneMatch(section -> section.getDownStation().equals(station));
+
+        if (stations.size() == 1 && b) {
+            return Optional.of(stations.get(0));
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean validateUpEnd(Station station) {
+        if (getUpEndByStation(station).isEmpty()) {
+            throw new InvalidEndSectionException();
         }
 
         return true;
     }
 
-    private boolean validateDownEnd(Station upStation) {
-        boolean a = sections.stream()
-                .filter(section -> section.getDownStation().equals(upStation))
-                .count() == 1L;
+    private Optional<Section> getDownEndByStation(Station station) {
+        List<Section> stations = sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .collect(Collectors.toList());
         boolean b = sections.stream()
-                .noneMatch(section -> section.getUpStation().equals(upStation));
+                .noneMatch(section -> section.getUpStation().equals(station));
 
-        if (!a || !b) {
-            throw new InvalidSectionException();
+        if (stations.size() == 1 && b) {
+            return Optional.of(stations.get(0));
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean validateDownEnd(Station station) {
+        if (getDownEndByStation(station).isEmpty()) {
+            throw new InvalidEndSectionException();
         }
 
         return true;

@@ -31,11 +31,9 @@ public class LineService {
     }
 
     public LineResponse addSectionToLine(Line line, SectionRequest sectionRequest) {
-        Station upStation = stationService.findById(sectionRequest.getUpStationId());
-        Station downStation = stationService.findById(sectionRequest.getDownStationId());
         line.addSection(Section.of(line,
-                upStation,
-                downStation,
+                stationService.findById(sectionRequest.getUpStationId()),
+                stationService.findById(sectionRequest.getDownStationId()),
                 sectionRequest.getDistance()));
         return LineResponse.of(lineRepository.save(line));
     }
@@ -65,5 +63,11 @@ public class LineService {
     public Line findLineById(long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundLineException(lineId));
+    }
+
+    public void deleteSectionToLine(long lineId, long stationId) {
+        Line line = findLineById(lineId);
+        line.deleteSection(stationService.findById(stationId));
+        lineRepository.save(line);
     }
 }
