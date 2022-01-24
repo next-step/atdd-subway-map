@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/lines")
@@ -28,26 +30,28 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    // 지하철 노선 생성
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+        Optional<LineResponse> existLine = lineService.findByName(lineRequest.getName());
+
+        if (existLine.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
-    // 지하철 목록 조회
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
-    // 지하철 노선 조회
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findById(id));
     }
 
-    // 지하철 노선 수정
     @PutMapping("/{id}")
     public ResponseEntity<LineResponse> modifyLine(
             @PathVariable Long id,
@@ -57,7 +61,6 @@ public class LineController {
         return ResponseEntity.ok().body(lineService.findById(id));
     }
 
-    // 지하철 노선 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);

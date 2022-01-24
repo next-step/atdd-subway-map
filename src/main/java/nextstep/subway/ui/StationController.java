@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.StationService;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import org.springframework.http.MediaType;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/stations")
@@ -21,6 +23,12 @@ public class StationController {
 
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
+        Optional<StationResponse> existLine = stationService.findByName(stationRequest.getName());
+
+        if (existLine.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
