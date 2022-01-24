@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,17 +26,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String name = "신분당선";
         String color = "bg-red-600";
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        ExtractableResponse<Response> response = RestAssured.given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .extract();
+        ExtractableResponse<Response> response = executeLineCreateRequest(name, color);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(name);
@@ -51,6 +42,27 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        String lineName1 = "신분당선";
+        String lineColor1 = "bg-red-600";
+        executeLineCreateRequest(lineName1, lineColor1);
+
+        String lineName2 = "2호선";
+        String lineColor2 = "bg-green-600";
+        executeLineCreateRequest(lineName2, lineColor2);
+
+        ExtractableResponse<Response> response = RestAssured.given()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<String> lineNames = response.jsonPath().getList("name");
+        assertThat(lineNames).contains(lineName1, lineName2);
+
+        List<String> lineColors = response.jsonPath().getList("color");
+        assertThat(lineColors).contains(lineColor1, lineColor2);
     }
 
     /**
@@ -81,5 +93,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+    }
+
+    private ExtractableResponse<Response> executeLineCreateRequest(String name, String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured.given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .extract();
     }
 }
