@@ -49,22 +49,15 @@ Then 지하철 노선 생성이 실패한다. <br>
   When  노선에 구간을 등록 요청한다.<br>
   Then  지하철 노선 구간이 등록된다.<br>
 
-- [ ] Feature: 지하철 노선에 구간을 등록하는 기능 구현 - 2<br>
-  Given <br>
-  When  <br>
-  Then  <br>
+- [X] Feature: 지하철 노선에 구간을 등록하는 기능 구현 - 2<br>
+  When 새로운 구간의 상행역은 현재 등록되어있는 하행 종점역<br>
+  Then 아닌 경우에는 에러를 내뱉는다. <br>
   
-- [ ] Feature: 지하철 노선에 구간을 제거하는 기능 구현<br>
-  Given <br>
-  When  <br>
-  Then  <br>
+- [ ] Feature: 지하철 노선에 구간을 제거하는 기능 구현 - 3<br>
+  When 새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.<br>
+  Then 아닌 경우에는 에러를 내뱉는다. <br>
   
 - [ ] Feature: 지하철 노선에 등록된 구간을 통해 역 목록을 조회하는 기능 구현<br>
-  Given <br>
-  When  <br>
-  Then  <br>
-  
-- [ ] Feature: 구간 등록 / 제거 시 예외 케이스에 대한 인수 테스트 작성<br>
   Given <br>
   When  <br>
   Then  <br>
