@@ -32,11 +32,31 @@ public class Section {
         this.distance = distance;
     }
 
-    public static Section of(Station upStation, Station downStation, int distance){
-        return new Section(upStation,downStation,distance);
+    public static Section of(Station upStation, Station downStation, int distance) {
+        return new Section(upStation, downStation, distance);
     }
 
     public void updateLine(Line line) {
         this.line = line;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 }
