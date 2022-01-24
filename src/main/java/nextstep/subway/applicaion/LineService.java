@@ -32,7 +32,7 @@ public class LineService {
     }
 
     private void checkDuplication(LineRequest request) {
-        if (lineRepository.findByName(request.getName()).isPresent()) {
+        if (lineRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("[duplication]:name");
         }
     }
