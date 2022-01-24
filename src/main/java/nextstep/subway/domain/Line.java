@@ -46,6 +46,15 @@ public class Line extends BaseEntity {
     }
 
     public void updateSection(Section section) {
+        this.sections = new ArrayList<>();
         this.sections.add(section);
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
+    private void validationSectionByStation(Section newSection) {
+        this.sections.forEach(section -> section.validationStation(newSection));
     }
 }

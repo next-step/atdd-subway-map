@@ -30,6 +30,12 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> createSectionInLine(@PathVariable Long id, @RequestBody LineCreateRequest lineCreateRequest) {
+        lineService.addSection(id, lineCreateRequest);
+        return null;
+    }
+
     @GetMapping
     public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());

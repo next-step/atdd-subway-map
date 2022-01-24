@@ -35,4 +35,29 @@ public class Section {
         this.downStation = downStation;
         this.distance = distance;
     }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public void validationStation(Section section) {
+        validationUpStation(section);
+        validationDownStation(section);
+    }
+
+    private void validationUpStation(Section section) {
+        if (this.downStation != section.getUpStation()) {
+            throw new IllegalArgumentException("추가되는 구간의 상행선은 현재 등록되어있는 하행 종점역이여야 합니다.");
+        }
+    }
+
+    private void validationDownStation(Section section) {
+        if (this.downStation == section.getDownStation() || this.upStation == section.getDownStation()) {
+            throw new IllegalArgumentException("추가되는 구간의 하행역은 현재 등록되어있는 역일 수 없습니다.");
+        }
+    }
 }
