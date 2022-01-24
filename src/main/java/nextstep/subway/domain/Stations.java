@@ -5,6 +5,7 @@ import nextstep.subway.exception.DuplicatedSectionException;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,5 +55,11 @@ public class Stations {
 
     public boolean contains(Station station) {
         return stations.contains(station);
+    }
+
+    public List<Long> getStationIds() {
+        return stations.stream()
+                .map(Station::getId)
+                .collect(Collectors.toList());
     }
 }

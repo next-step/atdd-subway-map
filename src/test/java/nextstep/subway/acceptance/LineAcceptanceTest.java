@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.domain.Line;
 import nextstep.subway.domain.SectionRequest;
 import nextstep.subway.domain.Station;
 import nextstep.subway.utils.DatabaseCleanup;
@@ -17,11 +18,16 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.data.util.Pair.toMap;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -534,10 +540,42 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    @DisplayName("지하철 노선에 등록된 구간을 통해 역 목록을 조회")
-    @Test
-    void getStations() {
 
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 새로운 지하철 노선 생성을 요청 하고
+     * When 지하철 노선 목록 조회를 요청 하면
+     * Then 노선에 등록된 구간을 순서대로 정렬하여 상행 종점부터 하행 종점까지 목록을 응답하기
+     */
+    @DisplayName("등록된 구간을 통해 역 목록 조회")
+    @Test
+    void getLinesSortedStation() {
+        long 강남역_id = 지하철역_생성(StationRequest.of(강남역)).jsonPath().getLong("id");
+        long 역삼역_id = 지하철역_생성(StationRequest.of(역삼역)).jsonPath().getLong("id");
+        long 경기중앙역_id = 지하철역_생성(StationRequest.of(경기중앙역)).jsonPath().getLong("id");
+        long 선릉역_id = 지하철역_생성(StationRequest.of(선릉역)).jsonPath().getLong("id");
+
+        long 신분당선_노선_id = 지하철_노선_생성_요청(LineRequest.of(신분당선, 신분당선_COLOR, 경기중앙역_id, 강남역_id, 30))
+                .jsonPath().getLong("id");
+        long _2호선_노선_id = 지하철_노선_생성_요청(LineRequest.of(_2호선, _2호선_COLOR, 강남역_id, 역삼역_id, 10))
+                .jsonPath().getLong("id");
+
+        지하철_노선에_구간_등록(역삼역_id, _2호선_노선_id, 선릉역_id);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<Line> lines = response.jsonPath().getList(".", Line.class);
+        assertThat(lines.size()).isEqualTo(2);
+        Map<Long, Line> lineIdToLine = lines.stream()
+                .collect(Collectors.toMap(Line::getId, Function.identity()));
+
+        assertThat(lineIdToLine.get(신분당선_노선_id).getStations().getStationIds())
+                .isEqualTo(Arrays.asList(경기중앙역_id, 강남역_id));
+        assertThat(lineIdToLine.get(_2호선_노선_id).getStations().getStationIds())
+                .isEqualTo(Arrays.asList(강남역_id, 역삼역_id, 선릉역_id));
     }
 
 }
