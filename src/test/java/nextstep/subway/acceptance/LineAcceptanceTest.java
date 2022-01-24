@@ -11,20 +11,27 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.common.CommonLineAcceptance.*;
+import static nextstep.subway.acceptance.common.CommonStationAcceptance.getParamsStationMap;
+import static nextstep.subway.acceptance.common.CommonStationAcceptance.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
     /**
+     * Given 지하철 상,하행역이 주어짐
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
      */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
+        //given
+        Map<String, String> 신분당선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                        "신분당선", "bg-color-600"
+                        , "100", "뚝섬역" , "신도림역");
         // when
-        Map<String, String> 신분당선 = getParamsLineMap("신분당선", "bg-red-600");
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
@@ -40,6 +47,26 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 
     /**
+     * When 존재 하지 않는 역으로 지하철 노선 생성을 요청
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 생성 - 실패")
+    @Test
+    void createLine_fail() {
+        // when
+        Map<String, String> 신분당선 =
+                getParamsLineMap("신분당선", "bg-red-600", "1", "2", "100");
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("존재하지 않는 역 역니다.");
+    }
+
+
+
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
@@ -49,11 +76,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                "신분당선", "bg-color-600"
+                , "100", "뚝섬역" , "신도림역");
+
+        Map<String, String> _2호선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                "2호선", "bg-green-600"
+                , "100", "삼성역" , "합정역");
+
+        //given
         지하철_노선_생성_요청(신분당선);
 
         //given
-        Map<String, String> _2호선 = getParamsLineMap("2호선", "bg-green-600");
         지하철_노선_생성_요청(_2호선);
 
         // when
@@ -62,7 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("lines")
                 .then().log().all().extract();
-        
+
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).containsExactly(신분당선.get("name"), _2호선.get("name"));
@@ -78,7 +114,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                "신분당선", "bg-color-600"
+                , "100", "뚝섬역" , "신도림역");
 
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
@@ -105,7 +144,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                "신분당선", "bg-color-600"
+                , "100", "뚝섬역" , "신도림역");
 
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
@@ -136,7 +178,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                "신분당선", "bg-color-600"
+                , "100", "뚝섬역" , "신도림역");
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // when
@@ -162,7 +207,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철노선 중복 이름으로 생성 불가")
     void duplicated_line_interdict() {
         //given
-        Map<String, String> 신분당선 = getParamsLineMap("신분당선","bg-red-600");
+        Map<String, String> 신분당선
+                = 상하행을_포함한_라인_파라미터_생성 (
+                "신분당선", "bg-color-600"
+                , "100", "뚝섬역" , "신도림역");
         지하철_노선_생성_요청(신분당선);
 
         //when
@@ -172,6 +220,21 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo("중복된 라인을 생성할 수 없습니다.");
+    }
+
+
+    private Map<String, String> 상하행을_포함한_라인_파라미터_생성 (String lineName, String lineColor, String distance, String upStation, String downStation) {
+        ExtractableResponse<Response> 상행역 =
+                지하철역_생성_요청(getParamsStationMap(upStation));
+        ExtractableResponse<Response> 하행역 =
+                지하철역_생성_요청(getParamsStationMap(downStation));
+
+        String upStationId = 상행역.jsonPath().getString("id");
+        String downStationId = 하행역.jsonPath().getString("id");
+
+        Map<String, String> 신분당선 =
+                getParamsLineMap(lineName, lineColor, upStationId, downStationId, distance);
+        return 신분당선;
     }
 
 }
