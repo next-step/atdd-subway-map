@@ -38,7 +38,7 @@ public class LineService {
                                              .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId())
                                              .orElseThrow(EntityNotFoundException::new);
-        line.createSection(upStation, downStation, request.getDistance());
+        line.addSection(upStation, downStation, request.getDistance());
 
         lineRepository.save(line);
         return LineResponse.from(line);

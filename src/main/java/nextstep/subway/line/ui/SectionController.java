@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import nextstep.subway.line.application.LineSectionService;
+import nextstep.subway.line.application.SectionService;
 import nextstep.subway.line.domain.dto.SectionRequest;
 
 @RequestMapping(path = "/lines/{lineId}/sections")
 @RestController
-public class LineSectionController {
+public class SectionController {
     private static final String URL_PATTERN = "/lines/%d/sections/%d";
 
-    private final LineSectionService lineSectionService;
+    private final SectionService lineSectionService;
 
-    public LineSectionController(LineSectionService lineSectionService) {
+    public SectionController(SectionService lineSectionService) {
         this.lineSectionService = lineSectionService;
     }
 
@@ -30,6 +30,7 @@ public class LineSectionController {
                                            @RequestBody SectionRequest request) {
         Long createSectionId = lineSectionService.addSection(lineId, request);
         String location = String.format(URL_PATTERN, lineId, createSectionId);
+        System.out.println("Location : " + location);
         return ResponseEntity.created(URI.create(location)).build();
     }
 

@@ -1,5 +1,7 @@
 package nextstep.subway.station.domain.model;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +11,7 @@ import javax.persistence.Id;
 import nextstep.subway.common.domain.model.BaseEntity;
 
 @Entity
-public class Station extends BaseEntity {
+public class Station extends BaseEntity implements Comparable<Station> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +20,11 @@ public class Station extends BaseEntity {
     private String name;
 
     public Station() {
+    }
+
+    public Station(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Station(String name) {
@@ -34,5 +41,25 @@ public class Station extends BaseEntity {
 
     public boolean matchId(Station thatStation) {
         return id.equals(thatStation.id);
+    }
+
+    @Override
+    public int compareTo(Station o) {
+        return Long.compare(this.id, o.id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Station station = (Station)o;
+        return Objects.equals(id, station.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

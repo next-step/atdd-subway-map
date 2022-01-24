@@ -21,7 +21,7 @@ class LineTest {
         Line line = new Line();
         Station upStation = new Station(upStationName);
         Station downStation = new Station(downStationName);
-        Section section = line.createSection(upStation, downStation, distance);
+        Section section = line.addSection(upStation, downStation, distance);
 
         assertThat(line.matchSectionsSize(1)).isTrue();
         assertThat(section.getUpStation().getName()).isEqualTo(upStationName);

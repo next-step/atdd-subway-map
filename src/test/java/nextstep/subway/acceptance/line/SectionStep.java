@@ -13,27 +13,19 @@ public class SectionStep {
     private static final long DOWN_STATION_NEW_SECTION = 3;
 
     private int dummyStation = 0;
-    private final LineStep lineStep;
 
-    public SectionStep(LineStep lineStep) {
-        this.lineStep = lineStep;
-    }
-
-    public ExtractableResponse<Response> 지하철_구간_생성_요청(SectionRequest request) {
-        lineStep.지하철_노선_생성_요청();
-        lineStep.getStationStep().지하철역_생성_요청();
-
+    public ExtractableResponse<Response> 지하철_구간_생성_요청(int lineId, SectionRequest request) {
         return RestAssured.given().log().all()
                           .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when()
-                          .post("/lines/1/sections")
+                          .post("/lines/" + lineId + "/sections")
                           .then().log().all()
                           .extract();
     }
 
-    public ExtractableResponse<Response> 지하철_구간_생성_요청() {
-        return 지하철_구간_생성_요청(dummyRequest());
+    public ExtractableResponse<Response> 지하철_구간_생성_요청(int lineId) {
+        return 지하철_구간_생성_요청(lineId, dummyRequest());
     }
 
     public SectionRequest dummyRequest() {

@@ -1,22 +1,15 @@
 package nextstep.subway.line.domain.model;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 import nextstep.subway.common.domain.model.BaseEntity;
-import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.common.exception.InvalidArgumentException;
-import nextstep.subway.common.exception.OptionalException;
 import nextstep.subway.station.domain.model.Station;
 
 @Entity
@@ -31,22 +24,17 @@ public class Line extends BaseEntity {
     @Column
     private String color;
 
-    @OneToMany(
-        fetch = FetchType.LAZY,
-        cascade = { CascadeType.PERSIST, CascadeType.MERGE },
-        orphanRemoval = true,
-        mappedBy = "line"
-    )
-    private List<Section> sections;
+    @Embedded
+    private Sections sections;
 
     protected Line() {
-        this.sections = new ArrayList<>();
+        this.sections = new Sections();
     }
 
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = new ArrayList<>();
+        this.sections = new Sections();
     }
 
     public Long getId() {
@@ -74,55 +62,15 @@ public class Line extends BaseEntity {
         return !this.name.equals(name);
     }
 
-    public Section createSection(Station upStation, Station downStation, Distance distance) {
-        verifySectionDockingPoint(upStation).verify();
-        verifyAlreadyRegisteredStationInSection(downStation).verify();
-
-        Section section = Section.builder()
-            .line(this)
-            .upStation(upStation)
-            .downStation(downStation)
-            .distance(distance)
-            .build();
-        this.sections.add(section);
-        return section;
+    public Section addSection(Station upStation, Station downStation, Distance distance) {
+        return sections.add(this, upStation, downStation, distance);
     }
 
-    private OptionalException<InvalidArgumentException> verifySectionDockingPoint(Station upStation) {
-        if (sections.isEmpty()) {
-            return OptionalException.empty();
-        }
-        Optional<Section> optionalSection =
-            sections.stream()
-                    .filter(iSection -> iSection.matchDownStation(upStation))
-                    .findFirst();
-        return OptionalException.ifEmpty(
-            optionalSection,
-            () -> new InvalidArgumentException(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
-        );
-    }
-
-    private OptionalException<InvalidArgumentException> verifyAlreadyRegisteredStationInSection(Station downStation) {
-        Optional<Section> optionalSection =
-            sections.stream()
-                    .filter(iSection -> iSection.matchUpStation(downStation) || iSection.matchDownStation(downStation))
-                    .findFirst();
-        return OptionalException.ifPresent(
-            optionalSection,
-            () -> new InvalidArgumentException(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
-        );
-    }
     public void deleteSection(Long sectionId) {
-        verifySectionSize().verify();
-
+        sections.delete(sectionId);
     }
 
-    private OptionalException<InvalidArgumentException> verifySectionSize() {
-        if (sections.size() <= 1) {
-            return OptionalException.of(
-                new InvalidArgumentException(ErrorMessage.BELOW_MIN_SECTION_SIZE.getMessage())
-            );
-        }
-        return OptionalException.empty();
+    public List<Station> stations() {
+        return sections.toStations();
     }
 }

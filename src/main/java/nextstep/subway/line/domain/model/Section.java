@@ -17,7 +17,7 @@ import nextstep.subway.station.domain.model.Station;
 public class Section extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Line line;
@@ -45,7 +45,7 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -63,6 +63,10 @@ public class Section extends BaseEntity {
 
     public Distance getDistance() {
         return distance;
+    }
+
+    public boolean matchId(Long id) {
+        return this.id.equals(id);
     }
 
     public boolean matchUpStation(Station thatStation) {
