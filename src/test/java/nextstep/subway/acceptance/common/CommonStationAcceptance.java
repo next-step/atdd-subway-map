@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class CommonStationAcceptance {
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         return RestAssured
                 .given().log().all()
-                .body(params)
+                .body(getParamsStationMap(name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all().extract();

@@ -3,13 +3,20 @@ package nextstep.subway.acceptance.common;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.Station;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.common.CommonStationAcceptance.getParamsStationMap;
+import static nextstep.subway.acceptance.common.CommonStationAcceptance.지하철역_생성_요청;
+
 public class CommonLineAcceptance {
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String lineName, String lineColor, String distance, String upStationId, String downStationId) {
+            Map<String, String> params =
+                    getParamsLineMap(lineName, lineColor, upStationId, downStationId, distance);
+
         return RestAssured
                 .given().log().all()
                 .body(params)
