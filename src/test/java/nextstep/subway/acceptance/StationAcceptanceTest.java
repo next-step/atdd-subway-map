@@ -63,7 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("강남역");
 
         // when
-        String stationId = getStationId(지하철역_생성_응답.header("Location"));
+        String stationId = getStationId(지하철역_생성_응답);
         ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
 
         // then
@@ -88,9 +88,8 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(지하철역_중복_생성_응답.jsonPath().getString("message")).isEqualTo("이미 등록된 역입니다. 역 이름 = " + "가양역");
     }
 
-    private String getStationId(String locations) {
-        String[] split = locations.split("/");
-
+    private String getStationId(ExtractableResponse<Response> response) {
+        String[] split = response.header("Location").split("/");
         return split[split.length - 1];
     }
 }

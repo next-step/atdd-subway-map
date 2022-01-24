@@ -7,10 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -64,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        String lineId = getLineId(지하철_노선_생성_응답.header("Location"));
+        String lineId = getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
 
         // then
@@ -102,7 +101,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        String lineId = getLineId(지하철_노선_생성_응답.header("Location"));
+        String lineId = getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청(lineId, "5호선", "보라색");
 
         // then
@@ -137,7 +136,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청("9호선", "갈색");
 
         // when
-        String lineId = getLineId(지하철_노선_생성_응답.header("Location"));
+        String lineId = getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_삭제_응답 = LineSteps.지하철_노선_삭제_요청(lineId);
 
         // then
@@ -165,9 +164,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_중복_생성_응답.jsonPath().getString("message")).isEqualTo("이미 등록된 노선입니다. 노선 이름 = " + "9호선");
     }
 
-    private String getLineId(String location) {
-        String[] split = location.split("/");
-
+    private String getLineId(ExtractableResponse<Response> response) {
+        String[] split = response.header("Location").split("/");
         return split[split.length - 1];
     }
 }
