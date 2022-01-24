@@ -96,17 +96,17 @@ class StationAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 기존지하철역생성() {
-        Map<String, String> params = 지하철역파라미터생성(기존지하철);
+        Map<String, Object> params = 지하철역파라미터생성(기존지하철);
         return 포스트_요청(기본주소, params);
     }
 
     private ExtractableResponse<Response> 새로운지하철역생성() {
-        Map<String, String> params = 지하철역파라미터생성(새로운지하철);
+        Map<String, Object> params = 지하철역파라미터생성(새로운지하철);
         return 포스트_요청(기본주소, params);
     }
 
-    private Map<String, String> 지하철역파라미터생성(String 지하철역) {
-        Map<String, String> params = new HashMap<>();
+    private Map<String, Object> 지하철역파라미터생성(String 지하철역) {
+        Map<String, Object> params = new HashMap<>();
         params.put("name", 지하철역);
         return params;
     }

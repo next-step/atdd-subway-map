@@ -25,7 +25,7 @@ public class LineService {
                 .ifPresent(l -> {
                     throw new DuplicationException();
                 });
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(request.toEntity());
         return new LineResponse(
                 line.getId(),
                 line.getName(),

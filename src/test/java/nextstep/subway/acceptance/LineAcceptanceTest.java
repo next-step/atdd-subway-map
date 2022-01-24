@@ -24,6 +24,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String 새로운색상 = "새로운색상";
     private static final String 수정노선 = "수정 노선";
     private static final String 수정색상 = "수정 색상";
+    private static final Long 상행종점 = 1L;
+    private static final Long 하행종점 = 3L;
+    private static final int 종점간거리 = 2;
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -141,25 +144,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 기존노선생성() {
-        Map<String, String> param = 노선파라미터생성(기존노선, 기존색상);
+        Map<String, Object> param = 노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리);
         return 포스트_요청(기본주소, param);
     }
 
     private ExtractableResponse<Response> 새로운노선생성() {
-        Map<String, String> param = 노선파라미터생성(새로운노선, 새로운색상);
+        Map<String, Object> param = 노선파라미터생성(새로운노선, 새로운색상, 상행종점, 하행종점, 종점간거리);
         return 포스트_요청(기본주소, param);
     }
 
     private ExtractableResponse<Response> 노선수정(ExtractableResponse<Response> createResponse) {
-        Map<String, String> updateParam = 노선파라미터생성(수정노선, 수정색상);
+        Map<String, Object> updateParam = 노선파라미터생성(수정노선, 수정색상, 상행종점, 하행종점, 종점간거리);
         ExtractableResponse<Response> updateResponse = 풋_요청(createResponse.header(HttpHeaders.LOCATION), updateParam);
         return updateResponse;
     }
 
-    private Map<String, String> 노선파라미터생성(String 노선, String 색상) {
-        Map<String, String> param = new HashMap<>();
+    private Map<String, Object> 노선파라미터생성(String 노선, String 색상, Long 상행종점, Long 하행종점, int 종점간거리) {
+        Map<String, Object> param = new HashMap<>();
         param.put("name", 노선);
         param.put("color", 색상);
+        param.put("upStationId", 상행종점);
+        param.put("downStationId", 하행종점);
+        param.put("distance", 종점간거리);
         return param;
     }
 }
