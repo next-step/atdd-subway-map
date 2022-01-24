@@ -128,6 +128,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        String 신분당선 = "신분당선";
+        String 신분당선_color = "bg-red-600";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", 신분당선);
+        params1.put("color", 신분당선_color);
+        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        String 구분당선 = "구분당선";
+        String 구분당선_color = "bg-blue-600";
+        Map<String, Object> requestParams = new HashMap<>();
+        requestParams.put("id", createResponse1.jsonPath().getLong("id"));
+        requestParams.put("name", 구분당선);
+        requestParams.put("color", 구분당선_color);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(requestParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(구분당선);
+        assertThat(response.jsonPath().getString("color")).isEqualTo(구분당선_color);
     }
 
     /**
