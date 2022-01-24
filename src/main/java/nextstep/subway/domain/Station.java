@@ -1,9 +1,6 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Station extends BaseEntity {
@@ -11,6 +8,9 @@ public class Station extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Line line;
 
     public Station() {
     }
@@ -25,5 +25,9 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    public Line getLine() {
+        return line;
     }
 }
