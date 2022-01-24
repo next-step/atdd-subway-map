@@ -25,7 +25,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        /// given
+        // given
         final String 신분당선 = "신분당선";
         final String 빨강색 = "bg-red-600";
 
@@ -50,10 +50,10 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 같은 이름으로 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
-    @DisplayName("지하철 노선 중복 이름")
+    @DisplayName("지하철 노선 이름 중복")
     @Test
-    void createDuplicateLine() {
-        /// given
+    void createDuplicateLineName() {
+        // given
         final String 신분당선 = "신분당선";
         정상적인_지하철_노선_생성을_요청한다(신분당선, "bg-red-600");
 
@@ -76,7 +76,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        /// given
+        // given
         final String 신분당선 = "신분당선";
         final String 빨강색 = "bg-red-600";
         정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
@@ -114,7 +114,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        /// given
+        // given
         final String 신분당선 = "신분당선";
         final String 빨강색 = "bg-red-600";
         final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
@@ -149,7 +149,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        /// given
+        // given
         final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
 
         final Map<String, String> params = new HashMap<>();

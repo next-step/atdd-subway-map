@@ -12,7 +12,7 @@ public class StationControllerAdvice {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(StationBusinessException.class)
-    protected ResponseEntity<StationErrorResponse> handleArticleBusinessException(final StationBusinessException stationBusinessException) {
+    protected ResponseEntity<StationErrorResponse> handleStationBusinessException(final StationBusinessException stationBusinessException) {
 
         log.error("StationBusinessException: {}", stationBusinessException.getMessage());
 

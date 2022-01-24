@@ -3,10 +3,10 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.line.LineDuplicateNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
@@ -21,8 +21,11 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineSaveResponse saveLine(final LineSaveRequest request) {
-        final Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+    public LineSaveResponse saveLine(final LineSaveRequest lineRequest) {
+        if (lineRepository.existsByName(lineRequest.getName())) {
+            throw new LineDuplicateNameException();
+        }
+        final Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         return new LineSaveResponse(line);
     }
 
@@ -41,7 +44,7 @@ public class LineService {
 
     public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
         if (lineRepository.existsByName(lineUpdateRequest.getName())) {
-            throw new EntityExistsException();
+            throw new LineDuplicateNameException();
         }
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());

@@ -40,7 +40,7 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 중복 이름")
     @Test
-    void createDuplicateStation() {
+    void createDuplicateStationName() {
         // given
         final String 강남역 = "강남역";
         정상적인_지하철_역_생성_요청한다(강남역);
