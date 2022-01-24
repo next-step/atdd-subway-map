@@ -14,10 +14,12 @@ public class LineResponse {
     private String name;
 
     private String color;
-    private Stations stations;
+    private List<Station> stations;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+
+    public LineResponse() {}
 
     public LineResponse(Long id,
                         String name,
@@ -30,7 +32,7 @@ public class LineResponse {
         this.color = color;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
-        this.stations = stations;
+        this.stations = stations.getStations();
     }
 
     public static LineResponse of(Line line) {
@@ -64,8 +66,8 @@ public class LineResponse {
         return modifiedDate;
     }
 
-    public Set<Station> getStations() {
-        return stations.getStations();
+    public List<Station> getStations() {
+        return stations;
     }
 
     @Override

@@ -168,12 +168,32 @@ public class Line extends BaseEntity {
     }
 
     public Stations getStations() {
-        Set<Station> stations = new HashSet<>();
+        LinkedList<Station> list = new LinkedList<>();
         for (Section section : sections) {
-            stations.add(section.getUpStation());
-            stations.add(section.getDownStation());
+            Station upStation = section.getUpStation();
+            Station downStation = section.getDownStation();
+            if (list.isEmpty()) {
+                list.addLast(upStation);
+                list.addLast(downStation);
+                continue;
+            }
+
+            if (list.indexOf(upStation) == -1) {
+                list.addFirst(upStation);
+                continue;
+            }
+
+            if (list.indexOf(downStation) == -1) {
+                list.add(downStation);
+            }
+//
+//            if (upStationIndex != -1 ) {
+//                list.add(upStationIndex + 1, upStation);
+//            }
+//
         }
 
+        List<Station> stations = new ArrayList<>(list);
         return Stations.of(stations);
     }
 

@@ -3,32 +3,29 @@ package nextstep.subway.domain;
 import nextstep.subway.enums.Direction;
 import nextstep.subway.exception.DuplicatedSectionException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Stations {
-    private final Set<Station> stations;
+    private List<Station> stations;
 
     public Stations() {
-        this.stations = new HashSet<>();
+        this.stations = new ArrayList<>();
     }
 
-    public Stations(Set<Station> stations) {
+    public Stations(List<Station> stations) {
         this.stations = stations;
     }
 
     public static Stations of(Station... stations) {
-        return new Stations(new HashSet<>(Arrays.asList(stations)));
+        return new Stations(new ArrayList<>(Arrays.asList(stations)));
     }
-    public static Stations of(Set<Station> stations) {
+    public static Stations of(List<Station> stations) {
         return new Stations(stations);
     }
 
-    public Set<Station> getStations() {
-        return stations;
+    public List<Station> getStations() {
+        return new ArrayList<>(stations);
     }
 
     public Direction getDirection(Section section) {

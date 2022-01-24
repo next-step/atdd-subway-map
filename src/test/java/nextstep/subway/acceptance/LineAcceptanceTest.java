@@ -4,10 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.SectionRequest;
 import nextstep.subway.domain.Station;
+import nextstep.subway.domain.Stations;
 import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -567,14 +569,14 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Line> lines = response.jsonPath().getList(".", Line.class);
+        List<LineResponse> lines = response.jsonPath().getList(".", LineResponse.class);
         assertThat(lines.size()).isEqualTo(2);
-        Map<Long, Line> lineIdToLine = lines.stream()
-                .collect(Collectors.toMap(Line::getId, Function.identity()));
+        Map<Long, LineResponse> lineIdToLine = lines.stream()
+                .collect(Collectors.toMap(LineResponse::getId, Function.identity()));
 
-        assertThat(lineIdToLine.get(신분당선_노선_id).getStations().getStationIds())
+        assertThat(Stations.of(lineIdToLine.get(신분당선_노선_id).getStations()).getStationIds())
                 .isEqualTo(Arrays.asList(경기중앙역_id, 강남역_id));
-        assertThat(lineIdToLine.get(_2호선_노선_id).getStations().getStationIds())
+        assertThat(Stations.of(lineIdToLine.get(_2호선_노선_id).getStations()).getStationIds())
                 .isEqualTo(Arrays.asList(강남역_id, 역삼역_id, 선릉역_id));
     }
 
