@@ -1,12 +1,11 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.ApiUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -25,7 +23,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_생성_테스트() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_API(GTXA노선);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -42,10 +40,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_이름_중복_생성_방지_테스트() {
         // given
-        지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_API(GTXA노선);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -62,11 +60,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
-        지하철_노선_생성_API(GTXA노선);
-        지하철_노선_생성_API(신분당선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(신분당선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_전체_리스트_조회_API();
 
         // then
         List<String> lineNames = response.body().jsonPath().getList("name");
@@ -85,10 +83,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회_테스트() {
         // given
-        지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_단건_조회_API(1L);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_단건_조회_API(1L);
 
         // then
         String lineName = response.body().jsonPath().get("name").toString();
@@ -109,13 +107,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정_테스트() {
         // given
-        지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_수정_API(1L, 노선색상);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_수정_API(1L, 노선색상);
 
         // then
-        ExtractableResponse<Response> updatedLine = 지하철_노선_단건_조회_API(1L);
+        ExtractableResponse<Response> updatedLine = ApiUtil.지하철_노선_단건_조회_API(1L);
         String lineName = updatedLine.body().jsonPath().get("name").toString();
         String lineColor = updatedLine.body().jsonPath().get("color").toString();
 
@@ -134,10 +132,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제_테스트() {
         // given
-        지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선);
 
         // when
-        ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제_API(1L);
+        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_삭제_API(1L);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -159,55 +157,5 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         노선색상 = new HashMap<>();
         노선색상.put("color", "bg-red-800");
-    }
-
-    ExtractableResponse<Response> 지하철_노선_생성_API(Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    ExtractableResponse<Response> 지하철_노선_전체_리스트_조회_API() {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    ExtractableResponse<Response> 지하철_노선_단건_조회_API(Long id) {
-        return RestAssured.given().log().all()
-                .pathParam("id", id)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines/{id}")
-                .then().log().all()
-                .extract();
-    }
-
-    ExtractableResponse<Response> 지하철_노선_수정_API(Long id, Map<String, String> updateParams) {
-        return RestAssured.given().log().all()
-                .pathParam("id", id)
-                .body(updateParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/{id}")
-                .then().log().all()
-                .extract();
-    }
-
-    ExtractableResponse<Response> 지하철_노선_삭제_API(Long id) {
-        return RestAssured.given().log().all()
-                .pathParam("id", id)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/lines/{id}")
-                .then().log().all()
-                .extract();
     }
 }

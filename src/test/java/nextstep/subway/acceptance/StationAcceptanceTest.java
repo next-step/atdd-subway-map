@@ -1,13 +1,12 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.ApiUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_API(강남역);
+        ExtractableResponse<Response> response = ApiUtil.지하철역_생성_API(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -42,10 +41,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_이름_중복_생성_방지_테스트() {
         // given
-        지하철역_생성_API(강남역);
+        ApiUtil.지하철역_생성_API(강남역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_API(강남역);
+        ExtractableResponse<Response> response = ApiUtil.지하철역_생성_API(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -61,11 +60,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        지하철역_생성_API(강남역);
-        지하철역_생성_API(역삼역);
+        ApiUtil.지하철역_생성_API(강남역);
+        ApiUtil.지하철역_생성_API(역삼역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_전체_리스트_조회_API();
+        ExtractableResponse<Response> response = ApiUtil.지하철역_전체_리스트_조회_API();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
@@ -81,11 +80,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성_API(강남역);
+        ExtractableResponse<Response> createResponse = ApiUtil.지하철역_생성_API(강남역);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철역_삭제_API(uri);
+        ExtractableResponse<Response> response = ApiUtil.지하철역_삭제_API(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -101,31 +100,5 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         역삼역 = new HashMap<>();
         역삼역.put("name", "역삼역");
-    }
-
-    ExtractableResponse<Response> 지하철역_생성_API(Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    ExtractableResponse<Response> 지하철역_전체_리스트_조회_API() {
-        return RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    ExtractableResponse<Response> 지하철역_삭제_API(String uri) {
-        return RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
     }
 }
