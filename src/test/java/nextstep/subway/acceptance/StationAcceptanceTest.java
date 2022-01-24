@@ -22,10 +22,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // when
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
-
-        // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
         assertThat(response.header(LOCATION)).isNotBlank();
     }
@@ -39,16 +36,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        // given
         ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(강남역);
-
-        // and
         ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(역삼역);
-
-        // when
         ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
-
-        // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
         assertThat(response.jsonPath().getList("name")).contains(강남역, 역삼역);
     }
@@ -61,13 +51,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
-        // given
         ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
-
-        // when
         ExtractableResponse<Response> response = 지하철역_삭제_요청(createResponse.header(LOCATION));
-
-        // then
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
 
@@ -79,13 +64,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철역 생성")
     @Test
     void createDuplicateStation()  {
-        // given
         ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
-
-        // when
         ExtractableResponse<Response> failResponse = 지하철역_생성_요청(강남역);
-
-        // then
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 }

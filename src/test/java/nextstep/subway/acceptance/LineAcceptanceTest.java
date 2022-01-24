@@ -21,10 +21,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // when
         ExtractableResponse<Response> response = 노선_생성_요청(신분당선);
-
-        // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
         assertThat(response.jsonPath().getString("color")).isEqualTo(신분당선.getColor());
         assertThat(response.header(LOCATION)).isNotBlank();
@@ -39,16 +36,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        // given
         ExtractableResponse<Response> createResponse1 = 노선_생성_요청(이호선);
-
-        // and
         ExtractableResponse<Response> createResponse2 = 노선_생성_요청(신분당선);
-
-        // when
         ExtractableResponse<Response> response = 노선_목록_조회_요청();
-
-        // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
         assertThat(response.jsonPath().getList("name")).contains(이호선.name(), 신분당선.name());
     }
@@ -61,13 +51,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> response = 노선_단건_조회_요청(createResponse.header(LOCATION));
-
-        // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(이호선.name());
     }
@@ -80,15 +65,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> updateResponse = 노선_수정_요청(신분당선, createResponse.header(LOCATION));
-
-        // then
         ExtractableResponse<Response> findResponse = 노선_단건_조회_요청(createResponse.header(LOCATION));
-
         assertThat(updateResponse.statusCode()).isEqualTo(OK.value());
         assertThat(findResponse.statusCode()).isEqualTo(OK.value());
         assertThat(findResponse.jsonPath().getString("name")).isEqualTo(신분당선.name());
@@ -103,13 +82,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> response = 노선_삭제_요청(createResponse.header(LOCATION));
-
-        // then
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
 
@@ -121,13 +95,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
     void createDuplicateLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> failResponse = 노선_생성_요청(이호선);
-
-        // then
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 }
