@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+    private static String DUPLICATE_NAME_ERROR_MASSAGE = "사용중인 노선 이름입니다.";
+
     private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -20,7 +22,12 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new IllegalArgumentException(DUPLICATE_NAME_ERROR_MASSAGE);
+        }
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
@@ -39,23 +46,23 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
-        line.changeName(lineRequest.getName());
-        line.changeColor(lineRequest.getColor());
+        line.update(lineRequest.getName(), lineRequest.getColor());
 
-        return createLineResponse(lineRepository.save(line));
+        createLineResponse(lineRepository.save(line));
     }
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }
 
-    public LineResponse createLineResponse(Line line) {
+    private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(),
                 line.getName(),
                 line.getColor(),
                 line.getCreatedDate(),
-                line.getModifiedDate());
+                line.getModifiedDate()
+        );
     }
 }
