@@ -33,13 +33,11 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public void setName(String name) {
+    public void update(String name, String color) {
         if (name != null && !name.isEmpty()) {
             this.name = name;
         }
-    }
 
-    public void setColor(String color) {
         if (color != null && !color.isEmpty()) {
             this.color = color;
         }
