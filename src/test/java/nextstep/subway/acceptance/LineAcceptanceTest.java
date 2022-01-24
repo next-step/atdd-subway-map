@@ -52,11 +52,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_요청(name2, "bg-green-600");
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
         assertAll(
@@ -78,11 +74,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(name, "bg-red-600");
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get(createResponse.header("Location"))
-                .then().log().all()
-                .extract();
+        final String path = createResponse.header("Location");
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(path);
 
         // then
         final JsonPath responseBody = response.jsonPath();
@@ -105,7 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // when
-        final String location = createResponse.header("Location");
+        final String path = createResponse.header("Location");
         final Map<String, String> updateRequestParams = new HashMap<>();
         updateRequestParams.put("name", "구분당선");
         updateRequestParams.put("color", "bg-blue-600");
@@ -114,15 +107,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(updateRequestParams)
                 .when()
-                .put(location)
+                .put(path)
                 .then().log().all()
                 .extract();
 
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get(location)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(path);
 
         // then
         final JsonPath responseBody = response.jsonPath();
@@ -165,6 +154,18 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .body(requestParams)
                 .when()
                 .post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
+        return 지하철_노선_조회_요청("/lines");
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회_요청(final String path) {
+        return RestAssured.given().log().all()
+                .when()
+                .get(path)
                 .then().log().all()
                 .extract();
     }
