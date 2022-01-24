@@ -3,7 +3,6 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.MediaType;
 
 public class AssuredRequest {

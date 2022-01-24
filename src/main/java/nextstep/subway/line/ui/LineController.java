@@ -1,12 +1,8 @@
-package nextstep.subway.ui;
+package nextstep.subway.line.ui;
 
-import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.common.GlobalExceptionAdvice;
-import nextstep.subway.domain.Line;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import nextstep.subway.line.application.LineService;
+import nextstep.subway.line.application.dto.LineRequest;
+import nextstep.subway.line.application.dto.LineResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

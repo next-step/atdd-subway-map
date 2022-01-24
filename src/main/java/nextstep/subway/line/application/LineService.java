@@ -1,9 +1,9 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.line.application;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.line.application.dto.LineRequest;
+import nextstep.subway.line.application.dto.LineResponse;
+import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nextstep.subway.common.ErrorMessages.DUPLICATE_LINE_NAME;
-import static nextstep.subway.common.ErrorMessages.NOT_FOUND_LINE;
 
 @Service
 @Transactional

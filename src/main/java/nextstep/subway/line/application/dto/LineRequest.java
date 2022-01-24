@@ -1,6 +1,6 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.line.application.dto;
 
-import nextstep.subway.domain.Line;
+import nextstep.subway.line.domain.Line;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
