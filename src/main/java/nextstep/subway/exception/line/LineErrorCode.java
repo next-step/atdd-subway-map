@@ -7,7 +7,8 @@ import java.util.Arrays;
 
 public enum LineErrorCode implements ErrorCode {
     DUPLICATE_NAME(LineDuplicateNameException.class, HttpStatus.CONFLICT, "duplicate line name occurred"),
-    DUPLICATE_COLOR(LineDuplicateColorException.class, HttpStatus.CONFLICT, "duplicate line color occurred");
+    DUPLICATE_COLOR(LineDuplicateColorException.class, HttpStatus.CONFLICT, "duplicate line color occurred"),
+    BLANK_NAME(LineBlankNameException.class, HttpStatus.BAD_REQUEST, "blank line name occurred");
 
     private final Class exceptionClass;
     private final HttpStatus httpStatus;

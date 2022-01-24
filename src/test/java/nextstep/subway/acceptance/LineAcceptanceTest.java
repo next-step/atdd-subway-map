@@ -30,7 +30,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 빨강색 = "bg-red-600";
 
         // when
-        ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
+        ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 빨강색);
 
         // then
         assertAll(
@@ -53,7 +53,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createBlankLineName() {
         // when
-        final ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다("  ", "bg-red-600");
+        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다("  ", "bg-red-600");
 
         // then
         assertAll(
@@ -72,10 +72,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createDuplicateLineName() {
         // given
         final String 신분당선 = "신분당선";
-        정상적인_지하철_노선_생성을_요청한다(신분당선, "bg-red-600");
+        지하철_노선_생성을_요청한다(신분당선, "bg-red-600");
 
         // when
-        final ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다(신분당선, "bg-green-600");
+        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, "bg-green-600");
 
         // then
         assertAll(
@@ -94,10 +94,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createDuplicateLineColor() {
         // given
         final String 빨강색 = "bg-red-600";
-        정상적인_지하철_노선_생성을_요청한다("신분당선", 빨강색);
+        지하철_노선_생성을_요청한다("신분당선", 빨강색);
 
         // when
-        final ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다("2호선", 빨강색);
+        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다("2호선", 빨강색);
 
         // then
         assertAll(
@@ -118,11 +118,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         final String 신분당선 = "신분당선";
         final String 빨강색 = "bg-red-600";
-        정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
+        지하철_노선_생성을_요청한다(신분당선, 빨강색);
 
         final String 이호선 = "2호선";
         final String 초록색 = "bg-green-600";
-        정상적인_지하철_노선_생성을_요청한다(이호선, 초록색);
+        지하철_노선_생성을_요청한다(이호선, 초록색);
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -156,7 +156,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         final String 신분당선 = "신분당선";
         final String 빨강색 = "bg-red-600";
-        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다(신분당선, 빨강색);
+        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색);
         final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         // when
@@ -189,7 +189,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
+        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
 
         final Map<String, String> params = new HashMap<>();
         final String updatedName = "구분당선";
@@ -224,7 +224,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        final ExtractableResponse<Response> saveResponse = 정상적인_지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
+        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -242,8 +242,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> 정상적인_지하철_노선_생성을_요청한다(final String name, final String color) {
-        final Map<String, String> params = 정상적인_지하철_노선_생성_데이터를_만든다(name, color);
+    private ExtractableResponse<Response> 지하철_노선_생성을_요청한다(final String name, final String color) {
+        final Map<String, String> params = 지하철_노선_생성_데이터를_만든다(name, color);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .accept(ContentType.ANY)
@@ -255,7 +255,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         return response;
     }
 
-    private Map<String, String> 정상적인_지하철_노선_생성_데이터를_만든다(final String name, final String color) {
+    private Map<String, String> 지하철_노선_생성_데이터를_만든다(final String name, final String color) {
         final Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
