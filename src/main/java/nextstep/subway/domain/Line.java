@@ -51,10 +51,14 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
+        validationSectionByStation(section);
         this.sections.add(section);
     }
 
     private void validationSectionByStation(Section newSection) {
-        this.sections.forEach(section -> section.validationStation(newSection));
+        Section lastSection = this.sections.get(this.sections.size() - 1);
+        lastSection.validationUpStation(newSection);
+
+        this.sections.forEach(section -> section.validationDownStation(newSection));
     }
 }

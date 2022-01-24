@@ -33,7 +33,7 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSectionInLine(@PathVariable Long id, @RequestBody LineCreateRequest lineCreateRequest) {
         lineService.addSection(id, lineCreateRequest);
-        return null;
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
