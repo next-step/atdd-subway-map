@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -23,11 +24,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성 테스트")
     @Test
     void 지하철_노선_생성_테스트() {
-        // given
-        Map<String, String> params = 파라미터_생성("GTX-A", "bg-red-900");
-
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
+        ExtractableResponse<Response> response = 지하철_노선_생성_API(GTXA노선);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -44,14 +42,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_이름_중복_생성_방지_테스트() {
         // given
-        String 노선 = "GTX-A";
-        String 노선색 = "bg-red-900";
-        지하철_노선_생성(노선, 노선색);
-
-        Map<String, String> params = 파라미터_생성(노선, 노선색);
+        지하철_노선_생성_API(GTXA노선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_API(params);
+        ExtractableResponse<Response> response = 지하철_노선_생성_API(GTXA노선);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -68,10 +62,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
-        String 노선1 = "GTX-A";
-        String 노선2 = "신분당선";
-        지하철_노선_생성("GTX-A", "bg-red-900");
-        지하철_노선_생성("신분당선", "bg-red-500");
+        지하철_노선_생성_API(GTXA노선);
+        지하철_노선_생성_API(신분당선);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
@@ -80,7 +72,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         List<String> lineNames = response.body().jsonPath().getList("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).contains(노선1, 노선2);
+        assertThat(lineNames).contains("GTX-A", "신분당선");
     }
 
     /**
@@ -93,9 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회_테스트() {
         // given
-        String 노선  = "GTX-A";
-        String 노선색  = "bg-red-900";
-        지하철_노선_생성(노선, 노선색);
+        지하철_노선_생성_API(GTXA노선);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_단건_조회_API(1L);
@@ -105,8 +95,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineColor = response.body().jsonPath().get("color").toString();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineName).isEqualTo(노선);
-        assertThat(lineColor).isEqualTo(노선색);
+        assertThat(lineName).isEqualTo("GTX-A");
+        assertThat(lineColor).isEqualTo("bg-red-900");
     }
 
     /**
@@ -119,15 +109,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정_테스트() {
         // given
-        String 노선  = "GTX-A";
-        String 노선색  = "bg-red-800";
-        지하철_노선_생성(노선, "bg-red-900");
-
-        Map<String, String> updateParams = new HashMap<>();
-        updateParams.put("color", 노선색);
+        지하철_노선_생성_API(GTXA노선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_수정_API(1L, updateParams);
+        ExtractableResponse<Response> response = 지하철_노선_수정_API(1L, 노선색상);
 
         // then
         ExtractableResponse<Response> updatedLine = 지하철_노선_단건_조회_API(1L);
@@ -135,8 +120,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineColor = updatedLine.body().jsonPath().get("color").toString();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineName).isEqualTo(노선);
-        assertThat(lineColor).isEqualTo(노선색);
+        assertThat(lineName).isEqualTo("GTX-A");
+        assertThat(lineColor).isEqualTo("bg-red-800");
     }
 
     /**
@@ -149,7 +134,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제_테스트() {
         // given
-        지하철_노선_생성("GTX-A", "bg-red-900");
+        지하철_노선_생성_API(GTXA노선);
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제_API(1L);
@@ -158,18 +143,22 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    Map<String, String> 파라미터_생성(String 노선, String 노선색) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", 노선);
-        params.put("color", 노선색);
+    static Map<String, String> GTXA노선;
+    static Map<String, String> 신분당선;
+    static Map<String, String> 노선색상;
 
-        return params;
-    }
+    @BeforeAll
+    public static void 초기화() {
+        GTXA노선 = new HashMap<>();
+        GTXA노선.put("name", "GTX-A");
+        GTXA노선.put("color", "bg-red-900");
 
-    ExtractableResponse<Response> 지하철_노선_생성(String 노선, String 노선색) {
-        Map<String, String> params = 파라미터_생성(노선, 노선색);
+        신분당선 = new HashMap<>();
+        신분당선.put("name", "신분당선");
+        신분당선.put("color", "bg-red-500");
 
-        return 지하철_노선_생성_API(params);
+        노선색상 = new HashMap<>();
+        노선색상.put("color", "bg-red-800");
     }
 
     ExtractableResponse<Response> 지하철_노선_생성_API(Map<String, String> params) {
