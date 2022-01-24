@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.application.dto.LineRequest;
-import nextstep.subway.line.application.dto.LineResponse;
+import nextstep.subway.section.application.dto.SectionLineResponse;
 import nextstep.subway.utils.AssuredRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
@@ -70,9 +70,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> {
-                    List<LineResponse> responseList = response.jsonPath().getList(".", LineResponse.class);
+                    List<SectionLineResponse> responseList = response.jsonPath().getList("", SectionLineResponse.class);
                     assertThat(responseList.size()).isEqualTo(requestList.size());
-                    assertThat(responseList.stream().map(LineResponse::getName).collect(Collectors.toList()))
+                    assertThat(responseList.stream().map(SectionLineResponse::getName).collect(Collectors.toList()))
                             .isEqualTo(requestList.stream().map(LineRequest::getName).collect(Collectors.toList()));
                 }
         );
