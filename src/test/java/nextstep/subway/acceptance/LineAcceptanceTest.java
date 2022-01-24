@@ -6,6 +6,9 @@ import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -58,26 +61,33 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선의 상행이 존재하지 않는 역이고
+     * Given 지하철 노선의 상행 또는 하행이 존재하지 않는 역이고
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
-    @DisplayName("상행이 존재하지 않는 지하철 역인 지하철 노선 생성")
-    @Test
-    void createLineWithNotExistUpStation() {
+    @DisplayName("지하철 역이 존재하지 않는 지하철 역인 지하철 노선 생성")
+    @CsvSource(delimiter = ':', value = {"1:2", "2:1"})
+    @ParameterizedTest
+    void createLineWithNotExistUpStation(String upStationId, String downStationId) {
+        //given
+        지하철역들_생성_요청(1);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String distance = "10";
 
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        //then
+        //todo advicecontroller로  400 badrequest로 반환하도록 리팩토링
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    /**
-     * Given 지하철 노선의 하행이 존재하지 않는 역이고
-     * When 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 실패한다.
-     */
-    @DisplayName("하이 존재하지 않는 지하철 역인 지하철 노선 생성")
-    @Test
-    void createLineWithNotExistDownStation() {
-
-    }
 
     /**
      * Given 지하철역 생성을 요청 하고
