@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,5 +47,10 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public LineResponse findLine(Long id) {
+        Optional<Line> line = lineRepository.findById(id);
+        return createLineResponse(line.get());
     }
 }
