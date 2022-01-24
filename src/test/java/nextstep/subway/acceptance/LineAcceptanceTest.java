@@ -22,7 +22,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // then
         assertAll(
