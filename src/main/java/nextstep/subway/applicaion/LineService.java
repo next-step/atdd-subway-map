@@ -1,27 +1,32 @@
 package nextstep.subway.applicaion;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.ShowLineResponse;
 import nextstep.subway.applicaion.dto.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
 import nextstep.subway.exception.DuplicateLineException;
 import nextstep.subway.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository,
+                       StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -29,7 +34,12 @@ public class LineService {
             throw new DuplicateLineException(request.getName());
         }
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Station upStation = stationService.findStationsById(request.getUpStationId());
+        Station downStation = stationService.findStationsById(request.getDownStationId());
+
+        Line line = lineRepository.save(
+                Line.of(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
@@ -44,8 +54,8 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-            .map(this::createShowLineResponse)
-            .collect(toList());
+                .map(this::createShowLineResponse)
+                .collect(toList());
     }
 
     @Transactional(readOnly = true)
@@ -66,16 +76,16 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
-            .orElseThrow(() -> new LineNotFoundException());
+                .orElseThrow(() -> new LineNotFoundException());
     }
 
     private ShowLineResponse createShowLineResponse(Line line) {
         return ShowLineResponse.of(
-            line.getId(),
-            line.getName(),
-            line.getColor(),
-            line.getCreatedDate(),
-            line.getModifiedDate()
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
         );
     }
 
