@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class LineSteps {
     public static final String DEFAULT_PATH = "/lines";
+    public static final String SECTIONS_PATH = "/sections";
 
     public static Map<String, String> getParams(String name, String color) {
         Map<String, String> params = new HashMap<>();
@@ -75,6 +76,7 @@ public class LineSteps {
     }
 
     public static ExtractableResponse<Response> 지하철_노선_구간_추가_요청(
+            String url,
             String upStationId,
             String downStationId,
             String distance) {
@@ -87,7 +89,7 @@ public class LineSteps {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post(DEFAULT_PATH)
+                .post(url + SECTIONS_PATH)
                 .then().log().all()
                 .extract();
     }

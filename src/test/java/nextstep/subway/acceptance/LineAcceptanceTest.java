@@ -126,19 +126,51 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선을 생성하고
-     * When 지하철 노선에 section을 추가하고
-     * THen 지하철 노선에 section 추가가 성공한다.
+     * When 지하철 노선에 구간을 추가하고
+     * THen 지하철 노선에 구간 추가가 성공한다.
      */
-    @DisplayName("지하철 노선 section 추가")
+    @DisplayName("지하철 노선 구간 추가")
     @Test
     void addSection() {
-        지하철역들_생성_요청(10);
+        지하철역들_생성_요청(5);
         String bgRed600 = "bg-red-600";
         String 신분당선 = "신분당선";
         String upStationId = "1";
         String downStationId = "4";
         String distance = "10";
-        지하철_노선_생성_요청2(
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        String uri = createResponse.header("Location");
+        //when
+        String upStationId2 = "4";
+        String downStationId2 = "5";
+        String distance2 = "10";
+        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가하고
+     * THen 지하철 노선에 구간 추가가 실패한다.
+     */
+    @DisplayName("지하철 노선에 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가")
+    @Test
+    void addSectionFailedByUpStation() {
+        지하철역들_생성_요청(5);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
                 신분당선,
                 bgRed600,
                 upStationId,
@@ -146,13 +178,48 @@ class LineAcceptanceTest extends AcceptanceTest {
                 distance);
 
         //when
-        String upStationId2 = "1";
-        String downStationId2 = "4";
+        String uri = createResponse.header("Location");
+        String upStationId2 = "3";
+        String downStationId2 = "5";
         String distance2 = "10";
-        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(upStationId2, downStationId2, distance2);
+        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 구간의 하행역이 현재 노선에 등록되어있는 역인 구간을 노선에 추가하고
+     * THen 지하철 노선에 구간 추가가 실패한다.
+     */
+    @DisplayName("지하철 노선에 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가")
+    @Test
+    void addSectionFailedByDownStation() {
+        지하철역들_생성_요청(5);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        //when
+        String uri = createResponse.header("Location");
+        String upStationId2 = "4";
+        String downStationId2 = "1";
+        String distance2 = "10";
+        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 
