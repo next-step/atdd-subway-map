@@ -21,6 +21,22 @@ class StationAcceptanceTest extends AcceptanceTest {
     private static final String 기존지하철 = "기존지하철";
     private static final String 새로운지하철 = "새로운지하철";
 
+    public static ExtractableResponse<Response> 기존지하철역생성() {
+        Map<String, Object> params = 지하철역파라미터생성(기존지하철);
+        return 포스트_요청(기본주소, params);
+    }
+
+    public static ExtractableResponse<Response> 새로운지하철역생성() {
+        Map<String, Object> params = 지하철역파라미터생성(새로운지하철);
+        return 포스트_요청(기본주소, params);
+    }
+
+    private static Map<String, Object> 지하철역파라미터생성(String 지하철역) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", 지하철역);
+        return params;
+    }
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -35,7 +51,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
-
 
     /**
      * Given 지하철역 생성을 요청 하고
@@ -93,21 +108,5 @@ class StationAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
-    }
-
-    private ExtractableResponse<Response> 기존지하철역생성() {
-        Map<String, Object> params = 지하철역파라미터생성(기존지하철);
-        return 포스트_요청(기본주소, params);
-    }
-
-    private ExtractableResponse<Response> 새로운지하철역생성() {
-        Map<String, Object> params = 지하철역파라미터생성(새로운지하철);
-        return 포스트_요청(기본주소, params);
-    }
-
-    private Map<String, Object> 지하철역파라미터생성(String 지하철역) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", 지하철역);
-        return params;
     }
 }
