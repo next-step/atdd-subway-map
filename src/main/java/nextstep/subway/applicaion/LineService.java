@@ -22,13 +22,7 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
         checkDuplication(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return LineResponse.of(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return createLineResponse(line);
     }
 
     private void checkDuplication(LineRequest request) {
@@ -40,20 +34,17 @@ public class LineService {
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map( line ->
-                        LineResponse.of(
-                                line.getId(),
-                                line.getName(),
-                                line.getColor(),
-                                line.getCreatedDate(),
-                                line.getModifiedDate()
-                        )
-                ).collect(Collectors.toList());
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
     }
 
     public LineResponse getLine(Long id) {
         Line line = lineRepository.getById(id);
-        return LineResponse.of(
+        return createLineResponse(line);
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
