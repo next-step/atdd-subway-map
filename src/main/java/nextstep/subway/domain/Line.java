@@ -33,7 +33,7 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public void chageLine(String name, String color) {
+    public void changeLine(String name, String color) {
         this.name = name;
         this.color = color;
     }

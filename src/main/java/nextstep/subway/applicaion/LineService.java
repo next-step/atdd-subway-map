@@ -41,7 +41,7 @@ public class LineService {
 
     public void modifyLine(Long lineId, LineRequest lineRequest) {
         Line findLine = getLineById(lineRepository, lineId);
-        findLine.chageLine(lineRequest.getName(), lineRequest.getColor());
+        findLine.changeLine(lineRequest.getName(), lineRequest.getColor());
     }
 
     public void deleteLine(Long lineId) {
