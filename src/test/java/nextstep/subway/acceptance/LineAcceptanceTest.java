@@ -171,4 +171,27 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
+
+    @DisplayName("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야한다.")
+    @Test
+    void newUpStationMustBeDownStation() {
+        // 역 2개 생성 : 1L, 2L
+        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
+        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+
+        // 노선 생성
+        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+
+        // 구간 생성
+        ExtractableResponse<Response> extract = SectionStep.saveSection(1L, 2L, 2, 1L);
+
+        // 새로운 상행역 2개
+        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
+        ExtractableResponse<Response> 돼지역 = StationStep.saveStation("돼지역");
+
+        // 새로운 구간 생성
+        ExtractableResponse<Response> extract_2 = SectionStep.saveSection(3L, 4L, 1, 1L);
+
+        assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
 }

@@ -23,6 +23,10 @@ public class Section {
 
 	private int distance;
 
+	public Section() {
+		//
+	}
+
 	public Section(
 					Line line,
 					Station upStation,
