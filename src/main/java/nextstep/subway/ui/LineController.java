@@ -45,7 +45,7 @@ public class LineController {
         @RequestBody LineRequest lineRequest) {
         lineService.changeLine(id, lineRequest);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
