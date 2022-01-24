@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.line.LineBlankColorException;
 import nextstep.subway.exception.line.LineBlankNameException;
 import nextstep.subway.exception.line.LineDuplicateColorException;
 import nextstep.subway.exception.line.LineDuplicateNameException;
@@ -65,6 +66,9 @@ public class LineService {
     }
 
     private void validateLineColor(final String lineColor) {
+        if (Strings.isBlank(lineColor)) {
+            throw new LineBlankColorException();
+        }
         if (lineRepository.existsByColor(lineColor)) {
             throw new LineDuplicateColorException();
         }

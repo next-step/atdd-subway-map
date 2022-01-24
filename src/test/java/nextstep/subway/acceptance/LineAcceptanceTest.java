@@ -63,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 공백 이름을 가진 지하철역 생성을 요청 하면
+     * When 공백 색깔을 가진 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 실패한다.
      */
     @DisplayName("지하철 노선 색깔 공백")
