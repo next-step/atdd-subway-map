@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -23,18 +24,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 정상적인_지하철_역_생성_요청한다("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -114,5 +105,45 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("지하철역 중복 이름")
+    @Test
+    void duplicateStationName() {
+        // given
+        final String stationName = "강남역";
+        정상적인_지하철_역_생성_요청한다(stationName);
+
+        // when
+        final ExtractableResponse<Response> response = 정상적인_지하철_역_생성_요청한다(stationName);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT),
+                () -> assertThat(response.body().jsonPath().get("errorMessage").equals("duplicate station name occurred"))
+        );
+    }
+
+    private ExtractableResponse<Response> 정상적인_지하철_역_생성_요청한다(final String name) {
+        final Map<String, String> params = 정상적인_지하철_역_생성_데이터를_만든다(name);
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+        return response;
+    }
+
+    private Map<String, String> 정상적인_지하철_역_생성_데이터를_만든다(final String name) {
+        final Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        return params;
     }
 }
