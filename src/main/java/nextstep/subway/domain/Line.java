@@ -48,4 +48,11 @@ public class Line extends BaseEntity {
         this.sections.add(section);
         section.setLine(this);
     }
+
+    public boolean upStationNoneMach(Station downStation) {
+        return sections
+                .stream()
+                .map(Section::getUpStation)
+                .anyMatch((sn) -> sn.equals(downStation.getName()));
+    }
 }

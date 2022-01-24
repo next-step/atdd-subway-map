@@ -26,6 +26,14 @@ public class Section {
         this.line = line;
     }
 
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
     public Section() {
     }
 
@@ -34,4 +42,13 @@ public class Section {
         this.downStation = downStation;
         this.distance = distance;
     }
+
+    public boolean downStationNotSameAs(Station upStation) {
+        return !this.downStation.getName().equals(upStation.getName());
+    }
+
+    public static Section of(Station upStation, Station downStation, int distance){
+        return new Section(upStation, downStation, distance);
+    }
+
 }

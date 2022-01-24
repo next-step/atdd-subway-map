@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,13 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         validateDuplicatedLine(request);
-
-        Station upStation = getStationById(request.getUpStationId());
-        Station downStation = getStationById(request.getDownStationId());
+        Station upStation =
+                getStationById(request.getUpStationId());
+        Station downStation =
+                getStationById(request.getDownStationId());
 
         Line line = new Line(request.getName(), request.getColor());
         Section section = new Section(upStation, downStation, request.getDistance());
-
         line.setSection(section);
 
         Line saveLine = lineRepository.save(line);
@@ -45,25 +46,45 @@ public class LineService {
     }
 
     public LineResponse getLine(Long lineId) {
-        Line findLine = getLineById(lineRepository, lineId);
+        Line findLine = lineRepository.findLineById(lineId);
         return new LineResponse(findLine);
     }
 
     public void modifyLine(Long lineId, LineRequest lineRequest) {
-        Line findLine = getLineById(lineRepository, lineId);
+        Line findLine = lineRepository.findLineById(lineId);
         findLine.changeLine(lineRequest.getName(), lineRequest.getColor());
     }
 
     public void deleteLine(Long lineId) {
-        Line findLine = getLineById(lineRepository, lineId);
+        Line findLine = lineRepository.findLineById(lineId);
         lineRepository.delete(findLine);
     }
 
-    private Line getLineById(LineRepository lineRepository, Long lineId) {
-        return lineRepository
-                .findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
+
+    public void addSection(Long lineId, SectionRequest request) {
+        Line line = lineRepository.findLineWithSectionsById(lineId);
+        List<Section> sections = line.getSections();
+        int sectionLastIndex = sections.size() - 1;
+
+        Section section =
+                sections.get(sectionLastIndex);
+        Station upStation =
+                getStationById(request.getUpStationId());
+        Station downStation =
+                getStationById(request.getDownStationId());
+
+        if (section.downStationNotSameAs(upStation)) {
+            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
+        }
+
+        if (line.upStationNoneMach(downStation) || upStation.equals(downStation)){
+            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
+        }
+
+        sections.add(Section
+                        .of(upStation, downStation, request.getDistance()));
     }
+
 
     private void validateDuplicatedLine(LineRequest request) {
         boolean existsLine = lineRepository.existsLineByName(request.getName());
@@ -76,6 +97,4 @@ public class LineService {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역 역니다."));
     }
-
-
 }
