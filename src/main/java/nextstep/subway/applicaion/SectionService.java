@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class SectionService {
@@ -38,6 +40,11 @@ public class SectionService {
 		Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
 
 		return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());
+	}
+
+	public void deleteSection(final Long lineId, final Long stationId) {
+		Section section = sectionRepository.findById(lineId).orElseThrow(RuntimeException::new);
+		sectionRepository.delete(section);
 	}
 
 	private void verifyStationsRelation(final Station upStation) {
