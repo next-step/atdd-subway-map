@@ -21,7 +21,8 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineService
+                                .saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -34,7 +35,6 @@ public class LineController {
 
     @GetMapping(value = "/{lineId}")
     public ResponseEntity<LineResponse> readLine(@PathVariable Long lineId){
-        lineIdValidate(lineId);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(lineService.getLine(lineId));
@@ -42,9 +42,9 @@ public class LineController {
 
 
     @PutMapping(value = "/{lineId}")
-    public ResponseEntity updateLine(@PathVariable Long lineId,
+    public ResponseEntity<Void> updateLine(@PathVariable Long lineId,
                                                    LineRequest lineRequest){
-        UpdateLineRequestValidate(lineId, lineRequest);
+
         lineService.modifyLine(lineId, lineRequest);
 
         return ResponseEntity.ok()
@@ -52,24 +52,10 @@ public class LineController {
     }
 
     @DeleteMapping(value = "/{lineId}")
-    public ResponseEntity deleteLine(@PathVariable Long lineId){
-        lineIdValidate(lineId);
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId){
         lineService.deleteLine(lineId);
         return ResponseEntity.noContent()
                 .build();
-    }
-
-
-    private void UpdateLineRequestValidate(Long lineId, LineRequest lineRequest) {
-        if (lineRequest == null || lineId == null || lineId <= 0) {
-            throw new IllegalArgumentException("잘못된 요청 입니다.");
-        }
-    }
-
-    private void lineIdValidate(Long lineId) {
-        if(lineId == null || lineId <= 0){
-            throw new IllegalArgumentException("잘못된 요청 입니다.");
-        }
     }
 
 
