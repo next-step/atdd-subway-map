@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -23,11 +24,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = 파라미터_생성("강남역");
-
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_API(params);
+        ExtractableResponse<Response> response = 지하철역_생성_API(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -44,11 +42,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_이름_중복_생성_방지_테스트() {
         // given
-        String 강남역 = "강남역";
-        지하철역_생성(강남역);
+        지하철역_생성_API(강남역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성(강남역);
+        ExtractableResponse<Response> response = 지하철역_생성_API(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -64,18 +61,15 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
-        지하철역_생성(강남역);
-
-        String 역삼역 = "역삼역";
-        지하철역_생성(역삼역);
+        지하철역_생성_API(강남역);
+        지하철역_생성_API(역삼역);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        assertThat(stationNames).contains("강남역", "역삼역");
     }
 
     /**
@@ -87,7 +81,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성("강남역");
+        ExtractableResponse<Response> createResponse = 지하철역_생성_API(강남역);
 
         // when
         String uri = createResponse.header("Location");
@@ -97,17 +91,16 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    Map<String, String> 파라미터_생성(String 지하철역명) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", 지하철역명);
+    static Map<String, String> 강남역;
+    static Map<String, String> 역삼역;
 
-        return params;
-    }
+    @BeforeAll
+    public static void 초기화() {
+        강남역 = new HashMap<>();
+        강남역.put("name", "강남역");
 
-    ExtractableResponse<Response> 지하철역_생성(String 지하철역명) {
-        Map<String, String> params = 파라미터_생성(지하철역명);
-
-        return 지하철역_생성_API(params);
+        역삼역 = new HashMap<>();
+        역삼역.put("name", "역삼역");
     }
 
     ExtractableResponse<Response> 지하철역_생성_API(Map<String, String> params) {
