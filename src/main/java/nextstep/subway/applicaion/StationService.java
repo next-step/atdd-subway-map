@@ -27,7 +27,7 @@ public class StationService {
             throw new StationException.Duplicated(station);
         }
         Station created = stationRepository.save(station);
-        return createStationResponse(created);
+        return StationResponse.fromStation(created);
     }
 
     @Transactional(readOnly = true)
@@ -35,7 +35,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::fromStation)
                 .collect(Collectors.toList());
     }
 
@@ -43,12 +43,4 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
-    }
 }
