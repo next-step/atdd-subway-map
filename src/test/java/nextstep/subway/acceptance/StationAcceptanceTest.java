@@ -65,7 +65,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성_API(역삼역);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_전체_리스트_조회_API();
+        ExtractableResponse<Response> response = 지하철역_전체_리스트_조회_API();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
@@ -85,7 +85,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_삭제_API(uri);
+        ExtractableResponse<Response> response = 지하철역_삭제_API(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -113,7 +113,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    ExtractableResponse<Response> 지하철_노선_전체_리스트_조회_API() {
+    ExtractableResponse<Response> 지하철역_전체_리스트_조회_API() {
         return RestAssured.given().log().all()
                 .when()
                 .get("/stations")
@@ -121,7 +121,7 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    ExtractableResponse<Response> 지하철_노선_삭제_API(String uri) {
+    ExtractableResponse<Response> 지하철역_삭제_API(String uri) {
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)
