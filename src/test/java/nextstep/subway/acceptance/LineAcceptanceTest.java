@@ -69,6 +69,28 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
+     * When 같은 색깔로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 색깔 중복")
+    @Test
+    void createDuplicateLineColor() {
+        // given
+        final String 빨강색 = "bg-red-600";
+        정상적인_지하철_노선_생성을_요청한다("신분당선", 빨강색);
+
+        // when
+        final ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다("2호선", 빨강색);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()),
+                () -> assertThat(response.body().jsonPath().get("message").equals("duplicate line color occurred"))
+        );
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
