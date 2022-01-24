@@ -21,13 +21,10 @@ public class SectionService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 노선입니다."));
 
-        List<Section> sections = line.getSections();
-        List<Long> stationIds = sections.stream()
-                .map(section1 -> section1.getUpStation().getId()).collect(Collectors.toList());
-        stationIds.add(sections.get(sections.size() - 1).getDownStation().getId());
+        validateSection(request, new Sections(line.getSections()));
 
-        validateSection(request, stationIds);
-
+        // 이렇게 elseThrow를 던지니 코드가 길어지는 느낌입니다
+        // 그래도 이렇게 꼭 elseThrow를 해야하는지 의견을 구합니다.
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(() -> new RuntimeException("상행역이 존재하지 않습니다."));
         Station downStation = stationRepository.findById(request.getDownStationId())
@@ -43,13 +40,12 @@ public class SectionService {
         return SectionResponse.of(sectionRepository.save(section));
     }
 
-    private void validateSection(SectionRequest request, List<Long> stationIds) {
-        Long downStationId = stationIds.get(stationIds.size() - 1);
-        if(request.getUpStationId() != downStationId) {
+    private void validateSection(SectionRequest request, Sections sections) {
+        if(request.getUpStationId() != sections.getDownStationId()) {
             throw new BadRequestException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
         }
 
-        if(stationIds.contains(request.getDownStationId())) {
+        if(sections.isRegisteredStation(request.getDownStationId())) {
             throw new BadRequestException("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없습니다.");
         }
     }

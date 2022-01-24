@@ -15,6 +15,8 @@ public class ExceptionController {
         return ResponseEntity.internalServerError().body(new ExceptionResponse(e.getMessage()));
     }
 
+    // Exception을 custom하는 이유가 이것인지
+    // 보통 예외처리할 때 internalServerError를 썼었는데 다른 리뷰를 보니 badRequest를 추천하더라 이유는
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> badRequestExceptionHandler(BadRequestException e) {
         e.printStackTrace();

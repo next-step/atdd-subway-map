@@ -20,6 +20,6 @@ public class SectionController {
     public ResponseEntity<SectionResponse> createSection(@RequestBody SectionRequest request,
                                                          @PathVariable("id") Long lineId) {
         SectionResponse section = sectionService.saveSection(request, lineId);
-        return ResponseEntity.created(URI.create("/lines/")).body(section);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId())).body(section);
     }
  }
