@@ -47,10 +47,28 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
+        if (!validateUpStation(section.getUpStation())) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
+        }
+
         sections.add(section);
 
         if (section.getLine() != this) {
             section.changeLine(this);
         }
+    }
+
+    public boolean validateUpStation(Station upStation) {
+        if (this.sections.isEmpty()) {
+            return true;
+        }
+
+        Station lastDownStation = sections
+            .stream()
+            .map(Section::getDownStation)
+            .reduce((a, b) -> b)
+            .orElseThrow(() -> new IllegalArgumentException("하행 종점역이 없습니다."));
+
+        return lastDownStation == upStation;
     }
 }
