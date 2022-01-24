@@ -1,12 +1,12 @@
 package nextstep.subway.applicaion.dto;
 
-public class LineSectionRequest {
+public class SectionRequest {
 
 	private Long upStationId;
 	private Long downStationId;
 	private int distance;
 
-	public LineSectionRequest(
+	public SectionRequest(
 					Long upStationId,
 					Long downStationId,
 					int distance

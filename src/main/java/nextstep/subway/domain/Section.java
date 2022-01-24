@@ -36,7 +36,7 @@ public class Section {
 	}
 
 	public Long getId() {
-		return this.getId();
+		return id;
 	}
 
 	public int getDistance() {

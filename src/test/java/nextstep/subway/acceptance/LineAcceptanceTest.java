@@ -3,6 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.step.LineStep;
+import nextstep.subway.step.SectionStep;
+import nextstep.subway.step.StationStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -130,4 +132,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     // 섹션에 대한 코드
+    @DisplayName("구간을 생성")
+    @Test
+    void createSection() {
+        // 역 2개 생성 : 1L, 2L
+        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
+        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+
+        // 노선 생성
+        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+
+        // 구간 생성
+        ExtractableResponse<Response> extract = SectionStep.saveSection(1L, 2L, 10, 1L);
+
+        // 상태 코드
+        assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(extract.header("Location")).isNotBlank();
+    }
 }

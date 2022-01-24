@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineSectionRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
@@ -23,13 +23,13 @@ public class SectionService {
 		this.stationRepository = stationRepository;
 	}
 
-	public SectionResponse createSection(final Long id, final LineSectionRequest lineSectionRequest) {
+	public SectionResponse createSection(final Long id, final SectionRequest sectionRequest) {
 		Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
 		Station upStation =
-						stationRepository.findById(lineSectionRequest.getUpStationId()).orElseThrow(RuntimeException::new);
+						stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(RuntimeException::new);
 		Station downStation =
-						stationRepository.findById(lineSectionRequest.getDownStationId()).orElseThrow(RuntimeException::new);
-		Section section = sectionRepository.save(Section.of(line, upStation, downStation, lineSectionRequest.getDistance()));
+						stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(RuntimeException::new);
+		Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
 
 		return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());
 	}
