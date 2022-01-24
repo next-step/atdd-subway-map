@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.common.exception.DuplicateAttributeException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,15 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        var requestName = request.getName();
+        var requestColor = request.getColor();
+
+        if (isLineNamePresent(requestName)) {
+            throw new DuplicateAttributeException("이미 존재하는 노선 명: " + requestName);
+        }
+
+        Line line = lineRepository.save(new Line(requestName, requestColor));
+        return LineResponse.of(line);
     }
 
     public void deleteLineById(Long id) {
@@ -39,7 +41,7 @@ public class LineService {
         var line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + id));
 
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +49,7 @@ public class LineService {
         var lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -56,16 +58,11 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + id));
         line.update(lineRequest.getName(), lineRequest.getColor());
 
-        return createLineResponse(line);
+        return LineResponse.of(line);
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+    private boolean isLineNamePresent(String lineName) {
+        return lineRepository.findByName(lineName)
+                .isPresent();
     }
 }
