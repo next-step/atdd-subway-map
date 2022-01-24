@@ -73,6 +73,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        String name = "신분당선";
+        String color = "bg-red-600";
+
+        ExtractableResponse<Response> createdResponse = executeLineCreateRequest(name, color);
+
+        Long createdId = createdResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = RestAssured.given()
+                .when()
+                .get("/lines/{id}", createdId)
+                .then()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(name);
+        assertThat(response.jsonPath().getString("color")).isEqualTo(color);
     }
 
     /**
