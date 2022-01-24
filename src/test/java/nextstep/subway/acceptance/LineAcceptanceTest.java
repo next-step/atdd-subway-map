@@ -46,6 +46,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * When 공백 이름을 가진 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 이름 공백")
+    @Test
+    void createBlankLineName() {
+        // when
+        final ExtractableResponse<Response> response = 정상적인_지하철_노선_생성을_요청한다("  ", "bg-red-600");
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.body().jsonPath().get("message").equals("blank line name occurred"))
+        );
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * When 같은 이름으로 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 실패한다.
