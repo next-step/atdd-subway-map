@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import nextstep.subway.domain.exception.LineException;
 import nextstep.subway.domain.exception.StationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class SubwayExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(StationException.class)
-    public ResponseEntity<Object> handleStationException(StationException e, WebRequest request) {
+    @ExceptionHandler({StationException.class, LineException.class})
+    public ResponseEntity<Object> handleSubwayException(Exception e, WebRequest request) {
         return handleExceptionInternal(
                 e,
                 new SubwayExceptionResponse(e.getMessage()),
