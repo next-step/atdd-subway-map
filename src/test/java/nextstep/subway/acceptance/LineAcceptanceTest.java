@@ -125,11 +125,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(createResponse.header("Location"))
-                .then().log().all()
-                .extract();
+        final String path = createResponse.header("Location");
+        final ExtractableResponse<Response> response = 지하철_노선_삭제_요청(path);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -171,6 +168,14 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .body(requestParams)
                 .when()
                 .put(path)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_삭제_요청(final String path) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(path)
                 .then().log().all()
                 .extract();
     }
