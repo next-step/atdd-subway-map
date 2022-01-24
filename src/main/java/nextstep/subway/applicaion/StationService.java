@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.exception.DuplicatedResourceException;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,19 @@ import java.util.stream.Collectors;
 @Transactional
 public class StationService {
     private StationRepository stationRepository;
+    private StationVerificationService stationVerificationService;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, StationVerificationService stationVerificationService) {
         this.stationRepository = stationRepository;
+        this.stationVerificationService = stationVerificationService;
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        String stationName = stationRequest.getName();
+        if (stationVerificationService.isExistStationByStationName(stationName)) {
+            throw new DuplicatedResourceException(String.format("이미 존재하는 역이 있습니다. [%s]", stationName));
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }

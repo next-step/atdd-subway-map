@@ -42,13 +42,11 @@ public class LineService {
         return LineResponse.fromEntity(lineRepository.findById(id).orElseThrow(EntityNotFoundException::new));
     }
 
-    @Transactional
     public void update(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         lineRepository.save(line.update(lineRequest.toEntity()));
     }
 
-    @Transactional
     public void delete(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         lineRepository.delete(line);
