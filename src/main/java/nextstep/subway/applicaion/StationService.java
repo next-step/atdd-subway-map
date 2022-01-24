@@ -20,6 +20,11 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        boolean existStationName = stationRepository.existsByName(stationRequest.getName());
+        if (existStationName) {
+            throw new IllegalArgumentException();
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
@@ -38,11 +43,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+        return new StationResponse(station);
     }
 }

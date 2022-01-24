@@ -111,8 +111,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String createdLineId = 노선_생성(lineName, lineColor).jsonPath().getString("id");
 
         //when
-        ExtractableResponse<Response> updateLineResult =
-                CustomRestAssured.put("/lines/" + createdLineId, createParams(updateLineName, updateLineColor));
+        ExtractableResponse<Response> updateLineResult = 노선_정보_변경(createdLineId, updateLineName, updateLineColor);
 
         //then
         ExtractableResponse<Response> searchResult = 노선_조회(createdLineId);
@@ -148,12 +147,61 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(searchResult.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * Scenario: 중복이름으로 지하철 노선 생성
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("같은 이름의 지하철 노선은 1개만 존재 가능하다.")
+    @Test
+    void createDuplicateLine() {
+        //given1 지하철 노선 생성
+        String lineName = "이름";
+        String lineColor = "빨간색";
+        노선_생성(lineName, lineColor);
+
+        //when
+        ExtractableResponse<Response> result = 노선_생성(lineName, lineColor);
+
+        //then
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * Scenario: 중복이름으로 지하철 노선 생성
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 이름을 업데이트 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("이미 존재하는 노선 이름으로 이름을 변경 할 수 없다.")
+    @Test
+    void updateDuplicateLine() {
+        //given1 지하철 노선 생성
+        String lineName = "이름1";
+        String lineColor = "빨간색";
+        String lineName2 = "이름2";
+
+        노선_생성(lineName, lineColor);
+        String createdLineId = 노선_생성(lineName2, lineColor).jsonPath().getString("id");
+
+        //when
+        ExtractableResponse<Response> result = 노선_정보_변경(createdLineId, lineName, lineColor);
+
+        //then
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private ExtractableResponse<Response> 노선_조회(final String createdLineId) {
         return CustomRestAssured.get("/lines/" + createdLineId);
     }
 
     private ExtractableResponse<Response> 노선_생성(final String lineName, final String lineColor) {
         return CustomRestAssured.post("/lines/", createParams(lineName, lineColor));
+    }
+
+    private ExtractableResponse<Response> 노선_정보_변경(final String id, final String name, final String color) {
+        return CustomRestAssured.put("/lines/" + id, createParams(name, color));
     }
 
     private Map<String, String> createParams(final String lineName, final String lineColor) {
