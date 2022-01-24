@@ -1,18 +1,25 @@
 package nextstep.subway.acceptance;
 
-import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import nextstep.subway.acceptance.step_feature.LineStepFeature;
+import nextstep.subway.acceptance.step_feature.StationStepFeature;
 import nextstep.subway.applicaion.dto.ShowLineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
+import static nextstep.subway.acceptance.step_feature.LineStepFeature.NUMBER2_LINE_NAME;
+import static nextstep.subway.acceptance.step_feature.LineStepFeature.SHINBUNDANG_LINE_NAME;
+import static nextstep.subway.acceptance.step_feature.StationStepFeature.GANGNAM_STATION_NAME;
+import static nextstep.subway.acceptance.step_feature.StationStepFeature.YEOKSAM_STATION_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -25,15 +32,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        Map<String, String> shinbundangLine = LineStepFeature.createShinbundangLineParams();
+        Map<String, String> params = LineStepFeature.createShinbundangLineParams();
 
         // when
-        ExtractableResponse<Response> response = LineStepFeature.callCreateLines(shinbundangLine);
+        ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank()
-            .isEqualTo("/lines/1");
+                .isEqualTo("/lines/1");
     }
 
     /**
@@ -45,11 +52,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine_duplicate_fail() {
         // given
-        Map<String, String> shinbundangLine = LineStepFeature.createShinbundangLineParams();
-        LineStepFeature.callCreateLines(shinbundangLine);
+        Map<String, String> params = LineStepFeature.createShinbundangLineParams();
+        LineStepFeature.callCreateLines(params);
 
         // when
-        ExtractableResponse<Response> response = LineStepFeature.callCreateLines(shinbundangLine);
+        ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -75,13 +82,13 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         List<String> lineNames = response.jsonPath()
-            .getList(".", ShowLineResponse.class)
-            .stream()
-            .map(ShowLineResponse::getLineName)
-            .collect(toList());
+                .getList(".", ShowLineResponse.class)
+                .stream()
+                .map(ShowLineResponse::getLineName)
+                .collect(toList());
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).contains(LineStepFeature.SHINBUNDANG_LINE_NAME, LineStepFeature.NUMBER2_LINE_NAME);
+        assertThat(lineNames).contains(SHINBUNDANG_LINE_NAME, NUMBER2_LINE_NAME);
 
     }
 
@@ -94,19 +101,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> shinbundangLine = LineStepFeature.createShinbundangLineParams();
-        LineStepFeature.callCreateLines(shinbundangLine);
+        Map<String, String> params = LineStepFeature.createShinbundangLineParams();
+        LineStepFeature.callCreateLines(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callGetLines(1);
 
         // then
         String lineName = response.jsonPath()
-            .getString("name");
+                .getString("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.body()).isNotNull();
-        assertThat(lineName).contains(LineStepFeature.SHINBUNDANG_LINE_NAME);
+        assertThat(lineName).contains(SHINBUNDANG_LINE_NAME);
     }
 
     /**
@@ -118,11 +125,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, String> shinbundangLine = LineStepFeature.createShinbundangLineParams();
-        LineStepFeature.callCreateLines(shinbundangLine);
+        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
+        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
+        Map<String, String> param = LineStepFeature.createLineParams(NUMBER2_LINE_NAME, "green", gangnam.getId(), yeoksam.getId(), 10);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
 
-        Map<String, String> param = new HashMap<>();
-        param.put("id", "1");
+        // when
+        param.put("id", String.valueOf(lineResponse.getLineId()));
         param.put("name", "구분당선");
         param.put("color", "blue");
 
@@ -132,14 +141,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
         List<String> lineNames = response.jsonPath()
-            .getList(".", ShowLineResponse.class)
-            .stream()
-            .map(ShowLineResponse::getLineName)
-            .collect(toList());
+                .getList(".", ShowLineResponse.class)
+                .stream()
+                .map(ShowLineResponse::getLineName)
+                .collect(toList());
 
         assertThat(responseUpdate.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(lineNames).contains("구분당선");
-        assertThat(lineNames).doesNotContain(LineStepFeature.SHINBUNDANG_LINE_NAME);
+        assertThat(lineNames).doesNotContain(SHINBUNDANG_LINE_NAME);
     }
 
     /**
@@ -150,13 +159,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine_fail() {
         // given
-        Map<String, String> param = new HashMap<>();
-        param.put("id", "1");
-        param.put("name", "구분당선");
-        param.put("color", "blue");
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "1");
+        params.put("name", "구분당선");
+        params.put("color", "blue");
 
         // when
-        ExtractableResponse<Response> response = LineStepFeature.callUpdateLines(param);
+        ExtractableResponse<Response> response = LineStepFeature.callUpdateLines(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
