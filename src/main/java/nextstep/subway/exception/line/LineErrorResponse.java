@@ -2,10 +2,7 @@ package nextstep.subway.exception.line;
 
 public class LineErrorResponse {
 
-    private String message;
-
-    private LineErrorResponse() {
-    }
+    private final String message;
 
     public LineErrorResponse(final String message) {
         this.message = message;

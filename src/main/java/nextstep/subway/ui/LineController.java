@@ -14,13 +14,13 @@ import java.util.List;
 public class LineController {
     private final LineService lineService;
 
-    public LineController(LineService lineService) {
+    public LineController(final LineService lineService) {
         this.lineService = lineService;
     }
 
     @PostMapping
     public ResponseEntity<LineSaveResponse> createLine(@RequestBody final LineSaveRequest lineRequest) {
-        LineSaveResponse line = lineService.saveLine(lineRequest);
+        final LineSaveResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 

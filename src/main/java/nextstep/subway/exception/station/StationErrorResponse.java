@@ -2,10 +2,7 @@ package nextstep.subway.exception.station;
 
 public class StationErrorResponse {
 
-    private String message;
-
-    private StationErrorResponse() {
-    }
+    private final String message;
 
     public StationErrorResponse(final String message) {
         this.message = message;

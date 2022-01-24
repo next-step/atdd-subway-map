@@ -5,17 +5,18 @@ import nextstep.subway.domain.Line;
 import java.time.LocalDateTime;
 
 public class LineSaveResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
-    public LineSaveResponse(Line line) {
+    public LineSaveResponse(final Line line) {
         this(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate());
     }
 
-    public LineSaveResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    public LineSaveResponse(final Long id, final String name, final String color,
+                            final LocalDateTime createdDate, final LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;

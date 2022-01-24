@@ -1,7 +1,8 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.StationReadAllResponse;
+import nextstep.subway.applicaion.dto.StationSaveRequest;
+import nextstep.subway.applicaion.dto.StationReadResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.station.StationBlankNameException;
@@ -22,18 +23,18 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(final StationRequest stationRequest) {
+    public StationReadResponse saveStation(final StationSaveRequest stationRequest) {
         validateStationName(stationRequest.getName());
         final Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return new StationResponse(station);
+        return new StationReadResponse(station);
     }
 
     @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
+    public List<StationReadAllResponse> findAllStations() {
         final List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(StationResponse::new)
+                .map(StationReadAllResponse::new)
                 .collect(Collectors.toList());
     }
 

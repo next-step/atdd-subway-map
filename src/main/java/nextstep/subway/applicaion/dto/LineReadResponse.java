@@ -6,18 +6,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class LineReadResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private List<String> stations;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<String> stations;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
-    public LineReadResponse(final Line line, List<String> stations) {
+    public LineReadResponse(final Line line, final List<String> stations) {
         this(line.getId(), line.getName(), line.getColor(), stations, line.getCreatedDate(), line.getModifiedDate());
     }
 
-    public LineReadResponse(final Long id, final String name, final String color, final List<String> stations, final LocalDateTime createdDate, final LocalDateTime modifiedDate) {
+    public LineReadResponse(final Long id, final String name, final String color, final List<String> stations,
+                            final LocalDateTime createdDate, final LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
