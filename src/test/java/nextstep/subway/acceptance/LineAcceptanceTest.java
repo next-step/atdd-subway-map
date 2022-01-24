@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,19 +25,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        final Map<String, String> requestParams = new HashMap<>();
-        requestParams.put("color", "bg-red-600");
-        requestParams.put("name", "신분당선");
-
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParams)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // then
         assertAll(
@@ -57,22 +45,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        final Map<String, String> requestParams1 = new HashMap<>();
-        requestParams1.put("name", "신분당선");
-        requestParams1.put("color", "bg-red-600");
+        final String name1 = "신분당선";
+        final String name2 = "2호선";
 
-        final Map<String, String> requestParams2 = new HashMap<>();
-        requestParams2.put("name", "2호선");
-        requestParams2.put("color", "bg-green-600");
-
-        Arrays.asList(requestParams1, requestParams2)
-                .forEach(requestParams -> RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .body(requestParams)
-                        .when()
-                        .post("/lines")
-                        .then().log().all()
-                        .extract());
+        지하철_노선_생성_요청(name1, "bg-red-600");
+        지하철_노선_생성_요청(name2, "bg-green-600");
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -84,7 +61,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("name")).contains(requestParams1.get("name"), requestParams2.get("name"))
+                () -> assertThat(response.jsonPath().getList("name")).contains(name1, name2)
         );
     }
 
@@ -97,17 +74,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        final Map<String, String> requestParams = new HashMap<>();
-        requestParams.put("name", "신분당선");
-        requestParams.put("color", "bg-red-600");
-
-        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParams)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        final String name = "신분당선";
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(name, "bg-red-600");
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -121,7 +89,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(responseBody.getLong("id")).isNotNull(),
-                () -> assertThat(responseBody.getString("name")).isEqualTo(requestParams.get("name"))
+                () -> assertThat(responseBody.getString("name")).isEqualTo(name)
         );
     }
 
@@ -134,17 +102,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        final Map<String, String> createRequestParams = new HashMap<>();
-        createRequestParams.put("name", "신분당선");
-        createRequestParams.put("color", "bg-red-600");
-
-        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(createRequestParams)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // when
         final String location = createResponse.header("Location");
@@ -184,17 +142,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        final Map<String, String> requestParams = new HashMap<>();
-        requestParams.put("name", "신분당선");
-        requestParams.put("color", "bg-red-600");
-
-        final ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParams)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "bg-red-600");
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -205,5 +153,19 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(final String name, final String color) {
+        final Map<String, String> requestParams = new HashMap<>();
+        requestParams.put("name", name);
+        requestParams.put("color", color);
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(requestParams)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
     }
 }
