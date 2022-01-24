@@ -17,15 +17,16 @@ public class ExceptionAdviser {
     }
 
     @ExceptionHandler(DuplicateStationException.class)
-    public ResponseEntity<Void> duplicateStationHandler(DuplicateStationException exception) {
+    public ResponseEntity<ErrorResponse> duplicateStationHandler(DuplicateStationException exception) {
         return ResponseEntity.badRequest()
-            .build();
+            .body(new ErrorResponse(exception.getMessage()));
     }
 
     @ExceptionHandler(DuplicateLineException.class)
-    public ResponseEntity<Void> DuplicateLineHandler(DuplicateLineException exception) {
+    public ResponseEntity<ErrorResponse> DuplicateLineHandler(DuplicateLineException exception) {
         return ResponseEntity.badRequest()
-            .build();
+            .body(new ErrorResponse(exception.getMessage()));
+
     }
 
 }

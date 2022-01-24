@@ -26,7 +26,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
-            throw new DuplicateLineException();
+            throw new DuplicateLineException(request.getName());
         }
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));

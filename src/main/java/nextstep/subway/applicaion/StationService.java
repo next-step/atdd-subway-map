@@ -25,7 +25,7 @@ public class StationService {
         boolean existStationByName = stationRepository.findByName(stationRequest.getName())
             .isPresent();
         if (existStationByName) {
-            throw new DuplicateStationException();
+            throw new DuplicateStationException(stationRequest.getName());
         }
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));
