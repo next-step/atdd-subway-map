@@ -28,12 +28,7 @@ public class LineStep {
         this(new StationStep());
     }
 
-    public ExtractableResponse<Response> 지하철_노선_생성_요청(final Consumer<LineRequest> custom) {
-        LineRequest request = dummyRequest();
-        if (Objects.nonNull(custom)) {
-            custom.accept(request);
-        }
-
+    public ExtractableResponse<Response> 지하철_노선_생성_요청(final LineRequest request) {
         stationStep.지하철역_생성_요청();
         stationStep.지하철역_생성_요청();
         return RestAssured.given().log().all()
@@ -46,7 +41,7 @@ public class LineStep {
     }
 
     public ExtractableResponse<Response> 지하철_노선_생성_요청() {
-        return 지하철_노선_생성_요청(null);
+        return 지하철_노선_생성_요청(dummyRequest());
     }
 
     public LineRequest dummyRequest() {

@@ -1,5 +1,7 @@
 package nextstep.subway.line.ui;
 
+import java.net.URI;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +16,7 @@ import nextstep.subway.line.domain.dto.SectionRequest;
 @RequestMapping(path = "/lines/{lineId}/sections", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class LineSectionController {
-    private static final String URL_PATTERN = "/lines/%d/%d";
+    private static final String URL_PATTERN = "/lines/%d/sections/%d";
 
     private final LineSectionService lineSectionService;
 
@@ -25,8 +27,8 @@ public class LineSectionController {
     @PostMapping
     public ResponseEntity<Void> addSection(@PathVariable("lineId") final Long lineId,
                                            @RequestBody SectionRequest request) {
-        lineSectionService.addSection(lineId, request);
-
-        return ResponseEntity.noContent().build();
+        Long createSectionId = lineSectionService.addSection(lineId, request);
+        String location = String.format(URL_PATTERN, lineId, createSectionId);
+        return ResponseEntity.created(URI.create(location)).build();
     }
 }

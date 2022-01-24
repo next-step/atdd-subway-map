@@ -18,6 +18,7 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.ErrorMessage;
+import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
@@ -60,9 +61,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLineThatFailing() {
         // given
         String name = lineStep.nextName();
-        lineStep.지하철_노선_생성_요청(request -> request.setName(name));
-        ExtractableResponse<Response> createResponse =
-            lineStep.지하철_노선_생성_요청(request -> request.setName(name));
+        LineRequest preRequest = lineStep.dummyRequest();
+        LineRequest postRequest = lineStep.dummyRequest();
+        preRequest.setName(name);
+        postRequest.setName(name);
+        lineStep.지하철_노선_생성_요청(preRequest);
+
+        // when
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(postRequest);
 
         // then
         AcceptanceTestThen.fromWhen(createResponse)
@@ -80,12 +86,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        List<String> names = Stream.generate(lineStep::nextName)
-                                   .limit(5)
-                                   .collect(Collectors.toList());
-        for (String iName : names) {
-            lineStep.지하철_노선_생성_요청(request -> request.setName(iName));
-        }
+        List<LineRequest> requests = Stream.generate(lineStep::dummyRequest)
+                                           .limit(5)
+                                           .collect(Collectors.toList());
+        requests.forEach(lineStep::지하철_노선_생성_요청);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -94,6 +98,9 @@ class LineAcceptanceTest extends AcceptanceTest {
                                                             .then().log().all()
                                                             .extract();
 
+        List<String> names = requests.stream()
+                                     .map(LineRequest::getName)
+                                     .collect(Collectors.toList());
         //then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
@@ -160,14 +167,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLineThatFailing() {
         // given
-        String name = lineStep.nextName();
-        lineStep.지하철_노선_생성_요청(request -> request.setName(name));
-        ExtractableResponse<Response> createResponse =
-            lineStep.지하철_노선_생성_요청();
+        LineRequest request = lineStep.dummyRequest();
+        lineStep.지하철_노선_생성_요청(request);
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
 
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", name);
+        params.put("name", request.getName());
         params.put("color", lineStep.nextColor());
 
         ExtractableResponse<Response> editResponse =

@@ -24,7 +24,7 @@ public class LineSectionService {
         this.stationRepository = stationRepository;
     }
 
-    public void addSection(Long lineId, SectionRequest request) {
+    public Long addSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findByIdWithSections(lineId)
                                   .orElseThrow(EntityNotFoundException::new);
         Station upStation = stationRepository.findById(request.getUpStationId())
@@ -32,6 +32,7 @@ public class LineSectionService {
         Station downStation = stationRepository.findById(request.getDownStationId())
                                                .orElseThrow(EntityNotFoundException::new);
 
-        line.createSection(upStation, downStation, request.getDistance());
+        Section createdSection = line.createSection(upStation, downStation, request.getDistance());
+        return createdSection.getId();
     }
 }

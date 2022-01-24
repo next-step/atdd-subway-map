@@ -3,9 +3,9 @@ package nextstep.subway.line.domain.dto;
 import nextstep.subway.line.domain.model.Distance;
 
 public class SectionRequest {
-    private final Long upStationId;
-    private final Long downStationId;
-    private final Distance distance;
+    private Long upStationId;
+    private Long downStationId;
+    private Distance distance;
 
     private SectionRequest(Long upStationId, Long downStationId, Distance distance) {
         this.upStationId = upStationId;
@@ -27,6 +27,18 @@ public class SectionRequest {
 
     public Distance getDistance() {
         return distance;
+    }
+
+    public void setUpStationId(Long upStationId) {
+        this.upStationId = upStationId;
+    }
+
+    public void setDownStationId(Long downStationId) {
+        this.downStationId = downStationId;
+    }
+
+    public void setDistance(Distance distance) {
+        this.distance = distance;
     }
 
     public static class Builder {

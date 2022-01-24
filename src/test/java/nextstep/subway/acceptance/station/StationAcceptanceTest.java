@@ -18,6 +18,7 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.ErrorMessage;
+import nextstep.subway.station.domain.dto.StationRequest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
@@ -58,11 +59,15 @@ class StationAcceptanceTest extends AcceptanceTest {
     void createStationThatFailing() {
         // given
         String name = stationStep.nextName();
-        stationStep.지하철역_생성_요청(request -> request.setName(name));
+        StationRequest preRequest = stationStep.dummyRequest();
+        StationRequest postRequest = stationStep.dummyRequest();
+
+        preRequest.setName(name);
+        postRequest.setName(name);
+        stationStep.지하철역_생성_요청(preRequest);
 
         // when
-        ExtractableResponse<Response> response =
-            stationStep.지하철역_생성_요청(request -> request.setName(name));
+        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청(postRequest);
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -84,14 +89,12 @@ class StationAcceptanceTest extends AcceptanceTest {
     })
     @DisplayName("지하철역 목록 조회")
     @ParameterizedTest
-    void getStations(int nameSize) {
+    void getStations(int size) {
         /// given
-        List<String> names = Stream.generate(stationStep::nextName)
-                                   .limit(nameSize)
-                                   .collect(Collectors.toList());
-        for (String iName : names) {
-            stationStep.지하철역_생성_요청(request -> request.setName(iName));
-        }
+        List<StationRequest> requests = Stream.generate(stationStep::dummyRequest)
+                                              .limit(size)
+                                              .collect(Collectors.toList());
+        requests.forEach(stationStep::지하철역_생성_요청);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -101,6 +104,9 @@ class StationAcceptanceTest extends AcceptanceTest {
                                                             .extract();
 
         // then
+        List<String> names = requests.stream()
+                                     .map(StationRequest::getName)
+                                     .collect(Collectors.toList());
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
                           .containsAll("name", names);

@@ -16,7 +16,7 @@ import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.model.Distance;
 import nextstep.subway.utils.AcceptanceTestThen;
 
-@DisplayName("구간 관리 기능")
+@DisplayName("구간 추가 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
     private static final long FIRST_SECTION_UP_STATION = 1;
     private static final long FIRST_SECTION_DOWN_STATION = 2;
@@ -25,6 +25,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     private LineStep lineStep;
     private StationStep stationStep;
+    private SectionStep sectionStep;
 
     @Override
     @BeforeEach
@@ -32,6 +33,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         super.setUp();
         stationStep = new StationStep();
         lineStep = new LineStep(stationStep);
+        sectionStep = new SectionStep();
     }
 
     /**
@@ -64,7 +66,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.NO_CONTENT);
+                          .equalsHttpStatus(HttpStatus.CREATED)
+                          .hasLocation();
     }
 
     /**
@@ -97,7 +100,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage());
+                          .equalsErrorMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
+                          .hasNotLocation();
     }
 
     /**
@@ -130,6 +134,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage());
+                          .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
+                          .hasNotLocation();
     }
 }

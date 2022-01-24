@@ -94,9 +94,7 @@ public class Line extends BaseEntity {
         }
         Optional<Section> optionalSection =
             sections.stream()
-                    .filter(
-                        iSection -> iSection.matchDownStation(upStation)
-                    )
+                    .filter(iSection -> iSection.matchDownStation(upStation))
                     .findFirst();
         return OptionalException.ifEmpty(
             optionalSection,
@@ -107,20 +105,11 @@ public class Line extends BaseEntity {
     private OptionalException<InvalidArgumentException> verifyAlreadyRegisteredStationInSection(Station downStation) {
         Optional<Section> optionalSection =
             sections.stream()
-                    .filter(
-                        iSection -> iSection.matchUpStation(downStation) || iSection.matchDownStation(downStation)
-                    )
+                    .filter(iSection -> iSection.matchUpStation(downStation) || iSection.matchDownStation(downStation))
                     .findFirst();
         return OptionalException.ifPresent(
             optionalSection,
             () -> new InvalidArgumentException(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
         );
-    }
-
-
-    private Optional<Section> findSectionHasDownStation(Station station) {
-        return sections.stream()
-                       .filter(iSection -> iSection.matchDownStation(station))
-                       .findFirst();
     }
 }

@@ -1,8 +1,5 @@
 package nextstep.subway.acceptance.station;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
@@ -15,12 +12,7 @@ public class StationStep {
 
     private int dummyCounter = 0;
 
-    public ExtractableResponse<Response> 지하철역_생성_요청(Consumer<StationRequest> custom) {
-        StationRequest request = dummyRequest();
-        if (Objects.nonNull(custom)) {
-            custom.accept(request);
-        }
-
+    public ExtractableResponse<Response> 지하철역_생성_요청(StationRequest request) {
         return RestAssured.given().log().all()
                           .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -31,10 +23,10 @@ public class StationStep {
     }
 
     public ExtractableResponse<Response> 지하철역_생성_요청() {
-        return 지하철역_생성_요청(null);
+        return 지하철역_생성_요청(dummyRequest());
     }
 
-    private StationRequest dummyRequest() {
+    public StationRequest dummyRequest() {
         return new StationRequest(nextName());
     }
 
