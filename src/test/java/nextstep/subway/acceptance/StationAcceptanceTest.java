@@ -11,6 +11,7 @@ import java.util.List;
 import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -28,6 +29,30 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    /**
+     *  Given 지하철역 생성을 요청하고
+     *  When 같은 이름으로 지하철역 생성을 요청 하면
+     *  Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("지하철역 중복 이름 생성 예외")
+    @Test
+    void createStationDuplicationNameException() {
+        //given
+        지하철역_생성_요청(FIXTURE_강남역);
+
+        //when
+        ExtractableResponse<Response> response = 지하철역_생성_요청(FIXTURE_강남역);
+        int statusCode = response.statusCode();
+        String errorMessage = response.body().asString();
+
+        //then
+        assertAll(
+            () -> assertThat(statusCode).isEqualTo(HttpStatus.CONFLICT.value()),
+            () -> assertThat(errorMessage).isEqualTo("같은 이름으로 등록된 데이터가 존재합니다.")
+        );
+
     }
 
 
