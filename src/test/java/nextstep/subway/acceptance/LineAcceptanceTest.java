@@ -99,26 +99,17 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         final String path = createResponse.header("Location");
-        final Map<String, String> updateRequestParams = new HashMap<>();
-        updateRequestParams.put("name", "구분당선");
-        updateRequestParams.put("color", "bg-blue-600");
-
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(updateRequestParams)
-                .when()
-                .put(path)
-                .then().log().all()
-                .extract();
-
-        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(path);
+        final String name = "구분당선";
+        final String color = "bg-blue-600";
+        지하철_노선_수정_요청(path, name, color);
 
         // then
+        final ExtractableResponse<Response> response = 지하철_노선_조회_요청(path);
         final JsonPath responseBody = response.jsonPath();
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(responseBody.getString("name")).isEqualTo(updateRequestParams.get("name")),
-                () -> assertThat(responseBody.getString("color")).isEqualTo(updateRequestParams.get("color"))
+                () -> assertThat(responseBody.getString("name")).isEqualTo(name),
+                () -> assertThat(responseBody.getString("color")).isEqualTo(color)
         );
     }
 
@@ -166,6 +157,20 @@ class LineAcceptanceTest extends AcceptanceTest {
         return RestAssured.given().log().all()
                 .when()
                 .get(path)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(final String path, final String name, final String color) {
+        final Map<String, String> requestParams = new HashMap<>();
+        requestParams.put("name", name);
+        requestParams.put("color", color);
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(requestParams)
+                .when()
+                .put(path)
                 .then().log().all()
                 .extract();
     }
