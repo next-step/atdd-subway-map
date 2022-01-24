@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.line.LineDuplicateColorException;
 import nextstep.subway.exception.line.LineDuplicateNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +23,8 @@ public class LineService {
     }
 
     public LineSaveResponse saveLine(final LineSaveRequest lineRequest) {
-        if (lineRepository.existsByName(lineRequest.getName())) {
-            throw new LineDuplicateNameException();
-        }
+        validateDuplicatedLineName(lineRequest.getName());
+        validateDuplicatedLineColor(lineRequest.getColor());
         final Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         return new LineSaveResponse(line);
     }
@@ -43,14 +43,25 @@ public class LineService {
     }
 
     public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
-        if (lineRepository.existsByName(lineUpdateRequest.getName())) {
-            throw new LineDuplicateNameException();
-        }
+        validateDuplicatedLineName(lineUpdateRequest.getName());
+        validateDuplicatedLineColor(lineUpdateRequest.getColor());
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     public void delete(final Long id) {
         lineRepository.deleteById(id);
+    }
+
+    private void validateDuplicatedLineName(final String lineName) {
+        if (lineRepository.existsByName(lineName)) {
+            throw new LineDuplicateNameException();
+        }
+    }
+
+    private void validateDuplicatedLineColor(final String lineColor) {
+        if (lineRepository.existsByColor(lineColor)) {
+            throw new LineDuplicateColorException();
+        }
     }
 }

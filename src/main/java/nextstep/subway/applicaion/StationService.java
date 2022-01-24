@@ -21,9 +21,7 @@ public class StationService {
     }
 
     public StationResponse saveStation(final StationRequest stationRequest) {
-        if (stationRepository.existsByName(stationRequest.getName())) {
-            throw new StationDuplicateNameException();
-        }
+        validateDuplicatedStationName(stationRequest.getName());
         final Station station = stationRepository.save(new Station(stationRequest.getName()));
         return new StationResponse(station);
     }
@@ -39,5 +37,11 @@ public class StationService {
 
     public void deleteStationById(final Long id) {
         stationRepository.deleteById(id);
+    }
+
+    private void validateDuplicatedStationName(final String name) {
+        if (stationRepository.existsByName(name)) {
+            throw new StationDuplicateNameException();
+        }
     }
 }

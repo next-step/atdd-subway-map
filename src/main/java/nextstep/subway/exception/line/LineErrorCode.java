@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 import java.util.Arrays;
 
 public enum LineErrorCode implements ErrorCode {
-    DUPLICATE_NAME(LineDuplicateNameException.class, HttpStatus.CONFLICT, "duplicate line name occurred");
+    DUPLICATE_NAME(LineDuplicateNameException.class, HttpStatus.CONFLICT, "duplicate line name occurred"),
+    DUPLICATE_COLOR(LineDuplicateColorException.class, HttpStatus.CONFLICT, "duplicate line color occurred");
 
     private final Class exceptionClass;
     private final HttpStatus httpStatus;
