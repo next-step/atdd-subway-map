@@ -36,4 +36,11 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(() -> new LineException.NotFound(id));
         return LineResponse.fromLine(line);
     }
+
+    public void updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new LineException.NotFound(id));
+        line.changeName(lineRequest.getName());
+        line.changeColor(lineRequest.getColor());
+        lineRepository.save(line);
+    }
 }
