@@ -53,4 +53,9 @@ public class LineService {
         Optional<Line> line = lineRepository.findById(id);
         return createLineResponse(line.get());
     }
+
+    public LineResponse updateLine(Line line) {
+        Line savedLine = lineRepository.save(line);
+        return createLineResponse(savedLine);
+    }
 }
