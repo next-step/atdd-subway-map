@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.entity.Line;
 import nextstep.subway.domain.repository.LineRepository;
+import nextstep.subway.domain.service.LineNameValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +16,15 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final LineNameValidator lineNameValidator;
 
-    public LineService(final LineRepository lineRepository) {
+    public LineService(final LineRepository lineRepository, LineNameValidator lineNameValidator) {
         this.lineRepository = lineRepository;
+        this.lineNameValidator = lineNameValidator;
     }
 
     public LineResponse saveLine(final LineRequest request) {
-        final Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        final Line line = lineRepository.save(new Line(request.getName(), request.getColor(), lineNameValidator));
 
         return createLineResponse(line);
     }
@@ -44,7 +47,7 @@ public class LineService {
 
     public void updateLine(final Long id, final LineRequest lineRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        line.changeName(lineRequest.getName());
+        line.changeName(lineRequest.getName(), lineNameValidator);
         line.changeColor(lineRequest.getColor());
     }
 
