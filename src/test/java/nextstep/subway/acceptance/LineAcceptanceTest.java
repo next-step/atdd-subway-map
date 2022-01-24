@@ -7,8 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Arrays.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -47,7 +49,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = 지하철_노선_목록_조회_응답.jsonPath().getList("name");
-        assertThat(lineNames).containsAll(lineNames);
+        List<String> expectedLineNames = asList("9호선", "5호선");
+        assertThat(lineNames).containsAll(expectedLineNames);
     }
 
     /**
