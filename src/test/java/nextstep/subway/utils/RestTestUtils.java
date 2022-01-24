@@ -17,12 +17,8 @@ public class RestTestUtils {
     }
 
     public static ExtractableResponse<Response> 요청_테스트(URI uri, Map<String, ?> params, Method httpMethod) {
-        RequestSpecification requestSpecification = createRequestSpecificationWithLog();
-
-        if (isNotEmptyParams(params)) {
-            requestSpecification
-                    .body(params);
-        }
+        RequestSpecification requestSpecification = createRequestSpecificationWithLog()
+                .body(params);
 
         return createResponseExtractableResponse(uri, httpMethod, requestSpecification);
     }
@@ -38,10 +34,6 @@ public class RestTestUtils {
                 .request(httpMethod, uri)
                 .then().log().all()
                 .extract();
-    }
-
-    private static boolean isNotEmptyParams(Map<String, ?> params) {
-        return params != null && !params.isEmpty();
     }
 
     public static URI getLocationURI(ExtractableResponse<Response> fixtureResponse) {

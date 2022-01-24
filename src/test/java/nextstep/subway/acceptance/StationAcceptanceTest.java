@@ -3,15 +3,19 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.RequestParamsBuilder;
+import nextstep.subway.utils.RestTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.restassured.http.Method.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
@@ -114,5 +118,31 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    void 중복이름으로_지하철역을_생성하면_실패한다() {
+        //given
+        String fixtureStationName = "강남역";
+        ExtractableResponse<Response> fixtureResponse = 지하철역_생성_요청(fixtureStationName);
+
+        //when
+        ExtractableResponse<Response> response = 지하철역_생성_요청(fixtureStationName);
+
+        //then
+        assertThat(fixtureResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    private ExtractableResponse<Response> 지하철역_생성_요청(String 역이름) {
+        return RestTestUtils.요청_테스트(URI.create("/stations"), RequestParamsBuilder.<String>builder()
+                .addParam("name", 역이름)
+                .build(), POST);
     }
 }
