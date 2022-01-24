@@ -20,8 +20,9 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        checkDuplication(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
+        return LineResponse.of(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
@@ -30,11 +31,17 @@ public class LineService {
         );
     }
 
+    private void checkDuplication(LineRequest request) {
+        if (lineRepository.findByName(request.getName()).isPresent()) {
+            throw new IllegalArgumentException("[duplication]:name");
+        }
+    }
+
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
                 .map( line ->
-                        new LineResponse(
+                        LineResponse.of(
                                 line.getId(),
                                 line.getName(),
                                 line.getColor(),
@@ -46,7 +53,7 @@ public class LineService {
 
     public LineResponse getLine(Long id) {
         Line line = lineRepository.getById(id);
-        return new LineResponse(
+        return LineResponse.of(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
@@ -55,17 +62,10 @@ public class LineService {
         );
     }
 
-    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.getById(id);
-        line.modify(lineRequest.getName(), lineRequest.getColor());
-        lineRepository.save(line);
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        line.setName(lineRequest.getName());
+        line.setColor(lineRequest.getColor());
     }
 
     public void deleteLine(Long id) {

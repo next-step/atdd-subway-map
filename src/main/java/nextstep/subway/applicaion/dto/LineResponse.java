@@ -17,6 +17,10 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
+    public static LineResponse of(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+        return new LineResponse(id, name, color, createdDate, modifiedDate);
+    }
+
     public Long getId() {
         return id;
     }

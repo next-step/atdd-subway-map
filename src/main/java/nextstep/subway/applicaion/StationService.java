@@ -20,8 +20,15 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        checkDuplication(stationRequest);
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
+    }
+
+    private void checkDuplication(StationRequest stationRequest) {
+        if (stationRepository.findByName(stationRequest.getName()).isPresent()) {
+            throw new IllegalArgumentException("[duplication]:name");
+        }
     }
 
     @Transactional(readOnly = true)
