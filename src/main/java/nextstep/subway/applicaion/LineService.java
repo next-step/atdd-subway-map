@@ -6,6 +6,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,44 +20,37 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+    public LineResponse saveLine(LineRequest request) throws IllegalArgumentException {
+        Line findLine = lineRepository.findByName(request.getName());
+        if (ObjectUtils.isEmpty(findLine)) {
+            Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+            return LineResponse.createLineResponse(line);
+        }
+
+        throw new IllegalArgumentException("이미 등록된 노선입니다. 노선 이름 = " + request.getName());
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(LineResponse::createLineResponse)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).get();
+        Line line = lineRepository.findById(id)
+                .orElse(new Line());
 
-        return createLineResponse(line);
+        return LineResponse.createLineResponse(line);
     }
 
-    public void updateLineById(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).get();
-        line.update(lineRequest);
-    }
+    public LineResponse updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElse(new Line());
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        line.update(lineRequest.getName(), lineRequest.getColor());
+        return LineResponse.createLineResponse(line);
     }
 
     public void deleteLineById(Long id) {
