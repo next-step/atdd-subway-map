@@ -132,6 +132,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
+        String name = "신분당선";
+        String color = "bg-red-600";
+
+        ExtractableResponse<Response> createdResponse = executeLineCreateRequest(name, color);
+
+        Long createdId = createdResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = RestAssured.given()
+                .when()
+                .delete("/lines/" + createdId)
+                .then()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> executeLineCreateRequest(String name, String color) {
