@@ -7,11 +7,12 @@ import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.DuplicateStationException;
+import nextstep.subway.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class StationService {
 
     private final StationRepository stationRepository;
@@ -20,6 +21,7 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         boolean existsStationByName = stationRepository.existsByName(stationRequest.getName());
         if (existsStationByName) {
@@ -30,25 +32,36 @@ public class StationService {
         return createStationResponse(station);
     }
 
-    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+            .map(this::createStationResponse)
+            .collect(Collectors.toList());
     }
 
+    public StationResponse showStationById(Long id) {
+        Station station = findStationsById(id);
+        return new StationResponse(station.getId(), station.getName(),
+            station.getCreatedDate(), station.getModifiedDate());
+    }
+
+    public Station findStationsById(Long id) {
+        return stationRepository.findById(id)
+            .orElseThrow(() -> new StationNotFoundException(id));
+    }
+
+    @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
 
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
+            station.getId(),
+            station.getName(),
+            station.getCreatedDate(),
+            station.getModifiedDate()
         );
     }
 

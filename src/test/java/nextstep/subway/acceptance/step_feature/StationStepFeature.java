@@ -33,6 +33,15 @@ public class StationStepFeature {
         return response;
     }
 
+    public static ExtractableResponse<Response> callFindStationByUri(String uri) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when()
+            .get(uri)
+            .then().log().all()
+            .extract();
+        return response;
+    }
+
     public static ExtractableResponse<Response> callDeleteStation(String uri) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .when()

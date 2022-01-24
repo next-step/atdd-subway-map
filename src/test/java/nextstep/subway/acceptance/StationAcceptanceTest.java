@@ -53,6 +53,29 @@ class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철역 생성을 요청 하고
+     * When 생성한 지하철을 조회한다.
+     * Then 생성한 지하철의 정보를 응답받는다
+     */
+    @DisplayName("지하철역 id로 조회")
+    @Test
+    void showStation() {
+        /// given
+        Map<String, String> gangnamStationParams = StationStepFeature.createGangnamStation();
+        ExtractableResponse<Response> createResponse = StationStepFeature.callCreateStation(gangnamStationParams);
+        String uri = createResponse.header("Location");
+
+        // when
+        ExtractableResponse<Response> response = StationStepFeature.callFindStationByUri(uri);
+
+        // then
+        String stationName = response.jsonPath().getString("name");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(stationName).isEqualTo(StationStepFeature.GANGNAM_STATION_NAME);
+    }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
      * Given 새로운 지하철역 생성을 요청 하고
      * When 지하철역 목록 조회를 요청 하면
      * Then 두 지하철역이 포함된 지하철역 목록을 응답받는다
