@@ -39,7 +39,7 @@ class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 이름 공백")
     @Test
-    void createBlankLineColor() {
+    void createBlankStationName() {
         // when
         final ExtractableResponse<Response> response = 지하철_역_생성_요청한다("  ");
 

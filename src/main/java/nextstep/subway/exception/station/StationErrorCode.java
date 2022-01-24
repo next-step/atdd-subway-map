@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 import java.util.Arrays;
 
 public enum StationErrorCode implements ErrorCode {
-    DUPLICATE_NAME(StationDuplicateNameException.class, HttpStatus.CONFLICT, "duplicate station name occurred");
+    DUPLICATE_NAME(StationDuplicateNameException.class, HttpStatus.CONFLICT, "duplicate station name occurred"),
+    BLANK_NAME(StationBlankNameException.class, HttpStatus.BAD_REQUEST, "blank station name occurred");
 
     private final Class exceptionClass;
     private final HttpStatus httpStatus;
