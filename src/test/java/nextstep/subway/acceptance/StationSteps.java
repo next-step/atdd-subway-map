@@ -24,7 +24,7 @@ public class StationSteps {
     public static ExtractableResponse<Response> 지하철역_목록_조회() {
         return RestAssured.given().log().all()
                 .when()
-                .get("/stations")
+                .get(STATION_URI)
                 .then().log().all()
                 .extract();
     }
