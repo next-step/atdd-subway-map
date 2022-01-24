@@ -26,7 +26,7 @@ public class StationService {
     }
 
     private void checkDuplication(StationRequest stationRequest) {
-        if (stationRepository.findByName(stationRequest.getName()).isPresent()) {
+        if (stationRepository.existsByName(stationRequest.getName())) {
             throw new IllegalArgumentException("[duplication]:name");
         }
     }
