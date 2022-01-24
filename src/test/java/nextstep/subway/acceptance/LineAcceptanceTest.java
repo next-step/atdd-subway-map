@@ -28,7 +28,9 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@DisplayName("지하철 노선 생성")
 	@Test
 	void createLine() {
-		지하철_노선_생성("신분당선", "bg-red-600");
+		ExtractableResponse<Response> response = 지하철_노선_생성("신분당선", "bg-red-600");
+		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(response.header("Location")).isNotBlank();
 	}
 
 	/**
@@ -132,20 +134,17 @@ class LineAcceptanceTest extends AcceptanceTest {
 		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 	}
 
-	private void 지하철_노선_생성(String name, String color) {
+	private ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", name);
 		params.put("color", color);
 
-		ExtractableResponse<Response> response = RestAssured
+		return RestAssured
 			.given().log().all()
 			.body(params)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().post("/lines")
 			.then().log().all().extract();
-
-		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(response.header("Location")).isNotBlank();
 	}
 
 	private ExtractableResponse<Response> 지하철_노선_조회(Long id) {

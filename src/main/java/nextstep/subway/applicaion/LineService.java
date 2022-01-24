@@ -22,13 +22,7 @@ public class LineService {
 
 	public LineResponse saveLine(LineRequest request) {
 		Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-		return new LineResponse(
-			line.getId(),
-			line.getName(),
-			line.getColor(),
-			line.getCreatedDate(),
-			line.getModifiedDate()
-		);
+		return LineResponse.of(line);
 	}
 
 	public List<LineResponse> findAllLines() {
@@ -45,7 +39,7 @@ public class LineService {
 
 	public void updateLine(Long id, LineRequest lineRequest) {
 		Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
-		line.update(lineRequest);
+		line.update(lineRequest.getName(), lineRequest.getColor());
 	}
 
 	public void deleteLine(Long id) {

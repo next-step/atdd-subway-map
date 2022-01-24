@@ -35,8 +35,8 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public void update(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }
