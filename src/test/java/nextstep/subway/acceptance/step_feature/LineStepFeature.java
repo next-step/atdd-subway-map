@@ -112,6 +112,25 @@ public class LineStepFeature {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> callAddSection(long lineId, long upStationId, long downStationId) {
+        Map<Object, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", 10);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(LINE_BASE_URI + "/" + lineId + "/sections")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
     public static Map<String, String> createShinbundangLineParams() {
         StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
         StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);

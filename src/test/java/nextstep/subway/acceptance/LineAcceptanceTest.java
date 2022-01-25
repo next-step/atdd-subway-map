@@ -17,8 +17,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 import static nextstep.subway.acceptance.step_feature.LineStepFeature.NUMBER2_LINE_NAME;
 import static nextstep.subway.acceptance.step_feature.LineStepFeature.SHINBUNDANG_LINE_NAME;
-import static nextstep.subway.acceptance.step_feature.StationStepFeature.GANGNAM_STATION_NAME;
-import static nextstep.subway.acceptance.step_feature.StationStepFeature.YEOKSAM_STATION_NAME;
+import static nextstep.subway.acceptance.step_feature.StationStepFeature.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -188,6 +187,75 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 역을 생성한다
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이며, 새로운 구간의 하행역이 노선에 등록되지 않은 구간을 생성한다
+     * Then 지하철 노선 구간 추가가 성공한다
+     */
+    @DisplayName("노선에 구간 추가")
+    @Test
+    void addSection() {
+        // given
+        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
+        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
+        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
+        Map<String, String> param = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given 지하철 역을 생성한다
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 등록한다
+     * Then 구간 추가가 실패한다
+     */
+    @DisplayName("노선에 구간 추가 - 기존 하행역과, 새로운 상행선이 동일하지 않으면 실패")
+    @Test
+    void addSection_validateDownStation() {
+        // given
+        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
+        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
+        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
+        Map<String, String> param = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), nonhyeon.getId(), gangnam.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 역을 생성한다
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 새로운 구간의 하행역은 현재 등록되어있는 역이다
+     * Then 구간 추가가 실패한다
+     */
+    @DisplayName("노선에 구간 추가 - 새로운 구간의 하행역이 현재 등록되어있는 역이면 실패")
+    @Test
+    void addSection_validateAlreadyRegisteredStation() {
+        // given
+        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
+        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
+        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
+        Map<String, String> param = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), gangnam.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 }
