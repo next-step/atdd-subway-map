@@ -131,7 +131,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 없는 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선이 생성이 성공한다.
      */
-    @DisplayName("지하철 노선 수정 - 없는 경우 생성")
+    @DisplayName("지하철 노선 수정 - 없는 경우 NOT FOUND")
     @Test
     void updateNotExistLine() {
         Map<String, String> params = createParams(구분당선);
@@ -140,8 +140,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선_변경_요청(params, "/lines/1");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     /**

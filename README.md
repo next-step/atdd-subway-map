@@ -67,9 +67,9 @@ npm run dev
       - Given 지하철 노선 생성을 요청 하고
       - When 지하철 노선의 정보 수정을 요청 하면
       - Then 지하철 노선의 정보 수정은 성공한다.
-    - case2: 존재하지 않는 노선을 생성
+    - case2: 존재하지 않는 노선을 수정
       - When 없는 지하철 노선의 정보 수정을 요청하면
-      - Then 지하철 노선 생성이 성곤한다.
+      - Then 노선 수정이 실패한다.
   - [X] 기능 구현
 - [X] 지하철 노선 삭제
   - [X] 인수 테스트 작성
@@ -83,8 +83,8 @@ npm run dev
 
 ### Step1 피드백
 
-- [ ] LineNotFoundException에서 매직 리터럴 관리
-- [ ] HTTP PUT METHOD 사용시 없는 경우 에러를 반환
+- [X] LineNotFoundException에서 매직 리터럴 관리
+- [X] HTTP PUT METHOD 사용시 없는 경우 에러를 반환
 - [ ] CONVERTER 대신 DTO가 변환 책임을 갖도록 변경
 - [ ] /lines 공통 @RequestMapping 사용
 - [ ] 테스트코드 검증부 모듈화

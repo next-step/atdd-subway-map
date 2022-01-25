@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,16 +41,11 @@ public class LineService {
                 .orElseThrow(() -> new LineNotFoundException(lineId));
     }
 
-    public boolean updateLine(Long lineId, LineRequest request) {
-        Optional<Line> lineOptional = lineRepository.findById(lineId);
-        if (lineOptional.isPresent()) {
-            Line line = lineOptional.get();
-            line.change(request.getName(), request.getColor());
-            return true;
-        }
+    public void updateLine(Long lineId, LineRequest request) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new LineNotFoundException(lineId));
 
-        lineRepository.save(new Line(lineId, request.getName(), request.getColor()));
-        return false;
+        line.change(request.getName(), request.getColor());
     }
 
     public void deleteLine(Long lineId) {
