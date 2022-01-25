@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
+import nextstep.subway.exception.NotExistedStationException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,8 @@ public class LineController {
         try {
             LineResponse line = lineService.saveLine(lineRequest);
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        } catch (NotExistedStationException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
         }

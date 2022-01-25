@@ -4,6 +4,8 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.NotExistedStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +15,17 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
         checkDuplication(request);
+        existsStation(request.getUpStationId());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
     }
@@ -28,6 +33,12 @@ public class LineService {
     private void checkDuplication(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("[duplication]:name");
+        }
+    }
+
+    private void existsStation(Long upStationId) {
+        if (upStationId == null || !stationRepository.existsById(upStationId)) {
+            throw new NotExistedStationException("[duplication]:name");
         }
     }
 
