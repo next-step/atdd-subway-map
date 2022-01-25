@@ -1,6 +1,6 @@
 package nextstep.subway.acceptance;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
@@ -31,6 +31,24 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    /**
+     *  Given 지하철 노선 생성을 요청 하고
+     *  When 같은 이름으로 지하철 노선 생성을 요청 하면
+     *  Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 이름 중복")
+    @Test
+    void duplicateLineName() {
+        // given
+        LineSteps.지하철_노선_생성_요청(신분당선);
+
+        // when
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(신분당선);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     /**

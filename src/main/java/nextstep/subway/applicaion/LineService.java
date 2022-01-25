@@ -15,6 +15,7 @@ import nextstep.subway.domain.LineRepository;
 @Transactional
 public class LineService {
     private final String NOT_EXISTS_NOTION = "해당 노선에 대한 정보가 없습니다.";
+    private final String DUPLICATE_NOTION_NAME = "노션 이름이 중복입니다.";
 
     private LineRepository lineRepository;
 
@@ -23,6 +24,10 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if(lineRepository.existsByName(request.getName())) {
+            throw new IllegalArgumentException(DUPLICATE_NOTION_NAME);
+        }
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return LineResponse.of(line);
     }
@@ -32,7 +37,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-            .map(line -> LineResponse.of(line))
+            .map(LineResponse::of)
             .collect(Collectors.toList());
     }
 
