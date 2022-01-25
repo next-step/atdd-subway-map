@@ -96,7 +96,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> duplicateResponse = Station_생성_요청(params);
 
         // then
-        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
+        중복이름으로_지하철_역_생성_실패함(duplicateResponse);
     }
 }

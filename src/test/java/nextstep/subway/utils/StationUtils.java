@@ -3,6 +3,7 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.*;
@@ -73,5 +74,9 @@ public class StationUtils {
                 .map(Objects::toString)
                 .collect(Collectors.toList());
         assertThat(requestNames).isEqualTo(responseName);
+    }
+
+    public static void 중복이름으로_지하철_역_생성_실패함(ExtractableResponse<Response> duplicateResponse) {
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }

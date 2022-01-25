@@ -3,6 +3,7 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
@@ -88,5 +89,9 @@ public class LineUtils {
     public static void responseList에_호선이_존재함(ExtractableResponse<Response> responseList, String lineName) {
         final String name = responseList.jsonPath().get("name");
         assertThat(name).contains(lineName);
+    }
+
+    public static void 중복이름으로_지하철_노선_생성_실패함(ExtractableResponse<Response> duplicateResponse) {
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }

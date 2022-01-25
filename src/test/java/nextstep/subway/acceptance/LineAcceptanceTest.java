@@ -136,6 +136,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> duplicateResponse = 지하철_노선_생성요청(line1);
 
         // then
-        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        중복이름으로_지하철_노선_생성_실패함(duplicateResponse);
     }
 }
