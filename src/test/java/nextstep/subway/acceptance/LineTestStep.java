@@ -10,6 +10,12 @@ import java.util.Map;
 
 public class LineTestStep {
 
+    public static Long 지하철_노선_생성한_후_아이디_추출하기(String lineColor, String lineName) {
+        ExtractableResponse<Response> response = 지하철_노선을_생성한다(lineColor, lineName);
+        Integer responseIntegerId = response.jsonPath().get("id");
+        return responseIntegerId.longValue();
+    }
+
     public static ExtractableResponse<Response> 지하철_노선을_생성한다(String lineColor, String lineName) {
         Map<String, String> body = new HashMap<>();
         body.put("color", lineColor);
