@@ -4,17 +4,15 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.ShowLineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.step_feature.StationStepFeature.*;
-
 public class LineStepFeature {
 
     public static final String SHINBUNDANG_LINE_NAME = "신분당선";
+    public static final String SHINBUNDANG_LINE_COLOR = "red";
     public static final String NUMBER2_LINE_NAME = "2호선";
     private static final String CREATE_LINE_NAME_PARAM_KEY = "name";
     private static final String CREATE_LINE_COLOR_PARAM_KEY = "color";
@@ -58,27 +56,13 @@ public class LineStepFeature {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> callGetLinesByUri(String uri) {
+    public static ExtractableResponse<Response> callGetLines(String uri) {
         return RestAssured.given()
                 .log()
                 .all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .get(uri)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-
-    public static ExtractableResponse<Response> callGetLines(long id) {
-        return RestAssured.given()
-                .log()
-                .all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get(LINE_BASE_URI + "/" + id)
                 .then()
                 .log()
                 .all()
@@ -92,7 +76,7 @@ public class LineStepFeature {
                 .body(lineParams)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put(LINE_BASE_URI + "/" + lineParams.get("id"))
+                .put(LINE_BASE_URI + "/" + String.valueOf(lineParams.get("id")))
                 .then()
                 .log()
                 .all()
@@ -131,18 +115,17 @@ public class LineStepFeature {
                 .extract();
     }
 
-    public static Map<String, String> createShinbundangLineParams() {
-        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
-        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
-
-        return createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
-    }
-
-    public static Map<String, String> createNumber2LineParams() {
-        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
-        StationResponse pangyo = StationStepFeature.callCreateAndFind(PANGYO_STATION_NAME);
-
-        return createLineParams(NUMBER2_LINE_NAME, "green", nonhyeon.getId(), pangyo.getId(), 10);
+    private static ExtractableResponse<Response> callGetLinesByUri(String uri) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(uri)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     public static Map<String, String> createLineParams(String name, String color, Long upStationId,

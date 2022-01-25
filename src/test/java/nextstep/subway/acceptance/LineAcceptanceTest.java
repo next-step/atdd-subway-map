@@ -6,6 +6,7 @@ import nextstep.subway.acceptance.step_feature.LineStepFeature;
 import nextstep.subway.acceptance.step_feature.StationStepFeature;
 import nextstep.subway.applicaion.dto.ShowLineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,13 +16,32 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
-import static nextstep.subway.acceptance.step_feature.LineStepFeature.NUMBER2_LINE_NAME;
-import static nextstep.subway.acceptance.step_feature.LineStepFeature.SHINBUNDANG_LINE_NAME;
+import static nextstep.subway.acceptance.step_feature.LineStepFeature.callCreateAndFind;
+import static nextstep.subway.acceptance.step_feature.LineStepFeature.*;
 import static nextstep.subway.acceptance.step_feature.StationStepFeature.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private StationResponse gangnam;
+    private StationResponse yeoksam;
+    private StationResponse nonhyeon;
+    private StationResponse pangyo;
+    private Map<String, String> params;
+
+    @BeforeEach
+    void setUpStation() {
+        gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
+        yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
+        nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
+        pangyo = StationStepFeature.callCreateAndFind(PANGYO_STATION_NAME);
+        params = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME,
+                SHINBUNDANG_LINE_COLOR,
+                gangnam.getId(),
+                yeoksam.getId(),
+                10);
+    }
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -30,9 +50,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        Map<String, String> params = LineStepFeature.createShinbundangLineParams();
-
         // when
         ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
@@ -51,7 +68,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine_duplicate_fail() {
         // given
-        Map<String, String> params = LineStepFeature.createShinbundangLineParams();
         LineStepFeature.callCreateLines(params);
 
         // when
@@ -71,9 +87,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> shinbundangLine = LineStepFeature.createShinbundangLineParams();
-        Map<String, String> number2Line = LineStepFeature.createNumber2LineParams();
-        LineStepFeature.callCreateLines(shinbundangLine);
+        Map<String, String> number2Line = createLineParams(NUMBER2_LINE_NAME, "green", nonhyeon.getId(), pangyo.getId(), 10);
+        LineStepFeature.callCreateLines(params);
         LineStepFeature.callCreateLines(number2Line);
 
         // when
@@ -100,11 +115,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> params = LineStepFeature.createShinbundangLineParams();
-        LineStepFeature.callCreateLines(params);
+        ExtractableResponse<Response> create = callCreateLines(params);
+        String location = create.header("Location");
 
         // when
-        ExtractableResponse<Response> response = LineStepFeature.callGetLines(1);
+        ExtractableResponse<Response> response = LineStepFeature.callGetLines(location);
 
         // then
         String lineName = response.jsonPath()
@@ -124,18 +139,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
-        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
-        Map<String, String> param = LineStepFeature.createLineParams(NUMBER2_LINE_NAME, "green", gangnam.getId(), yeoksam.getId(), 10);
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+        String modifyName = "구분당선";
+        ShowLineResponse createResponse = callCreateAndFind(params);
+        Map modifyParams = new HashMap();
+        modifyParams.put("id", createResponse.getLineId());
+        modifyParams.put("name", modifyName);
+        modifyParams.put("color", "blue");
 
         // when
-        param.put("id", String.valueOf(lineResponse.getLineId()));
-        param.put("name", "구분당선");
-        param.put("color", "blue");
-
-        // when
-        ExtractableResponse<Response> responseUpdate = LineStepFeature.callUpdateLines(param);
+        ExtractableResponse<Response> responseUpdate = LineStepFeature.callUpdateLines(modifyParams);
 
         // then
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
@@ -146,7 +158,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .collect(toList());
 
         assertThat(responseUpdate.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(lineNames).contains("구분당선");
+        assertThat(lineNames).contains(modifyName);
         assertThat(lineNames).doesNotContain(SHINBUNDANG_LINE_NAME);
     }
 
@@ -179,11 +191,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> shinbundangLine = LineStepFeature.createShinbundangLineParams();
-        LineStepFeature.callCreateLines(shinbundangLine);
+        ShowLineResponse createResponse = callCreateAndFind(params);
 
         // when
-        ExtractableResponse<Response> response = LineStepFeature.callDeleteLines(1);
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteLines(createResponse.getLineId());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -199,11 +210,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection() {
         // given
-        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
-        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
-        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
-        Map<String, String> param = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
@@ -222,11 +229,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection_validateDownStation() {
         // given
-        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
-        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
-        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
-        Map<String, String> param = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), nonhyeon.getId(), gangnam.getId());
@@ -245,11 +248,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection_validateAlreadyRegisteredStation() {
         // given
-        StationResponse gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
-        StationResponse yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
-        StationResponse nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
-        Map<String, String> param = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME, "red", gangnam.getId(), yeoksam.getId(), 10);
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(param);
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), gangnam.getId());
