@@ -2,35 +2,23 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static nextstep.subway.utils.RestAssuredRequest.*;
+import static nextstep.subway.acceptance.StationSteps.*;
+import static nextstep.subway.utils.RestAssuredRequest.delete;
+import static nextstep.subway.utils.RestAssuredRequest.get;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
     private static final String STATIONS_PATH = "/stations";
-
-    private Map<String, String> 강남역;
-    private Map<String, String> 역삼역;
-
-    @BeforeEach
-    void initParam() {
-        강남역 = new HashMap<>();
-        강남역.put("name", "강남역");
-
-        역삼역 = new HashMap<>();
-        역삼역.put("name", "역삼역");
-    }
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -102,10 +90,6 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철역_이름_중복됨(response);
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
-        return post(params, STATIONS_PATH);
     }
 
     private ExtractableResponse<Response> 지하철역_목록_조회_요청() {

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.acceptance.StationSteps.*;
 import static nextstep.subway.utils.RestAssuredRequest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,15 +21,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LineAcceptanceTest extends AcceptanceTest {
     private static final String LINES_PATH = "/lines";
 
+    private Long 강남역id;
+    private Long 양재역id;
     private Map<String, String> 신분당선;
     private Map<String, String> 이호선;
     private Map<String, String> 구분당선;
 
     @BeforeEach
     void initParam() {
+        강남역id = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
+        양재역id = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
+
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
         신분당선.put("color", "bg-red-600");
+        신분당선.put("upStationId", String.valueOf(강남역id));
+        신분당선.put("downStationId", String.valueOf(양재역id));
+        신분당선.put("distance", String.valueOf(1600));
 
         이호선 = new HashMap<>();
         이호선.put("name", "2호선");
@@ -180,6 +189,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
         응답_요청_확인(response, HttpStatus.CREATED);
         assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(강남역id, 양재역id);
     }
 
     private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> ... createResponses) {
