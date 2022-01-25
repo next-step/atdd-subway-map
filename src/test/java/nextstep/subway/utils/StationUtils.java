@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static nextstep.subway.utils.ResponseUtils.httpStatus가_OK면서_ResponseBody가_존재함;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -61,6 +62,11 @@ public class StationUtils {
                 .extract();
     }
 
+    public static void 생성요청한_지하철역이_생성됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
     public static void 생성요청_Station_name_list와_생성된_Station_name_list가_동일함(List<ExtractableResponse<Response>> requestList, ExtractableResponse<Response> responseList) {
         final List<String> requestNames = requestList.stream()
                 .map(r -> r.body())
@@ -74,6 +80,8 @@ public class StationUtils {
                 .map(Objects::toString)
                 .collect(Collectors.toList());
         assertThat(requestNames).isEqualTo(responseName);
+
+        httpStatus가_OK면서_ResponseBody가_존재함(responseList);
     }
 
     public static void 중복이름으로_지하철_역_생성_실패함(ExtractableResponse<Response> duplicateResponse) {

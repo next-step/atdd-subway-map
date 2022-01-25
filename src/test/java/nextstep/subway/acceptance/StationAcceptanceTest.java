@@ -9,9 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.utils.ResponseUtils.*;
 import static nextstep.subway.utils.StationUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -34,7 +32,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = Station_생성_요청(params);
 
         // then
-        httpStatus가_CREATED면서_Location이_존재함(response);
+        생성요청한_지하철역이_생성됨(response);
     }
 
     /**
@@ -54,7 +52,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> responseList = Station_목록_요청();
 
         // then
-        httpStatus가_OK면서_ResponseBody가_존재함(responseList);
         생성요청_Station_name_list와_생성된_Station_name_list가_동일함(requestList, responseList);
     }
 
