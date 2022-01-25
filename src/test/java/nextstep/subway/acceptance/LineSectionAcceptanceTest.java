@@ -14,6 +14,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.utils.RestAssuredCRUD;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import org.springframework.http.MediaType;
 @DisplayName("지하철 구간 관련 기능")
 public class LineSectionAcceptanceTest extends AcceptanceTest{
 
-    private LineResponse 일호선역;
+    private LineResponse 일호선;
     private StationResponse 일호선역1;
     private StationResponse 일호선역2;
     private StationResponse 일호선역3;
@@ -38,7 +39,7 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
         일호선역4 = StationAcceptanceTest.지하철_역_을_등록한다(StationRequest.of("1호선역4")).as(StationResponse.class);
 
         LineRequest lineRequest = LineRequest.of("신분당선", "bg-red-600", 일호선역1.getId(), 일호선역4.getId(), 10);
-        일호선역 = LineAcceptanceTest.지하철_노선을_등록한다(lineRequest).as(LineResponse.class);
+        일호선 = LineAcceptanceTest.지하철_노선을_등록한다(lineRequest).as(LineResponse.class);
     }
 
     /**
@@ -54,15 +55,15 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
     void 지하철_노선에_구간을_등록하고_조회해서_확인한다() {
         // when // then
         ExtractableResponse<Response> 노선구간등록결과;
-        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
+        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역2, 10);
         응답결과가_OK(노선구간등록결과);
-        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역4, 10);
+        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선, 일호선역2, 일호선역4, 10);
         응답결과가_OK(노선구간등록결과);
-        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역4, 일호선역3, 10);
+        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선, 일호선역4, 일호선역3, 10);
         응답결과가_OK(노선구간등록결과);
 
         // when
-        ExtractableResponse<Response> 노선역조회결과 = 지하철_노선의_역들을_조회한다(일호선역);
+        ExtractableResponse<Response> 노선역조회결과 = 지하철_노선의_역들을_조회한다(일호선);
         // then
         원하는_역들이_들어있다(노선역조회결과, Arrays.asList(일호선역1, 일호선역2));
     }
@@ -71,11 +72,11 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선에_구간을_등록_실패한다_1() {
         // given
-        지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
-        지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역3, 10);
+        지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역2, 10);
+        지하철_노선에_구간을_등록한다(일호선, 일호선역2, 일호선역3, 10);
 
         // when // then
-        ExtractableResponse<Response> 구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역4, 5);
+        ExtractableResponse<Response> 구간등록결과 = 지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역4, 5);
         응답결과가_BAD_REQUEST(구간등록결과);
     }
 
@@ -83,12 +84,47 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선에_구간을_등록_실패한다_2() {
         // given
-        지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
-        지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역3, 10);
+        지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역2, 10);
+        지하철_노선에_구간을_등록한다(일호선, 일호선역2, 일호선역3, 10);
 
         // when // then
-        ExtractableResponse<Response> 구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역3, 일호선역1, 5);
+        ExtractableResponse<Response> 구간등록결과 = 지하철_노선에_구간을_등록한다(일호선, 일호선역3, 일호선역1, 5);
         응답결과가_BAD_REQUEST(구간등록결과);
+    }
+
+    @DisplayName("지하철 노선에서 특정 역을 삭제 성공한다.")
+    @Test
+    void 지하철_노선에서_역을_삭제_성공한다() {
+        // given
+        지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역2, 10);
+        지하철_노선에_구간을_등록한다(일호선, 일호선역2, 일호선역3, 10);
+
+        // when // then
+        ExtractableResponse<Response> 구간삭제결과 = 지하철_노선에서_역을_삭제한다(일호선.getId(), 일호선역3.getId());
+        응답결과가_OK(구간삭제결과);
+    }
+
+    @DisplayName("지하철 노선에서 역이 최하행역이 아니라서 삭제 불가하다.")
+    @Test
+    void 지하철_노선에서_역을_삭제_실패한다_1() {
+        // given
+        지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역2, 10);
+        지하철_노선에_구간을_등록한다(일호선, 일호선역2, 일호선역3, 10);
+
+        // when // then
+        ExtractableResponse<Response> 구간삭제결과 = 지하철_노선에서_역을_삭제한다(일호선.getId(), 일호선역2.getId());
+        응답결과가_BAD_REQUEST(구간삭제결과);
+    }
+
+    @DisplayName("지하철 노선에서 구간이 1개라서 역을 삭제 할 수 없다.")
+    @Test
+    void 지하철_노선에서_역을_삭제_실패한다_2() {
+        // given
+        지하철_노선에_구간을_등록한다(일호선, 일호선역1, 일호선역2, 10);
+
+        // when // then
+        ExtractableResponse<Response> 구간삭제결과 = 지하철_노선에서_역을_삭제한다(일호선.getId(), 일호선역2.getId());
+        응답결과가_BAD_REQUEST(구간삭제결과);
     }
 
     public static void 원하는_역들이_들어있다(ExtractableResponse<Response> 노선역조회결과, List<StationResponse> 원하는결과) {
@@ -123,6 +159,14 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(sectionRequest)
             .when().post("/lines/{lineId}/sections", line.getId())
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선에서_역을_삭제한다(Long lineId, Long stationId) {
+        return RestAssured
+            .given().log().all()
+            .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
             .then().log().all()
             .extract();
     }
