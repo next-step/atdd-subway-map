@@ -43,9 +43,6 @@ public class StationService {
     }
 
     private void validateStationName(final String name) {
-        if (Strings.isBlank(name)) {
-            throw new StationBlankNameException();
-        }
         if (stationRepository.existsByName(name)) {
             throw new StationDuplicateNameException();
         }

@@ -3,11 +3,8 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.exception.line.LineBlankColorException;
-import nextstep.subway.exception.line.LineBlankNameException;
 import nextstep.subway.exception.line.LineDuplicateColorException;
 import nextstep.subway.exception.line.LineDuplicateNameException;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +23,8 @@ public class LineService {
     }
 
     public LineSaveResponse saveLine(final LineSaveRequest lineRequest) {
-        validateLineName(lineRequest.getName());
-        validateLineColor(lineRequest.getColor());
+        validateDuplicatedLineName(lineRequest.getName());
+        validateDuplicatedLineColor(lineRequest.getColor());
         final Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         return new LineSaveResponse(line);
     }
@@ -46,8 +43,8 @@ public class LineService {
     }
 
     public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
-        validateLineName(lineUpdateRequest.getName());
-        validateLineColor(lineUpdateRequest.getColor());
+        validateDuplicatedLineName(lineUpdateRequest.getName());
+        validateDuplicatedLineColor(lineUpdateRequest.getColor());
         final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
@@ -56,19 +53,13 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    private void validateLineName(final String lineName) {
-        if (Strings.isBlank(lineName)) {
-            throw new LineBlankNameException();
-        }
+    private void validateDuplicatedLineName(final String lineName) {
         if (lineRepository.existsByName(lineName)) {
             throw new LineDuplicateNameException();
         }
     }
 
-    private void validateLineColor(final String lineColor) {
-        if (Strings.isBlank(lineColor)) {
-            throw new LineBlankColorException();
-        }
+    private void validateDuplicatedLineColor(final String lineColor) {
         if (lineRepository.existsByColor(lineColor)) {
             throw new LineDuplicateColorException();
         }

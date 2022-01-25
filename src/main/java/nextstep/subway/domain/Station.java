@@ -1,5 +1,8 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.station.StationBlankNameException;
+import org.apache.logging.log4j.util.Strings;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,7 +19,14 @@ public class Station extends BaseEntity {
     }
 
     public Station(String name) {
+        validateBlankName(name);
         this.name = name;
+    }
+
+    private void validateBlankName(final String name) {
+        if (Strings.isBlank(name)) {
+            throw new StationBlankNameException();
+        }
     }
 
     public Long getId() {
