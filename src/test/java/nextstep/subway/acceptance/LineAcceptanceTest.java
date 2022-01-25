@@ -4,12 +4,14 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static nextstep.subway.acceptance.AssertSteps.httpStatusCode_검증;
 import static nextstep.subway.acceptance.LineAcceptanceFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -25,17 +27,17 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = LineSteps.createLine(FIXTURE_RED);
 
-        int actual = response.statusCode();
+        int statusCode = response.statusCode();
 
         //then
-        assertThat(actual).isEqualTo(HttpStatus.CREATED.value());
+        httpStatusCode_검증(statusCode, CREATED.value());
 
     }
 
     /**
-     *  Given 지하철 노선 생성을 요청 하고
-     *  when 동일한 이름의 지하철 노선 생성을 요청 하면
-     *  Then 지하철 노선 생성이 실패 한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * when 동일한 이름의 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패 한다.
      */
     @DisplayName("지하철 노선 중복 이름 생성 실패")
     @Test
@@ -49,8 +51,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         int actual = response.statusCode();
 
         //then
-        assertThat(actual).isEqualTo(HttpStatus.CONFLICT.value());
-
+        httpStatusCode_검증(actual, CONFLICT.value());
     }
 
     /**
@@ -69,10 +70,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = LineSteps.findLines();
 
-        List<String> actual = response.jsonPath().getList("name");
+        int statusCode = response.statusCode();
+        List<String> namesOfLines = response.jsonPath().getList("name");
 
         //then
-        assertThat(actual).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME);
+        assertAll(
+                () -> httpStatusCode_검증(statusCode, OK.value()),
+                () -> assertThat(namesOfLines).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME)
+        );
+
     }
 
     /**
@@ -90,10 +96,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = LineSteps.findLines(uri);
 
-        String actual = response.jsonPath().get("name");
+        int statusCode = response.statusCode();
+        String findLineName = response.jsonPath().get("name");
 
         //then
-        assertThat(actual).isEqualTo(RED_LINE_NAME);
+        assertAll(
+                () -> httpStatusCode_검증(statusCode, OK.value()),
+                () -> assertThat(findLineName).isEqualTo(RED_LINE_NAME)
+        );
     }
 
     /**
@@ -111,10 +121,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = LineSteps.updateLine(uri, FIXTURE_BLUE);
 
-        String actual = response.jsonPath().get("name");
+        int statusCode = response.statusCode();
+        String updatedName = response.jsonPath().get("name");
 
         //then
-        assertThat(actual).isEqualTo(BLUE_LINE_NAME);
+        assertAll(
+                () -> httpStatusCode_검증(statusCode, OK.value()),
+                () -> assertThat(updatedName).isEqualTo(BLUE_LINE_NAME)
+        );
     }
 
     /**
@@ -132,10 +146,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = LineSteps.deleteLine(uri);
 
-        int actual = response.statusCode();
+        int statusCode = response.statusCode();
 
         //then
-        assertThat(actual).isEqualTo(HttpStatus.NO_CONTENT.value());
+        httpStatusCode_검증(statusCode, NO_CONTENT.value());
     }
 
 }

@@ -4,14 +4,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static nextstep.subway.acceptance.AssertSteps.httpStatusCode_검증;
 import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -26,9 +27,14 @@ class StationAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철역_생성_요청(FIXTURE_강남역);
 
+        int statusCode = response.statusCode();
+        String location = response.header("Location");
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertAll(
+                () -> httpStatusCode_검증(statusCode, CREATED.value()),
+                () -> assertThat(location).isNotBlank()
+        );
     }
 
     /**
@@ -49,7 +55,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         //then
         assertAll(
-            () -> assertThat(statusCode).isEqualTo(HttpStatus.CONFLICT.value()),
+            () -> httpStatusCode_검증(statusCode, CONFLICT.value()),
             () -> assertThat(errorMessage).isEqualTo("같은 이름으로 등록된 데이터가 존재합니다.")
         );
 
@@ -72,10 +78,14 @@ class StationAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철역_목록_조회();
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        int statusCode = response.statusCode();
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+
+        // then
+        assertAll(
+                () -> httpStatusCode_검증(statusCode, OK.value()),
+                () -> assertThat(stationNames).contains(강남역, 역삼역)
+        );
     }
 
     /**
@@ -93,8 +103,11 @@ class StationAcceptanceTest extends AcceptanceTest {
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = 지하철역_삭제(uri);
 
+        int statusCode = response.statusCode();
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        httpStatusCode_검증(statusCode, NO_CONTENT.value());
+
     }
 
 
