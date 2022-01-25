@@ -19,19 +19,6 @@ public class ShowLineResponse {
     private ShowLineResponse() {
     }
 
-    public static ShowLineResponse of(
-            Long id,
-            String name,
-            String color,
-            LocalDateTime createdDate,
-            LocalDateTime modifiedDate) {
-
-        ShowLineResponse result = new ShowLineResponse();
-        result.lineResponse = new LineResponse(id, name, color, createdDate, modifiedDate);
-
-        return result;
-    }
-
     public static ShowLineResponse of(Long id,
                                       String name,
                                       String color,
