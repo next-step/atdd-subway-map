@@ -39,7 +39,7 @@ public class LineService {
 
     private void existsStation(Long upStationId) {
         if (upStationId == null || !stationRepository.existsById(upStationId)) {
-            throw new NotExistedStationException("[duplication]:name");
+            throw new NotExistedStationException("[notExist]:stationId");
         }
     }
 
