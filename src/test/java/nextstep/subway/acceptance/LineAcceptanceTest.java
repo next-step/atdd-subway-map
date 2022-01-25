@@ -108,4 +108,23 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         응답_상태코드_검증(response, HttpStatus.NO_CONTENT);
     }
+
+    /**
+     *  Scenario: 지하철 노선의 이름 중복을 검증한다.
+     *  given   : 지하철 노선 생성을 요청하고
+     *  when    : 같은 이름의 노선 생성을 다시 요청하면,
+     *  then    : 두번째 노선은 생성되지 않는다. (409)
+     */
+    @DisplayName("지하철 노선 중복 검증")
+    @Test
+    void validateLineName() {
+        // given
+        노선_생성(LINE_NEW_BOONDANG);
+
+        // when
+        ExtractableResponse<Response> duplicatedLineResponse = 노선_생성(LINE_NEW_BOONDANG);
+
+        // then
+        응답_상태코드_검증(duplicatedLineResponse, HttpStatus.CONFLICT);
+    }
 }
