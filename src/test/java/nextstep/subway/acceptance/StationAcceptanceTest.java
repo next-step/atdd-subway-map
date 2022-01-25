@@ -71,4 +71,23 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    void duplicatedStationName() {
+        // given
+        String 군자역 = "군자역";
+        지하철_역_생성_요청(군자역);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_역_생성_요청(군자역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
 }
