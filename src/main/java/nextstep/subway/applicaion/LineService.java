@@ -1,15 +1,15 @@
 package nextstep.subway.applicaion;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.LineNameDuplicationException;
 import nextstep.subway.exception.NotFoundLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -22,11 +22,15 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new LineNameDuplicationException(request.getName());
+        }
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
         return createLineResponse(line);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
@@ -35,7 +39,7 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
-
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
             .orElseThrow(() -> new NotFoundLineException(id));
@@ -44,21 +48,14 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-            line.getId(),
-            line.getName(),
-            line.getColor(),
-            line.getStations().getStations(),
-            line.getCreatedDate(),
-            line.getModifiedDate()
-        );
+        return LineResponse.from(line);
     }
 
     public void changeLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
             .orElseThrow(() -> new NotFoundLineException(id));
 
-        line.update(lineRequest);
+        line.update(lineRequest.getColor(), lineRequest.getName());
     }
 
     public void deleteLine(Long id) {

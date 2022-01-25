@@ -1,21 +1,23 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.RequestMethod;
+import nextstep.subway.utils.RequestParams;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private static final String DEFAULT_PATH = "/lines";
+    private static final String DEFAULT_NAME_KEY = "name";
+    private static final String DEFAULT_NAME_VALUE = "신분당선";
+    private static final String DEFAULT_COLOR_KEY = "color";
+    private static final String DEFAULT_COLOR_VALUE = "bg-red-600";
 
     /**
      * When 지하철 노선 생성을 요청 하면 Then 지하철 노선 생성이 성공한다.
@@ -23,19 +25,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        RequestParams params = createDefaultParams();
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -49,42 +42,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
+        RequestParams params1 = createDefaultParams();
 
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-            .body(params1)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .extract();
+        RequestParams params2 = new RequestParams("name", "2호선");
+        params2.addParams("color", "bg-green-600");
 
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "2호선");
-        params2.put("color", "bg-green-600");
-
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-            .body(params2)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .extract();
+        RequestMethod.post(DEFAULT_PATH, params1);
+        RequestMethod.post(DEFAULT_PATH, params2);
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/lines")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = RequestMethod.get(DEFAULT_PATH);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).contains("신분당선", "2호선");
-        assertThat(response.jsonPath().getList("color")).contains("bg-green-600", "bg-red-600");
+        assertThat(response.jsonPath().getList(DEFAULT_NAME_KEY)).contains("신분당선", "2호선");
+        assertThat(response.jsonPath().getList(DEFAULT_COLOR_KEY)).contains("bg-green-600",
+            "bg-red-600");
     }
 
     /**
@@ -94,62 +67,38 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
+        RequestParams params = createDefaultParams();
 
-        ExtractableResponse<Response> createResponse = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when().post("/lines")
-            .then().log().all().extract();
+        ExtractableResponse<Response> createResponse = RequestMethod.post(DEFAULT_PATH, params);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines/" + createResponse.jsonPath().getString("id"))
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = RequestMethod.get(
+            "/lines/" + createResponse.jsonPath().getString("id"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * When 지하철 노선의 정보 수정을 요청 하면
+     * Then 지하철 노선의 정보 수정은 성공한다.
      */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
         //given
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
-
-        ExtractableResponse<Response> createResponse = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(param)
-            .when().post("/lines")
-            .then().extract();
+        RequestParams params = createDefaultParams();
+        ExtractableResponse<Response> createResponse = RequestMethod.post(DEFAULT_PATH, params);
 
         // when
-        Map<String, String> changeParam = new HashMap<>();
-        changeParam.put("name", "구분당선");
-        changeParam.put("color", "bg-blue-600");
+        RequestParams changeParam = createDefaultParams();
 
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(ContentType.JSON)
-            .body(changeParam)
-            .when().put("/lines/" + createResponse.jsonPath().getString("id"))
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = RequestMethod.put(
+            "/lines/" + createResponse.jsonPath().getString("id"), changeParam);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -159,25 +108,39 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        Map<String, String> param = new HashMap<>();
-        param.put("name", "신분당선");
-        param.put("color", "bg-red-600");
+        RequestParams params = createDefaultParams();
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-            .body(param)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> createResponse = RequestMethod.post(DEFAULT_PATH, params);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/lines/" + createResponse.jsonPath().getString("id"))
-            .then().log().all().extract();
+        ExtractableResponse<Response> response = RequestMethod.delete(
+            "/lines/" + createResponse.jsonPath().getString("id"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고 When 같은 이름으로 지하철 노선 생성을 요청 하면 Then 지하철 노선 생성이 실패한다.
+     */
+    @Test
+    @DisplayName("중복이름으로 지하철 노선 생성 실패")
+    void duplicationLineNameExceptionTest() {
+        // given
+        RequestParams params = createDefaultParams();
+
+        RequestMethod.post(DEFAULT_PATH, params);
+        // when
+        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, params);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+    }
+
+    private static RequestParams createDefaultParams() {
+        RequestParams params = new RequestParams(DEFAULT_NAME_KEY, DEFAULT_NAME_VALUE);
+        params.addParams(DEFAULT_COLOR_KEY, DEFAULT_COLOR_VALUE);
+
+        return params;
     }
 }
