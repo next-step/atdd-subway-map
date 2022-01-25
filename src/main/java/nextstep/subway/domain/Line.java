@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.Section;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -69,13 +70,7 @@ public class Line extends BaseEntity {
             return true;
         }
 
-        Station lastDownStation = sections
-            .stream()
-            .map(Section::getDownStation)
-            .reduce((a, b) -> b)
-            .orElseThrow(() -> new IllegalArgumentException("하행 종점역이 없습니다."));
-
-        return lastDownStation == upStation;
+        return getLastDownStation() == upStation;
     }
 
     public boolean validateDownStation(Station downStation) {
@@ -94,5 +89,29 @@ public class Line extends BaseEntity {
             .stream()
             .map(func)
             .collect(Collectors.toList());
+    }
+
+    private Station getLastDownStation() {
+        return sections
+            .stream()
+            .map(Section::getDownStation)
+            .reduce((a, b) -> b)
+            .orElseThrow(() -> new IllegalArgumentException("하행 종점역이 없습니다."));
+    }
+
+    public void deleteSection(Long lastDownStationId) {
+        if (sections.size() <= 1) {
+            throw new IllegalArgumentException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
+        }
+
+        Station lastDownStation = getLastDownStation();
+
+        Section delete = sections.stream()
+            .filter(section -> section.getDownStation() == lastDownStation)
+            .filter(section -> section.getDownStation().getId().equals(lastDownStationId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("마지막 역(하행 종점역)만 제거할 수 있습니다."));
+
+        sections.remove(delete);
     }
 }

@@ -92,6 +92,12 @@ public class LineService {
         line.addSection(new Section(upStation, downStation, sectionRequest.getDistance()));
     }
 
+    public void deleteSection(Long id, Long lastDownStationId) {
+        Line line = getLineById(id);
+
+        line.deleteSection(lastDownStationId);
+    }
+
     private Line getLineById(Long id) {
         return lineRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("일치하는 라인이 없습니다."));
