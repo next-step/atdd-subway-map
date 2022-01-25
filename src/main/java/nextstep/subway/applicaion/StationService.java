@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.converter.ResponseConverter;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
@@ -22,7 +21,7 @@ public class StationService {
 
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return ResponseConverter.toStationResponse(station);
+        return StationResponse.fromEntity(station);
     }
 
     @Transactional(readOnly = true)
@@ -30,7 +29,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(ResponseConverter::toStationResponse)
+                .map(StationResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 

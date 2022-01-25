@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.converter.ResponseConverter;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.exception.LineNotFoundException;
@@ -23,21 +22,21 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return ResponseConverter.toLineResponse(line);
+        return LineResponse.fromEntity(line);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAll() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map(ResponseConverter::toLineResponse)
+                .map(LineResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long lineId) throws LineNotFoundException {
         return lineRepository.findById(lineId)
-                .map(ResponseConverter::toLineResponse)
+                .map(LineResponse::fromEntity)
                 .orElseThrow(() -> new LineNotFoundException(lineId));
     }
 

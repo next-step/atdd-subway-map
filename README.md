@@ -85,7 +85,7 @@ npm run dev
 
 - [X] LineNotFoundException에서 매직 리터럴 관리
 - [X] HTTP PUT METHOD 사용시 없는 경우 에러를 반환
-- [ ] CONVERTER 대신 DTO가 변환 책임을 갖도록 변경
+- [X] CONVERTER 대신 DTO가 변환 책임을 갖도록 변경
 - [ ] /lines 공통 @RequestMapping 사용
 - [ ] 테스트코드 검증부 모듈화
 - [ ] 테스트에서 메소드 직접 사용 대신 @MehtodSource, @ArgumentSource 사용
