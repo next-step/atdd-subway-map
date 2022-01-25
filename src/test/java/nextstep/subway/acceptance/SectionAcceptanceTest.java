@@ -59,6 +59,83 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
+    /**
+     *  given : 노선이 주어진다.
+     *  given :새로운 구간의 상행역이 노선의 종착역이 아닌 구간이 주어진다 .
+     *  when : 구간을 등록 요청 한다.
+     *  then : 구간 등록이 실패 한다.
+     */
+    @Test
+    @DisplayName("지하철 구간 등록 예외 상황 - 종착역과 상행역이 연결되지 않은경우")
+    void createSection_downStation_error(){
+        //given
+        String upStationId = 지하철역_생성_요청("뚝섬역")
+                .jsonPath()
+                .getString("id");
+
+        String downStationId = 지하철역_생성_요청("신도림역")
+                .jsonPath()
+                .getString("id");
+
+        String newUpStationId = 지하철역_생성_요청("합정역")
+                .jsonPath()
+                .getString("id");
+
+        String newDownStationId = 지하철역_생성_요청("문래역")
+                .jsonPath()
+                .getString("id");
+
+        ExtractableResponse<Response> 신분당선 =
+                지하철_노선_생성_요청("신분당선", "bg-red-600", "100", upStationId, downStationId);
+
+        //given
+        Map<String, String> params = 구간_파라미터_생성(newUpStationId, newDownStationId);
+
+        //when
+        신분당선 = 지하철_구간_추가(신분당선, params);
+
+        //then
+        assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(신분당선.jsonPath().getString("message")).isEqualTo("구간을 추가할 수 없습니다.");
+    }
+
+    /**
+     *  given : 노선이 주어진다.
+     *  given :새로운 구간의 종창역이 노선 내 존재하는 역으로 주어진다.
+     *  when : 구간을 등록 요청 한다.
+     *  then : 구간 등록이 실패 한다.
+     */
+    @Test
+    @DisplayName("지하철 구간 등록 예외 상황 - 중복된 역을 등록하는 경우")
+    void createSection_error(){
+        //given
+        String upStationId = 지하철역_생성_요청("뚝섬역")
+                .jsonPath()
+                .getString("id");
+
+        String downStationId = 지하철역_생성_요청("신도림역")
+                .jsonPath()
+                .getString("id");
+
+        String newSectionUpStationId = 지하철역_생성_요청("문래역")
+                .jsonPath()
+                .getString("id");
+
+
+        ExtractableResponse<Response> 신분당선 =
+                지하철_노선_생성_요청("신분당선", "bg-red-600", "100", upStationId, downStationId);
+
+        Map<String, String> params = 구간_파라미터_생성(downStationId, newSectionUpStationId);
+        지하철_구간_추가(신분당선, params);
+        //when
+        params = 구간_파라미터_생성(newSectionUpStationId, downStationId);
+        신분당선 = 지하철_구간_추가(신분당선, params);
+
+        //then
+        assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(신분당선.jsonPath().getString("message")).isEqualTo("구간을 추가할 수 없습니다.");
+    }
+
 
 
     /**
@@ -100,6 +177,39 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+    /**
+     * given : 노선과 하나의 구간이 주어진다.
+     * when  : 주어진 노선의 구간을 삭제 요청을 한다.
+     * then  : 에러 상황이 생긴다.
+     */
+    @Test
+    @DisplayName("구간 제거 기능 - 예외 상황")
+    void deleteSection_error() {
+        //given
+        String 뚝섬역 = 지하철역_생성_요청("뚝섬역")
+                .jsonPath()
+                .getString("id");
+
+        String 신도림역 = 지하철역_생성_요청("신도림역")
+                .jsonPath()
+                .getString("id");
+
+
+        ExtractableResponse<Response> _2호선 = 지하철_노선_생성_요청("2호선", "bg_green_600", "10", 뚝섬역, 신도림역);
+
+        //when
+        String _2호선_구간_location = _2호선.header("location");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .param("stationId",신도림역)
+                .when().delete(_2호선_구간_location + "/sections")
+                .then().log().all().extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("삭제할 수 있는 구간이 존재하지 않습니다");
+    }
 
     /**
      * given : 노선이 주어진다.
@@ -136,5 +246,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getList("stations.id")).containsExactly(Integer.parseInt(뚝섬역), Integer.parseInt(신도림역));
         assertThat(response.jsonPath().getList("stations.name")).containsExactly("뚝섬역", "신도림역");
     }
+//
+//    @Test
+//    @DisplayName("")
+
+
 
 }

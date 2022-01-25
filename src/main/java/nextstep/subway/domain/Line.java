@@ -2,7 +2,9 @@ package nextstep.subway.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Line extends BaseEntity {
@@ -49,10 +51,14 @@ public class Line extends BaseEntity {
         section.setLine(this);
     }
 
-    public boolean upStationNoneMach(Station downStation) {
-        return sections
+    public boolean stationNoneMach(Station downStation) {
+        Set<Station> stations = new HashSet<>();
+        sections.forEach(section -> {
+            stations.add(section.getUpStation());
+            stations.add(section.getDownStation());
+        });
+        return stations
                 .stream()
-                .map(Section::getUpStation)
-                .anyMatch((sn) -> sn.equals(downStation.getName()));
+                .anyMatch(station -> station.getName().equals(downStation.getName()));
     }
 }

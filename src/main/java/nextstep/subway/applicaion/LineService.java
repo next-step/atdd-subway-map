@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.*;
 @Service
 @Transactional
 public class LineService {
+    public static final int MIN_SECTION_COUNT = 2;
     private LineRepository lineRepository;
     private StationRepository stationRepository;
 
@@ -77,13 +78,29 @@ public class LineService {
             throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
         }
 
-        if (line.upStationNoneMach(downStation) || upStation.equals(downStation)){
+        if (line.stationNoneMach(downStation)){
             throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
         }
 
         line
             .setSection(Section.of(upStation, downStation, request.getDistance()));
     }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findLineWithSectionsById(lineId);
+        List<Section> sections = line.getSections();
+        int size = sections.size();
+
+        if(size < MIN_SECTION_COUNT){
+            throw new IllegalArgumentException("삭제할 수 있는 구간이 존재하지 않습니다");
+        }
+
+        Section lastSection = sections.get(size - 1);
+        if(lastSection.getDownStation().getId() == stationId){
+            sections.remove(lastSection);
+        }
+    }
+
 
 
     private void validateDuplicatedLine(LineRequest request) {
@@ -98,18 +115,4 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역 역니다."));
     }
 
-    public void deleteSection(Long lineId, Long stationId) {
-        Line line = lineRepository.findLineWithSectionsById(lineId);
-        List<Section> sections = line.getSections();
-        int size = sections.size();
-
-        if(size < 2){
-            throw new RuntimeException("삭제할 수 있는 구간이 존재하지 않습니다");
-        }
-
-        Section lastSection = sections.get(size - 1);
-        if(lastSection.getDownStation().getId() == stationId){
-            sections.remove(lastSection);
-        }
-    }
 }
