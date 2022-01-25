@@ -95,4 +95,77 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
+    /**
+     * Given 지하철 노선 생성
+     * Given 지하철역 3개 생성
+     * Given 구간 2개 생성
+     * When 구간 삭제 요청
+     * Then 구간 삭제 완료
+     */
+    @DisplayName("구간 제거")
+    @Test
+    void deleteSection() {
+        // given
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
+        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().jsonPath().getLong("id");
+        ExtractableResponse<Response> response1 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
+        ExtractableResponse<Response> response2 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId2, stationId3, 5), lineId);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제(lineId, stationId3);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성
+     * Given 지하철역 3개 생성
+     * Given 구간 2개 생성
+     * When 하행 종점역이 아닌 stationId로 구간 삭제 요청
+     * Then 구간 삭제 실패
+     */
+    @DisplayName("구간 제거 시 마지막 역(하행 종점역)이 아닌 경우 에러가 발생한다.")
+    @Test
+    void deleteSectionValidateLastDownStation() {
+        // given
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
+        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().jsonPath().getLong("id");
+        ExtractableResponse<Response> response1 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
+        ExtractableResponse<Response> response2 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId2, stationId3, 5), lineId);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제(lineId, stationId2);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성
+     * Given 지하철역 3개 생성
+     * Given 구간 1개 생성
+     * When 구간 삭제 요청
+     * Then 구간 삭제 실패
+     */
+    @DisplayName("구간이 1개인 경우 역을 삭제하면 에러가 발생한다. ")
+    @Test
+    void deleteSingleSection() {
+        // given
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
+        ExtractableResponse<Response> response1 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제(lineId, stationId2);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
 }
