@@ -1,4 +1,4 @@
-package nextstep.subway.exception;
+package nextstep.subway.exception.section;
 
 public class DeleteLastDownStationException extends RuntimeException {
 

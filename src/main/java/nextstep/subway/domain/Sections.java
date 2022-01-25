@@ -1,6 +1,10 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.exception.*;
+import nextstep.subway.exception.section.AlreadyRegisteredStationInLineException;
+import nextstep.subway.exception.section.DeleteLastDownStationException;
+import nextstep.subway.exception.section.DownStationNotMatchException;
+import nextstep.subway.exception.section.MinimumSectionException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
