@@ -36,7 +36,7 @@ npm run dev
 ./gradlew bootRun
 ```
 
-# 1단계 - 노선 관리 기능 구현
+# 🚀 1단계 - 노선 관리 기능 구현
 # 요구사항
 
 ---
@@ -227,7 +227,7 @@ Date: Fri, 13 Nov 2020 00:11:51 GMT
   그리고 왜 200일까? 204가 맞지 않을까? → [이건 팀 규칙으로 생각해야 하나?](https://developer.mozilla.org/ko/docs/Web/HTTP/Methods/PUT#%EC%9D%91%EB%8B%B5)
   예외 처리도 필요 데이터 없을 시 201 응답
 
-# 2단계 - 인수 테스트 리팩토링
+# 🚀 2단계 - 인수 테스트 리팩토링
 # 요구사항
 
 ---
