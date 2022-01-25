@@ -1,10 +1,10 @@
-package nextstep.subway.exception.station;
+package nextstep.subway.exception;
 
-public class StationErrorResponse {
+public class ErrorResponse {
 
     private final String message;
 
-    public StationErrorResponse(final String message) {
+    public ErrorResponse(final String message) {
         this.message = message;
     }
 

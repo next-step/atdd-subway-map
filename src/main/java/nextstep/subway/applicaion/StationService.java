@@ -5,12 +5,10 @@ import nextstep.subway.applicaion.dto.StationReadResponse;
 import nextstep.subway.applicaion.dto.StationSaveRequest;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
-import nextstep.subway.exception.station.StationBlankNameException;
-import nextstep.subway.exception.station.StationDuplicateNameException;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +22,7 @@ public class StationService {
     }
 
     public StationReadResponse saveStation(final StationSaveRequest stationRequest) {
-        validateStationName(stationRequest.getName());
+        validateDuplicatedStationName(stationRequest.getName());
         final Station station = stationRepository.save(new Station(stationRequest.getName()));
         return new StationReadResponse(station);
     }
@@ -42,9 +40,9 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private void validateStationName(final String name) {
-        if (stationRepository.existsByName(name)) {
-            throw new StationDuplicateNameException();
+    private void validateDuplicatedStationName(final String stationName) {
+        if (stationRepository.existsByName(stationName)) {
+            throw new EntityExistsException("duplicate station stationName occurred");
         }
     }
 }

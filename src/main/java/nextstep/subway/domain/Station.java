@@ -1,6 +1,5 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.station.StationBlankNameException;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.Entity;
@@ -25,7 +24,7 @@ public class Station extends BaseEntity {
 
     private void validateBlankName(final String name) {
         if (Strings.isBlank(name)) {
-            throw new StationBlankNameException();
+            throw new IllegalArgumentException("blank station name occurred");
         }
     }
 

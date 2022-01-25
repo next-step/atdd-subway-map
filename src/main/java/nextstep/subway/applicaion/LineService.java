@@ -3,11 +3,10 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.exception.line.LineDuplicateColorException;
-import nextstep.subway.exception.line.LineDuplicateNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
@@ -55,13 +54,13 @@ public class LineService {
 
     private void validateDuplicatedLineName(final String lineName) {
         if (lineRepository.existsByName(lineName)) {
-            throw new LineDuplicateNameException();
+            throw new EntityExistsException("duplicate line name occurred");
         }
     }
 
     private void validateDuplicatedLineColor(final String lineColor) {
         if (lineRepository.existsByColor(lineColor)) {
-            throw new LineDuplicateColorException();
+            throw new EntityExistsException("duplicate line color occurred");
         }
     }
 }

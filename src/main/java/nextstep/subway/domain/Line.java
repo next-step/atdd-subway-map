@@ -1,7 +1,5 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.line.LineBlankColorException;
-import nextstep.subway.exception.line.LineBlankNameException;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.Entity;
@@ -29,13 +27,13 @@ public class Line extends BaseEntity {
 
     private void validateBlankName(final String name) {
         if (Strings.isBlank(name)) {
-            throw new LineBlankNameException();
+            throw new IllegalArgumentException("blank line name occurred");
         }
     }
 
     private void validateBlankColor(final String color) {
         if (Strings.isBlank(color)) {
-            throw new LineBlankColorException();
+            throw new IllegalArgumentException("blank line color occurred");
         }
     }
 
