@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.LineSteps.지하철노선_생성;
+import static nextstep.subway.acceptance.StationSteps.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -154,5 +155,23 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름의 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 요청이 실패한다.
+     */
+    @DisplayName("지하철 노선 등록 실패 - 이름 중복")
+    @Test
+    void createLineWithDuplicatedException() {
+        // given
+        지하철노선_생성("1호선", "blue");
+
+        // when
+        ExtractableResponse<Response> response = 지하철노선_생성("1호선", "red");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
