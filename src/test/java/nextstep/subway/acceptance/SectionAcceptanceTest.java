@@ -1,8 +1,10 @@
 package nextstep.subway.acceptance;
 
+import com.jayway.jsonpath.JsonPath;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.Station;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.common.CommonLineAcceptance.지하철_노선_생성_요청;
@@ -97,4 +100,41 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * given : 노선이 주어진다.
+     * when  : 노선을 검색했을 때
+     * then  : 해당 노선에 포함된 모든 역과 함께 조회된다.
+     */
+    @Test
+    @DisplayName("역 목록 조회")
+    void selectStations(){
+        //given
+        String 뚝섬역 = 지하철역_생성_요청("뚝섬역")
+                .jsonPath()
+                .getString("id");
+
+        String 신도림역 = 지하철역_생성_요청("신도림역")
+                .jsonPath()
+                .getString("id");
+
+        ExtractableResponse<Response> _2호선 = 지하철_노선_생성_요청("2호선", "bg_green_600", "10", 뚝섬역, 신도림역);
+
+        //when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get(_2호선.header("location"))
+                .then().log().all().extract();
+
+        //then
+        List<Station> stations = response.jsonPath().getList("stations");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("2호선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg_green_600");
+        assertThat(response.jsonPath().getList("stations.id")).containsExactly(Integer.parseInt(뚝섬역), Integer.parseInt(신도림역));
+        assertThat(response.jsonPath().getList("stations.name")).containsExactly("뚝섬역", "신도림역");
+    }
+
 }
