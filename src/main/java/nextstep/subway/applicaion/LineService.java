@@ -4,11 +4,12 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -50,20 +51,23 @@ public class LineService {
         );
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         Optional<Line> line = lineRepository.findById(id);
-        return createLineResponse(line.get());
+        return createLineResponse(line.orElseThrow(() -> new NoSuchElementException()));
     }
 
-    public LineResponse updateLine(Line line) {
-        Line savedLine = lineRepository.save(line);
-        return createLineResponse(savedLine);
+    public LineResponse updateLine(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException());
+        line.updateLine(request.getName(), request.getColor());
+        return createLineResponse(lineRepository.save(line));
     }
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public boolean isDuplicatedNameOfLine(String name) {
         Optional<Line> line = lineRepository.findByName(name);
         return !line.isEmpty();

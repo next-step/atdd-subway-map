@@ -47,6 +47,7 @@ public class StationService {
         );
     }
 
+    @Transactional(readOnly = true)
     public boolean isDuplicatedNameOfStation(String name) {
         Optional<Station> station = stationRepository.findByName(name);
         return !station.isEmpty();
