@@ -9,4 +9,7 @@ public class StationRequest {
     public String getName() {
         return name;
     }
+
+    public StationRequest() {
+    }
 }

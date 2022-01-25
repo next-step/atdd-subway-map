@@ -4,8 +4,6 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.application.dto.LineRequest;
 import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.section.application.SectionService;
-import nextstep.subway.section.application.dto.SectionLineResponse;
-import nextstep.subway.section.application.manager.LineData;
 import nextstep.subway.section.application.dto.SectionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,9 +32,8 @@ public class LineController {
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SectionLineResponse>> showAllLines() {
-        // List<LineResponse> list = lineService.findAllLines();
-        List<SectionLineResponse> list = sectionService.findAllLinesStations();
+    public ResponseEntity<List<LineResponse>> showAllLines() {
+        List<LineResponse> list = lineService.findAllLines();
         return ResponseEntity.ok().body(list);
     }
 

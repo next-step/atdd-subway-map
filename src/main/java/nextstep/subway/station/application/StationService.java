@@ -1,5 +1,6 @@
 package nextstep.subway.station.application;
 
+import nextstep.subway.section.application.SectionService;
 import nextstep.subway.station.application.dto.StationRequest;
 import nextstep.subway.station.application.dto.StationResponse;
 import nextstep.subway.station.domain.Station;
@@ -17,9 +18,11 @@ import static nextstep.subway.common.ErrorMessages.DUPLICATE_STATION_NAME;
 @Transactional
 public class StationService {
     private final StationRepository stationRepository;
+    private final SectionService sectionService;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, SectionService sectionService) {
         this.stationRepository = stationRepository;
+        this.sectionService = sectionService;
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
@@ -39,9 +42,9 @@ public class StationService {
     }
 
     public void deleteStationById(Long id) {
+        Assert.isTrue(!sectionService.isExistStation(id), "구간에 사용중인 지하철역은 삭제할 수 없습니다.");
         stationRepository.deleteById(id);
     }
-
 
     private void checkExistsStationName(String name) {
         Assert.isTrue(!stationRepository.existsByName(name), DUPLICATE_STATION_NAME.getMessage());

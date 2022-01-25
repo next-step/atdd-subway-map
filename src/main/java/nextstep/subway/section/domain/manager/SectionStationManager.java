@@ -1,10 +1,11 @@
-package nextstep.subway.section.application.manager;
+package nextstep.subway.section.domain.manager;
 
 import java.util.List;
 import java.util.Set;
 
 public interface SectionStationManager {
+
     List<StationData> getAllInStations(Set<Long> stationIds);
 
-    boolean existInStations(Long upStationId, Long downStationId);
+    boolean isExistInStations(Long upStationId, Long downStationId);
 }

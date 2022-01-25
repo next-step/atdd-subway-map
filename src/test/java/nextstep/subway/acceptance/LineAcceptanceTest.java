@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.application.dto.LineRequest;
-import nextstep.subway.section.application.dto.SectionLineResponse;
+import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.utils.AssuredRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
@@ -70,9 +70,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> {
-                    List<SectionLineResponse> responseList = response.jsonPath().getList("", SectionLineResponse.class);
+                    List<LineResponse> responseList = response.jsonPath().getList("", LineResponse.class);
                     assertThat(responseList.size()).isEqualTo(requestList.size());
-                    assertThat(responseList.stream().map(SectionLineResponse::getName).collect(Collectors.toList()))
+                    assertThat(responseList.stream().map(LineResponse::getName).collect(Collectors.toList()))
                             .isEqualTo(requestList.stream().map(LineRequest::getName).collect(Collectors.toList()));
                 }
         );
@@ -152,10 +152,10 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 같은 이름으로 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
-    @DisplayName("중복이름으로 지하철 노선 생성")
+    @DisplayName("지하철 노선 생성 에러 - 중복된 이름으로 생성할 수 없다")
     @Test
     @Order(11)
-    void duplicateLine() {
+    void createLineError1() {
         // given
         LineRequest lineRequest = 노선_요청_정보_샘플1();
         지하철_노선_생성_요청(lineRequest);
@@ -180,11 +180,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private LineRequest 노선_요청_정보_수정_샘플1() {
-        return new LineRequest("100호선", "무지개색");
+        return new LineRequest("비둘기열차", "노랑색");
     }
 
     private LineRequest 노선_요청_정보_중복_샘플1() {
-        return new LineRequest("1호선", "발간색");
+        return new LineRequest("1호선", "초록색");
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {

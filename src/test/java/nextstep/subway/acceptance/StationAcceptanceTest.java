@@ -93,9 +93,9 @@ class StationAcceptanceTest extends AcceptanceTest {
      * When 같은 이름으로 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 실패한다.
      */
-    @DisplayName("중복이름으로 지하철역 생성")
+    @DisplayName("지하철역 생성 에러 - 중복된 이름으로 생성할 수 없다")
     @Test
-    void duplicateStation() {
+    void createStationError1() {
         // given
         String 강남역 = "강남역";
         Map<String, String> params1 = new HashMap<>();

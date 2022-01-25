@@ -2,9 +2,10 @@ package nextstep.subway.section.domain;
 
 
 import nextstep.subway.common.BaseEntity;
-import nextstep.subway.line.domain.Line;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Section extends BaseEntity {
@@ -32,6 +33,13 @@ public class Section extends BaseEntity {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public Set<Long> getStationIds() {
+        Set<Long> ids = new HashSet<>();
+        ids.add(getUpStationId());
+        ids.add(getDownStationId());
+        return ids;
     }
 
     public Long getId() {
@@ -65,4 +73,6 @@ public class Section extends BaseEntity {
     public void setDistance(int distance) {
         this.distance = distance;
     }
+
+
 }

@@ -1,10 +1,8 @@
-package nextstep.subway.station.application;
+package nextstep.subway.station.domain;
 
-import nextstep.subway.section.application.manager.StationData;
-import nextstep.subway.section.application.manager.SectionStationManager;
-import nextstep.subway.station.domain.StationRepository;
+import nextstep.subway.section.domain.manager.SectionStationManager;
+import nextstep.subway.section.domain.manager.StationData;
 import org.springframework.stereotype.Component;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +24,7 @@ public class SectionStationManagerImpl implements SectionStationManager {
     }
 
     @Override
-    public boolean existInStations(Long upStationId, Long downStationId) {
+    public boolean isExistInStations(Long upStationId, Long downStationId) {
         Set<Long> ids = new HashSet();
         ids.add(upStationId);
         ids.add(downStationId);

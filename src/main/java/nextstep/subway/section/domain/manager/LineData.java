@@ -1,8 +1,10 @@
-package nextstep.subway.section.application.manager;
+package nextstep.subway.section.domain.manager;
 
 import nextstep.subway.line.domain.Line;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LineData {
     private Long id;
@@ -11,6 +13,7 @@ public class LineData {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
+    private List<StationData> stations;
     public LineData() {
     }
 
@@ -20,8 +23,16 @@ public class LineData {
         this.color = color;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+        this.stations = new ArrayList<>();
     }
 
+    public void setStations(List<StationData> stations) {
+        this.stations = stations;
+    }
+
+    public List<StationData> getStations() {
+        return stations;
+    }
     public Long getId() {
         return id;
     }

@@ -5,7 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
-    List<Section> findAllByLineId(Long lineId);
+    List<Section> findAllByLineIdOrderById(Long lineId);
+
+    boolean existsByUpStationIdOrDownStationId(Long upStationId, Long downStationId);
 
     void deleteByDownStationIdAndLineId(Long downStationId, Long lineId);
+
+    void deleteByLineId(Long lineId);
 }
