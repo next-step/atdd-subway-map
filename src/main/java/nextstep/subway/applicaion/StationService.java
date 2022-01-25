@@ -25,7 +25,7 @@ public class StationService {
             throw new DuplicationNameException();
         }
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.from(station);
     }
 
     @Transactional(readOnly = true)
@@ -33,7 +33,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -41,12 +41,4 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
-    }
 }

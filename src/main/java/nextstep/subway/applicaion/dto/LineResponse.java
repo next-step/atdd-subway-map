@@ -19,8 +19,8 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    public LineResponse(Line line) {
-        this(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate());
+    public static LineResponse from(Line line) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate());
     }
 
     public Long getId() {

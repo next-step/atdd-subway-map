@@ -26,7 +26,7 @@ public class LineService {
             throw new DuplicationNameException();
         }
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(line);
+        return LineResponse.from(line);
     }
 
     @Transactional(readOnly = true)
@@ -34,21 +34,21 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(LineResponse::new)
+                .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
         return lineRepository.findById(id)
-                .map(LineResponse::new)
+                .map(LineResponse::from)
                 .orElseThrow(EntityNotFoundException::new);
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         line.update(lineRequest.getName(), lineRequest.getColor());
-        return new LineResponse(line);
+        return LineResponse.from(line);
     }
 
     public void deleteLine(Long id) {
