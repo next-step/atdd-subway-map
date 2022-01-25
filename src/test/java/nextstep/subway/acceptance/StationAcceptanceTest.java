@@ -1,18 +1,31 @@
 package nextstep.subway.acceptance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import java.util.Map;
 import nextstep.subway.acceptance.step_feature.StationStepFeature;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+import java.util.Map;
+
+import static nextstep.subway.acceptance.step_feature.StationStepFeature.GANGNAM_STATION_NAME;
+import static nextstep.subway.acceptance.step_feature.StationStepFeature.YEOKSAM_STATION_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
+    private Map<String, String> params;
+    private Map<String, String> params2;
+
+    @BeforeEach
+    void setUpStation() {
+        params = StationStepFeature.createStationParams(GANGNAM_STATION_NAME);
+        params2 = StationStepFeature.createStationParams(YEOKSAM_STATION_NAME);
+    }
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -21,9 +34,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // given
-        Map<String, String> params = StationStepFeature.createGangnamStation();
-
         // when
         ExtractableResponse<Response> response = StationStepFeature.callCreateStation(params);
 
@@ -41,7 +51,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation_duplicate_fail() {
         // given
-        Map<String, String> params = StationStepFeature.createGangnamStation();
         StationStepFeature.callCreateStation(params);
 
         // when
@@ -60,18 +69,17 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void showStation() {
         /// given
-        Map<String, String> gangnamStationParams = StationStepFeature.createGangnamStation();
-        ExtractableResponse<Response> createResponse = StationStepFeature.callCreateStation(gangnamStationParams);
-        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> createResponse = StationStepFeature.callCreateStation(params);
+        String location = createResponse.header("Location");
 
         // when
-        ExtractableResponse<Response> response = StationStepFeature.callFindStationByUri(uri);
+        ExtractableResponse<Response> response = StationStepFeature.callFindStationByUri(location);
 
         // then
         String stationName = response.jsonPath().getString("name");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(stationName).isEqualTo(StationStepFeature.GANGNAM_STATION_NAME);
+        assertThat(stationName).isEqualTo(GANGNAM_STATION_NAME);
     }
 
     /**
@@ -84,18 +92,15 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> gangnamStationParams = StationStepFeature.createGangnamStation();
-        StationStepFeature.callCreateStation(gangnamStationParams);
-
-        Map<String, String> yeoksamStationParams = StationStepFeature.createYeoksamStation();
-        StationStepFeature.callCreateStation(yeoksamStationParams);
+        StationStepFeature.callCreateStation(params);
+        StationStepFeature.callCreateStation(params2);
 
         // when
         ExtractableResponse<Response> response = StationStepFeature.callFindAllStation();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(StationStepFeature.GANGNAM_STATION_NAME, StationStepFeature.YEOKSAM_STATION_NAME);
+        assertThat(stationNames).contains(GANGNAM_STATION_NAME, YEOKSAM_STATION_NAME);
     }
 
     /**
@@ -107,12 +112,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> gangnamStationParams = StationStepFeature.createGangnamStation();
-        ExtractableResponse<Response> createResponse = StationStepFeature.callCreateStation(gangnamStationParams);
+        ExtractableResponse<Response> createResponse = StationStepFeature.callCreateStation(params);
+        String location = createResponse.header("Location");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = StationStepFeature.callDeleteStation(uri);
+        ExtractableResponse<Response> response = StationStepFeature.callDeleteStation(location);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

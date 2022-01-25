@@ -19,24 +19,14 @@ public class StationStepFeature {
     private static final String STATION_BASE_URI = "stations";
 
     public static StationResponse callCreateAndFind(String stationName) {
-        ExtractableResponse<Response> createResponse = callCreateStation(stationName);
-        String uri = createResponse.header("Location");
+        Map<String, String> params = createStationParams(stationName);
 
-        ExtractableResponse<Response> response = callFindStationByUri(uri);
+        ExtractableResponse<Response> createResponse = callCreateStation(params);
+        String location = createResponse.header("Location");
+
+        ExtractableResponse<Response> response = callFindStationByUri(location);
         return response.as(StationResponse.class);
 
-    }
-
-    public static ExtractableResponse<Response> callCreateStation(String stationName) {
-        Map<String, String> stationParams = createStationParams(stationName);
-
-        return RestAssured.given().log().all()
-                .body(stationParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(STATION_BASE_URI)
-                .then().log().all()
-                .extract();
     }
 
     public static ExtractableResponse<Response> callCreateStation(Map<String, String> StationParams) {
@@ -76,15 +66,7 @@ public class StationStepFeature {
         return response;
     }
 
-    public static Map<String, String> createGangnamStation() {
-        return createStationParams(GANGNAM_STATION_NAME);
-    }
-
-    public static Map<String, String> createYeoksamStation() {
-        return createStationParams(YEOKSAM_STATION_NAME);
-    }
-
-    private static Map<String, String> createStationParams(String name) {
+    public static Map<String, String> createStationParams(String name) {
         Map<String, String> result = new HashMap();
         result.put(CREATE_STATION_NAME_PARAM_KEY, name);
 
