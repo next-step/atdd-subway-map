@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.exception.LineNameDuplicatedException;
 import nextstep.subway.applicaion.exception.LineNotFoundException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -21,7 +22,12 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        String name = request.getName();
+        if (lineRepository.existsByName(name)) {
+            throw new LineNameDuplicatedException(name);
+        }
+
+        Line line = lineRepository.save(new Line(name, request.getColor()));
         return LineResponse.fromEntity(line);
     }
 
