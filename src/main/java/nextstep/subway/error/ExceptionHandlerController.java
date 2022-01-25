@@ -1,15 +1,19 @@
 package nextstep.subway.error;
 
-import nextstep.subway.exception.DuplicateException;
-import nextstep.subway.exception.NextStepException;
-import nextstep.subway.exception.NotFoundLineException;
-import nextstep.subway.exception.ValidationException;
+import nextstep.subway.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ExceptionHandlerController {
+
+    @ExceptionHandler(NotFoundStationException.class)
+    public ResponseEntity<ErrorResponse> notFoundStation(final NotFoundStationException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.of(e.getErrorCode()));
+    }
 
     @ExceptionHandler(NotFoundLineException.class)
     public ResponseEntity<ErrorResponse> notFoundLine(final NotFoundLineException e) {
