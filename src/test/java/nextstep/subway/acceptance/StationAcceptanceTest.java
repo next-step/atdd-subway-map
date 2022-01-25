@@ -116,4 +116,37 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    void duplicateStation() {
+        // given
+        String 강남역 = "강남역";
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", 강남역);
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> duplicateResponse = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
