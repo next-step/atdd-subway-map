@@ -4,6 +4,9 @@ public class LineRequest {
     private String name;
     private String color;
 
+    public LineRequest() {
+    }
+
     public LineRequest(LineRequest lineRequest) {
         this(lineRequest.getName(), lineRequest.getColor());
     }

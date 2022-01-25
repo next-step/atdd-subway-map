@@ -54,7 +54,7 @@ public class StationSteps {
 				.body(request)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
-				.put("/stations")
+				.put(uri)
 				.then().log().all()
 			.extract();
 	}

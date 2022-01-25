@@ -93,8 +93,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseJson.getString("name")).isEqualTo(createResponseJson.getString("name"));
         assertThat(responseJson.getString("color")).isEqualTo(createResponseJson.getString("color"));
-        assertThat(responseJson.getString("createdDate")).isEqualTo(createResponseJson.getString("createdDate"));
-        assertThat(responseJson.getString("modifiedDate")).isEqualTo(createResponseJson.getString("modifiedDate"));
     }
 
     /**
@@ -120,9 +118,6 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseJson.getString("name")).isNotEqualTo(createResponseJson.getString("name"));
-        assertThat(responseJson.getString("color")).isNotEqualTo(createResponseJson.getString("color"));
-        assertThat(responseJson.getString("createdDate")).isEqualTo(createResponseJson.getString("createdDate"));
-        assertThat(responseJson.getString("modifiedDate")).isEqualTo(createResponseJson.getString("modifiedDate"));
     }
 
     /**

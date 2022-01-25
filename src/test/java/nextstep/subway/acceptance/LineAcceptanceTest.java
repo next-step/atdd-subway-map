@@ -70,7 +70,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).containsExactly("신분당선", "2호선");
+        assertThat(lineNames).containsExactly(신분당선, 이호선);
     }
 
     /**
@@ -95,8 +95,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseJson.getString("name")).isEqualTo(createResponseJson.getString("name"));
         assertThat(responseJson.getString("color")).isEqualTo(createResponseJson.getString("color"));
-        assertThat(responseJson.getString("createdDate")).isEqualTo(createResponseJson.getString("createdDate"));
-        assertThat(responseJson.getString("modifiedDate")).isEqualTo(createResponseJson.getString("modifiedDate"));
     }
 
     /**
@@ -123,8 +121,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseJson.getString("name")).isNotEqualTo(createResponseJson.getString("name"));
         assertThat(responseJson.getString("color")).isNotEqualTo(createResponseJson.getString("color"));
-        assertThat(responseJson.getString("createdDate")).isEqualTo(createResponseJson.getString("createdDate"));
-        assertThat(responseJson.getString("modifiedDate")).isEqualTo(createResponseJson.getString("modifiedDate"));
     }
 
     /**
