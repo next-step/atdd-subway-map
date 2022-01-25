@@ -42,18 +42,14 @@ public class LineController {
 
     @PatchMapping("/{lineId}")
     public ResponseEntity patchLine(@PathVariable(name = "lineId") Long id,
-                                            @RequestBody LineRequest lineRequest) {
-        if (lineService.patchLine(id, lineRequest)) {
-            return ResponseEntity.notFound().build();
-        }
+                                    @RequestBody LineRequest lineRequest) {
+        lineService.patchLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{lineId}")
     public ResponseEntity deleteLine(@PathVariable(name = "lineId") Long id) {
-        if (lineService.deleteLine(id)) {
-            return ResponseEntity.notFound().build();
-        }
+        lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
     }
 }

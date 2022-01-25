@@ -7,12 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LineDetailResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private List<?> stations = new ArrayList<>();
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+
+    public static LineDetailResponse from(Line line) {
+        return new LineDetailResponse(line.getId(), line.getName(), line.getColor(), line.getStations(),
+                line.getCreatedDate(), line.getModifiedDate());
+    }
+
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<?> stations;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
     public Long getId() {
         return id;
@@ -45,17 +51,13 @@ public class LineDetailResponse {
         this.color = color;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
-        initStations(stations);
+        this.stations = initStations(stations);
     }
 
-    public static LineDetailResponse from(Line line) {
-        return new LineDetailResponse(line.getId(), line.getName(), line.getColor(), line.getStations(),
-                line.getCreatedDate(), line.getModifiedDate());
-    }
-
-    private void initStations(List<?> stations) {
+    private List<?> initStations(List<?> stations) {
         if (stations != null) {
-            this.stations = stations;
+            return stations;
         }
+        return new ArrayList<>();
     }
 }
