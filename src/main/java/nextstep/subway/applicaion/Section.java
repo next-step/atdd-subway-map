@@ -42,6 +42,10 @@ public class Section {
     }
 
     public Section(Station upStation, Station downStation, int distance) {
+        if (upStation == downStation) {
+            throw new IllegalArgumentException("상행역과 하행역이 같을 수 없습니다.");
+        }
+
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;

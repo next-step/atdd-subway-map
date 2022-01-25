@@ -5,6 +5,8 @@ import nextstep.subway.applicaion.Section;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -51,6 +53,10 @@ public class Line extends BaseEntity {
             throw new IllegalArgumentException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
         }
 
+        if (!validateDownStation(section.getDownStation())) {
+            throw new IllegalArgumentException("하행역은 현재 등록되어있는 역일 수 없습니다.");
+        }
+
         sections.add(section);
 
         if (section.getLine() != this) {
@@ -70,5 +76,23 @@ public class Line extends BaseEntity {
             .orElseThrow(() -> new IllegalArgumentException("하행 종점역이 없습니다."));
 
         return lastDownStation == upStation;
+    }
+
+    public boolean validateDownStation(Station downStation) {
+        Function<Section, Station> getDownStation = Section::getDownStation;
+        Function<Section, Station> getUpStation = Section::getUpStation;
+
+        if (getSectionStations(getUpStation).contains(downStation)) {
+            return false;
+        }
+
+        return !getSectionStations(getDownStation).contains(downStation);
+    }
+
+    private List<Station> getSectionStations(Function<Section, Station> func) {
+        return sections
+            .stream()
+            .map(func)
+            .collect(Collectors.toList());
     }
 }
