@@ -1,5 +1,6 @@
 package nextstep.subway.global.error;
 
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import nextstep.subway.exception.LineNameDuplicationException;
 import nextstep.subway.exception.NotFoundLineException;
 import nextstep.subway.exception.StationNameDuplicationException;
@@ -29,4 +30,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @ExceptionHandler(InvalidDefinitionException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions() {
+        ErrorResponse response = ErrorResponse.of(ErrorCode.ILLEGAL_ARGUMENT);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }
