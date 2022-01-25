@@ -332,6 +332,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
+     * GIven 노선에 구간의 추가를 요청하고
      * When 생성한 지하철 노선에 구간의 삭제를 요청 하면
      * Then 생성한 지하철 노선에 구간의 삭제가 성공한다.
      */
@@ -352,9 +353,17 @@ class LineAcceptanceTest extends AcceptanceTest {
                 downStationId,
                 distance);
 
+        String uri = createResponse.header("Location");
+
+        String upStationId2 = "4";
+        String downStationId2 = "5";
+        String distance2 = "10";
+        지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+
         // when
-        String uri = createResponse.header("Location") + "sections?stationId=" + downStationId;
+        uri = createResponse.header("Location") + "/sections";
         ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", downStationId2)
                 .when()
                 .delete(uri)
                 .then().log().all()
@@ -362,6 +371,84 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성한 지하철 노선에 구간의 삭제를 요청 하면
+     * Then 생성한 지하철 노선에 구간의 삭제가 실패한다.
+     */
+    @DisplayName("지하철 노선의 구간이 하나일때 삭제")
+    @Test
+    void deleteSectionFailed() {
+        // given
+        지하철역들_생성_요청(5);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        // when
+        String uri = createResponse.header("Location") + "/sections";
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", downStationId)
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 노선에 구간의 추가를 요청하고
+     * When 생성한 지하철 노선에 마지막 구간이 아닌 다른 구간의 지하철역을 삭제요청 하면
+     * Then 생성한 지하철 노선에 구간의 삭제가 실패한다.
+     */
+    @DisplayName("지하철 노선의 마지막 구간의 하행이 아닌 다른 구간의 지하철역을 삭제")
+    @Test
+    void deleteSectionFailedByNotLastDownStation() {
+        // given
+        지하철역들_생성_요청(5);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        String uri = createResponse.header("Location");
+
+        String upStationId2 = "4";
+        String downStationId2 = "5";
+        String distance2 = "10";
+        지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+
+        // when
+        uri = createResponse.header("Location") + "/sections";
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", downStationId)
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
 }
