@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static nextstep.subway.model.Station.*;
 import static nextstep.subway.model.StationEntitiesHelper.*;
 import static org.apache.http.HttpHeaders.LOCATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +23,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> response = 지하철역_생성_요청(강남역.name());
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
         assertThat(response.header(LOCATION)).isNotBlank();
     }
@@ -36,11 +37,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(강남역);
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(역삼역);
+        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(강남역.name());
+        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(역삼역.name());
         ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
         assertThat(response.statusCode()).isEqualTo(OK.value());
-        assertThat(response.jsonPath().getList("name")).contains(강남역, 역삼역);
+        assertThat(response.jsonPath().getList("name")).contains(강남역.name(), 역삼역.name());
     }
 
     /**
@@ -51,7 +52,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역.name());
         ExtractableResponse<Response> response = 지하철역_삭제_요청(createResponse.header(LOCATION));
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
@@ -64,8 +65,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철역 생성")
     @Test
     void createDuplicateStation()  {
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
-        ExtractableResponse<Response> failResponse = 지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역.name());
+        ExtractableResponse<Response> failResponse = 지하철역_생성_요청(강남역.name());
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 }

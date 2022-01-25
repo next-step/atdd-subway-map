@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.model.StationEntitiesHelper.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public final class LineEntitiesHelper {
@@ -25,8 +26,13 @@ public final class LineEntitiesHelper {
     }
 
     public static ExtractableResponse<Response> 노선_생성_요청(Line line) {
+        ExtractableResponse<Response> upStationResponse = 지하철역_생성_요청(line.getUpStation());
+        ExtractableResponse<Response> downStationResponse = 지하철역_생성_요청(line.getDownStation());
+        Long upStationId = upStationResponse.jsonPath().getLong("id");
+        Long downStationId = downStationResponse.jsonPath().getLong("id");
+
         return RestAssured.given().log().all()
-                .body(newLine(line))
+                .body(newLine(line, upStationId, downStationId, line.getDistance()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(REQUEST_URI)
