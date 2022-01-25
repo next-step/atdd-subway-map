@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.util.Pair.toMap;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,18 +40,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     public static final String 신분당선 = "신분당선";
     public static final String 신분당선_COLOR = "bg-red-600";
     public static final String LINE_CONTROLLER_COMMON_PATH = "/lines";
-
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    void setup() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
-    }
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
         return RestAssured

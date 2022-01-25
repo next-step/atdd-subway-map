@@ -27,18 +27,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     private static final String STATION_API_PATH = "/stations";
     public static final String 강남역 = "강남역";
     public static final String 역삼역 = "역삼역";
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    void setup() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
-    }
-
     public static ExtractableResponse<Response> 지하철역_생성(StationRequest params) {
         return RestAssured.given().log().all()
                 .body(params)
