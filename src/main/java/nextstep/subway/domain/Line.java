@@ -46,7 +46,7 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public void setSection(Section section) {
+    public void addSection(Section section) {
         this.sections.add(section);
         section.setLine(this);
     }

@@ -33,7 +33,7 @@ public class LineService {
 
         Line line = new Line(request.getName(), request.getColor());
         Section section = new Section(upStation, downStation, request.getDistance());
-        line.setSection(section);
+        line.addSection(section);
 
         Line saveLine = lineRepository.save(line);
         return new LineResponse(saveLine);
@@ -63,8 +63,10 @@ public class LineService {
 
 
     public void addSection(Long lineId, SectionRequest request) {
-        Line line = lineRepository.findLineWithSectionsById(lineId);
-        List<Section> sections = line.getSections();
+        Line line =
+                lineRepository.findLineWithSectionsById(lineId);
+        List<Section> sections =
+                line.getSections();
         int sectionLastIndex = sections.size() - 1;
 
         Section section =
@@ -82,21 +84,23 @@ public class LineService {
             throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
         }
 
-        line
-            .setSection(Section.of(upStation, downStation, request.getDistance()));
+        Section newSection =
+                Section.of(upStation, downStation, request.getDistance());
+
+        line.addSection(newSection);
     }
 
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findLineWithSectionsById(lineId);
         List<Section> sections = line.getSections();
         int size = sections.size();
+        Section lastSection = sections.get(size - 1);
 
         if(size < MIN_SECTION_COUNT){
             throw new IllegalArgumentException("삭제할 수 있는 구간이 존재하지 않습니다");
         }
 
-        Section lastSection = sections.get(size - 1);
-        if(lastSection.getDownStation().getId() == stationId){
+        if(isDownStationId(stationId, lastSection)){
             sections.remove(lastSection);
         }
     }
@@ -113,6 +117,10 @@ public class LineService {
     private Station getStationById(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역 역니다."));
+    }
+
+    private boolean isDownStationId(Long stationId, Section lastSection) {
+        return lastSection.getDownStation().getId() == stationId;
     }
 
 }
