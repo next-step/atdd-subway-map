@@ -24,11 +24,10 @@ public class LineService {
     }
 
     public LineResponse saveLine(final LineRequest request) {
-        final String lineName = request.getName();
-        if (isDuplicate(lineName)) {
+        if (isDuplicate(request.getName())) {
             throw new DuplicateException();
         }
-        final Line line = new Line(lineName, request.getColor());
+        final Line line = Line.of(request);
         final Line createdLine = lineRepository.save(line);
         return LineResponse.of(createdLine);
     }

@@ -14,7 +14,7 @@ public final class LineEntitiesHelper {
 
     private static final String REQUEST_URI = "/lines";
 
-    public static ExtractableResponse<Response> 노선_생성_요청(Line line, Long upStationId, Long downStationId, Long distance) {
+    public static ExtractableResponse<Response> 노선_생성_요청(Line line, Long upStationId, Long downStationId, int distance) {
         return RestAssured.given().log().all()
                 .body(newLine(line, upStationId, downStationId, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -75,12 +75,13 @@ public final class LineEntitiesHelper {
         return params;
     }
 
-    private static Map<String, Object> newLine(Line line, Long upStationId, Long downStationId, Long distance) {
+    private static Map<String, Object> newLine(Line line, Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", line.name());
         params.put("color", line.getColor());
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
+        params.put("distance", distance);
         return params;
     }
 }

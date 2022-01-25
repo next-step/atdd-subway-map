@@ -117,7 +117,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         Long upStationId = upStationResponse.jsonPath().getLong("id");
         Long downStationId = downStationResponse.jsonPath().getLong("id");
-        Long distance = 8L;
+        int distance = 1;
 
         ExtractableResponse<Response> response = 노선_생성_요청(신분당선, upStationId, downStationId, distance);
 
