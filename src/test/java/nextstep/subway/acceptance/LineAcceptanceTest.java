@@ -2,11 +2,14 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.model.StationEntitiesHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.model.Line.*;
 import static nextstep.subway.model.LineEntitiesHelper.*;
+import static nextstep.subway.model.StationEntitiesHelper.*;
+import static nextstep.subway.model.StationEntitiesHelper.강남역;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
 import static org.apache.http.HttpHeaders.LOCATION;
@@ -99,4 +102,31 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> failResponse = 노선_생성_요청(이호선);
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
+
+    /**
+     * Given 지하철역 생성을 요청하고
+     * Given 다른 이름의 지하철역 생성을 요청하고
+     * When 생성된 두 역의 ID 과 거리 값을 갖는 지하철 노선 생성을 요청 하면
+     * Then 두 역의 ID 와 거리 값이 포함된 지하철 노선을 응답받는다
+     */
+    @DisplayName("두 종점역과 거리를 갖는 지하철 노선 생성")
+    @Test
+    void createLineHasTwoTerminateStation() {
+        ExtractableResponse<Response> upStationResponse = 지하철역_생성_요청(강남역);
+        ExtractableResponse<Response> downStationResponse = 지하철역_생성_요청(역삼역);
+
+        Long upStationId = upStationResponse.jsonPath().getLong("id");
+        Long downStationId = downStationResponse.jsonPath().getLong("id");
+        Long distance = 8L;
+
+        ExtractableResponse<Response> response = 노선_생성_요청(신분당선, upStationId, downStationId, distance);
+
+        // NPE
+        Long result = response.jsonPath().getLong("upStationId");
+
+        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(upStationId);
+        assertThat(response.header(LOCATION)).isNotBlank();
+    }
+
 }
