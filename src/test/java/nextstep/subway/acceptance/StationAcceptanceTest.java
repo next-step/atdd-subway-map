@@ -68,7 +68,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 id로 조회")
     @Test
     void showStation() {
-        /// given
+        // given
         ExtractableResponse<Response> createResponse = StationStepFeature.callCreateStation(params);
         String location = createResponse.header("Location");
 
@@ -91,7 +91,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        /// given
+        // given
         StationStepFeature.callCreateStation(params);
         StationStepFeature.callCreateStation(params2);
 
