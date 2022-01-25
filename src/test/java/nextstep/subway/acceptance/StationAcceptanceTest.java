@@ -4,6 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 import static nextstep.subway.utils.ResponseUtils.*;
 import static nextstep.subway.utils.StationUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -75,5 +77,26 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         httpStatus가_NO_CONTENT(deleteResponse);
+    }
+
+
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철역 생성")
+    @Test
+    void duplicateCheck() {
+        // given
+        Map<String, String> params = Station_데이터_생성(강남역);
+        Station_생성_요청(params);
+
+        // when
+        ExtractableResponse<Response> duplicateResponse = Station_생성_요청(params);
+
+        // then
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
     }
 }

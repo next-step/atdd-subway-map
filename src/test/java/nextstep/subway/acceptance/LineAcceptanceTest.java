@@ -5,7 +5,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.Map;
 import static nextstep.subway.utils.LineUtils.*;
 import static nextstep.subway.utils.ResponseUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -122,15 +120,19 @@ class LineAcceptanceTest extends AcceptanceTest {
         httpStatus가_NO_CONTENT(deleteResponse);
     }
 
-    @DisplayName("지하철 노선 중복 생성 실패")
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
-    @Transactional
     void duplicateCheck() {
         // given
         final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        지하철_노선_생성요청(line1);
 
         // when
-        지하철_노선_생성요청(line1);
         final ExtractableResponse<Response> duplicateResponse = 지하철_노선_생성요청(line1);
 
         // then
