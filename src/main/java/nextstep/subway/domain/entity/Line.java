@@ -72,15 +72,11 @@ public class Line extends BaseEntity {
         return distance;
     }
 
-    public void changeName(final String name, final LineNameValidator validator) {
+    public void change(final String name, final String color, final LineNameValidator validator) {
         validator.validate(name);
-
-        this.name = name;
-    }
-
-    public void changeColor(final String color) {
         validateColor(color);
 
+        this.name = name;
         this.color = color;
     }
 }

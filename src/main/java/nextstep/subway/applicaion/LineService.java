@@ -54,8 +54,7 @@ public class LineService {
 
     public void updateLine(final Long id, final LineRequest lineRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        line.changeName(lineRequest.getName(), lineNameValidator);
-        line.changeColor(lineRequest.getColor());
+        line.change(lineRequest.getName(), lineRequest.getColor(), lineNameValidator);
     }
 
     public void deleteLineById(final Long id) {
