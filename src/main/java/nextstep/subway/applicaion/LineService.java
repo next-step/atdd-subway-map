@@ -3,16 +3,17 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineDetailResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.handler.error.custom.BusinessException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import org.springframework.dao.EmptyResultDataAccessException;
+import nextstep.subway.handler.error.custom.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static nextstep.subway.handler.error.custom.ErrorCode.*;
 
 @Service
 @Transactional
@@ -24,6 +25,9 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new BusinessException(FOUND_DUPLICATED_NAME);
+        }
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineResponse(
                 line.getId(),
@@ -43,30 +47,19 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineDetailResponse getLine(Long id) {
-        Optional<Line> optionalLine = lineRepository.findById(id);
-
-        if (optionalLine.isPresent()) {
-            return LineDetailResponse.from(optionalLine.get());
-        }
-
-        return null;
+        return LineDetailResponse.from(lineRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID)));
     }
 
-    public boolean patchLine(Long id, LineRequest lineRequest) {
-        Optional<Line> optionalLine = lineRepository.findById(id);
-
-        if (optionalLine.isPresent()) {
-            optionalLine.get().modify(lineRequest.getName(), lineRequest.getColor());
-            return false;
-        }
-        return true;
+    public void patchLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
+        line.modify(lineRequest.getName(), lineRequest.getColor());
     }
 
-    public boolean deleteLine(Long id) {
-        if (lineRepository.existsById(id)) {
-            lineRepository.deleteById(id);
-            return false;
+    public void deleteLine(Long id) {
+        if (!lineRepository.existsById(id)) {
+            throw new BusinessException(LINE_NOT_FOUND_BY_ID);
         }
-        return true;
+        lineRepository.deleteById(id);
     }
 }

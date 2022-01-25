@@ -1,122 +1,17 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.testenum.TestLine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static nextstep.subway.acceptance.linestep.LineRequestStep.*;
+import static nextstep.subway.acceptance.linestep.LineValidateStep.*;
 import static nextstep.subway.acceptance.testenum.TestLine.*;
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    private final String BODY_ELEMENT_NAME = "name";
-    private final String BODY_ELEMENT_COLOR = "color";
-    private final String BODY_ELEMENT_ID = "id";
-
-    private Map<String, String> createRequestBody(TestLine line) {
-        Map<String, String> params = new HashMap<>();
-        params.put(BODY_ELEMENT_NAME, line.getName());
-        params.put(BODY_ELEMENT_COLOR, line.getColor());
-
-        return params;
-    }
-
-    private ExtractableResponse<Response> postOneLine(TestLine line) {
-        Map<String, String> params = createRequestBody(line);
-
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-
-                .when()
-                .post("/lines")
-
-                .then().log().all()
-                .extract();
-        return response;
-    }
-
-    private void verifyResponseBodyElement(ExtractableResponse<Response> response, String name, String color) {
-        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_NAME)).isEqualTo(name);
-        assertThat(response.body().jsonPath().getString(BODY_ELEMENT_COLOR)).isEqualTo(color);
-    }
-
-    private void verifyResponseStatus(ExtractableResponse<Response> response, HttpStatus status) {
-        assertThat(response.statusCode()).isEqualTo(status.value());
-    }
-
-    private ExtractableResponse<Response> getLineList() {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-
-                .when()
-                .get("/lines")
-
-                .then().log().all()
-                .extract();
-        return response;
-    }
-
-    private ExtractableResponse<Response> getOneLine(Long id) {
-        return RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-
-                .when()
-                .get("/lines/" + id)
-
-                .then().log().all()
-                .extract();
-    }
-
-    private long extractId(ExtractableResponse<Response> responseByPost) {
-        return responseByPost.body().jsonPath().getLong(BODY_ELEMENT_ID);
-    }
-
-    private ExtractableResponse<Response> patchOneLine(String lineName, String lineColor, Long id) {
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.ALL_VALUE)
-                .body(patchRequestBody(lineName, lineColor))
-
-                .when()
-                .patch("/lines/" + id)
-
-                .then().log().all()
-                .extract();
-    }
-
-    private Map<String, String> patchRequestBody(String lineName, String lineColor) {
-        Map<String, String> params = new HashMap<>(1);
-        params.put(BODY_ELEMENT_NAME, lineName);
-        params.put(BODY_ELEMENT_COLOR, lineColor);
-        return params;
-    }
-
-    private ExtractableResponse<Response> deleteLine(Long deletedId) {
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .accept(MediaType.ALL_VALUE)
-
-                .when()
-                .delete("/lines/" + deletedId)
-
-                .then().log().all()
-                .extract();
-        return response;
-    }
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -126,11 +21,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = postOneLine(LINE_NEW_BOONDANG);
+        ExtractableResponse<Response> response = 노선_생성(LINE_NEW_BOONDANG);
 
         // then
-        verifyResponseStatus(response, HttpStatus.CREATED);
-        verifyResponseBodyElement(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
+        응답_상태코드_검증(response, HttpStatus.CREATED);
+        응답_바디_각_요소_검증(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
     }
 
     /**
@@ -143,20 +38,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        postOneLine(LINE_NEW_BOONDANG);
+        노선_생성(LINE_NEW_BOONDANG);
         // given
-        postOneLine(LINE_TWO);
+        노선_생성(LINE_TWO);
 
         // when
-        ExtractableResponse<Response> response = getLineList();
+        ExtractableResponse<Response> response = 노선_목록_조회();
 
         // then
-        verifyResponseStatus(response, HttpStatus.OK);
-
-        assertThat(response.body().jsonPath().getList(BODY_ELEMENT_NAME))
-                .containsExactly(LINE_NEW_BOONDANG.getName(), LINE_TWO.getName());
-        assertThat(response.body().jsonPath().getList(BODY_ELEMENT_COLOR))
-                .containsExactly(LINE_NEW_BOONDANG.getColor(), LINE_TWO.getColor());
+        응답_상태코드_검증(response, HttpStatus.OK);
+        응답_바디_여러_요소_검증(response);
     }
 
     /**
@@ -168,14 +59,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Long lineId = extractId(postOneLine(LINE_NEW_BOONDANG));
+        Long lineId = extractId(노선_생성(LINE_NEW_BOONDANG));
 
         // when
-        ExtractableResponse<Response> response = getOneLine(lineId);
+        ExtractableResponse<Response> response = 노선_조회(lineId);
 
         // then
-        verifyResponseStatus(response, HttpStatus.OK);
-        verifyResponseBodyElement(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
+        응답_상태코드_검증(response, HttpStatus.OK);
+        응답_바디_각_요소_검증(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
     }
 
     /**
@@ -190,15 +81,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         String modifyColor = "bg-blue-600";
 
         // given
-        Long modifiedId = extractId(postOneLine(LINE_NEW_BOONDANG));
+        Long modifiedId = extractId(노선_생성(LINE_NEW_BOONDANG));
 
         // when
-        ExtractableResponse<Response> response =
-                patchOneLine(modifyName, modifyColor, modifiedId);
+        ExtractableResponse<Response> response = 노선_변경(modifyName, modifyColor, modifiedId);
 
         // then
-        verifyResponseStatus(response, HttpStatus.OK);
-        verifyResponseBodyElement(getOneLine(modifiedId), modifyName, modifyColor);
+        응답_상태코드_검증(response, HttpStatus.OK);
+        응답_바디_각_요소_검증(노선_조회(modifiedId), modifyName, modifyColor);
     }
 
     /**
@@ -210,12 +100,31 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Long deletedId = extractId(postOneLine(LINE_NEW_BOONDANG));
+        Long deletedId = extractId(노선_생성(LINE_NEW_BOONDANG));
 
         // when
-        ExtractableResponse<Response> response = deleteLine(deletedId);
+        ExtractableResponse<Response> response = 노선_삭제(deletedId);
 
         // then
-        verifyResponseStatus(response, HttpStatus.NO_CONTENT);
+        응답_상태코드_검증(response, HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     *  Scenario: 지하철 노선의 이름 중복을 검증한다.
+     *  given   : 지하철 노선 생성을 요청하고
+     *  when    : 같은 이름의 노선 생성을 다시 요청하면,
+     *  then    : 두번째 노선은 생성되지 않는다. (409)
+     */
+    @DisplayName("지하철 노선 중복 검증")
+    @Test
+    void validateLineName() {
+        // given
+        노선_생성(LINE_NEW_BOONDANG);
+
+        // when
+        ExtractableResponse<Response> duplicatedLineResponse = 노선_생성(LINE_NEW_BOONDANG);
+
+        // then
+        응답_상태코드_검증(duplicatedLineResponse, HttpStatus.CONFLICT);
     }
 }
