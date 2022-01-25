@@ -39,7 +39,7 @@ public class LineService {
     public LineResponse findLine(Long lineId) throws LineNotFoundException {
         return lineRepository.findById(lineId)
                 .map(ResponseConverter::toLineResponse)
-                .orElseThrow(() -> new LineNotFoundException("INVALID LINE id: " + lineId));
+                .orElseThrow(() -> new LineNotFoundException(lineId));
     }
 
     public boolean updateLine(Long lineId, LineRequest request) {
