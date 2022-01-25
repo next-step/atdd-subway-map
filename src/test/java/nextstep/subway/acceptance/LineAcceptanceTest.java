@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.step.LineSteps;
+import nextstep.subway.acceptance.step.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -16,24 +17,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
     final String 이름 = "name";
-    final String 색상 = "color";
+    final String 번호 = "id";
 
-    final Map<String, String> 신분당선 = Map.of(이름, "신분당선", 색상, "bg-red-600");
-    final Map<String, String> 이호선 = Map.of(이름, "2호선", 색상, "bg-green-600");
+    final Map<String, String> 신사역 = Map.of(이름, "신사역");
+    final Map<String, String> 광교역 = Map.of(이름, "광교역");
+
+    final Map<String, String> 성수역 = Map.of(이름, "성수역");
+    final Map<String, String> 신설동역 = Map.of(이름, "신설동역");
 
     /**
-     * When 지하철 노선 생성을 요청 하면
+     * Given 상행, 하행 종점역 생성을 요청 하고
+     * When 지하철 노선 생성을 요청하면
      * Then 지하철 노선 생성이 성공한다.
      */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        //given & when
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(신분당선);
+        // given
+        final Long upStationId = StationSteps.지하철_역_생성_요청(신사역).jsonPath().getLong(번호);
+        final Long downStationId = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+
+        // when
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 100);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.header("Location")).isNotBlank();
     }
 
     /**
@@ -43,10 +52,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복된 지하철 노선 생성")
     @Test
     void createDuplicateStation() {
-        LineSteps.지하철_노선_생성_요청(신분당선);
+        // given
+        final Long upStationId = StationSteps.지하철_역_생성_요청(신사역).jsonPath().getLong(번호);
+        final Long downStationId = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
 
-        // given & when
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 100);
+
+        // when
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 100);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
@@ -61,9 +74,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        //given & when
-        LineSteps.지하철_노선_생성_요청(신분당선);
-        LineSteps.지하철_노선_생성_요청(이호선);
+        //given
+        final Long upStationId1 = StationSteps.지하철_역_생성_요청(신사역).jsonPath().getLong(번호);
+        final Long downStationId1 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId1, downStationId1, 100);
+
+        final Long upStationId2 = StationSteps.지하철_역_생성_요청(성수역).jsonPath().getLong(번호);
+        final Long downStationId2 = StationSteps.지하철_역_생성_요청(신설동역).jsonPath().getLong(번호);
+        LineSteps.지하철_노선_생성_요청("2호선", "bg-green-600", upStationId2, downStationId2, 50);
 
         //when
         ExtractableResponse<Response> searchResponse = LineSteps.지하철_노선_조회_요청();
@@ -72,7 +90,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = searchResponse.jsonPath().getList(이름);
-        assertThat(lineNames).contains(신분당선.get(이름), 이호선.get(이름));
+        assertThat(lineNames).contains("신분당선", "2호선");
     }
 
     /**
@@ -84,7 +102,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        final Long upStationId1 = StationSteps.지하철_역_생성_요청(신사역).jsonPath().getLong(번호);
+        final Long downStationId1 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId1, downStationId1, 100);
 
         // when
         final String uri = createResponse.header("Location");
@@ -103,7 +123,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        final Long upStationId1 = StationSteps.지하철_역_생성_요청(신사역).jsonPath().getLong(번호);
+        final Long downStationId1 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId1, downStationId1, 100);
 
         //given
         Map<String, String> params = new HashMap<>();
@@ -127,7 +149,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        final Long upStationId1 = StationSteps.지하철_역_생성_요청(신사역).jsonPath().getLong(번호);
+        final Long downStationId1 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId1, downStationId1, 100);
 
         // when
         final String uri = createResponse.header("Location");
