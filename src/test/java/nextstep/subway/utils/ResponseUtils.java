@@ -17,7 +17,5 @@ public class ResponseUtils {
         assertThat(response.body()).isNotNull();
     }
 
-    public static void httpStatus가_NO_CONTENT(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
+
 }

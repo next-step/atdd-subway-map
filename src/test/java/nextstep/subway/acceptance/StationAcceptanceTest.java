@@ -4,7 +4,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +75,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = Station_삭제_요청(uri);
 
         // then
-        httpStatus가_NO_CONTENT(deleteResponse);
+        삭제요청한_지하철_역이_존재하지_않음(deleteResponse);
     }
 
 
