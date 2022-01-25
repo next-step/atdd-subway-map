@@ -23,7 +23,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        Map<String, String> params = 지하철_노선_파라미터_생성("신분당선", "bg-red-600");
+        Map<String, String> params = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10);
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
 
         // then
@@ -42,8 +47,18 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String 신분당선 = "신분당선";
         String 호선2 = "2호선";
-        Map<String, String> params1 = 지하철_노선_파라미터_생성(신분당선, "bg-red-600");
-        Map<String, String> params2 = 지하철_노선_파라미터_생성(호선2, "bg-green-600");
+        Map<String, String> params1 = 지하철_노선_파라미터_생성(
+                신분당선,
+                "bg-red-600",
+                1L,
+                2L,
+                10);
+        Map<String, String> params2 = 지하철_노선_파라미터_생성(
+                호선2,
+                "bg-green-600",
+                1L,
+                2L,
+                10);
         지하철_노선_생성_요청(params1);
         지하철_노선_생성_요청(params2);
 
@@ -65,7 +80,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         String 신분당선 = "신분당선";
-        Map<String, String> params = 지하철_노선_파라미터_생성("신분당선", "bg-red-600");
+        Map<String, String> params = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10);
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(params);
         String uri = createResponse.header("Location");
 
@@ -86,13 +106,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, String> createParams = 지하철_노선_파라미터_생성("신분당선", "bg-red-600");
+        Map<String, String> createParams = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10);
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createParams);
         String uri = createResponse.header("Location");
 
         // when
         String 구분당선 = "구분당선";
-        Map<String, String> updateParams = 지하철_노선_파라미터_생성(구분당선, "bg-blue-600");
+        Map<String, String> updateParams = 지하철_노선_파라미터_생성(
+                구분당선,
+                "bg-blue-600",
+                1L,
+                2L,
+                10);
         ExtractableResponse<Response> response = 지하철_노선_수정_요청(uri, updateParams);
 
         // then
@@ -109,7 +139,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params = 지하철_노선_파라미터_생성("신분당선", "bg-red-600");
+        Map<String, String> params = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10);
         ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(params);
         String uri = createResponse.header("Location");
 
@@ -130,7 +165,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        Map<String, String> params = 지하철_노선_파라미터_생성("신분당선", "bg-red-600");
+        Map<String, String> params = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                1L,
+                2L,
+                10);
         지하철_노선_생성_요청(params);
 
         // when
@@ -140,10 +180,19 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성_실패(response);
     }
 
-    private Map<String, String> 지하철_노선_파라미터_생성(String name, String color) {
+    private Map<String, String> 지하철_노선_파라미터_생성(
+            String name,
+            String color,
+            Long upStationId,
+            Long downStationId,
+            int distance) {
+
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", String.valueOf(distance));
         return params;
     }
 
