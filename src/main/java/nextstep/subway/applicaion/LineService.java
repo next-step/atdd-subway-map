@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.handler.error.custom.BusinessException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.handler.error.custom.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,9 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new BusinessException(FOUND_DUPLICATED_NAME);
+        }
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return new LineResponse(
                 line.getId(),
