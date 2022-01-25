@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import static nextstep.subway.acceptance.stationstep.StationRequestStep.*;
 import static nextstep.subway.acceptance.stationstep.StationValidateStep.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -64,5 +65,26 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         역_응답_상태_검증(response, HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     *  scenario: 지하철역 이름 중복 생성 금지
+     *  given   : 지하철역 생성을 요청하고
+     *  when    : 같은 이름의 지하철역 생성을 요청하면
+     *  then    : 지하철역 생성이 안된다. (409)
+     */
+    @DisplayName("지하철역 이름 중복 검증")
+    @Test
+    void validateStationName() {
+        // given
+        역_생성("강남역");
+
+        // when
+        ExtractableResponse<Response> duplicatedStationResponse = 역_생성("강남역");
+
+        // then
+        ExtractableResponse<Response> stationList = 역_목록_조회();
+        역_응답_바디_개수_검증(stationList, 1);
+        역_응답_상태_검증(duplicatedStationResponse, HttpStatus.CONFLICT);
     }
 }

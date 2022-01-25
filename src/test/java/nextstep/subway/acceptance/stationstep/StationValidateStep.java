@@ -22,4 +22,8 @@ public class StationValidateStep {
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
+
+    public static void 역_응답_바디_개수_검증(ExtractableResponse<Response> stationList, int count) {
+        assertThat(stationList.body().jsonPath().getList("name").size()).isEqualTo(count);
+    }
 }
