@@ -24,9 +24,8 @@ public class Line extends BaseEntity {
     @Column(unique = true)
     private String name;
     private String color;
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-        orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -53,7 +52,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return sections.get();
     }
 
     public void update(Line line) {
@@ -62,30 +61,21 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        validate(section);
+        validateAddable(section);
 
         sections.add(section);
         section.setLine(this);
     }
 
-    private void validate(Section section) {
+    private void validateAddable(Section section) {
         sortSections();
 
         if (sections.isEmpty()) {
             return;
         }
 
-        if (!sections.get(sections.size()-1).getDownStation().getId()
-            .equals(section.getUpStation().getId())) {
-            throw new IllegalArgumentException("등록하는 구간의 상행역이 기존 최하행역과 맞지 않음.");
-        }
-
-        if (sections.stream()
-            .anyMatch(section1 -> (section1.getUpStation().getId()
-                .equals(section.getDownStation().getId()))
-            || section1.getDownStation().getId().equals(section.getDownStation().getId()))) {
-            throw new IllegalArgumentException("등록하는 구간의 하행역이 기존 라인에 등록된 역임.");
-        }
+        sections.validateUpStation(section);
+        sections.validateDownStation(section);
     }
 
     public List<Station> getStations() {
