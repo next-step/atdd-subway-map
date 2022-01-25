@@ -1,6 +1,6 @@
 package nextstep.subway.domain.entity;
 
-import nextstep.subway.domain.service.StationNameValidator;
+import nextstep.subway.domain.service.StationValidator;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,8 +18,8 @@ public class Station extends BaseEntity {
     public Station() {
     }
 
-    public Station(final String name, final StationNameValidator stationNameValidator) {
-        stationNameValidator.validate(name);
+    public Station(final String name, final StationValidator stationValidator) {
+        stationValidator.validateStation(name);
 
         this.name = name;
     }

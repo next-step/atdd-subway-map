@@ -8,15 +8,20 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class LineNameValidator {
+public class LineValidator {
 
     private final LineRepository lineRepository;
 
-    public LineNameValidator(LineRepository lineRepository) {
+    public LineValidator(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
-    public void validate(final String name) {
+    public void validateLine(final String name, final String color) {
+        validateName(name);
+        validateColor(color);
+    }
+
+    public void validateName(final String name) {
         if (Objects.isNull(name)) {
             throw new IllegalArgumentException("노선의 이름은 필수 입니다.");
         }
@@ -27,6 +32,15 @@ public class LineNameValidator {
         final List<Line> lines = lineRepository.findByName(name);
         if (!lines.isEmpty()) {
             throw new DuplicateArgumentException("중복된 이름 입니다.");
+        }
+    }
+
+    public void validateColor(final String color) {
+        if (Objects.isNull(color)) {
+            throw new IllegalArgumentException("노선의 색상은 필수 입니다.");
+        }
+        if (color.isEmpty()) {
+            throw new IllegalArgumentException("노선의 색상은 1 자 이상 이어야 합니다.");
         }
     }
 }

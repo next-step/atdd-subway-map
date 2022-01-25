@@ -4,7 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.entity.Line;
 import nextstep.subway.domain.repository.LineRepository;
-import nextstep.subway.domain.service.LineNameValidator;
+import nextstep.subway.domain.service.LineValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final LineNameValidator lineNameValidator;
+    private final LineValidator lineValidator;
 
-    public LineService(final LineRepository lineRepository, final LineNameValidator lineNameValidator) {
+    public LineService(final LineRepository lineRepository, final LineValidator lineValidator) {
         this.lineRepository = lineRepository;
-        this.lineNameValidator = lineNameValidator;
+        this.lineValidator = lineValidator;
     }
 
     public LineResponse saveLine(final LineRequest request) {
@@ -30,7 +30,7 @@ public class LineService {
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance(),
-                lineNameValidator
+                lineValidator
         ));
 
         return createLineResponse(line);
@@ -54,7 +54,7 @@ public class LineService {
 
     public void updateLine(final Long id, final LineRequest lineRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        line.change(lineRequest.getName(), lineRequest.getColor(), lineNameValidator);
+        line.change(lineRequest.getName(), lineRequest.getColor(), lineValidator);
     }
 
     public void deleteLineById(final Long id) {
