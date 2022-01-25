@@ -69,7 +69,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createShowLineResponse)
+                .map(this::createShowLineResponse2)
                 .collect(toList());
     }
 
@@ -93,6 +93,17 @@ public class LineService {
     private Line findLineById(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException());
+    }
+
+    private ShowLineResponse createShowLineResponse2(Line line) {
+        return ShowLineResponse.of(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate(),
+                line.getAllStations()
+        );
     }
 
     private ShowLineResponse createShowLineResponse(Line line) {

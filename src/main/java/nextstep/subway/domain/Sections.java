@@ -47,6 +47,15 @@ public class Sections {
         return sections;
     }
 
+    public List<Station> getAllStations() {
+        List<Station> stations = sections.stream()
+                .map(it -> it.getUpStation())
+                .collect(Collectors.toList());
+        stations.add(getLastDownStation());
+
+        return stations;
+    }
+
     private void validateDownStation(Station upStation) {
         if (!isAddableSection(upStation)) {
             throw new DownStationNotMatchException(upStation.getName());
@@ -81,15 +90,6 @@ public class Sections {
         int lastIndex = sections.size() - 1;
         Section section = sections.get(lastIndex);
         return section.getDownStation();
-    }
-
-    private List<Station> getAllStations() {
-        List<Station> stations = sections.stream()
-                .map(it -> it.getUpStation())
-                .collect(Collectors.toList());
-        stations.add(getLastDownStation());
-
-        return stations;
     }
 
 }

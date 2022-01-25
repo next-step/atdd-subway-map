@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -40,6 +41,10 @@ public class Line extends BaseEntity {
 
     public void deleteStation(Station deleteStation) {
         sections.deleteStation(deleteStation);
+    }
+
+    public List<Station> getAllStations() {
+        return sections.getAllStations();
     }
 
     public Long getId() {
