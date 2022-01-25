@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,10 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public List<Section> getSections() {
+        return Collections.unmodifiableList(sections);
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
@@ -58,7 +63,19 @@ public class Line extends BaseEntity {
     private void validationSectionByStation(Section newSection) {
         Section lastSection = this.sections.get(this.sections.size() - 1);
         lastSection.validationUpStation(newSection);
-
         this.sections.forEach(section -> section.validationDownStation(newSection));
+    }
+
+    public void deleteSection(Long stationId) {
+        validationDeleteStationCount();
+        Section lastSection = this.sections.get(this.sections.size() - 1);
+        lastSection.validationDeleteStation(stationId);
+        this.sections.remove(lastSection);
+    }
+
+    private void validationDeleteStationCount() {
+        if (this.sections.size() == 1) {
+            throw new IllegalArgumentException("구간이 하나인 경우 삭제할 수 없습니다.");
+        }
     }
 }

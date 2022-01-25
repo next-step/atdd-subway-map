@@ -55,4 +55,10 @@ public class Section {
             throw new IllegalArgumentException("추가되는 구간의 하행역은 현재 등록되어있는 역일 수 없습니다.");
         }
     }
+
+    public void validationDeleteStation(Long stationId) {
+        if (!this.downStation.equals(stationId)) {
+            throw new IllegalArgumentException("마지막 하행 지하철역만 삭제 할수 있습니다.");
+        }
+    }
 }

@@ -74,6 +74,13 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    public void deleteSectionById(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+        line.deleteSection(stationId);
+
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
