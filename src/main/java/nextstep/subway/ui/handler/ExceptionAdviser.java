@@ -18,7 +18,9 @@ public class ExceptionAdviser {
             DuplicateStationException.class,
             AlreadyRegisteredStationInLineException.class,
             DownStationNotMatchException.class,
-            DuplicateLineException.class})
+            DuplicateLineException.class,
+            MinimumSectionException.class,
+            DeleteLastDownStationException.class})
     public ResponseEntity<ErrorResponse> duplicateStationHandler(RuntimeException exception) {
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(exception.getMessage()));

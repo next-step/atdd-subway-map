@@ -257,4 +257,61 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Given 3개의 역을 이용하여 지하철 노선 생성한다
+     * When 마지막 역을 삭제한다
+     * Then 구간 삭제 성공
+     */
+    @DisplayName("노선의 마지막역은 삭제 가능하다")
+    @Test
+    void deleteSection() {
+        // given
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), nonhyeon.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+
+    /**
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 노선의 구간(마지막 역)을 삭제한다
+     * Then 구간 삭제가 실패한다
+     */
+    @DisplayName("노선에 구간은 최소 1개가 유지되어야 한다")
+    @Test
+    void deleteSection_minimumSection() {
+        // given
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 3개의 역을 이용하여 지하철 노선 생성한다
+     * When 마지막 역이 아닌 역을 삭제한다
+     * Then 구간 삭제 실패
+     */
+    @DisplayName("마지막 역만 삭제 가능하다")
+    @Test
+    void deleteSection_LastDownStation() {
+        // given
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 }
