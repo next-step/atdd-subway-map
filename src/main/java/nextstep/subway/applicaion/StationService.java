@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
+    private final String NOT_EXISTS_STATION = "해당 지하철역에 대한 정보가 없습니다.";
+    private final String DUPLICATE_STATION_NAME = "지하철역 이름이 중복입니다.";
+
     private StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
@@ -20,8 +23,12 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new IllegalArgumentException(DUPLICATE_STATION_NAME);
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
@@ -29,20 +36,26 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public StationResponse findStationById(Long id) {
+        Station station = stationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION));
+
+        return StationResponse.of(station);
+    }
+
+    public void updateStationById(Long id, StationRequest request) {
+        Station station = stationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION));
+
+        station.update(request.getName());
     }
 
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
     }
 }
