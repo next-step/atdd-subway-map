@@ -26,4 +26,21 @@ public class StationSteps {
                 .when().post("/stations")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 지하철역_삭제(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철역_목록_조회() {
+        return RestAssured.given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
 }

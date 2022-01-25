@@ -28,4 +28,27 @@ public class LineSteps {
                 .when().post("/lines")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 지하철노선_삭제(int id) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/lines/" + id)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철노선_수정(int id, Map<String, String> params2) {
+        return RestAssured
+                .given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + id)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철노선_조회(int id) {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines/" + id)
+                .then().log().all().extract();
+    }
 }

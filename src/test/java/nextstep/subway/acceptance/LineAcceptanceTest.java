@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.LineSteps.지하철노선_생성;
+import static nextstep.subway.acceptance.LineSteps.*;
 import static nextstep.subway.acceptance.StationSteps.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -84,13 +84,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> response1 = 지하철노선_생성(_2호선, 초록색);
 
-        int id = response1.jsonPath().getInt("id");
+        int stationId = response1.jsonPath().getInt("id");
 
         // when
-        ExtractableResponse<Response> response2 = RestAssured
-                .given().log().all()
-                .when().get("/lines/" + id)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response2 = 지하철노선_조회(stationId);
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -111,28 +108,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> response1 = 지하철노선_생성();
-        int id = response1.jsonPath().getInt("id");
+        int stationId = response1.jsonPath().getInt("id");
 
         // when
-        String _1호선 = "1호선-수정";
-        String 파란색 = "bg-blue-600-수정";
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", _1호선);
-        params2.put("color", 파란색);
+        String _1호정_수정 = "1호선-수정";
+        String 파란색_수정 = "bg-blue-600-수정";
+        Map<String, String> params = new HashMap<>();
+        params.put("name", _1호정_수정);
+        params.put("color", 파란색_수정);
 
-        ExtractableResponse<Response> response2 = RestAssured
-                .given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response2 = 지하철노선_수정(stationId, params);
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
         String name = response2.jsonPath().getString("name");
         String color = response2.jsonPath().getString("color");
-        assertThat(name).isEqualTo(_1호선);
-        assertThat(color).isEqualTo(파란색);
+        assertThat(name).isEqualTo(_1호정_수정);
+        assertThat(color).isEqualTo(파란색_수정);
     }
 
     /**
@@ -145,13 +137,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> response1 = 지하철노선_생성();
-        int id = response1.jsonPath().getInt("id");
+        int stationId = response1.jsonPath().getInt("id");
 
         // when
-        ExtractableResponse<Response> response2 = RestAssured
-                .given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all().extract();
+        ExtractableResponse<Response> response2 = 지하철노선_삭제(stationId);
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
