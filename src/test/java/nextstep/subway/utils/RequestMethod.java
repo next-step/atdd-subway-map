@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 
 public class RequestMethod {
 
-    public static ExtractableResponse<Response> get(String path) {
+    public static ExtractableResponse<Response> get(final String path) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -16,10 +16,10 @@ public class RequestMethod {
             .extract();
     }
 
-    public static ExtractableResponse<Response> post(String path, RequestParams params) {
+    public static ExtractableResponse<Response> post(final String path, final Object params) {
         return RestAssured
             .given().log().all()
-            .body(params.getParams())
+            .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .post(path)
@@ -27,7 +27,7 @@ public class RequestMethod {
             .extract();
     }
 
-    public static ExtractableResponse<Response> put(String path, RequestParams params) {
+    public static ExtractableResponse<Response> put(final String path, final Object params) {
         return RestAssured
             .given().log().all()
             .body(params)
@@ -37,7 +37,7 @@ public class RequestMethod {
             .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> delete(String path) {
+    public static ExtractableResponse<Response> delete(final String path) {
         return RestAssured
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
