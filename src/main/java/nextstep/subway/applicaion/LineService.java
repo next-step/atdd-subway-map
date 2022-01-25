@@ -27,6 +27,7 @@ public class LineService {
         checkDuplication(request);
         existsStation(request.getUpStationId());
         existsStation(request.getDownStationId());
+        equalsUpDownStation(request.getUpStationId(), request.getDownStationId());
         checkDistanceLessThanZero(request.getDistance());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
@@ -47,6 +48,12 @@ public class LineService {
     private void checkDistanceLessThanZero(int distance) {
         if (distance <= 0) {
             throw new NotExistedStationException("[notValid]:distance");
+        }
+    }
+
+    private void equalsUpDownStation(Long upStationId, Long downStationId) {
+        if (upStationId.equals(downStationId)) {
+            throw new NotExistedStationException("[notValid]:upStationId, downStationId");
         }
     }
 
