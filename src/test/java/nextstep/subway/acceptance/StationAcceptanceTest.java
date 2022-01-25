@@ -1,10 +1,14 @@
 package nextstep.subway.acceptance;
 
-import nextstep.subway.acceptance.rest.BaseCrudStep;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.fixture.StationFixture;
+import nextstep.subway.acceptance.step.StationStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-
-    private final String STATION_PATH = "/stations";
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -23,14 +25,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        var params = giveMeStationRequest("강남역");
+        var params = StationFixture.강남역;
 
         // when
-        var response = BaseCrudStep.createResponse(STATION_PATH, params);
+        var response = StationStep.역_생성_요청(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        역_생성_완료(response);
     }
 
     /**
@@ -43,18 +44,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        var params1 = giveMeStationRequest("강남역");
-        var createResponse1 = BaseCrudStep.createResponse(STATION_PATH, params1);
+        var params1 = StationFixture.강남역;
+        var createResponse1 = StationStep.역_생성_요청(params1);
 
-        var params2 = giveMeStationRequest("역삼역");
-        var createResponse2 = BaseCrudStep.createResponse(STATION_PATH, params2);
+        var params2 = StationFixture.역삼역;
+        var createResponse2 = StationStep.역_생성_요청(params2);
 
         // when
-        var response = BaseCrudStep.readResponse(STATION_PATH);
+        var response = StationStep.역_목록_조회_요청();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(params1.get("name"), params2.get("name"));
+        역_목록_조회_완료(response, params1, params2);
     }
 
     /**
@@ -66,12 +65,12 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        var params = giveMeStationRequest("강남역");
-        var createResponse = BaseCrudStep.createResponse(STATION_PATH, params);
+        var params = StationFixture.강남역;
+        var createResponse = StationStep.역_생성_요청(params);
 
         // when
         String uri = createResponse.header("Location");
-        var response = BaseCrudStep.deleteResponse(uri);
+        var response = StationStep.역_삭제_요청(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -86,17 +85,24 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        var params = giveMeStationRequest("강남역");
-        var createResponse = BaseCrudStep.createResponse(STATION_PATH, params);
+        var params = StationFixture.강남역;
+        var createResponse = StationStep.역_생성_요청(params);
 
         // when
-        var response = BaseCrudStep.createResponse(STATION_PATH, params);
+        var response = StationStep.역_생성_요청(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
-    private Map<String, String> giveMeStationRequest(String name) {
-        return Map.of("name", name);
+    private void 역_생성_완료(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void 역_목록_조회_완료(ExtractableResponse<Response> response, Map<String, String>... paramsArgs) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> stationNames = response.jsonPath().getList("name");
+        assertThat(stationNames).contains(Arrays.stream(paramsArgs).map(m -> m.get("name")).toArray(String[]::new));
     }
 }
