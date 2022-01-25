@@ -16,16 +16,27 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private int distance;
 
     public Line() {
     }
 
-    public Line(final String name, final String color, final LineNameValidator lineNameValidator) {
+    public Line(final String name,
+                final String color,
+                final Long upStationId,
+                final Long downStationId,
+                final int distance,
+                final LineNameValidator lineNameValidator) {
         lineNameValidator.validate(name);
         validateColor(color);
 
         this.name = name;
         this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     private void validateColor(final String color) {
@@ -47,6 +58,18 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     public void changeName(final String name, final LineNameValidator validator) {

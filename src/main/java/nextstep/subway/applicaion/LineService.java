@@ -18,13 +18,20 @@ public class LineService {
     private final LineRepository lineRepository;
     private final LineNameValidator lineNameValidator;
 
-    public LineService(final LineRepository lineRepository, LineNameValidator lineNameValidator) {
+    public LineService(final LineRepository lineRepository, final LineNameValidator lineNameValidator) {
         this.lineRepository = lineRepository;
         this.lineNameValidator = lineNameValidator;
     }
 
     public LineResponse saveLine(final LineRequest request) {
-        final Line line = lineRepository.save(new Line(request.getName(), request.getColor(), lineNameValidator));
+        final Line line = lineRepository.save(new Line(
+                request.getName(),
+                request.getColor(),
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance(),
+                lineNameValidator
+        ));
 
         return createLineResponse(line);
     }
@@ -60,6 +67,9 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                line.getUpStationId(),
+                line.getDownStationId(),
+                line.getDistance(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
