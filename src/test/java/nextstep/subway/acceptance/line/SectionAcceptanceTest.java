@@ -3,6 +3,7 @@ package nextstep.subway.acceptance.line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
@@ -18,10 +19,13 @@ import nextstep.subway.utils.AcceptanceTestWhen;
 
 @DisplayName("지하철 구간 관리")
 public class SectionAcceptanceTest extends AcceptanceTest {
-    private static final int LINE_ID = 1;
+    private static final Long LINE_ID = (long) 1;
 
+    @Autowired
     private LineStep lineStep;
+    @Autowired
     private StationStep stationStep;
+    @Autowired
     private SectionStep sectionStep;
 
     @Override
@@ -29,10 +33,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void setUp() {
         // TODO Step 클래스의 Id 관리방법 모두 리팩토링 하기
         super.setUp();
-        stationStep = new StationStep();
-        lineStep = new LineStep(stationStep);
-        sectionStep = new SectionStep();
+
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
         lineStep.지하철_노선_생성_요청();
+        stationStep.지하철역_생성_요청();
     }
 
     /**
@@ -44,9 +49,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록")
     @Test
     void addSection() {
-        // given
-        stationStep.지하철역_생성_요청();
-
         // when
         ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(LINE_ID);
 
@@ -66,8 +68,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing1() {
         // given
-        stationStep.지하철역_생성_요청();
-
         SectionRequest request = sectionStep.dummyRequest();
         long upStationInFirstSection = 1;
         request.setUpStationId(upStationInFirstSection);
@@ -94,8 +94,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing2() {
         // given
-        stationStep.지하철역_생성_요청();
-
         SectionRequest request = sectionStep.dummyRequest();
         long downStationInFirstSection = 2;
         request.setUpStationId(downStationInFirstSection);
@@ -121,7 +119,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        stationStep.지하철역_생성_요청();
         ExtractableResponse<Response> createResponse = sectionStep.지하철_구간_생성_요청(LINE_ID);
 
         // when
@@ -142,14 +139,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionThatFailing1() {
         // given
-        stationStep.지하철역_생성_요청();
         ExtractableResponse<Response> preResponse = sectionStep.지하철_구간_생성_요청(LINE_ID);
 
         stationStep.지하철역_생성_요청();
-        SectionRequest request = sectionStep.dummyRequest();
-        request.setUpStationId((long) 3);
-        request.setDownStationId((long) 4);
-        sectionStep.지하철_구간_생성_요청(LINE_ID, request);
+        sectionStep.지하철_구간_생성_요청(LINE_ID, (long) 3, (long) 4);
 
         // when
         ExtractableResponse<Response> deleteResponse = AcceptanceTestWhen.fromGiven(preResponse)

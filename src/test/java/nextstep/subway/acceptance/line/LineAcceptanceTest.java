@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import io.restassured.RestAssured;
@@ -16,6 +17,7 @@ import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.line.domain.dto.LineRequest;
@@ -24,13 +26,17 @@ import nextstep.subway.utils.AcceptanceTestWhen;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    @Autowired
+    private StationStep stationStep;
+    @Autowired
     private LineStep lineStep;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
-        lineStep = new LineStep();
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
     }
 
     /**
@@ -65,6 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         LineRequest postRequest = lineStep.dummyRequest();
         preRequest.setName(name);
         postRequest.setName(name);
+        stationStep.지하철역_생성_요청();
         lineStep.지하철_노선_생성_요청(preRequest);
 
         // when
@@ -86,10 +93,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        List<LineRequest> requests = Stream.generate(lineStep::dummyRequest)
-                                           .limit(5)
-                                           .collect(Collectors.toList());
-        requests.forEach(lineStep::지하철_노선_생성_요청);
+        List<LineRequest> requests = LongStream.iterate(1, index -> index + 2)
+                                               .limit(5)
+                                               .boxed()
+                                               .map(index -> {
+                                                   stationStep.지하철역_생성_요청();
+                                                   stationStep.지하철역_생성_요청();
+                                                   LineRequest lineRequest = lineStep.dummyRequest();
+                                                   lineRequest.setName(index + "호선");
+                                                   lineRequest.setUpStationId(index);
+                                                   lineRequest.setDownStationId(index + 1);
+                                                   lineStep.지하철_노선_생성_요청(lineRequest);
+                                                   return lineRequest;
+                                               })
+                                               .collect(Collectors.toList());
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -169,7 +186,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         LineRequest request = lineStep.dummyRequest();
         lineStep.지하철_노선_생성_요청(request);
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(2, 3);
 
         // when
         Map<String, String> params = new HashMap<>();

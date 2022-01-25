@@ -1,12 +1,14 @@
 package nextstep.subway.acceptance.station;
 
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.station.domain.dto.StationRequest;
 
+@Service
 public class StationStep {
     private static final String NAME_FORMAT = "%d역";
 
