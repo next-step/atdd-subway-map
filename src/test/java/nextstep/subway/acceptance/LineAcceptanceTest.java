@@ -288,6 +288,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         GTXA노선_상행_하행_정보같음.put("color", "bg-red-900");
         GTXA노선_상행_하행_정보같음.put("upStationId", "1");
         GTXA노선_상행_하행_정보같음.put("downStationId", "1");
+        GTXA노선_상행_하행_정보같음.put("distance", "10");
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
