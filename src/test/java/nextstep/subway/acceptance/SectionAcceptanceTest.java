@@ -56,9 +56,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * When 새로운 구간생성을 요청하면
      * Then 상행역은 현재 등록되어있는 하행 종점역이어야 합니다 에러가 발생한다.
      */
-    @DisplayName("구간 생성 하행 종점역 에러 테스트")
+    @DisplayName("구간 생성 상행역 에러 테스트")
     @Test
-    void validateDownStation() {
+    void validateUpStation() {
         // given
         Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
         Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
@@ -68,6 +68,29 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId3, 10), lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성을 요청하고
+     * Given 지하철역 3개 생성을 요청하고
+     * Given 구간을 생성을 요청하고
+     * When 중복 된 하행역으로 새로운 구간생성을 요청하면
+     * Then 하행역은 현재 등록되어있는 역일 수 없습니다. 에러가 발생한다.
+     */
+    @DisplayName("하행역 중복 에러 테스트")
+    @Test
+    void validateDownStation() {
+        // given
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
+        SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.지하철_구간_생성(new SectionRequest(stationId2, stationId1, 10), lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
