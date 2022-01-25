@@ -7,6 +7,7 @@ import nextstep.subway.applicaion.dto.SectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 
 @RequiredArgsConstructor
@@ -21,5 +22,11 @@ public class SectionController {
                                                          @PathVariable("id") Long lineId) {
         SectionResponse section = sectionService.saveSection(request, lineId);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId())).body(section);
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId, HttpServletRequest request) {
+        sectionService.deleteSection(lineId, Long.valueOf(request.getParameter("stationId")));
+        return ResponseEntity.noContent().build();
     }
  }
