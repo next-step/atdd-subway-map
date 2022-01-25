@@ -41,7 +41,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.body().jsonPath().get("id").equals(1)),
                 () -> assertThat(response.body().jsonPath().get("name").equals(신분당선)),
                 () -> assertThat(response.body().jsonPath().get("color").equals(빨강색))
-                // 시간과 관련된 테스트는 어떻게 해야할지 궁금합니다!
         );
     }
 
@@ -142,14 +141,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_생성을_요청한다(이호선, 초록색);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .accept(ContentType.JSON)
-                .header(HttpHeaders.HOST, "localhost:" + port)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_노선_목록_조회를_요청한다();
 
         // then
         assertAll(
@@ -174,17 +166,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 신분당선 = "신분당선";
         final String 빨강색 = "bg-red-600";
         final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색);
+        final String uri = saveResponse.header("Location");
         final Long lineId = Long.valueOf(saveResponse.body().jsonPath().get("id").toString());
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .accept(ContentType.JSON)
-                .header(HttpHeaders.HOST, "localhost:" + port)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get(saveResponse.header("Location"))
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_노선_조회를_요청한다(uri);
 
         // then
         assertAll(
@@ -207,23 +193,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
-
-        final Map<String, String> params = new HashMap<>();
-        final String updatedName = "구분당선";
-        final String updatedColor = "bg-blue-600";
-        params.put("name", updatedName);
-        params.put("color", updatedColor);
+        final String uri = saveResponse.header("Location");
 
         // when
-        final ExtractableResponse<Response> updateResponse = RestAssured.given().log().all()
-                .accept(ContentType.ANY)
-                .header(HttpHeaders.HOST, "localhost:" + port)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when()
-                .put(saveResponse.header("Location")) // 모든 데이터를 변경하고 있어서 put 으로 했습니다.
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> updateResponse = 지하철_노선_변경을_요청한다(uri);
 
         // then
         assertAll(
@@ -242,15 +215,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다("신분당선", "bg-red-600");
+        final String uri = saveResponse.header("Location");
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .accept(ContentType.ANY)
-                .header(HttpHeaders.HOST, "localhost:" + port)
-                .when()
-                .delete(saveResponse.header("Location"))
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_노선_삭제를_요청한다(uri);
 
         // then
         assertAll(
@@ -277,5 +245,59 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", name);
         params.put("color", color);
         return params;
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_목록_조회를_요청한다() {
+        return RestAssured.given().log().all()
+                .accept(ContentType.JSON)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회를_요청한다(final String uri) {
+        return RestAssured.given().log().all()
+                .accept(ContentType.JSON)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_변경을_요청한다(final String uri) {
+        final Map<String, String> params = 지하철_노선_변경_데이터를_만든다();
+        return RestAssured.given().log().all()
+                .accept(ContentType.ANY)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .put(uri) // 모든 데이터를 변경하고 있어서 put 으로 했습니다.
+                .then().log().all()
+                .extract();
+    }
+
+    private Map<String, String> 지하철_노선_변경_데이터를_만든다() {
+        final Map<String, String> params = new HashMap<>();
+        final String updatedName = "구분당선";
+        final String updatedColor = "bg-blue-600";
+        params.put("name", updatedName);
+        params.put("color", updatedColor);
+        return params;
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_삭제를_요청한다(final String uri) {
+        return RestAssured.given().log().all()
+                .accept(ContentType.ANY)
+                .header(HttpHeaders.HOST, "localhost:" + port)
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
     }
 }

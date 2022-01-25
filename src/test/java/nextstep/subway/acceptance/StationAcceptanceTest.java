@@ -24,7 +24,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = 지하철_역_생성_요청한다("강남역");
+        final ExtractableResponse<Response> response = 지하철_역_생성을_요청한다("강남역");
 
         // then
         assertAll(
@@ -41,7 +41,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createBlankStationName() {
         // when
-        final ExtractableResponse<Response> response = 지하철_역_생성_요청한다("  ");
+        final ExtractableResponse<Response> response = 지하철_역_생성을_요청한다("  ");
 
         // then
         assertAll(
@@ -60,10 +60,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     void createDuplicateStationName() {
         // given
         final String 강남역 = "강남역";
-        지하철_역_생성_요청한다(강남역);
+        지하철_역_생성을_요청한다(강남역);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_역_생성_요청한다(강남역);
+        final ExtractableResponse<Response> response = 지하철_역_생성을_요청한다(강남역);
 
         // then
         assertAll(
@@ -85,15 +85,11 @@ class StationAcceptanceTest extends AcceptanceTest {
         final String 강남역 = "강남역";
         final String 역삼역 = "역삼역";
 
-        지하철_역_생성_요청한다(강남역);
-        지하철_역_생성_요청한다(역삼역);
+        지하철_역_생성을_요청한다(강남역);
+        지하철_역_생성을_요청한다(역삼역);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_역_목록_조회를_요청한다();
 
         // then
         assertAll(
@@ -111,21 +107,17 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        final ExtractableResponse<Response> createResponse = 지하철_역_생성_요청한다("강남역");
+        final ExtractableResponse<Response> createResponse = 지하철_역_생성을_요청한다("강남역");
+        final String uri = createResponse.header("Location");
 
         // when
-        final String uri = createResponse.header("Location");
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = 지하철_역_삭제를_요청한다(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> 지하철_역_생성_요청한다(final String name) {
+    private ExtractableResponse<Response> 지하철_역_생성을_요청한다(final String name) {
         final Map<String, String> params = 지하철_역_생성_데이터를_만든다(name);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
@@ -141,5 +133,21 @@ class StationAcceptanceTest extends AcceptanceTest {
         final Map<String, String> params = new HashMap<>();
         params.put("name", name);
         return params;
+    }
+
+    private ExtractableResponse<Response> 지하철_역_목록_조회를_요청한다() {
+        return RestAssured.given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_역_삭제를_요청한다(final String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
     }
 }
