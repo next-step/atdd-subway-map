@@ -2,9 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.StationService;
-import nextstep.subway.utils.LineSteps;
 import nextstep.subway.utils.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
 
         // when
-        String stationId = getStationId(지하철역_생성_응답);
+        String stationId = StationSteps.getStationId(지하철역_생성_응답);
         ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
 
         // then
@@ -105,10 +103,5 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(지하철역_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(지하철역_중복_생성_응답.jsonPath().getString("message"))
                 .isEqualTo(String.format(StationService.STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, 가양역));
-    }
-
-    private String getStationId(ExtractableResponse<Response> response) {
-        String[] split = response.header("Location").split("/");
-        return split[split.length - 1];
     }
 }

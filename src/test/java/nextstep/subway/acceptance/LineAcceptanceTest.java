@@ -71,7 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
 
         // when
-        String lineId = getLineId(지하철_노선_생성_응답);
+        String lineId = LineSteps.getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
 
         // then
@@ -111,7 +111,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
 
         // when
-        String lineId = getLineId(지하철_노선_생성_응답);
+        String lineId = LineSteps.getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_수정_응답 = LineSteps.지하철_노선_수정_요청(lineId, 노선_5호선, 색상_5호선);
 
         // then
@@ -151,7 +151,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
 
         // when
-        String lineId = getLineId(지하철_노선_생성_응답);
+        String lineId = LineSteps.getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_삭제_응답 = LineSteps.지하철_노선_삭제_요청(lineId);
 
         // then
@@ -194,10 +194,5 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(지하철_노선_중복_생성_응답.jsonPath().getString("message"))
                 .isEqualTo(String.format(LineService.LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, 노선_9호선));
-    }
-
-    private String getLineId(ExtractableResponse<Response> response) {
-        String[] split = response.header("Location").split("/");
-        return split[split.length - 1];
     }
 }

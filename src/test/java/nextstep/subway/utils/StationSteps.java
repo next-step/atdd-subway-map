@@ -35,4 +35,9 @@ public class StationSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static String getStationId(ExtractableResponse<Response> response) {
+        String[] split = response.header("Location").split("/");
+        return split[split.length - 1];
+    }
 }

@@ -61,4 +61,9 @@ public class LineSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static String getLineId(ExtractableResponse<Response> response) {
+        String[] split = response.header("Location").split("/");
+        return split[split.length - 1];
+    }
 }
