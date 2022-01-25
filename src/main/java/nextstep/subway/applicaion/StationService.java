@@ -19,8 +19,15 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        final String name = stationRequest.getName();
+
+        if (stationRepository.findByName(name).isPresent()) {
+            throw new RuntimeException(String.format("이미 존재하는 역입니다. %s : %s", name));
+        }
+
+        Station station = stationRepository.save(new Station(name));
         return createStationResponse(station);
     }
 
@@ -36,6 +43,7 @@ public class StationService {
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
+
 
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 import static nextstep.subway.utils.LineUtils.*;
-import static nextstep.subway.utils.ResponseUtils.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -28,7 +27,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
 
         // then
-        httpStatus가_CREATED면서_Location이_존재함(response);
+        생성_요청한_지하철_노선_생성됨(response);
     }
 
     /**
@@ -41,17 +40,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
-        final Map<String, String> line7 = 지하철_노선_데이터_생성("7호선", "green darken-3");
+        final Map<String, String> line = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final Map<String, String> newLine = 지하철_노선_데이터_생성("7호선", "green darken-3");
 
-        지하철_노선_생성요청(Arrays.asList(line1, line7));
+        지하철_노선_생성요청(Arrays.asList(line, newLine));
 
         // when
-        final ExtractableResponse<Response> responseList = 지하철_노선_목록요청();
+        final ExtractableResponse<Response> responseList = 지하철_모든_노선_목록요청();
 
         // then
-        httpStatus가_OK면서_ResponseBody가_존재함(responseList);
-        responseList에_호선이_존재함(responseList, Arrays.asList("1호선", "7호선"));
+        생성요청한_지하철_노선들이_포함된_응답을_받음(responseList, Arrays.asList("1호선", "7호선"));
     }
 
     /**
@@ -63,7 +61,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final String line1Name = "1호선";
+
+        final Map<String, String> line1 = 지하철_노선_데이터_생성(line1Name, "blue darken-4");
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성요청(line1);
 
         // when
@@ -71,8 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> getResponse = 지하철_노선_목록요청(uri);
 
         // then
-        httpStatus가_OK면서_ResponseBody가_존재함(getResponse);
-        responseList에_호선이_존재함(getResponse, "1호선");
+        생성요청한_지하철_노선이_포함된_응답을_받음(getResponse, line1Name);
     }
 
     /**
@@ -94,8 +93,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> editResponse = 지하철_노선_수정요청(editedLine, uri);
 
         // then
-        httpStatus가_OK면서_ResponseBody가_존재함(editResponse);
-        responseList에_호선이_존재함(editResponse, "7호선");
+        지하철노선_수정요청이_성공함(editResponse, "7호선");
     }
 
     /**
@@ -115,6 +113,25 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제요청(uri);
 
         // then
-        httpStatus가_NO_CONTENT(deleteResponse);
+        삭제요청한_지하철_노선이_존재하지_않음(deleteResponse);
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
+    @Test
+    void duplicateCheck() {
+        // given
+        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        지하철_노선_생성요청(line1);
+
+        // when
+        final ExtractableResponse<Response> duplicateResponse = 지하철_노선_생성요청(line1);
+
+        // then
+        중복이름으로_지하철_노선_생성_실패함(duplicateResponse);
     }
 }
