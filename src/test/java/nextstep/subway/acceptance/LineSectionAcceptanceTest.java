@@ -71,9 +71,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
         지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역3, 10);
 
         // when // then
-        assertThatThrownBy(() -> {
-            지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역4, 5);
-        }).isInstanceOf(IllegalArgumentException.class);
+        ExtractableResponse<Response> 구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역4, 5);
+        응답결과가_BAD_REQUEST(구간등록결과);
     }
 
     @DisplayName("지하철 노선에 추가하는 새로운 구간의 하행역이 현재 등록되어 있는 역이다.")
@@ -84,9 +83,8 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
         지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역3, 10);
 
         // when // then
-        assertThatThrownBy(() -> {
-            지하철_노선에_구간을_등록한다(일호선역, 일호선역3, 일호선역1, 5);
-        }).isInstanceOf(IllegalArgumentException.class);
+        ExtractableResponse<Response> 구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역3, 일호선역1, 5);
+        응답결과가_BAD_REQUEST(구간등록결과);
     }
 
     public static void 원하는_역들이_들어있다(ExtractableResponse<Response> 노선역조회결과, List<StationResponse> 원하는결과) {
