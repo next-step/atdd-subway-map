@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.exception.DuplicationNameException;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new DuplicationNameException();
+        }
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
