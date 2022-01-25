@@ -21,20 +21,25 @@ import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.line.domain.dto.LineRequest;
+import nextstep.subway.station.domain.dto.StationRequest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    @Autowired
     private StationStep stationStep;
-    @Autowired
     private LineStep lineStep;
+    private SectionStep sectionStep;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
+        
+        lineStep = new LineStep();
+        stationStep = new StationStep();
+        sectionStep = new SectionStep();
+
         stationStep.지하철역_생성_요청();
         stationStep.지하철역_생성_요청();
     }
@@ -125,25 +130,44 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 노선에 등록할 지하철 역을 등록하고
-     * And 지하철 노선을 등록하고
+     * Given 지하철 노선을 등록하고
+     * And 지하철 구간을 등록하고
      * When 생성한 지하철 노선 조회를 요청 하면
-     * Then 생성한 지하철 노선을 응답받는다
+     * Then 생성한 지하철 노선과 구간에 등록된 지하철역을 포함해 응답받는다
      */
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
         // given
+        long lineId = 1;
         ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
+        List<StationRequest> stationRequests = LongStream.iterate(1, i -> i + 1)
+                                                         .limit(10)
+                                                         .boxed()
+                                                         .map(index -> {
+                                                             StationRequest stationRequest = stationStep.dummyRequest();
+                                                             stationRequest.setName(index + "역");
+                                                             stationStep.지하철역_생성_요청(stationRequest);
+                                                             sectionStep.지하철_구간_생성_요청(lineId, index, index + 1);
+                                                             return stationRequest;
+                                                         })
+                                                         .collect(Collectors.toList());
 
         // when
         ExtractableResponse<Response> response =
             AcceptanceTestWhen.fromGiven(createResponse)
                               .requestLocation(Method.GET);
 
+        List<String> names = stationRequests.stream()
+                                            .map(StationRequest::getName)
+                                            .collect(Collectors.toList());
+        names.add(0, "2역");
+        names.add(0, "1역");
+
         // then
         AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.OK);
+                          .equalsHttpStatus(HttpStatus.OK)
+                          .containsAll("stations.name", names);
     }
 
     /**

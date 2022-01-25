@@ -32,9 +32,9 @@ class SectionsTest {
             line.addSection(upStation, downStation, DUMMY_DISTANCE);
         }
 
-        List<String> stationNames = line.stations().stream()
-                                              .map(Station::getName)
-                                              .collect(Collectors.toList());
+        List<String> stationNames = line.getStations().stream()
+                                        .map(Station::getName)
+                                        .collect(Collectors.toList());
 
         assertThat(stationNames)
             .withFailMessage("결과값이 다름 : " + String.join(",", stationNames))

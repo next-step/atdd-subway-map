@@ -9,7 +9,6 @@ import io.restassured.response.Response;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.model.Distance;
 
-@Service
 public class LineStep {
     private static final String NAME_FORMAT = "%d호선";
     private static final String COLOR = "bg-red-600";

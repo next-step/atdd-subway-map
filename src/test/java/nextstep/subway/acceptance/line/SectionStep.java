@@ -9,7 +9,6 @@ import io.restassured.response.Response;
 import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.model.Distance;
 
-@Service
 public class SectionStep {
     private static final long START_UP_STATION_NEW_SECTION = 2;
     private static final long START_DOWN_STATION_NEW_SECTION = 3;

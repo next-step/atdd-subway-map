@@ -21,11 +21,8 @@ import nextstep.subway.utils.AcceptanceTestWhen;
 public class SectionAcceptanceTest extends AcceptanceTest {
     private static final Long LINE_ID = (long) 1;
 
-    @Autowired
     private LineStep lineStep;
-    @Autowired
     private StationStep stationStep;
-    @Autowired
     private SectionStep sectionStep;
 
     @Override
@@ -33,6 +30,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void setUp() {
         // TODO Step 클래스의 Id 관리방법 모두 리팩토링 하기
         super.setUp();
+        lineStep = new LineStep();
+        stationStep = new StationStep();
+        sectionStep = new SectionStep();
 
         stationStep.지하철역_생성_요청();
         stationStep.지하철역_생성_요청();
@@ -68,10 +68,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing1() {
         // given
+        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청();
         SectionRequest request = sectionStep.dummyRequest();
-        long upStationInFirstSection = 1;
+        long upStationInFirstSection = 3;
+        long downStationInNewSection = 4;
         request.setUpStationId(upStationInFirstSection);
-        long downStationInNewSection = 3;
         request.setDownStationId(downStationInNewSection);
 
         // when
@@ -94,11 +96,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing2() {
         // given
+        stationStep.지하철역_생성_요청();
         SectionRequest request = sectionStep.dummyRequest();
-        long downStationInFirstSection = 2;
-        request.setUpStationId(downStationInFirstSection);
-        long upStationInFirstSection = 1;
-        request.setDownStationId(upStationInFirstSection);
+        long upStationInFirstSection = 2;
+        long downStationInFirstSection = 1;
+        request.setUpStationId(upStationInFirstSection);
+        request.setDownStationId(downStationInFirstSection);
 
         // when
         ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(LINE_ID, request);

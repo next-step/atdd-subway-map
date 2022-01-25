@@ -70,7 +70,7 @@ public class Line extends BaseEntity {
         sections.delete(sectionId);
     }
 
-    public List<Station> stations() {
+    public List<Station> getStations() {
         return sections.toStations();
     }
 }

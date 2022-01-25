@@ -8,7 +8,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.station.domain.dto.StationRequest;
 
-@Service
 public class StationStep {
     private static final String NAME_FORMAT = "%d역";
 
@@ -32,7 +31,7 @@ public class StationStep {
         return new StationRequest(nextName());
     }
 
-    public synchronized String nextName() {
+    public String nextName() {
         return String.format(NAME_FORMAT, dummyCounter++);
     }
 }
