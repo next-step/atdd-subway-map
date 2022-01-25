@@ -24,8 +24,8 @@ public class StationService {
         try {
             Station station = stationRepository.save(new Station(stationRequest.getName()));
             return createStationResponse(station);
-        } catch (Exception exception) {
-            throw new DuplicationException(stationRequest.getName(), exception);
+        } catch (Exception e) {
+            throw new DuplicationException(stationRequest.getName(), e);
         }
     }
 
