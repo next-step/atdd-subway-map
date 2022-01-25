@@ -87,23 +87,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
+        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
+
         Map<String, String> number2Line = createLineParams(NUMBER2_LINE_NAME, "green", nonhyeon.getId(), pangyo.getId(), 10);
-        LineStepFeature.callCreateLines(params);
         LineStepFeature.callCreateLines(number2Line);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
 
         // then
-        List<String> lineNames = response.jsonPath()
-                .getList(".", ShowLineResponse.class)
-                .stream()
-                .map(ShowLineResponse::getLineName)
-                .collect(toList());
+        List<ShowLineResponse> responses = response.jsonPath()
+                .getList(".", ShowLineResponse.class);
+        ShowLineResponse response1 = responses.get(0);
+        ShowLineResponse response2 = responses.get(1);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).contains(SHINBUNDANG_LINE_NAME, NUMBER2_LINE_NAME);
 
+        assertThat(response1.getLineName()).isEqualTo(SHINBUNDANG_LINE_NAME);
+        assertThat(response2.getLineName()).isEqualTo(NUMBER2_LINE_NAME);
+
+        assertThat(response1.getStations().size()).isEqualTo(3);
+        assertThat(response2.getStations().size()).isEqualTo(2);
     }
 
     /**
