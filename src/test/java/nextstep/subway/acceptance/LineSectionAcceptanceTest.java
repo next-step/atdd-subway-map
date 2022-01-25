@@ -52,9 +52,13 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선에 구간을 추가한 후 구간을 조회해서 확인한다.")
     @Test
     void 지하철_노선에_구간을_등록하고_조회해서_확인한다() {
-        // when
-        ExtractableResponse<Response> 노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
-        // then
+        // when // then
+        ExtractableResponse<Response> 노선구간등록결과;
+        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
+        응답결과가_OK(노선구간등록결과);
+        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역4, 10);
+        응답결과가_OK(노선구간등록결과);
+        노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역4, 일호선역3, 10);
         응답결과가_OK(노선구간등록결과);
 
         // when
