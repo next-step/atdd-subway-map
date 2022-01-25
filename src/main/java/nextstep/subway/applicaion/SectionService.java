@@ -25,8 +25,6 @@ public class SectionService {
 
         validateSaveSection(new Sections(line.getSections()), request);
 
-        // 이렇게 elseThrow를 던지니 코드가 길어지는 느낌입니다
-        // 그래도 이렇게 꼭 elseThrow를 해야하는지 의견을 구합니다.
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(() -> new RuntimeException("상행역이 존재하지 않습니다."));
         Station downStation = stationRepository.findById(request.getDownStationId())

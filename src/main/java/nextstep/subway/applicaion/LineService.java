@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.*;
+import nextstep.subway.exception.BadRequestException;
 import nextstep.subway.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class LineService {
 
     private void validateDuplicateLineName(String name) {
         if(lineRepository.findByName(name) != null) {
-            throw new RuntimeException("중복된 이름입니다.");
+            throw new BadRequestException("중복된 노선 이름입니다.");
         }
     }
 
@@ -86,12 +87,18 @@ public class LineService {
     }
 
     public LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        Sections sections = new Sections(line.getSections());
+        List<StationResponse> stations = sections.getStations().stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(stations)
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .build();
     }
 }

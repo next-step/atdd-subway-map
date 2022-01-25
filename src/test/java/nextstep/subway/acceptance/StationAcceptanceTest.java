@@ -60,8 +60,8 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역_생성요청("홍대입구역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(jsonPath("$.exceptionMessage", is("중복된 이름입니다.")));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(jsonPath("$.exceptionMessage", is("중복된 역 이름입니다.")));
     }
 
     /**

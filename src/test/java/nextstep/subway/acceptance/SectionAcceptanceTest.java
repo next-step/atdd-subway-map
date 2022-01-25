@@ -16,7 +16,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.steps.LineSteps.지하철노선_생성요청2;
+import static nextstep.subway.acceptance.steps.LineSteps.지하철노선_생성요청;
 import static nextstep.subway.acceptance.steps.SectionSteps.지하철노선_구간생성요청;
 import static nextstep.subway.acceptance.steps.StationSteps.지하철역_생성요청;
 
@@ -43,10 +43,9 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .distance(7)
                 .build();
 
-        lineId = 지하철노선_생성요청2(request).jsonPath().getLong("id");
+        lineId = 지하철노선_생성요청(request).jsonPath().getLong("id");
     }
 
-    // 지하철 노선 생성 부분을 setUp 부분으로 분리시켰는데 시나리오 Given에다 적어야 하는가...?
     /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이 아니고
@@ -170,8 +169,6 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         // given
         long sectionDownStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
 
-        // downStationId를 전역변수로 설정했는데 뭔가 헷갈릴 수 있겠다는 생각이 듭니다.
-        // 좀더 명시적인 네이밍에 대한 의견을 구하고 싶습니다.
         SectionRequest sectionRequest = new SectionRequest(downStationId, sectionDownStationId, 5);
         지하철노선_구간생성요청(lineId, sectionRequest);
 

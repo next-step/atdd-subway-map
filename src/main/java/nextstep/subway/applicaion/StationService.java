@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class StationService {
 
     private void validateDuplicateStationName(String name) {
        if(stationRepository.findByName(name) != null) {
-           throw new RuntimeException("중복된 이름입니다.");
+           throw new BadRequestException("중복된 역 이름입니다.");
        }
     }
 

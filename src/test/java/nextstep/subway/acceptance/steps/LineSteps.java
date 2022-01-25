@@ -15,20 +15,7 @@ public class LineSteps {
 
     private LineSteps() {}
 
-    public static ExtractableResponse<Response> 지하철노선_생성요청(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract();
-    }
-
-    public static ExtractableResponse<Response> 지하철노선_생성요청2(LineRequest request) {
+    public static ExtractableResponse<Response> 지하철노선_생성요청(LineRequest request) {
         Map<String, String> params = new HashMap<>();
         params.put("name", request.getName());
         params.put("color", request.getColor());
