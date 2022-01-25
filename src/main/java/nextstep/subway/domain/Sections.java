@@ -1,17 +1,20 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.AlreadyRegisteredStationInLineException;
-import nextstep.subway.exception.DownStationNotMatchException;
+import nextstep.subway.exception.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
+
+    private static final String SECTION_FIRST_ADD_ERROR_MESSAGE = "첫 구간 추가시에만 가능";
+    private static final int MINIMUM_SIZE_SECTION = 1;
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
@@ -21,7 +24,7 @@ public class Sections {
 
     public void addFirstSection(Section section) {
         if (!sections.isEmpty()) {
-            throw new RuntimeException("첫 구간 추가시에만 가능");
+            throw new ApplicationException(SECTION_FIRST_ADD_ERROR_MESSAGE);
         }
         sections.add(section);
     }
@@ -30,6 +33,14 @@ public class Sections {
         validateDownStation(section.getUpStation());
         validateAlreadyRegisteredStation(section.getDownStation());
         sections.add(section);
+    }
+
+    public void deleteStation(Station deleteStation) {
+        validateDeleteLastDownStation(deleteStation);
+        validateMinimumSection();
+
+        int lastIndex = sections.size() - 1;
+        sections.remove(lastIndex);
     }
 
     public List<Section> getSections() {
@@ -45,6 +56,19 @@ public class Sections {
     private void validateAlreadyRegisteredStation(Station dowStation) {
         if (getAllStations().contains(dowStation)) {
             throw new AlreadyRegisteredStationInLineException(dowStation.getName());
+        }
+    }
+
+    private void validateDeleteLastDownStation(Station deleteStation) {
+        Station lastDownStation = getLastDownStation();
+        if (!Objects.equals(lastDownStation, deleteStation)) {
+            throw new DeleteLastDownStationException(deleteStation.getName());
+        }
+    }
+
+    private void validateMinimumSection() {
+        if (sections.size() <= MINIMUM_SIZE_SECTION) {
+            throw new MinimumSectionException();
         }
     }
 

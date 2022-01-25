@@ -14,7 +14,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class LineService {
 
     private final LineRepository lineRepository;
@@ -26,6 +26,7 @@ public class LineService {
         this.stationService = stationService;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new DuplicateLineException(request.getName());
@@ -46,6 +47,7 @@ public class LineService {
         );
     }
 
+    @Transactional
     public ShowLineResponse addSection(Long lineId, SectionRequest request) {
         Line line = findLineById(lineId);
         Station upStation = stationService.findStationsById(request.getUpStationId());
@@ -56,7 +58,13 @@ public class LineService {
         return createShowLineResponse(line);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        Station deleteStation = stationService.findStationsById(stationId);
+        line.deleteStation(deleteStation);
+    }
+
     public List<ShowLineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
@@ -65,18 +73,19 @@ public class LineService {
                 .collect(toList());
     }
 
-    @Transactional(readOnly = true)
     public ShowLineResponse findLine(Long id) {
         Line line = findLineById(id);
 
         return createShowLineResponse(line);
     }
 
+    @Transactional
     public void updateLine(Long id, UpdateLineRequest request) {
         Line line = findLineById(id);
         line.updateInfo(request.getName(), request.getColor());
     }
 
+    @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
     }

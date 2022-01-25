@@ -115,6 +115,21 @@ public class LineStepFeature {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> callDeleteSection(long lineId, long stationId) {
+        String deleteSectionUri = "/lines/%s/sections?stationId=%s";
+        return RestAssured.given()
+                .log()
+                .all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete(String.format(deleteSectionUri, lineId, stationId))
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+
     private static ExtractableResponse<Response> callGetLinesByUri(String uri) {
         return RestAssured.given()
                 .log()
