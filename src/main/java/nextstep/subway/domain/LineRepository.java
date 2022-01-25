@@ -10,4 +10,5 @@ public interface LineRepository extends JpaRepository<Line, Long> {
 
     @EntityGraph(attributePaths = "sections")
     Line findLineWithSectionsById(Long lineId);
+
 }
