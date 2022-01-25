@@ -1,9 +1,6 @@
 package nextstep.subway.ui.handler;
 
-import nextstep.subway.exception.DuplicateLineException;
-import nextstep.subway.exception.DuplicateStationException;
-import nextstep.subway.exception.LineNotFoundException;
-import nextstep.subway.exception.StationNotFoundException;
+import nextstep.subway.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,23 +14,14 @@ public class ExceptionAdviser {
                 .build();
     }
 
-    @ExceptionHandler(DuplicateStationException.class)
-    public ResponseEntity<ErrorResponse> duplicateStationHandler(DuplicateStationException exception) {
+    @ExceptionHandler({
+            DuplicateStationException.class,
+            AlreadyRegisteredStationInLineException.class,
+            DownStationNotMatchException.class,
+            DuplicateLineException.class})
+    public ResponseEntity<ErrorResponse> duplicateStationHandler(RuntimeException exception) {
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(exception.getMessage()));
-    }
-
-    @ExceptionHandler(DuplicateLineException.class)
-    public ResponseEntity<ErrorResponse> DuplicateLineHandler(DuplicateLineException exception) {
-        return ResponseEntity.badRequest()
-                .body(new ErrorResponse(exception.getMessage()));
-
-    }
-
-    @ExceptionHandler(StationNotFoundException.class)
-    public ResponseEntity<ErrorResponse> stationNotFoundHandler(StationNotFoundException exception) {
-        return ResponseEntity.notFound()
-                .build();
     }
 
 }

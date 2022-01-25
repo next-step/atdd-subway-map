@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.ShowLineResponse;
-import nextstep.subway.applicaion.dto.UpdateLineRequest;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -47,6 +44,16 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public ShowLineResponse addSection(Long lineId, SectionRequest request) {
+        Line line = findLineById(lineId);
+        Station upStation = stationService.findStationsById(request.getUpStationId());
+        Station downStation = stationService.findStationsById(request.getDownStationId());
+
+        line.addSection(upStation, downStation, request.getDistance());
+
+        return createShowLineResponse(line);
     }
 
     @Transactional(readOnly = true)
