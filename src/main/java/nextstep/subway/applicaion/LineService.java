@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+
+    public static final String LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE = "이미 등록된 노선입니다. 노선 이름 = %s";
+    public static final String LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE = "존재하지 않는 노선입니다. id = %s";
+
     private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -29,7 +33,7 @@ public class LineService {
             return LineResponse.createLineResponse(line);
         }
 
-        throw new DuplicateRegistrationRequestException("이미 등록된 노선입니다. 노선 이름 = " + request.getName());
+        throw new DuplicateRegistrationRequestException(String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));
     }
 
     public List<LineResponse> findAllLines() {
@@ -42,20 +46,23 @@ public class LineService {
 
     public LineResponse findLineById(Long id) throws NotFoundRequestException {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundRequestException("존재하지 않는 노선입니다. id = " + id));
+                .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
 
         return LineResponse.createLineResponse(line);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) throws NotFoundRequestException {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundRequestException("존재하지 않는 노선입니다. id = " + id));
+                .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
 
         line.update(lineRequest.getName(), lineRequest.getColor());
         LineResponse.createLineResponse(line);
     }
 
     public void deleteLineById(Long id) throws NotFoundRequestException {
-        lineRepository.deleteById(id);
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
+
+        lineRepository.delete(line);
     }
 }

@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.DuplicateRegistrationRequestException;
+import nextstep.subway.exception.NotFoundRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -15,6 +16,10 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
+
+    public static final String STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE = "이미 등록된 역입니다. 역 이름 = %s";
+    public static final String STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE = "존재하지 않는 역입니다. id = %s";
+
     private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
@@ -28,7 +33,7 @@ public class StationService {
             return StationResponse.createStationResponse(station);
         }
 
-        throw new DuplicateRegistrationRequestException("이미 등록된 역입니다. 역 이름 = " + request.getName());
+        throw new DuplicateRegistrationRequestException(String.format(STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));
     }
 
     @Transactional(readOnly = true)
@@ -41,6 +46,9 @@ public class StationService {
     }
 
     public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+        Station station = stationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundRequestException(String.format(STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
+
+        stationRepository.delete(station);
     }
 }
