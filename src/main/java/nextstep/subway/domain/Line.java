@@ -44,4 +44,13 @@ public class Line extends BaseEntity {
         sections.add(section);
         section.updateLine(this);
     }
+
+    public boolean isDownStation(Long upStationId) {
+        for (Section section : sections) {
+            if (!section.isSameDownStation(upStationId)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

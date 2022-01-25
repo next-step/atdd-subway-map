@@ -59,4 +59,8 @@ public class Section {
     public int getDistance() {
         return distance;
     }
+
+    public boolean isSameDownStation(Long upStationId) {
+        return downStation.isSmaeStation(upStationId);
+    }
 }
