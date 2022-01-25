@@ -329,4 +329,39 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성한 지하철 노선에 구간의 삭제를 요청 하면
+     * Then 생성한 지하철 노선에 구간의 삭제가 성공한다.
+     */
+    @DisplayName("지하철 노선의 구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        지하철역들_생성_요청(5);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        // when
+        String uri = createResponse.header("Location") + "sections?stationId=" + downStationId;
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+    }
 }
