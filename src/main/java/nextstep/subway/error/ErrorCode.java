@@ -11,6 +11,7 @@ public enum ErrorCode {
     NOT_FOUND_LINE_ERROR(HttpStatus.BAD_REQUEST, "-10005", "노선을 찾을 수 없습니다."),
     DUPLICATE_ERROR(HttpStatus.BAD_REQUEST, "-10006", "이미 등록된 정보입니다."),
     NOT_FOUND_STATION_ERROR(HttpStatus.BAD_REQUEST, "-10007", "지하철 역을 찾을 수 없습니다."),
+    SECTION_CREATE_ERROR(HttpStatus.BAD_REQUEST, "-10008", "구간을 등록할 수 없습니다."),
     ;
 
     private final HttpStatus status;

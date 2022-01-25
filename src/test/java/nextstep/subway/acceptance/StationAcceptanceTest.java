@@ -28,20 +28,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철역 생성을 요청하고
-     * When 생성된 지하철역의 이름으로 조회를 요청 하면
-     * Then 생성된 지하철역을 응답 받는다
-     */
-    @DisplayName("이름으로 지하철역 조회")
-    @Test
-    void getStation() {
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
-        ExtractableResponse<Response> response = 지하철역_이름으로_조회_요청(강남역);
-        assertThat(response.statusCode()).isEqualTo(OK.value());
-        assertThat(response.jsonPath().getString("name")).contains(강남역);
-    }
-
-    /**
      * Given 지하철역 생성을 요청 하고
      * Given 새로운 지하철역 생성을 요청 하고
      * When 지하철역 목록 조회를 요청 하면

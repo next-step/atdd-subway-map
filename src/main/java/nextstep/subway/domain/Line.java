@@ -2,40 +2,31 @@ package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
     public static Line of(final LineRequest lineRequest) {
-        return new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance());
+        return new Line(lineRequest.getName(), lineRequest.getColor());
     }
 
-    private Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
     public void update(String name, String color) {
@@ -55,15 +46,7 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
+    public List<Section> getSections() {
+        return sections;
     }
 }

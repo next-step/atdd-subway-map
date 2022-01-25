@@ -8,6 +8,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionHandlerController {
 
+    @ExceptionHandler(SectionSaveException.class)
+    public ResponseEntity<ErrorResponse> sectionCreate(final SectionSaveException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.of(e.getErrorCode()));
+    }
+
     @ExceptionHandler(NotFoundStationException.class)
     public ResponseEntity<ErrorResponse> notFoundStation(final NotFoundStationException e) {
         return ResponseEntity
