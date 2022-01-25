@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,15 +17,15 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
@@ -66,7 +67,9 @@ public class Section {
 
     public void setLine(Line line) {
         this.line = line;
-        this.line.addSection(this);
+        if (!this.line.containsSection(this)) {
+            this.line.addSection(this);
+        }
     }
 
     @Override
