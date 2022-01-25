@@ -1,6 +1,6 @@
 package nextstep.subway.acceptance;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(신분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     /**

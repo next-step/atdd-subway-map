@@ -10,6 +10,8 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicateStoreException;
+import nextstep.subway.exception.NotFoundException;
 
 @Service
 @Transactional
@@ -25,7 +27,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         if(lineRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException(DUPLICATE_NOTION_NAME);
+            throw new DuplicateStoreException(DUPLICATE_NOTION_NAME);
         }
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
@@ -44,13 +46,13 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_NOTION));
+            .orElseThrow(() -> new NotFoundException(NOT_EXISTS_NOTION));
         return LineResponse.of(line);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_NOTION));
+            .orElseThrow(() -> new NotFoundException(NOT_EXISTS_NOTION));
 
         line.update(lineRequest.getName(), lineRequest.getColor());
     }

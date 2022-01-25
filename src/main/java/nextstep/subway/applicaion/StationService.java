@@ -1,14 +1,17 @@
 package nextstep.subway.applicaion;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import nextstep.subway.exception.DuplicateStoreException;
+import nextstep.subway.exception.NotFoundException;
 
 @Service
 @Transactional
@@ -24,7 +27,7 @@ public class StationService {
 
     public StationResponse saveStation(StationRequest stationRequest) {
         if (stationRepository.existsByName(stationRequest.getName())) {
-            throw new IllegalArgumentException(DUPLICATE_STATION_NAME);
+            throw new DuplicateStoreException(DUPLICATE_STATION_NAME);
         }
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));
@@ -43,14 +46,14 @@ public class StationService {
     @Transactional(readOnly = true)
     public StationResponse findStationById(Long id) {
         Station station = stationRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION));
+            .orElseThrow(() -> new NotFoundException(NOT_EXISTS_STATION));
 
         return StationResponse.of(station);
     }
 
     public void updateStationById(Long id, StationRequest request) {
         Station station = stationRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException(NOT_EXISTS_STATION));
+            .orElseThrow(() -> new NotFoundException(NOT_EXISTS_STATION));
 
         station.update(request.getName());
     }
