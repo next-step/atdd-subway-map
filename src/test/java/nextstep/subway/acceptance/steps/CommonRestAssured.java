@@ -9,7 +9,7 @@ import java.util.Map;
 
 class CommonRestAssured {
 
-    public static ExtractableResponse<Response> post(String url, Map params) {
+    public static ExtractableResponse<Response> create(String url, Map params) {
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -39,7 +39,7 @@ class CommonRestAssured {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> put(String url, Map params) {
+    public static ExtractableResponse<Response> modify(String url, Map params) {
 
         return RestAssured.given().log().all()
                 .body(params)

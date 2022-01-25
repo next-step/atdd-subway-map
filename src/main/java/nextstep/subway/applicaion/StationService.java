@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.StationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ public class StationService {
 
     public StationResponse saveStation(StationRequest stationRequest) {
         if (stationRepository.existsByName(stationRequest.getName())) {
-            throw new IllegalArgumentException(DUPLICATE_NAME_ERROR_MASSAGE);
+            throw new StationException(DUPLICATE_NAME_ERROR_MASSAGE);
         }
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));

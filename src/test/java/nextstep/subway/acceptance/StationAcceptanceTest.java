@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
     private static String FIRST_NAME = "강남역";
+    private static final String RESPONSE_HEADER_LOCATION = "Location";
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -23,11 +24,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = StationSteps.post(FIRST_NAME);
+        ExtractableResponse<Response> response = StationSteps.create(FIRST_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(RESPONSE_HEADER_LOCATION)).isNotBlank();
     }
 
     /**
@@ -42,8 +43,8 @@ class StationAcceptanceTest extends AcceptanceTest {
         /// given
         String name = "역삼역";
 
-        StationSteps.post(FIRST_NAME);
-        StationSteps.post(name);
+        StationSteps.create(FIRST_NAME);
+        StationSteps.create(name);
 
         // when
         ExtractableResponse<Response> response = StationSteps.get();
@@ -63,11 +64,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = StationSteps.post("강남역");
+        ExtractableResponse<Response> createResponse = StationSteps.create("강남역");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = StationSteps.delete(uri);
+        ExtractableResponse<Response> response = StationSteps.delete(createResponse.header(RESPONSE_HEADER_LOCATION));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -83,10 +83,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateStationName() {
         // given
-        StationSteps.post(FIRST_NAME);
+        StationSteps.create(FIRST_NAME);
 
         // when
-        ExtractableResponse<Response> response = StationSteps.post(FIRST_NAME);
+        ExtractableResponse<Response> response = StationSteps.create(FIRST_NAME);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

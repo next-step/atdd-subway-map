@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationSteps {
-    public static String URL = "/stations";
+    public static final String URL = "/stations";
 
-    public static ExtractableResponse<Response> post(String name) {
+    public static ExtractableResponse<Response> create(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        return CommonRestAssured.post(URL, params);
+        return CommonRestAssured.create(URL, params);
     }
 
     public static ExtractableResponse<Response> delete(String url) {

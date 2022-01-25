@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LineSteps {
-    private static String URL = "/lines";
+    private static final String URL = "/lines";
 
-    public static ExtractableResponse<Response> post(String name, String color) {
+    public static ExtractableResponse<Response> create(String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
 
-        return CommonRestAssured.post(URL, params);
+        return CommonRestAssured.create(URL, params);
     }
 
     public static ExtractableResponse<Response> get() {
@@ -25,11 +25,11 @@ public class LineSteps {
         return CommonRestAssured.delete(url);
     }
 
-    public static ExtractableResponse<Response> put(String url, String name, String color) {
+    public static ExtractableResponse<Response> modify(String url, String name, String color) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
 
-        return CommonRestAssured.put(url, params);
+        return CommonRestAssured.modify(url, params);
     }
 }

@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.LineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException(DUPLICATE_NAME_ERROR_MASSAGE);
+            throw new LineException(DUPLICATE_NAME_ERROR_MASSAGE);
         }
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
