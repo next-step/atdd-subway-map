@@ -4,7 +4,10 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.NotFoundLineException;
+import nextstep.subway.exception.NotFoundStationException;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +19,26 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+
+        Line line = new Line(
+                request.getName(),
+                request.getColor(),
+                upStation,
+                downStation,
+                request.getDistance()
+        );
+
+        lineRepository.save(line);
         return LineResponse.of(line);
     }
 
@@ -52,5 +68,9 @@ public class LineService {
 
     private Line findLineById(Long id) {
         return lineRepository.findById(id).orElseThrow(() -> new NotFoundLineException(id));
+    }
+
+    private Station findStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(() -> new NotFoundStationException(id));
     }
 }
