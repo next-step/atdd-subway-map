@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -55,11 +56,37 @@ public class LineSectionAcceptanceTest extends AcceptanceTest{
         ExtractableResponse<Response> 노선구간등록결과 = 지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
         // then
         응답결과가_OK(노선구간등록결과);
-        
+
         // when
         ExtractableResponse<Response> 노선역조회결과 = 지하철_노선의_역들을_조회한다(일호선역);
         // then
         원하는_역들이_들어있다(노선역조회결과, Arrays.asList(일호선역1, 일호선역2));
+    }
+
+    @DisplayName("지하철 노선에 추가하는 새로운 구간의 상행역이 기존 하행역과 맞지 않는다.")
+    @Test
+    void 지하철_노선에_구간을_등록_실패한다_1() {
+        // given
+        지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
+        지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역3, 10);
+
+        // when // then
+        assertThatThrownBy(() -> {
+            지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역4, 5);
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("지하철 노선에 추가하는 새로운 구간의 하행역이 현재 등록되어 있는 역이다.")
+    @Test
+    void 지하철_노선에_구간을_등록_실패한다_2() {
+        // given
+        지하철_노선에_구간을_등록한다(일호선역, 일호선역1, 일호선역2, 10);
+        지하철_노선에_구간을_등록한다(일호선역, 일호선역2, 일호선역3, 10);
+
+        // when // then
+        assertThatThrownBy(() -> {
+            지하철_노선에_구간을_등록한다(일호선역, 일호선역3, 일호선역1, 5);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     public static void 원하는_역들이_들어있다(ExtractableResponse<Response> 노선역조회결과, List<StationResponse> 원하는결과) {
