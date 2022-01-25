@@ -320,13 +320,14 @@ getter 기반으로 읽어오는 것이었다. 계속 예외 메시지를 넣었
 
 ## 👄피드백
 
-### 도메인이 자주 변하는 DTO에 의존하면 도메인 또한 자주 변경될 수 있기 때문에
-좋지 않다.
+- [x]  **도메인이 자주 변하는 DTO에 의존하면 도메인 또한 자주 변경될 수 있기 때문에
+  좋지 않다.**
 
-도메인은 자주 변하지 않고, DTO는 자주 변하는 객체이다. 이런 관계에서는
-많이 변하는 쪽이 많이 변하지 않는 곳에 의존해야 한다.
-UI가 서버 API에 의존하지 서버 API가 UI에 의존하지는 않는다.
-자동차 경주나 볼링 게임 같은 미션을 해보면서 확실히 느낀 부분이다.
+  → 도메인은 자주 변하지 않고, DTO는 자주 변하는 객체이다. 이런 관계에서는
+  많이 변하는 쪽이 많이 변하지 않는 곳에 의존해야 한다.
+  UI가 서버 API에 의존하지 서버 API가 UI에 의존하지는 않는다.
+  자동차 경주나 볼링 게임 같은 미션을 해보면서 확실히 느낀 부분이다.
+
 
 ```java
 // 좋지 않음.
@@ -341,6 +342,24 @@ public void update(String name, String color) {
     this.color = color;
 }
 ```
+
+- [x]  **http 응답 코드 개선하기**
+- [x]  **예외 처리에서 try catch 대신 @ExceptionHandler 사용하기**
+- [x]  예외 메시지를 View 객체인  ResponseStation과 같은 곳에 담지 말기. 연관성이 없는 것이다.
+  → 따로 ExeptionDto 클래스를 반환 하도록 개선했음.
+- [ ]  `**if (*ObjectUtils*.*isEmpty*(findLine)) {` 로 체크하지 말고 existsByXXX 쿼리 메서드로 개선하기**
+- [ ]  이와 같은 것은 StationResponse 객체 안에서 정팩 팩토리 메서드로 분리?
+
+```java
+if (ObjectUtils.isEmpty(findStation)) {
+            Station station = stationRepository.save(new Station(request.getName()));
+            return createStationResponse(station);
+```
+
+- [ ]  **매직 리터럴 없애기. 실수의 여지를 제공하게 됨.
+  → 모듈화하거나, 멤버로 빼거나**
+- [ ]  테스트 검증 부분도 모듈화가 고민
+- [ ]  노선 색깔도 변경했으니 색깔도 검증하기.
 
 ### 질문에 대한 답변
 
