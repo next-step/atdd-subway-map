@@ -20,6 +20,9 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
+        if(stationService.isDuplicatedNameOfStation(stationRequest.getName())) {
+            return ResponseEntity.badRequest().build();
+        }
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,5 +45,10 @@ public class StationService {
                 station.getCreatedDate(),
                 station.getModifiedDate()
         );
+    }
+
+    public boolean isDuplicatedNameOfStation(String name) {
+        Optional<Station> station = stationRepository.findByName(name);
+        return !station.isEmpty();
     }
 }
