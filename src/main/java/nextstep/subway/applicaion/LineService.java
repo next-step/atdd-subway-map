@@ -22,7 +22,14 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        final String name = request.getName();
+        final String color = request.getColor();
+
+        if (lineRepository.findByName(name).isPresent()) {
+            throw new RuntimeException(String.format("이미 존재하는 노선입니다. %s : %s", name, color));
+        }
+
+        Line line = lineRepository.save(new Line(name, color));
         return new LineResponse(
                 line.getId(),
                 line.getName(),
