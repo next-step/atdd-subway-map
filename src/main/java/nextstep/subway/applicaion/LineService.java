@@ -29,7 +29,7 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    public void checkDuplication(LineRequest request) {
+    private void checkDuplication(LineRequest request) {
         if (lineRepository.findByName(request.getName()).isPresent()) {
             throw new DuplicatedLineException();
         }
