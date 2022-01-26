@@ -1,8 +1,8 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.request.LineRequest;
+import nextstep.subway.applicaion.dto.response.LineResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -23,7 +23,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     String 색상_5호선 = "보라색";
 
     /**
-     * When 지하철 노선 생성을 요청 하면
+     * When 지하철 노선 생성을 요청하면
      * Then 지하철 노선 생성이 성공한다.
      */
     @Test
