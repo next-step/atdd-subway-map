@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.exception.BusinessException;
 import nextstep.subway.applicaion.exception.NotLastSectionException;
+import org.springframework.http.HttpStatus;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -57,6 +59,9 @@ public class Line extends BaseEntity {
     }
 
     public void deleteSection(Long stationId) {
+        if (sections.size() == 1) {
+            throw new BusinessException("마지막 구간 삭제 불가", HttpStatus.BAD_REQUEST);
+        }
         int isLastDownStation = 1;
         int count = validSections(stationId);
         if (count == isLastDownStation) {
