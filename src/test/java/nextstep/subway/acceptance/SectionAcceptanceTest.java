@@ -82,6 +82,22 @@ public class SectionAcceptanceTest extends AcceptanceTest{
      * Then 삭제 된다.
      */
 
+    @DisplayName("하행 종점인 구간 삭제를 요청한다")
+    @Test
+    void 하행종점_구간_삭제() {
+        //given
+        테스트준비_노선등록();
+        ExtractableResponse<Response> 테스트준비_구간등록 = 테스트준비_구간등록();
+
+        //when
+        Long 지하철역_ID = 테스트준비_구간등록.jsonPath().getLong("downStation.id");
+        ExtractableResponse<Response> response = 구간삭제요청(지하철역_ID);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+    }
+
 
     /**
      * Given 지하철 역 (상행, 하행)생성을 요청한다. + 노선 등록을 요청한다
