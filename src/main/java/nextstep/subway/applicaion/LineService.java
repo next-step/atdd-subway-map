@@ -108,6 +108,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         if (!line.equalsLastDownStation(upStation)) { throw new InvalidParameterException(); }
+        if (line.checkDuplicatedDownStation(downStation))  { throw new InvalidParameterException(); }
         Section section = new Section(
                 line,
                 upStation,

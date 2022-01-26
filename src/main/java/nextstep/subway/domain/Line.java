@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -62,14 +63,26 @@ public class Line extends BaseEntity {
         }
     }
 
-    public Section getLastDownStation() {
-        return this.getSections()
+    public Section getLastSection() {
+        return sections
                 .stream()
                 .max(Comparator.comparing(Section::getId))
                 .orElseThrow(EntityNotFoundException::new);
     }
 
     public boolean equalsLastDownStation(Station upStation) {
-        return getLastDownStation().getDownStation().equals(upStation);
+        return getLastSection().getDownStation().equals(upStation);
+    }
+
+    public boolean checkDuplicatedDownStation(Station downStation) {
+        boolean duplidatedDownStation = sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet())
+                .contains(downStation);
+        boolean duplidatedUpStation = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet())
+                .contains(downStation);
+        return duplidatedDownStation || duplidatedUpStation;
     }
 }
