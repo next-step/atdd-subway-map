@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import lombok.Builder;
+
 import javax.persistence.CascadeType;
 
 import javax.persistence.Entity;
@@ -32,6 +34,7 @@ public class Section extends BaseEntity {
     public Section() {
     }
 
+    @Builder
     public Section(Line line, Station upStation, Station downStation, int distance) {
         this.line = line;
         this.upStation = upStation;

@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Builder;
 import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public class LineResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
+    @Builder
     public LineResponse(
             Long id,
             String name,

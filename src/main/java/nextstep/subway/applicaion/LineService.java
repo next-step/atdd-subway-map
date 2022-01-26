@@ -38,12 +38,12 @@ public class LineService {
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        Section section = new Section(
-                line,
-                upStation,
-                downStation,
-                request.getDistance()
-        );
+        Section section = Section.builder()
+                .line(line)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(request.getDistance())
+                .build();
         line.addSection(section);
         return createLineResponse(line);
     }
@@ -79,14 +79,14 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate(),
-                line.getStations()
-        );
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .stations(line.getStations())
+                .build();
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
@@ -110,12 +110,12 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         if (!line.equalsLastDownStation(upStation)) { throw new InvalidParameterException(); }
         if (line.checkDuplicatedDownStation(downStation))  { throw new InvalidParameterException(); }
-        Section section = new Section(
-                line,
-                upStation,
-                downStation,
-                request.getDistance()
-        );
+        Section section = Section.builder()
+                .line(line)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(request.getDistance())
+                .build();
         line.addSection(section);
     }
 
