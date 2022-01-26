@@ -64,7 +64,7 @@ public class ApiUtil {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines/{id}/section")
+                .post("/lines/{id}/sections")
                 .then().log().all()
                 .extract();
     }
@@ -72,7 +72,7 @@ public class ApiUtil {
     public static ExtractableResponse<Response> 지하철_노선_구간_삭제_API(Long id, Map<String, String> params) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
-                .body(params)
+                .params(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .delete("/lines/{id}/sections")
