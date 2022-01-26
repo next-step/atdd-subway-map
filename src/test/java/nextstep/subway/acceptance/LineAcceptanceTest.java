@@ -32,6 +32,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private Map<String, String> 양재_판교_구간;
     private Map<String, String> 역삼_판교_구간;
+    private Map<String, String> 양재_강남_구간;
 
     @BeforeEach
     void initParam() {
@@ -67,6 +68,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         역삼_판교_구간.put("upStationId", String.valueOf(역삼역id));
         역삼_판교_구간.put("downStationId", String.valueOf(판교역id));
         역삼_판교_구간.put("distance", String.valueOf(999));
+
+        양재_강남_구간 = new HashMap<>();
+        양재_강남_구간.put("upStationId", String.valueOf(양재역id));
+        양재_강남_구간.put("downStationId", String.valueOf(강남역id));
+        양재_강남_구간.put("distance", String.valueOf(999));
     }
 
     /**
@@ -208,13 +214,33 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("구간 등록 실패 - 새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 함.")
     @Test
-    void addSectionFail() {
+    void addSectionFailUpStation() {
         // given
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
 
         // when
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = 구간_등록_요청(uri, 역삼_판교_구간);
+
+        // then
+        구간_등록_실패됨(response);
+    }
+
+    /**
+     * Scenario: 구간 등록(비정상적인 시나리오)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * When 잘못된 구간 등록(상행:양재역, 하행:강남역) 요청하면
+     * Then 구간 등록이 성공한다.
+     */
+    @DisplayName("구간 등록 실패 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @Test
+    void addSectionFailDownStation() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+
+        // when
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = 구간_등록_요청(uri, 양재_강남_구간);
 
         // then
         구간_등록_실패됨(response);
