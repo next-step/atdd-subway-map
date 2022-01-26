@@ -1,9 +1,10 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.domain.step_feature.SectionStepFeature;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static nextstep.subway.domain.step_feature.SectionStepFeature.createSection;
 import static nextstep.subway.domain.step_feature.StationStepFeature.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,16 +12,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("Sections(구간 일급 객체)의 테스트")
 class SectionsTest {
 
+    private Sections sections;
+    private Section section1;
+    private Section section2;
+
+    @BeforeEach
+    void setUp() {
+        sections = new Sections();
+        section1 = createSection(createGangnamStation(), createYeoksamStation());
+        section2 = createSection(createYeoksamStation(), createPangyoStation());
+    }
 
     @DisplayName("라인을 처음 생성 시에 생성하는 첫 구간만 등록한다.")
     @Test
     void addFirstSection() {
-        // given
-        Sections sections = new Sections();
-        Section section = new Section();
-
         // when
-        sections.addFirstSection(section);
+        sections.addFirstSection(section1);
 
         // then
         assertThat(sections.getSections().size()).isEqualTo(1);
@@ -30,9 +37,6 @@ class SectionsTest {
     @Test
     void addFirstSection_fail() {
         // given
-        Sections sections = new Sections();
-        Section section1 = new Section();
-        Section section2 = new Section();
         sections.addFirstSection(section1);
 
         // then
@@ -44,13 +48,10 @@ class SectionsTest {
     @Test
     void validateAlreadyRegisteredStation() {
         // given
-        Sections sections = new Sections();
-        Section section = SectionStepFeature.createSection(createGangnamStation(), createYeoksamStation());
-        sections.addFirstSection(section);
-        Section addSection = SectionStepFeature.createSection(createYeoksamStation(), createPangyoStation());
+        sections.addFirstSection(section1);
 
         // when
-        sections.addSection(addSection);
+        sections.addSection(section2);
 
         // then
         assertThat(sections.getSections()
@@ -61,10 +62,8 @@ class SectionsTest {
     @Test
     void validateAlreadyRegisteredStation_fail() {
         // given
-        Sections sections = new Sections();
-        Section section = SectionStepFeature.createSection(createGangnamStation(), createYeoksamStation());
-        sections.addFirstSection(section);
-        Section addSection = SectionStepFeature.createSection(createNonhyeonStation(), createPangyoStation());
+        sections.addFirstSection(section1);
+        Section addSection = createSection(createNonhyeonStation(), createPangyoStation());
 
         // then
         assertThatThrownBy(() -> sections.addSection(addSection))
