@@ -15,7 +15,10 @@ public class LineRequestStep {
     private final static String BODY_ELEMENT_ID = "id";
 
     public static ExtractableResponse<Response> 노선_생성(TestLine line) {
-        Map<String, String> params = createRequestBody(line);
+        Map<String, Object> params = new HashMap<>();
+
+        insertRequestBody(params, BODY_ELEMENT_NAME, line.getName());
+        insertRequestBody(params, BODY_ELEMENT_COLOR, line.getColor());
 
         return RestAssured
                 .given().log().all()
@@ -30,12 +33,8 @@ public class LineRequestStep {
                 .extract();
     }
 
-    private static Map<String, String> createRequestBody(TestLine line) {
-        Map<String, String> params = new HashMap<>();
-        params.put(BODY_ELEMENT_NAME, line.getName());
-        params.put(BODY_ELEMENT_COLOR, line.getColor());
-
-        return params;
+    private static void insertRequestBody(Map<String, Object> params, String key, Object value) {
+        params.put(key, value);
     }
 
     public static ExtractableResponse<Response> 노선_목록_조회() {
