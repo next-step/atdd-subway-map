@@ -64,7 +64,7 @@ public class ApiUtil {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .delete("/lines/{id}/section")
+                .post("/lines/{id}/section")
                 .then().log().all()
                 .extract();
     }
