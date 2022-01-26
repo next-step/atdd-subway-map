@@ -34,13 +34,7 @@ public class LineService {
         line.addSection(Section.of(upStation, downStation, request.getDistance()));
 
         line = lineRepository.save(line);
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findAll() {

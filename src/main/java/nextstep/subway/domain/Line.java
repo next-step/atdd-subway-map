@@ -44,6 +44,10 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     public void addSection(Section section) {
         sections.add(section);
         section.updateLine(this);

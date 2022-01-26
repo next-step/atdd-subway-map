@@ -10,8 +10,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.utils.HttpRequestTestUtil.딜리트_요청;
+import static nextstep.subway.utils.LineStepUtil.기본주소;
 import static nextstep.subway.utils.LineStepUtil.*;
-import static nextstep.subway.utils.StationStepUtil.지하철역들생성;
+import static nextstep.subway.utils.StationStepUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -93,6 +94,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(기존노선);
+        assertThat(response.jsonPath().getList("stations.name")).contains(기존지하철, 새로운지하철);
+
     }
 
     /**
