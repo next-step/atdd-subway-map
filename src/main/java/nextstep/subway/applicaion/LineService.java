@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
     public LineResponse saveLine(LineRequest request) {
         validateDuplicateLineName(request.getName());
@@ -48,10 +48,8 @@ public class LineService {
     }
 
     private Section createSection(LineRequest request, Line line) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(() -> new RuntimeException("상행역을 입력해주세요"));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(() -> new RuntimeException("하행역을 입력해주세요"));
+        Station upStation = stationService.findById(request.getUpStationId(), "상행역이 존재하지 않습니다");
+        Station downStation = stationService.findById(request.getDownStationId(), "하행역이 존재하지 않습니다.");
 
         return Section.builder()
                 .line(line)
@@ -67,26 +65,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException("해당 노선은 존재하지 않습니다."));
-
-        return createLineResponse(line);
-    }
-
-    public LineResponse updateLine(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException("해당 노선은 존재하지 않습니다."));
-
-        line.update(request.getName(), request.getColor());
-        return createLineResponse(line);
-    }
-
-    public void deleteLineById(Long id) {
-        lineRepository.deleteById(id);
-    }
-
-    public LineResponse createLineResponse(Line line) {
+    private LineResponse createLineResponse(Line line) {
         Sections sections = new Sections(line.getSections());
         List<StationResponse> stations = sections.getStations().stream()
                 .map(StationResponse::of)
@@ -101,4 +80,25 @@ public class LineService {
                 .modifiedDate(line.getModifiedDate())
                 .build();
     }
+
+    public LineResponse findLine(Long id) {
+        Line line = findById(id);
+        return createLineResponse(line);
+    }
+
+    public LineResponse updateLine(Long id, LineRequest request) {
+        Line line = findById(id);
+        line.update(request.getName(), request.getColor());
+        return createLineResponse(line);
+    }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
+
+    public Line findById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("존재하지 않는 노선입니다."));
+    }
+
 }

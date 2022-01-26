@@ -43,4 +43,8 @@ public class Sections {
         return sections.size() > 1;
     }
 
+    public boolean isDownStation(Long stationId) {
+        return stationId == getDownStationId();
+    }
+
 }

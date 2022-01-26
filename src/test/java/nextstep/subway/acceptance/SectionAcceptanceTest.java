@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.steps.SectionSteps;
+import nextstep.subway.acceptance.steps.LineSteps;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import org.assertj.core.api.Assertions;
@@ -16,16 +16,18 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.steps.LineSteps.지하철노선_단건조회;
 import static nextstep.subway.acceptance.steps.LineSteps.지하철노선_생성요청;
 import static nextstep.subway.acceptance.steps.SectionSteps.지하철노선_구간생성요청;
 import static nextstep.subway.acceptance.steps.StationSteps.지하철역_생성요청;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선의 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest{
 
     long lineId;
     long upStationId;
-    long downStationId;
+    long firstDownStationId;
 
     @BeforeEach
     @Override
@@ -33,13 +35,13 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         RestAssured.port = port;
 
         upStationId = 지하철역_생성요청("신도림역").jsonPath().getLong("id");
-        downStationId = 지하철역_생성요청("문래역").jsonPath().getLong("id");
+        firstDownStationId = 지하철역_생성요청("문래역").jsonPath().getLong("id");
 
         LineRequest request = LineRequest.builder()
                 .name("2호선")
                 .color("bg-green")
                 .upStationId(upStationId)
-                .downStationId(downStationId)
+                .downStationId(firstDownStationId)
                 .distance(7)
                 .build();
 
@@ -74,7 +76,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -90,7 +92,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         int distance = 7;
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", String.valueOf(downStationId));
+        params.put("upStationId", String.valueOf(firstDownStationId));
         params.put("downStationId", String.valueOf(upStationId));
         params.put("distance", String.valueOf(distance));
 
@@ -103,7 +105,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -119,7 +121,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         int distance = 3;
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", String.valueOf(downStationId));
+        params.put("upStationId", String.valueOf(firstDownStationId));
         params.put("downStationId", String.valueOf(sectionDownStationId));
         params.put("distance", String.valueOf(distance));
 
@@ -131,8 +133,12 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .when().post("/lines/" + lineId + "/sections")
                 .then().log().all().extract();
 
+        ExtractableResponse<Response> findLineResponse = 지하철노선_단건조회(lineId);
+
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(findLineResponse.jsonPath().getList("stations").size()).isEqualTo(3);
+
     }
 
     /**
@@ -144,7 +150,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void validateDeleteSection_OneSection() {
         // given
-        long stationId = downStationId;
+        long stationId = firstDownStationId;
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -153,7 +159,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -169,7 +175,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         // given
         long sectionDownStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
 
-        SectionRequest sectionRequest = new SectionRequest(downStationId, sectionDownStationId, 5);
+        SectionRequest sectionRequest = new SectionRequest(firstDownStationId, sectionDownStationId, 5);
         지하철노선_구간생성요청(lineId, sectionRequest);
 
         // when
@@ -179,7 +185,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -194,7 +200,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         // given
         long sectionDownStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
 
-        SectionRequest sectionRequest = new SectionRequest(downStationId, sectionDownStationId, 5);
+        SectionRequest sectionRequest = new SectionRequest(firstDownStationId, sectionDownStationId, 5);
         지하철노선_구간생성요청(lineId, sectionRequest);
 
         // when
@@ -204,6 +210,6 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all().extract();
 
         // then
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
