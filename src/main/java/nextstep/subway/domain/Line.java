@@ -78,4 +78,13 @@ public class Line extends BaseEntity {
     private Station lastDownStation() {
         return sections.get(sections.size() - 1).getDownStation();
     }
+
+    public void removeSection(Station station) {
+        if (lastDownStation().equals(station)) {
+            sections.remove(sections.size() - 1);
+            return;
+        }
+
+        throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다.");
+    }
 }
