@@ -17,7 +17,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Given 상행 지하철역 생성하고
      * Given 하행 지하철역 생성하고
      * Given 지하철 노선을 생성하고
-     * Given 하행 지하철역 생성하고
+     * Given 하행 지하철역을 생성하고
      * When 지하철 구간 생성을 요청하면
      * Then 지하철 구간 생성이 성공한다.
      */
@@ -50,8 +50,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Given 상행 지하철역 생성하고
      * Given 하행 지하철역 생성하고
      * Given 지하철 노선을 생성하고
-     * Given 상행 지하철역 생성하고
-     * Given 하행 지하철역 생성하고
+     * Given 상행 지하철역을 생성하고
+     * Given 하행 지하철역을 생성하고
      * When 노선에 등록되어있는 하행 종점역과 다른 상행 지하철역으로 지하철 구간 생성을 요청하면
      * Then 지하철 구간 생성이 실패한다.
      */
@@ -109,5 +109,105 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_구간_생성_실패(response);
+    }
+
+    /**
+     * Given 상행 지하철역 생성하고
+     * Given 하행 지하철역 생성하고
+     * Given 지하철 노선을 생성하고
+     * Given 하행 지하철역을 생성하고
+     * Given 지하철 구간을 생성하고
+     * When 지하철 구간 삭제를 요청하면
+     * Then 지하철 구간 삭제가 성공한다.
+     */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        Long 강남역 = 상행_지하철역_생성_요청("강남역");
+        Long 양재역 = 하행_지하철역_생성_요청("양재역");
+        Map<String, String> lineParams = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                강남역,
+                양재역,
+                10);
+        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(lineParams);
+        Long lineId = lineResponse.body().jsonPath().getLong("id");
+
+        Long 양재시민의숲역 = 하행_지하철역_생성_요청("양재시민의숲역");
+        Map<String, String> params = 지하철_구간_파라미터_생성(양재역, 양재시민의숲역, 10);
+        ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(lineId, params);
+        Long downStationId = createResponse.body().jsonPath().getLong("downStationId");
+
+        // when
+        ExtractableResponse<Response> response = SectionStepDefinition.지하철_구간_삭제_요청(lineId, downStationId);
+
+                // then
+        지하철_구간_삭제_완료(response);
+    }
+
+    /**
+     * Given 상행 지하철역 생성하고
+     * Given 하행 지하철역 생성하고
+     * Given 지하철 노선을 생성하고
+     * Given 하행 지하철역을 생성하고
+     * Given 지하철 구간을 생성하고
+     * When 하행 종점역이 아닌 역으로 지하철 구간 삭제를 요청하면
+     * Then 지하철 구간 삭제가 실패한다.
+     */
+    @DisplayName("지하철 노선에 등록된 마지막 역(하행 종점역)만 제거할 수 있다")
+    @Test
+    void deleteSectionWithInvalidDownStation() {
+        // given
+        Long 강남역 = 상행_지하철역_생성_요청("강남역");
+        Long 양재역 = 하행_지하철역_생성_요청("양재역");
+        Map<String, String> lineParams = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                강남역,
+                양재역,
+                10);
+        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(lineParams);
+        Long lineId = lineResponse.body().jsonPath().getLong("id");
+
+        Long 양재시민의숲역 = 하행_지하철역_생성_요청("양재시민의숲역");
+        Map<String, String> params = 지하철_구간_파라미터_생성(양재역, 양재시민의숲역, 10);
+        ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(lineId, params);
+
+        // when
+        ExtractableResponse<Response> response = SectionStepDefinition.지하철_구간_삭제_요청(lineId, 양재역);
+
+        // then
+        지하철_구간_삭제_실패(response);
+    }
+
+    /**
+     * Given 상행 지하철역 생성하고
+     * Given 하행 지하철역 생성하고
+     * Given 지하철 노선을 생성하고
+     * When 구간 삭제를 요청하면
+     * Then 지하철 구간 삭제가 실패한다.
+     */
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다")
+    @Test
+    void deleteSectionWhenOnlyOne() {
+        // given
+        Long 강남역 = 상행_지하철역_생성_요청("강남역");
+        Long 양재역 = 하행_지하철역_생성_요청("양재역");
+        Map<String, String> lineParams = 지하철_노선_파라미터_생성(
+                "신분당선",
+                "bg-red-600",
+                강남역,
+                양재역,
+                10);
+        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(lineParams);
+        Long lineId = lineResponse.body().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = SectionStepDefinition.지하철_구간_삭제_요청(lineId, 양재역);
+
+        // then
+        지하철_구간_삭제_실패(response);
     }
 }

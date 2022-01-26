@@ -32,6 +32,16 @@ public class SectionStepDefinition {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId", stationId)
+                .when()
+                .delete("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
+
     public static void 지하철_구간_응답_상태_검증(ExtractableResponse<Response> response, HttpStatus status) {
         assertThat(response.statusCode()).isEqualTo(status.value());
     }
@@ -44,4 +54,11 @@ public class SectionStepDefinition {
         지하철_구간_응답_상태_검증(response, HttpStatus.BAD_REQUEST);
     }
 
+    public static void 지하철_구간_삭제_완료(ExtractableResponse<Response> response) {
+        지하철_구간_응답_상태_검증(response, HttpStatus.NO_CONTENT);
+    }
+
+    public static void 지하철_구간_삭제_실패(ExtractableResponse<Response> response) {
+        지하철_구간_응답_상태_검증(response, HttpStatus.BAD_REQUEST);
+    }
 }
