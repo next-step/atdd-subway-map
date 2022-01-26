@@ -309,7 +309,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성 및 노선 구간 생성을 하고,
      * When 생성한 지하철 노선 구간 삭제를 요청 하면
      * Then 생성한 지하철 노선 구간 삭제가 성공한다.
-     * @see nextstep.subway.ui.LineController#deleteSetion
+     * @see nextstep.subway.ui.LineController#deleteSection
      */
     @DisplayName("지하철 노선 구간 삭제 테스트")
     @Test
