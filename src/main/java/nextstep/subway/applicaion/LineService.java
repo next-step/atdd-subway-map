@@ -2,12 +2,13 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.LineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +18,15 @@ public class LineService {
     private static String DUPLICATE_NAME_ERROR_MASSAGE = "사용중인 노선 이름입니다.";
 
     private LineRepository lineRepository;
+    private StationRepository stationRepository;
+    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository,
+                       StationRepository stationRepository,
+                       SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -29,13 +36,7 @@ public class LineService {
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return createLineResponse(line);
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +44,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(this::createLineAndStationResponse)
                 .collect(Collectors.toList());
     }
 
@@ -58,12 +59,55 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+    public void saveSection(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).get();
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
+        Station downStation = stationRepository.findById(lineRequest.getUpStationId()).get();
+
+        Section section = createSection(line, upStation, downStation, lineRequest.getDistance());
+
+        sectionRepository.save(section);
+    }
+
+    private Section createSection(Line line, Station upStation, Station downStation, int distance) {
+        return new Section(
+                line,
+                upStation,
+                downStation,
+                distance
+        );
+    }
+
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(),
+        return new LineResponse(
+                line.getId(),
                 line.getName(),
                 line.getColor(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
+        );
+    }
+
+    private LineResponse createLineAndStationResponse(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getStations()
+                        .stream()
+                        .map(this::createStationResponse)
+                        .collect(Collectors.toList()),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        );
+    }
+
+    private StationResponse createStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName(),
+                station.getCreatedDate(),
+                station.getModifiedDate()
         );
     }
 }

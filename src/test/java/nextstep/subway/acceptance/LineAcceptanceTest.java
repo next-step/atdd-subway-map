@@ -3,6 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.steps.LineSteps;
+import nextstep.subway.acceptance.steps.SectionSteps;
+import nextstep.subway.acceptance.steps.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String FIRST_NAME = "신분당선";
     private static final String FIRST_COLOR = "bg-red-700";
     private static final String RESPONSE_HEADER_LOCATION = "Location";
+    private static final int DEFAULT_DISTANCE = 5;
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -129,5 +132,63 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * When 지하철 노선 구간 생성을 요청 하면
+     * Then 지하철 노선 구간이 생성된다
+     */
+    @DisplayName("지하철 노선 구간 등록")
+    @Test
+    void saveSection() {
+        // given
+        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> station1 = StationSteps.create("강남역");
+        ExtractableResponse<Response> station2 = StationSteps.create("양재역");
+
+        // when
+        ExtractableResponse<Response> response
+                = SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 노선 구간 생성을 요청 하고
+     * When 지하철 노선 조회를 요청 하면
+     * Then 지하철 노선이 구간까지여 조회된다.
+     */
+    @DisplayName("지하철 노선 구간 조회")
+    @Test
+    void getLineAndSection() {
+        // given
+        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> station1 = StationSteps.create("강남역");
+        ExtractableResponse<Response> station2 = StationSteps.create("양재역");
+        ExtractableResponse<Response> station3 = StationSteps.create("양재시민의숲");
+        ExtractableResponse<Response> station4 = StationSteps.create("판교역");
+
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station3), getStationId(station4), DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = LineSteps.get();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> lineNames = response.jsonPath().getList("name");
+    }
+
+    private Long getStationId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }
