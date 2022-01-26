@@ -106,7 +106,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ApiUtil.지하철역_생성_API(서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_거리_정보없음);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_거리_음수);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -239,7 +239,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     static Map<String, String> GTXA노선;
     static Map<String, String> GTXA노선_상행_정보없음;
     static Map<String, String> GTXA노선_하행_정보없음;
-    static Map<String, String> GTXA노선_거리_정보없음;
+    static Map<String, String> GTXA노선_거리_음수;
     static Map<String, String> 신분당선;
     static Map<String, String> 노선색상;
 
@@ -283,11 +283,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         GTXA노선_하행_정보없음.put("upStationId", "1");
         GTXA노선_하행_정보없음.put("distance", "10");
 
-        GTXA노선_거리_정보없음 = new HashMap<>();
-        GTXA노선_거리_정보없음.put("name", "GTX-A");
-        GTXA노선_거리_정보없음.put("color", "bg-red-900");
-        GTXA노선_거리_정보없음.put("upStationId", "1");
-        GTXA노선_거리_정보없음.put("downStationId", "2");
+        GTXA노선_거리_음수 = new HashMap<>();
+        GTXA노선_거리_음수.put("name", "GTX-A");
+        GTXA노선_거리_음수.put("color", "bg-red-900");
+        GTXA노선_거리_음수.put("upStationId", "1");
+        GTXA노선_거리_음수.put("downStationId", "2");
+        GTXA노선_거리_음수.put("distance", "-1");
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
