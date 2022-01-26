@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.error.exception.EntityDuplicateException;
+import nextstep.subway.error.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,4 +47,7 @@ public class StationService {
         });
     }
 
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
 }
