@@ -34,6 +34,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     *  Given 지하철 노선 생성을 요청 하고
+     *  When 같은 이름으로 지하철 노선 생성을 요청 하면
+     *  Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선 이름 중복")
+    @Test
+    void duplicateLineName() {
+        // given
+        LineSteps.지하철_노선_생성_요청(신분당선);
+
+        // when
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(신분당선);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
@@ -52,7 +70,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).containsExactly("신분당선", "2호선");
+        assertThat(lineNames).containsExactly(신분당선, 이호선);
     }
 
     /**
@@ -77,8 +95,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseJson.getString("name")).isEqualTo(createResponseJson.getString("name"));
         assertThat(responseJson.getString("color")).isEqualTo(createResponseJson.getString("color"));
-        assertThat(responseJson.getString("createdDate")).isEqualTo(createResponseJson.getString("createdDate"));
-        assertThat(responseJson.getString("modifiedDate")).isEqualTo(createResponseJson.getString("modifiedDate"));
     }
 
     /**
@@ -105,8 +121,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseJson.getString("name")).isNotEqualTo(createResponseJson.getString("name"));
         assertThat(responseJson.getString("color")).isNotEqualTo(createResponseJson.getString("color"));
-        assertThat(responseJson.getString("createdDate")).isEqualTo(createResponseJson.getString("createdDate"));
-        assertThat(responseJson.getString("modifiedDate")).isEqualTo(createResponseJson.getString("modifiedDate"));
     }
 
     /**
