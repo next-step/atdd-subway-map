@@ -1,10 +1,14 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.SectionRequest;
+
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import static nextstep.subway.domain.utils.LineUtils.*;
+import static nextstep.subway.domain.utils.SectionUtils.*;
+import static nextstep.subway.domain.utils.StationUtils.isSameStation;
 
 @Entity
 public class Line extends BaseEntity {
@@ -51,14 +55,20 @@ public class Line extends BaseEntity {
         section.setLine(this);
     }
 
-    public boolean stationNoneMach(Station downStation) {
-        Set<Station> stations = new HashSet<>();
-        sections.forEach(section -> {
-            stations.add(section.getUpStation());
-            stations.add(section.getDownStation());
-        });
-        return stations
-                .stream()
-                .anyMatch(station -> station.getName().equals(downStation.getName()));
+
+    public Section newSection(Station upStation, Station downStation,SectionRequest request) {
+        getLastSection(sections)
+                .upStationisNot(request.getUpStationId());
+        downStation.notEqualsIn(getIdsIn(sections));
+        return new Section(upStation,downStation,request.getDistance());
+    }
+
+
+    public void removeSection(Long stationId) {
+        validSectionsSize(sections.size());
+        Section lastSection = getLastSection(sections);
+        if(isSameStation(stationId, getDownStationIdIn(lastSection))){
+            sections.remove(lastSection);
+        }
     }
 }

@@ -29,7 +29,7 @@ public class LineResponse {
         this.createdDate = line.getCreatedDate();
         this.modifiedDate = line.getModifiedDate();
         this.stations = StationResponse
-                            .toDtoList(line.getSections());
+                            .toDtos(line.getSections());
     }
 
     public Long getId() {

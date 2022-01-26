@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 public class Section {
@@ -43,12 +45,18 @@ public class Section {
         this.distance = distance;
     }
 
-    public boolean downStationNotSameAs(Station upStation) {
-        return !this.downStation.getName().equals(upStation.getName());
+    public void upStationisNot(Long stationId) {
+        if (upStation.isSameStation(stationId)) {
+            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
+        }
     }
+
 
     public static Section of(Station upStation, Station downStation, int distance){
         return new Section(upStation, downStation, distance);
     }
 
+    public List<Long> getStationIds() {
+        return Arrays.asList(upStation.getId(),downStation.getId());
+    }
 }

@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -39,5 +40,17 @@ public class Station extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getName());
+    }
+
+    public boolean isSameStation(Long stationId) {
+        return Objects.equals(id, stationId);
+    }
+
+    public void notEqualsIn(List<Long> stationIdsInLine) {
+        boolean isEqual = stationIdsInLine.stream()
+                .anyMatch(id -> Objects.equals(id, this.id));
+        if (isEqual){
+            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
+        }
     }
 }

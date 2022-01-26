@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static java.util.stream.Collectors.*;
+import static nextstep.subway.common.consts.LineConsts.*;
 
 @Service
 @Transactional
 public class LineService {
-    public static final int MIN_SECTION_COUNT = 2;
     private LineRepository lineRepository;
     private StationRepository stationRepository;
 
@@ -63,53 +63,23 @@ public class LineService {
 
 
     public void addSection(Long lineId, SectionRequest request) {
-        Line line =
-                lineRepository.findLineWithSectionsById(lineId);
-        List<Section> sections =
-                line.getSections();
-        int sectionLastIndex = sections.size() - 1;
+        Line line = lineRepository.findLineWithSectionsById(lineId);
+        Station upStation = getStationById(request.getUpStationId());
+        Station downStation = getStationById(request.getDownStationId());
 
-        Section section =
-                sections.get(sectionLastIndex);
-        Station upStation =
-                getStationById(request.getUpStationId());
-        Station downStation =
-                getStationById(request.getDownStationId());
-
-        if (section.downStationNotSameAs(upStation)) {
-            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
-        }
-
-        if (line.stationNoneMach(downStation)){
-            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
-        }
-
-        Section newSection =
-                Section.of(upStation, downStation, request.getDistance());
-
+        Section newSection = line.newSection(upStation,downStation,request);
         line.addSection(newSection);
     }
 
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findLineWithSectionsById(lineId);
-        List<Section> sections = line.getSections();
-        int size = sections.size();
-        Section lastSection = sections.get(size - 1);
-
-        if(size < MIN_SECTION_COUNT){
-            throw new IllegalArgumentException("삭제할 수 있는 구간이 존재하지 않습니다");
-        }
-
-        if(isDownStationId(stationId, lastSection)){
-            sections.remove(lastSection);
-        }
+        line.removeSection(stationId);
     }
-
 
 
     private void validateDuplicatedLine(LineRequest request) {
         boolean existsLine = lineRepository.existsLineByName(request.getName());
-        if(existsLine) {
+        if (existsLine) {
             throw new DuplicatedException("중복된 라인을 생성할 수 없습니다.");
         }
     }
@@ -117,10 +87,6 @@ public class LineService {
     private Station getStationById(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역 역니다."));
-    }
-
-    private boolean isDownStationId(Long stationId, Section lastSection) {
-        return lastSection.getDownStation().getId() == stationId;
     }
 
 }

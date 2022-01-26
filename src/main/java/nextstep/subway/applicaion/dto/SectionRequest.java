@@ -10,24 +10,11 @@ public class SectionRequest {
         return downStationId;
     }
 
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
     public Long getUpStationId() {
         return upStationId;
-    }
-
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
     }
 
     public int getDistance() {
         return distance;
     }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
 }

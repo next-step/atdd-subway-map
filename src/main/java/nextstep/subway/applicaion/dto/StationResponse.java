@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -33,7 +32,7 @@ public class StationResponse {
     }
 
 
-    public static List<StationResponse> toDtoList(List<Section> sections) {
+    public static List<StationResponse> toDtos(List<Section> sections) {
         Set<Station> stations = new HashSet<>();
         sections.
             forEach(section -> {
