@@ -16,18 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract();
-    }
-
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -38,7 +26,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
-
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -165,6 +152,18 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
     }
 }
 
