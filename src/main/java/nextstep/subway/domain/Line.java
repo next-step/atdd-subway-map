@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.exception.NotLastSectionException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,5 +54,28 @@ public class Line extends BaseEntity {
             }
         }
         return true;
+    }
+
+    public void deleteSection(Long stationId) {
+        int isLastDownStation = 1;
+        int count = validSections(stationId);
+        if (count == isLastDownStation) {
+            Section findSection = sections.stream().filter(section ->
+                    section.isSameDownStation(stationId))
+                    .findFirst().orElse(null);
+            sections.remove(findSection);
+            return;
+        }
+        throw new NotLastSectionException();
+    }
+
+    private int validSections(Long stationId) {
+        int count = 0;
+        for (Section section : sections) {
+            if (section.isSameUpStation(stationId) || section.isSameDownStation(stationId)) {
+                count++;
+            }
+        }
+        return count;
     }
 }

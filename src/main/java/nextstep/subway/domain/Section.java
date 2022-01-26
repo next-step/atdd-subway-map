@@ -60,7 +60,11 @@ public class Section {
         return distance;
     }
 
-    public boolean isSameDownStation(Long upStationId) {
-        return downStation.isSmaeStation(upStationId);
+    public boolean isSameDownStation(Long stationId) {
+        return downStation.isSmaeStation(stationId);
+    }
+
+    public boolean isSameUpStation(Long stationId) {
+        return upStation.isSmaeStation(stationId);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/lines/{lineId}")
+@RequestMapping("/lines/{lineId}/sections")
 public class SectionController {
 
     private final SectionService sectionService;
@@ -18,10 +18,18 @@ public class SectionController {
         this.sectionService = sectionService;
     }
 
-    @PostMapping("/sections")
+    @PostMapping
     public ResponseEntity<Section> createSection(@PathVariable Long lineId,
-                                                 @RequestBody SectionRequest request){
+                                                 @RequestBody SectionRequest request) {
         Section section = sectionService.createSection(lineId, request);
-        return ResponseEntity.created(URI.create("/lines/"+lineId+"/sections"+"?stationId="+section.getId())).body(section);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections" + "?stationId=" + section.getId())).body(section);
     }
+
+    @DeleteMapping
+    public ResponseEntity<Section> deleteSection(@PathVariable Long lineId,
+                                                 @RequestParam("stationId") Long stationId) {
+        sectionService.deleteSection(lineId, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

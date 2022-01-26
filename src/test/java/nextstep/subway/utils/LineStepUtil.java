@@ -26,9 +26,9 @@ public class LineStepUtil {
     private LineStepUtil() {
     }
 
-    public static void 테스트준비_노선등록(){
+    public static ExtractableResponse<Response> 테스트준비_노선등록() {
         지하철역들생성();
-        기존노선생성();
+        return 기존노선생성();
     }
 
     public static ExtractableResponse<Response> 노선조회(String url) {
