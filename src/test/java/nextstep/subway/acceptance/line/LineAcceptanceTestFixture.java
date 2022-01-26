@@ -10,5 +10,6 @@ public class LineAcceptanceTestFixture {
 	public static final String 하행역_종점_아이디_필드 = "downStationId";
 	public static final String 종점역_간_거리_필드 = "distance";
 	public static final String 노선_아이디_필드 = "id";
-
+	public static final String 역_목록_필드 = "stations";
+	public static final String 역_이름_필드 = "name";
 }

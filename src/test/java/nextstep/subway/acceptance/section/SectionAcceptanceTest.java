@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.line.LineAcceptanceTestParameter;
 import nextstep.subway.acceptance.line.LineAcceptanceTestRequest;
+import nextstep.subway.acceptance.line.LineAcceptanceTestValidation;
 import nextstep.subway.acceptance.station.StationAcceptanceTestRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,14 +18,16 @@ import java.util.stream.Stream;
 class SectionAcceptanceTest extends AcceptanceTest {
 
 	final SectionAcceptanceTestRequest sectionAcceptanceTestRequest;
-	final SectionAcceptanceTestValidation sectionAcceptanceTestValidation;
-
 	final LineAcceptanceTestRequest lineAcceptanceTestRequest;
 	final StationAcceptanceTestRequest stationAcceptanceTestRequest;
+
+	final SectionAcceptanceTestValidation sectionAcceptanceTestValidation;
+	final LineAcceptanceTestValidation lineAcceptanceTestValidation;
 
 	SectionAcceptanceTest() {
 		this.sectionAcceptanceTestRequest = new SectionAcceptanceTestRequest();
 		this.sectionAcceptanceTestValidation = new SectionAcceptanceTestValidation();
+		this.lineAcceptanceTestValidation = new LineAcceptanceTestValidation();
 		this.lineAcceptanceTestRequest = new LineAcceptanceTestRequest();
 		this.stationAcceptanceTestRequest = new StationAcceptanceTestRequest();
 	}
@@ -84,6 +87,39 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
 		// then
 		sectionAcceptanceTestValidation.삭제_요청_검증(삭제_응답);
+	}
+
+	static Stream<Arguments> provideLineWithStations() {
+		return Stream.of(
+				Arguments.of(
+						new LineAcceptanceTestParameter("신분당선", "bg-red-600", "강남역", "양재역", 11),
+						new SectionAcceptanceTestParameter("양재역", "판교역", 100)
+				)
+		);
+	}
+
+	/**
+	 * When 지하철 노선을 조회하면
+	 * Then 노선에 등록된 구간 순서대로 정렬된 상행 종점부터 하행 종점까지 목록을 받는다.
+	 */
+	@DisplayName("지하철 노선과 순서대로 정렬된 구간 조회")
+	@MethodSource("provideLineWithStations")
+	@ParameterizedTest
+	void getLineWithAllStations(LineAcceptanceTestParameter 신분당선, SectionAcceptanceTestParameter 양재_판교_구간) {
+		// given
+		final long 상행역_종점_아이디 = stationAcceptanceTestRequest.역_생성요청_아이디_반환(신분당선.상행_종점역);
+		final long 하행역_종점_아이디 = stationAcceptanceTestRequest.역_생성요청_아이디_반환(신분당선.하행_종점역);
+		final long 노선_아이디 = lineAcceptanceTestRequest.노선_생성_요청_아이디_반환(신분당선, 상행역_종점_아이디, 하행역_종점_아이디);
+
+		final long 구간_하행역_아이디 = stationAcceptanceTestRequest.역_생성요청_아이디_반환(양재_판교_구간.하행역);
+
+		sectionAcceptanceTestRequest.구간_생성_요청(노선_아이디, 양재_판교_구간, 하행역_종점_아이디, 구간_하행역_아이디);
+
+		// when
+		final ExtractableResponse<Response> 요청_응답 = lineAcceptanceTestRequest.목록_조회_요청();
+
+		// then
+		lineAcceptanceTestValidation.역_순서_검증(요청_응답, 신분당선.상행_종점역, 신분당선.하행_종점역, 양재_판교_구간.하행역);
 	}
 
 }

@@ -1,10 +1,14 @@
 package nextstep.subway.applicaion.station.response;
 
+import nextstep.subway.applicaion.line.domain.Line;
 import nextstep.subway.applicaion.station.domain.Station;
+import nextstep.subway.applicaion.station.domain.Stations;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 public class StationResponse {
 	private Long id;
@@ -28,7 +32,14 @@ public class StationResponse {
 	}
 
 	public static List<StationResponse> fromList(List<Station> stations) {
-		return stations.stream().map(StationResponse::from).collect(Collectors.toList());
+		return stations.stream().map(StationResponse::from).collect(toList());
+	}
+
+	public static List<StationResponse> ofSections(Line line) {
+		if (line.hasNoSections()) {
+			return emptyList();
+		}
+		return StationResponse.fromList(Stations.ofLine(line));
 	}
 
 	public Long getId() {

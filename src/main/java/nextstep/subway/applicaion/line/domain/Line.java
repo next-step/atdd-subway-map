@@ -74,4 +74,8 @@ public class Line extends BaseEntity {
 	public boolean hasOnlyOneSection() {
 		return sections.size() == 1;
 	}
+
+	public boolean hasNoSections() {
+		return sections.isEmpty();
+	}
 }

@@ -185,4 +185,5 @@ class LineAcceptanceTest extends AcceptanceTest {
 		lineAcceptanceTestValidation.중복_생성_요청_실패_검증(요청_응답);
 	}
 
+
 }

@@ -14,4 +14,5 @@ public class SectionAcceptanceTestValidation extends AcceptanceTestValidation {
 		assertThat(구간_생성_응답.jsonPath().getLong(SectionAcceptanceTestFixture.하행역_아이디_필드)).isEqualTo(구간_하행역_아이디);
 		assertThat(구간_생성_응답.jsonPath().getInt(SectionAcceptanceTestFixture.구간_거리_필드)).isEqualTo(구간.구간_거리);
 	}
+
 }
