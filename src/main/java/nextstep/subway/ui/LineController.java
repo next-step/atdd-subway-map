@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.exception.NotExistedStationException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -61,5 +62,11 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/section")
+    public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.saveSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/section")).build();
     }
 }
