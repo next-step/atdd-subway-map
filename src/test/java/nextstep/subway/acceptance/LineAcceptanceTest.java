@@ -254,7 +254,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_연신내역_삼성역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     static Map<String, String> GTXA노선_연신내_서울역;
