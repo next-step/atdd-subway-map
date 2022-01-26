@@ -87,8 +87,8 @@ npm run dev
 - [X] HTTP PUT METHOD 사용시 없는 경우 에러를 반환
 - [X] CONVERTER 대신 DTO가 변환 책임을 갖도록 변경
 - [X] /lines 공통 @RequestMapping 사용
-- [ ] 테스트코드 검증부 모듈화
-- [ ] 테스트에서 메소드 직접 사용 대신 @MehtodSource, @ArgumentSource 사용
+- 테스트코드 검증부 모듈화
+- 테스트에서 메소드 직접 사용 대신 @MehtodSource, @ArgumentSource 사용 -> 테스트 스텝 안으로 이동
 
 ### Step2 요구사항
 
@@ -105,4 +105,4 @@ npm run dev
     - When 같은 이름으로 지하철 노선 생성을 요청 하면
     - Then 지하철 노선 생성이 실패한다.
     - [X] 기능 구현
-- [ ] 새로운 기능 추가하면서 인수 테스트 리팩터링
+- [X] 새로운 기능 추가하면서 인수 테스트 리팩터링

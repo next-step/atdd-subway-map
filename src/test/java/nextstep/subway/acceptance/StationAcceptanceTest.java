@@ -14,6 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
+    private static final String 군자역 = "군자역";
+
+    private static final String 역_이름 = "name";
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -22,11 +29,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        ExtractableResponse<Response> response = 지하철_역_생성_요청("강남역");
+        ExtractableResponse<Response> response = 지하철_역_생성_요청(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
     }
 
     /**
@@ -39,17 +46,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
         지하철_역_생성_요청(강남역);
-
-        String 역삼역 = "역삼역";
         지하철_역_생성_요청(역삼역);
 
         // when
         ExtractableResponse<Response> response = 지하철_역_목록_조회_요청();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
+        List<String> stationNames = response.jsonPath().getList(역_이름);
         assertThat(stationNames).contains(강남역, 역삼역);
     }
 
@@ -62,7 +66,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_역_생성_요청("강남역");
+        ExtractableResponse<Response> createResponse = 지하철_역_생성_요청(강남역);
 
         // when
         String uri = createResponse.header(HttpHeaders.LOCATION);
@@ -81,7 +85,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicatedStationName() {
         // given
-        String 군자역 = "군자역";
         지하철_역_생성_요청(군자역);
 
         // when

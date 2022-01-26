@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    private static final String 이름 = "name";
-    private static final String 색 = "color";
+    private static final String 노선_이름 = "name";
+    private static final String 노선_색 = "color";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -54,9 +54,9 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> lineNames = response.jsonPath().getList(이름);
+        List<String> lineNames = response.jsonPath().getList(노선_이름);
         assertThat(lineNames).containsExactly(신분당선.이름, _2호선.이름);
-        List<String> lineColors = response.jsonPath().getList(색);
+        List<String> lineColors = response.jsonPath().getList(노선_색);
         assertThat(lineColors).containsExactly(신분당선.색, _2호선.색);
     }
 
@@ -76,9 +76,9 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String name = response.jsonPath().get(이름);
+        String name = response.jsonPath().get(노선_이름);
         assertThat(name).isEqualTo(신분당선.이름);
-        String color = response.jsonPath().get(색);
+        String color = response.jsonPath().get(노선_색);
         assertThat(color).isEqualTo(신분당선.색);
     }
 
