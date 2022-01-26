@@ -84,7 +84,8 @@ public class LineService {
                 line.getName(),
                 line.getColor(),
                 line.getCreatedDate(),
-                line.getModifiedDate()
+                line.getModifiedDate(),
+                line.getStations()
         );
     }
 

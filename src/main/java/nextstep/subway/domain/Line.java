@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -75,14 +76,23 @@ public class Line extends BaseEntity {
     }
 
     public boolean checkDuplicatedDownStation(Station downStation) {
-        boolean duplidatedDownStation = sections.stream()
+        boolean duplicatedDownStationYn = sections.stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toSet())
                 .contains(downStation);
-        boolean duplidatedUpStation = sections.stream()
+        boolean duplicatedUpStationYn = sections.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toSet())
                 .contains(downStation);
-        return duplidatedDownStation || duplidatedUpStation;
+        return duplicatedDownStationYn || duplicatedUpStationYn;
+    }
+
+    public List<Station> getStations() {
+        List<Station> stations = sections.stream()
+                .sorted(Comparator.comparing(Section::getId))
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        stations.add(getLastSection().getDownStation());
+        return stations;
     }
 }
