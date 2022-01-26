@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Optional;
-
 @Service
 @Transactional
 public class SectionService {
@@ -43,7 +41,9 @@ public class SectionService {
 	}
 
 	public void deleteSection(final Long lineId, final Long stationId) {
-		Section section = sectionRepository.findById(lineId).orElseThrow(RuntimeException::new);
+		Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+		Station downStation = stationRepository.findById(stationId).orElseThrow(RuntimeException::new);
+		Section section = sectionRepository.findByLineAndDownStation(line, downStation).orElseThrow(RuntimeException::new);
 		sectionRepository.delete(section);
 	}
 
@@ -61,5 +61,9 @@ public class SectionService {
 				throw new RuntimeException("새로운 상행역은 무조건 하행역으로 등록되어있어야합니다.");
 			}
 		}
+	}
+
+	private void deleteSectionMustBeDownStation(final Long stationId) {
+
 	}
 }
