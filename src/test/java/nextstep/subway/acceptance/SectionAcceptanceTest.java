@@ -136,5 +136,34 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
+
+    /**
+     * Given 하행 종점역이 아닌 역에 대해
+     * When 구간 삭제 요청을 하면
+     * Then 구간 삭제가 실패한다.
+     */
+    @DisplayName("하행 종점역이 아닌 역에 대한 구간 삭제 요청")
+    @Test
+    void deleteNotDownStationSection() {
+    }
+
+    /**
+     * Given 구간이 하나인 노선이 있을 때
+     * When 해당 구간 삭제 요청을 하면
+     * Then 구간 삭제가 실패한다.
+     */
+    @DisplayName("구간이 하나인 노선이 있을 때 구간 삭제 요청")
+    @Test
+    void deleteOnlyOneSection() {
+    }
+
+    /**
+     * When 구간 삭제 요청을 하면
+     * Then 구간 삭제가 성공한다.
+     */
+    @DisplayName("구간 삭제")
+    @Test
+    void deleteSection() {
+    }
 }
 
