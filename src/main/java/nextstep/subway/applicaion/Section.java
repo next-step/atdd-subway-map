@@ -58,7 +58,8 @@ public class Section {
 
         this.line = line;
 
-        line.getSections().add(this);
+        if (!line.getSections().contains(this)) {
+            line.getSections().add(this);
+        }
     }
-
 }
