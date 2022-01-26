@@ -234,6 +234,27 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * When 지하철 노선 구간 생성을 요청 하면,
+     * Then 지하철 노선 구간 생성이 성공한다.
+     * @see nextstep.subway.ui.LineController#createSection
+     */
+    @DisplayName("지하철 노선 구간 등록 테스트")
+    @Test
+    void 지하철_노선_구간_등록_테스트() {
+        //given
+        ApiUtil.지하철역_생성_API(연신내역);
+        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(삼성역);
+        ApiUtil.지하철_노선_생성_API(GTXA노선);
+
+        // when
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
     static Map<String, String> GTXA노선;
     static Map<String, String> GTXA노선_상행_정보없음;
     static Map<String, String> GTXA노선_하행_정보없음;
@@ -244,8 +265,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     static Map<String, String> 연신내역;
     static Map<String, String> 서울역;
+    static Map<String, String> 삼성역;
     static Map<String, String> 강남역;
     static Map<String, String> 양재역;
+
+    static Map<String, String> GTXA노선_구간;
 
     @BeforeAll
     public static void 초기화() {
@@ -253,6 +277,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         연신내역.put("name", "연신내");
         서울역 = new HashMap<>();
         서울역.put("name", "서울역");
+        삼성역 = new HashMap<>();
+        삼성역.put("name", "삼성역");
         강남역 = new HashMap<>();
         강남역.put("name", "강남역");
         양재역 = new HashMap<>();
@@ -299,5 +325,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         노선색상 = new HashMap<>();
         노선색상.put("color", "bg-red-800");
+
+        GTXA노선_구간 = new HashMap<>();
+        GTXA노선_구간.put("upStationId", "2");
+        GTXA노선_구간.put("downStationId", "3");
+        GTXA노선_구간.put("distance", "10");
     }
 }
