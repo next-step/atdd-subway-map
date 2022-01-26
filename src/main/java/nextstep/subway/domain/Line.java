@@ -50,6 +50,29 @@ public class Line extends BaseEntity {
         return upStationId.equals(getLastDownStation().getId());
     }
 
+    public void addSection(Section section) {
+        if (!sections.contains(section)) {
+            sections.add(section);
+        }
+        section.applyToLine(this);
+    }
+
+    public Section findSection(Long stationId) {
+        return sections.stream()
+                .filter(s -> s.getDownStation().getId().equals(stationId))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public void removeSection(Section section) {
+        sections.remove(section);
+    }
+
+    public boolean isPossibleToRemove(Section section) {
+        return sections.size() > 1 &&
+                sections.equals(getLastDownStation());
+    }
+
     public Long getId() {
         return id;
     }
@@ -69,12 +92,5 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() {
         return sections;
-    }
-
-    public void addSection(Section section) {
-        if (!sections.contains(section)) {
-            sections.add(section);
-        }
-        section.applyToLine(this);
     }
 }

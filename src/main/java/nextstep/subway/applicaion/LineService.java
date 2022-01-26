@@ -7,6 +7,7 @@ import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
+import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.error.exception.EntityDuplicateException;
 import nextstep.subway.error.exception.InvalidValueException;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,21 @@ public class LineService {
     private final LineRepository lineRepository;
     private final SectionService sectionService;
 
-    public LineService(LineRepository lineRepository, SectionService sectionService) {
+    public LineService(LineRepository lineRepository,
+                       SectionService sectionService) {
         this.lineRepository = lineRepository;
         this.sectionService = sectionService;
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    private void checkDuplicated(String name) {
+        lineRepository.findByName(name).ifPresent(l -> {
+            throw new EntityDuplicateException();
+        });
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -76,15 +89,13 @@ public class LineService {
         return SectionResponse.of(section);
     }
 
-    private Line findById(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
-    }
-
-    private void checkDuplicated(String name) {
-        lineRepository.findByName(name).ifPresent(l -> {
-            throw new EntityDuplicateException();
-        });
+    public void removeSection(Long lineId, Long stationId) {
+        Line line = findById(lineId);
+        Section section = line.findSection(stationId);
+        if (!line.isPossibleToRemove(section)) {
+            throw new InvalidValueException();
+        }
+        line.removeSection(section);
     }
 
 }

@@ -14,9 +14,4 @@ public class GlobalExceptionHandler {
         final ErrorCode errorCode = e.getErrorCode();
         return new ResponseEntity<>(HttpStatus.valueOf(errorCode.getStatus()));
     }
-
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Void> handleException(Exception e) {
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

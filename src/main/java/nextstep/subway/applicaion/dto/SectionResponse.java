@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public class SectionResponse {
     private Long id;
+    private Long lineId;
     private Long upStationId;
     private Long downStationId;
     private int distance;
@@ -13,12 +14,14 @@ public class SectionResponse {
     private LocalDateTime modifiedDate;
 
     public SectionResponse(Long id,
+                           Long lineId,
                            Long upStationId,
                            Long downStationId,
                            int distance,
                            LocalDateTime createdDate,
                            LocalDateTime modifiedDate) {
         this.id = id;
+        this.lineId = lineId;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -29,6 +32,7 @@ public class SectionResponse {
     public static SectionResponse of(Section section) {
         return new SectionResponse(
                 section.getId(),
+                section.getLine().getId(),
                 section.getUpStation().getId(),
                 section.getDownStation().getId(),
                 section.getDistance(),
@@ -38,6 +42,10 @@ public class SectionResponse {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getLineId() {
+        return lineId;
     }
 
     public Long getUpStationId() {
