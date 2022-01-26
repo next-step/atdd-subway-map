@@ -31,6 +31,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     private Map<String, String> 구분당선;
 
     private Map<String, String> 양재_판교_구간;
+    private Map<String, String> 역삼_판교_구간;
 
     @BeforeEach
     void initParam() {
@@ -61,6 +62,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         양재_판교_구간.put("upStationId", String.valueOf(양재역id));
         양재_판교_구간.put("downStationId", String.valueOf(판교역id));
         양재_판교_구간.put("distance", String.valueOf(12700));
+
+        역삼_판교_구간 = new HashMap<>();
+        역삼_판교_구간.put("upStationId", String.valueOf(역삼역id));
+        역삼_판교_구간.put("downStationId", String.valueOf(판교역id));
+        역삼_판교_구간.put("distance", String.valueOf(999));
     }
 
     /**
@@ -190,16 +196,28 @@ class LineAcceptanceTest extends AcceptanceTest {
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = 구간_등록_요청(uri, 양재_판교_구간);
 
+        // then
         구간_등록됨(response, 양재_판교_구간);
     }
 
-    private ExtractableResponse<Response> 구간_등록_요청(String uri, Map<String, String> params) {
-        return post(params, uri + "/sections");
-    }
+    /**
+     * Scenario: 구간 등록(비정상적인 시나리오)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * When 잘못된 구간 등록(상행:역삼역, 하행:판교역) 요청하면
+     * Then 구간 등록이 성공한다.
+     */
+    @DisplayName("구간 등록 실패 - 새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 함.")
+    @Test
+    void addSectionFail() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
 
-    private void 구간_등록됨(ExtractableResponse<Response> response, Map<String, String> params) {
-        응답_요청_확인(response, HttpStatus.CREATED);
-        assertThat(response.header("Location")).isNotBlank();
+        // when
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = 구간_등록_요청(uri, 역삼_판교_구간);
+
+        // then
+        구간_등록_실패됨(response);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
@@ -220,6 +238,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 지하철_노선_삭제_요청(String uri) {
         return delete(uri);
+    }
+
+    private ExtractableResponse<Response> 구간_등록_요청(String uri, Map<String, String> params) {
+        return post(params, uri + "/sections");
     }
 
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(Map<String, String> params) {
@@ -266,6 +288,15 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private void 지하철_노선_이름_중복됨(ExtractableResponse<Response> response) {
         응답_요청_확인(response, HttpStatus.CONFLICT);
+    }
+
+    private void 구간_등록됨(ExtractableResponse<Response> response, Map<String, String> params) {
+        응답_요청_확인(response, HttpStatus.CREATED);
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void 구간_등록_실패됨(ExtractableResponse<Response> response) {
+        응답_요청_확인(response, HttpStatus.BAD_REQUEST);
     }
 
     private void 응답_요청_확인(ExtractableResponse<Response> response, HttpStatus httpStatus) {
