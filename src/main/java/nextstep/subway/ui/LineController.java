@@ -1,8 +1,12 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.SectionService;
-import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.applicaion.dto.request.LineRequest;
+import nextstep.subway.applicaion.dto.request.SectionRequest;
+import nextstep.subway.applicaion.dto.response.LineCreationResponse;
+import nextstep.subway.applicaion.dto.response.LineResponse;
+import nextstep.subway.applicaion.dto.response.SectionResponse;
+import nextstep.subway.applicaion.service.LineService;
+import nextstep.subway.applicaion.service.SectionService;
 import nextstep.subway.ui.path.SubwayPath;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

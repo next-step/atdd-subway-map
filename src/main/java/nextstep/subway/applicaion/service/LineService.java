@@ -1,10 +1,10 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.service;
 
-import nextstep.subway.applicaion.dto.LineCreationResponse;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.applicaion.dto.response.LineCreationResponse;
+import nextstep.subway.applicaion.dto.request.LineRequest;
+import nextstep.subway.applicaion.dto.response.LineResponse;
+import nextstep.subway.domain.Entity.Line;
+import nextstep.subway.domain.Repository.LineRepository;
 import nextstep.subway.exception.DuplicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +12,6 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

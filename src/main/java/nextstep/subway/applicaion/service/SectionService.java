@@ -1,8 +1,13 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.service;
 
-import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.applicaion.dto.SectionResponse;
-import nextstep.subway.domain.*;
+import nextstep.subway.applicaion.dto.request.SectionRequest;
+import nextstep.subway.applicaion.dto.response.SectionResponse;
+import nextstep.subway.domain.Entity.Line;
+import nextstep.subway.domain.Entity.Section;
+import nextstep.subway.domain.Entity.Station;
+import nextstep.subway.domain.Repository.LineRepository;
+import nextstep.subway.domain.Repository.SectionRepository;
+import nextstep.subway.domain.Repository.StationRepository;
 import nextstep.subway.exception.DuplicationException;
 import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
