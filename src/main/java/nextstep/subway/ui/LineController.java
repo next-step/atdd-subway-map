@@ -63,7 +63,7 @@ public class LineController {
 
     @PostMapping("/{id}/sections")
     public ResponseEntity<SectionResponse> createSection(
-            @PathVariable Long id,
+            @PathVariable final Long id,
             @Valid @RequestBody final SectionRequest sectionRequest,
             BindingResult bindingResult
     ) {
@@ -71,7 +71,13 @@ public class LineController {
             throw new ValidationException(bindingResult);
         }
         final SectionResponse section = sectionService.saveSection(sectionRequest, id);
-        final URI uri = URI.create("/lines/" + id + "/sections" + section.getId());
+        final URI uri = URI.create("/lines/" + id + "/sections/" + section.getId());
         return ResponseEntity.created(uri).body(section);
+    }
+
+    @DeleteMapping("/{id}/sections/{sectionId}")
+    public ResponseEntity<Void> deleteSection(@PathVariable final Long id, @PathVariable final Long sectionId) {
+        sectionService.deleteSectionById(id, sectionId);
+        return ResponseEntity.noContent().build();
     }
 }

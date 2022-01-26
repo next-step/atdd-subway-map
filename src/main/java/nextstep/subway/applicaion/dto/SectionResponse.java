@@ -13,7 +13,7 @@ public class SectionResponse {
         return new SectionResponse(section.getId(), section.getDownStation().getId(), section.getUpStation().getId(), section.getDistance());
     }
 
-    private SectionResponse(Long id, Long downStationId, Long upStationId, int distance) {
+    private SectionResponse(final Long id, final Long downStationId, final Long upStationId, final int distance) {
         this.id = id;
         this.downStationId = downStationId;
         this.upStationId = upStationId;

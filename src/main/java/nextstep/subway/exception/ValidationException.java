@@ -12,6 +12,11 @@ public class ValidationException extends NextStepException {
         this.errors = errors;
     }
 
+    public ValidationException(final String message) {
+        super(ErrorCode.VALIDATION_ERROR, message);
+        this.errors = null;
+    }
+
     public Errors getErrors() {
         return errors;
     }

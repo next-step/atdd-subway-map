@@ -10,13 +10,11 @@ import java.util.Map;
 
 import static nextstep.subway.model.LineEntitiesHelper.노선_생성_요청;
 import static nextstep.subway.model.LineEntitiesHelper.이호선;
-import static nextstep.subway.model.SectionEntitiesHelper.newSection;
-import static nextstep.subway.model.SectionEntitiesHelper.구간_생성_요청;
+import static nextstep.subway.model.SectionEntitiesHelper.*;
 import static nextstep.subway.model.StationEntitiesHelper.*;
 import static org.apache.http.HttpHeaders.LOCATION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 
 class SectionAcceptanceTest extends AcceptanceTest {
 
@@ -86,5 +84,56 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse1.header(LOCATION)).isNotNull();
         assertThat(createResponse2.header(LOCATION)).isNotNull();
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 구간 생성을 요청하고
+     * When 생성된 구간 삭제를 요청하면
+     * Then 삭제에 실패한다
+     */
+    @DisplayName("구간이 1개인 경우 역을 삭제할 수 없다")
+    @Test
+    void deleteSection() {
+        ExtractableResponse<Response> createResponse = 구간_생성_요청(params, requestUri);
+        ExtractableResponse<Response> failResponse = 구간_삭제_요청(createResponse.header(LOCATION));
+        assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 구간 생성을 요청하고
+     * Given 구간 생성을 요청하고
+     * When 첫 번째에 생성된 구간 삭제를 요청하면
+     * Then 삭제에 실패한다
+     */
+    @DisplayName("하행 종점역이 아닌 구간에 대한 삭제는 실패한다")
+    @Test
+    void deleteOfNonUnderTerminateSectionFails() {
+        ExtractableResponse<Response> createResponse1 = 구간_생성_요청(params, requestUri);
+
+        Long 선릉역_ID = 지하철역_생성_요청(선릉역).jsonPath().getLong("id");
+        Map<String, Object> params1 = newSection(선릉역_ID, 역삼역_ID, 5);
+        ExtractableResponse<Response> createResponse2 = 구간_생성_요청(params1, requestUri);
+
+        ExtractableResponse<Response> failResponse = 구간_삭제_요청(createResponse1.header(LOCATION));
+        assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 구간 생성을 요청하고
+     * Given 구간 생성을 요청하고
+     * When 마지막에 생성된 구간 삭제를 요청하면
+     * Then 삭제에 성공한다
+     */
+    @DisplayName("하행 종점역만 제거할 수 있다.")
+    @Test
+    void onlyTheUnderTerminateStationCanBeRemoved() {
+        ExtractableResponse<Response> createResponse1 = 구간_생성_요청(params, requestUri);
+
+        Long 선릉역_ID = 지하철역_생성_요청(선릉역).jsonPath().getLong("id");
+        Map<String, Object> params1 = newSection(선릉역_ID, 역삼역_ID, 5);
+        ExtractableResponse<Response> createResponse2 = 구간_생성_요청(params1, requestUri);
+
+        ExtractableResponse<Response> failResponse = 구간_삭제_요청(createResponse2.header(LOCATION));
+        assertThat(failResponse.statusCode()).isEqualTo(NO_CONTENT.value());
     }
 }

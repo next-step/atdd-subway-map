@@ -20,6 +20,14 @@ public final class SectionEntitiesHelper {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 구간_삭제_요청(String uri) {
+        return RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
     public static Map<String, Object> newSection(Long downStationId, Long upStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("downStationId", downStationId);

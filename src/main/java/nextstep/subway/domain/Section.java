@@ -1,7 +1,7 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.exception.SectionSaveException;
+import nextstep.subway.exception.ValidationException;
 
 import javax.persistence.*;
 import java.util.List;
@@ -40,11 +40,23 @@ public class Section {
 
         final Station lastRegisteredDownStation = registeredDownStations.get(registeredDownStations.size() - 1);
         if(!lastRegisteredDownStation.getId().equals(upStationId)) {
-            throw new SectionSaveException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
+            throw new ValidationException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
         }
 
         if(getIds(registeredDownStations).contains(downStationId) || getIds(registeredUpStations).contains(downStationId)) {
-            throw new SectionSaveException("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없습니다.");
+            throw new ValidationException("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없습니다.");
+        }
+    }
+
+    public static void validateForDelete(final List<Section> sections, final Long downStationId) {
+        if(sections.isEmpty() || sections.size() == 1) {
+            throw new ValidationException("구간을 삭제할 수 없습니다.");
+        }
+
+        final List<Station> registeredDownStations = getRegisteredDownStation(sections);
+        final Station lastRegisteredDownStation = registeredDownStations.get(registeredDownStations.size() - 1);
+        if(!lastRegisteredDownStation.getId().equals(downStationId)) {
+            throw new ValidationException("마지막 구간만 삭제할 수 있습니다.");
         }
     }
 
