@@ -26,7 +26,6 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-
     public LineCreateResponse saveLine(LineCreateRequest request) {
         validateDuplicate(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
