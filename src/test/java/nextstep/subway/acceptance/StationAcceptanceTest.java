@@ -8,34 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static nextstep.subway.utils.HttpRequestTestUtil.*;
+import static nextstep.subway.utils.HttpRequestTestUtil.딜리트_요청;
+import static nextstep.subway.utils.StationStepUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-
-    private static final String 기본주소 = "/stations";
-    private static final String 기존지하철 = "기존지하철";
-    private static final String 새로운지하철 = "새로운지하철";
-
-    public static ExtractableResponse<Response> 기존지하철역생성() {
-        Map<String, Object> params = 지하철역파라미터생성(기존지하철);
-        return 포스트_요청(기본주소, params);
-    }
-
-    public static ExtractableResponse<Response> 새로운지하철역생성() {
-        Map<String, Object> params = 지하철역파라미터생성(새로운지하철);
-        return 포스트_요청(기본주소, params);
-    }
-
-    private static Map<String, Object> 지하철역파라미터생성(String 지하철역) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", 지하철역);
-        return params;
-    }
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -64,10 +42,10 @@ class StationAcceptanceTest extends AcceptanceTest {
         /// given
         기존지하철역생성();
 
-        새로운지하철역생성();
+        새로운지하철역생성(새로운지하철);
 
         // when
-        ExtractableResponse<Response> response = 겟_요청(기본주소);
+        ExtractableResponse<Response> response = 지하철역조회();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).contains(기존지하철, 새로운지하철);

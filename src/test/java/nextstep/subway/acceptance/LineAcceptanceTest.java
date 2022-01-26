@@ -9,27 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static nextstep.subway.acceptance.StationAcceptanceTest.기존지하철역생성;
-import static nextstep.subway.acceptance.StationAcceptanceTest.새로운지하철역생성;
-import static nextstep.subway.utils.HttpRequestTestUtil.*;
+import static nextstep.subway.utils.HttpRequestTestUtil.딜리트_요청;
+import static nextstep.subway.utils.LineStepUtil.*;
+import static nextstep.subway.utils.StationStepUtil.지하철역들생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-
-    private static final String 기본주소 = "/lines";
-    private static final String 기존노선 = "기존노선";
-    private static final String 기존색상 = "기존색상";
-    private static final String 새로운노선 = "새로운노선";
-    private static final String 새로운색상 = "새로운색상";
-    private static final String 수정노선 = "수정 노선";
-    private static final String 수정색상 = "수정 색상";
-    private static final int 종점간거리 = 2;
-    private Long 상행종점 = 1L;
-    private Long 하행종점 = 2L;
 
     /**
      * Given 지하철 역 (상행, 하행)생성을 요청한다.
@@ -40,7 +26,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선생성_테스트() {
         //given
-        지하철역생성();
+        지하철역들생성();
 
         //when
         ExtractableResponse<Response> response = 기존노선생성();
@@ -50,20 +36,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 역 (상행, 하행)생성을 요청한다.
      * When 없는 역을 종점으로 선언하고 노선 생성 요청을 한다
      * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("없는 역을 노선에 등록한다")
     @Test
     void notFoundSection() {
-        //given
-        지하철역생성();
-        상행종점 = Long.MAX_VALUE;
-        하행종점 = Long.MIN_VALUE;
 
         //when
-        ExtractableResponse<Response> response = 기존노선생성();
+        ExtractableResponse<Response> response = 노선생성("신규노선", "신규색상", Long.MAX_VALUE, Long.MIN_VALUE, Integer.MAX_VALUE);
 
         //then
         assertThat(response.jsonPath().getString("message")).isEqualTo(NotFoundException.MESSAGE);
@@ -81,12 +62,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선목록조회_테스트() {
         //given
-        지하철역생성();
+        지하철역들생성();
         기존노선생성();
         새로운노선생성();
 
         //when
-        ExtractableResponse<Response> response = 겟_요청(기본주소);
+        ExtractableResponse<Response> response = 노선조회(기본주소);
 
         //then
         assertThat(response.jsonPath().getList("name")).contains(새로운노선, 기존노선);
@@ -103,11 +84,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선조회_테스트() {
         //given
-        지하철역생성();
+        지하철역들생성();
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
-        ExtractableResponse<Response> response = 겟_요청(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 노선조회(createResponse.header(HttpHeaders.LOCATION));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -124,14 +105,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선업데이트_테스트() {
         //given
-        지하철역생성();
+        지하철역들생성();
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
         ExtractableResponse<Response> updateResponse = 노선수정(createResponse);
 
         //then
-        ExtractableResponse<Response> response = 겟_요청(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 노선조회(createResponse.header(HttpHeaders.LOCATION));
 
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -149,7 +130,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선삭제_테스트() {
         //given
-        지하철역생성();
+        지하철역들생성();
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
@@ -170,7 +151,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicationLine() {
         //given
-        지하철역생성();
+        지하철역들생성();
         기존노선생성();
 
         //when
@@ -181,36 +162,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
     }
 
-    private void 지하철역생성() {
-        ExtractableResponse<Response> 기존지하철역생성 = 기존지하철역생성();
-        ExtractableResponse<Response> 새로운지하철역생성 = 새로운지하철역생성();
-        상행종점 = Long.valueOf(기존지하철역생성.jsonPath().getString("id"));
-        하행종점 = Long.valueOf(새로운지하철역생성.jsonPath().getString("id"));
-    }
 
-    private ExtractableResponse<Response> 기존노선생성() {
-        Map<String, Object> param = 노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리);
-        return 포스트_요청(기본주소, param);
-    }
 
-    private ExtractableResponse<Response> 새로운노선생성() {
-        Map<String, Object> param = 노선파라미터생성(새로운노선, 새로운색상, 상행종점, 하행종점, 종점간거리);
-        return 포스트_요청(기본주소, param);
-    }
 
-    private ExtractableResponse<Response> 노선수정(ExtractableResponse<Response> createResponse) {
-        Map<String, Object> updateParam = 노선파라미터생성(수정노선, 수정색상, 상행종점, 하행종점, 종점간거리);
-        ExtractableResponse<Response> updateResponse = 풋_요청(createResponse.header(HttpHeaders.LOCATION), updateParam);
-        return updateResponse;
-    }
-
-    private Map<String, Object> 노선파라미터생성(String 노선, String 색상, Long 상행종점, Long 하행종점, int 종점간거리) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("name", 노선);
-        param.put("color", 색상);
-        param.put("upStationId", 상행종점);
-        param.put("downStationId", 하행종점);
-        param.put("distance", 종점간거리);
-        return param;
-    }
 }
