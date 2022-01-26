@@ -46,7 +46,7 @@ public class LineCommandService {
         );
     }
 
-    public ShowLineResponse addSection(Long lineId, SectionRequest request) {
+    public LineAndSectionResponse addSection(Long lineId, SectionRequest request) {
         Line line = lineQueryService.findLineById(lineId);
         Station upStation = stationQueryService.findStationsById(request.getUpStationId());
         Station downStation = stationQueryService.findStationsById(request.getDownStationId());

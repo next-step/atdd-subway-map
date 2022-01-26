@@ -3,7 +3,7 @@ package nextstep.subway.acceptance.step_feature;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.ShowLineResponse;
+import nextstep.subway.applicaion.dto.LineAndSectionResponse;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -21,12 +21,12 @@ public class LineStepFeature {
     private static final String CREATE_LINE_DISTANCE_PARAM_KEY = "distance";
     private static final String LINE_BASE_URI = "lines";
 
-    public static ShowLineResponse callCreateAndFind(Map<String, String> lineParams) {
+    public static LineAndSectionResponse callCreateAndFind(Map<String, String> lineParams) {
         ExtractableResponse<Response> createResponse = callCreateLines(lineParams);
         String uri = createResponse.header("Location");
 
         ExtractableResponse<Response> response = callGetLinesByUri(uri);
-        return response.as(ShowLineResponse.class);
+        return response.as(LineAndSectionResponse.class);
     }
 
     public static ExtractableResponse<Response> callCreateLines(Map<String, String> lineParams) {

@@ -10,23 +10,23 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ShowLineResponse {
+public class LineAndSectionResponse {
 
     @JsonUnwrapped
     private LineResponse lineResponse;
     private List<StationResponse> stations = new ArrayList();
 
-    private ShowLineResponse() {
+    private LineAndSectionResponse() {
     }
 
-    public static ShowLineResponse of(Long id,
-                                      String name,
-                                      String color,
-                                      LocalDateTime createdDate,
-                                      LocalDateTime modifiedDate,
-                                      List<Station> allStations) {
+    public static LineAndSectionResponse of(Long id,
+                                            String name,
+                                            String color,
+                                            LocalDateTime createdDate,
+                                            LocalDateTime modifiedDate,
+                                            List<Station> allStations) {
 
-        ShowLineResponse result = new ShowLineResponse();
+        LineAndSectionResponse result = new LineAndSectionResponse();
         result.lineResponse = new LineResponse(id, name, color, createdDate, modifiedDate);
         result.stations = allStations.stream()
                 .map(it -> new StationResponse(it.getId(), it.getName(), it.getCreatedDate(), it.getModifiedDate()))

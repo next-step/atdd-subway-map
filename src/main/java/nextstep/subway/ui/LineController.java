@@ -30,15 +30,15 @@ public class LineController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ShowLineResponse>> showLine() {
-        List<ShowLineResponse> lines = lineQueryService.findAllLines();
+    public ResponseEntity<List<LineAndSectionResponse>> showLine() {
+        List<LineAndSectionResponse> lines = lineQueryService.findAllLines();
 
         return ResponseEntity.ok(lines);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ShowLineResponse> showLine(@PathVariable("id") Long id) {
-        ShowLineResponse line = lineQueryService.findLine(id);
+    public ResponseEntity<LineAndSectionResponse> showLine(@PathVariable("id") Long id) {
+        LineAndSectionResponse line = lineQueryService.findLine(id);
 
         return ResponseEntity.ok(line);
     }
@@ -61,8 +61,8 @@ public class LineController {
     }
 
     @PostMapping("{id}/sections")
-    public ResponseEntity<ShowLineResponse> addSection(@PathVariable("id") Long id, @RequestBody SectionRequest request) {
-        ShowLineResponse lineResponse = lineCommandService.addSection(id, request);
+    public ResponseEntity<LineAndSectionResponse> addSection(@PathVariable("id") Long id, @RequestBody SectionRequest request) {
+        LineAndSectionResponse lineResponse = lineCommandService.addSection(id, request);
 
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getLineId()))
                 .body(lineResponse);

@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion.query;
 
-import nextstep.subway.applicaion.dto.ShowLineResponse;
+import nextstep.subway.applicaion.dto.LineAndSectionResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.line.LineNotFoundException;
@@ -21,7 +21,7 @@ public class LineQueryService {
         this.lineRepository = lineRepository;
     }
 
-    public List<ShowLineResponse> findAllLines() {
+    public List<LineAndSectionResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
@@ -29,7 +29,7 @@ public class LineQueryService {
                 .collect(toList());
     }
 
-    public ShowLineResponse findLine(Long id) {
+    public LineAndSectionResponse findLine(Long id) {
         Line line = findLineById(id);
 
         return createShowLineResponse(line);
@@ -40,8 +40,8 @@ public class LineQueryService {
                 .orElseThrow(() -> new LineNotFoundException());
     }
 
-    public ShowLineResponse createShowLineResponse(Line line) {
-        return ShowLineResponse.of(
+    public LineAndSectionResponse createShowLineResponse(Line line) {
+        return LineAndSectionResponse.of(
                 line.getId(),
                 line.getName(),
                 line.getColor(),

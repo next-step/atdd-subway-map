@@ -4,7 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.step_feature.LineStepFeature;
 import nextstep.subway.acceptance.step_feature.StationStepFeature;
-import nextstep.subway.applicaion.dto.ShowLineResponse;
+import nextstep.subway.applicaion.dto.LineAndSectionResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -87,7 +87,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
         LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
         Map<String, String> number2Line = createLineParams(NUMBER2_LINE_NAME, "green", nonhyeon.getId(), pangyo.getId(), 10);
@@ -97,10 +97,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
 
         // then
-        List<ShowLineResponse> responses = response.jsonPath()
-                .getList(".", ShowLineResponse.class);
-        ShowLineResponse response1 = responses.get(0);
-        ShowLineResponse response2 = responses.get(1);
+        List<LineAndSectionResponse> responses = response.jsonPath()
+                .getList(".", LineAndSectionResponse.class);
+        LineAndSectionResponse response1 = responses.get(0);
+        LineAndSectionResponse response2 = responses.get(1);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
@@ -145,7 +145,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         String modifyName = "구분당선";
-        ShowLineResponse createResponse = callCreateAndFind(params);
+        LineAndSectionResponse createResponse = callCreateAndFind(params);
         Map modifyParams = new HashMap();
         modifyParams.put("id", createResponse.getLineId());
         modifyParams.put("name", modifyName);
@@ -157,9 +157,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
         List<String> lineNames = response.jsonPath()
-                .getList(".", ShowLineResponse.class)
+                .getList(".", LineAndSectionResponse.class)
                 .stream()
-                .map(ShowLineResponse::getLineName)
+                .map(LineAndSectionResponse::getLineName)
                 .collect(toList());
 
         assertThat(responseUpdate.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -196,7 +196,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ShowLineResponse createResponse = callCreateAndFind(params);
+        LineAndSectionResponse createResponse = callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callDeleteLines(createResponse.getLineId());
@@ -215,7 +215,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
@@ -236,7 +236,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection_validateDownStation() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), nonhyeon.getId(), gangnam.getId());
@@ -255,7 +255,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection_validateAlreadyRegisteredStation() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), gangnam.getId());
@@ -273,7 +273,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
         LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
         // when
@@ -293,7 +293,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection_minimumSection() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
         // when
         ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
@@ -311,7 +311,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection_LastDownStation() {
         // given
-        ShowLineResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
         LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
         // when
