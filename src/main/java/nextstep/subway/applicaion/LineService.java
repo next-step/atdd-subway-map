@@ -43,4 +43,8 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
+
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
