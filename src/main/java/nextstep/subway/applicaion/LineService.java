@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
-    private SectionRepository sectionRepository;
-    private StationRepository stationRepository;
+    private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
+    private final StationRepository stationRepository;
 
     public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
@@ -26,18 +26,12 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    @Transactional(readOnly = true)
-    public boolean existsLineByName(String name) {
-        return lineRepository.existsLineByName(name);
-    }
 
     public LineCreateResponse saveLine(LineCreateRequest request) {
+        validateDuplicate(request);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상행 지하철역 입니다."));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 하행 지하철역 입니다."));
-
+        Station upStation = getUpStation(request.getUpStationId());
+        Station downStation = getDownStation(request.getDownStationId());
         Section section = Section.createOf(line, upStation, downStation, request.getDistance());
         line.updateSection(section);
 
@@ -60,15 +54,13 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+        Line line = getLine(id);
 
         return createLineResponse(line);
     }
 
     public void updateLineById(Long id, LineCreateRequest lineCreateRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+        Line line = getLine(id);
         line.update(lineCreateRequest.getName(), lineCreateRequest.getColor());
     }
 
@@ -77,9 +69,38 @@ public class LineService {
     }
 
     public void deleteSectionById(Long lineId, Long stationId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+        Line line = getLine(lineId);
         line.deleteSection(stationId);
+    }
+
+    public void addSection(Long id, LineCreateRequest request) {
+        Line line = getLine(id);
+        Station upStation = getUpStation(request.getUpStationId());
+        Station downStation = getDownStation(request.getDownStationId());
+
+        Section section = Section.createOf(line, upStation, downStation, request.getDistance());
+        line.addSection(section);
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+    }
+
+    private Station getUpStation(Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상행 지하철역 입니다."));
+    }
+
+    private Station getDownStation(Long downStationId) {
+        return stationRepository.findById(downStationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 하행 지하철역 입니다."));
+    }
+
+    private void validateDuplicate(LineCreateRequest request) {
+        lineRepository.findByName(request.getName()).ifPresent(line -> {
+            throw new IllegalArgumentException("중복된 이름입니다.");
+        });
     }
 
     private LineResponse createLineResponse(Line line) {
@@ -95,17 +116,5 @@ public class LineService {
                 stations,
                 line.getCreatedDate(),
                 line.getModifiedDate());
-    }
-
-    public void addSection(Long id, LineCreateRequest request) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상행 지하철역 입니다."));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 하행 지하철역 입니다."));
-
-        Section section = Section.createOf(line, upStation, downStation, request.getDistance());
-        line.addSection(section);
     }
 }
