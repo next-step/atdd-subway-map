@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static nextstep.subway.acceptance.AssertSteps.httpStatusCode_검증;
-import static nextstep.subway.acceptance.LineAcceptanceFixture.*;
+import static nextstep.subway.acceptance.LineFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
@@ -25,7 +25,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         //given
         //when
-        ExtractableResponse<Response> response = LineSteps.createLine(FIXTURE_RED);
+        ExtractableResponse<Response> response = LineSteps.createLine(FIXTURE_1호선);
 
         int statusCode = response.statusCode();
 
@@ -43,10 +43,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineDuplicationNameException() {
         //given
-        LineSteps.createLine(FIXTURE_RED);
+        LineSteps.createLine(FIXTURE_1호선);
 
         //when
-        ExtractableResponse<Response> response = LineSteps.createLine(FIXTURE_RED);
+        ExtractableResponse<Response> response = LineSteps.createLine(FIXTURE_1호선);
 
         int actual = response.statusCode();
 
@@ -64,8 +64,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        LineSteps.createLine(FIXTURE_RED);
-        LineSteps.createLine(FIXTURE_BLUE);
+        LineSteps.createLine(FIXTURE_1호선);
+        LineSteps.createLine(FIXTURE_2호선);
 
         //when
         ExtractableResponse<Response> response = LineSteps.findLines();
@@ -76,7 +76,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         assertAll(
                 () -> httpStatusCode_검증(statusCode, OK.value()),
-                () -> assertThat(namesOfLines).containsExactly(RED_LINE_NAME, BLUE_LINE_NAME)
+                () -> assertThat(namesOfLines).containsExactly(일호선_이름, 이호선_이름)
         );
 
     }
@@ -90,7 +90,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        ExtractableResponse<Response> redLine = LineSteps.createLine(FIXTURE_RED);
+        ExtractableResponse<Response> redLine = LineSteps.createLine(FIXTURE_1호선);
         String uri = redLine.header("Location");
 
         //when
@@ -102,7 +102,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         assertAll(
                 () -> httpStatusCode_검증(statusCode, OK.value()),
-                () -> assertThat(findLineName).isEqualTo(RED_LINE_NAME)
+                () -> assertThat(findLineName).isEqualTo(일호선_이름)
         );
     }
 
@@ -115,11 +115,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        ExtractableResponse<Response> redLine = LineSteps.createLine(FIXTURE_RED);
+        ExtractableResponse<Response> redLine = LineSteps.createLine(FIXTURE_1호선);
         String uri = redLine.header("Location");
 
         //when
-        ExtractableResponse<Response> response = LineSteps.updateLine(uri, FIXTURE_BLUE);
+        ExtractableResponse<Response> response = LineSteps.updateLine(uri, FIXTURE_2호선);
 
         int statusCode = response.statusCode();
         String updatedName = response.jsonPath().get("name");
@@ -127,7 +127,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         assertAll(
                 () -> httpStatusCode_검증(statusCode, OK.value()),
-                () -> assertThat(updatedName).isEqualTo(BLUE_LINE_NAME)
+                () -> assertThat(updatedName).isEqualTo(이호선_이름)
         );
     }
 
@@ -140,7 +140,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        ExtractableResponse<Response> redLine = LineSteps.createLine(FIXTURE_RED);
+        ExtractableResponse<Response> redLine = LineSteps.createLine(FIXTURE_1호선);
         String uri = redLine.header("Location");
 
         //when
