@@ -64,10 +64,7 @@ public class Line extends BaseEntity {
     }
 
     public Section getLastSection() {
-        return sections
-                .stream()
-                .max(Comparator.comparing(Section::getId))
-                .orElseThrow(EntityNotFoundException::new);
+        return sections.get(sections.size() - 1);
     }
 
     public boolean equalsLastDownStation(Station upStation) {
