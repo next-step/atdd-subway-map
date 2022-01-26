@@ -1,37 +1,29 @@
 package nextstep.subway.acceptance.station;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.HttpStatus;
-
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.station.domain.dto.StationRequest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-    private StationStep stationStep;
 
-    @Override
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        stationStep = new StationStep();
-    }
+    @Autowired
+    private StationStep stationStep;
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -41,12 +33,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given, when
-        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청();
+        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청(
+            StationStep.DUMMY_STATION_NAME
+        );
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.CREATED)
-                          .hasLocation();
+                          .existsLocation();
     }
 
     /**
@@ -58,24 +52,20 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationThatFailing() {
         // given
-        String name = stationStep.nextName();
-        StationRequest preRequest = stationStep.dummyRequest();
-        StationRequest postRequest = stationStep.dummyRequest();
-
-        preRequest.setName(name);
-        postRequest.setName(name);
-        stationStep.지하철역_생성_요청(preRequest);
+        stationStep.지하철역_생성_요청(StationStep.DUMMY_STATION_NAME);
 
         // when
-        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청(postRequest);
+        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청(
+            StationStep.DUMMY_STATION_NAME
+        );
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.CONFLICT)
-                          .equalsErrorMessage(
+                          .equalsMessage(
                               ErrorMessage.DUPLICATE_COLUMN.getMessage(ColumnName.STATION_NAME.getName())
                           )
-                          .hasNotLocation();
+                          .notExistsLocation();
     }
 
     /**
@@ -91,10 +81,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @ParameterizedTest
     void getStations(int size) {
         /// given
-        List<StationRequest> requests = Stream.generate(stationStep::dummyRequest)
-                                              .limit(size)
-                                              .collect(Collectors.toList());
-        requests.forEach(stationStep::지하철역_생성_요청);
+        String NAME_SUFFIX = "호선";
+        List<String> names = IntStream.iterate(0, nameCounter -> nameCounter + 1)
+                                      .limit(size)
+                                      .boxed()
+                                      .map(nameCounter -> nameCounter + NAME_SUFFIX)
+                                      .collect(Collectors.toList());
+        names.forEach(stationStep::지하철역_생성_요청);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -104,9 +97,6 @@ class StationAcceptanceTest extends AcceptanceTest {
                                                             .extract();
 
         // then
-        List<String> names = requests.stream()
-                                     .map(StationRequest::getName)
-                                     .collect(Collectors.toList());
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
                           .containsAll("name", names);
@@ -121,7 +111,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = stationStep.지하철역_생성_요청();
+        ExtractableResponse<Response> createResponse = stationStep.지하철역_생성_요청(
+            StationStep.DUMMY_STATION_NAME
+        );
 
         // when
         AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);

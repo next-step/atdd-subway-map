@@ -2,17 +2,14 @@ package nextstep.subway.station.applicaion;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.DuplicateColumnException;
-import nextstep.subway.common.exception.OptionalException;
 import nextstep.subway.station.domain.dto.StationRequest;
 import nextstep.subway.station.domain.dto.StationResponse;
 import nextstep.subway.station.domain.model.Station;
 import nextstep.subway.station.domain.repository.StationRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -24,18 +21,11 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest request) {
-        verifyExistsByName(request.getName()).verify();
+        if (stationRepository.existsByName(request.getName())) {
+            throw new DuplicateColumnException(ColumnName.STATION_NAME);
+        }
         Station station = stationRepository.save(new Station(request.getName()));
         return StationResponse.from(station);
-    }
-
-    private OptionalException<DuplicateColumnException> verifyExistsByName(String name) {
-        if (stationRepository.existsByName(name)) {
-            return OptionalException.of(
-                new DuplicateColumnException(ColumnName.STATION_NAME)
-            );
-        }
-        return OptionalException.empty();
     }
 
     @Transactional(readOnly = true)

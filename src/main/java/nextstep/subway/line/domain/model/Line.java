@@ -1,14 +1,12 @@
 package nextstep.subway.line.domain.model;
 
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import nextstep.subway.common.domain.model.BaseEntity;
 import nextstep.subway.station.domain.model.Station;
 
@@ -31,10 +29,15 @@ public class Line extends BaseEntity {
         this.sections = new Sections();
     }
 
-    public Line(String name, String color) {
+    private Line(String name, String color, Station upStation, Station downStation, Distance distance) {
         this.name = name;
         this.color = color;
         this.sections = new Sections();
+        addSection(upStation, downStation, distance);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public Long getId() {
@@ -58,10 +61,6 @@ public class Line extends BaseEntity {
         return this.sections.size() == size;
     }
 
-    public boolean notMatchName(String name) {
-        return !this.name.equals(name);
-    }
-
     public Section addSection(Station upStation, Station downStation, Distance distance) {
         return sections.add(this, upStation, downStation, distance);
     }
@@ -72,5 +71,42 @@ public class Line extends BaseEntity {
 
     public List<Station> getStations() {
         return sections.toStations();
+    }
+
+    public static class Builder {
+        private String name;
+        private String color;
+        private Station upStation;
+        private Station downStation;
+        private Distance distance;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder color(String color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder upStation(Station upStation) {
+            this.upStation = upStation;
+            return this;
+        }
+
+        public Builder downStation(Station downStation) {
+            this.downStation = downStation;
+            return this;
+        }
+
+        public Builder distance(Distance distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(name, color, upStation, downStation, distance);
+        }
     }
 }

@@ -5,15 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
-
 import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.common.exception.InvalidArgumentException;
-import nextstep.subway.common.exception.OptionalException;
 import nextstep.subway.station.domain.model.Station;
 
 @Embeddable
@@ -31,8 +27,11 @@ public class Sections {
     }
 
     public Section add(Line line, Station upStation, Station downStation, Distance distance) {
-        verifySectionDockingPoint(upStation).verify();
-        verifyAlreadyRegisteredStationInSection(downStation).verify();
+        checkAddable(upStation, downStation)
+            .map(errorMessage -> new IllegalArgumentException(errorMessage.getMessage()))
+            .ifPresent(e -> {
+                throw e;
+            });
 
         Section section = Section.builder()
             .line(line)
@@ -44,61 +43,54 @@ public class Sections {
         return section;
     }
 
-    private OptionalException<InvalidArgumentException> verifySectionDockingPoint(Station upStation) {
-        if (values.isEmpty()) {
-            return OptionalException.empty();
+    private Optional<ErrorMessage> checkAddable(Station upStation, Station downStation) {
+        if (!values.isEmpty() && !existsDockingPoint(upStation)) {
+            return Optional.of(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT);
         }
-        Optional<Section> optionalSection =
-            values.stream()
-                  .filter(iSection -> iSection.matchDownStation(upStation))
-                  .findFirst();
-        return OptionalException.ifEmpty(
-            optionalSection,
-            () -> new InvalidArgumentException(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
-        );
+        if (existsStation(downStation)) {
+            return Optional.of(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION);
+        }
+        return Optional.empty();
     }
 
-    private OptionalException<InvalidArgumentException> verifyAlreadyRegisteredStationInSection(Station downStation) {
-        Optional<Section> optionalSection =
-            values.stream()
-                  .filter(iSection -> iSection.matchUpStation(downStation) || iSection.matchDownStation(downStation))
-                  .findFirst();
-        return OptionalException.ifPresent(
-            optionalSection,
-            () -> new InvalidArgumentException(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
-        );
+    private boolean existsDockingPoint(Station upStation) {
+        return values.stream()
+                     .anyMatch(iSection -> iSection.matchDownStation(upStation));
+    }
+
+    private boolean existsStation(Station station) {
+        return values.stream()
+                     .anyMatch(iSection -> iSection.matchUpStation(station) || iSection.matchDownStation(station));
     }
 
     public void delete(Long sectionId) {
-        verifySectionSize().verify();
-        verifyNonLastSection(sectionId).verify();
+        checkRemovable(sectionId)
+            .map(errorMessage -> new IllegalArgumentException(errorMessage.getMessage()))
+            .ifPresent(e -> {
+                throw e;
+            });
 
         values.removeIf(iSection -> iSection.matchId(sectionId));
     }
 
-    private OptionalException<InvalidArgumentException> verifySectionSize() {
+    private Optional<ErrorMessage> checkRemovable(Long sectionId) {
         if (values.size() <= 1) {
-            return OptionalException.of(
-                new InvalidArgumentException(ErrorMessage.BELOW_MIN_SECTION_SIZE.getMessage())
-            );
+            return Optional.of(ErrorMessage.BELOW_MIN_SECTION_SIZE);
         }
-        return OptionalException.empty();
+        if (!matchLastSectionId(sectionId)) {
+            return Optional.of(ErrorMessage.NON_LAST_SECTION);
+        }
+        return Optional.empty();
     }
 
-    private OptionalException<InvalidArgumentException> verifyNonLastSection(Long sectionId) {
+    private boolean matchLastSectionId(Long sectionId) {
         Section lastSection = values.get(values.size() - 1);
-        if (lastSection.getId().equals(sectionId)) {
-            return OptionalException.empty();
-        }
-        return OptionalException.of(
-            new InvalidArgumentException(ErrorMessage.NON_LAST_SECTION.getMessage())
-        );
+        return lastSection.getId().equals(sectionId);
     }
 
     public List<Station> toStations() {
         return Stream.concat(values.stream().map(Section::getUpStation),
-                             values.stream().map(Section::getDownStation)
-        )
+                             values.stream().map(Section::getDownStation))
                      .distinct()
                      .sorted()
                      .collect(Collectors.toList());

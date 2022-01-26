@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import nextstep.subway.common.exception.DuplicateColumnException;
 import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.common.exception.ErrorResponse;
-import nextstep.subway.common.exception.InvalidArgumentException;
 
 @ControllerAdvice
 @RestController
 public class ExceptionControllerAdvice {
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public ErrorResponse entityNotFound() {
         return new ErrorResponse(ErrorMessage.ENTITY_NOT_FOUND.getMessage());
@@ -29,7 +28,7 @@ public class ExceptionControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidArgumentException.class)
+    @ExceptionHandler(IllegalArgumentException.class)
     public ErrorResponse invalidArgumentException(Exception e) {
         return new ErrorResponse(e.getMessage());
     }

@@ -1,5 +1,6 @@
 package nextstep.subway.line.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import nextstep.subway.line.domain.model.Distance;
 
 public class LineRequest {
@@ -9,6 +10,7 @@ public class LineRequest {
     private Long downStationId;
     private Distance distance;
 
+    @JsonCreator
     private LineRequest(String name, String color, Long upStationId, Long downStationId, Distance distance) {
         this.name = name;
         this.color = color;

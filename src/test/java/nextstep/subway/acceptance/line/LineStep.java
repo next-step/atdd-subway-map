@@ -1,19 +1,20 @@
 package nextstep.subway.acceptance.line;
 
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.model.Distance;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 
+@Service
 public class LineStep {
-    private static final String NAME_FORMAT = "%d호선";
-    private static final String COLOR = "bg-red-600";
-
-    private int dummyCounter = 0;
+    public static final String DUMMY_NAME = "1호선";
+    public static final String COLOR = "bg-red-600";
+    public static final Distance DUMMY_DISTANCE = new Distance(100);
+    public static final Long DUMMY_UP_STATION_ID = 1L;
+    public static final Long DUMMY_DOWN_STATION_ID = 2L;
 
     public ExtractableResponse<Response> 지하철_노선_생성_요청(final LineRequest request) {
         return RestAssured.given().log().all()
@@ -25,36 +26,21 @@ public class LineStep {
                           .extract();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_생성_요청(long upStationId, long downStationId) {
+    public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, long upStationId, long downStationId) {
         LineRequest request = dummyRequest();
+        request.setName(name);
         request.setUpStationId(upStationId);
         request.setDownStationId(downStationId);
         return 지하철_노선_생성_요청(request);
     }
 
-    public ExtractableResponse<Response> 지하철_노선_생성_요청() {
-        return 지하철_노선_생성_요청(dummyRequest());
-    }
-
     public LineRequest dummyRequest() {
         return LineRequest.builder()
-            .name(nextName())
-            .color(nextColor())
-            .upStationId((long) 1)
-            .downStationId((long) 2)
-            .distance(nextDistance())
+            .name(DUMMY_NAME)
+            .color(COLOR)
+            .upStationId(DUMMY_UP_STATION_ID)
+            .downStationId(DUMMY_DOWN_STATION_ID)
+            .distance(DUMMY_DISTANCE)
             .build();
-    }
-
-    public String nextName() {
-        return String.format(NAME_FORMAT, ++dummyCounter);
-    }
-
-    public String nextColor() {
-        return COLOR;
-    }
-
-    private Distance nextDistance() {
-        return new Distance(2);
     }
 }

@@ -1,7 +1,7 @@
 package nextstep.subway.line.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
@@ -9,6 +9,7 @@ import javax.persistence.Embeddable;
 @Access(AccessType.FIELD)
 @Embeddable
 public class Distance {
+    @JsonValue
     private int value;
 
     protected Distance() {
@@ -16,10 +17,6 @@ public class Distance {
 
     public Distance(int value) {
         this.value = value;
-    }
-
-    public int getValue() {
-        return value;
     }
 
     @Override

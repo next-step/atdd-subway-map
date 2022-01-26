@@ -1,19 +1,19 @@
 package nextstep.subway.acceptance.station;
 
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.station.domain.dto.StationRequest;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 
+@Service
 public class StationStep {
-    private static final String NAME_FORMAT = "%d역";
+    public static final String DUMMY_STATION_NAME = "1호선";
 
-    private int dummyCounter = 0;
+    public ExtractableResponse<Response> 지하철역_생성_요청(String name) {
+        StationRequest request = new StationRequest(name);
 
-    public ExtractableResponse<Response> 지하철역_생성_요청(StationRequest request) {
         return RestAssured.given().log().all()
                           .body(request)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -21,17 +21,5 @@ public class StationStep {
                           .post("/stations")
                           .then().log().all()
                           .extract();
-    }
-
-    public ExtractableResponse<Response> 지하철역_생성_요청() {
-        return 지하철역_생성_요청(dummyRequest());
-    }
-
-    public StationRequest dummyRequest() {
-        return new StationRequest(nextName());
-    }
-
-    public String nextName() {
-        return String.format(NAME_FORMAT, dummyCounter++);
     }
 }

@@ -1,14 +1,14 @@
 package nextstep.subway.acceptance.line;
 
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.model.Distance;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SectionStep {
     private static final long START_UP_STATION_NEW_SECTION = 2;
     private static final long START_DOWN_STATION_NEW_SECTION = 3;
@@ -28,10 +28,6 @@ public class SectionStep {
         sectionRequest.setUpStationId(upStationId);
         sectionRequest.setDownStationId(downStationId);
         return 지하철_구간_생성_요청(lineId, sectionRequest);
-    }
-
-    public ExtractableResponse<Response> 지하철_구간_생성_요청(Long lineId) {
-        return 지하철_구간_생성_요청(lineId, dummyRequest());
     }
 
     public SectionRequest dummyRequest() {

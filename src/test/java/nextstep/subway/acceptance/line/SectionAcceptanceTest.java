@@ -1,11 +1,5 @@
 package nextstep.subway.acceptance.line;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
@@ -13,31 +7,36 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.utils.AcceptanceTestThen;
 import nextstep.subway.utils.AcceptanceTestWhen;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철 구간 관리")
 public class SectionAcceptanceTest extends AcceptanceTest {
-    private static final Long LINE_ID = (long) 1;
+    private static final Long LINE_ID = 1L;
 
+    @Autowired
     private LineStep lineStep;
+    @Autowired
     private StationStep stationStep;
+    @Autowired
     private SectionStep sectionStep;
 
     @Override
     @BeforeEach
     public void setUp() {
-        // TODO Step 클래스의 Id 관리방법 모두 리팩토링 하기
         super.setUp();
-        lineStep = new LineStep();
-        stationStep = new StationStep();
-        sectionStep = new SectionStep();
 
-        stationStep.지하철역_생성_요청();
-        stationStep.지하철역_생성_요청();
-        lineStep.지하철_노선_생성_요청();
-        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청("1역");
+        stationStep.지하철역_생성_요청("2역");
+        lineStep.지하철_노선_생성_요청(
+            LineStep.DUMMY_NAME, 1L, 2L
+        );
+        stationStep.지하철역_생성_요청("3역");
     }
 
     /**
@@ -50,12 +49,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection() {
         // when
-        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(LINE_ID);
+        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(
+            LINE_ID, 2L, 3L
+        );
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.CREATED)
-                          .hasLocation();
+                          .existsLocation();
     }
 
     /**
@@ -68,22 +69,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing1() {
         // given
-        stationStep.지하철역_생성_요청();
-        stationStep.지하철역_생성_요청();
-        SectionRequest request = sectionStep.dummyRequest();
-        long upStationInFirstSection = 3;
-        long downStationInNewSection = 4;
-        request.setUpStationId(upStationInFirstSection);
-        request.setDownStationId(downStationInNewSection);
+        stationStep.지하철역_생성_요청("3역");
+        stationStep.지하철역_생성_요청("4역");
 
         // when
-        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(LINE_ID, request);
+        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(
+            LINE_ID, 3L, 4L
+        );
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
-                          .hasNotLocation();
+                          .equalsMessage(ErrorMessage.NOT_FOUND_SECTION_DOCKING_POINT.getMessage())
+                          .notExistsLocation();
     }
 
     /**
@@ -96,21 +94,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionThatFailing2() {
         // given
-        stationStep.지하철역_생성_요청();
-        SectionRequest request = sectionStep.dummyRequest();
-        long upStationInFirstSection = 2;
-        long downStationInFirstSection = 1;
-        request.setUpStationId(upStationInFirstSection);
-        request.setDownStationId(downStationInFirstSection);
 
         // when
-        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(LINE_ID, request);
+        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(
+            LINE_ID, 2L, 1L
+        );
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
-                          .hasNotLocation();
+                          .equalsMessage(ErrorMessage.ALREADY_REGISTERED_STATION_IN_SECTION.getMessage())
+                          .notExistsLocation();
     }
 
     /**
@@ -122,7 +116,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        ExtractableResponse<Response> createResponse = sectionStep.지하철_구간_생성_요청(LINE_ID);
+        ExtractableResponse<Response> createResponse = sectionStep.지하철_구간_생성_요청(
+            LINE_ID, 2L, 3L
+        );
 
         // when
         AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
@@ -142,10 +138,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionThatFailing1() {
         // given
-        ExtractableResponse<Response> preResponse = sectionStep.지하철_구간_생성_요청(LINE_ID);
-
-        stationStep.지하철역_생성_요청();
-        sectionStep.지하철_구간_생성_요청(LINE_ID, (long) 3, (long) 4);
+        ExtractableResponse<Response> preResponse = sectionStep.지하철_구간_생성_요청(
+            LINE_ID, 2L, 3L
+        );
+        stationStep.지하철역_생성_요청("4역");
+        sectionStep.지하철_구간_생성_요청(LINE_ID, 3L, 4L);
 
         // when
         ExtractableResponse<Response> deleteResponse = AcceptanceTestWhen.fromGiven(preResponse)
@@ -154,7 +151,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.NON_LAST_SECTION.getMessage());
+                          .equalsMessage(ErrorMessage.NON_LAST_SECTION.getMessage());
     }
 
     /**
@@ -175,6 +172,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
                           .equalsHttpStatus(HttpStatus.BAD_REQUEST)
-                          .equalsErrorMessage(ErrorMessage.BELOW_MIN_SECTION_SIZE.getMessage());
+                          .equalsMessage(ErrorMessage.BELOW_MIN_SECTION_SIZE.getMessage());
     }
 }

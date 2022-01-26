@@ -1,47 +1,41 @@
 package nextstep.subway.acceptance.line;
 
-import java.util.HashMap;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.restassured.RestAssured;
+import io.restassured.http.Method;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-
+import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.acceptance.station.StationStep;
+import nextstep.subway.line.domain.dto.LineRequest;
+import nextstep.subway.utils.AcceptanceTestThen;
+import nextstep.subway.utils.AcceptanceTestWhen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import io.restassured.RestAssured;
-import io.restassured.http.Method;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.station.StationStep;
-import nextstep.subway.common.exception.ColumnName;
-import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.line.domain.dto.LineRequest;
-import nextstep.subway.station.domain.dto.StationRequest;
-import nextstep.subway.utils.AcceptanceTestThen;
-import nextstep.subway.utils.AcceptanceTestWhen;
-
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    @Autowired
     private StationStep stationStep;
+    @Autowired
     private LineStep lineStep;
+    @Autowired
     private SectionStep sectionStep;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
-        
-        lineStep = new LineStep();
-        stationStep = new StationStep();
-        sectionStep = new SectionStep();
 
-        stationStep.지하철역_생성_요청();
-        stationStep.지하철역_생성_요청();
+        stationStep.지하철역_생성_요청("1역");
+        stationStep.지하철역_생성_요청("2역");
     }
 
     /**
@@ -53,12 +47,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given, when
-        ExtractableResponse<Response> response = lineStep.지하철_노선_생성_요청();
+        ExtractableResponse<Response> response = lineStep.지하철_노선_생성_요청(
+            LineStep.DUMMY_NAME, LineStep.DUMMY_UP_STATION_ID, LineStep.DUMMY_DOWN_STATION_ID
+        );
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.CREATED)
-                          .hasLocation();
+                          .existsLocation();
     }
 
     /**
@@ -71,21 +67,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineThatFailing() {
         // given
-        String name = lineStep.nextName();
-        LineRequest preRequest = lineStep.dummyRequest();
-        LineRequest postRequest = lineStep.dummyRequest();
-        preRequest.setName(name);
-        postRequest.setName(name);
-        stationStep.지하철역_생성_요청();
-        lineStep.지하철_노선_생성_요청(preRequest);
+        lineStep.지하철_노선_생성_요청(
+            LineStep.DUMMY_NAME, LineStep.DUMMY_UP_STATION_ID, LineStep.DUMMY_DOWN_STATION_ID
+        );
+        stationStep.지하철역_생성_요청("3역");
+        stationStep.지하철역_생성_요청("4역");
 
         // when
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(postRequest);
+        ExtractableResponse<Response> postResponse = lineStep.지하철_노선_생성_요청(
+            LineStep.DUMMY_NAME, 3L, 4L
+        );
 
         // then
-        AcceptanceTestThen.fromWhen(createResponse)
+        AcceptanceTestThen.fromWhen(postResponse)
                           .equalsHttpStatus(HttpStatus.CONFLICT)
-                          .hasNotLocation();
+                          .notExistsLocation();
     }
 
     /**
@@ -98,20 +94,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        List<LineRequest> requests = LongStream.iterate(1, index -> index + 2)
-                                               .limit(5)
-                                               .boxed()
-                                               .map(index -> {
-                                                   stationStep.지하철역_생성_요청();
-                                                   stationStep.지하철역_생성_요청();
-                                                   LineRequest lineRequest = lineStep.dummyRequest();
-                                                   lineRequest.setName(index + "호선");
-                                                   lineRequest.setUpStationId(index);
-                                                   lineRequest.setDownStationId(index + 1);
-                                                   lineStep.지하철_노선_생성_요청(lineRequest);
-                                                   return lineRequest;
-                                               })
-                                               .collect(Collectors.toList());
+        String STATION_NAME_SUFFIX = "-역";
+        String LINE_NAME_SUFFIX = "-호선";
+        List<String> names = LongStream.iterate(1, index -> index + 2)
+                                       .limit(5)
+                                       .boxed()
+                                       .map(index -> {
+                                           String lineName = index + LINE_NAME_SUFFIX;
+                                           stationStep.지하철역_생성_요청(
+                                               index + STATION_NAME_SUFFIX
+                                           );
+                                           stationStep.지하철역_생성_요청(
+                                               (index + 1) + STATION_NAME_SUFFIX
+                                           );
+                                           lineStep.지하철_노선_생성_요청(
+                                               index + LINE_NAME_SUFFIX, index, index + 1
+                                           );
+                                           return lineName;
+                                       })
+                                       .collect(Collectors.toList());
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -119,10 +120,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                                                             .get("/lines")
                                                             .then().log().all()
                                                             .extract();
-
-        List<String> names = requests.stream()
-                                     .map(LineRequest::getName)
-                                     .collect(Collectors.toList());
         //then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
@@ -140,16 +137,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         long lineId = 1;
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
-        List<StationRequest> stationRequests = LongStream.iterate(1, i -> i + 1)
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(
+            LineStep.DUMMY_NAME, 1L, 2L
+        );
+        List<String> stationNames = LongStream.iterate(3, i -> i + 1)
                                                          .limit(10)
                                                          .boxed()
                                                          .map(index -> {
-                                                             StationRequest stationRequest = stationStep.dummyRequest();
-                                                             stationRequest.setName(index + "역");
-                                                             stationStep.지하철역_생성_요청(stationRequest);
-                                                             sectionStep.지하철_구간_생성_요청(lineId, index, index + 1);
-                                                             return stationRequest;
+                                                             String stationName = index + "역";
+                                                             stationStep.지하철역_생성_요청(stationName);
+                                                             sectionStep.지하철_구간_생성_요청(lineId, index - 1, index);
+                                                             return stationName;
                                                          })
                                                          .collect(Collectors.toList());
 
@@ -158,16 +156,13 @@ class LineAcceptanceTest extends AcceptanceTest {
             AcceptanceTestWhen.fromGiven(createResponse)
                               .requestLocation(Method.GET);
 
-        List<String> names = stationRequests.stream()
-                                            .map(StationRequest::getName)
-                                            .collect(Collectors.toList());
-        names.add(0, "2역");
-        names.add(0, "1역");
+        stationNames.add(0, "2역");
+        stationNames.add(0, "1역");
 
         // then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
-                          .containsAll("stations.name", names);
+                          .containsAll("stations.name", stationNames);
     }
 
     /**
@@ -180,55 +175,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
+        LineRequest request = lineStep.dummyRequest();
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(request);
 
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineStep.nextName());
-        params.put("color", lineStep.nextColor());
+        request.setName("변경된 이름");
+        request.setColor("변경된 색상");
 
         ExtractableResponse<Response> editResponse =
             AcceptanceTestWhen.fromGiven(createResponse)
-                              .requestLocation(Method.PUT, params);
+                              .requestLocation(Method.PUT, request);
 
         // then
         AcceptanceTestThen.fromWhen(editResponse)
                           .equalsHttpStatus(HttpStatus.OK);
-    }
-
-    /**
-     * Given 노선에 등록할 지하철 역을 등록하고
-     * And 지하철 노선 생성을 요청 하고
-     * And 노선에 등록할 지하철 역을 등록하고
-     * And 새로운(수정할) 지하철 노선 등록하고
-     * When 이미 존재하는 지하철 노선 이름으로 새로운 지하철 노선의 정보 수정을 요청 하면
-     * Then 지하철 노선의 정보 수정은 실패한다.
-     */
-    @DisplayName("지하철 노선 수정 실패 - 중복 이름")
-    @Test
-    void updateLineThatFailing() {
-        // given
-        LineRequest request = lineStep.dummyRequest();
-        lineStep.지하철_노선_생성_요청(request);
-        stationStep.지하철역_생성_요청();
-        stationStep.지하철역_생성_요청();
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(2, 3);
-
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", request.getName());
-        params.put("color", lineStep.nextColor());
-
-        ExtractableResponse<Response> editResponse =
-            AcceptanceTestWhen.fromGiven(createResponse)
-                              .requestLocation(Method.PUT, params);
-
-        // then
-        AcceptanceTestThen.fromWhen(editResponse)
-                          .equalsHttpStatus(HttpStatus.CONFLICT)
-                          .equalsErrorMessage(
-                              ErrorMessage.DUPLICATE_COLUMN.getMessage(ColumnName.LINE_NAME.getName())
-                          );
     }
 
     /**
@@ -241,7 +201,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청();
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(
+            lineStep.dummyRequest()
+        );
 
         // when
         AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
@@ -252,6 +214,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         AcceptanceTestThen.fromWhen(deleteResponse)
                           .equalsHttpStatus(HttpStatus.NO_CONTENT);
         AcceptanceTestThen.fromWhen(findResponse)
-                          .equalsHttpStatus(HttpStatus.NOT_IMPLEMENTED);
+                          .equalsHttpStatus(HttpStatus.NOT_FOUND);
     }
 }

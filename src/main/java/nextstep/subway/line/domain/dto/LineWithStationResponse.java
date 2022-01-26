@@ -1,35 +1,46 @@
 package nextstep.subway.line.domain.dto;
 
 import java.time.LocalDateTime;
-import nextstep.subway.line.domain.model.Line;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class LineResponse {
+import nextstep.subway.line.domain.model.Line;
+import nextstep.subway.station.domain.dto.StationResponse;
+
+public class LineWithStationResponse {
     private final Long id;
     private final String name;
     private final String color;
+    private final List<StationResponse> stations;
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
 
-    public LineResponse(Long id, String name, String color, LocalDateTime createdDate,
-        LocalDateTime modifiedDate) {
+    public LineWithStationResponse(Long id, String name, String color,
+                        List<StationResponse> stations, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.stations = stations;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
 
-    public static LineResponse.Builder builder() {
-        return new LineResponse.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public static LineResponse from(Line line) {
+    public static LineWithStationResponse from(Line line) {
+        List<StationResponse> stations = line.getStations()
+                                             .stream()
+                                             .map(StationResponse::from)
+                                             .collect(Collectors.toList());
         return builder()
             .id(line.getId())
             .name(line.getName())
             .color(line.getColor())
             .createdDate(line.getCreatedDate())
             .modifiedDate(line.getModifiedDate())
+            .stations(stations)
             .build();
     }
 
@@ -43,6 +54,10 @@ public class LineResponse {
 
     public String getColor() {
         return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 
     public LocalDateTime getCreatedDate() {
@@ -59,6 +74,7 @@ public class LineResponse {
         private String color;
         private LocalDateTime createdDate;
         private LocalDateTime modifiedDate;
+        private List<StationResponse> stations;
 
         private Builder() {
         }
@@ -88,9 +104,14 @@ public class LineResponse {
             return this;
         }
 
-        public LineResponse build() {
-            return new LineResponse(
-                id, name, color, createdDate, modifiedDate
+        public Builder stations(List<StationResponse> stations) {
+            this.stations = stations;
+            return this;
+        }
+
+        public LineWithStationResponse build() {
+            return new LineWithStationResponse(
+                id, name, color, stations, createdDate, modifiedDate
             );
         }
     }
