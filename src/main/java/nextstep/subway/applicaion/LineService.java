@@ -4,9 +4,9 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicatedNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,15 +22,13 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(LineRequest request) throws DuplicatedNameException {
+        if(isDuplicatedNameOfLine(request.getName())) {
+            throw new DuplicatedNameException();
+        }
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return createLineResponse(line);
     }
 
     @Transactional(readOnly = true)
@@ -53,14 +51,14 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
-        Optional<Line> line = lineRepository.findById(id);
-        return createLineResponse(line.orElseThrow(() -> new NoSuchElementException()));
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return createLineResponse(line);
     }
 
     public LineResponse updateLine(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException());
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
         line.updateLine(request.getName(), request.getColor());
-        return createLineResponse(lineRepository.save(line));
+        return createLineResponse(line);
     }
 
     public void deleteLineById(Long id) {
@@ -70,6 +68,6 @@ public class LineService {
     @Transactional(readOnly = true)
     public boolean isDuplicatedNameOfLine(String name) {
         Optional<Line> line = lineRepository.findByName(name);
-        return !line.isEmpty();
+        return line.isPresent();
     }
 }

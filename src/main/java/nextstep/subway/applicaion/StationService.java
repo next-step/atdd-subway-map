@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicatedNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,11 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
+    public StationResponse saveStation(StationRequest stationRequest) throws DuplicatedNameException {
+        if(isDuplicatedNameOfStation(stationRequest.getName())) {
+            throw new DuplicatedNameException();
+        }
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
@@ -50,6 +55,6 @@ public class StationService {
     @Transactional(readOnly = true)
     public boolean isDuplicatedNameOfStation(String name) {
         Optional<Station> station = stationRepository.findByName(name);
-        return !station.isEmpty();
+        return station.isPresent();
     }
 }
