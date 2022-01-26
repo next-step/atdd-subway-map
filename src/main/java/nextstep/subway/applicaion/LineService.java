@@ -28,7 +28,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        checkDuplication(request);
+        checkDuplicatedName(request);
         existsStation(request.getUpStationId());
         existsStation(request.getDownStationId());
         checkDistanceLessThanZero(request.getDistance());
@@ -47,7 +47,7 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    private void checkDuplication(LineRequest request) {
+    private void checkDuplicatedName(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("[duplication]:name");
         }
