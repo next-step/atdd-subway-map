@@ -2,10 +2,9 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.NotFoundLineException;
 import nextstep.subway.exception.NotFoundStationException;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,10 +19,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -72,5 +73,21 @@ public class LineService {
 
     private Station findStationById(Long id) {
         return stationRepository.findById(id).orElseThrow(() -> new NotFoundStationException(id));
+    }
+
+    public SectionResponse addSection(Long lineId, SectionRequest request) {
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+
+        Line line = findLineById(lineId);
+        Section section = new Section(
+                line,
+                upStation,
+                downStation,
+                request.getDistance()
+        );
+
+        sectionRepository.save(section);
+        return SectionResponse.of(section);
     }
 }
