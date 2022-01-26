@@ -14,6 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationTestStep {
 
+    public static Long 지하철역_생성_후_아이디_추출하기(String stationName) {
+        ExtractableResponse<Response> response = 지하철역_생성하기(stationName);
+        Integer stationIntegerId = response.jsonPath().get("id");
+        return stationIntegerId.longValue();
+    }
+
     public static ExtractableResponse<Response> 지하철역_생성하기(String stationName) {
         Map<String, String> body = new HashMap<>();
         body.put("name", stationName);

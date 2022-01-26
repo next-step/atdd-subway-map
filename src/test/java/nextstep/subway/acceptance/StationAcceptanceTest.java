@@ -56,9 +56,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     void deleteStation() {
         // given
         String 강남역_이름 = "강남역";
-        ExtractableResponse<Response> createResponse = StationTestStep.지하철역_생성하기(강남역_이름);
-        Integer stationIntegerId = createResponse.jsonPath().get("id");
-        Long stationId = stationIntegerId.longValue();
+        Long stationId = StationTestStep.지하철역_생성_후_아이디_추출하기(강남역_이름);
 
         // when
         ExtractableResponse<Response> response = StationTestStep.지하철역_삭제하기(stationId);
