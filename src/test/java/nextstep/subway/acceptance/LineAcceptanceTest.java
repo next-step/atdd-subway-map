@@ -23,14 +23,19 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private Long 강남역id;
     private Long 양재역id;
+    private Long 판교역id;
+
     private Map<String, String> 신분당선;
     private Map<String, String> 이호선;
     private Map<String, String> 구분당선;
+
+    private Map<String, String> 양재_판교_구간;
 
     @BeforeEach
     void initParam() {
         강남역id = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
         양재역id = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
+        판교역id = 지하철역_생성_요청(판교역).jsonPath().getLong("id");
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
@@ -46,6 +51,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         구분당선 = new HashMap<>();
         구분당선.put("name", "구분당선");
         구분당선.put("color", "bg-blue-600");
+
+        양재_판교_구간 = new HashMap<>();
+        양재_판교_구간.put("upStationId", String.valueOf(양재역id));
+        양재_판교_구간.put("downStationId", String.valueOf(판교역id));
+        양재_판교_구간.put("distance", String.valueOf(12700));
     }
 
     /**
@@ -157,6 +167,34 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         지하철_노선_이름_중복됨(response);
+    }
+
+    /**
+     * Scenario: 구간 등록(정상적인 시나리오)
+     * Given 지하철 노선 생성 요청 하고
+     * When 구간 등록 요청하면
+     * Then 구간 등록이 성공한다.
+     */
+    @DisplayName("구간 등록")
+    @Test
+    void addSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+
+        // when
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = 구간_등록_요청(uri, 양재_판교_구간);
+
+        구간_등록됨(response, 양재_판교_구간);
+    }
+
+    private ExtractableResponse<Response> 구간_등록_요청(String uri, Map<String, String> params) {
+        return post(params, uri + "/sections");
+    }
+
+    private void 구간_등록됨(ExtractableResponse<Response> response, Map<String, String> params) {
+        응답_요청_확인(response, HttpStatus.CREATED);
+        assertThat(response.header("Location")).isNotBlank();
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
