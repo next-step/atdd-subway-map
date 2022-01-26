@@ -1,11 +1,18 @@
 package nextstep.subway.applicaion.service;
 
+import nextstep.subway.applicaion.dto.request.SectionRequest;
 import nextstep.subway.applicaion.dto.response.LineCreationResponse;
 import nextstep.subway.applicaion.dto.request.LineRequest;
 import nextstep.subway.applicaion.dto.response.LineResponse;
+import nextstep.subway.applicaion.dto.response.SectionResponse;
 import nextstep.subway.domain.Entity.Line;
+import nextstep.subway.domain.Entity.Section;
+import nextstep.subway.domain.Entity.Station;
 import nextstep.subway.domain.Repository.LineRepository;
+import nextstep.subway.domain.Repository.SectionRepository;
+import nextstep.subway.domain.Repository.StationRepository;
 import nextstep.subway.exception.DuplicationException;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -17,10 +24,20 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    private final static int NUMBER_ZERO = 0;
+
+    private final SectionRepository sectionRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
+
+    public LineService(SectionRepository sectionRepository,
+                       LineRepository lineRepository,
+                       StationRepository stationRepository
+    ) {
+        this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineCreationResponse saveLine(LineRequest request) {
@@ -34,6 +51,14 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    private void verifyDuplication(final String name) {
+        Line line = lineRepository.findByName(name);
+
+        if (!ObjectUtils.isEmpty(line)) {
+            throw new DuplicationException("이미 존재합니다.");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -74,11 +99,48 @@ public class LineService {
                 line.getModifiedDate());
     }
 
-    private void verifyDuplication(final String name) {
-        Line line = lineRepository.findByName(name);
+    public SectionResponse createSection(final Long id, final SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        Station upStation =
+                stationRepository.findById(sectionRequest.getUpStationId())
+                        .orElseThrow(() -> new NotFoundException("상행역이 존재하지 않습니다." + "LineId : " + id));
+        Station downStation =
+                stationRepository.findById(sectionRequest.getDownStationId())
+                        .orElseThrow(() -> new NotFoundException("하행역이 존재하지 않습니다." + "LineId : " + id));
+        verifyStationsRelation(upStation);
+        newUpStationMustBeDownStation(upStation);
+        Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
 
-        if (!ObjectUtils.isEmpty(line)) {
-            throw new DuplicationException("이미 존재합니다.");
+        return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());
+    }
+
+    private void verifyStationsRelation(final Station upStation) {
+        Section sectionByUpStation = sectionRepository.findSectionByUpStation(upStation);
+        if (!ObjectUtils.isEmpty(sectionByUpStation)) {
+
+            throw new DuplicationException("새로운 구간의 상행역은 이미 등록되어있습니다.");
         }
+    }
+
+    private void newUpStationMustBeDownStation(final Station upStation) {
+        if (NUMBER_ZERO != sectionRepository.count()) {
+            Section sectionByDownStation = sectionRepository.findSectionByDownStation(upStation);
+            if (ObjectUtils.isEmpty(sectionByDownStation)) {
+
+                throw new RuntimeException("새로운 상행역은 무조건 하행역으로 등록되어있어야합니다.");
+            }
+        }
+    }
+
+    public void deleteSection(final Long lineId, final Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
+        Station downStation = stationRepository.findById(stationId).orElseThrow(RuntimeException::new);
+        Section section = sectionRepository.findByLineAndDownStation(line, downStation).orElseThrow(RuntimeException::new);
+        sectionRepository.delete(section);
+    }
+
+
+    private void deleteSectionMustBeDownStation(final Long stationId) {
+
     }
 }
