@@ -84,7 +84,20 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("새로운 구간 등록")
     @Test
     void 등록안된_하행구간_등록_테스트(){
+        //given
+        지하철역생성();
+        기존노선생성();
 
+        //when
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 하행종점);
+        params.put("downStationId", 3L);
+        params.put("distance", 10);
+
+        //삭제 동시접근시?
+        ExtractableResponse<Response> response = 포스트_요청(기본구간주소, params);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private void 지하철역생성() {
