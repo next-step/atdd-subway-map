@@ -240,7 +240,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     static Map<String, String> GTXA노선_상행_정보없음;
     static Map<String, String> GTXA노선_하행_정보없음;
     static Map<String, String> GTXA노선_거리_정보없음;
-    static Map<String, String> GTXA노선_상행_하행_정보같음;
     static Map<String, String> 신분당선;
     static Map<String, String> 노선색상;
 
@@ -289,13 +288,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         GTXA노선_거리_정보없음.put("color", "bg-red-900");
         GTXA노선_거리_정보없음.put("upStationId", "1");
         GTXA노선_거리_정보없음.put("downStationId", "2");
-
-        GTXA노선_상행_하행_정보같음 = new HashMap<>();
-        GTXA노선_상행_하행_정보같음.put("name", "GTX-A");
-        GTXA노선_상행_하행_정보같음.put("color", "bg-red-900");
-        GTXA노선_상행_하행_정보같음.put("upStationId", "1");
-        GTXA노선_상행_하행_정보같음.put("downStationId", "1");
-        GTXA노선_상행_하행_정보같음.put("distance", "10");
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
