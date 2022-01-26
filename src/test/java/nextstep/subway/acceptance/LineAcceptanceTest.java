@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -263,18 +264,40 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> createParams = getParams("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createParams);
+        지하철역들_생성_요청(10);
+        String bgRed600 = "bg-red-600";
+        String 신분당선 = "신분당선";
+        String upStationId = "1";
+        String downStationId = "4";
+        String distance = "10";
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
+                신분당선,
+                bgRed600,
+                upStationId,
+                downStationId,
+                distance);
+
+        // when
+        String uri = createResponse.header("Location");
+        String upStationId2 = "4";
+        String downStationId2 = "5";
+        String distance2 = "10";
+        지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
 
         // when
         LineCreateResponse lineCreateResponse = createResponse.body().as(LineCreateResponse.class);
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(uri);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(uri + "/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        LineResponse createLineResponse = lineCreateResponseConvertToLineResponse(lineCreateResponse);
+
         LineResponse lineResponse = response.body().as(LineResponse.class);
+        Station upStation = new Station(upStationId);
+        Station downStation = new Station(downStationId);
+        Station downStation2 = new Station(downStationId2);
+        List<Station> stations = lineResponse.getStations();
+        assertThat(stations).contains(upStation, downStation, downStation2);
+        LineResponse createLineResponse = lineCreateResponseConvertToLineResponse(lineCreateResponse);
 
         assertThat(createLineResponse).isEqualTo(lineResponse);
     }
