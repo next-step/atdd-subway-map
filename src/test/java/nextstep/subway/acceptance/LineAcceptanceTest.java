@@ -21,11 +21,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = 노선_생성(LINE_NEW_BOONDANG);
+        ExtractableResponse<Response> response = 노선_생성(신분당선);
 
         // then
-        응답_상태코드_검증(response, HttpStatus.CREATED);
-        응답_바디_각_요소_검증(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
+        노선_응답_검증(response, HttpStatus.CREATED, 신분당선);
     }
 
     /**
@@ -38,16 +37,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        노선_생성(LINE_NEW_BOONDANG);
+        노선_생성(신분당선);
         // given
-        노선_생성(LINE_TWO);
+        노선_생성(이호선);
 
         // when
         ExtractableResponse<Response> response = 노선_목록_조회();
 
         // then
-        응답_상태코드_검증(response, HttpStatus.OK);
-        응답_바디_여러_요소_검증(response);
+        노선_목록_조회_응답_검증(response, HttpStatus.OK, 신분당선, 이호선);
     }
 
     /**
@@ -59,14 +57,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Long lineId = extractId(노선_생성(LINE_NEW_BOONDANG));
+        Long lineId = extractId(노선_생성(신분당선));
 
         // when
         ExtractableResponse<Response> response = 노선_조회(lineId);
 
         // then
-        응답_상태코드_검증(response, HttpStatus.OK);
-        응답_바디_각_요소_검증(response, LINE_NEW_BOONDANG.getName(), LINE_NEW_BOONDANG.getColor());
+        노선_응답_검증(response, HttpStatus.OK, 신분당선);
     }
 
     /**
@@ -81,14 +78,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         String modifyColor = "bg-blue-600";
 
         // given
-        Long modifiedId = extractId(노선_생성(LINE_NEW_BOONDANG));
+        Long modifiedId = extractId(노선_생성(신분당선));
 
         // when
         ExtractableResponse<Response> response = 노선_변경(modifyName, modifyColor, modifiedId);
 
         // then
-        응답_상태코드_검증(response, HttpStatus.OK);
-        응답_바디_각_요소_검증(노선_조회(modifiedId), modifyName, modifyColor);
+        노선_응답_상태_검증(response, HttpStatus.OK);
     }
 
     /**
@@ -100,13 +96,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Long deletedId = extractId(노선_생성(LINE_NEW_BOONDANG));
+        Long deletedId = extractId(노선_생성(신분당선));
 
         // when
         ExtractableResponse<Response> response = 노선_삭제(deletedId);
 
         // then
-        응답_상태코드_검증(response, HttpStatus.NO_CONTENT);
+        노선_응답_상태_검증(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -119,12 +115,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void validateLineName() {
         // given
-        노선_생성(LINE_NEW_BOONDANG);
+        노선_생성(신분당선);
 
         // when
-        ExtractableResponse<Response> duplicatedLineResponse = 노선_생성(LINE_NEW_BOONDANG);
+        ExtractableResponse<Response> duplicatedLineResponse = 노선_생성(신분당선);
 
         // then
-        응답_상태코드_검증(duplicatedLineResponse, HttpStatus.CONFLICT);
+        노선_응답_상태_검증(duplicatedLineResponse, HttpStatus.CONFLICT);
     }
 }

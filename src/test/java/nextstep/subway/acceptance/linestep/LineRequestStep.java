@@ -17,7 +17,7 @@ public class LineRequestStep {
     public static ExtractableResponse<Response> 노선_생성(TestLine line) {
         Map<String, String> params = createRequestBody(line);
 
-        ExtractableResponse<Response> response = RestAssured
+        return RestAssured
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +28,6 @@ public class LineRequestStep {
 
                 .then().log().all()
                 .extract();
-        return response;
     }
 
     private static Map<String, String> createRequestBody(TestLine line) {
@@ -40,7 +39,7 @@ public class LineRequestStep {
     }
 
     public static ExtractableResponse<Response> 노선_목록_조회() {
-        ExtractableResponse<Response> response = RestAssured
+        return RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
 
@@ -49,7 +48,6 @@ public class LineRequestStep {
 
                 .then().log().all()
                 .extract();
-        return response;
     }
 
     public static ExtractableResponse<Response> 노선_조회(Long id) {
@@ -90,7 +88,7 @@ public class LineRequestStep {
     }
 
     public static ExtractableResponse<Response> 노선_삭제(Long deletedId) {
-        ExtractableResponse<Response> response = RestAssured
+        return RestAssured
                 .given()
                 .accept(MediaType.ALL_VALUE)
 
@@ -99,6 +97,5 @@ public class LineRequestStep {
 
                 .then().log().all()
                 .extract();
-        return response;
     }
 }

@@ -31,7 +31,7 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<?> getStations() {
+    public List<Station> getStations() {
         return null;
     }
 

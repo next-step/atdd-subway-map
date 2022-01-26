@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import static nextstep.subway.acceptance.stationstep.StationRequestStep.*;
 import static nextstep.subway.acceptance.stationstep.StationValidateStep.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -22,8 +21,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 역_생성("강남역");
 
         // then
-        역_응답_상태_검증(response, HttpStatus.CREATED);
-        역_응답_바디_검증(response);
+        역_생성_응답_검증(response, HttpStatus.CREATED);
     }
 
     /**
@@ -35,18 +33,19 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        /// given
-        String 강남역 = "강남역";
-        ExtractableResponse<Response> createResponse1 = 역_생성(강남역);
+        // given
+        String 역1 = "강남역";
+        역_생성(역1);
 
-        String 역삼역 = "역삼역";
-        ExtractableResponse<Response> createResponse2 = 역_생성(역삼역);
+        // given
+        String 역2 = "역삼역";
+        역_생성(역2);
 
         // when
         ExtractableResponse<Response> response = 역_목록_조회();
 
-        역_응답_상태_검증(response, HttpStatus.OK);
-        역_목록_조회_바디_검증(강남역, 역삼역, response);
+        // then
+        역_목록_조회_응답_검증(response, HttpStatus.OK, 역1, 역2);
     }
 
     /**
@@ -64,7 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 역_삭제(createResponse);
 
         // then
-        역_응답_상태_검증(response, HttpStatus.NO_CONTENT);
+        역_삭제_응답_검증(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -83,8 +82,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> duplicatedStationResponse = 역_생성("강남역");
 
         // then
-        ExtractableResponse<Response> stationList = 역_목록_조회();
-        역_응답_바디_개수_검증(stationList, 1);
-        역_응답_상태_검증(duplicatedStationResponse, HttpStatus.CONFLICT);
+        역_이름_중복_응답_검증(duplicatedStationResponse, HttpStatus.CONFLICT);
     }
 }
