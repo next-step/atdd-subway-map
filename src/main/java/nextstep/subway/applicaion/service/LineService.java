@@ -42,7 +42,12 @@ public class LineService {
 
     public LineCreationResponse saveLine(LineRequest request) {
         verifyDuplication(request.getName());
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(
+                new Line(request.getName(),
+                        request.getColor(),
+                        request.getUpStationId(),
+                        request.getDownStationId(),
+                        request.getDistance()));
 
         return new LineCreationResponse(
                 line.getId(),

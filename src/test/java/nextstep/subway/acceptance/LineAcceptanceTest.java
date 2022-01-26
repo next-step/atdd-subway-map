@@ -131,19 +131,27 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
-    // 섹션에 대한 코드
     @DisplayName("구간을 생성")
     @Test
     void createSection() {
         // 역 2개 생성 : 1L, 2L
-        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
-        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역");
+        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역");
+        ExtractableResponse<Response> 신도림 = StationStep.saveStation("신도림");
+
+        // 첫 노선도에 들어갈 두 역
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
 
         // 노선 생성
-        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+        ExtractableResponse<Response> line =
+            LineStep.saveLine("파란색", "1호선", upStationId, downStationId, 20);
+
+        long lineId = line.jsonPath().getLong("id");
 
         // 구간 생성
-        ExtractableResponse<Response> extract = SectionStep.saveSection(1L, 2L, 10, 1L);
+        long newStationId = 신도림.jsonPath().getLong("id");
+        ExtractableResponse<Response> extract = SectionStep.saveSection(downStationId, newStationId, 10, lineId);
 
         // 상태 코드
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());

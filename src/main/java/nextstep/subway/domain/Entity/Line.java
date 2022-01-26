@@ -32,9 +32,12 @@ public class Line extends BaseEntity {
         //
     }
 
-    public Line(String name, String color) {
+    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     public void updateLine(final String name, final String color) {
@@ -52,5 +55,17 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 }
