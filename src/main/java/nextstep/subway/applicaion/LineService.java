@@ -55,7 +55,7 @@ public class LineService {
                 line.getColor(),
                 line.getCreatedDate(),
                 line.getModifiedDate(),
-                new ArrayList<>()
+                line.getAllStations()
             ))
             .collect(Collectors.toList());
     }
@@ -70,7 +70,7 @@ public class LineService {
             line.getColor(),
             line.getCreatedDate(),
             line.getModifiedDate(),
-            new ArrayList<>()
+            line.getAllStations()
         );
     }
 

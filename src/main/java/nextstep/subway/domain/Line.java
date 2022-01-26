@@ -1,11 +1,11 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.Section;
+import nextstep.subway.applicaion.dto.StationResponse;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -113,5 +113,19 @@ public class Line extends BaseEntity {
             .orElseThrow(() -> new IllegalArgumentException("마지막 역(하행 종점역)만 제거할 수 있습니다."));
 
         sections.remove(delete);
+    }
+
+    public List<StationResponse> getAllStations() {
+        List<Station> allStation = sections.
+            stream()
+            .map(Section::getUpStation)
+            .collect(Collectors.toList());
+
+        allStation.add(getLastDownStation());
+
+        return allStation
+            .stream()
+            .map(StationResponse::ofStation)
+            .collect(Collectors.toList());
     }
 }
