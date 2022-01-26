@@ -26,6 +26,8 @@ public class SectionService {
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(() -> new StationException.NotFound(sectionRequest.getDownStationId()));
 
+        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
+        line.extend(section);
         return new SectionResponse();
     }
 }

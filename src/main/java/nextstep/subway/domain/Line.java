@@ -1,6 +1,10 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.domain.exception.SectionException;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -19,6 +23,9 @@ public class Line extends BaseEntity {
     private Station downStation;
 
     private int distance;
+
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
@@ -61,5 +68,11 @@ public class Line extends BaseEntity {
 
     public void changeColor(String color) {
         this.color = color;
+    }
+
+    public void extend(Section section) {
+        if (!section.isStartWith(getDownStation())) {
+            throw SectionException.ofIllegalUpStation(section);
+        }
     }
 }

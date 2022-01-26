@@ -97,6 +97,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("상행역이 노선의 하행 종점역이 아닐 때")
     @Test
     void createNotConsistsUpStationSection() {
+        ExtractableResponse<Response> otherStationResponse = StationSteps.executeStationCreateRequest("정자역");
+        Long otherStationId = otherStationResponse.jsonPath().getLong("id");
+
+        SectionRequest request = defaultSectionRequestBuilder.withUpStationId(otherStationId).build();
+        ExtractableResponse<Response> response = SectionSteps.executeSectionCreateRequest(lineId, request);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).contains("Illegal Section");
     }
 
     /**
