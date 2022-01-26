@@ -22,6 +22,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         lineRepository.findByName(request.getName())
                 .ifPresent(l -> {
