@@ -5,20 +5,12 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.util.List;
 
 import static nextstep.subway.fixture.TLine.*;
 import static nextstep.subway.steps.LineSteps.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-
-    private static final String 노선_이름 = "name";
-    private static final String 노선_색 = "color";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -31,9 +23,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
+        노선_생성_성공(response);
     }
 
     /**
@@ -53,11 +43,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> lineNames = response.jsonPath().getList(노선_이름);
-        assertThat(lineNames).containsExactly(신분당선.이름, _2호선.이름);
-        List<String> lineColors = response.jsonPath().getList(노선_색);
-        assertThat(lineColors).containsExactly(신분당선.색, _2호선.색);
+        노선_목록_조회_성공(response, 신분당선, _2호선);
     }
 
     /**
@@ -75,11 +61,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String name = response.jsonPath().get(노선_이름);
-        assertThat(name).isEqualTo(신분당선.이름);
-        String color = response.jsonPath().get(노선_색);
-        assertThat(color).isEqualTo(신분당선.색);
+        노선_조회_성공(response, 신분당선);
     }
 
     /**
@@ -93,7 +75,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(999L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        노선_조회_실패_없는_노선(response);
     }
 
     /**
@@ -112,7 +94,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_변경_요청(uri, 신분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        노선_변경_성공(response);
     }
 
     /**
@@ -126,7 +108,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_변경_요청("/lines/1", 구분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        노선_변경_실패_없는_노선(response);
     }
 
     /**
@@ -145,7 +127,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        노선_삭제_성공(response);
     }
 
     /**
@@ -163,7 +145,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(구분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        노선_생성_실패_중복(response);
     }
 
 }
