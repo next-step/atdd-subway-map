@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.StationAcceptanceTest.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -11,9 +10,6 @@ import nextstep.subway.utils.CustomRestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -219,36 +215,5 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    public static ExtractableResponse<Response> 노선_조회(final String createdLineId) {
-        return CustomRestAssured.get("/lines/" + createdLineId);
-    }
-
-    public static ExtractableResponse<Response> 노선_생성(final String lineName, final String lineColor, String upStationId, String downStationId, String distance) {
-        return CustomRestAssured.post("/lines/", createParams(lineName, lineColor, upStationId, downStationId, distance));
-    }
-
-    private ExtractableResponse<Response> 노선_정보_변경(final String id, final String name, final String color) {
-        return CustomRestAssured.put("/lines/" + id, createParams(name, color));
-    }
-
-    private static Map<String, String> createParams(final String lineName, final String lineColor, String upStationId, String downStationId, String distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", lineColor);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return params;
-    }
-
-    private static Map<String, String> createParams(final String lineName, final String lineColor) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", lineColor);
-
-        return params;
     }
 }

@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line extends BaseEntity {
@@ -43,6 +44,10 @@ public class Line extends BaseEntity {
 
     public void addSection(Long upStationId, Long downStationId, int distance) {
         sections.addSection(upStationId, downStationId, distance);
+    }
+
+    public boolean hasName(String name) {
+        return Objects.equals(this.name, name);
     }
 
     public List<Long> getAllStations() {

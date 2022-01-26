@@ -58,7 +58,7 @@ public class LineService {
         boolean existLineName = lineRepository.existsByName(request.getName());
         Line line = lineRepository.findById(request.getId()).orElseThrow(IllegalArgumentException::new);
 
-        if (existLineName && !line.getName().equals(request.getName())) {
+        if (existLineName && !line.hasName(request.getName())) {
             throw new IllegalArgumentException();
         }
 

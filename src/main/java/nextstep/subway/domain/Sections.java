@@ -27,14 +27,13 @@ public class Sections {
     }
 
     public void addSection(final Long upStationId, final Long downStationId, final int distance) {
-        if (upStationId.equals(downStationId) || !lastSection().isDownStationId(upStationId)
+        if (upStationId.equals(downStationId) || !lastSection().hasDownStationId(upStationId)
                 || upStationIds().contains(downStationId)
         ) {
             throw new IllegalArgumentException("출발역과 도착역은 같을 수 없습니다.");
         }
 
-        Section section = new Section(upStationId, downStationId, distance);
-        this.sections.add(section);
+        this.sections.add(new Section(upStationId, downStationId, distance));
     }
 
     public List<Long> getAllStations() {
@@ -45,7 +44,7 @@ public class Sections {
     }
 
     public void deleteSection(final Long stationId) {
-        if (this.sections.size() == MINIMUM_SECTION_COUNT || !lastSection().isDownStationId(stationId)) {
+        if (this.sections.size() == MINIMUM_SECTION_COUNT || !lastSection().hasDownStationId(stationId)) {
             throw new IllegalArgumentException();
         }
 

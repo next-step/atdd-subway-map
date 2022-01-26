@@ -15,7 +15,7 @@ public class Section {
         this.distance = distance;
     }
 
-    public boolean isDownStationId(long downStationId) {
+    public boolean hasDownStationId(long downStationId) {
         return this.downStationId.equals(downStationId);
     }
 

@@ -10,9 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -98,16 +96,5 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(duplicateCreateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    private ExtractableResponse<Response> 지하철역_조회() {
-        return CustomRestAssured.get("/stations");
-    }
-
-    public static ExtractableResponse<Response> 지하철역_생성(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return CustomRestAssured.post("/stations", params);
     }
 }

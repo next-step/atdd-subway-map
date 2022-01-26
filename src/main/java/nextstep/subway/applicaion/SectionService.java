@@ -19,6 +19,7 @@ public class SectionService {
         this.lineRepository = lineRepository;
     }
 
+    @Transactional
     public void addSection(final SectionAddRequest request) {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(IllegalArgumentException::new);
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(IllegalArgumentException::new);
@@ -27,6 +28,7 @@ public class SectionService {
         line.addSection(upStation.getId(), downStation.getId(), request.getDistance());
     }
 
+    @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
 
