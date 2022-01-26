@@ -221,7 +221,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank()
+                .isEqualTo("/lines/1");
     }
 
     /**
