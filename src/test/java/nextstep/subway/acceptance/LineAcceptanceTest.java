@@ -25,18 +25,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String color = "bg-red-600";
         String name = "신분당선";
-        Map<String, String> params = new HashMap<>();
-        params.put("color", color);
-        params.put("name", name);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then().log().all()
-                .extract();
+        var response = 지하철_노선_생성_요청(name, color);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
