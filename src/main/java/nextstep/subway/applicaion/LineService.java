@@ -4,7 +4,8 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.exception.DuplicationException;
+import nextstep.subway.exception.LogicError;
+import nextstep.subway.exception.LogicException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +22,13 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        try {
-            Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-            return LineResponse.of(line);
-        } catch (Exception e) {
-            throw new DuplicationException(request.getName(), e);
+
+        if(isExistLineName(request.getName())){
+            throw new LogicException(LogicError.DUPLICATED_NAME_LINE);
         }
 
+        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -52,8 +53,12 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public Line findById(Long id) {
+    private Line findById(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException());
+                .orElseThrow(() -> new LogicException(LogicError.NOT_EXIST_LINE));
+    }
+
+    private boolean isExistLineName(String name) {
+        return lineRepository.findByName(name).isPresent();
     }
 }
