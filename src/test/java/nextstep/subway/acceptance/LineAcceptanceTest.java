@@ -27,7 +27,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ApiUtil.지하철역_생성_API(서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,10 +46,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
@@ -125,7 +125,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         ApiUtil.지하철역_생성_API(강남역);
         ApiUtil.지하철역_생성_API(양재역);
@@ -153,7 +153,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // when
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_단건_조회_API(1L);
@@ -179,7 +179,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // when
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_수정_API(1L, 노선색상);
@@ -206,7 +206,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // when
         ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_삭제_API(1L);
@@ -227,16 +227,37 @@ class LineAcceptanceTest extends AcceptanceTest {
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
         ApiUtil.지하철역_생성_API(삼성역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    static Map<String, String> GTXA노선;
+    /**
+     * When 지하철 노선 구간 생성을 요청 시, 상행역은 해당 노선에 등록되어있는 하행역 아니면,
+     * Then 지하철 노선 구건 생성에 실패한다.
+     * @see nextstep.subway.ui.LineController#createSection
+     */
+    @DisplayName("[예외]지하철 노선 구간 생성 시 기존 역의 하행역이 아닐경우 방지 테스트")
+    @Test
+    void 지하철_노선_구간_생성_시_기존_역의_하행역이_아닐경우_방지_테스트() {
+        //given
+        ApiUtil.지하철역_생성_API(연신내역);
+        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(삼성역);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+
+        // when
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_연신내역_삼성역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    static Map<String, String> GTXA노선_연신내_서울역;
     static Map<String, String> GTXA노선_상행_정보없음;
     static Map<String, String> GTXA노선_하행_정보없음;
     static Map<String, String> GTXA노선_거리_음수;
@@ -249,7 +270,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     static Map<String, String> 강남역;
     static Map<String, String> 양재역;
 
-    static Map<String, String> GTXA노선_구간;
+    static Map<String, String> GTXA노선_구간_서울역_삼성역;
+    static Map<String, String> GTXA노선_구간_연신내역_삼성역;
 
     @BeforeAll
     public static void 초기화() {
@@ -264,12 +286,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         양재역 = new HashMap<>();
         양재역.put("name", "양재역");
 
-        GTXA노선 = new HashMap<>();
-        GTXA노선.put("name", "GTX-A");
-        GTXA노선.put("color", "bg-red-900");
-        GTXA노선.put("upStationId", "1");
-        GTXA노선.put("downStationId", "2");
-        GTXA노선.put("distance", "10");
+        GTXA노선_연신내_서울역 = new HashMap<>();
+        GTXA노선_연신내_서울역.put("name", "GTX-A");
+        GTXA노선_연신내_서울역.put("color", "bg-red-900");
+        GTXA노선_연신내_서울역.put("upStationId", "1");
+        GTXA노선_연신내_서울역.put("downStationId", "2");
+        GTXA노선_연신내_서울역.put("distance", "10");
 
         GTXA노선_상행_정보없음 = new HashMap<>();
         GTXA노선_상행_정보없음.put("name", "GTX-A");
@@ -300,9 +322,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         노선색상 = new HashMap<>();
         노선색상.put("color", "bg-red-800");
 
-        GTXA노선_구간 = new HashMap<>();
-        GTXA노선_구간.put("upStationId", "2");
-        GTXA노선_구간.put("downStationId", "3");
-        GTXA노선_구간.put("distance", "10");
+        GTXA노선_구간_서울역_삼성역 = new HashMap<>();
+        GTXA노선_구간_서울역_삼성역.put("upStationId", "2");
+        GTXA노선_구간_서울역_삼성역.put("downStationId", "3");
+        GTXA노선_구간_서울역_삼성역.put("distance", "10");
+
+        GTXA노선_구간_연신내역_삼성역 = new HashMap<>();
+        GTXA노선_구간_연신내역_삼성역.put("upStationId", "1");
+        GTXA노선_구간_연신내역_삼성역.put("downStationId", "3");
+        GTXA노선_구간_연신내역_삼성역.put("distance", "10");
     }
 }
