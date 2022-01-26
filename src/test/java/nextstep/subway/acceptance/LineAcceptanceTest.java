@@ -24,6 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     private Long 강남역id;
     private Long 양재역id;
     private Long 판교역id;
+    private Long 역삼역id;
 
     private Map<String, String> 신분당선;
     private Map<String, String> 이호선;
@@ -36,6 +37,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         강남역id = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
         양재역id = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
         판교역id = 지하철역_생성_요청(판교역).jsonPath().getLong("id");
+        역삼역id = 지하철역_생성_요청(역삼역).jsonPath().getLong("id");
 
         신분당선 = new HashMap<>();
         신분당선.put("name", "신분당선");
@@ -47,6 +49,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         이호선 = new HashMap<>();
         이호선.put("name", "2호선");
         이호선.put("color", "bg-green-600");
+        이호선.put("upStationId", String.valueOf(강남역id));
+        이호선.put("downStationId", String.valueOf(역삼역id));
+        이호선.put("distance", String.valueOf(1600));
 
         구분당선 = new HashMap<>();
         구분당선.put("name", "구분당선");
@@ -69,7 +74,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
-        지하철_노선_생성됨(response);
+        지하철_노선_생성됨(response, 신분당선);
     }
 
     /**
@@ -219,15 +224,15 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 지하철_노선_등록되어_있음(Map<String, String> params) {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
-        지하철_노선_생성됨(response);
+        지하철_노선_생성됨(response, params);
 
         return response;
     }
 
-    private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
+    private void 지하철_노선_생성됨(ExtractableResponse<Response> response, Map<String, String> params) {
         응답_요청_확인(response, HttpStatus.CREATED);
         assertThat(response.header("Location")).isNotBlank();
-        assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(강남역id, 양재역id);
+        assertThat(response.jsonPath().getList("stations.id", String.class)).containsExactly(params.get("upStationId"), params.get("downStationId"));
     }
 
     private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> ... createResponses) {
