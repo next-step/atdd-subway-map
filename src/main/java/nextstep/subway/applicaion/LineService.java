@@ -118,4 +118,17 @@ public class LineService {
         );
         line.addSection(section);
     }
+
+    public void deleteSection(Long id, Long stationId) {
+        existsStation(stationId);
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(EntityNotFoundException::new);
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        line.getSections()
+                .stream()
+                .filter(t -> t.getDownStation().getId().equals(stationId))
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
+    }
 }

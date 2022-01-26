@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -65,7 +66,7 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/section")
+    @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         try {
             lineService.saveSection(id, sectionRequest);
@@ -73,5 +74,11 @@ public class LineController {
         } catch (InvalidParameterException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
         }
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam("stationId") Long stationId) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
