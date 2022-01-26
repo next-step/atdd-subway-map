@@ -4,29 +4,27 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
-import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
 
 import static nextstep.subway.acceptance.LineSteps.*;
-import static nextstep.subway.acceptance.LineSteps.지하철_노선_생성_요청2;
 import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
+    @BeforeEach
+    void init() {
+        지하철역들_생성_요청(5);
+    }
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -35,31 +33,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        지하철역들_생성_요청(10);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
+        String color = "bg-red-600";
+        String name = "신분당선";
         String upStationId = "1";
         String downStationId = "4";
         String distance = "10";
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                name,
+                color,
                 upStationId,
                 downStationId,
                 distance);
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        LineResponse lineResponse = createResponse.body().as(LineResponse.class);
-        assertAll(
-                () -> assertNotNull(lineResponse.getId()),
-                () -> assertEquals(lineResponse.getName(), 신분당선),
-                () -> assertEquals(lineResponse.getColor(), bgRed600),
-                () -> assertNotNull(lineResponse.getCreatedDate()),
-                () -> assertNotNull(lineResponse.getModifiedDate()));
+        지하철_노선_생성_응답_검증(color, name, createResponse);
     }
 
     /**
@@ -67,29 +56,21 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
-    @DisplayName("지하철 역이 존재하지 않는 지하철 역인 지하철 노선 생성")
-    @CsvSource(delimiter = ':', value = {"1:2", "2:1"})
+    @DisplayName("생성할 노선의 지하철 역이 존재하지 않는 지하철 역인 지하철 노선 생성")
+    @CsvSource(delimiter = ':', value = {"1:6", "6:1"})
     @ParameterizedTest
     void createLineWithNotExistUpStation(String upStationId, String downStationId) {
-        //given
-        지하철역들_생성_요청(1);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String distance = "10";
-
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
                 upStationId,
                 downStationId,
-                distance);
+                "10");
 
         //then
-        //todo advicecontroller로  400 badrequest로 반환하도록 리팩토링
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        실패_응답_검증(createResponse.statusCode());
     }
-
 
     /**
      * Given 지하철역 생성을 요청 하고
@@ -100,29 +81,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicateNameLine() {
         // given
-        지하철역들_생성_요청(10);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-        지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
+        지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "2",
+                "5",
+                "3");
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        실패_응답_검증(createResponse.statusCode());
     }
 
     /**
@@ -133,28 +108,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 구간 추가")
     @Test
     void addSection() {
-        지하철역들_생성_요청(5);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
 
-        String uri = createResponse.header("Location");
         //when
-        String upStationId2 = "4";
-        String downStationId2 = "5";
-        String distance2 = "10";
-        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, "4", "5", "1");
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        성공_응답_검증(response.statusCode());
     }
 
     /**
@@ -165,28 +131,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가")
     @Test
     void addSectionFailedByUpStation() {
-        지하철역들_생성_요청(5);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
 
         //when
         String uri = createResponse.header("Location");
-        String upStationId2 = "3";
-        String downStationId2 = "5";
-        String distance2 = "10";
-        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, "3", "5", "10");
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        실패_응답_검증(response.statusCode());
     }
 
 
@@ -199,28 +156,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가")
     @Test
     void addSectionFailedByDownStation() {
-        지하철역들_생성_요청(5);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
 
         //when
         String uri = createResponse.header("Location");
-        String upStationId2 = "4";
-        String downStationId2 = "1";
-        String distance2 = "10";
-        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+        ExtractableResponse<Response> response =
+                지하철_노선_구간_추가_요청(uri, "5", "2", "10");
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        실패_응답_검증(response.statusCode());
     }
 
 
@@ -234,11 +183,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> createParams = getParams("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요청(createParams);
+        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "3",
+                "5");
 
-        Map<String, String> createParams2 = getParams("2호선", "bg-green-600");
-        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청(createParams2);
+        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청(
+                "2호선",
+                "bg-green-600",
+                "2",
+                "5",
+                "5");
 
         //when
         LineCreateResponse firstLine = createResponse1.body().as(LineCreateResponse.class);
@@ -247,12 +204,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(url);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<LineResponse> lineResponses = response.body().jsonPath().getList(".", LineResponse.class);
-
-        LineResponse firstLineResponse = lineCreateResponseConvertToLineResponse(firstLine);
-        LineResponse secondLineResponse = lineCreateResponseConvertToLineResponse(secondLine);
-        assertThat(lineResponses).contains(firstLineResponse, secondLineResponse);
+        지하철_목록_응답_검증(firstLine, secondLine, response);
     }
 
     /**
@@ -264,42 +216,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        지하철역들_생성_요청(10);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
-
-        // when
-        String uri = createResponse.header("Location");
-        String upStationId2 = "4";
-        String downStationId2 = "5";
-        String distance2 = "10";
-        지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
-
-        // when
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
         LineCreateResponse lineCreateResponse = createResponse.body().as(LineCreateResponse.class);
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(uri + "/sections");
+        String uri = createResponse.header("Location");
+        지하철_노선_구간_추가_요청(uri, "4", "5", "3");
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        LineResponse lineResponse = response.body().as(LineResponse.class);
-        Station upStation = new Station(upStationId);
-        Station downStation = new Station(downStationId);
-        Station downStation2 = new Station(downStationId2);
-        List<Station> stations = lineResponse.getStations();
-        assertThat(stations).contains(upStation, downStation, downStation2);
-        LineResponse createLineResponse = lineCreateResponseConvertToLineResponse(lineCreateResponse);
-
-        assertThat(createLineResponse).isEqualTo(lineResponse);
+        List<Station> stations = Arrays.asList(new Station(1L), new Station(4L), new Station(5L));
+        지하철_노선_조회_검증(lineCreateResponse, response, stations);
     }
 
     /**
@@ -311,22 +243,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, String> createParams = getParams("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createParams);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "2",
+                "5");
 
         // when
-        Map<String, String> updateParams = getParams("구분당선", "bg-blue-600");
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(updateParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_수정_요청("구분당선", "bg-blue-600", uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        성공_응답_검증(response.statusCode());
     }
 
     /**
@@ -338,8 +267,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> createParams = getParams("신분당선", "bg-red-600");
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(createParams);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "2",
+                "5");
 
         // when
         String uri = createResponse.header("Location");
@@ -363,37 +296,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        지하철역들_생성_요청(5);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
-                downStationId,
-                distance);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
 
         String uri = createResponse.header("Location");
-
-        String upStationId2 = "4";
-        String downStationId2 = "5";
-        String distance2 = "10";
-        지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+        String lastDownStationId = "5";
+        지하철_노선_구간_추가_요청(uri, "4", lastDownStationId, "2");
 
         // when
-        uri = createResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .param("stationId", downStationId2)
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = 지하철_노선_구간_삭제_요청(lastDownStationId, uri);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        성공_응답_검증(response.statusCode());
     }
 
     /**
@@ -405,30 +324,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionFailed() {
         // given
-        지하철역들_생성_요청(5);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
         String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
                 downStationId,
-                distance);
+                "10");
 
         // when
-        String uri = createResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .param("stationId", downStationId)
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = 지하철_노선_구간_삭제_요청(downStationId, uri);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        실패_응답_검증(response.statusCode());
     }
 
     /**
@@ -441,37 +350,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionFailedByNotLastDownStation() {
         // given
-        지하철역들_생성_요청(5);
-        String bgRed600 = "bg-red-600";
-        String 신분당선 = "신분당선";
-        String upStationId = "1";
         String downStationId = "4";
-        String distance = "10";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청2(
-                신분당선,
-                bgRed600,
-                upStationId,
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                "신분당선",
+                "bg-red-600",
+                "1",
                 downStationId,
-                distance);
+                "10");
 
         String uri = createResponse.header("Location");
-
-        String upStationId2 = "4";
-        String downStationId2 = "5";
-        String distance2 = "10";
-        지하철_노선_구간_추가_요청(uri, upStationId2, downStationId2, distance2);
+        지하철_노선_구간_추가_요청(uri, "4", "5", "10");
 
         // when
-        uri = createResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .param("stationId", downStationId)
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_구간_삭제_요청(downStationId, uri);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        실패_응답_검증(response.statusCode());
     }
-
 }
