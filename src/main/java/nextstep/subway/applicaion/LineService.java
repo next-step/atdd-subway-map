@@ -28,14 +28,8 @@ public class LineService {
             throw new DuplicatedNameException();
         }
 
-        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(NoSuchElementException::new);
-        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(NoSuchElementException::new);
-
         Line line = new Line(request.getName(), request.getColor());
-        Section section = new Section(line, upStation, downStation, request.getDistance());
-        line.getSections().add(section);
-        lineRepository.save(line);
-        return createLineResponse(line);
+        return saveSection(line, request);
     }
 
     @Transactional(readOnly = true)
@@ -76,5 +70,22 @@ public class LineService {
     public boolean isDuplicatedNameOfLine(String name) {
         Optional<Line> line = lineRepository.findByName(name);
         return line.isPresent();
+    }
+
+    public LineResponse addSection(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return saveSection(line, request);
+    }
+
+    public LineResponse saveSection(Line line, LineRequest request) {
+        Section section = new Section(line, makeStation(request.getUpStationId())
+                                        , makeStation(request.getDownStationId()), request.getDistance());
+        line.getSections().add(section);
+        lineRepository.save(line);
+        return createLineResponse(line);
+    }
+
+    public Station makeStation(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
     }
 }

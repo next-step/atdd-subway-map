@@ -37,7 +37,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 강남역_아이디 = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
         ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(신분당선, BG_RED_600
                 , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
-                , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
+                , 양재역_아이디
                 , 미금역_양재역_거리);
 
         // when
