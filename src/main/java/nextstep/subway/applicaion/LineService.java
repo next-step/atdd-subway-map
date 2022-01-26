@@ -4,12 +4,12 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicateException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -21,14 +21,19 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        String name = request.getName();
+        String color = request.getColor();
+
+        validateNameDuplicated(name);
+
+        Line line = lineRepository.save(new Line(name, color));
+        return LineResponse.of(line);
+    }
+
+    private void validateNameDuplicated(String name) {
+        if(lineRepository.existsByName(name)){
+            throw new DuplicateException("Duplicate Line"+ name);
+        }
     }
 
     public List<LineResponse> findAllLines() {
