@@ -80,11 +80,19 @@ public class Line extends BaseEntity {
     }
 
     public void removeSection(Station station) {
-        if (lastDownStation().equals(station)) {
-            sections.remove(sections.size() - 1);
-            return;
+        checkRemoveSection(station);
+        sections.remove(sections.size() - 1);
+
+
+    }
+
+    private void checkRemoveSection(Station station) {
+        if (!lastDownStation().equals(station)) {
+            throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다.");
         }
 
-        throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있습니다.");
+        if (sections.size() == 1) {
+            throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없습니다.");
+        }
     }
 }
