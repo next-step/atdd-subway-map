@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicationException;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -30,9 +31,11 @@ public class SectionService {
 	public SectionResponse createSection(final Long id, final SectionRequest sectionRequest) {
 		Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
 		Station upStation =
-						stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(RuntimeException::new);
+						stationRepository.findById(sectionRequest.getUpStationId())
+										.orElseThrow(() -> new NotFoundException("상행역이 존재하지 않습니다." + "LineId : " + id));
 		Station downStation =
-						stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(RuntimeException::new);
+						stationRepository.findById(sectionRequest.getDownStationId())
+										.orElseThrow(() -> new NotFoundException("하행역이 존재하지 않습니다." + "LineId : " + id));
 		verifyStationsRelation(upStation);
 		newUpStationMustBeDownStation(upStation);
 		Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));

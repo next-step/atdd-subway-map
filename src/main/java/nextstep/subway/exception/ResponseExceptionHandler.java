@@ -14,4 +14,11 @@ public class ResponseExceptionHandler {
 
 		return new ExceptionResponse(HttpStatus.CONFLICT.value(), exception.getMessage());
 	}
+
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ExceptionResponse notFound(NotFoundException exception) {
+
+		return new ExceptionResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+	}
 }
