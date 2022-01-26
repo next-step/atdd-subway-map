@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 @RestController
@@ -66,7 +67,11 @@ public class LineController {
 
     @PostMapping("/{id}/section")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        lineService.saveSection(id, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + id + "/section")).build();
+        try {
+            lineService.saveSection(id, sectionRequest);
+            return ResponseEntity.created(URI.create("/lines/" + id + "/section")).build();
+        } catch (InvalidParameterException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
+        }
     }
 }

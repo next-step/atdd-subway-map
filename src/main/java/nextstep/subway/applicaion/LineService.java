@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,12 +99,15 @@ public class LineService {
     }
 
     public void saveSection(Long id, SectionRequest request) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        existsStation(request.getUpStationId());
+        existsStation(request.getDownStationId());
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        if (!line.equalsLastDownStation(upStation)) { throw new InvalidParameterException(); }
         Section section = new Section(
                 line,
                 upStation,
