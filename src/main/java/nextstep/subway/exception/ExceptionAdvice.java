@@ -17,4 +17,9 @@ public class ExceptionAdvice {
     public ResponseEntity<ErrorResponse> stationExcpetion(StationException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
     }
+
+    @ExceptionHandler(SectionException.class)
+    public ResponseEntity<ErrorResponse> sectionExcpetion(SectionException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
 }

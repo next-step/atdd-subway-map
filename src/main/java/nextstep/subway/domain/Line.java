@@ -41,6 +41,16 @@ public class Line extends BaseEntity {
     }
 
     public List<Station> getStations() {
-        return sections.getStations();
+        List<Station> stations = new ArrayList<>();
+
+        if (sections != null) {
+            stations = sections.getStations();
+        }
+
+        return stations;
+    }
+
+    public void validationSectionStation(Station upStation, Station downStation) {
+        sections.validationSectionStation(upStation, downStation);
     }
 }

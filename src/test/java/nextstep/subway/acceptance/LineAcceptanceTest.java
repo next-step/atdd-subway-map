@@ -5,11 +5,13 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.steps.LineSteps;
 import nextstep.subway.acceptance.steps.SectionSteps;
 import nextstep.subway.acceptance.steps.StationSteps;
+import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -19,6 +21,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String FIRST_COLOR = "bg-red-700";
     private static final String RESPONSE_HEADER_LOCATION = "Location";
     private static final int DEFAULT_DISTANCE = 5;
+    private static String FIRST_STATION_NAME = "강남역";
+    private static String SECOND_STATION_NAME = "양재역";
+    private static String THIRD_STATION_NAME = "양재시민의숲";
+    private static String FOURTH_STATION_NAME = "판교역";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -146,8 +152,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     void saveSection() {
         // given
         ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
-        ExtractableResponse<Response> station1 = StationSteps.create("강남역");
-        ExtractableResponse<Response> station2 = StationSteps.create("양재역");
+        ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
+        ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
 
         // when
         ExtractableResponse<Response> response
@@ -163,6 +169,8 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 역 생성을 요청 하고
      * Given 지하철 역 생성을 요청 하고
      * Given 지하철 노선 구간 생성을 요청 하고
+     * Given 지하철 노선 구간 생성을 요청 하고
+     * Given 지하철 노선 구간 생성을 요청 하고
      * When 지하철 노선 조회를 요청 하면
      * Then 지하철 노선이 구간까지여 조회된다.
      */
@@ -171,10 +179,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLineAndSection() {
         // given
         ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
-        ExtractableResponse<Response> station1 = StationSteps.create("강남역");
-        ExtractableResponse<Response> station2 = StationSteps.create("양재역");
-        ExtractableResponse<Response> station3 = StationSteps.create("양재시민의숲");
-        ExtractableResponse<Response> station4 = StationSteps.create("판교역");
+        ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
+        ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
+        ExtractableResponse<Response> station3 = StationSteps.create(THIRD_STATION_NAME);
+        ExtractableResponse<Response> station4 = StationSteps.create(FOURTH_STATION_NAME);
 
         SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
         SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
@@ -184,8 +192,68 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.get();
 
         // then
+//        List<LineResponse> lines = response.jsonPath().getList(".", LineResponse.class);
+//        List<String> names = lines.get(0).getStations()
+//                                    .stream()
+//                                    .map(s-> s.getName())
+//                                    .collect(Collectors.toList());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> lineNames = response.jsonPath().getList("name");
+//        assertThat(lines.get(0).getStations().size()).isEqualTo(4);
+//        assertThat(names).contains(FIRST_STATION_NAME, SECOND_STATION_NAME, THIRD_STATION_NAME, FOURTH_STATION_NAME);
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * When 이미 등록된 역으로 하행역으로 구간 등록을 요청하면
+     * Then 지하철 노선에 구간 등록이 실패한다.
+     */
+    @DisplayName("이미 구간 등록된 상행역을 상행역 구간 등록")
+    @Test
+    void upStationIsRegisteredAsDownStation() {
+        // given
+        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
+        ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
+        ExtractableResponse<Response> station3 = StationSteps.create(THIRD_STATION_NAME);
+
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station3), DEFAULT_DISTANCE);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * When 이미 등록된 역으로 하행역으로 구간 등록을 요청하면
+     * Then 지하철 노선에 구간 등록이 실패한다.
+     */
+    @DisplayName("이미 구간 등록된 역을 하행역 재등록")
+    @Test
+    void duplicateSectionStation() {
+        // given
+        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
+        ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
+        ExtractableResponse<Response> station3 = StationSteps.create(THIRD_STATION_NAME);
+
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station3), getStationId(station1), DEFAULT_DISTANCE);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private Long getStationId(ExtractableResponse<Response> response) {

@@ -8,7 +8,6 @@ import nextstep.subway.exception.LineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,7 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineAndStationResponse)
+                .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
@@ -62,7 +61,9 @@ public class LineService {
     public void saveSection(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
-        Station downStation = stationRepository.findById(lineRequest.getUpStationId()).get();
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).get();
+
+        line.validationSectionStation(upStation, downStation);
 
         Section section = createSection(line, upStation, downStation, lineRequest.getDistance());
 
@@ -79,16 +80,6 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
-    }
-
-    private LineResponse createLineAndStationResponse(Line line) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
