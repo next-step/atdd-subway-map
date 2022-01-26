@@ -14,4 +14,10 @@ public class ExceptionResponse {
     public ResponseEntity<Void> handleDataIntegrityViolationException() {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Void> hadleIllegalArgumentException() {
+        return ResponseEntity.badRequest().build();
+    }
 }

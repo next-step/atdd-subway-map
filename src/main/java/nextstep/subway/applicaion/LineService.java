@@ -86,6 +86,7 @@ public class LineService {
                 downStation,
                 request.getDistance()
         );
+        line.addSection(section);
 
         sectionRepository.save(section);
         return SectionResponse.of(section);

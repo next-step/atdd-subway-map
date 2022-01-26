@@ -49,4 +49,24 @@ public class Line extends BaseEntity {
     public String getColor() {
         return color;
     }
+
+    public void addSection(Section section) {
+        validAddSection(section);
+        sections.add(section);
+    }
+
+    private void validAddSection(Section section) {
+        checkUpstationCondition(section);
+    }
+
+    private void checkUpstationCondition(Section section) {
+        if (section.getUpStation().equals(lastDownStation())) {
+            return;
+        }
+        throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+    }
+
+    private Station lastDownStation() {
+        return sections.get(sections.size() - 1).getDownStation();
+    }
 }
