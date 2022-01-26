@@ -2,8 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,17 +16,25 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) throws DuplicatedNameException {
+    public LineResponse saveLine(LineRequest request) throws DuplicatedNameException, NoSuchElementException {
         if(isDuplicatedNameOfLine(request.getName())) {
             throw new DuplicatedNameException();
         }
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(NoSuchElementException::new);
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(NoSuchElementException::new);
+
+        Line line = new Line(request.getName(), request.getColor());
+        Section section = new Section(line, upStation, downStation, request.getDistance());
+        line.getSections().add(section);
+        lineRepository.save(line);
         return createLineResponse(line);
     }
 

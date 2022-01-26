@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -15,16 +16,15 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     private static final String 이호선 = "2호선";
     private static final String BG_GREEN_600 = "bg-green-600";
-    private static final Long 강남역_아이디 = 1L;
-    private static final Long 역삼역_아이디 = 2L;
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
     private static final int 강남역_역삼역_거리 = 7;
 
     private static final String 신분당선 = "신분당선";
     private static final String BG_RED_600 = "bg-red-600";
-    private static final Long 미금역_아이디 = 3L;
-    private static final Long 양재역_아이디 = 4L;
+    private static final String 미금역 = "미금역";
+    private static final String 양재역 = "양재역";
     private static final int 미금역_양재역_거리 = 2;
-
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -35,7 +35,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
+                지하철_노선_생성_요청(신분당선, BG_RED_600
+                        , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
+                        , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
+                        , 미금역_양재역_거리);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,8 +55,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
-        지하철_노선_생성_요청(이호선, BG_GREEN_600, 강남역_아이디, 역삼역_아이디, 강남역_역삼역_거리);
+        지하철_노선_생성_요청(신분당선, BG_RED_600
+                , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
+                , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
+                , 미금역_양재역_거리);
+        지하철_노선_생성_요청(이호선, BG_GREEN_600
+                , 지하철역_생성_요청(강남역).jsonPath().getLong("id")
+                , 지하철역_생성_요청(역삼역).jsonPath().getLong("id")
+                , 강남역_역삼역_거리);
 
         // when
         ExtractableResponse<Response> getResponse = 지하철_노선_조회_요청();
@@ -74,7 +83,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
+                지하철_노선_생성_요청(신분당선, BG_RED_600
+                        , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
+                        , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
+                        , 미금역_양재역_거리);
 
         // when
         ExtractableResponse<Response> getResponse = 지하철_노선_조회_요청(createResponse.header("Location"));
@@ -95,7 +107,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
+                지하철_노선_생성_요청(신분당선, BG_RED_600
+                        , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
+                        , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
+                        , 미금역_양재역_거리);
 
         // when
         ExtractableResponse<Response> updateResponse =
@@ -117,7 +132,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> createResponse =
-                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
+                지하철_노선_생성_요청(신분당선, BG_RED_600
+                        , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
+                        , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
+                        , 미금역_양재역_거리);
 
         // when
         ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제_요청(createResponse.header("Location"));
@@ -134,6 +152,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
     void duplicateLine() {
+        Long 미금역_아이디 = 지하철역_생성_요청(미금역).jsonPath().getLong("id");
+        Long 양재역_아이디 = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
+
         // given
         지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
 
