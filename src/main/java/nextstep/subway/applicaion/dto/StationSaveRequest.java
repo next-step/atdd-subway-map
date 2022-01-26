@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
-public class StationRequest {
+public class StationSaveRequest {
     private String name;
 
     public String getName() {

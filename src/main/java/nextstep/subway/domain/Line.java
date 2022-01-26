@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import org.apache.logging.log4j.util.Strings;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,12 +15,26 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color) {
+        validateBlankName(name);
+        validateBlankColor(color);
         this.name = name;
         this.color = color;
+    }
+
+    private void validateBlankName(final String name) {
+        if (Strings.isBlank(name)) {
+            throw new IllegalArgumentException("blank line name occurred");
+        }
+    }
+
+    private void validateBlankColor(final String color) {
+        if (Strings.isBlank(color)) {
+            throw new IllegalArgumentException("blank line color occurred");
+        }
     }
 
     public Long getId() {

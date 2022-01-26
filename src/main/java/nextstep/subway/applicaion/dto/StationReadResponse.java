@@ -1,28 +1,23 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-public class LineReadAllResponse {
+public class StationReadResponse {
     private final Long id;
     private final String name;
-    private final String color;
-    private final List<String> stations;
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
 
-    public LineReadAllResponse(final Line line, final List<String> stations) {
-        this(line.getId(), line.getName(), line.getColor(), stations, line.getCreatedDate(), line.getModifiedDate());
+    public StationReadResponse(final Station station) {
+        this(station.getId(), station.getName(), station.getCreatedDate(), station.getModifiedDate());
     }
 
-    public LineReadAllResponse(final Long id, final String name, final String color, final List<String> stations,
+    public StationReadResponse(final Long id, final String name,
                                final LocalDateTime createdDate, final LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
-        this.color = color;
-        this.stations = stations;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
@@ -33,14 +28,6 @@ public class LineReadAllResponse {
 
     public String getName() {
         return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public List<String> getStations() {
-        return stations;
     }
 
     public LocalDateTime getCreatedDate() {
