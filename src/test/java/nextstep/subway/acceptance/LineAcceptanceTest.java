@@ -113,25 +113,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 지하철 노선 생성을 요청 했을 때 상행역과 하행역이 같으면,
-     * Then 지하철 노선 생성이 실패한다.
-     * @see nextstep.subway.ui.LineController#createLine
-     */
-    @DisplayName("[예외]지하철 노선 상행 하행 중복 방지 테스트")
-    @Test
-    void 지하철_노선_상행_하행_중복_방지_테스트() {
-        //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-
-        // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_상행_하행_정보같음);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-    }
-
-    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
