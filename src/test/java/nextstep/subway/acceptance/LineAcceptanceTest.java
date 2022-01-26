@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
@@ -137,6 +138,39 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
+        // given
+        String lineName = "신분당선";
+        String lineColor = "bg-red-600";
+        final Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", lineColor);
+
+        RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract();
+
+        // when
+        String newLineName = "구분당선";
+        String newLineColor = "bg-blue-600";
+        final Map<String, String> updateParams = new HashMap<>();
+        updateParams.put("name", newLineName);
+        updateParams.put("color", newLineColor);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .contentType(ContentType.JSON)
+            .body(updateParams)
+            .pathParam("id", 1)
+            .when()
+            .put("/lines/{id}")
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
