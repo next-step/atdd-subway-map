@@ -3,6 +3,7 @@ package nextstep.subway.steps;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.application.dto.LineRequest;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -32,6 +33,16 @@ public class LineSteps {
 
         return RestAssured.given()
                 .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> executeLineCreateRequest(LineRequest request) {
+        return RestAssured.given()
+                .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
