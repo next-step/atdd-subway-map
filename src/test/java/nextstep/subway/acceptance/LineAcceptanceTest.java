@@ -268,6 +268,32 @@ class LineAcceptanceTest extends AcceptanceTest {
         구간_제거됨(response);
     }
 
+    /**
+     * Scenario: 구간 제거(실패 - 하행 좀점역 이외의 역 제거)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * Given 신분당선에 구간 등록(상행:양재역, 하행:판교역) 요청 하고
+     * When 구간(양재역) 제거 요청하면
+     * Then 구간 제거가 실패한다.
+     */
+    @DisplayName("구간 제거 실패 - 하행 종점역 이외의 역을 제거")
+    @Test
+    void removeSectionFail() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+        String uri = createResponse.header("Location");
+        구간_등록되어_있음(uri, 양재_판교_구간);
+
+        // when
+        ExtractableResponse<Response> response = 구간_제거_요청(uri, 양재역id);
+
+        // then
+        구간_제거_실패됨(response);
+    }
+
+    private void 구간_제거_실패됨(ExtractableResponse<Response> response) {
+        응답_요청_확인(response, HttpStatus.BAD_REQUEST);
+    }
+
     private void 구간_제거됨(ExtractableResponse<Response> response) {
         응답_요청_확인(response, HttpStatus.NO_CONTENT);
     }
