@@ -3,7 +3,7 @@ package nextstep.subway.step;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.ui.path.StationPath;
+import nextstep.subway.ui.path.SubwayPath;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ public class StationStep {
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-						.when().post(StationPath.ROOT)
+						.when().post(SubwayPath.STATIONS)
 						.then().log().all()
 						.extract();
 	}
@@ -25,7 +25,7 @@ public class StationStep {
 
 		return RestAssured.given().log().all()
 						.when()
-						.get(StationPath.ROOT)
+						.get(SubwayPath.STATIONS)
 						.then().log().all()
 						.extract();
 	}

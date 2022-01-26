@@ -4,11 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.ui.path.LinePath;
+import nextstep.subway.ui.path.SubwayPath;
 import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LineStep {
 
@@ -24,7 +21,7 @@ public class LineStep {
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-						.when().post(LinePath.ROOT)
+						.when().post(SubwayPath.LINES)
 						.then().log().all()
 						.extract();
 	}
@@ -34,7 +31,7 @@ public class LineStep {
 
 		return RestAssured
 						.given().log().all()
-						.when().get(LinePath.ROOT + LinePath.ID, id)
+						.when().get(SubwayPath.LINES + SubwayPath.ID, id)
 						.then().log().all()
 						.extract();
 
@@ -45,7 +42,7 @@ public class LineStep {
 
 		return RestAssured
 						.given().log().all()
-						.when().get(LinePath.ROOT)
+						.when().get(SubwayPath.LINES)
 						.then().log().all()
 						.extract();
 	}
@@ -64,7 +61,7 @@ public class LineStep {
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-						.when().put(LinePath.ROOT + LinePath.ID, id)
+						.when().put(SubwayPath.LINES + SubwayPath.ID, id)
 						.then().log().all()
 						.extract();
 	}
@@ -74,7 +71,7 @@ public class LineStep {
 
 		return RestAssured
 						.given().log().all()
-						.when().delete(LinePath.ROOT + LinePath.ID, 1)
+						.when().delete(SubwayPath.LINES + SubwayPath.ID, 1)
 						.then().log().all()
 						.extract();
 	}

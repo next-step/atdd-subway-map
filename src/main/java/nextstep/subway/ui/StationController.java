@@ -3,7 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.ui.path.StationPath;
+import nextstep.subway.ui.path.SubwayPath;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-@RequestMapping(StationPath.ROOT)
+@RequestMapping(SubwayPath.STATIONS)
 @RestController
 public class StationController {
 
@@ -32,7 +32,7 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
-    @DeleteMapping(StationPath.ID)
+    @DeleteMapping(SubwayPath.ID)
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStationById(id);
         return ResponseEntity.noContent().build();
