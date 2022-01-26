@@ -104,7 +104,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         return CustomRestAssured.get("/stations");
     }
 
-    private ExtractableResponse<Response> 지하철역_생성(String name) {
+    public static ExtractableResponse<Response> 지하철역_생성(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
