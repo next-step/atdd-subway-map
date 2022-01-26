@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -14,9 +15,9 @@ public class LineSteps {
 
     private static final String LINES_URI = "/lines";
 
-    public static ExtractableResponse<Response> createLine(Map<String, String> param) {
+    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
-                .body(param)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(LINES_URI)
@@ -40,9 +41,9 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> updateLine(String uri, Map<String, String> line) {
+    public static ExtractableResponse<Response> updateLine(String uri, LineRequest lineRequest) {
         return RestAssured.given().log().all()
-                .body(line)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(uri)
