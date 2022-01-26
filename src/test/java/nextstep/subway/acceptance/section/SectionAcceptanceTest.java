@@ -62,4 +62,28 @@ class SectionAcceptanceTest extends AcceptanceTest {
 		sectionAcceptanceTestValidation.구간_생성_요청_검증(구간_생성_응답, 구간, 하행역_종점_아이디, 구간_하행역_아이디);
 	}
 
+	/**
+	 * Given 지하철 노선에 등록된 마지막 역(하행 종점역) 이며
+	 * Given 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 (구간이 1개인 경우) 가 아닐 때
+	 * When 지하철 노선에 지하철 구간 삭제를 요청하면
+	 * Then 지하철 노선에 구간 삭제가 성공한다
+	 */
+	@DisplayName("지하철역 구간 제거")
+	@MethodSource("provideSectionParameters")
+	@ParameterizedTest
+	void removeSection(LineAcceptanceTestParameter 노선, SectionAcceptanceTestParameter 구간) {
+		// given
+		final long 상행역_종점_아이디 = stationAcceptanceTestRequest.역_생성요청_아이디_반환(노선.상행_종점역);
+		final long 하행역_종점_아이디 = stationAcceptanceTestRequest.역_생성요청_아이디_반환(노선.하행_종점역);
+		final long 노선_아이디 = lineAcceptanceTestRequest.노선_생성_요청_아이디_반환(노선, 상행역_종점_아이디, 하행역_종점_아이디);
+		final long 구간_하행역_아이디 = stationAcceptanceTestRequest.역_생성요청_아이디_반환(구간.하행역);
+		sectionAcceptanceTestRequest.구간_생성_요청_아이디_반환(노선_아이디, 구간, 하행역_종점_아이디, 구간_하행역_아이디);
+
+		// when
+		final ExtractableResponse<Response> 삭제_응답 = sectionAcceptanceTestRequest.구간_삭제_요청(노선_아이디, 구간_하행역_아이디);
+
+		// then
+		sectionAcceptanceTestValidation.삭제_요청_검증(삭제_응답);
+	}
+
 }

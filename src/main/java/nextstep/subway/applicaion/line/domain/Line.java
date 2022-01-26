@@ -70,4 +70,8 @@ public class Line extends BaseEntity {
 		return sections.stream()
 				.anyMatch(section -> section.hasStation(station));
 	}
+
+	public boolean hasOnlyOneSection() {
+		return sections.size() == 1;
+	}
 }

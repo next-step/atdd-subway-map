@@ -47,6 +47,10 @@ public class AcceptanceTestRequest {
 		return request(DELETE, createRequestPathWithVariable(requestBasePath, 아이디_추출(response)), Collections.emptyMap());
 	}
 
+	public ExtractableResponse<Response> 삭제_요청(String requestPath) {
+		return request(DELETE, requestPath, Collections.emptyMap());
+	}
+
 	public ExtractableResponse<Response> 수정_요청(long id, Map<String, String> params) {
 		return request(PUT, createRequestPathWithVariable(requestBasePath, id), params);
 	}

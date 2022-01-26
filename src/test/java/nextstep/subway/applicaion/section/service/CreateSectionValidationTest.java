@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class SectionValidationTest {
+class CreateSectionValidationTest {
 
 	SectionValidation sectionValidation;
 
@@ -75,7 +75,7 @@ class SectionValidationTest {
 	@ParameterizedTest
 	@MethodSource("provideInvalidDownStationSectionParameter")
 	void invalidDownStationTest(Line 신분당선, Station 판교역) {
-		assertThatThrownBy(() -> sectionValidation.validateDownStation(신분당선, 판교역))
+		assertThatThrownBy(() -> sectionValidation.validateCreateDownStation(신분당선, 판교역))
 				.isInstanceOf(DownStationInvalidException.class)
 				.describedAs(판교역.getName());
 	}
@@ -88,7 +88,7 @@ class SectionValidationTest {
 	@ParameterizedTest
 	@MethodSource("provideInvalidUpStationSectionParameter")
 	void invalidUpStationTest(Line 신분당선, Station 양재역) {
-		assertThatThrownBy(() -> sectionValidation.validateUpStation(신분당선, 양재역))
+		assertThatThrownBy(() -> sectionValidation.validateCreateUpStation(신분당선, 양재역))
 				.isInstanceOf(UpStationInvalidException.class);
 	}
 

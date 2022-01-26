@@ -4,10 +4,7 @@ import nextstep.subway.applicaion.section.dto.SectionRequest;
 import nextstep.subway.applicaion.section.dto.SectionResponse;
 import nextstep.subway.applicaion.section.service.SectionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -27,6 +24,15 @@ public class SectionController {
 		return ResponseEntity
 				.created(getCreateStatusHeader(lineId, sectionResponse))
 				.body(sectionResponse);
+	}
+
+	@DeleteMapping("/lines/{lineId}/sections")
+	public ResponseEntity<SectionResponse> createLine(@PathVariable long lineId, @RequestParam long stationId) {
+		sectionService.removeSection(lineId, stationId);
+
+		return ResponseEntity
+				.noContent()
+				.build();
 	}
 
 	private URI getCreateStatusHeader(long lineId, SectionResponse sectionResponse) {
