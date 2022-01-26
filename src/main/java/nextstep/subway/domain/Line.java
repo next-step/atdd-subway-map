@@ -58,7 +58,8 @@ public class Line extends BaseEntity {
 
     public Section newSection(Station upStation, Station downStation,SectionRequest request) {
         getLastSection(sections)
-                .upStationisNot(request.getUpStationId());
+                .downStationIsNot(request.getUpStationId());
+
         downStation.notEqualsIn(getIdsIn(sections));
         return new Section(upStation,downStation,request.getDistance());
     }

@@ -18,6 +18,14 @@ public class CommonSectionAcceptance {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_구간_삭제(String stationId,String location) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId",stationId)
+                .when().delete(location)
+                .then().log().all().extract();
+    }
+
     public static Map<String, String> 구간_파라미터_생성(String downStationId, String newSectionDownStationId) {
         Map<String, String> params =
                 new HashMap<>();
@@ -26,6 +34,8 @@ public class CommonSectionAcceptance {
         params.put("upStationId", downStationId);
         return params;
     }
+
+
 
 
 }

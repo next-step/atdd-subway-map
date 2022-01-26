@@ -45,9 +45,9 @@ public class Section {
         this.distance = distance;
     }
 
-    public void upStationisNot(Long stationId) {
-        if (upStation.isSameStation(stationId)) {
-            throw new IllegalArgumentException("구간을 추가할 수 없습니다.");
+    public void downStationIsNot(Long stationId) {
+        if (downStation.isSameStation(stationId)) {
+            throw new IllegalArgumentException("노선과 연결되지 않아 추가할 수 없습니다.");
         }
     }
 

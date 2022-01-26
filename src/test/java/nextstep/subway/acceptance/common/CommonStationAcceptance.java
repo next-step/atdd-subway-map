@@ -19,17 +19,26 @@ public class CommonStationAcceptance {
                 .then().log().all().extract();
     }
 
-    public static Map<String, String> getParamsStationMap(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return params;
-    }
-
     public static ExtractableResponse<Response> 지하철역_조회_요청() {
         return RestAssured
                 .given().log().all()
                 .when().get("/stations")
                 .then().log().all().extract();
     }
+
+
+    public static Map<String, String> getParamsStationMap(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        return params;
+    }
+
+
+    public static String 지하철_생성_후_아이디_추출(String stationName) {
+        return 지하철역_생성_요청(stationName)
+                .jsonPath()
+                .getString("id");
+    }
+
 
 }
