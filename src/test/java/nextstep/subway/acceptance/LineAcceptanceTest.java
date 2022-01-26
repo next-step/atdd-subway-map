@@ -246,6 +246,42 @@ class LineAcceptanceTest extends AcceptanceTest {
         구간_등록_실패됨(response);
     }
 
+    /**
+     * Scenario: 구간 제거(정상적인 시나리오)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * Given 신분당선에 구간 등록(상행:양재역, 하행:판교역) 요청 하고
+     * When 구간(판교역) 제거 요청하면
+     * Then 구간(양재_판교_구간) 제거가 성공한다.
+     */
+    @DisplayName("구간 제거")
+    @Test
+    void removeSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+        String uri = createResponse.header("Location");
+        구간_등록되어_있음(uri, 양재_판교_구간);
+
+        // when
+        ExtractableResponse<Response> response = 구간_제거_요청(uri, 판교역id);
+
+        // then
+        구간_제거됨(response);
+    }
+
+    private void 구간_제거됨(ExtractableResponse<Response> response) {
+        응답_요청_확인(response, HttpStatus.NO_CONTENT);
+    }
+
+    private ExtractableResponse<Response> 구간_제거_요청(String uri, Long stationId) {
+        return delete(uri + "/sections?stationId=" + stationId);
+    }
+
+    private ExtractableResponse<Response> 구간_등록되어_있음(String uri, Map<String, String> params) {
+        ExtractableResponse<Response> response = 구간_등록_요청(uri, params);
+        구간_등록됨(response, params);
+        return response;
+    }
+
     private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
         return post(params, LINES_PATH);
     }
