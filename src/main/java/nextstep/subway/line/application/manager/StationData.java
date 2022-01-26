@@ -1,4 +1,4 @@
-package nextstep.subway.section.domain.manager;
+package nextstep.subway.line.application.manager;
 
 import nextstep.subway.station.domain.Station;
 

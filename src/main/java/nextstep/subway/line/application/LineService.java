@@ -1,29 +1,35 @@
 package nextstep.subway.line.application;
 
 import nextstep.subway.common.exception.LineNotFoundException;
+import nextstep.subway.common.exception.StationNotFoundException;
 import nextstep.subway.line.application.dto.LineRequest;
 import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.line.domain.LineRepository;
-import nextstep.subway.section.application.SectionService;
-import nextstep.subway.section.application.dto.SectionRequest;
-import nextstep.subway.section.domain.manager.LineData;
+import nextstep.subway.line.domain.Sections;
+import nextstep.subway.line.application.dto.SectionRequest;
+import nextstep.subway.line.application.manager.LineStationManager;
+import nextstep.subway.line.application.manager.StationData;
+import nextstep.subway.station.application.manager.StationLineManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
 import static nextstep.subway.common.ErrorMessages.DUPLICATE_LINE_NAME;
 
 @Service
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final SectionService sectionService;
+    private final LineStationManager lineStationManager;
 
-    public LineService(LineRepository lineRepository, SectionService sectionService) {
+    public LineService(LineRepository lineRepository, LineStationManager lineStationManager) {
         this.lineRepository = lineRepository;
-        this.sectionService = sectionService;
+        this.lineStationManager = lineStationManager;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -32,7 +38,7 @@ public class LineService {
 
         if (request.hasSectionAvailable()) {
             SectionRequest sectionRequest = new SectionRequest(request.getUpStationId(), request.getDownStationId(), request.getDistance());
-            sectionService.addSection(line.getId(), sectionRequest);
+            saveSection(line, sectionRequest);
         }
 
         return LineResponse.of(line);
@@ -40,17 +46,14 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        List<LineData> lineDataList = lineRepository.findAll().stream()
-                .map(LineData::of).collect(Collectors.toList());
-
-        return sectionService.findAllStations(lineDataList).stream()
-                .map(LineResponse::of).collect(Collectors.toList());
+        return lineRepository.findAll().stream()
+                .map(this::createStationData).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) {
-        LineData lineData = LineData.of(getLine(id));
-        return LineResponse.of(sectionService.findStations(lineData));
+        Line line = getLine(id);
+        return createStationData(line);
     }
 
     public void updateLine(Long id, LineRequest updateRequest) {
@@ -62,18 +65,51 @@ public class LineService {
     }
 
     public void deleteLineById(Long id) {
-        getLine(id);
-        sectionService.removeLineById(id);
-        lineRepository.deleteById(id);
+        Line line = getLine(id);
+        lineRepository.delete(line);
+    }
+
+    public void addSection(Long lineId, SectionRequest request) {
+        Assert.isTrue(!Objects.equals(request.getUpStationId(), request.getDownStationId()),
+                "상행역과 하행역은 동일할 수 없습니다.");
+
+        Line line = getLine(lineId);
+        saveSection(line, request);
+    }
+
+    public void removeSectionById(Long lineId, Long downStationId) {
+        Line line = getLine(lineId);
+        Sections sections = line.getSections();
+        sections.checkRemoveValidation(downStationId);
+        sections.removeDownStation(downStationId);
     }
 
     private Line getLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException());
-        return line;
+        return lineRepository.findById(id)
+                .orElseThrow(LineNotFoundException::new);
     }
 
     private void checkExistsLineName(String name) {
         Assert.isTrue(!lineRepository.existsByName(name), DUPLICATE_LINE_NAME.getMessage());
+    }
+
+    private LineResponse createStationData(Line line) {
+        LineResponse lineResponse = LineResponse.of(line);
+        Sections sections = line.getSections();
+        if (!sections.isEmpty()) {
+            List<StationData> stations = lineStationManager.getAllInStations(sections.getSectionIds());
+            lineResponse.setStations(stations);
+        }
+        return lineResponse;
+    }
+
+    private void saveSection(Line line, SectionRequest request) {
+        if (!lineStationManager.isExistInStations(request.getUpStationId(), request.getDownStationId()))
+            throw new StationNotFoundException();
+
+        Sections sections = line.getSections();
+        sections.checkAddValidation(request.getUpStationId(), request.getDownStationId());
+        sections.addSection(request.toSection(line));
+        //sectionRepository.save(request.toSection(line));
     }
 }

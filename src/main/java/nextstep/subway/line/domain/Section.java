@@ -1,7 +1,8 @@
-package nextstep.subway.section.domain;
+package nextstep.subway.line.domain;
 
 
 import nextstep.subway.common.BaseEntity;
+import nextstep.subway.line.domain.Line;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -13,8 +14,9 @@ public class Section extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long lineId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "line_id", nullable = false)
+    private Line line;
 
     @Column(nullable = false)
     private Long upStationId;
@@ -28,8 +30,8 @@ public class Section extends BaseEntity {
     public Section() {
     }
 
-    public Section(long lineId, Long upStationId, Long downStationId, int distance) {
-        this.lineId = lineId;
+    public Section(Line line, Long upStationId, Long downStationId, int distance) {
+        this.line = line;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -74,5 +76,11 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
+    public Line getLine() {
+        return line;
+    }
 
+    public void setLine(Line line) {
+        this.line = line;
+    }
 }

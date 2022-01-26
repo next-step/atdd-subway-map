@@ -17,6 +17,9 @@ public class Line extends BaseEntity {
     @Column(nullable = false)
     private String color;
 
+    @Embedded
+    private Sections sections = new Sections();
+
     public Line() {
     }
 
@@ -40,5 +43,9 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public Sections getSections() {
+        return sections;
     }
 }

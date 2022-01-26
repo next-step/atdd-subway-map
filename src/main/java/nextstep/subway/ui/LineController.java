@@ -3,8 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.application.dto.LineRequest;
 import nextstep.subway.line.application.dto.LineResponse;
-import nextstep.subway.section.application.SectionService;
-import nextstep.subway.section.application.dto.SectionRequest;
+import nextstep.subway.line.application.dto.SectionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +17,9 @@ import java.util.List;
 @RestController
 public class LineController {
     private final LineService lineService;
-    private final SectionService sectionService;
 
-    public LineController(LineService lineService, SectionService sectionService) {
+    public LineController(LineService lineService) {
         this.lineService = lineService;
-        this.sectionService = sectionService;
     }
 
     @PostMapping(value = "/lines", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -57,13 +54,13 @@ public class LineController {
 
     @PostMapping(value = "/lines/{id}/sections", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @Valid @RequestBody SectionRequest sectionRequest) {
-        sectionService.addSection(id, sectionRequest);
+        lineService.addSection(id, sectionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/lines/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam @Positive Long stationId) {
-        sectionService.removeSectionById(id, stationId);
+        lineService.removeSectionById(id, stationId);
         return ResponseEntity.noContent().build();
     }
 }

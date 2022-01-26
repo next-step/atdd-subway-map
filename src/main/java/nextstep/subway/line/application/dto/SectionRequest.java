@@ -1,6 +1,7 @@
-package nextstep.subway.section.application.dto;
+package nextstep.subway.line.application.dto;
 
-import nextstep.subway.section.domain.Section;
+import nextstep.subway.line.domain.Line;
+import nextstep.subway.line.domain.Section;
 
 import javax.validation.constraints.Positive;
 
@@ -33,7 +34,7 @@ public class SectionRequest {
         return distance;
     }
 
-    public Section toSection(Long lineId) {
-        return new Section(lineId, upStationId, downStationId, distance);
+    public Section toSection(Line line) {
+        return new Section(line, upStationId, downStationId, distance);
     }
 }

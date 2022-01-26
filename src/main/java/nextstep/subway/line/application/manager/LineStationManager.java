@@ -1,9 +1,9 @@
-package nextstep.subway.section.domain.manager;
+package nextstep.subway.line.application.manager;
 
 import java.util.List;
 import java.util.Set;
 
-public interface SectionStationManager {
+public interface LineStationManager {
 
     List<StationData> getAllInStations(Set<Long> stationIds);
 

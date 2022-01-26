@@ -1,23 +1,22 @@
-package nextstep.subway.section.domain;
+package nextstep.subway.line.domain;
 
 
 import org.springframework.util.Assert;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import javax.persistence.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Embeddable
 public class Sections {
     private static final int MIN_SECTION_SIZE = 1;
-    private List<Section> sections;
 
-    public Sections(List<Section> sections) {
-        this.sections = sections;
-    }
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OrderBy("id")
+    private List<Section> sections = new ArrayList();
 
     public boolean isEmpty() {
-        return sections.isEmpty();
+        return sections == null || sections.isEmpty();
     }
 
     public Set<Long> getSectionIds() {
@@ -37,6 +36,20 @@ public class Sections {
             checkRemoveOnlyStation();
             checkRemoveDownStation(downStationId);
         }
+    }
+
+    public void removeDownStation(Long downStationId) {
+        if (!isEmpty()) {
+            sections.stream().filter(section ->
+                    Objects.equals(section.getDownStationId(), downStationId)
+            ).collect(Collectors.toList()).forEach(section ->
+                    sections.remove(section)
+            );
+        }
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
     }
 
     private void checkUpStationNone(Long upStationId) {

@@ -153,7 +153,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철 구간 삭제 - 노선에 등록된 마지막 역(하행 종점역)만 제거")
+    @DisplayName("지하철 구간 삭제 에러 - 노선에 등록된 마지막 역(하행 종점역)만 제거")
     @Test
     @Order(11)
     void deleteSectionError1() {
@@ -176,7 +176,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
     }
 
 
-    @DisplayName("지하철 구간 삭제 - 구간이 1개인 경우 삭제할 수 없다")
+    @DisplayName("지하철 구간 삭제 에러 - 구간이 1개인 경우 삭제할 수 없다")
     @Test
     @Order(13)
     void deleteSectionError2() {
@@ -192,7 +192,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철역 삭제 - 구간에서 사용중이면 삭제할 수 없다")
+    @DisplayName("지하철역 삭제 에러 - 구간에서 사용중이면 삭제할 수 없다")
     @Test
     @Order(15)
     void deleteStationError1() {
@@ -201,7 +201,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         // when
-        String uri = STATION_END_POINT + "/1";
+        String uri = STATION_END_POINT + "/2";
         ExtractableResponse<Response> response = 지하철역_삭제_요청(uri);
 
         // then
