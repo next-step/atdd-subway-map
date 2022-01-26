@@ -125,10 +125,10 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        line.getSections()
-                .stream()
-                .filter(t -> t.getDownStation().getId().equals(stationId))
-                .findFirst()
-                .orElseThrow(EntityNotFoundException::new);
+        List<Section> sections = line.getSections();
+
+        Section lastSection = sections.get(sections.size() - 1);
+        if (!lastSection.getDownStation().equals(station)) { throw new InvalidParameterException(); }
+        line.getSections().remove(lastSection);
     }
 }

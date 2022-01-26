@@ -78,7 +78,11 @@ public class LineController {
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam("stationId") Long stationId) {
-        lineService.deleteSection(id, stationId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        try {
+            lineService.deleteSection(id, stationId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (InvalidParameterException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
+        }
     }
 }
