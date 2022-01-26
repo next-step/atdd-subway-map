@@ -46,11 +46,10 @@ public class Section {
     }
 
     public void downStationIsNot(Long stationId) {
-        if (downStation.isSameStation(stationId)) {
+        if (downStation.isNotSameStation(stationId)) {
             throw new IllegalArgumentException("노선과 연결되지 않아 추가할 수 없습니다.");
         }
     }
-
 
     public static Section of(Station upStation, Station downStation, int distance){
         return new Section(upStation, downStation, distance);

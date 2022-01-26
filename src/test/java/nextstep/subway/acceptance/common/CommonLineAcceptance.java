@@ -37,9 +37,9 @@ public class CommonLineAcceptance {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
-        params.put("upStationId",upStationId);
-        params.put("downStationId",downStationId);
-        params.put("distance",distance);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
         return params;
     }
 

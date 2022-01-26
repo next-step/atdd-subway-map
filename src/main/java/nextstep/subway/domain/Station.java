@@ -42,8 +42,8 @@ public class Station extends BaseEntity {
         return Objects.hash(getName());
     }
 
-    public boolean isSameStation(Long stationId) {
-        return Objects.equals(id, stationId);
+    public boolean isNotSameStation(Long stationId) {
+        return !Objects.equals(id, stationId);
     }
 
     public void notEqualsIn(List<Long> stationIdsInLine) {
