@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nextstep.subway.utils.HttpRequestTestUtil.*;
-import static nextstep.subway.utils.StationStepUtil.지하철역들생성;
+import static nextstep.subway.utils.StationStepUtil.테스트준비_지하철역들생성;
 
 public class LineStepUtil {
 
@@ -27,7 +27,7 @@ public class LineStepUtil {
     }
 
     public static ExtractableResponse<Response> 테스트준비_노선등록() {
-        지하철역들생성();
+        테스트준비_지하철역들생성();
         return 기존노선생성();
     }
 
@@ -36,13 +36,11 @@ public class LineStepUtil {
     }
 
     public static ExtractableResponse<Response> 기존노선생성() {
-        Map<String, Object> param = 노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리);
-        return 포스트_요청(기본주소, param);
+        return 노선생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리);
     }
 
     public static ExtractableResponse<Response> 새로운노선생성() {
-        Map<String, Object> param = 노선파라미터생성(새로운노선, 새로운색상, 상행종점, 하행종점, 종점간거리);
-        return 포스트_요청(기본주소, param);
+        return 노선생성(새로운노선, 새로운색상, 상행종점, 하행종점, 종점간거리);
     }
 
     public static ExtractableResponse<Response> 노선생성(String 노선이름,String 노선색상,Long 상행역,Long 하행역,int 종점간거리) {

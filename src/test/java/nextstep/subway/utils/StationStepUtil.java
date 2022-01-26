@@ -15,7 +15,7 @@ public class StationStepUtil {
     public static final String 기존지하철 = "기존지하철";
     public static final String 새로운지하철 = "새로운지하철";
 
-    public static void 지하철역들생성() {
+    public static void 테스트준비_지하철역들생성() {
         기존지하철역생성();
         새로운지하철역생성(새로운지하철);
     }

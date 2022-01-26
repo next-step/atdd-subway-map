@@ -27,7 +27,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선생성_테스트() {
         //given
-        지하철역들생성();
+        테스트준비_지하철역들생성();
 
         //when
         ExtractableResponse<Response> response = 기존노선생성();
@@ -63,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선목록조회_테스트() {
         //given
-        지하철역들생성();
+        테스트준비_지하철역들생성();
         기존노선생성();
         새로운노선생성();
 
@@ -85,7 +85,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선조회_테스트() {
         //given
-        지하철역들생성();
+        테스트준비_지하철역들생성();
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
@@ -108,7 +108,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선업데이트_테스트() {
         //given
-        지하철역들생성();
+        테스트준비_지하철역들생성();
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
@@ -133,7 +133,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 노선삭제_테스트() {
         //given
-        지하철역들생성();
+        테스트준비_지하철역들생성();
         ExtractableResponse<Response> createResponse = 기존노선생성();
 
         //when
@@ -154,7 +154,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicationLine() {
         //given
-        지하철역들생성();
+        테스트준비_지하철역들생성();
         기존노선생성();
 
         //when
