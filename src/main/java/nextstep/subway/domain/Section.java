@@ -34,7 +34,7 @@ public class Section {
         return new Section(line, upStation, downStation, request.getDistance());
     }
 
-    public static void validateForSave(final List<Section> sections, final Long upStationId, final Long downStationId) {
+    public static void validateSave(final List<Section> sections, final Long upStationId, final Long downStationId) {
         final List<Station> registeredDownStations = getRegisteredDownStation(sections);
         final List<Station> registeredUpStations = getRegisteredUpStation(sections);
 
@@ -48,7 +48,7 @@ public class Section {
         }
     }
 
-    public static void validateForDelete(final List<Section> sections, final Long downStationId) {
+    public static void validateDelete(final List<Section> sections, final Long downStationId) {
         if(sections.isEmpty() || sections.size() == 1) {
             throw new ValidationException("구간을 삭제할 수 없습니다.");
         }

@@ -23,17 +23,17 @@ public class StationService {
     }
 
     public StationResponse saveStation(final StationRequest stationRequest) {
-        final String stationName = stationRequest.getName();
+        String stationName = stationRequest.getName();
         if (isDuplicate(stationName)) {
             throw new DuplicateException();
         }
-        final Station station = stationRepository.save(new Station(stationName));
+        Station station = stationRepository.save(new Station(stationName));
         return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
-        final List<Station> stations = stationRepository.findAll();
+        List<Station> stations = stationRepository.findAll();
         return stations.stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());

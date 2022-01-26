@@ -27,14 +27,14 @@ public class LineService {
         if (isDuplicate(request.getName())) {
             throw new DuplicateException();
         }
-        final Line line = Line.of(request);
-        final Line createdLine = lineRepository.save(line);
+        Line line = Line.of(request);
+        Line createdLine = lineRepository.save(line);
         return LineResponse.of(createdLine);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        final List<Line> lines = lineRepository.findAll();
+        List<Line> lines = lineRepository.findAll();
         return lines.stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
@@ -60,7 +60,7 @@ public class LineService {
     }
 
     private boolean isDuplicate(final String lineName) {
-        final Optional<Line> station = lineRepository.findByName(lineName);
+        Optional<Line> station = lineRepository.findByName(lineName);
         return station.isPresent();
     }
 }

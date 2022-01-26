@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static nextstep.subway.model.LineEntitiesHelper.노선_생성_요청;
-import static nextstep.subway.model.LineEntitiesHelper.이호선;
+import static nextstep.subway.model.LineEntitiesHelper.*;
 import static nextstep.subway.model.SectionEntitiesHelper.*;
 import static nextstep.subway.model.StationEntitiesHelper.*;
 import static org.apache.http.HttpHeaders.LOCATION;
@@ -20,7 +19,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
     private Long 역삼역_ID;
     private Long 강남역_ID;
+    private String createdLineUri;
     private String requestUri;
+    private static final String SECTION_URI = "/sections";
     Map<String, Object> params;
 
     @Override
@@ -29,7 +30,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
         super.setUp();
         역삼역_ID = 지하철역_생성_요청(역삼역).jsonPath().getLong("id");
         강남역_ID = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
-        requestUri = 노선_생성_요청(이호선).header(LOCATION) + "/sections";
+        createdLineUri = 노선_생성_요청(이호선).header(LOCATION);
+        requestUri = createdLineUri + SECTION_URI;
         params = newSection(역삼역_ID, 강남역_ID, 3);
     }
 
@@ -124,7 +126,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 마지막에 생성된 구간 삭제를 요청하면
      * Then 삭제에 성공한다
      */
-    @DisplayName("하행 종점역만 제거할 수 있다.")
+    @DisplayName("하행 종점역만 제거할 수 있다")
     @Test
     void onlyTheUnderTerminateStationCanBeRemoved() {
         ExtractableResponse<Response> createResponse1 = 구간_생성_요청(params, requestUri);
@@ -135,5 +137,24 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> failResponse = 구간_삭제_요청(createResponse2.header(LOCATION));
         assertThat(failResponse.statusCode()).isEqualTo(NO_CONTENT.value());
+    }
+
+    /**
+     * Given 구간 생성을 요청하고
+     * Given 구간 생성을 요청하고
+     * When 노선 조회를 요청하면
+     * Then 역 목록을 포함한 노선을 응답 받는다.
+     */
+    @DisplayName("등록된 구간을 통해 역 목록 조회 기능")
+    @Test
+    void findStationsThroughRegisteredSectionsInLine() {
+        ExtractableResponse<Response> createResponse1 = 구간_생성_요청(params, requestUri);
+
+        Long 선릉역_ID = 지하철역_생성_요청(선릉역).jsonPath().getLong("id");
+        Map<String, Object> params1 = newSection(선릉역_ID, 역삼역_ID, 5);
+        ExtractableResponse<Response> createResponse2 = 구간_생성_요청(params1, requestUri);
+
+        ExtractableResponse<Response> findResponse = 노선_단건_조회_요청(createdLineUri);
+        assertThat(findResponse.jsonPath().getList("stations")).isNotEmpty();
     }
 }

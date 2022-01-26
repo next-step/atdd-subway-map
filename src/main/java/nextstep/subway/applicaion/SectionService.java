@@ -6,14 +6,12 @@ import nextstep.subway.domain.*;
 import nextstep.subway.exception.NotFoundLineException;
 import nextstep.subway.exception.NotFoundSectionException;
 import nextstep.subway.exception.NotFoundStationException;
-import nextstep.subway.exception.ValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static nextstep.subway.domain.Section.validateForDelete;
-import static nextstep.subway.domain.Section.validateForSave;
+import static nextstep.subway.domain.Section.*;
 
 @Transactional
 @Service
@@ -30,24 +28,24 @@ public class SectionService {
     }
 
     public SectionResponse saveSection(final SectionRequest request, final Long id) {
-        final Line line = findLineById(id);
-        final Station upStation = findStationById(request.getUpStationId());
-        final Station downStation = findStationById(request.getDownStationId());
+        Line line = findLineById(id);
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
 
-        final List<Section> sections = line.getSections();
+        List<Section> sections = line.getSections();
         if(!sections.isEmpty()) {
-            validateForSave(sections, request.getUpStationId(), request.getDownStationId());
+            validateSave(sections, request.getUpStationId(), request.getDownStationId());
         }
 
-        final Section section = Section.of(line, upStation, downStation, request);
-        final Section createdSection = sectionRepository.save(section);
+        Section section = Section.of(line, upStation, downStation, request);
+        Section createdSection = sectionRepository.save(section);
         return SectionResponse.of(createdSection);
     }
 
     public void deleteSectionById(final Long lineId, final Long sectionId) {
-        final Line line = findLineById(lineId);
-        final Section section = findSectionById(sectionId);
-        validateForDelete(line.getSections(), section.getDownStation().getId());
+        Line line = findLineById(lineId);
+        Section section = findSectionById(sectionId);
+        validateDelete(line.getSections(), section.getDownStation().getId());
         sectionRepository.deleteById(sectionId);
     }
 

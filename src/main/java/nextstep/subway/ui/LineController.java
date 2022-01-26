@@ -35,7 +35,7 @@ public class LineController {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
-        final LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -70,7 +70,7 @@ public class LineController {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
-        final SectionResponse section = sectionService.saveSection(sectionRequest, id);
+        SectionResponse section = sectionService.saveSection(sectionRequest, id);
         final URI uri = URI.create("/lines/" + id + "/sections/" + section.getId());
         return ResponseEntity.created(uri).body(section);
     }
