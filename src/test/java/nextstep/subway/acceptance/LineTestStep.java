@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.dto.LineTestRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -14,20 +15,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineTestStep {
 
-    public static Long 지하철_노선_생성한_후_아이디_추출하기(String lineColor, String lineName) {
-        ExtractableResponse<Response> response = 지하철_노선을_생성한다(lineColor, lineName);
+    public static LineTestRequest 지하철_노선_요청_신분당선_데이터_생성하기() {
+        return LineTestRequest.builder()
+                .color("bg-red-600")
+                .name("신분당선")
+                .upStationId(StationTestStep.지하철역_생성_후_아이디_추출하기("강남역"))
+                .downStationId(StationTestStep.지하철역_생성_후_아이디_추출하기("광교역"))
+                .distance(33)
+                .build();
+    }
+
+    public static LineTestRequest 지하철_노선_요청_이호선_데이터_생성하기() {
+        Long 시청역_아이디 = StationTestStep.지하철역_생성_후_아이디_추출하기("시청역");
+        return LineTestRequest.builder()
+                .color("bg-green-600")
+                .name("2호선")
+                .upStationId(시청역_아이디)
+                .downStationId(시청역_아이디)
+                .distance(48)
+                .build();
+    }
+
+    public static Long 지하철_노선_생성한_후_아이디_추출하기(LineTestRequest lineTestRequest) {
+        ExtractableResponse<Response> response = 지하철_노선을_생성한다(lineTestRequest);
         Integer responseIntegerId = response.jsonPath().get("id");
         return responseIntegerId.longValue();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선을_생성한다(String lineColor, String lineName) {
-        Map<String, String> body = new HashMap<>();
-        body.put("color", lineColor);
-        body.put("name", lineName);
-
+    public static ExtractableResponse<Response> 지하철_노선을_생성한다(LineTestRequest lineTestRequest) {
         return RestAssured
                 .given().log().all()
-                .body(body)
+                .body(lineTestRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
