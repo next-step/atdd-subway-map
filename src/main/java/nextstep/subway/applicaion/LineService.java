@@ -32,4 +32,9 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.getById(id);
+        return LineResponse.from(line);
+    }
 }
