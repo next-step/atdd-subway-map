@@ -62,7 +62,7 @@ public class LineService {
     }
 
     private void checkDistanceLessThanZero(int distance) {
-        if (distance <= 0) {
+        if (distance < 0) {
             throw new NotExistedStationException("[notValid]:distance");
         }
     }
