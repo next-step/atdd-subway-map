@@ -37,7 +37,7 @@ public class LineRequest {
         return new Line(name, color);
     }
 
-    public boolean ableSection() {
+    public boolean hasSectionAvailable() {
         if (upStationId == null || downStationId == null || distance == null) {
             return false;
         }

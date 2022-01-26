@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +42,7 @@ public class SectionService {
     }
 
     public void addSection(Long lineId, SectionRequest request) {
-        Assert.isTrue(request.getUpStationId() != request.getDownStationId(),
+        Assert.isTrue(!Objects.equals(request.getUpStationId(), request.getDownStationId()),
                 "상행역과 하행역은 동일할 수 없습니다.");
 
         if (!sectionLineManager.isExistsByLine(lineId))

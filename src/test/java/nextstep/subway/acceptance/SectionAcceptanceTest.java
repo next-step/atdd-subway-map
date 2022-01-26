@@ -2,17 +2,14 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.line.application.dto.LineRequest;
 import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.utils.AssuredRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -107,8 +104,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
         지하철_구간_생성_요청(searchUri + "/sections", params);
 
         // when
-        String uri = searchUri + "/sections?stationId=3";
-        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri);
+        String uri = searchUri + "/sections";
+
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri, 3);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -170,8 +168,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
         지하철_구간_생성_요청(searchUri + "/sections", params);
 
         // when
-        String uri = STATION_END_POINT + "/1";
-        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri);
+        String uri = searchUri + "/sections";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri, 1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -187,8 +185,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         // when
-        String uri = searchUri + "/sections?stationId=1";
-        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri);
+        String uri = searchUri + "/sections";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri, 1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -203,18 +201,25 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         // when
-        String uri = searchUri + "/sections?stationId=1";
-        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(uri);
+        String uri = STATION_END_POINT + "/1";
+        ExtractableResponse<Response> response = 지하철역_삭제_요청(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-
+    private Map<String, String> 노선_요청_정보_샘플1() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "2호선");
+        params.put("color", "연두색");
+        params.put("upStationId", "1");
+        params.put("downStationId", "2");
+        params.put("distance", "30");
+        return params;
+    }
 
     private String 샘플1_지하철_노선_생성_요청() {
-        LineRequest lineRequest = new LineRequest("2호선", "연두색", 1L, 2L, 30);
-        ExtractableResponse<Response> givenResponse = 지하철_노선_생성_요청(lineRequest);
+        ExtractableResponse<Response> givenResponse = 지하철_노선_생성_요청(노선_요청_정보_샘플1());
         return givenResponse.header("Location");
     }
 
@@ -238,12 +243,14 @@ class SectionAcceptanceTest extends AcceptanceTest {
         return AssuredRequest.doCreate(uri, map);
     }
 
-    private ExtractableResponse<Response> 지하철_구간_삭제_요청(String uri) {
-        return AssuredRequest.doDelete(uri);
+    private ExtractableResponse<Response> 지하철_구간_삭제_요청(String uri, long stationId) {
+        Map<String, String> queryMap = new HashMap();
+        queryMap.put("stationId", String.valueOf(stationId));
+        return AssuredRequest.doDelete(uri, queryMap);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest lineRequest) {
-        return AssuredRequest.doCreate(LINE_END_POINT, lineRequest);
+    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> map) {
+        return AssuredRequest.doCreate(LINE_END_POINT, map);
     }
 
     private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
@@ -252,5 +259,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> map) {
         return AssuredRequest.doCreate(STATION_END_POINT, map);
+    }
+
+    private ExtractableResponse<Response> 지하철역_삭제_요청(String uri) {
+        return AssuredRequest.doDelete(uri);
     }
 }

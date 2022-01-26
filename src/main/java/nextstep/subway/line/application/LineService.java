@@ -30,7 +30,7 @@ public class LineService {
         checkExistsLineName(request.getName());
         Line line = lineRepository.save(request.toLine());
 
-        if (request.ableSection()) {
+        if (request.hasSectionAvailable()) {
             SectionRequest sectionRequest = new SectionRequest(request.getUpStationId(), request.getDownStationId(), request.getDistance());
             sectionService.addSection(line.getId(), sectionRequest);
         }
