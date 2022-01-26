@@ -21,13 +21,13 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(LineRequest lineRequest) {
 
-        if(isExistLineName(request.getName())){
+        if(isExistLineName(lineRequest.getName())){
             throw new LogicException(LogicError.DUPLICATED_NAME_LINE);
         }
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         return LineResponse.of(line);
     }
 
