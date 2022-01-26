@@ -1,8 +1,8 @@
 package nextstep.subway.applicaion.command;
 
-import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.applicaion.query.LineQueryService;
+import nextstep.subway.applicaion.query.StationQueryService;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -15,15 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class LineCommandService {
 
     private final LineRepository lineRepository;
-    private final StationService stationService;
     private final LineQueryService lineQueryService;
+    private final StationQueryService stationQueryService;
 
     public LineCommandService(LineRepository lineRepository,
-                              StationService stationService,
-                              LineQueryService lineQueryService) {
+                              LineQueryService lineQueryService,
+                              StationQueryService stationQueryService) {
         this.lineRepository = lineRepository;
-        this.stationService = stationService;
         this.lineQueryService = lineQueryService;
+        this.stationQueryService = stationQueryService;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -31,8 +31,8 @@ public class LineCommandService {
             throw new DuplicateLineException(request.getName());
         }
 
-        Station upStation = stationService.findStationsById(request.getUpStationId());
-        Station downStation = stationService.findStationsById(request.getDownStationId());
+        Station upStation = stationQueryService.findStationsById(request.getUpStationId());
+        Station downStation = stationQueryService.findStationsById(request.getDownStationId());
 
         Line line = lineRepository.save(
                 Line.of(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
@@ -48,8 +48,8 @@ public class LineCommandService {
 
     public ShowLineResponse addSection(Long lineId, SectionRequest request) {
         Line line = lineQueryService.findLineById(lineId);
-        Station upStation = stationService.findStationsById(request.getUpStationId());
-        Station downStation = stationService.findStationsById(request.getDownStationId());
+        Station upStation = stationQueryService.findStationsById(request.getUpStationId());
+        Station downStation = stationQueryService.findStationsById(request.getDownStationId());
 
         line.addSection(upStation, downStation, request.getDistance());
 
@@ -58,7 +58,7 @@ public class LineCommandService {
 
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineQueryService.findLineById(lineId);
-        Station deleteStation = stationService.findStationsById(stationId);
+        Station deleteStation = stationQueryService.findStationsById(stationId);
         line.deleteStation(deleteStation);
     }
 
