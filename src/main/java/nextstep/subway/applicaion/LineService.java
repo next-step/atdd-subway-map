@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -61,6 +62,7 @@ public class LineService {
     public LineResponse findLineById(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
+
         return createLineResponse(line);
     }
 
@@ -78,15 +80,19 @@ public class LineService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 아이디를 입력했습니다."));
         line.deleteSection(stationId);
-
     }
 
     private LineResponse createLineResponse(Line line) {
+        List<Station> stations = line.getSections().stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
+                .collect(Collectors.toList());
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                Collections.EMPTY_LIST,
+                stations,
                 line.getCreatedDate(),
                 line.getModifiedDate());
     }
