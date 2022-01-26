@@ -168,6 +168,34 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철 노선 생성 및 구간등록 요청 하고,
+     * When 생성한 지하철 노선 조회를 요청 하면
+     * Then 생성한 지하철 노선 역을 응답받는다
+     * @see nextstep.subway.ui.LineController#getLine
+     */
+    @DisplayName("지하철 노선역 조회 테스트")
+    @Test
+    void 지하철_노선역_조회_테스트() {
+        // given
+        ApiUtil.지하철역_생성_API(연신내역);
+        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(삼성역);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
+
+        // when
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_단건_조회_API(1L);
+
+        // then
+        List<HashMap<String, String>> stations = response.body().jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(3);
+        System.out.println(stations.get(0).get("name"));
+        assertThat(stations.get(0).get("name").equals("연신내")).isTrue();
+        assertThat(stations.get(1).get("name").equals("서울역")).isTrue();
+        assertThat(stations.get(2).get("name").equals("삼성역")).isTrue();
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * When 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선의 정보 수정은 성공한다.
@@ -268,7 +296,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         ApiUtil.지하철역_생성_API(연신내역);
         ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철역_생성_API(삼성역);
         ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
 
         // when
