@@ -12,6 +12,7 @@ import nextstep.subway.exception.NotExistedStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -33,7 +34,18 @@ public class LineService {
         existsStation(request.getDownStationId());
         equalsUpDownStation(request.getUpStationId(), request.getDownStationId());
         checkDistanceLessThanZero(request.getDistance());
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Section section = new Section(
+                line,
+                upStation,
+                downStation,
+                request.getDistance()
+        );
+        line.addSection(section);
         return createLineResponse(line);
     }
 
@@ -95,11 +107,11 @@ public class LineService {
 
     public void saveSection(Long id, SectionRequest request) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(NotExistedStationException::new);
+                .orElseThrow(EntityNotFoundException::new);
         Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(NotExistedStationException::new);
+                .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(NotExistedStationException::new);
+                .orElseThrow(EntityNotFoundException::new);
         Section section = new Section(
                 line,
                 upStation,
