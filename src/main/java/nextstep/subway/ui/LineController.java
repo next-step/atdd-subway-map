@@ -1,7 +1,8 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.command.LineCommandService;
 import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.applicaion.query.LineQueryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,29 +13,32 @@ import java.util.List;
 @RequestMapping("/lines")
 public class LineController {
 
-    private final LineService lineService;
+    private final LineCommandService lineCommandService;
+    private final LineQueryService lineQueryService;
 
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
+    public LineController(LineCommandService lineCommandService,
+                          LineQueryService lineQueryService) {
+        this.lineCommandService = lineCommandService;
+        this.lineQueryService = lineQueryService;
     }
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineCommandService.saveLine(lineRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
     public ResponseEntity<List<ShowLineResponse>> showLine() {
-        List<ShowLineResponse> lines = lineService.findAllLines();
+        List<ShowLineResponse> lines = lineQueryService.findAllLines();
 
         return ResponseEntity.ok(lines);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<ShowLineResponse> showLine(@PathVariable("id") Long id) {
-        ShowLineResponse line = lineService.findLine(id);
+        ShowLineResponse line = lineQueryService.findLine(id);
 
         return ResponseEntity.ok(line);
     }
@@ -42,7 +46,7 @@ public class LineController {
     @PutMapping("{id}")
     public ResponseEntity<Void> updateLine(@PathVariable("id") Long id,
                                            @RequestBody UpdateLineRequest request) {
-        lineService.updateLine(id, request);
+        lineCommandService.updateLine(id, request);
 
         return ResponseEntity.noContent()
                 .build();
@@ -50,7 +54,7 @@ public class LineController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable("id") Long id) {
-        lineService.deleteLine(id);
+        lineCommandService.deleteLine(id);
 
         return ResponseEntity.noContent()
                 .build();
@@ -58,7 +62,7 @@ public class LineController {
 
     @PostMapping("{id}/sections")
     public ResponseEntity<ShowLineResponse> addSection(@PathVariable("id") Long id, @RequestBody SectionRequest request) {
-        ShowLineResponse lineResponse = lineService.addSection(id, request);
+        ShowLineResponse lineResponse = lineCommandService.addSection(id, request);
 
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getLineId()))
                 .body(lineResponse);
@@ -66,7 +70,7 @@ public class LineController {
 
     @DeleteMapping("{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId, @RequestParam("stationId") Long stationId) {
-        lineService.deleteSection(lineId, stationId);
+        lineCommandService.deleteSection(lineId, stationId);
 
         return ResponseEntity.noContent()
                 .build();
