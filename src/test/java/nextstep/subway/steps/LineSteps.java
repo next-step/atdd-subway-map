@@ -26,20 +26,6 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> executeLineCreateRequest(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured.given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .extract();
-    }
-
     public static ExtractableResponse<Response> executeLineCreateRequest(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
