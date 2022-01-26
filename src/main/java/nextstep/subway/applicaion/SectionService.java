@@ -22,8 +22,8 @@ public class SectionService {
     public Section createSection(Line line, SectionRequest sectionRequest) {
         Station upStation = stationService.findStationById(sectionRequest.getUpStationId());
         Station downStation = stationService.findStationById(sectionRequest.getDownStationId());
-        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
-
+        Section section = sectionRepository.save(
+                new Section(line, upStation, downStation, sectionRequest.getDistance()));
         return section;
     }
 }

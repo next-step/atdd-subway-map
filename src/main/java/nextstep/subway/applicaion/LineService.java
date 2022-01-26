@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.applicaion.dto.SectionResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
@@ -62,7 +59,11 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLine(Long id) {
-        return LineResponse.of(findById(id));
+        Line line = findById(id);
+        List<StationResponse> stations = line.getStations()
+                        .stream().map(StationResponse::of)
+                        .collect(Collectors.toList());
+        return LineResponse.of(line, stations);
     }
 
     public LineResponse updateLine(Long id, LineRequest lineRequest) {
@@ -92,10 +93,12 @@ public class LineService {
     public void removeSection(Long lineId, Long stationId) {
         Line line = findById(lineId);
         Section section = line.findSection(stationId);
+
         if (!line.isPossibleToRemove(section)) {
             throw new InvalidValueException();
         }
         line.removeSection(section);
     }
+
 
 }
