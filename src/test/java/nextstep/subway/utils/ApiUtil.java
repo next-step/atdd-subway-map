@@ -69,6 +69,17 @@ public class ApiUtil {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_API(Long id, Map<String, String> params) {
+        return RestAssured.given().log().all()
+                .pathParam("id", id)
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> 지하철역_생성_API(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)

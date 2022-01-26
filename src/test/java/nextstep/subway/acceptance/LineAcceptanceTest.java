@@ -305,6 +305,29 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
+    /**
+     * Given 지하철 노선 생성 및 노선 구간 생성을 하고,
+     * When 생성한 지하철 노선 구간 삭제를 요청 하면
+     * Then 생성한 지하철 노선 구간 삭제가 성공한다.
+     * @see nextstep.subway.ui.LineController#deleteSetion
+     */
+    @DisplayName("지하철 노선 구간 삭제 테스트")
+    @Test
+    void 지하철_노선_구간_삭제_테스트() {
+        //given
+        ApiUtil.지하철역_생성_API(연신내역);
+        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(삼성역);
+        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, GTXA노선_구간_삭제_삼성역);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
     static Map<String, String> GTXA노선_연신내_서울역;
     static Map<String, String> GTXA노선_상행_정보없음;
     static Map<String, String> GTXA노선_하행_정보없음;
@@ -321,6 +344,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     static Map<String, String> GTXA노선_구간_서울역_삼성역;
     static Map<String, String> GTXA노선_구간_연신내역_삼성역;
     static Map<String, String> GTXA노선_구간_서울역_연신내역;
+
+    static Map<String, String> GTXA노선_구간_삭제_삼성역;
 
     @BeforeAll
     public static void 초기화() {
@@ -385,5 +410,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         GTXA노선_구간_서울역_연신내역.put("upStationId", "2");
         GTXA노선_구간_서울역_연신내역.put("downStationId", "1");
         GTXA노선_구간_서울역_연신내역.put("distance", "10");
+
+        GTXA노선_구간_삭제_삼성역 = new HashMap<>();
+        GTXA노선_구간_삭제_삼성역.put("stationId", "3");
     }
 }
