@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,46 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
+        // given
+        String firstLineName = "신분당선";
+        String firstLineColor = "bg-red-600";
+        final Map<String, String> params1 = new HashMap<>();
+        params1.put("name", firstLineName);
+        params1.put("color", firstLineColor);
+
+        RestAssured.given().log().all()
+            .body(params1)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract();
+
+        String secondLineName = "2호선";
+        String secondLineColor = "bg-green-600";
+        final Map<String, String> params2 = new HashMap<>();
+        params2.put("name", secondLineName);
+        params2.put("color", secondLineColor);
+
+        RestAssured.given().log().all()
+            .body(params2)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/lines")
+            .then().log().all()
+            .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> lineNames = response.jsonPath().getList("name");
+        assertThat(lineNames).contains(firstLineName, secondLineName);
     }
 
     /**
