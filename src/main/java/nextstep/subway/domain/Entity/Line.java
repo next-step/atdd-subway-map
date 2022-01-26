@@ -13,7 +13,17 @@ public class Line extends BaseEntity {
     @Column(unique = true)
     private String name;
 
+    @Column(name = "color")
     private String color;
+
+    @Column(name = "up_station_id")
+    private Long upStationId;
+
+    @Column(name = "down_station_id")
+    private Long downStationId;
+
+    @Column(name = "distance")
+    private int distance;
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
