@@ -40,11 +40,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        final String name = "신분당선";
-        지하철_노선_생성_요청(name, "bg-red-600");
+        final String 신분당선 = "신분당선";
+        지하철_노선_생성_요청(신분당선, "bg-red-600", "강남역", "역삼역");
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_생성_요청(name, "bg-green-600");
+        final ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선, "bg-green-600", "합정역", "당산역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
@@ -60,10 +60,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        final String name1 = "신분당선";
-        final String name2 = "2호선";
-        지하철_노선_생성_요청(name1, "bg-red-600");
-        지하철_노선_생성_요청(name2, "bg-green-600");
+        final String 신분당선 = "신분당선";
+        final String 지하철2호선 = "2호선";
+        지하철_노선_생성_요청(신분당선, "bg-red-600", "강남역", "역삼역");
+        지하철_노선_생성_요청(지하철2호선, "bg-green-600", "합정역", "당산역");
 
         // when
         final ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
@@ -71,7 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("name")).contains(name1, name2)
+                () -> assertThat(response.jsonPath().getList("name")).contains(신분당선, 지하철2호선)
         );
     }
 
@@ -84,8 +84,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        final String name = "신분당선";
-        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(name, "bg-red-600");
+        final String 신분당선 = "신분당선";
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600");
 
         // when
         final String path = createResponse.header("Location");
@@ -96,7 +96,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(responseBody.getLong("id")).isNotNull(),
-                () -> assertThat(responseBody.getString("name")).isEqualTo(name)
+                () -> assertThat(responseBody.getString("name")).isEqualTo(신분당선)
         );
     }
 
@@ -113,16 +113,16 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         final String path = createResponse.header("Location");
-        final String name = "구분당선";
+        final String 구분당선 = "구분당선";
         final String color = "bg-blue-600";
-        지하철_노선_수정_요청(path, name, color);
+        지하철_노선_수정_요청(path, 구분당선, color);
 
         // then
         final ExtractableResponse<Response> response = 지하철_노선_조회_요청(path);
         final JsonPath responseBody = response.jsonPath();
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(responseBody.getString("name")).isEqualTo(name),
+                () -> assertThat(responseBody.getString("name")).isEqualTo(구분당선),
                 () -> assertThat(responseBody.getString("color")).isEqualTo(color)
         );
     }
