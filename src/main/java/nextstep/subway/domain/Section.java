@@ -1,9 +1,13 @@
 package nextstep.subway.domain;
 
 public class Section {
+
     private Long upStationId;
     private Long downStationId;
     private int distance;
+
+    protected Section() {
+    }
 
     public Section(final Long upStationId, final Long downStationId, final int distance) {
         this.upStationId = upStationId;
@@ -11,7 +15,8 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section() {
+    public boolean isDownStationId(long downStationId) {
+        return this.downStationId.equals(downStationId);
     }
 
     public Long getUpStationId() {
@@ -24,17 +29,5 @@ public class Section {
 
     public int getDistance() {
         return distance;
-    }
-
-    public void setUpStationId(final Long upStationId) {
-        this.upStationId = upStationId;
-    }
-
-    public void setDownStationId(final Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
-    public void setDistance(final int distance) {
-        this.distance = distance;
     }
 }
