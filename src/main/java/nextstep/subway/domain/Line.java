@@ -1,9 +1,6 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Line extends BaseEntity {
@@ -12,8 +9,15 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+
+    @ManyToOne
+    @JoinColumn(name="up_station_id")
+    private Station upStation;
+
+    @ManyToOne
+    @JoinColumn(name="down_station_id")
+    private Station downStation;
+
     private int distance;
 
     public Line() {
@@ -24,11 +28,11 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -44,12 +48,12 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public int getDistance() {

@@ -13,4 +13,10 @@ public class StationException extends RuntimeException {
             super("Already exists station; name=" + station.getName());
         }
     }
+
+    public static class NotFound extends StationException {
+        public NotFound(Long id) {
+            super("Not found station; id=" + id);
+        }
+    }
 }

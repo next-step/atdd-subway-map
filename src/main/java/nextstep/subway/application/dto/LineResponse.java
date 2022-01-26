@@ -8,18 +8,18 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+    private StationResponse upStation;
+    private StationResponse downStation;
     private int distance;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    private LineResponse(Long id, String name, String color, Long upStationId, Long downStationId, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(Long id, String name, String color, StationResponse upStation, StationResponse downStation, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
@@ -30,8 +30,8 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getUpStationId(),
-                line.getDownStationId(),
+                StationResponse.fromStation(line.getUpStation()),
+                StationResponse.fromStation(line.getDownStation()),
                 line.getDistance(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
@@ -50,12 +50,12 @@ public class LineResponse {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public StationResponse getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public StationResponse getDownStation() {
+        return downStation;
     }
 
     public int getDistance() {

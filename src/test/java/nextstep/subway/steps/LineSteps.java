@@ -41,12 +41,12 @@ public class LineSteps {
     }
 
     public static ExtractableResponse<Response> executeLineCreateRequest(LineRequest request) {
-        return RestAssured.given()
+        return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
-                .then()
+                .then().log().all()
                 .extract();
     }
 
