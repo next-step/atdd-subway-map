@@ -4,19 +4,19 @@ import nextstep.subway.error.exception.BusinessException;
 import nextstep.subway.error.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
-    protected ResponseEntity<Object> handleBusinessException(final BusinessException e) {
+    protected ResponseEntity<Void> handleBusinessException(final BusinessException e) {
         final ErrorCode errorCode = e.getErrorCode();
         return new ResponseEntity<>(HttpStatus.valueOf(errorCode.getStatus()));
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Object> handleException(Exception e) {
+    protected ResponseEntity<Void> handleException(Exception e) {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
