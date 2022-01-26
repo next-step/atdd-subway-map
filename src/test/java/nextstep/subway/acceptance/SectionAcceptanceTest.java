@@ -1,7 +1,14 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.application.dto.*;
+import nextstep.subway.steps.SectionSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -14,6 +21,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간을 등록하려는 노선이 존재하지 않을 때")
     @Test
     void createNotExistsLineSection() {
+        SectionRequest request = SectionRequestBuilder.ofDefault().build();
+        ExtractableResponse<Response> response = SectionSteps.executeSectionCreateRequest(INVALID_ID, request);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).contains("Not found line");
     }
 
     /**
