@@ -85,24 +85,24 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철_역_등록_실패한다(역등록결과);
     }
 
-    private ExtractableResponse<Response> 지하철_역_을_등록한다(StationRequest request) {
+    public static ExtractableResponse<Response> 지하철_역_을_등록한다(StationRequest request) {
         return RestAssuredCRUD.postRequest("/stations", request);
     }
 
-    private ExtractableResponse<Response> 지하철_역_목록을_조회한다() {
+    public static ExtractableResponse<Response> 지하철_역_목록을_조회한다() {
         return RestAssuredCRUD.get("/stations");
     }
 
-    private ExtractableResponse<Response> 지하철_역을_삭제한다(Long stationId) {
+    public static ExtractableResponse<Response> 지하철_역을_삭제한다(Long stationId) {
         return RestAssuredCRUD.delete("/stations/"+stationId);
     }
 
-    private void 지하철_역_등록성공(ExtractableResponse<Response> 역등록결과) {
+    public static void 지하철_역_등록성공(ExtractableResponse<Response> 역등록결과) {
         assertThat(역등록결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(역등록결과.header("Location")).isNotBlank();
     }
 
-    private void 지하철_역_목록조회_결과에_원하는_역들이_있다(ExtractableResponse<Response> 역목록조회결과, List<StationRequest> 역요청들) {
+    public static void 지하철_역_목록조회_결과에_원하는_역들이_있다(ExtractableResponse<Response> 역목록조회결과, List<StationRequest> 역요청들) {
         assertThat(역목록조회결과.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = 역목록조회결과.jsonPath().getList("name");
@@ -112,11 +112,11 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(lineNames).containsAll(names);
     }
 
-    private void 지하철_역_등록_실패한다(ExtractableResponse<Response> 역등록결과) {
+    public static void 지하철_역_등록_실패한다(ExtractableResponse<Response> 역등록결과) {
         assertThat(역등록결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    private void 지하철_역_삭제_성공한다(ExtractableResponse<Response> 역삭제결과) {
+    public static void 지하철_역_삭제_성공한다(ExtractableResponse<Response> 역삭제결과) {
         assertThat(역삭제결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
