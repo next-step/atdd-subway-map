@@ -79,6 +79,10 @@ public class LineService {
     }
 
     public void removeLineStation(Long lineId, Long stationId) {
-
+        Line persistLine = findLineById(lineId);
+        Station persistStation = stationRepository.findById(stationId)
+            .orElseThrow(NoSuchElementException::new);
+        persistLine.remove(persistStation);
     }
+
 }

@@ -1,20 +1,13 @@
 package nextstep.subway.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Line extends BaseEntity {
@@ -81,21 +74,24 @@ public class Line extends BaseEntity {
     public List<Station> getStations() {
         sortSections();
 
-        List<Station> stations = new ArrayList<>();
-        for (int i = 0; i < sections.size(); ++i) {
-            stations.add(sections.get(i).getUpStation());
-            if (i == sections.size()-1) {
-                stations.add(sections.get(sections.size()-1).getDownStation());
-            }
-        }
-        return stations;
+        return sections.getStations();
     }
 
     private void sortSections() {
-
+        // 구간순서 보장 안될 경우 정렬
     }
 
     public boolean containsSection(Section section) {
         return sections.contains(section);
+    }
+
+    public void remove(Station station) {
+        validateRemovable(station);
+
+        sections.removeFarDownSection();
+    }
+
+    private void validateRemovable(Station station) {
+        sections.validateRemovalbe(station);
     }
 }

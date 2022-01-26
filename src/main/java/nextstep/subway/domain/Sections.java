@@ -53,4 +53,37 @@ public class Sections {
     public boolean contains(Section section) {
         return sections.contains(section);
     }
+
+    public void validateRemovalbe(Station station) {
+        if (sections.size() <= 1) {
+            throw new IllegalStateException("노선에 구간이 1개 남은 상태는 역을 삭제 할 수 없음.");
+        }
+
+        if (!isLastStation(station)) {
+            throw new IllegalArgumentException("노선의 마지막 구간 하행역이 아니면 삭제 할 수 없음.");
+        }
+    }
+
+    private boolean isLastStation(Station station) {
+        if (sections.isEmpty()) {
+            return false;
+        }
+
+        return sections.get(sections.size()-1).getDownStation().equals(station);
+    }
+
+    public void removeFarDownSection() {
+        sections.remove(sections.size()-1);
+    }
+
+    public List<Station> getStations() {
+        List<Station> stations = new ArrayList<>();
+        for (int i = 0; i < sections.size(); ++i) {
+            stations.add(sections.get(i).getUpStation());
+            if (i == sections.size()-1) {
+                stations.add(sections.get(sections.size()-1).getDownStation());
+            }
+        }
+        return stations;
+    }
 }
