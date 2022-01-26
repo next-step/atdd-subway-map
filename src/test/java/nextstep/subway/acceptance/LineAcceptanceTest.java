@@ -28,9 +28,22 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@DisplayName("지하철 노선 생성")
 	@Test
 	void createLine() {
+		// when
 		ExtractableResponse<Response> response = 지하철_노선_생성("신분당선", "bg-red-600");
+		// then
 		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(response.header("Location")).isNotBlank();
+	}
+
+	@DisplayName("중복이름으로 지하철 노선 생성")
+	@Test
+	void createLineWithDuplicateName() {
+		// given
+		지하철_노선_생성("신분당선", "bg-red-600");
+		// when
+		ExtractableResponse<Response> response = 지하철_노선_생성("신분당선", "bg-red-600");
+		// then
+		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
 	}
 
 	/**

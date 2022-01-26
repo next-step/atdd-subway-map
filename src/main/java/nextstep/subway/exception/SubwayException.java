@@ -1,6 +1,6 @@
 package nextstep.subway.exception;
 
-public class StationException {
+public class SubwayException {
 
 	public static class DuplicatedNameException extends IllegalArgumentException {
 		private static final String DEFAULT_ERROR_MESSAGE = "Duplicate name";

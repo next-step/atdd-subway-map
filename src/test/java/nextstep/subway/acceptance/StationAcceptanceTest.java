@@ -55,8 +55,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성("강남역");
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성("역삼역");
+        지하철역_생성("강남역");
+        지하철역_생성("역삼역");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
