@@ -1,8 +1,11 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.Section;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,5 +46,29 @@ class LineTest {
 
         // then
         assertThat(line.validateDownStation(newSection.getDownStation())).isEqualTo(false);
+    }
+
+    @DisplayName("노선에 포함 된 지하철역 조회")
+    @Test
+    void getAllStations() {
+        // given
+        // given
+        Station station1 = new Station("강남역");
+        Station station2 = new Station("역삼역");
+        Station station3 = new Station("선릉역");
+        Section section1 = new Section(station1, station2, 10);
+        Section section2 = new Section(station2, station3, 5);
+        Line line = new Line("2호선", "bg-green-600");
+
+        line.addSection(section1);
+        line.addSection(section2);
+
+        // when
+        List<StationResponse> allStations = line.getAllStations();
+
+        assertThat(allStations.size()).isEqualTo(3);
+        assertThat(allStations.get(0).getName()).isEqualTo(station1.getName());
+        assertThat(allStations.get(1).getName()).isEqualTo(station2.getName());
+        assertThat(allStations.get(2).getName()).isEqualTo(station3.getName());
     }
 }
