@@ -8,6 +8,9 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
+    private String upStationName;
+    private String downStationName;
+    private int distance;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
