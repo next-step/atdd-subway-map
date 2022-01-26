@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +27,18 @@ public class StationService {
         return createStationResponse(station);
     }
 
+    private StationResponse createStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName(),
+                station.getCreatedDate(),
+                station.getModifiedDate()
+        );
+    }
+
     private void validateDuplicateStationName(String name) {
        if(stationRepository.findByName(name) != null) {
-           throw new RuntimeException("중복된 이름입니다.");
+           throw new BadRequestException("중복된 역 이름입니다.");
        }
     }
 
@@ -45,12 +55,14 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+    public Station findById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("존재하지 않는 역입니다."));
     }
+
+    public Station findById(Long id, String exceptionMessage) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(exceptionMessage));
+    }
+
 }

@@ -1,23 +1,17 @@
 package nextstep.subway.applicaion.dto;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LineRequest {
-    private String name;
-    private String color;
+public class SectionRequest {
     private Long upStationId;
     private Long downStationId;
     private int distance;
 
-    @Builder
-    private LineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
-        this.name = name;
-        this.color = color;
+    public SectionRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
