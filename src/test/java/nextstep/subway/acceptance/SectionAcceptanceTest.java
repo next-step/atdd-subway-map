@@ -2,12 +2,13 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.utils.LineStepUtil;
+import nextstep.subway.applicaion.exception.NotLastSectionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.utils.LineStepUtil.*;
+import static nextstep.subway.utils.SectionStepUtil.구간삭제요청;
 import static nextstep.subway.utils.SectionStepUtil.새로운구간등록;
 import static nextstep.subway.utils.StationStepUtil.새로운지하철역생성;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +25,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 새로운_구간_등록_테스트() {
         //given
-        LineStepUtil.테스트준비_노선등록();
+        테스트준비_노선등록();
         ExtractableResponse<Response> 아무개 = 새로운지하철역생성("아무개");
         Long 지하철역_ID = 아무개.jsonPath().getLong("id");
 
@@ -46,7 +47,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 잘못된_상행_하행_구간_등록_테스트() {
         //given
-        LineStepUtil.테스트준비_노선등록();
+        테스트준비_노선등록();
 
         //when
 
@@ -66,7 +67,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 등록안된_하행구간_등록_테스트() {
         //given
-        LineStepUtil.테스트준비_노선등록();
+        테스트준비_노선등록();
         //when
         Long 없는지하철역 = Long.MAX_VALUE;
         ExtractableResponse<Response> response = 새로운구간등록(하행종점, 없는지하철역, 종점간거리);
@@ -75,20 +76,35 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     }
 
     /**
-     * Given 지하철 역 (상행, 하행)생성을 요청한다.
-     * Given 노선 등록을 요청한다
+     * Given 지하철 역 (상행, 하행)생성을 요청한다. + 노선 등록을 요청한다
      * Given 구간 등록을 요청한다
      * When  하행 종점인 구간 삭제를 요청한다.
      * Then 삭제 된다.
      */
 
+
     /**
-     * Given 지하철 역 (상행, 하행)생성을 요청한다.
-     * Given 노선 등록을 요청한다
+     * Given 지하철 역 (상행, 하행)생성을 요청한다. + 노선 등록을 요청한다
      * Given 구간 등록을 요청한다
      * When  하행 종점이 아닌 구간 삭제를 요청한다.
-     * Then 삭제 요청이 실패한다.
+     * Then 삭제 되지 않는다.
      */
+
+    @DisplayName("마지막 구간만 삭제가 가능하다")
+    @Test
+    void 마지막_구간만_삭제가능() {
+        //given
+        테스트준비_노선등록();
+        테스트준비_구간등록();
+
+        //when
+        ExtractableResponse<Response> response = 구간삭제요청(하행종점);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo(NotLastSectionException.MESSAGE);
+
+    }
 
     /**
      * Given 지하철 역 (상행, 하행)생성을 요청한다.
@@ -97,6 +113,12 @@ public class SectionAcceptanceTest extends AcceptanceTest{
      * When  마지막 구간 삭제를 요청한다.
      * Then 삭제 요청이 실패한다.
      */
+
+    private void 테스트준비_구간등록() {
+        ExtractableResponse<Response> 아무개 = 새로운지하철역생성("아무개");
+        Long 지하철역_ID = 아무개.jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 새로운구간등록(하행종점, 지하철역_ID, 종점간거리);
+    }
 
 
 }

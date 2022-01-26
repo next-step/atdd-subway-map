@@ -2,16 +2,12 @@ package nextstep.subway.applicaion.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class NotFoundException extends RuntimeException{
+public class NotFoundException extends BusinessException {
 
     public static final String MESSAGE = "찾는 개체가 없습니다.";
-    private HttpStatus code = HttpStatus.NOT_FOUND;
+    private static HttpStatus code = HttpStatus.NOT_FOUND;
 
     public NotFoundException() {
-        super(MESSAGE);
-    }
-
-    public HttpStatus getCode() {
-        return code;
+        super(MESSAGE, code);
     }
 }
