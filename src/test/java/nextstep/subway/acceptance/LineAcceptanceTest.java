@@ -27,7 +27,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String name = "신분당선";
 
         // when
-        var response = 지하철_노선_생성_요청(name, color);
+        var response = LineSteps.지하철_노선_생성_요청(name, color);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,8 +46,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        지하철_노선_생성_요청("신분당선", "bg-red-600");
-        지하철_노선_생성_요청("2호선", "bg-green-600");
+        LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600");
+        LineSteps.지하철_노선_생성_요청("2호선", "bg-green-600");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -74,7 +74,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name = "신분당선";
         String color = "red";
-        var uri = 지하철_노선_생성_요청(name, color).header("Location");
+        var uri = LineSteps.지하철_노선_생성_요청(name, color).header("Location");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -99,7 +99,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var uri = 지하철_노선_생성_요청("2호선", "green").header("Location");
+        var uri = LineSteps.지하철_노선_생성_요청("2호선", "green").header("Location");
         String newName = "신분당선";
         String newColor = "Red";
         Map<String, String> params = new HashMap<>();
@@ -128,7 +128,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        var uri = 지하철_노선_생성_요청("2호선", "green").header("Location");
+        var uri = LineSteps.지하철_노선_생성_요청("2호선", "green").header("Location");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -151,27 +151,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicateLine() {
         // given
-        지하철_노선_생성_요청("2호선", "green");
+        LineSteps.지하철_노선_생성_요청("2호선", "green");
 
         // when
-        var response = 지하철_노선_생성_요청("2호선", "green");
+        var response = LineSteps.지하철_노선_생성_요청("2호선", "green");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured.given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .extract();
     }
 
 }
