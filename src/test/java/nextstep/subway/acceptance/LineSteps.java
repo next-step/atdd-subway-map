@@ -51,4 +51,13 @@ public class LineSteps {
                 .when().get("/lines/" + id)
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 지하철노선_목록_조회(Map<String, String> params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then().log().all().extract();
+    }
 }

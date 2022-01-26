@@ -1,16 +1,12 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,11 +21,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성();
+        ExtractableResponse<Response> createResponse = 지하철역_생성();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.header("Location")).isNotBlank();
     }
 
     /**
@@ -48,10 +44,10 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성(역삼역);
 
         // when
-        ExtractableResponse<Response> response = 지하철역_목록_조회();
+        ExtractableResponse<Response> readResponse = 지하철역_목록_조회();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
+        assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> stationNames = readResponse.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
 
@@ -68,10 +64,10 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철역_삭제(uri);
+        ExtractableResponse<Response> deleteResponse = 지하철역_삭제(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -86,9 +82,9 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성("용산역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_생성("용산역");
+        ExtractableResponse<Response> createResponse = 지하철역_생성("용산역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
