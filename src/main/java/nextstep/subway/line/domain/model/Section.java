@@ -42,7 +42,8 @@ public class Section extends BaseEntity {
     protected Section() {
     }
 
-    private Section(Line line, Station upStation, Station downStation, Distance distance) {
+    private Section(Long id, Line line, Station upStation, Station downStation, Distance distance) {
+        this.id = id;
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -86,10 +87,16 @@ public class Section extends BaseEntity {
     }
 
     public static class Builder {
+        private Long id;
         private Line line;
         private Station upStation;
         private Station downStation;
         private Distance distance;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
 
         public Builder line(Line line) {
             this.line = line;
@@ -112,7 +119,7 @@ public class Section extends BaseEntity {
         }
 
         public Section build() {
-            return new Section(line, upStation, downStation, distance);
+            return new Section(id, line, upStation, downStation, distance);
         }
     }
 }

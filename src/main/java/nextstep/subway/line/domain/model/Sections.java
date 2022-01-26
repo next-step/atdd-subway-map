@@ -26,19 +26,13 @@ public class Sections {
         values = new ArrayList<>();
     }
 
-    public Section add(Line line, Station upStation, Station downStation, Distance distance) {
-        checkAddable(upStation, downStation)
+    public Section add(Section section) {
+        checkAddable(section.getUpStation(), section.getDownStation())
             .map(errorMessage -> new IllegalArgumentException(errorMessage.getMessage()))
             .ifPresent(e -> {
                 throw e;
             });
 
-        Section section = Section.builder()
-            .line(line)
-            .upStation(upStation)
-            .downStation(downStation)
-            .distance(distance)
-            .build();
         this.values.add(section);
         return section;
     }
@@ -92,7 +86,6 @@ public class Sections {
         return Stream.concat(values.stream().map(Section::getUpStation),
                              values.stream().map(Section::getDownStation))
                      .distinct()
-                     .sorted()
                      .collect(Collectors.toList());
     }
 

@@ -62,7 +62,14 @@ public class Line extends BaseEntity {
     }
 
     public Section addSection(Station upStation, Station downStation, Distance distance) {
-        return sections.add(this, upStation, downStation, distance);
+        Section section = Section.builder()
+            .line(this)
+            .upStation(upStation)
+            .downStation(downStation)
+            .distance(distance)
+            .build();
+
+        return sections.add(section);
     }
 
     public void deleteSection(Long sectionId) {
