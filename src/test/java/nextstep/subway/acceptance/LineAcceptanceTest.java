@@ -7,30 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static nextstep.subway.acceptance.LineFixture.*;
 import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_되어있음;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-
-    private static final String 강남역 = "강남역";
-    private static final String 양재역 = "양재역";
-    private static final String 양재시민의숲역 = "양재시민의숲역_번호";
-
-    private static final String 사당역 = "사당역";
-    private static final String 낙성대역 = "낙성대역";
-
-    private static final String 신분당선 = "신분당선";
-    private static final String 이호선 = "2호선";
-
-    private static final String 빨강색 = "bg-red-600";
-    private static final String 초록색 = "bg-green-600";
-
-    private static final int 강남_양재_거리 = 7;
-    private static final int 양재_양재시민의숲_거리 = 5;
-    private static final int 사당_낙성대_거리 = 1;
 
     /**
      * 🥕 Given 지하철역(상행) 생성을 요청 하고
@@ -55,8 +40,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.body().jsonPath().get("id").equals(1)).isTrue(),
-                () -> assertThat(response.body().jsonPath().get("name").equals(신분당선)).isTrue(),
-                () -> assertThat(response.body().jsonPath().get("color").equals(빨강색)).isTrue()
+                () -> assertThat(response.body().jsonPath().get(LINE_NAME).equals(신분당선)).isTrue(),
+                () -> assertThat(response.body().jsonPath().get(LINE_COLOR).equals(빨강색)).isTrue()
         );
     }
 
@@ -199,8 +184,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.jsonPath().getList("id")).contains(1, 2),
-                () -> assertThat(response.jsonPath().getList("name")).contains(신분당선, 이호선),
-                () -> assertThat(response.jsonPath().getList("color")).contains(빨강색, 초록색)
+                () -> assertThat(response.jsonPath().getList(LINE_NAME)).contains(신분당선, 이호선),
+                () -> assertThat(response.jsonPath().getList(LINE_COLOR)).contains(빨강색, 초록색)
         );
     }
 
@@ -228,8 +213,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE),
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.body().jsonPath().get("id").equals(1)).isTrue(),
-                () -> assertThat(response.body().jsonPath().get("name").equals(신분당선)).isTrue(),
-                () -> assertThat(response.body().jsonPath().get("color").equals(빨강색)).isTrue()
+                () -> assertThat(response.body().jsonPath().get(LINE_NAME).equals(신분당선)).isTrue(),
+                () -> assertThat(response.body().jsonPath().get(LINE_COLOR).equals(빨강색)).isTrue()
         );
     }
 
@@ -249,7 +234,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String uri = saveResponse.header("Location");
 
         // when
-        final ExtractableResponse<Response> updateResponse = 지하철_노선_변경을_요청한다(uri);
+        final ExtractableResponse<Response> updateResponse = 지하철_노선_변경을_요청한다(uri, 구분당선, 파랑색);
 
         // then
         assertAll(
@@ -291,15 +276,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 구간 등록")
     @Test
     void addSection() {
+        // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
         final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
         final String 양재시민의숲역_번호 = 지하철_역_생성_되어있음(양재시민의숲역);
 
-        final ExtractableResponse<Response> lineSaveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
-        final String 신분당선_번호 = lineSaveResponse.jsonPath().get("id").toString();
+        final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
+        // when
         final ExtractableResponse<Response> response = 지하철_노선_구간_등록을_요청한다(신분당선_번호, 양재역_번호, 양재시민의숲역_번호, 양재_양재시민의숲_거리);
 
+        // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.header("Location")).isNotBlank()
@@ -314,15 +301,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("하행 종점이 아닌 상행역으로 지하철 노선 구간 등록")
     @Test
     void addSectionInvalidUpStation() {
+        // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
         final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
         final String 양재시민의숲역_번호 = 지하철_역_생성_되어있음(양재시민의숲역);
 
-        final ExtractableResponse<Response> lineSaveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
-        final String 신분당선_번호 = lineSaveResponse.jsonPath().get("id").toString();
+        final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
+        // when
         final ExtractableResponse<Response> response = 지하철_노선_구간_등록을_요청한다(신분당선_번호, 강남역_번호, 양재시민의숲역_번호, 양재_양재시민의숲_거리);
 
+        // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
                 () -> assertThat(response.body().jsonPath().get("message").equals("invalid station occurred"))

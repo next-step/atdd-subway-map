@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.StationFixture.STATION_NAME;
+
 public class StationSteps {
 
     public static String 지하철_역_생성_되어있음(final String name) {
@@ -28,7 +30,7 @@ public class StationSteps {
 
     private static Map<String, String> 지하철_역_생성_데이터를_만든다(final String name) {
         final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
+        params.put(STATION_NAME, name);
         return params;
     }
 

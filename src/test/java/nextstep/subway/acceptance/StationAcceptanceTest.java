@@ -6,12 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -20,7 +22,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = 지하철_역_생성을_요청한다("강남역");
+        final ExtractableResponse<Response> response = 지하철_역_생성을_요청한다(강남역);
 
         // then
         assertAll(
@@ -55,7 +57,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicateStationName() {
         // given
-        final String 강남역 = "강남역";
         지하철_역_생성을_요청한다(강남역);
 
         // when
@@ -78,11 +79,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        final String 강남역 = "강남역";
-        final String 역삼역 = "역삼역";
-
         지하철_역_생성을_요청한다(강남역);
-        지하철_역_생성을_요청한다(역삼역);
+        지하철_역_생성을_요청한다(양재역);
 
         // when
         final ExtractableResponse<Response> response = 지하철_역_목록_조회를_요청한다();
@@ -90,7 +88,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("name")).contains(강남역, 역삼역)
+                () -> assertThat(response.jsonPath().getList(STATION_NAME)).contains(강남역, 양재역)
         );
     }
 
@@ -103,7 +101,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        final ExtractableResponse<Response> createResponse = 지하철_역_생성을_요청한다("강남역");
+        final ExtractableResponse<Response> createResponse = 지하철_역_생성을_요청한다(강남역);
         final String uri = createResponse.header("Location");
 
         // when

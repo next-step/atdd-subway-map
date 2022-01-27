@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.LineFixture.*;
+
 public class LineSteps {
 
     public static String 지하철_노선이_생성되어_있음(final String name, final String color,
@@ -32,11 +34,11 @@ public class LineSteps {
     private static Map<String, String> 지하철_노선_생성_데이터를_만든다(final String name, final String color,
                                                           final String upStationId, final String downStationId, final int distance) {
         final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", String.valueOf(distance));
+        params.put(LINE_NAME, name);
+        params.put(LINE_COLOR, color);
+        params.put(UP_STATION_ID, upStationId);
+        params.put(DOWN_STATION_ID, downStationId);
+        params.put(DISTANCE, String.valueOf(distance));
         return params;
     }
 
@@ -60,8 +62,8 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_변경을_요청한다(final String uri) {
-        final Map<String, String> params = 지하철_노선_변경_데이터를_만든다();
+    public static ExtractableResponse<Response> 지하철_노선_변경을_요청한다(final String uri, final String updatedName, final String updatedColor) {
+        final Map<String, String> params = 지하철_노선_변경_데이터를_만든다(updatedName, updatedColor);
         return RestAssured.given().log().all()
                 .accept(ContentType.ANY)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -72,12 +74,10 @@ public class LineSteps {
                 .extract();
     }
 
-    private static Map<String, String> 지하철_노선_변경_데이터를_만든다() {
+    private static Map<String, String> 지하철_노선_변경_데이터를_만든다(final String updatedName, final String updatedColor) {
         final Map<String, String> params = new HashMap<>();
-        final String updatedName = "구분당선";
-        final String updatedColor = "bg-blue-600";
-        params.put("name", updatedName);
-        params.put("color", updatedColor);
+        params.put(LINE_NAME, updatedName);
+        params.put(LINE_COLOR, updatedColor);
         return params;
     }
 
@@ -104,9 +104,9 @@ public class LineSteps {
 
     private static Map<String, String> 지하철_노선_구간_데이터를_만든다(final String upStationId, final String downStationId, final int distance) {
         final Map<String, String> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", String.valueOf(distance));
+        params.put(UP_STATION_ID, upStationId);
+        params.put(DOWN_STATION_ID, downStationId);
+        params.put(DISTANCE, String.valueOf(distance));
         return params;
     }
 }
