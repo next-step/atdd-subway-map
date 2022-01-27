@@ -51,7 +51,7 @@ public class SectionRequestStep {
     }
 
     public static ExtractableResponse<Response> 구간_삭제_요청(Long 대상_노선Id, Long 대상_지하철역Id) {
-        ExtractableResponse<Response> deleteResponse = RestAssured
+        return RestAssured
                 .given().log().all()
                 .accept(MediaType.ALL_VALUE)
 
@@ -60,6 +60,16 @@ public class SectionRequestStep {
 
                 .then().log().all()
                 .extract();
-        return deleteResponse;
+    }
+
+    public static ExtractableResponse<Response> 노선의_구간_조회_요청(Long 대상_노선Id) {
+        return RestAssured
+                .given().log().all()
+
+                .when()
+                .get("/lines/" + 대상_노선Id + "/sections")
+
+                .then().log().all()
+                .extract();
     }
 }
