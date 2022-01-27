@@ -13,7 +13,7 @@ public class SectionResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public SectionResponse(Long id,
+    private SectionResponse(Long id,
                            Long lineId,
                            Long upStationId,
                            Long downStationId,
