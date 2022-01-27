@@ -16,23 +16,11 @@ public class LineResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
         stations = new ArrayList<>();
-        this.createdDate = createdDate;
-        this.modifiedDate = modifiedDate;
-    }
-
-    public LineResponse(Long id, String name, String color, Section section,
-                        LocalDateTime createdDate, LocalDateTime modifiedDate) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        stations = new ArrayList<>();
-        stations.add(section.getUpStation());
-        stations.add(section.getDownStation());
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
@@ -42,17 +30,6 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
-    }
-
-    public static LineResponse createLineResponseTest(Line line, Section section) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                section,
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );

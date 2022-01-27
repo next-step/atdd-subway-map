@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +32,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    public LineSaveResponse saveLineTest(LineRequest request) throws DuplicateRegistrationRequestException, NotFoundRequestException {
+    public LineSaveResponse saveLine(LineRequest request) throws DuplicateRegistrationRequestException, NotFoundRequestException {
         // 전제 조건 : 역이 먼저 생성되어 있어야 함.
         Line findLine = lineRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findLine)) {
@@ -54,16 +53,6 @@ public class LineService {
             lineRepository.save(line);
 
             return LineSaveResponse.createLineResponse(line, section);
-        }
-
-        throw new DuplicateRegistrationRequestException(String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));
-    }
-
-    public LineResponse saveLine(LineRequest request) throws DuplicateRegistrationRequestException {
-        Line findLine = lineRepository.findByName(request.getName());
-        if (ObjectUtils.isEmpty(findLine)) {
-            Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-            return LineResponse.createLineResponse(line);
         }
 
         throw new DuplicateRegistrationRequestException(String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));

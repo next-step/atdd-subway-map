@@ -2,11 +2,8 @@ package nextstep.subway.applicaion.dto.response;
 
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LineSaveResponse {
     private Long id;

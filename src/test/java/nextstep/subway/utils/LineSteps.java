@@ -22,25 +22,12 @@ public class LineSteps {
         return RestAssured
                 .given().log().all()
                 .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/test")
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
     }
 
-//    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("name", name);
-//        params.put("color", color);
-//
-//        return RestAssured
-//                .given().log().all()
-//                .body(params).contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().post("/lines")
-//                .then().log().all()
-//                .extract();
-//    }
-
-    public static ExtractableResponse<Response> 지하철_노선_조회_요청(String lindId) {
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long lindId) {
         return RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -58,7 +45,7 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(String lineId) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제_요청(Long lineId) {
         return RestAssured
                 .given().log().all()
                 .when().delete("/lines/" + lineId)
@@ -66,7 +53,7 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(String lineId, String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(Long lineId, String name, String color) {
         Map<String, String> updateParams = new HashMap<>();
         updateParams.put("name", name);
         updateParams.put("color", color);
@@ -79,8 +66,8 @@ public class LineSteps {
                 .extract();
     }
 
-    public static String getLineId(ExtractableResponse<Response> response) {
+    public static Long getLineId(ExtractableResponse<Response> response) {
         String[] split = response.header("Location").split("/");
-        return split[split.length - 1];
+        return Long.valueOf(split[split.length - 1]);
     }
 }
