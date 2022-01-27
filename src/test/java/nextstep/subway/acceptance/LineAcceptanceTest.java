@@ -195,8 +195,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void upStationDownStationRelation() {
 
-        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역"); // 기존에 등록되어있는 역
-
         // 첫 노선도에 들어갈 두 역
         long upStationId = 수원역.jsonPath().getLong("id");
         long downStationId = 사당역.jsonPath().getLong("id");
@@ -204,10 +202,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 노선 생성
         ExtractableResponse<Response> line = LineStep.saveLine("파란색", "1호선", upStationId, downStationId, 20);
         long lineId = line.jsonPath().getLong("id");
-        long isExistedId = 성균관대역.jsonPath().getLong("id");
 
         // 구간 생성
-        ExtractableResponse<Response> extract = SectionStep.saveSection(downStationId, isExistedId, 2, lineId);
+        ExtractableResponse<Response> extract = SectionStep.saveSection(downStationId, upStationId, 2, lineId);
 
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
@@ -216,8 +213,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void newUpStationMustBeDownStation() {
 
-        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
-        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
         ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
 
         // 첫 노선도에 들어갈 두 역
@@ -233,43 +228,61 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 구간 생성
         ExtractableResponse<Response> extract = SectionStep.saveSection(newStationId, downStationId, 2, lineId);
 
-        assertThat(extract.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
     void deleteSection() {
 
-        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
-        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
-        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
+        long 수원역_ID = 수원역.jsonPath().getLong("id"); // init
+        long 사당역_ID = 사당역.jsonPath().getLong("id"); // init
+        long 신도림_ID = 신도림.jsonPath().getLong("id");
+        long 신림역_ID = 신림역.jsonPath().getLong("id");
 
         // 노선 생성
-        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+        ExtractableResponse<Response> line = LineStep.saveLine("파란색", "1호선", 수원역_ID, 사당역_ID, 10);
+        long lineId = line.jsonPath().getLong("id");
 
         // 구간 생성
-        SectionStep.saveSection(1L, 2L, 10, 1L);
-        SectionStep.saveSection(2L, 3L, 10, 1L);
+        SectionStep.saveSection(사당역_ID, 신도림_ID, 10, lineId);
+        SectionStep.saveSection(신도림_ID, 신림역_ID, 10, lineId);
 
-        ExtractableResponse<Response> response = SectionStep.deleteSection(1L, 3L);
+        ExtractableResponse<Response> response = SectionStep.deleteSection(lineId, 신림역_ID);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("지하철 노선에 등록된 마지막 역(하행 종점역)만 제거할 수 있다.")
     @Test
     void deleteSectionMustBeDownStation() {
-        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
-        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
-        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
+        long 수원역_ID = 수원역.jsonPath().getLong("id"); // init
+        long 사당역_ID = 사당역.jsonPath().getLong("id"); // init
+        long 신도림_ID = 신도림.jsonPath().getLong("id");
+        long 신림역_ID = 신림역.jsonPath().getLong("id");
 
         // 노선 생성
-        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+        ExtractableResponse<Response> line = LineStep.saveLine("파란색", "1호선", 수원역_ID, 사당역_ID, 10);
+        long lineId = line.jsonPath().getLong("id");
 
         // 구간 생성
-        SectionStep.saveSection(1L, 2L, 10, 1L);
-        SectionStep.saveSection(2L, 3L, 10, 1L);
+        SectionStep.saveSection(사당역_ID, 신도림_ID, 10, lineId);
+        SectionStep.saveSection(신도림_ID, 신림역_ID, 10, lineId);
 
-        ExtractableResponse<Response> response = SectionStep.deleteSection(1L, 2L);
+        ExtractableResponse<Response> response = SectionStep.deleteSection(lineId, 사당역_ID);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteSectionMustBeTwoNode() {
+        long 수원역_ID = 수원역.jsonPath().getLong("id"); // init
+        long 사당역_ID = 사당역.jsonPath().getLong("id"); // init
+
+        // 노선 생성
+        ExtractableResponse<Response> line = LineStep.saveLine("파란색", "1호선", 수원역_ID, 사당역_ID, 10);
+        long lineId = line.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = SectionStep.deleteSection(lineId, 사당역_ID);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }

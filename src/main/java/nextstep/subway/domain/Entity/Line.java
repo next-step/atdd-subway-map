@@ -1,7 +1,5 @@
 package nextstep.subway.domain.Entity;
 
-import nextstep.subway.exception.DuplicationException;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +25,10 @@ public class Line extends BaseEntity {
     @Column(name = "distance")
     private int distance;
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
@@ -42,20 +44,33 @@ public class Line extends BaseEntity {
         this.distance = distance;
     }
 
-    public void isExistSection(Station station) {
+    public Boolean isExistSection(Station station) {
         for (Section isExistSection : sections) {
             if (isExistSection.getUpStation().equals(station)) {
-                throw new DuplicationException("생성하고자하는 구간의 하행역이 이미 구간에 등록되어있습니다.");
+                return true;
             }
             if (isExistSection.getDownStation().equals(station)) {
-                throw new DuplicationException("생성하고자하는 구간의 하행역이 이미 구간에 등록되어있습니다.");
+                return true;
             }
         }
+        return false;
+    }
+
+    public void updateDownStation(Station downStation) {
+        this.downStationId = downStation.getId();
+    }
+
+    public Boolean isDownStation(Long stationId) {
+        return this.downStationId == stationId;
     }
 
     public void updateLine(final String name, final String color) {
         this.color = color;
         this.name = name;
+    }
+
+    public int sectionCount() {
+        return this.sections.size();
     }
 
     public Long getId() {

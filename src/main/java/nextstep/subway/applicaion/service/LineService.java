@@ -17,16 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
-
-    private final static int NUMBER_ZERO = 0;
 
     private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
@@ -45,7 +41,7 @@ public class LineService {
         verifyDuplication(request.getName());
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(()-> new NotFoundException("존재하지 않는 역입니다. 역 id : " + request.getUpStationId()));
-        Station downStation = stationRepository.findById(request.getUpStationId())
+        Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(()-> new NotFoundException("존재하지 않는 역입니다. 역 id : " + request.getDownStationId()));
 
         Line line = lineRepository.save(
@@ -62,7 +58,8 @@ public class LineService {
                 line.getName(),
                 line.getColor(),
                 line.getCreatedDate(),
-                line.getModifiedDate()
+                line.getModifiedDate(),
+                line.getSections()
         );
     }
 
@@ -107,7 +104,6 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                Collections.EMPTY_LIST,
                 line.getCreatedDate(),
                 line.getModifiedDate());
     }
@@ -121,33 +117,34 @@ public class LineService {
         Station downStation =
                 stationRepository.findById(sectionRequest.getDownStationId())
                         .orElseThrow(() -> new NotFoundException("하행역이 존재하지 않습니다." + "LineId : " + id));
-        line.isExistSection(downStation);
-        newUpStationMustBeDownStation(line.getDownStationId(), upStation);
+        if (line.isExistSection(downStation)) {
+            throw new DuplicationException("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.");
+        }
+        if (!line.isDownStation(upStation.getId())) {
+            throw new RuntimeException("등록하고자 하는 상행역은 하행역(종점)이여야한다.");
+        }
         Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
+        line.updateDownStation(downStation);
 
         return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());
     }
 
-    // 노선에서 이 등록하고자 하는 상행역이 하행역으로 등록되어있는지 확인해야한다.
-    private void newUpStationMustBeDownStation(final Long downStationId, final Station upStation) {
-        Station downStation = stationRepository.findById(downStationId)
-                .orElseThrow(() -> new NotFoundException("해당 역이 존재하지 않습니다." + "stationId : " + downStationId));
-
-        if (downStation.getId() != upStation.getId()) {
-
-            throw new RuntimeException("등록하고자 하는 상행역이 하행역으로 등록되어있어야합니다.");
-        }
-    }
-
     public void deleteSection(final Long lineId, final Long stationId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(RuntimeException::new);
-        Station downStation = stationRepository.findById(stationId).orElseThrow(RuntimeException::new);
-        Section section = sectionRepository.findByLineAndDownStation(line, downStation).orElseThrow(RuntimeException::new);
+
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException("노선이 존재하지 않습니다." + "LineId : " + lineId));
+        if (!line.isDownStation(stationId)) {
+            throw new RuntimeException("삭제하고자 하는 역이 종점역이 아닙니다. id : " + stationId);
+        }
+        Station downStation = stationRepository.findById(stationId)
+                .orElseThrow(() -> new NotFoundException("해당 역이 존재하지 않습니다." + "stationId : " + stationId));
+
+        Section section = sectionRepository.findByDownStation(downStation)
+                .orElseThrow(() -> new NotFoundException("구간이 존재하지 않습니다."));
+        if (1 == line.sectionCount()) {
+            throw new RuntimeException("구간이 1개 있는 경우 역을 삭제 할 수 없다.");
+        }
+
         sectionRepository.delete(section);
-    }
-
-
-    private void deleteSectionMustBeDownStation(final Long stationId) {
-
     }
 }
