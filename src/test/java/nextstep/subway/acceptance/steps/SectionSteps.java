@@ -18,7 +18,7 @@ public class SectionSteps {
         return CommonRestAssured.create(getSectionUrl(resource), params);
     }
 
-    public static ExtractableResponse<Response> delete(String resource, String stationId) {
+    public static ExtractableResponse<Response> delete(String resource, Long stationId) {
         String url = getSectionUrl(resource) + "?stationId=" + stationId;
         return CommonRestAssured.delete(url);
     }

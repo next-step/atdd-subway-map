@@ -25,6 +25,10 @@ public class Sections {
         this.sections = sections;
     }
 
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
     public List<Station> getStations() {
         List<Station> result = new ArrayList<>();
         if (sections.size() > 0) {

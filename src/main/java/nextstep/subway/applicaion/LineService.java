@@ -66,8 +66,13 @@ public class LineService {
         line.validationSectionStation(upStation, downStation);
 
         Section section = createSection(line, upStation, downStation, lineRequest.getDistance());
+        line.addSection(section);
+    }
 
-        sectionRepository.save(section);
+    public void deleteSectionById(Long id, Long stationId) {
+        Line line = lineRepository.findById(id).get();
+        Station station = stationRepository.findById(stationId).get();
+        line.deleteSectionById(station);
     }
 
     private Section createSection(Line line, Station upStation, Station downStation, int distance) {

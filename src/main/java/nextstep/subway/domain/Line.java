@@ -53,4 +53,12 @@ public class Line extends BaseEntity {
     public void validationSectionStation(Station upStation, Station downStation) {
         sections.validationSectionStation(upStation, downStation);
     }
+
+    public void deleteSectionById(Station station) {
+        sections.deleteStation(station);
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
+    }
 }

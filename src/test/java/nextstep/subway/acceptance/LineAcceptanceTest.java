@@ -198,7 +198,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 //                                    .map(s-> s.getName())
 //                                    .collect(Collectors.toList());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-//        assertThat(lines.get(0).getStations().size()).isEqualTo(4);
 //        assertThat(names).contains(FIRST_STATION_NAME, SECOND_STATION_NAME, THIRD_STATION_NAME, FOURTH_STATION_NAME);
     }
 
@@ -234,12 +233,14 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 역 생성을 요청 하고
      * Given 지하철 역 생성을 요청 하고
      * Given 지하철 역 생성을 요청 하고
-     * When 이미 등록된 역으로 하행역으로 구간 등록을 요청하면
-     * Then 지하철 노선에 구간 등록이 실패한다.
+     * Given 생성된 지하철 노선에 구간 등록을 요청하고
+     * Given 생성된 지하철 노선에 구간 등록을 요청하고
+     * When 해당 노선의 마지막 역으로 구간 삭제를 요청하면
+     * Then 지하철 노선 구간이 삭제된다.
      */
-    @DisplayName("이미 구간 등록된 역을 하행역 재등록")
+    @DisplayName("노선 구간 삭제")
     @Test
-    void duplicateSectionStation() {
+    void deleteSectionStation() {
         // given
         ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
         ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
@@ -250,7 +251,61 @@ class LineAcceptanceTest extends AcceptanceTest {
         SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
 
         // when
-        ExtractableResponse<Response> response = SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station3), getStationId(station1), DEFAULT_DISTANCE);
+        ExtractableResponse<Response> response = SectionSteps.delete(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station3));
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 생성된 지하철 노선에 구간 등록을 요청하고
+     * Given 생성된 지하철 노선에 구간 등록을 요청하고
+     * When 해당 노선의 중간역을 구간 삭제를 요청하면
+     * Then 지하철 노선 구간 삭제 요청이 실패한다.
+     */
+    @DisplayName("노선 구간 중간 삭제")
+    @Test
+    void deleteSectionCenterStation() {
+        // given
+        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
+        ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
+        ExtractableResponse<Response> station3 = StationSteps.create(THIRD_STATION_NAME);
+
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.delete(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2));
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 생성된 지하철 노선에 구간 등록을 요청하고
+     * When 해당 노선의 마지막 역으로 구간 삭제를 요청하면
+     * Then 지하철 노선 구간 삭제 요청이 실패한다.
+     */
+    @DisplayName("노선 구간 1개일 때 삭제")
+    @Test
+    void deleteOneSectionStation() {
+        // given
+        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
+        ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
+
+        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.delete(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
