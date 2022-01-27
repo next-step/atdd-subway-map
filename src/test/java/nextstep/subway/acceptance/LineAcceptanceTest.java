@@ -164,43 +164,45 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 역 2개 생성 : 1L, 2L
         ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
         ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역"); // 기존에 등록되어있는 역
+
+        // 첫 노선도에 들어갈 두 역
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
 
         // 노선 생성
-        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+        ExtractableResponse<Response> line = LineStep.saveLine("파란색", "1호선", upStationId, downStationId, 20);
+        long lineId = line.jsonPath().getLong("id");
+        long isExistedId = 성균관대역.jsonPath().getLong("id");
 
         // 구간 생성
-        ExtractableResponse<Response> extract = SectionStep.saveSection(1L, 2L, 2, 1L);
+        ExtractableResponse<Response> extract = SectionStep.saveSection(downStationId, isExistedId, 2, lineId);
 
-        // 새로운 역 추가
-        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역"); // down
-
-        // 새로운 구간 생성
-        ExtractableResponse<Response> extract_2 = SectionStep.saveSection(1L, 3L, 1, 1L);
-
-        assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     @DisplayName("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야한다.")
     @Test
     void newUpStationMustBeDownStation() {
-        // 역 2개 생성 : 1L, 2L
+
         ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
         ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
+
+        // 첫 노선도에 들어갈 두 역
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+        long newStationId = 성균관대역.jsonPath().getLong("id");
 
         // 노선 생성
-        LineStep.saveLine("파란색", "1호선", 1L, 2L, 10);
+        ExtractableResponse<Response> line =
+                LineStep.saveLine("파란색", "1호선", upStationId, downStationId, 10);
+        long lineId = line.jsonPath().getLong("id");
 
         // 구간 생성
-        ExtractableResponse<Response> extract = SectionStep.saveSection(1L, 2L, 2, 1L);
+        ExtractableResponse<Response> extract = SectionStep.saveSection(newStationId, downStationId, 2, lineId);
 
-        // 새로운 상행역 2개
-        ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역");
-        ExtractableResponse<Response> 돼지역 = StationStep.saveStation("돼지역");
-
-        // 새로운 구간 생성
-        ExtractableResponse<Response> extract_2 = SectionStep.saveSection(3L, 4L, 1, 1L);
-
-        assertThat(extract_2.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(extract.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @DisplayName("지하철 구간을 삭제한다.")
