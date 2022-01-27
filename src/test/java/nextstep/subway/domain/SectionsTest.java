@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class SectionsTest {
+public class SectionsTest extends SectionFixData {
     private static int DEFAULT_DISTANCE = 5;
 
     @DisplayName("구간 등록 시에 상행역이 아닌 하행역 등록은 예외")
@@ -45,21 +45,5 @@ public class SectionsTest {
         assertThatThrownBy(() -> sections.validationSectionStation(section.getUpStation(), section.getDownStation()))
                 .isInstanceOf(SectionException.class)
                 .hasMessage("이미 구간에 등록되어 있습니다.");
-    }
-
-    private Line createLine() {
-        return new Line("2호선", "bg-green-700");
-    }
-
-    private Station createStation(String name) {
-        return new Station(name);
-    }
-
-    private Section createSection(Station upStation, Station downStation) {
-        return new Section(createLine(), upStation, downStation, DEFAULT_DISTANCE);
-    }
-
-    private Sections createSections(Section ...sections) {
-        return new Sections(Arrays.asList(sections));
     }
 }

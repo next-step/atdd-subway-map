@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class SectionTest {
+public class SectionTest extends SectionFixData{
     private static int DEFAULT_DISTANCE = 5;
 
     @DisplayName("구간 생성")
@@ -17,19 +17,11 @@ public class SectionTest {
         Station downStation = createStation("역삼역");
 
         // when
-        Section section = new Section(line, upStation, downStation, DEFAULT_DISTANCE);
+        Section section = createSection(upStation, downStation);
 
         // then
         assertThat(section).isNotNull();
         assertThat(section.getDownStation()).isEqualTo(downStation);
         assertThat(section.getUpStation()).isEqualTo(upStation);
-    }
-
-    private Line createLine() {
-        return new Line("2호선", "bg-green-700");
-    }
-
-    private Station createStation(String name) {
-        return new Station(name);
     }
 }
