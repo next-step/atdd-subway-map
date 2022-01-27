@@ -19,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,12 +43,19 @@ public class LineService {
 
     public LineCreationResponse saveLine(LineRequest request) {
         verifyDuplication(request.getName());
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(()-> new NotFoundException("존재하지 않는 역입니다. 역 id : " + request.getUpStationId()));
+        Station downStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(()-> new NotFoundException("존재하지 않는 역입니다. 역 id : " + request.getDownStationId()));
+
         Line line = lineRepository.save(
                 new Line(request.getName(),
                         request.getColor(),
                         request.getUpStationId(),
                         request.getDownStationId(),
                         request.getDistance()));
+
+        sectionRepository.save(new Section(line, upStation, downStation, request.getDistance()));
 
         return new LineCreationResponse(
                 line.getId(),
@@ -110,18 +118,18 @@ public class LineService {
         Station upStation =
                 stationRepository.findById(sectionRequest.getUpStationId())
                         .orElseThrow(() -> new NotFoundException("상행역이 존재하지 않습니다." + "LineId : " + id));
+        verifyIsExistStation(sectionRequest.getDownStationId());
         Station downStation =
                 stationRepository.findById(sectionRequest.getDownStationId())
                         .orElseThrow(() -> new NotFoundException("하행역이 존재하지 않습니다." + "LineId : " + id));
-        verifyStationsRelation(line.getDownStationId(), upStation);
-        newUpStationMustBeDownStation(upStation);
+        newUpStationMustBeDownStation(line.getDownStationId(), upStation);
         Section section = sectionRepository.save(Section.of(line, upStation, downStation, sectionRequest.getDistance()));
 
         return SectionResponse.of(section.getId(), upStation.getId(), downStation.getId(), section.getDistance());
     }
 
     // 노선에서 이 등록하고자 하는 상행역이 하행역으로 등록되어있는지 확인해야한다.
-    private void verifyStationsRelation(final Long downStationId, final Station upStation) {
+    private void newUpStationMustBeDownStation(final Long downStationId, final Station upStation) {
         Station downStation = stationRepository.findById(downStationId)
                 .orElseThrow(() -> new NotFoundException("해당 역이 존재하지 않습니다." + "stationId : " + downStationId));
 
@@ -131,13 +139,12 @@ public class LineService {
         }
     }
 
-    private void newUpStationMustBeDownStation(final Station upStation) {
-        if (NUMBER_ZERO != sectionRepository.count()) {
-            Section sectionByDownStation = sectionRepository.findSectionByDownStation(upStation);
-            if (ObjectUtils.isEmpty(sectionByDownStation)) {
+    // 새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다
+    private void verifyIsExistStation(final Long downStationId) {
 
-                throw new RuntimeException("새로운 상행역은 무조건 하행역으로 등록되어있어야합니다.");
-            }
+        Optional<Station> station = stationRepository.findById(downStationId);
+        if (station.isPresent()) {
+            throw new DuplicationException("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.");
         }
     }
 

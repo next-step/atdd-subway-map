@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import nextstep.subway.step.LineStep;
 import nextstep.subway.step.SectionStep;
 import nextstep.subway.step.StationStep;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LineAcceptanceTest extends AcceptanceTest {
 
     private final static Integer NUMBER_ONE = 1;
+
+    private ExtractableResponse<Response> 수원역;
+    private ExtractableResponse<Response> 사당역;
+    private ExtractableResponse<Response> 신도림;
+
+    @BeforeEach
+    void init() {
+        수원역 = StationStep.saveStation("수원역");
+        사당역 = StationStep.saveStation("사당역");
+        신도림 = StationStep.saveStation("신도림");
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -25,8 +38,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
 
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+
         // 요청 후, 노선을 생성하다
-        ExtractableResponse<Response> extract = LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
+        ExtractableResponse<Response> extract
+                = LineStep.saveLine("하늘색", "4호선", upStationId,downStationId,3);
 
         // 상태 코드
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value());

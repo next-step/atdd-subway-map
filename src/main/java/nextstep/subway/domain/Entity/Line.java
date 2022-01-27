@@ -40,6 +40,15 @@ public class Line extends BaseEntity {
         this.distance = distance;
     }
 
+    public Boolean isExistSection(Section section) {
+        for (Section isExistSection : sections) {
+            if (isExistSection.equals(section)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void updateLine(final String name, final String color) {
         this.color = color;
         this.name = name;
