@@ -63,7 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()),
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value()),
                 () -> assertThat(response.body().jsonPath().get("message").equals("duplicate station name occurred"))
         );
     }

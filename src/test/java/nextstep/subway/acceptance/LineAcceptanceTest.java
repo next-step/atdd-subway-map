@@ -30,8 +30,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     private final int 사당_낙성대_거리 = 1;
 
     /**
-     * Given 지하철역(상행) 생성을 요청 하고
-     * And 새로운 지하철역(하행) 생성을 요청 하고
+     * 🥕 Given 지하철역(상행) 생성을 요청 하고
+     * 🥕 And 새로운 지하철역(하행) 생성을 요청 하고
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
      */
@@ -58,10 +58,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철역(상행) 생성을 요청 하고
-     * And 새로운 지하철역(하행) 생성을 요청 하고
+     * 🥕 Scenario: 지하철 역이 없는 상태에서 지하철 노선 생성
      * When 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 성공한다.
+     * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("지하철역이 없을 때, 지하철 노선 생성")
     @Test
@@ -139,7 +138,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()),
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value()),
                 () -> assertThat(response.body().jsonPath().get("message").equals("duplicate line name occurred"))
         );
     }
@@ -165,7 +164,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value()),
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value()),
                 () -> assertThat(response.body().jsonPath().get("message").equals("duplicate line color occurred"))
         );
     }
