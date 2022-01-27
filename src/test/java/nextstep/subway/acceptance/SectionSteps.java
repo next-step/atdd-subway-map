@@ -34,4 +34,19 @@ public class SectionSteps {
         ExtractableResponse<Response> response = SectionSteps.구간_생성_요청(lineResponse.getId(), sectionRequest);
         return response.statusCode();
     }
+
+    public static ExtractableResponse<Response> 구간_삭제_요청(SectionRequest sectionRequest) {
+        return RestAssured.given().log().all()
+                .queryParam("stationId", sectionRequest.getId())
+                .when()
+                .delete(String.format(SECTION_URI, sectionRequest.getLineId()))
+                .then().log().all()
+                .extract();
+    }
+
+    public static int 구간_삭제_요청_응답_HttpStatusCode(SectionRequest sectionRequest) {
+        ExtractableResponse<Response> response = SectionSteps.구간_삭제_요청(sectionRequest);
+        return response.statusCode();
+    }
+
 }

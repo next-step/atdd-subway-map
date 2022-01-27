@@ -1,5 +1,7 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
@@ -11,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import static nextstep.subway.acceptance.AssertSteps.httpStatusCode_검증;
 import static nextstep.subway.acceptance.LineFixture.이호선_색상;
 import static nextstep.subway.acceptance.LineFixture.이호선_이름;
-import static nextstep.subway.acceptance.SectionSteps.구간_생성_요청_응답_HttpStatusCode;
-import static nextstep.subway.acceptance.SectionSteps.신규_구간;
+import static nextstep.subway.acceptance.SectionSteps.*;
 import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_요청_응답;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -94,4 +95,22 @@ class SectionAcceptanceTest extends AcceptanceTest {
         httpStatusCode_검증(statusCode, CREATED.value());
     }
 
+    /**
+     * Given 강남-역삼 구간이 등록된 노선 생성 요청을 하고 <br>
+     * When 구간 삭제 요청을 하면 <br>
+     * Then 구간 삭제 실패한다.
+     */
+    @DisplayName("구간이 1개만 남은 경우 구간 삭제 실패")
+    @Test
+    void 구간_삭제_실패_예외() {
+        //given
+        SectionRequest sectionRequest = SectionRequest.valueOf(역삼역.getId(), 이호선.getId());
+
+        //when
+        int statusCode = 구간_삭제_요청_응답_HttpStatusCode(sectionRequest);
+
+        //then
+        httpStatusCode_검증(statusCode, BAD_REQUEST.value());
+
+    }
 }

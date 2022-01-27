@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.domain.exception.CannotAddSectionException;
+import nextstep.subway.domain.exception.CannotRemoveSectionException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -25,13 +26,17 @@ public class Sections {
     }
 
     private void addableUpStation(Section section) {
-        Section lastSection = sections.get(sections.size() - 1);
+        Section lastSection = getLastSection();
 
         if (!lastSection.isAddableLastSection(section)) {
             String lastStationName = lastSection.downStationName();
             String addUpStationName = section.upStationName();
             throw new CannotAddSectionException(lastStationName, addUpStationName);
         }
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size() - 1);
     }
 
     private void addableDownStation(Section section) {
@@ -41,6 +46,21 @@ public class Sections {
         if (containsStation) {
             throw new CannotAddSectionException(section.downStationName());
         }
+    }
+
+    public void remove(Station station) {
+        validateSectionsSize();
+
+    }
+
+    private void validateSectionsSize() {
+        if (sections.isEmpty() || sections.size() == 1) {
+            throw new CannotRemoveSectionException();
+        }
+    }
+
+
+    private void validateRemovable(Station station) {
     }
 
 }
