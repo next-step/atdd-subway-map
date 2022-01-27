@@ -1,14 +1,11 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    @BeforeEach
-    void init() {
-        지하철역들_생성_요청(5);
-    }
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -33,22 +26,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        String color = "bg-red-600";
-        String name = "신분당선";
-        String upStationId = "1";
-        String downStationId = "4";
-        String distance = "10";
-
+        지하철_역들이_생성되어_있다(5);
+        
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
-                name,
-                color,
-                upStationId,
-                downStationId,
-                distance);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
+                "신분당선",
+                "bg-red-600",
+                "1",
+                "4",
+                "10");
 
         // then
-        지하철_노선_생성_응답_검증(color, name, createResponse);
+        지하철_노선_생성이_성공한다("bg-red-600", "신분당선", 지하철_노선_생성_응답);
     }
 
     /**
@@ -59,29 +48,33 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("생성할 노선의 지하철 역이 존재하지 않는 지하철 역인 지하철 노선 생성")
     @CsvSource(delimiter = ':', value = {"1:6", "6:1"})
     @ParameterizedTest
-    void createLineWithNotExistUpStation(String upStationId, String downStationId) {
+    void createLineWithNotExistUpStation(String 상행역, String 하행역) {
+        // given
+        지하철_역들이_생성되어_있다(5);
+
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
-                upStationId,
-                downStationId,
+                상행역,
+                하행역,
                 "10");
 
         //then
-        실패_응답_검증(createResponse.statusCode());
+        지하철_노선_생성이_실패한다(지하철_노선_생성_응답);
     }
 
     /**
-     * Given 지하철역 생성을 요청 하고
-     * When 같은 이름으로 지하철역 생성을 요청 하면
-     * Then 지하철역 생성이 실패한다.
+     * Given 지하철 노선을 생성 요청 하고
+     * When 같은 이름으로 지하철 노선을 생성 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
      */
     @DisplayName("지하철 노선 중복이름 생성")
     @Test
     void createDuplicateNameLine() {
         // given
-        지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
@@ -89,7 +82,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "10");
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "2",
@@ -97,7 +90,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "3");
 
         // then
-        실패_응답_검증(createResponse.statusCode());
+        지하철_노선_생성이_실패한다(지하철_노선_생성_응답);
     }
 
     /**
@@ -108,7 +101,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 구간 추가")
     @Test
     void addSection() {
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_구간_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
@@ -116,11 +110,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "10");
 
         //when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, "4", "5", "1");
+        ExtractableResponse<Response> 지하철_노선_구간_추가_응답 =
+                지하철_노선_구간_추가를_요청한다(지하철_노선_구간_생성_응답, "4", "5", "1");
 
         //then
-        성공_응답_검증(response.statusCode());
+        지하철_노선_구간_추가에_성공한다(지하철_노선_구간_추가_응답);
     }
 
     /**
@@ -131,7 +125,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가")
     @Test
     void addSectionFailedByUpStation() {
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
@@ -139,11 +134,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "10");
 
         //when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_구간_추가_요청(uri, "3", "5", "10");
+        ExtractableResponse<Response> 지하철_노선_구간_추가_응답 =
+                지하철_노선_구간_추가를_요청한다(지하철_노선_생성_응답, "3", "5", "10");
 
         //then
-        실패_응답_검증(response.statusCode());
+        지하철_노선에_구간_추가가_실패한다(지하철_노선_구간_추가_응답);
     }
 
 
@@ -156,7 +151,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 노선에 추가")
     @Test
     void addSectionFailedByDownStation() {
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        //given
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
@@ -164,12 +161,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "10");
 
         //when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response =
-                지하철_노선_구간_추가_요청(uri, "5", "2", "10");
+        ExtractableResponse<Response> 지하철_노선_구간_추가_응답 =
+                지하철_노선_구간_추가를_요청한다(지하철_노선_생성_응답, "5", "2", "10");
 
         //then
-        실패_응답_검증(response.statusCode());
+        지하철_노선에_구간_추가가_실패한다(지하철_노선_구간_추가_응답);
     }
 
 
@@ -183,14 +179,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 신분당선_지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
                 "3",
                 "5");
 
-        ExtractableResponse<Response> createResponse2 = 지하철_노선_생성_요청(
+        ExtractableResponse<Response> 이호선_지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "2호선",
                 "bg-green-600",
                 "2",
@@ -198,13 +195,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "5");
 
         //when
-        LineCreateResponse firstLine = createResponse1.body().as(LineCreateResponse.class);
-        LineCreateResponse secondLine = createResponse2.body().as(LineCreateResponse.class);
-        String url = LineSteps.DEFAULT_PATH;
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(url);
+        ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_목록_조회를_요청한다();
 
         //then
-        지하철_목록_응답_검증(firstLine, secondLine, response);
+        지하철_노선_목록들을_응답받는다(신분당선_지하철_노선_생성_응답, 이호선_지하철_노선_생성_응답, 지하철_노선_목록_조회_응답);
     }
 
     /**
@@ -216,22 +210,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
                 "4",
                 "10");
-        LineCreateResponse lineCreateResponse = createResponse.body().as(LineCreateResponse.class);
-        String uri = createResponse.header("Location");
-        지하철_노선_구간_추가_요청(uri, "4", "5", "3");
+        지하철_노선_구간_추가를_요청한다(지하철_노선_생성_응답, "4", "5", "3");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회_요청(uri);
+        ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_조회를_요청한다(지하철_노선_생성_응답);
 
         // then
-        List<Station> stations = Arrays.asList(new Station(1L), new Station(4L), new Station(5L));
-        지하철_노선_조회_검증(lineCreateResponse, response, stations);
+        List<Station> 지하철_역_목록 = Arrays.asList(new Station(1L), new Station(4L), new Station(5L));
+        지하철_노선을_응답받는다(지하철_노선_생성_응답, 지하철_노선_목록_조회_응답, 지하철_역_목록);
     }
 
     /**
@@ -243,7 +236,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
@@ -251,11 +245,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "5");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_수정_요청("구분당선", "bg-blue-600", uri);
+        ExtractableResponse<Response> 지하철_노선_수정_요청_응답 = 지하철_노선_수정을_요청한다(지하철_노선_생성_응답, "구분당선", "bg-blue-600");
 
         // then
-        성공_응답_검증(response.statusCode());
+        지하철_노선_수정이_성공한다(지하철_노선_수정_요청_응답);
     }
 
     /**
@@ -267,7 +260,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
@@ -275,15 +269,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 "5");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> 지하철_노선_삭제_요청_응답 = 지하철_노선_삭제를_요청한다(지하철_노선_생성_응답);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_노선_삭제가_성공한다(지하철_노선_삭제_요청_응답);
     }
 
     /**
@@ -296,23 +285,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
                 "4",
                 "10");
 
-        String uri = createResponse.header("Location");
-        String lastDownStationId = "5";
-        지하철_노선_구간_추가_요청(uri, "4", lastDownStationId, "2");
+        String 마지막_노선_구간의_하행 = "5";
+        지하철_노선_구간_추가를_요청한다(지하철_노선_생성_응답, "4", 마지막_노선_구간의_하행, "2");
 
         // when
-        uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_구간_삭제_요청(lastDownStationId, uri);
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_요청_응답 = 지하철_노선_구간_삭제를_요청한다(지하철_노선_생성_응답, 마지막_노선_구간의_하행);
 
         //then
-        성공_응답_검증(response.statusCode());
+        지하철_노선_구간_삭제가_성공한다(지하철_노선_구간_삭제_요청_응답);
     }
 
     /**
@@ -324,20 +312,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionFailed() {
         // given
-        String downStationId = "4";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        String 노선_구간의_하행 = "4";
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
-                downStationId,
+                노선_구간의_하행,
                 "10");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 지하철_노선_구간_삭제_요청(downStationId, uri);
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_요청_응답 = 지하철_노선_구간_삭제를_요청한다(지하철_노선_생성_응답, 노선_구간의_하행);
 
         //then
-        실패_응답_검증(response.statusCode());
+        지하철_노선에_구간_삭제가_실패한다(지하철_노선_구간_삭제_요청_응답);
     }
 
     /**
@@ -350,21 +338,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionFailedByNotLastDownStation() {
         // given
-        String downStationId = "4";
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+        지하철_역들이_생성되어_있다(5);
+        String 노선_구간의_하행 = "4";
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = 지하철_노선_생성_요청을_한다(
                 "신분당선",
                 "bg-red-600",
                 "1",
-                downStationId,
+                노선_구간의_하행,
                 "10");
-
-        String uri = createResponse.header("Location");
-        지하철_노선_구간_추가_요청(uri, "4", "5", "10");
+        지하철_노선_구간_추가를_요청한다(지하철_노선_생성_응답, "4", "5", "10");
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_구간_삭제_요청(downStationId, uri);
+        ExtractableResponse<Response> 지하철_노선_구간_삭제_요청_응답 = 지하철_노선_구간_삭제를_요청한다(지하철_노선_생성_응답, 노선_구간의_하행);
 
         //then
-        실패_응답_검증(response.statusCode());
+        지하철_노선에_구간_삭제가_실패한다(지하철_노선_구간_삭제_요청_응답);
     }
 }

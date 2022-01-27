@@ -24,7 +24,7 @@ public class StationSteps {
                 .extract();
     }
 
-    public static void 지하철역들_생성_요청(int count) {
+    public static void 지하철_역들이_생성되어_있다(int count) {
         for (int i = 1; i <= count; i++) {
             지하철역_생성_요청(i + "역");
         }
