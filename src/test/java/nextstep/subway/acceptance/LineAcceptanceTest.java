@@ -5,22 +5,12 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static nextstep.subway.LineTestRequest.*;
-import static nextstep.subway.acceptance.LineAcceptanceTest.노선.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.fixture.TLine.*;
+import static nextstep.subway.steps.LineSteps.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-
-    private static final String 이름 = "name";
-    private static final String 색 = "color";
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -29,16 +19,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        Map<String, String> params = createParams(신분당선);
-
         // when
-        ExtractableResponse<Response> response = 노선_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
+        노선_생성_성공(response);
     }
 
     /**
@@ -51,21 +36,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> params1 = createParams(신분당선);
-        Map<String, String> params2 = createParams(_2호선);
-
-        노선_생성_요청(params1);
-        노선_생성_요청(params2);
+        지하철_노선_생성_요청(신분당선);
+        지하철_노선_생성_요청(_2호선);
 
         // when
-        ExtractableResponse<Response> response = 노선_목록_조회_요청();
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> lineNames = response.jsonPath().getList(이름);
-        assertThat(lineNames).containsExactly(신분당선.이름, _2호선.이름);
-        List<String> lineColors = response.jsonPath().getList(색);
-        assertThat(lineColors).containsExactly(신분당선.색, _2호선.색);
+        노선_목록_조회_성공(response, 신분당선, _2호선);
     }
 
     /**
@@ -77,19 +55,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> params = createParams(신분당선);
-
-        노선_생성_요청(params);
+        지하철_노선_생성_요청(신분당선);
 
         // when
-        ExtractableResponse<Response> response = 노선_조회_요청(1L);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String name = response.jsonPath().get(이름);
-        assertThat(name).isEqualTo(신분당선.이름);
-        String color = response.jsonPath().get(색);
-        assertThat(color).isEqualTo(신분당선.색);
+        노선_조회_성공(response, 신분당선);
     }
 
     /**
@@ -100,10 +72,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getInvalidLine() {
         // when
-        ExtractableResponse<Response> response = 노선_조회_요청(999L);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(999L);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        노선_조회_실패_없는_노선(response);
     }
 
     /**
@@ -115,33 +87,28 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, String> params = createParams(구분당선);
-
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(params);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(구분당선);
 
         // when
         String uri = createResponse.header(HttpHeaders.LOCATION);
-        ExtractableResponse<Response> response = 노선_변경_요청(params, uri);
+        ExtractableResponse<Response> response = 지하철_노선_변경_요청(uri, 신분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        노선_변경_성공(response);
     }
 
     /**
      * When 없는 지하철 노선의 정보 수정을 요청 하면
      * Then 지하철 노선이 생성이 성공한다.
      */
-    @DisplayName("지하철 노선 수정 - 없는 경우 생성")
+    @DisplayName("지하철 노선 수정 - 없는 경우 NOT FOUND")
     @Test
     void updateNotExistLine() {
-        Map<String, String> params = createParams(구분당선);
-
         // when
-        ExtractableResponse<Response> response = 노선_변경_요청(params, "/lines/1");
+        ExtractableResponse<Response> response = 지하철_노선_변경_요청("/lines/1", 구분당선);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header(HttpHeaders.LOCATION)).isNotBlank();
+        노선_변경_실패_없는_노선(response);
     }
 
     /**
@@ -153,36 +120,32 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> params = createParams(구분당선);
-
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(params);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(구분당선);
 
         // when
         String uri = createResponse.header(HttpHeaders.LOCATION);
-        ExtractableResponse<Response> response = 노선_삭제_요청(params, uri);
+        ExtractableResponse<Response> response = 지하철_노선_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        노선_삭제_성공(response);
     }
 
-    private Map<String, String> createParams(노선 노선) {
-        Map<String, String> params = new HashMap<>();
-        params.put(이름, 노선.이름);
-        params.put(색, 노선.색);
-        return params;
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 같은 이름으로 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
+    @Test
+    void duplicatedStationName() {
+        // given
+        지하철_노선_생성_요청(구분당선);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(구분당선);
+
+        // then
+        노선_생성_실패_중복(response);
     }
 
-    enum 노선 {
-        신분당선("신분당선", "bg-red-600"),
-        구분당선("구분당선", "bg-blue-600"),
-        _2호선("2호선", "bg-green-600");
-
-        public final String 이름;
-        public final String 색;
-
-        노선(String 이름, String 색) {
-            this.이름 = 이름;
-            this.색 = 색;
-        }
-    }
 }

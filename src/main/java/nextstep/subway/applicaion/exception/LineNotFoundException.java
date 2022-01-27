@@ -1,11 +1,10 @@
 package nextstep.subway.applicaion.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(HttpStatus.NOT_FOUND)
 public class LineNotFoundException extends RuntimeException {
-    public LineNotFoundException(String message) {
-        super(message);
+
+    private static final String MSG_INVALID_LINE_ID = "INVALID LINE id: %s";
+
+    public LineNotFoundException(Long id) {
+        super(String.format(MSG_INVALID_LINE_ID, id));
     }
 }
