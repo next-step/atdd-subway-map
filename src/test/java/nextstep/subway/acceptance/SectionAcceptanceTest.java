@@ -76,19 +76,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         구간_생성_요청(역삼역Id, 양재역Id, 역삼_양재_거리, 신분당선Id);
 
         // when
+        ExtractableResponse<Response> deleteResponse = 구간_삭제_요청(신분당선Id, 양재역Id);
+
+        // then
+        응답_상태_검증(deleteResponse, HttpStatus.NO_CONTENT);
+        구간_개수_검증(신분당선Id, 1);
+    }
+
+    private ExtractableResponse<Response> 구간_삭제_요청(Long 대상_노선Id, Long 대상_지하철역Id) {
         ExtractableResponse<Response> deleteResponse = RestAssured
                 .given().log().all()
                 .accept(MediaType.ALL_VALUE)
 
                 .when()
-                .delete("/lines/" + 신분당선Id + "/sections?sectionId=" + 양재역Id)
+                .delete("/lines/" + 대상_노선Id + "/sections?stationId=" + 대상_지하철역Id)
 
                 .then().log().all()
                 .extract();
-
-        // then
-        응답_상태_검증(deleteResponse, HttpStatus.NO_CONTENT);
-        구간_개수_검증(신분당선Id, 1);
+        return deleteResponse;
     }
 
     private ExtractableResponse<Response> 구간_생성_요청(Long 상행선Id, Long 하행선Id, int 거리, Long 노선Id) {

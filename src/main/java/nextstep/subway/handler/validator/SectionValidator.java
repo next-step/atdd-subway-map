@@ -1,6 +1,7 @@
 package nextstep.subway.handler.validator;
 
 import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.handler.error.custom.BusinessException;
 
@@ -12,6 +13,12 @@ public class SectionValidator {
         validateUpStation(line, upStation);
         validateDownStation(line, downStation);
         validateDistance(distance);
+    }
+
+    public static void properDelete(Section section, Station station) {
+        if(!section.hasDownStation(station)) {
+            throw new BusinessException(STATION_IS_NOT_LATEST);
+        }
     }
 
     private static void validateUpStation(Line line, Station upStation) {

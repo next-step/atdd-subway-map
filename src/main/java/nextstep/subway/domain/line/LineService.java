@@ -89,4 +89,9 @@ public class LineService {
         return stationRepository.findById(upStationId)
                 .orElseThrow(() -> new BusinessException(STATION_NOT_FOUND_BY_ID));
     }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        line.deleteSection(findStationById(stationId));
+    }
 }

@@ -2,6 +2,7 @@ package nextstep.subway.domain.section;
 
 import nextstep.subway.domain.section.dto.SectionDetailResponse;
 import nextstep.subway.domain.station.Station;
+import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -45,5 +46,13 @@ public class Sections {
                 .map(SectionDetailResponse::of)
                 .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public Section delete(Station station) {
+        Section section = sectionList.get(sectionList.size() - 1);
+        SectionValidator.properDelete(section, station);
+        sectionList.remove(section);
+
+        return section;
     }
 }
