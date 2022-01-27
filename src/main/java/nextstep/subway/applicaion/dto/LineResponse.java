@@ -55,10 +55,7 @@ public class LineResponse {
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (color != null ? !color.equals(that.color) : that.color != null) return false;
-        if (stations != null ? !stations.equals(that.stations) : that.stations != null) return false;
-        if (createdDate != null ? !createdDate.equals(that.createdDate) : that.createdDate != null) return false;
-        return modifiedDate != null ? modifiedDate.equals(that.modifiedDate) : that.modifiedDate == null;
+        return color != null ? color.equals(that.color) : that.color == null;
     }
 
     @Override
@@ -66,9 +63,6 @@ public class LineResponse {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (color != null ? color.hashCode() : 0);
-        result = 31 * result + (stations != null ? stations.hashCode() : 0);
-        result = 31 * result + (createdDate != null ? createdDate.hashCode() : 0);
-        result = 31 * result + (modifiedDate != null ? modifiedDate.hashCode() : 0);
         return result;
     }
 }

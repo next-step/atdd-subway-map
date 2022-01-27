@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineCreateRequest;
 import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineResponse;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +22,14 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineCreateResponse> createLine(@RequestBody LineCreateRequest lineCreateRequest) {
-        boolean existsLineByName = lineService.existsLineByName(lineCreateRequest.getName());
-        if (existsLineByName) {
-            return ResponseEntity.badRequest().build();
-        }
-
         LineCreateResponse line = lineService.saveLine(lineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> createSectionInLine(@PathVariable Long id, @RequestBody LineCreateRequest lineCreateRequest) {
+        lineService.addSection(id, lineCreateRequest);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
@@ -50,5 +52,11 @@ public class LineController {
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
+        lineService.deleteSectionById(lineId, stationId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -11,14 +11,10 @@ import java.util.Map;
 public class StationSteps {
     public static final String DEFAULT_PATH = "/stations";
 
-    public static Map<String, String> getParams(String name) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        return params;
-    }
-
-    public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -26,5 +22,11 @@ public class StationSteps {
                 .post(DEFAULT_PATH)
                 .then().log().all()
                 .extract();
+    }
+
+    public static void 지하철_역들이_생성되어_있다(int count) {
+        for (int i = 1; i <= count; i++) {
+            지하철역_생성_요청(i + "역");
+        }
     }
 }
