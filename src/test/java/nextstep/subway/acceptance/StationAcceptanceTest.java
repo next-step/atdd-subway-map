@@ -110,5 +110,4 @@ class StationAcceptanceTest extends AcceptanceTest {
 
     }
 
-
 }
