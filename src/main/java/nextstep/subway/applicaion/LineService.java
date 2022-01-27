@@ -1,13 +1,9 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.applicaion.dto.SectionResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.NotFoundLineException;
 import nextstep.subway.exception.NotFoundStationException;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +15,10 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -57,8 +51,7 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    @Modifying
-    public void updateLine(Long id, LineRequest request) {
+    public void updateLine(Long id, LineUpdateRequest request) {
         Line line = findLineById(id);
         line.update(request.getName(), request.getColor());
     }
@@ -80,7 +73,6 @@ public class LineService {
         );
         line.addSection(section);
 
-        sectionRepository.save(section);
         return SectionResponse.of(section);
     }
 
