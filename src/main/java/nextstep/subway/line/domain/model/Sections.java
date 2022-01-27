@@ -57,7 +57,7 @@ public class Sections {
                      .anyMatch(iSection -> iSection.matchUpStation(station) || iSection.matchDownStation(station));
     }
 
-    public void delete(Long sectionId) {
+    public void delete(long sectionId) {
         checkRemovable(sectionId)
             .map(errorMessage -> new IllegalArgumentException(errorMessage.getMessage()))
             .ifPresent(e -> {
@@ -67,7 +67,7 @@ public class Sections {
         values.removeIf(iSection -> iSection.matchId(sectionId));
     }
 
-    private Optional<ErrorMessage> checkRemovable(Long sectionId) {
+    private Optional<ErrorMessage> checkRemovable(long sectionId) {
         if (values.size() <= 1) {
             return Optional.of(ErrorMessage.BELOW_MIN_SECTION_SIZE);
         }
@@ -77,7 +77,7 @@ public class Sections {
         return Optional.empty();
     }
 
-    private boolean matchLastSectionId(Long sectionId) {
+    private boolean matchLastSectionId(long sectionId) {
         Section lastSection = values.get(values.size() - 1);
         return lastSection.getId().equals(sectionId);
     }

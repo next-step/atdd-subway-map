@@ -1,26 +1,34 @@
 package nextstep.subway.line.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import nextstep.subway.line.domain.model.Line;
+import nextstep.subway.station.domain.dto.StationResponse;
 
+@JsonInclude(Include.NON_NULL)
 public class LineResponse {
     private final Long id;
     private final String name;
     private final String color;
+    private final List<StationResponse> stations;
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
 
-    public LineResponse(Long id, String name, String color, LocalDateTime createdDate,
-        LocalDateTime modifiedDate) {
+    public LineResponse(long id, String name, String color,
+                        List<StationResponse> stations, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.stations = stations;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
 
-    public static LineResponse.Builder builder() {
-        return new LineResponse.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static LineResponse from(Line line) {
@@ -30,6 +38,21 @@ public class LineResponse {
             .color(line.getColor())
             .createdDate(line.getCreatedDate())
             .modifiedDate(line.getModifiedDate())
+            .build();
+    }
+
+    public static LineResponse withStationsFrom(Line line) {
+        List<StationResponse> stations = line.getStations()
+                                             .stream()
+                                             .map(StationResponse::from)
+                                             .collect(Collectors.toList());
+        return builder()
+            .id(line.getId())
+            .name(line.getName())
+            .color(line.getColor())
+            .createdDate(line.getCreatedDate())
+            .modifiedDate(line.getModifiedDate())
+            .stations(stations)
             .build();
     }
 
@@ -43,6 +66,10 @@ public class LineResponse {
 
     public String getColor() {
         return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 
     public LocalDateTime getCreatedDate() {
@@ -59,11 +86,12 @@ public class LineResponse {
         private String color;
         private LocalDateTime createdDate;
         private LocalDateTime modifiedDate;
+        private List<StationResponse> stations;
 
         private Builder() {
         }
 
-        public Builder id(Long id) {
+        public Builder id(long id) {
             this.id = id;
             return this;
         }
@@ -88,9 +116,14 @@ public class LineResponse {
             return this;
         }
 
+        public Builder stations(List<StationResponse> stations) {
+            this.stations = stations;
+            return this;
+        }
+
         public LineResponse build() {
             return new LineResponse(
-                id, name, color, createdDate, modifiedDate
+                id, name, color, stations, createdDate, modifiedDate
             );
         }
     }

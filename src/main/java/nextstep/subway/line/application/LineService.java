@@ -7,14 +7,11 @@ import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.DuplicateColumnException;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.dto.LineResponse;
-import nextstep.subway.line.domain.dto.LineWithStationResponse;
 import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.model.Line;
-import nextstep.subway.line.domain.model.Section;
 import nextstep.subway.line.domain.repository.LineRepository;
-import nextstep.subway.line.domain.repository.SectionRepository;
+import nextstep.subway.station.applicaion.StationService;
 import nextstep.subway.station.domain.model.Station;
-import nextstep.subway.station.domain.repository.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,23 +19,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
+    private final StationService stationService;
 
     public LineService(LineRepository lineRepository,
-        StationRepository stationRepository,
-        SectionRepository sectionRepository) {
+        StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
+        this.stationService = stationService;
     }
 
-    public LineWithStationResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new DuplicateColumnException(ColumnName.LINE_NAME);
         }
-        Station upStation = findStation(request.getUpStationId());
-        Station downStation = findStation(request.getDownStationId());
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
 
         Line line = Line.builder()
             .name(request.getName())
@@ -49,12 +43,7 @@ public class LineService {
             .build();
 
         lineRepository.save(line);
-        return LineWithStationResponse.from(line);
-    }
-
-    private Station findStation(Long id) {
-        return stationRepository.findById(id)
-                                .orElseThrow(EntityNotFoundException::new);
+        return LineResponse.from(line);
     }
 
     public List<LineResponse> findAllLines() {
@@ -64,9 +53,9 @@ public class LineService {
                              .collect(Collectors.toList());
     }
 
-    public LineWithStationResponse findById(long id) {
+    public LineResponse findById(long id) {
         return lineRepository.findByIdWithStations(id)
-                             .map(LineWithStationResponse::from)
+                             .map(LineResponse::withStationsFrom)
                              .orElseThrow(EntityNotFoundException::new);
     }
 
@@ -80,18 +69,16 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public Long addSection(Long lineId, SectionRequest request) {
+    public void addSection(long lineId, SectionRequest request) {
         Line line = lineRepository.findByIdWithStations(lineId)
                                   .orElseThrow(EntityNotFoundException::new);
-        Station upStation = findStation(request.getUpStationId());
-        Station downStation = findStation(request.getDownStationId());
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
 
-        Section createdSection = line.addSection(upStation, downStation, request.getDistance());
-        sectionRepository.save(createdSection);
-        return createdSection.getId();
+        line.addSection(upStation, downStation, request.getDistance());
     }
 
-    public void deleteSection(Long lineId, Long sectionId) {
+    public void deleteSection(long lineId, long sectionId) {
         lineRepository.findByIdWithStations(lineId)
                       .ifPresent(line -> line.deleteSection(sectionId));
     }

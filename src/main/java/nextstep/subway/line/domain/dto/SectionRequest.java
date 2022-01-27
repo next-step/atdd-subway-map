@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import nextstep.subway.line.domain.model.Distance;
 
 public class SectionRequest {
-    private Long upStationId;
-    private Long downStationId;
+    private long upStationId;
+    private long downStationId;
     private Distance distance;
 
     @JsonCreator
-    private SectionRequest(Long upStationId, Long downStationId, Distance distance) {
+    private SectionRequest(long upStationId, long downStationId, Distance distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -50,12 +50,12 @@ public class SectionRequest {
 
         private Builder() {}
 
-        public Builder upStationId(Long upStationId) {
+        public Builder upStationId(long upStationId) {
             this.upStationId = upStationId;
             return this;
         }
 
-        public Builder downStationId(Long downStationId) {
+        public Builder downStationId(long downStationId) {
             this.downStationId = downStationId;
             return this;
         }

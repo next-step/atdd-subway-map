@@ -13,5 +13,5 @@ public interface LineRepository extends JpaRepository<Line, Long> {
         + " JOIN FETCH s.upStation"
         + " JOIN FETCH s.downStation"
         + " WHERE l.id = :id")
-    Optional<Line> findByIdWithStations(Long id);
+    Optional<Line> findByIdWithStations(long id);
 }

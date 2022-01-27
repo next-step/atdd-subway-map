@@ -11,7 +11,7 @@ public class LineRequest {
     private Distance distance;
 
     @JsonCreator
-    private LineRequest(String name, String color, Long upStationId, Long downStationId, Distance distance) {
+    private LineRequest(String name, String color, long upStationId, long downStationId, Distance distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -51,11 +51,11 @@ public class LineRequest {
         this.color = color;
     }
 
-    public void setUpStationId(Long upStationId) {
+    public void setUpStationId(long upStationId) {
         this.upStationId = upStationId;
     }
 
-    public void setDownStationId(Long downStationId) {
+    public void setDownStationId(long downStationId) {
         this.downStationId = downStationId;
     }
 
@@ -82,12 +82,12 @@ public class LineRequest {
             return this;
         }
 
-        public Builder upStationId(Long upStationId) {
+        public Builder upStationId(long upStationId) {
             this.upStationId = upStationId;
             return this;
         }
 
-        public Builder downStationId(Long downStationId) {
+        public Builder downStationId(long downStationId) {
             this.downStationId = downStationId;
             return this;
         }

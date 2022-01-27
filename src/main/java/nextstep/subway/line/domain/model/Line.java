@@ -72,7 +72,7 @@ public class Line extends BaseEntity {
         return sections.add(section);
     }
 
-    public void deleteSection(Long sectionId) {
+    public void deleteSection(long sectionId) {
         sections.delete(sectionId);
     }
 

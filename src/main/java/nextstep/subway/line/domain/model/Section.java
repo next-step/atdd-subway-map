@@ -70,7 +70,7 @@ public class Section extends BaseEntity {
         return distance;
     }
 
-    public boolean matchId(Long id) {
+    public boolean matchId(long id) {
         return this.id.equals(id);
     }
 

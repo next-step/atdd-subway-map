@@ -1,21 +1,16 @@
 package nextstep.subway.acceptance.station;
 
 import io.restassured.RestAssured;
-import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.utils.AcceptanceTestThen;
-import nextstep.subway.utils.AcceptanceTestWhen;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -33,9 +28,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given, when
-        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청(
-            StationStep.DUMMY_STATION_NAME
-        );
+        ExtractableResponse<Response> response =
+            stationStep.지하철역_생성_요청(StationStep.DUMMY_STATION_NAME);
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -55,9 +49,8 @@ class StationAcceptanceTest extends AcceptanceTest {
         stationStep.지하철역_생성_요청(StationStep.DUMMY_STATION_NAME);
 
         // when
-        ExtractableResponse<Response> response = stationStep.지하철역_생성_요청(
-            StationStep.DUMMY_STATION_NAME
-        );
+        ExtractableResponse<Response> response =
+            stationStep.지하철역_생성_요청(StationStep.DUMMY_STATION_NAME);
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -74,27 +67,15 @@ class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록 조회를 요청 하면
      * Then 두 지하철역이 포함된 지하철역 목록을 응답받는다
      */
-    @ValueSource(ints = {
-        5, 10
-    })
     @DisplayName("지하철역 목록 조회")
-    @ParameterizedTest
-    void getStations(int size) {
+    @Test
+    void getStations() {
         /// given
-        String NAME_SUFFIX = "호선";
-        List<String> names = IntStream.iterate(0, nameCounter -> nameCounter + 1)
-                                      .limit(size)
-                                      .boxed()
-                                      .map(nameCounter -> nameCounter + NAME_SUFFIX)
-                                      .collect(Collectors.toList());
+        List<String> names = Arrays.asList("1호선", "2호선");
         names.forEach(stationStep::지하철역_생성_요청);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .when()
-                                                            .get("/stations")
-                                                            .then().log().all()
-                                                            .extract();
+        ExtractableResponse<Response> response = stationStep.지하철_역_조회_요청();
 
         // then
         AcceptanceTestThen.fromWhen(response)
@@ -111,16 +92,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = stationStep.지하철역_생성_요청(
-            StationStep.DUMMY_STATION_NAME
-        );
+        stationStep.지하철역_생성_요청(StationStep.DUMMY_STATION_NAME);
 
         // when
-        AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
-        ExtractableResponse<Response> deleteResponse = when.requestLocation(Method.DELETE);
+        ExtractableResponse<Response> deleteResponse = stationStep.지하철_역_삭제_요청(1L);
+        ExtractableResponse<Response> findResponse = stationStep.지하철_역_조회_요청();
 
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
                           .equalsHttpStatus(HttpStatus.NO_CONTENT);
+        AcceptanceTestThen.fromWhen(findResponse)
+                          .checkEmpty("id");
     }
 }

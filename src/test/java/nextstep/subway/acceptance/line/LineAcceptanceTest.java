@@ -1,19 +1,13 @@
 package nextstep.subway.acceptance.line;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
-import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
+import java.util.Arrays;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.utils.AcceptanceTestThen;
-import nextstep.subway.utils.AcceptanceTestWhen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,12 +16,11 @@ import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    private static final Long FIRST_LINE_ID = 1L;
     @Autowired
     private StationStep stationStep;
     @Autowired
     private LineStep lineStep;
-    @Autowired
-    private SectionStep sectionStep;
 
     @Override
     @BeforeEach
@@ -46,15 +39,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given, when
-        ExtractableResponse<Response> response = lineStep.지하철_노선_생성_요청(
+        // when
+        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(
             LineStep.DUMMY_NAME, LineStep.DUMMY_UP_STATION_ID, LineStep.DUMMY_DOWN_STATION_ID
         );
+        ExtractableResponse<Response> findResponse = lineStep.지하철_노선_조회_요청(FIRST_LINE_ID);
 
         // then
-        AcceptanceTestThen.fromWhen(response)
+        AcceptanceTestThen.fromWhen(createResponse)
                           .equalsHttpStatus(HttpStatus.CREATED)
                           .existsLocation();
+        AcceptanceTestThen.fromWhen(findResponse)
+                          .equalsHttpStatus(HttpStatus.OK);
     }
 
     /**
@@ -94,36 +90,29 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        String STATION_NAME_SUFFIX = "-역";
-        String LINE_NAME_SUFFIX = "-호선";
-        List<String> names = LongStream.iterate(1, index -> index + 2)
-                                       .limit(5)
-                                       .boxed()
-                                       .map(index -> {
-                                           String lineName = index + LINE_NAME_SUFFIX;
-                                           stationStep.지하철역_생성_요청(
-                                               index + STATION_NAME_SUFFIX
-                                           );
-                                           stationStep.지하철역_생성_요청(
-                                               (index + 1) + STATION_NAME_SUFFIX
-                                           );
-                                           lineStep.지하철_노선_생성_요청(
-                                               index + LINE_NAME_SUFFIX, index, index + 1
-                                           );
-                                           return lineName;
-                                       })
-                                       .collect(Collectors.toList());
+        String 일호선 = "1호선";
+        String 이호선 = "2호선";
+
+        lineStep.지하철_노선_생성_요청(
+            일호선, LineStep.DUMMY_UP_STATION_ID, LineStep.DUMMY_DOWN_STATION_ID
+        );
+        stationStep.지하철역_생성_요청("3역");
+        stationStep.지하철역_생성_요청("4역");
+        lineStep.지하철_노선_생성_요청(
+            이호선, 3L, 4L
+        );
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .when()
-                                                            .get("/lines")
-                                                            .then().log().all()
-                                                            .extract();
+        ExtractableResponse<Response> response =
+            RestAssured.given().log().all()
+                       .when()
+                       .get("/lines")
+                       .then().log().all()
+                       .extract();
         //then
         AcceptanceTestThen.fromWhen(response)
                           .equalsHttpStatus(HttpStatus.OK)
-                          .containsAll("name", names);
+                          .containsAll("name", Arrays.asList(일호선, 이호선));
     }
 
     /**
@@ -136,33 +125,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        long lineId = 1;
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(
-            LineStep.DUMMY_NAME, 1L, 2L
-        );
-        List<String> stationNames = LongStream.iterate(3, i -> i + 1)
-                                                         .limit(10)
-                                                         .boxed()
-                                                         .map(index -> {
-                                                             String stationName = index + "역";
-                                                             stationStep.지하철역_생성_요청(stationName);
-                                                             sectionStep.지하철_구간_생성_요청(lineId, index - 1, index);
-                                                             return stationName;
-                                                         })
-                                                         .collect(Collectors.toList());
+        lineStep.지하철_노선_생성_요청(LineStep.DUMMY_NAME, FIRST_LINE_ID, 2L);
 
         // when
-        ExtractableResponse<Response> response =
-            AcceptanceTestWhen.fromGiven(createResponse)
-                              .requestLocation(Method.GET);
-
-        stationNames.add(0, "2역");
-        stationNames.add(0, "1역");
+        ExtractableResponse<Response> findResponse = lineStep.지하철_노선_조회_요청(FIRST_LINE_ID);
 
         // then
-        AcceptanceTestThen.fromWhen(response)
+        AcceptanceTestThen.fromWhen(findResponse)
                           .equalsHttpStatus(HttpStatus.OK)
-                          .containsAll("stations.name", stationNames);
+                          .containsAll("stations.name", Arrays.asList("1역", "2역"));
     }
 
     /**
@@ -175,20 +146,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        LineRequest request = lineStep.dummyRequest();
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(request);
+        lineStep.지하철_노선_생성_요청(lineStep.dummyParams());
 
         // when
-        request.setName("변경된 이름");
-        request.setColor("변경된 색상");
-
-        ExtractableResponse<Response> editResponse =
-            AcceptanceTestWhen.fromGiven(createResponse)
-                              .requestLocation(Method.PUT, request);
+        LineRequest changeRequest = lineStep.dummyParams();
+        changeRequest.setName("변경된 이름");
+        changeRequest.setColor("변경된 색상");
+        ExtractableResponse<Response> editResponse = lineStep.지하철_노선_수정_요청(FIRST_LINE_ID, changeRequest);
+        ExtractableResponse<Response> findResponse = lineStep.지하철_노선_조회_요청(FIRST_LINE_ID);
 
         // then
         AcceptanceTestThen.fromWhen(editResponse)
                           .equalsHttpStatus(HttpStatus.OK);
+        AcceptanceTestThen.fromWhen(findResponse)
+                          .equalsHttpStatus(HttpStatus.OK)
+                          .equalsResult("name", changeRequest.getName())
+                          .equalsResult("color", changeRequest.getColor());
     }
 
     /**
@@ -201,19 +174,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineStep.지하철_노선_생성_요청(
-            lineStep.dummyRequest()
-        );
+        lineStep.지하철_노선_생성_요청(lineStep.dummyParams());
 
         // when
-        AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
-        ExtractableResponse<Response> deleteResponse = when.requestLocation(Method.DELETE);
-        ExtractableResponse<Response> findResponse = when.requestLocation(Method.GET);
+        ExtractableResponse<Response> deleteResponse = lineStep.지하철_노선_삭제_요청(FIRST_LINE_ID);
+        ExtractableResponse<Response> getResponse = lineStep.지하철_노선_조회_요청(FIRST_LINE_ID);
 
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
                           .equalsHttpStatus(HttpStatus.NO_CONTENT);
-        AcceptanceTestThen.fromWhen(findResponse)
+        AcceptanceTestThen.fromWhen(getResponse)
                           .equalsHttpStatus(HttpStatus.NOT_FOUND);
     }
 }

@@ -5,8 +5,8 @@ import java.util.List;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.dto.LineResponse;
-import nextstep.subway.line.domain.dto.LineWithStationResponse;
 import nextstep.subway.line.domain.dto.SectionRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/lines")
 public class LineController {
-    private static final String SECTION_URL_PATTERN = "/lines/%d/sections/%d";
-
     private final LineService lineService;
 
     public LineController(LineService lineService) {
@@ -30,8 +28,8 @@ public class LineController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineWithStationResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineWithStationResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+        LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -42,8 +40,8 @@ public class LineController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<LineWithStationResponse> getLine(@PathVariable("id") long id) {
-        LineWithStationResponse responses = lineService.findById(id);
+    public ResponseEntity<LineResponse> getLine(@PathVariable("id") long id) {
+        LineResponse responses = lineService.findById(id);
         return ResponseEntity.ok().body(responses);
     }
 
@@ -60,16 +58,15 @@ public class LineController {
     }
 
     @PostMapping(path = "{lineId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> addSection(@PathVariable("lineId") final Long lineId,
+    public ResponseEntity<Void> addSection(@PathVariable("lineId") final long lineId,
         @RequestBody SectionRequest request) {
-        Long createSectionId = lineService.addSection(lineId, request);
-        String location = String.format(SECTION_URL_PATTERN, lineId, createSectionId);
-        return ResponseEntity.created(URI.create(location)).build();
+        lineService.addSection(lineId, request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "{lineId}/sections/{sectionId}")
     public ResponseEntity<Void> deleteSection(
-        @PathVariable("lineId") final Long lineId, @PathVariable("sectionId") final Long sectionId) {
+        @PathVariable("lineId") final long lineId, @PathVariable("sectionId") final long sectionId) {
         lineService.deleteSection(lineId, sectionId);
 
         return ResponseEntity.noContent().build();

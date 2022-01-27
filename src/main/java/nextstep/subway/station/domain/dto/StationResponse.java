@@ -10,7 +10,7 @@ public class StationResponse {
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
 
-    private StationResponse(Long id, String name, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private StationResponse(long id, String name, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.createdDate = createdDate;
@@ -52,7 +52,7 @@ public class StationResponse {
         private LocalDateTime createdDate;
         private LocalDateTime modifiedDate;
 
-        public Builder id(Long id) {
+        public Builder id(long id) {
             this.id = id;
             return this;
         }

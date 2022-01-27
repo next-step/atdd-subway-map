@@ -2,6 +2,7 @@ package nextstep.subway.station.applicaion;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import nextstep.subway.common.exception.ColumnName;
 import nextstep.subway.common.exception.DuplicateColumnException;
 import nextstep.subway.station.domain.dto.StationRequest;
@@ -29,6 +30,12 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
+    public Station findById(long id) {
+        return stationRepository.findById(id)
+                                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
 
@@ -37,7 +44,7 @@ public class StationService {
                        .collect(Collectors.toList());
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStationById(long id) {
         stationRepository.deleteById(id);
     }
 }

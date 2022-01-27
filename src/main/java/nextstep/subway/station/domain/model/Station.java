@@ -22,7 +22,7 @@ public class Station extends BaseEntity implements Comparable<Station> {
     public Station() {
     }
 
-    public Station(Long id, String name) {
+    public Station(long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -50,16 +50,18 @@ public class Station extends BaseEntity implements Comparable<Station> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        Station station = (Station)o;
-        return Objects.equals(id, station.id);
+        }
+        Station station = (Station) o;
+        return Objects.equals(id, station.id) && Objects.equals(name, station.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name);
     }
 }

@@ -1,14 +1,13 @@
 package nextstep.subway.acceptance.line;
 
 import io.restassured.RestAssured;
-import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.utils.AcceptanceTestThen;
-import nextstep.subway.utils.AcceptanceTestWhen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,14 +48,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection() {
         // when
-        ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(
+        ExtractableResponse<Response> createResponse = sectionStep.지하철_구간_생성_요청(
             LINE_ID, 2L, 3L
         );
 
         // then
-        AcceptanceTestThen.fromWhen(response)
-                          .equalsHttpStatus(HttpStatus.CREATED)
-                          .existsLocation();
+        ExtractableResponse<Response> lineFindResponse = lineStep.지하철_노선_조회_요청(1L);
+        AcceptanceTestThen.fromWhen(createResponse)
+                          .equalsHttpStatus(HttpStatus.CREATED);
     }
 
     /**
@@ -93,8 +92,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록 실패 - 등록할 구간의 하행역이 구간에 이미 등록되있는 역일때 ")
     @Test
     void addSectionThatFailing2() {
-        // given
-
         // when
         ExtractableResponse<Response> response = sectionStep.지하철_구간_생성_요청(
             LINE_ID, 2L, 1L
@@ -116,13 +113,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        ExtractableResponse<Response> createResponse = sectionStep.지하철_구간_생성_요청(
-            LINE_ID, 2L, 3L
-        );
+        sectionStep.지하철_구간_생성_요청(LINE_ID, 2L, 3L);
 
         // when
-        AcceptanceTestWhen when = AcceptanceTestWhen.fromGiven(createResponse);
-        ExtractableResponse<Response> deleteResponse = when.requestLocation(Method.DELETE);
+        ExtractableResponse<Response> deleteResponse =
+            sectionStep.지하철_구간_삭제_요청(LINE_ID, 2L);
 
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
@@ -138,15 +133,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionThatFailing1() {
         // given
-        ExtractableResponse<Response> preResponse = sectionStep.지하철_구간_생성_요청(
-            LINE_ID, 2L, 3L
-        );
-        stationStep.지하철역_생성_요청("4역");
-        sectionStep.지하철_구간_생성_요청(LINE_ID, 3L, 4L);
+        sectionStep.지하철_구간_생성_요청(LINE_ID, 2L, 3L);
 
         // when
-        ExtractableResponse<Response> deleteResponse = AcceptanceTestWhen.fromGiven(preResponse)
-                                                                         .requestLocation(Method.DELETE);
+        ExtractableResponse<Response> deleteResponse =
+            sectionStep.지하철_구간_삭제_요청(LINE_ID, 1L);
 
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
@@ -163,11 +154,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionThatFailing2() {
         // when
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                                                                  .when()
-                                                                  .delete("/lines/1/sections/1")
-                                                                  .then().log().all()
-                                                                  .extract();
+        ExtractableResponse<Response> deleteResponse =
+            RestAssured.given().log().all()
+                       .when()
+                       .delete("/lines/1/sections/1")
+                       .then().log().all()
+                       .extract();
 
         // then
         AcceptanceTestThen.fromWhen(deleteResponse)
