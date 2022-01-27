@@ -4,12 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
 
@@ -23,6 +18,11 @@ public class LineSteps {
                 .post(LINES_URI)
                 .then().log().all()
                 .extract();
+    }
+
+    public static int 노선_생성_요청_응답_HttpStatusCode(LineRequest lineRequest) {
+        ExtractableResponse<Response> response = createLine(lineRequest);
+        return response.statusCode();
     }
 
     public static ExtractableResponse<Response> findLines() {
