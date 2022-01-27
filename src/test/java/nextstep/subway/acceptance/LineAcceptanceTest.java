@@ -22,12 +22,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> 수원역;
     private ExtractableResponse<Response> 사당역;
     private ExtractableResponse<Response> 신도림;
+    private ExtractableResponse<Response> 신림역;
+    private ExtractableResponse<Response> 가산역;
 
     @BeforeEach
     void init() {
         수원역 = StationStep.saveStation("수원역");
         사당역 = StationStep.saveStation("사당역");
         신도림 = StationStep.saveStation("신도림");
+        신림역 = StationStep.saveStation("신림역");
+        가산역 = StationStep.saveStation("가산역");
     }
 
     /**
@@ -60,9 +64,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
 
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
-        LineStep.saveLine("파란색", "1호선", 1L,2L,3);
+        LineStep.saveLine("하늘색", "4호선", upStationId,downStationId,3);
+        LineStep.saveLine("파란색", "1호선", upStationId,downStationId,3);
 
         ExtractableResponse<Response> response = LineStep.showLines();
 
@@ -81,8 +88,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
 
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
+        LineStep.saveLine("하늘색", "4호선", upStationId,downStationId,3);
 
         // 조회 결과
         ExtractableResponse<Response> response = LineStep.showLine(NUMBER_ONE);
@@ -102,8 +112,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
 
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
+        LineStep.saveLine("하늘색", "4호선", upStationId,downStationId,3);
 
         // 수정 요청
         ExtractableResponse<Response> response = LineStep.updateLine("파란색", "1호선", 1, 1L,2L,3);
@@ -120,8 +133,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
 
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+
         // 요청 후, 노선을 생성하다
-        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
+        LineStep.saveLine("하늘색", "4호선", upStationId,downStationId,3);
 
         // 노선을 삭제하다
         ExtractableResponse<Response> response = LineStep.deleteLine(NUMBER_ONE);
@@ -138,8 +154,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine_duplication() {
 
+        long upStationId = 수원역.jsonPath().getLong("id");
+        long downStationId = 사당역.jsonPath().getLong("id");
+
+
         // 노선을 생성한다.
-        LineStep.saveLine("하늘색", "4호선", 1L,2L,3);
+        LineStep.saveLine("하늘색", "4호선", upStationId,downStationId,3);
 
         // 중복으로 생성할 때
         ExtractableResponse<Response> response = LineStep.saveLine("파란색", "4호선", 1L,2L,3);
@@ -151,10 +171,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간을 생성")
     @Test
     void createSection() {
-        // 역 2개 생성 : 1L, 2L
-        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역");
-        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역");
-        ExtractableResponse<Response> 신도림 = StationStep.saveStation("신도림");
 
         // 첫 노선도에 들어갈 두 역
         long upStationId = 수원역.jsonPath().getLong("id");
@@ -178,9 +194,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("새로운 구간의 하행역은 현재 등록되어있는 역일 수 없다.")
     @Test
     void upStationDownStationRelation() {
-        // 역 2개 생성 : 1L, 2L
-        ExtractableResponse<Response> 수원역 = StationStep.saveStation("수원역"); // up
-        ExtractableResponse<Response> 사당역 = StationStep.saveStation("사당역"); // down
+
         ExtractableResponse<Response> 성균관대역 = StationStep.saveStation("성균관대역"); // 기존에 등록되어있는 역
 
         // 첫 노선도에 들어갈 두 역

@@ -17,6 +17,14 @@ public class Section {
 	@JoinColumn(name = "up_station_id")
 	private Station upStation;
 
+	public Station getUpStation() {
+		return upStation;
+	}
+
+	public Station getDownStation() {
+		return downStation;
+	}
+
 	@ManyToOne
 	@JoinColumn(name = "down_station_id")
 	private Station downStation;
@@ -26,6 +34,8 @@ public class Section {
 	protected Section() {
 		//
 	}
+
+
 
 	public Section(
 					Line line,

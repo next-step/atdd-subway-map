@@ -1,5 +1,7 @@
 package nextstep.subway.domain.Entity;
 
+import nextstep.subway.exception.DuplicationException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +42,15 @@ public class Line extends BaseEntity {
         this.distance = distance;
     }
 
-    public Boolean isExistSection(Section section) {
+    public void isExistSection(Station station) {
         for (Section isExistSection : sections) {
-            if (isExistSection.equals(section)) {
-                return true;
+            if (isExistSection.getUpStation().equals(station)) {
+                throw new DuplicationException("생성하고자하는 구간의 하행역이 이미 구간에 등록되어있습니다.");
+            }
+            if (isExistSection.getDownStation().equals(station)) {
+                throw new DuplicationException("생성하고자하는 구간의 하행역이 이미 구간에 등록되어있습니다.");
             }
         }
-        return false;
     }
 
     public void updateLine(final String name, final String color) {
