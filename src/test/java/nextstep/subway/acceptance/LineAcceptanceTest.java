@@ -67,9 +67,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("지하철 노선 생성 실패")
     void createLineExceptionTest() {
-        //given
+        //give
+        String failParam = "fail";
+
         // when
-        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, param1);
+        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, failParam);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
