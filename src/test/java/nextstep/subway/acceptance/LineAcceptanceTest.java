@@ -6,10 +6,13 @@ import nextstep.subway.acceptance.steps.LineSteps;
 import nextstep.subway.acceptance.steps.SectionSteps;
 import nextstep.subway.acceptance.steps.StationSteps;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -178,27 +181,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineAndSection() {
         // given
-        ExtractableResponse<Response> Line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
+        ExtractableResponse<Response> line = LineSteps.create(FIRST_NAME, FIRST_COLOR);
         ExtractableResponse<Response> station1 = StationSteps.create(FIRST_STATION_NAME);
         ExtractableResponse<Response> station2 = StationSteps.create(SECOND_STATION_NAME);
         ExtractableResponse<Response> station3 = StationSteps.create(THIRD_STATION_NAME);
         ExtractableResponse<Response> station4 = StationSteps.create(FOURTH_STATION_NAME);
 
-        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
-        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
-        SectionSteps.create(Line.header(RESPONSE_HEADER_LOCATION), getStationId(station3), getStationId(station4), DEFAULT_DISTANCE);
+        SectionSteps.create(line.header(RESPONSE_HEADER_LOCATION), getStationId(station1), getStationId(station2), DEFAULT_DISTANCE);
+        SectionSteps.create(line.header(RESPONSE_HEADER_LOCATION), getStationId(station2), getStationId(station3), DEFAULT_DISTANCE);
+        SectionSteps.create(line.header(RESPONSE_HEADER_LOCATION), getStationId(station3), getStationId(station4), DEFAULT_DISTANCE);
 
         // when
-        ExtractableResponse<Response> response = LineSteps.get();
+        ExtractableResponse<Response> response = LineSteps.get(getLineId(line));
 
         // then
-//        List<LineResponse> lines = response.jsonPath().getList(".", LineResponse.class);
-//        List<String> names = lines.get(0).getStations()
-//                                    .stream()
-//                                    .map(s-> s.getName())
-//                                    .collect(Collectors.toList());
+        List<String> names = response.jsonPath().getList("stations.name");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-//        assertThat(names).contains(FIRST_STATION_NAME, SECOND_STATION_NAME, THIRD_STATION_NAME, FOURTH_STATION_NAME);
+        assertThat(names).contains(FIRST_STATION_NAME, SECOND_STATION_NAME, THIRD_STATION_NAME, FOURTH_STATION_NAME);
     }
 
     /**
@@ -312,6 +311,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     private Long getStationId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
+    }
+    private Long getLineId(ExtractableResponse<Response> response) {
         return response.jsonPath().getLong("id");
     }
 }

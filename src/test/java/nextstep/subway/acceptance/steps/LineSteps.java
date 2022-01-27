@@ -21,6 +21,10 @@ public class LineSteps {
         return CommonRestAssured.get(URL);
     }
 
+    public static ExtractableResponse<Response> get(Long lineId) {
+        return CommonRestAssured.get(URL + "/" + lineId);
+    }
+
     public static ExtractableResponse<Response> delete(String url) {
         return CommonRestAssured.delete(url);
     }
