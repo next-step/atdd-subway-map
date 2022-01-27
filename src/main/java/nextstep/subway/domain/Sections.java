@@ -16,6 +16,12 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
+    protected Sections() { }
+
+    public Sections(List<Section> sections) {
+        this.sections = sections;
+    }
+
     public List<Station> getStations() {
         List<Station> result = new ArrayList<>();
         if (sections.size() > 0) {
@@ -27,23 +33,23 @@ public class Sections {
     }
 
     public void validationSectionStation(Station upStation, Station downStation) {
-        if (!isDownStationRegistered(upStation)) {
+        if (!matchDownStation(upStation)) {
             throw new SectionException(DOWN_STATION_REGISTERED_ERROR_MASSAGE);
         }
 
-        if (isSectionStationRegistered(downStation)) {
+        if (matchAllStation(downStation)) {
             throw new SectionException(SECTION_STATION_REGISTERED_ERROR_MASSAGE);
         }
     }
 
-    private boolean isDownStationRegistered(Station station) {
+    private boolean matchDownStation(Station station) {
         return sections.size() == 0
                 || sections.stream()
-                        .anyMatch(sec -> sec.isDownStationRegistered(station));
+                        .anyMatch(sec -> sec.matchDownStation(station));
     }
 
-    private boolean isSectionStationRegistered(Station station) {
+    private boolean matchAllStation(Station station) {
         return sections.stream()
-                        .anyMatch(sec -> sec.isSectionStationRegistered(station));
+                        .anyMatch(sec -> sec.matchAllStation(station));
     }
 }

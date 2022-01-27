@@ -33,12 +33,12 @@ public class Section {
         this.distance = distance;
     }
 
-    public boolean isDownStationRegistered(Station station) {
+    public boolean matchDownStation(Station station) {
         return downStation.equals(station);
     }
 
-    public boolean isSectionStationRegistered(Station station) {
-        return isDownStationRegistered(station)
+    public boolean matchAllStation(Station station) {
+        return matchDownStation(station)
                 || upStation.equals(station);
     }
 
