@@ -6,8 +6,7 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static nextstep.subway.acceptance.StationStepDefinition.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,16 +78,24 @@ public class LineStepDefinition {
         지하철_노선_응답_상태_검증(response, HttpStatus.CREATED);
     }
 
-    public static void 지하철_노선_조회_완료(ExtractableResponse<Response> response) {
+    public static void 지하철_노선_목록_조회_완료(ExtractableResponse<Response> response, String...lines) {
         지하철_노선_응답_상태_검증(response, HttpStatus.OK);
+        assertThat(response.jsonPath().getList("name")).containsExactlyInAnyOrder(lines);
+    }
+
+    public static void 지하철_노선_조회_완료(ExtractableResponse<Response> response, String line) {
+        지하철_노선_응답_상태_검증(response, HttpStatus.OK);
+        assertThat(response.jsonPath().getString("name")).isEqualTo(line);
     }
 
     public static void 지하철_노선_삭제_완료(ExtractableResponse<Response> response) {
         지하철_노선_응답_상태_검증(response, HttpStatus.NO_CONTENT);
     }
 
-    public static void 지하철_노선_수정_완료(ExtractableResponse<Response> response) {
+    public static void 지하철_노선_수정_완료(ExtractableResponse<Response> response, Map<String, String> params) {
         지하철_노선_응답_상태_검증(response, HttpStatus.OK);
+        assertThat(response.jsonPath().getString("name")).isEqualTo(params.get("name"));
+        assertThat(response.jsonPath().getString("color")).isEqualTo(params.get("color"));
     }
 
     public static void 지하철_노선_생성_실패(ExtractableResponse<Response> response) {

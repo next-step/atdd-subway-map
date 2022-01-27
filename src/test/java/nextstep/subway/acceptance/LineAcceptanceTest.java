@@ -75,8 +75,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청("/lines");
 
         // then
-        지하철_노선_조회_완료(response);
-        assertThat(response.jsonPath().getList("name")).contains(신분당선, 호선2);
+        지하철_노선_목록_조회_완료(response, 신분당선, 호선2);
     }
 
     /**
@@ -93,8 +92,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회_요청(createUri);
 
         // then
-        지하철_노선_조회_완료(response);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선);
+        지하철_노선_조회_완료(response, 신분당선);
     }
 
     /**
@@ -118,8 +116,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_수정_요청(createUri, updateParams);
 
         // then
-        지하철_노선_수정_완료(response);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(구분당선);
+        지하철_노선_수정_완료(response, updateParams);
     }
 
     /**

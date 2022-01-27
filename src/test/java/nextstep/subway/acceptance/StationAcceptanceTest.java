@@ -30,7 +30,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     void createStation() {
         // then
         지하철역_생성_완료(createResponse);
-        assertThat(createResponse.header("Location")).isNotBlank();
     }
 
     /**
@@ -49,9 +48,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철역_조회_요청("/stations");
 
-        지하철역_조회_완료(response);
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        지하철역_목록_조회_완료(response, 강남역, 역삼역);
     }
 
     /**

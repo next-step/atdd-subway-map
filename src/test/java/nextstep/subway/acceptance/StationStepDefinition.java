@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,10 +48,12 @@ public class StationStepDefinition {
 
     public static void 지하철역_생성_완료(ExtractableResponse<Response> response) {
         지하철역_응답_상태_검증(response, HttpStatus.CREATED);
+        assertThat(response.header("Location")).isNotBlank();
     }
 
-    public static void 지하철역_조회_완료(ExtractableResponse<Response> response) {
+    public static void 지하철역_목록_조회_완료(ExtractableResponse<Response> response, String ...stations) {
         지하철역_응답_상태_검증(response, HttpStatus.OK);
+        assertThat(response.jsonPath().getList("name")).contains(stations);
     }
 
     public static void 지하철역_삭제_완료(ExtractableResponse<Response> response) {
