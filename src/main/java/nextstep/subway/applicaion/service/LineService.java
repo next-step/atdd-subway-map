@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,10 +101,20 @@ public class LineService {
 
     private LineResponse createLineResponse(final Line line) {
 
+        List<Station> stations = new ArrayList<>();
+
+        for (Section section : line.getSections()) {
+            stations.add(section.getUpStation());
+            stations.add(section.getDownStation());
+        }
+
+        List<Station> newStations = stations.stream().distinct().collect(Collectors.toList());
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                newStations,
                 line.getCreatedDate(),
                 line.getModifiedDate());
     }
