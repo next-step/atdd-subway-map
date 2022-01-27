@@ -1,11 +1,16 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static nextstep.subway.acceptance.LineSteps.*;
 import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_되어있음;
@@ -16,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class LineAcceptanceTest extends AcceptanceTest {
 
     private static final String 강남역 = "강남역";
-    private static final String 역삼역 = "역삼역";
+    private static final String 양재역 = "양재역";
+    private static final String 양재시민의숲역 = "양재시민의숲역_번호";
+
     private static final String 사당역 = "사당역";
     private static final String 낙성대역 = "낙성대역";
 
@@ -26,8 +33,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String 빨강색 = "bg-red-600";
     private static final String 초록색 = "bg-green-600";
 
-    private final int 강남_역삼_거리 = 7;
-    private final int 사당_낙성대_거리 = 1;
+    private static final int 강남_양재_거리 = 7;
+    private static final int 양재_양재시민의숲_거리 = 5;
+    private static final int 사당_낙성대_거리 = 1;
 
     /**
      * 🥕 Given 지하철역(상행) 생성을 요청 하고
@@ -40,10 +48,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // then
         assertAll(
@@ -66,7 +74,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineExcludeStation() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 빨강색, "1", "2", 강남_역삼_거리);
+        ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 빨강색, "1", "2", 강남_양재_거리);
 
         // then
         assertAll(
@@ -84,10 +92,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createBlankLineName() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다("  ", 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다("  ", 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // then
         assertAll(
@@ -105,10 +113,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createBlankLineColor() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, "  ", 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, "  ", 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // then
         assertAll(
@@ -127,11 +135,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createDuplicateLineName() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
         final String 사당역_번호 = 지하철_역_생성_되어있음(사당역);
         final String 낙성대역_번호 = 지하철_역_생성_되어있음(낙성대역);
 
-        지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // when
         final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 초록색, 사당역_번호, 낙성대역_번호, 사당_낙성대_거리);
@@ -153,11 +161,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createDuplicateLineColor() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
         final String 사당역_번호 = 지하철_역_생성_되어있음(사당역);
         final String 낙성대역_번호 = 지하철_역_생성_되어있음(낙성대역);
 
-        지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // when
         final ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(이호선, 빨강색, 사당역_번호, 낙성대역_번호, 사당_낙성대_거리);
@@ -180,11 +188,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
         final String 사당역_번호 = 지하철_역_생성_되어있음(사당역);
         final String 낙성대역_번호 = 지하철_역_생성_되어있음(낙성대역);
 
-        지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
         지하철_노선_생성을_요청한다(이호선, 초록색, 사당역_번호, 낙성대역_번호, 사당_낙성대_거리);
 
         // when
@@ -211,9 +219,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
-        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
         final String uri = saveResponse.header("Location");
 
         // when
@@ -240,9 +248,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
-        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
         final String uri = saveResponse.header("Location");
 
         // when
@@ -265,9 +273,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
-        final String 역삼역_번호 = 지하철_역_생성_되어있음(역삼역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
-        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 역삼역_번호, 강남_역삼_거리);
+        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
         final String uri = saveResponse.header("Location");
 
         // when
@@ -277,6 +285,41 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(response.header("Date")).isNotBlank()
+        );
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 지하철 노선에 새로운 구간 추가 요청을 하면
+     * Then 지하철 노선에 새로운 구간이 등록된다.
+     */
+    @DisplayName("지하철 노선 구간 등록")
+    @Test
+    void addSection() {
+        final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
+        final String 양재시민의숲역_번호 = 지하철_역_생성_되어있음(양재시민의숲역);
+
+        final ExtractableResponse<Response> lineSaveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
+        final String 신분당선_번호 = lineSaveResponse.jsonPath().get("id").toString();
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("downStationId", 양재역_번호);
+        params.put("upStationId", 양재시민의숲역_번호);
+        params.put("distance", String.valueOf(양재_양재시민의숲_거리));
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .accept(ContentType.ANY)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(String.format("/lines/%s/sections", 신분당선_번호))
+                .then().log().all()
+                .extract();
+
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.header("Location")).isNotBlank()
         );
     }
 }

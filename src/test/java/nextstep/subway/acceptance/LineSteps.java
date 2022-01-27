@@ -11,10 +11,15 @@ import java.util.Map;
 
 public class LineSteps {
 
+    public static String 지하철_노선이_생성되어_있음(final String name, final String color,
+                                         final String upStationId, final String downStationId, final int distance) {
+        return 지하철_노선_생성을_요청한다(name, color, upStationId, downStationId, distance).jsonPath().get("id").toString();
+    }
+
     public static ExtractableResponse<Response> 지하철_노선_생성을_요청한다(final String name, final String color,
                                                                 final String upStationId, final String downStationId, final int distance) {
         final Map<String, String> params = 지하철_노선_생성_데이터를_만든다(name, color, upStationId, downStationId, distance);
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .body(params)
                 .accept(ContentType.ANY)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -22,7 +27,6 @@ public class LineSteps {
                 .post("/lines")
                 .then().log().all()
                 .extract();
-        return response;
     }
 
     private static Map<String, String> 지하철_노선_생성_데이터를_만든다(final String name, final String color,
