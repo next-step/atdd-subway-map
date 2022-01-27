@@ -1,44 +1,43 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.step.LineStep.구간_삭제;
+import static nextstep.subway.step.LineStep.구간_생성;
+import static nextstep.subway.step.LineStep.노선_목록_조회;
+import static nextstep.subway.step.LineStep.노선_변경;
+import static nextstep.subway.step.LineStep.노선_삭제;
+import static nextstep.subway.step.LineStep.노선_생성;
+import static nextstep.subway.step.StationStep.역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.ChangeLineRequest;
+import nextstep.subway.domain.SectionRequest;
 import nextstep.subway.utils.RequestMethod;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
     private static final String DEFAULT_PATH = "/lines";
+    private static final String JSON_PATH_ID = "id";
 
-    private static final String PARAM1_NAME_VALUE = "신분당선";
-    private static final String PARAM1_COLOR_VALUE = "bg-red-600";
-    private static final Long PARAM1_UPSTATION_ID = 1L;
-    private static final Long PARAM1_DOWNSTATION_ID = 2L;
-    private static final int PARAM1_DISTANCE_VALUE = 5;
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
+    private static final String 신촌역 = "신촌역";
+    private static final String 교대역 = "교대역";
 
-    private static final String PARAM2_NAME_VALUE = "2호선";
-    private static final String PARAM2_COLOR_VALUE = "bg-green-600";
-    private static final Long PARAM2_UPSTATION_ID = 10L;
-    private static final Long PARAM2_DOWNSTATION_ID = 20L;
-    private static final int PARAM2_DISTANCE_VALUE = 10;
+    private static final String 신분당선 = "신분당선";
+    private static final String 수인분당선 = "수인분당선";
 
-    private LineRequest param1;
-    private LineRequest param2;
+    private static final String SINBUNDANGLINE_COLOR = "bg-red-600";
+    private static final String SUINBUNDANGLINE_COLOR = "bg-blue-700";
 
-    @BeforeEach
-    void paramsInit() {
-        param1 = new LineRequest(PARAM1_NAME_VALUE, PARAM1_COLOR_VALUE,
-            PARAM1_UPSTATION_ID, PARAM1_DOWNSTATION_ID, PARAM1_DISTANCE_VALUE);
-
-        param2 = new LineRequest(PARAM2_NAME_VALUE, PARAM2_COLOR_VALUE,
-            PARAM2_UPSTATION_ID, PARAM2_DOWNSTATION_ID, PARAM2_DISTANCE_VALUE);
-    }
+    private static final int DEFAULT_DISTANCE = 5;
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -46,10 +45,15 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 생성")
     @Test
-    void createLine() {
+    void createLineTest() {
         // given
+
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
         // when
-        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, param1);
+        ExtractableResponse<Response> response = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
