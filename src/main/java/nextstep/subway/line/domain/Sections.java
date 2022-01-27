@@ -40,11 +40,13 @@ public class Sections {
 
     public void removeDownStation(Long downStationId) {
         if (!isEmpty()) {
-            sections.stream().filter(section ->
-                    Objects.equals(section.getDownStationId(), downStationId)
-            ).collect(Collectors.toList()).forEach(section ->
-                    sections.remove(section)
-            );
+
+            Section section = sections.stream().filter(it ->
+                    Objects.equals(it.getDownStationId(), downStationId)
+            ).findFirst().orElse(null);
+
+            if (section != null)
+                sections.remove(section);
         }
     }
 

@@ -2,6 +2,7 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.common.BaseEntity;
 import nextstep.subway.line.application.dto.LineRequest;
+import nextstep.subway.line.application.dto.SectionRequest;
 
 import javax.persistence.*;
 
@@ -32,6 +33,15 @@ public class Line extends BaseEntity {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
     }
+
+    public void saveSection(SectionRequest request) {
+        Sections sections = getSections();
+        sections.checkAddValidation(request.getUpStationId(), request.getDownStationId());
+
+        Section section = new Section(this, request.getUpStationId(), request.getDownStationId(), request.getDistance());
+        sections.addSection(section);
+    }
+
 
     public Long getId() {
         return id;

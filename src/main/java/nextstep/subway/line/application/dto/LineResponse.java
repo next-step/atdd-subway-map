@@ -4,6 +4,7 @@ import nextstep.subway.line.application.manager.StationData;
 import nextstep.subway.line.domain.Line;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LineResponse {
@@ -13,7 +14,7 @@ public class LineResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    private List<StationData> stations;
+    private List<StationData> stations = new ArrayList<>();
 
     public LineResponse() {
     }
@@ -26,8 +27,8 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    public void setStations(List<StationData> stations) {
-        this.stations = stations;
+    public void addStationAll(List<StationData> stations) {
+        this.stations.addAll(stations);
     }
 
     public Long getId() {

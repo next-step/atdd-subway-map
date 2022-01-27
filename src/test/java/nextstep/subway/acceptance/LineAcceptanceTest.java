@@ -32,7 +32,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Order(1)
     void createLine() {
         // given
-        Map lineRequest = 노선_요청_정보_샘플1();
+        Map<String, String> lineRequest = 노선_요청_정보_샘플1();
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(lineRequest);

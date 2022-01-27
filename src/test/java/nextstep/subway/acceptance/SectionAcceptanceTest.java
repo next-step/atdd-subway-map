@@ -21,6 +21,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
     private static final String LINE_END_POINT = "/lines";
     private static final String STATION_END_POINT = "/stations";
 
+    private static final String SAMPLE_TEST_UP_STATION_ID_1 = "1";
+    private static final String SAMPLE_TEST_UP_STATION_ID_2 = "2";
+    private static final String SAMPLE_TEST_DOWN_STATION_ID_3 = "3";
+    private static final String SAMPLE_TEST_DISTANCE_1 = "30";
+
+    private static final String SAMPLE_TEST_UP_STATION_ID_3 = "3";
+    private static final String SAMPLE_TEST_DOWN_STATION_ID_4 = "4";
+    private static final String SAMPLE_TEST_DISTANCE_2 = "50";
+
+    private static final String SAMPLE_TEST_DOWN_STATION_ID_1 = "1";
+
     /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 지하철역 생성을 요청 하고
@@ -65,9 +76,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", "30");
+        params.put("upStationId", SAMPLE_TEST_UP_STATION_ID_2);
+        params.put("downStationId", SAMPLE_TEST_DOWN_STATION_ID_3);
+        params.put("distance", SAMPLE_TEST_DISTANCE_1);
         지하철_구간_생성_요청(searchUri + "/sections", params);
 
         // when
@@ -98,9 +109,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", "30");
+        params.put("upStationId", SAMPLE_TEST_UP_STATION_ID_2);
+        params.put("downStationId", SAMPLE_TEST_DOWN_STATION_ID_3);
+        params.put("distance", SAMPLE_TEST_DISTANCE_1);
         지하철_구간_생성_요청(searchUri + "/sections", params);
 
         // when
@@ -122,9 +133,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "3");
-        params.put("downStationId", "4");
-        params.put("distance", "30");
+        params.put("upStationId", SAMPLE_TEST_UP_STATION_ID_3);
+        params.put("downStationId", SAMPLE_TEST_DOWN_STATION_ID_4);
+        params.put("distance", SAMPLE_TEST_DISTANCE_2);
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_생성_요청(searchUri + "/sections", params);
@@ -142,9 +153,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "1");
-        params.put("distance", "30");
+
+        params.put("upStationId", SAMPLE_TEST_UP_STATION_ID_2);
+        params.put("downStationId", SAMPLE_TEST_DOWN_STATION_ID_1);
+        params.put("distance", SAMPLE_TEST_DISTANCE_1);
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_생성_요청(searchUri + "/sections", params);
@@ -162,9 +174,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
         String searchUri = 샘플1_지하철_노선_생성_요청();
 
         Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", "30");
+        params.put("upStationId", SAMPLE_TEST_UP_STATION_ID_2);
+        params.put("downStationId", SAMPLE_TEST_DOWN_STATION_ID_3);
+        params.put("distance", SAMPLE_TEST_DISTANCE_1);
+
         지하철_구간_생성_요청(searchUri + "/sections", params);
 
         // when

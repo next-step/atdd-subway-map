@@ -58,11 +58,8 @@ public class StationService implements LineStationManager {
     }
 
     @Override
-    public boolean isExistInStations(Long upStationId, Long downStationId) {
-        Set<Long> ids = new HashSet();
-        ids.add(upStationId);
-        ids.add(downStationId);
-        return stationRepository.findAllByIdIn(ids).size() == 2;
+    public boolean isExistInStations(Set<Long> stationIds) {
+        return stationRepository.findAllByIdIn(stationIds).size() == 2;
     }
 
     private void checkExistsStationName(String name) {

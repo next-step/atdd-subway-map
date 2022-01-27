@@ -7,5 +7,5 @@ public interface LineStationManager {
 
     List<StationData> getAllInStations(Set<Long> stationIds);
 
-    boolean isExistInStations(Long upStationId, Long downStationId);
+    boolean isExistInStations(Set<Long> stationsIds);
 }

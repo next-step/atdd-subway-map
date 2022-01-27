@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static nextstep.subway.common.ErrorMessages.DUPLICATE_LINE_NAME;
@@ -98,18 +100,18 @@ public class LineService {
         Sections sections = line.getSections();
         if (!sections.isEmpty()) {
             List<StationData> stations = lineStationManager.getAllInStations(sections.getSectionIds());
-            lineResponse.setStations(stations);
+            lineResponse.addStationAll(stations);
         }
         return lineResponse;
     }
 
     private void saveSection(Line line, SectionRequest request) {
-        if (!lineStationManager.isExistInStations(request.getUpStationId(), request.getDownStationId()))
+        Set<Long> stationIds = new HashSet<>();
+        stationIds.add(request.getUpStationId());
+        stationIds.add(request.getDownStationId());
+        if (!lineStationManager.isExistInStations(stationIds))
             throw new StationNotFoundException();
 
-        Sections sections = line.getSections();
-        sections.checkAddValidation(request.getUpStationId(), request.getDownStationId());
-        sections.addSection(request.toSection(line));
-        //sectionRepository.save(request.toSection(line));
+        line.saveSection(request);
     }
 }
