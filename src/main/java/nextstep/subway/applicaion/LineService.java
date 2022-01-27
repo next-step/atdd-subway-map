@@ -38,7 +38,7 @@ public class LineService {
     }
 
     private void checkDuplicated(String name) {
-        lineRepository.findByName(name).ifPresent(l -> {
+        lineRepository.findByName(name).ifPresent(line -> {
             throw new EntityDuplicateException(name);
         });
     }
@@ -47,7 +47,7 @@ public class LineService {
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map(l -> LineResponse.of(l, getStationResponses(l)))
+                .map(line -> LineResponse.of(line, getStationResponses(line)))
                 .collect(Collectors.toList());
     }
 
