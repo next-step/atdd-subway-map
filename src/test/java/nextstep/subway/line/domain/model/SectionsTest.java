@@ -4,14 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 import nextstep.subway.station.domain.model.Station;
 
@@ -119,62 +116,5 @@ class SectionsTest {
         List<String> expert = Arrays.asList("1역", "2역", "3역", "4역", "5역", "6역");
         assertThat(actual)
             .containsExactly(expert.toArray(new String[0]));
-    }
-
-    private Map<Long, Station> newStations(String strIdAndNames) {
-        return Arrays.stream(strIdAndNames.split(","))
-                     .map(eachStrIdAndName -> {
-                              String[] splitted = eachStrIdAndName.split("=");
-                              return new Station(
-                                  Long.parseLong(splitted[0]), splitted[1]
-                              );
-                          }
-                     )
-                     .collect(Collectors.toMap(
-                         Station::getId,
-                         eachStation -> eachStation
-                     ));
-    }
-
-    private List<LinkData> newLinkDatas(String strLinkIds) {
-        return Arrays.stream(strLinkIds.split(","))
-                     .map(eachStrLinkData -> new LinkData(eachStrLinkData.split("-")))
-                     .collect(Collectors.toList());
-    }
-
-    private Sections newSections(Map<Long, Station> idEachStation, List<LinkData> linkDatas) {
-        long sectionIdCounter = 0;
-        Sections sections = new Sections();
-        for (LinkData eachLinkData : linkDatas) {
-            Section section = Section.builder()
-                .id(++sectionIdCounter)
-                .upStation(
-                    idEachStation.get(eachLinkData.getUpStationId())
-                )
-                .downStation(
-                    idEachStation.get(eachLinkData.getDownStationId())
-                )
-                .line(DUMMY_LINE)
-                .distance(DUMMY_DISTANCE)
-                .build();
-            sections.add(section);
-        }
-        return sections;
-    }
-
-    private static class LinkData {
-        private String[] linkData;
-
-        public LinkData(String[] linkData) {
-            this.linkData = linkData;
-        }
-
-        public Long getUpStationId() {
-            return Long.parseLong(linkData[0]);
-        }
-
-        public Long getDownStationId() {
-            return Long.parseLong(linkData[1]);
-        }
     }
 }
