@@ -46,7 +46,7 @@ public class Line extends BaseEntity {
         sections.addSection(upStationId, downStationId, distance);
     }
 
-    public boolean hasName(String name) {
+    public boolean equalsName(String name) {
         return Objects.equals(this.name, name);
     }
 

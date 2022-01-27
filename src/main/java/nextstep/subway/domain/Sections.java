@@ -37,7 +37,13 @@ public class Sections {
     }
 
     public List<Long> getAllStations() {
-        List<Long> results = sections.stream().map(Section::getUpStationId).collect(Collectors.toList());
+        List<Long> results = new ArrayList<>();
+
+        List<Long> upStationIds = sections.stream()
+                .map(Section::getUpStationId)
+                .collect(Collectors.toList());
+
+        results.addAll(upStationIds);
         results.add(lastSection().getDownStationId());
 
         return results;
