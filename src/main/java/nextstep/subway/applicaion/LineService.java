@@ -18,14 +18,11 @@ public class LineService {
 
     private LineRepository lineRepository;
     private StationRepository stationRepository;
-    private SectionRepository sectionRepository;
 
     public LineService(LineRepository lineRepository,
-                       StationRepository stationRepository,
-                       SectionRepository sectionRepository) {
+                       StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -56,8 +53,6 @@ public class LineService {
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
         line.update(lineRequest.getName(), lineRequest.getColor());
-
-        createLineResponse(lineRepository.save(line));
     }
 
     public void deleteLineById(Long id) {
