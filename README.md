@@ -32,9 +32,9 @@
 - [ ] 지하철 구간 삭제
 
 ## 지하철 구간 관리 요구사항
-- [ ] 새로운 구간의 상행선은 기존 구간의 하행선이여야한다.   SectionValidator#validateUpStation()
-- [ ] 새로운 구간의 하행선은 해당 노선에 속하지 않아야 한다. SectionValidator#validateDownStation()
-- [ ] 거리가 0이거나 0보다 작으면 안된다. SectionValidator#validateDistance()
+- [x] 새로운 구간의 상행선은 기존 구간의 하행선이여야한다.   SectionValidator#validateUpStation()
+- [x] 새로운 구간의 하행선은 해당 노선에 속하지 않아야 한다. SectionValidator#validateDownStation()
+- [x] 거리가 0이거나 0보다 작으면 안된다. SectionValidator#validateDistance()
 
 ## 리뷰 사항
 - [x] 메서드 호출 위치 변경
