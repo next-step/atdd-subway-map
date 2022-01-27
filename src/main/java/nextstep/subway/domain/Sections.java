@@ -50,7 +50,9 @@ public class Sections {
 
     public void remove(Station station) {
         validateSectionsSize();
+        validateLastStation(station);
 
+        sections.remove(getLastSection());
     }
 
     private void validateSectionsSize() {
@@ -59,8 +61,10 @@ public class Sections {
         }
     }
 
-
-    private void validateRemovable(Station station) {
+    private void validateLastStation(Station station) {
+        if (!getLastSection().isDownStation(station)) {
+            throw new CannotRemoveSectionException(station.getName());
+        }
     }
 
 }

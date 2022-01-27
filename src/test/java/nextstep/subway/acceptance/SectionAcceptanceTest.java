@@ -1,7 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
@@ -16,8 +14,7 @@ import static nextstep.subway.acceptance.LineFixture.이호선_이름;
 import static nextstep.subway.acceptance.SectionSteps.*;
 import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_요청_응답;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("노선 구간 관리 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
@@ -51,7 +48,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         SectionRequest sectionRequest = 신규_구간(이호선, 선릉역, 역삼역);
 
         //when
-        int statusCode = 구간_생성_요청_응답_HttpStatusCode(이호선, sectionRequest);
+        int statusCode = 구간_생성_요청_응답_HttpStatusCode(sectionRequest);
 
         //then
         httpStatusCode_검증(statusCode, BAD_REQUEST.value());
@@ -70,7 +67,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         SectionRequest sectionRequest = 신규_구간(이호선, 강남역, 선릉역);
 
         //when
-        int statusCode = 구간_생성_요청_응답_HttpStatusCode(이호선, sectionRequest);
+        int statusCode = 구간_생성_요청_응답_HttpStatusCode(sectionRequest);
 
         //then
         httpStatusCode_검증(statusCode, BAD_REQUEST.value());
@@ -89,7 +86,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         SectionRequest sectionRequest = 신규_구간(이호선, 역삼역, 선릉역);
 
         //when
-        int statusCode = 구간_생성_요청_응답_HttpStatusCode(이호선, sectionRequest);
+        int statusCode = 구간_생성_요청_응답_HttpStatusCode(sectionRequest);
 
         //then
         httpStatusCode_검증(statusCode, CREATED.value());
@@ -113,4 +110,46 @@ class SectionAcceptanceTest extends AcceptanceTest {
         httpStatusCode_검증(statusCode, BAD_REQUEST.value());
 
     }
+
+    /**
+     * Given 강남-역삼-선릉 구간이 등록된 노선 생성 요청을 하고 <br>
+     * When 하행 종점 역이 아닌 구간 삭제 요청을 하면 <br>
+     * Then 구간 삭제 실패한다.
+     */
+    @DisplayName("하행 종점역이 아닌 경우 삭제 실패")
+    @Test
+    void 구간_삭제_실패_하행_종점역_예외() {
+        //given
+        구간_생성_요청(신규_구간(이호선, 역삼역, 선릉역));
+        SectionRequest 역삼역_삭제_요청 = SectionRequest.valueOf(역삼역.getId(), 이호선.getId());
+
+        //when
+        int statusCode = 구간_삭제_요청_응답_HttpStatusCode(역삼역_삭제_요청);
+
+        //then
+        httpStatusCode_검증(statusCode, BAD_REQUEST.value());
+
+    }
+
+    /**
+     * Given 강남-역삼-선릉 구간이 등록된 노선 생성 요청을 하고 <br>
+     * When 구간 삭제 요청을 하면 <br>
+     * Then 구간 삭제 성공한다.
+     */
+    @DisplayName("하행 종점역 삭제")
+    @Test
+    void 구간_삭제() {
+        //given
+        구간_생성_요청(신규_구간(이호선, 역삼역, 선릉역));
+        SectionRequest 선릉역_삭제_요청 = SectionRequest.valueOf(선릉역.getId(), 이호선.getId());
+
+        //when
+        int statusCode = 구간_삭제_요청_응답_HttpStatusCode(선릉역_삭제_요청);
+
+        //then
+        httpStatusCode_검증(statusCode, NO_CONTENT.value());
+
+    }
+
+
 }

@@ -6,22 +6,19 @@ import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Line;
 import org.springframework.http.MediaType;
-
-import java.util.Map;
 
 public class SectionSteps {
 
     private static final String SECTION_URI = "/lines/%d/sections";
     private static final int DEFAULT_DISTANCE = 10;
 
-    public static ExtractableResponse<Response> 구간_생성_요청(Long lineId, SectionRequest sectionRequest) {
+    public static ExtractableResponse<Response> 구간_생성_요청(SectionRequest sectionRequest) {
         return RestAssured.given().log().all()
                 .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post(String.format(SECTION_URI, lineId))
+                .post(String.format(SECTION_URI, sectionRequest.getLineId()))
                 .then().log().all()
                 .extract();
     }
@@ -30,8 +27,8 @@ public class SectionSteps {
         return SectionRequest.of(lineResponse.getId(), upStation.getId(), downStation.getId(), DEFAULT_DISTANCE);
     }
 
-    public static int 구간_생성_요청_응답_HttpStatusCode(LineResponse lineResponse, SectionRequest sectionRequest) {
-        ExtractableResponse<Response> response = SectionSteps.구간_생성_요청(lineResponse.getId(), sectionRequest);
+    public static int 구간_생성_요청_응답_HttpStatusCode(SectionRequest sectionRequest) {
+        ExtractableResponse<Response> response = SectionSteps.구간_생성_요청(sectionRequest);
         return response.statusCode();
     }
 

@@ -42,6 +42,10 @@ public class Section extends BaseEntity {
         return this.downStation.equals(section.getUpStation());
     }
 
+    public boolean isDownStation(Station station) {
+        return this.downStation.equals(station);
+    }
+
     public String upStationName() {
         return upStation.getName();
     }
