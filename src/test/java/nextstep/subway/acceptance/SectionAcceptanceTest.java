@@ -79,7 +79,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all()
                 .extract();
 
-        assertThat(getResponse.body().jsonPath().getLong("sections.upStationId")).isEqualTo(상행선Id);
+        assertThat(getResponse.body().jsonPath().getLong("[0].stations[0].id")).isEqualTo(상행선Id);
     }
 
     /**
