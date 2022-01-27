@@ -18,7 +18,7 @@ public class LineUtils {
 
     private LineUtils() {}
 
-    public static ExtractableResponse<Response> 지하철노선_생성요청(LineRequest request) {
+    public static ExtractableResponse<Response> 지하철노선_생성_요청(LineRequest request) {
         long upStationId = 지하철역_생성요청(request.getUpStationName()).jsonPath().getLong("id");
         long downStationId = 지하철역_생성요청(request.getDownStationName()).jsonPath().getLong("id");
 
@@ -36,12 +36,8 @@ public class LineUtils {
         생성요청_성공(response);
     }
 
-    public static void 지하철노선_생성_실패(ExtractableResponse<Response> response) {
-        요청_실패(response);
-    }
-
-    public static ExtractableResponse<Response> 지하철노선_단건조회_요청(Long lineId) {
-        return get_요청("/lines/" + lineId);
+    public static ExtractableResponse<Response> 지하철노선_단건조회_요청(Long id) {
+        return get_요청("/lines/" + id);
     }
 
     public static void 지하철노선_단건조회_성공(ExtractableResponse<Response> response) {
@@ -58,8 +54,8 @@ public class LineUtils {
         assertThat(response.jsonPath().getList("id").size()).isEqualTo(2);
     }
 
-    public static ExtractableResponse<Response> 지하철노선_수정_요청(Long lineId, Map<String, String> params) {
-       return put_요청("/lines/" + lineId, params);
+    public static ExtractableResponse<Response> 지하철노선_수정_요청(Long id, Map<String, String> params) {
+       return put_요청("/lines/" + id, params);
     }
 
     public static void 지하철노선_수정_성공(ExtractableResponse<Response> response, Map<String, String> params) {
@@ -68,12 +64,8 @@ public class LineUtils {
         assertThat(jsonPath("$.color", is(params.get("color"))));
     }
 
-    public static ExtractableResponse<Response> 지하철노선_삭제_요청(String url) {
-        return delete_요청(url);
-    }
-
-    public static void 지하철노선_삭제_성공(ExtractableResponse<Response> response) {
-        삭제요청_성공(response);
+    public static ExtractableResponse<Response> 지하철노선_삭제_요청(Long id) {
+        return delete_요청("/lines/" + id);
     }
 
 }

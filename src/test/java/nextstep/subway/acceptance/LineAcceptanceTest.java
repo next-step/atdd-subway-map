@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.utils.AssertUtils.삭제요청_성공;
+import static nextstep.subway.acceptance.utils.AssertUtils.요청_실패;
 import static nextstep.subway.acceptance.utils.LineUtils.*;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -32,7 +34,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .build();
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_생성요청(request);
+        ExtractableResponse<Response> response = 지하철노선_생성_요청(request);
 
         // then
         지하철노선_생성_성공(response);
@@ -54,7 +56,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .downStationName("문래")
                 .distance(7)
                 .build();
-        지하철노선_생성요청(request);
+        지하철노선_생성_요청(request);
 
         // when
         LineRequest request2 = LineRequest.builder()
@@ -64,10 +66,10 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .downStationName("당산역")
                 .distance(7)
                 .build();
-        ExtractableResponse<Response> response = 지하철노선_생성요청(request2);
+        ExtractableResponse<Response> response = 지하철노선_생성_요청(request2);
 
         // then
-        지하철노선_생성_실패(response);
+        요청_실패(response);
     }
 
     /**
@@ -87,7 +89,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .downStationName("문래")
                 .distance(7)
                 .build();
-        지하철노선_생성요청(request);
+        지하철노선_생성_요청(request);
 
         LineRequest request2 = LineRequest.builder()
                 .lineName("1호선")
@@ -96,7 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .downStationName("소사역")
                 .distance(5)
                 .build();
-        지하철노선_생성요청(request2);
+        지하철노선_생성_요청(request2);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_목록조회_요청();
@@ -112,7 +114,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 조회")
     @Test
-    void getLine() throws Exception{
+    void getLine() {
         // given
         LineRequest request = LineRequest.builder()
                 .lineName("2호선")
@@ -122,11 +124,11 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .distance(7)
                 .build();
 
-        ExtractableResponse<Response> 지하철노선_생성응답 = 지하철노선_생성요청(request);
-        Long 지하철노선_코드 = 지하철노선_생성응답.jsonPath().getLong("id");
+        ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청(request);
+        Long 이호선 = 지하철노선_생성_응답.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_단건조회_요청(지하철노선_코드);
+        ExtractableResponse<Response> response = 지하철노선_단건조회_요청(이호선);
 
         // then
         지하철노선_단건조회_성공(response);
@@ -149,15 +151,15 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .distance(7)
                 .build();
 
-        ExtractableResponse<Response> 지하철노선_생성응답 = 지하철노선_생성요청(request);
-        Long 지하철노선_코드 = 지하철노선_생성응답.jsonPath().getLong("id");
+        ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청(request);
+        Long 이호선 = 지하철노선_생성_응답.jsonPath().getLong("id");
 
         Map<String, String> params = new HashMap<>();
         params.put("name", "신1호선");
         params.put("color", "bg-blue-200");
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_수정_요청(지하철노선_코드, params);
+        ExtractableResponse<Response> response = 지하철노선_수정_요청(이호선, params);
 
         // then
         지하철노선_수정_성공(response, params);
@@ -180,12 +182,12 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .distance(7)
                 .build();
 
-        ExtractableResponse<Response> 지하철노선_생성응답 = 지하철노선_생성요청(request);
+        long 이호선 = 지하철노선_생성_요청(request).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_삭제_요청(지하철노선_생성응답.header("Location"));
+        ExtractableResponse<Response> response = 지하철노선_삭제_요청(이호선);
 
         // then
-        지하철노선_삭제_성공(response);
+        삭제요청_성공(response);
     }
 }

@@ -4,53 +4,56 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.dto.LineRequest;
-import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.acceptance.dto.SectionRequest;
+import nextstep.subway.acceptance.utils.SectionUtils;
+import nextstep.subway.acceptance.utils.StationUtils;
+import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.utils.LineUtils.지하철노선_생성요청;
-import static nextstep.subway.acceptance.utils.SectionUtils.지하철노선_구간생성요청;
+import static nextstep.subway.acceptance.utils.AssertUtils.삭제요청_성공;
+import static nextstep.subway.acceptance.utils.AssertUtils.요청_실패;
+import static nextstep.subway.acceptance.utils.LineUtils.지하철노선_단건조회_요청;
+import static nextstep.subway.acceptance.utils.LineUtils.지하철노선_생성_요청;
+import static nextstep.subway.acceptance.utils.SectionUtils.*;
 import static nextstep.subway.acceptance.utils.StationUtils.지하철역_생성요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선의 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest{
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
 
-    long 생성된_노선_코드;
-    long 생성된_노선_상행역_코드;
-    long 생성된_노선_하행역_코드;
+    long 이호선;
+    long 이호선_상행역;
+    long 이호선_하행역;
 
     @BeforeEach
     @Override
     public void setUp() {
         RestAssured.port = port;
+        databaseCleanup.execute();
 
-        생성된_노선_상행역_코드 = 지하철역_생성요청("신도림역").jsonPath().getLong("id");
-        생성된_노선_하행역_코드 = 지하철역_생성요청("문래역").jsonPath().getLong("id");
+        LineRequest request = LineRequest.builder()
+                 .lineName("2호선")
+                 .lineColor("bg-green")
+                 .upStationName("신도림역")
+                 .downStationName("문래역")
+                 .distance(7)
+                 .build();
 
-       LineRequest request = LineRequest.builder()
-                .lineName("2호선")
-                .lineColor("bg-green")
-                .upStationName("신도림역")
-                .downStationName("문래역")
-                .distance(7)
-                .build();
+        ExtractableResponse<Response> response = 지하철노선_생성_요청(request);
 
-        ExtractableResponse<Response> response = 지하철노선_생성요청(request);
+        이호선 = response.jsonPath().getLong("id");
+        List<Map<String, Object>> 이호선_역목록 = response.jsonPath().getList("stations");
 
-        생성된_노선_코드 = response.jsonPath().getLong("id");
-        List<Map<String, Object>> 노선_역목록 = response.jsonPath().getList("stations");
-
-        생성된_노선_상행역_코드 = Long.valueOf(String.valueOf(노선_역목록.get(0).get("id")));
-        생성된_노선_하행역_코드 = Long.valueOf(String.valueOf(노선_역목록.get(1).get("id")));
-
+        이호선_상행역 = Long.valueOf(String.valueOf(이호선_역목록.get(0).get("id")));
+        이호선_하행역 = Long.valueOf(String.valueOf(이호선_역목록.get(1).get("id")));
     }
 
     /**
@@ -59,30 +62,25 @@ public class SectionAcceptanceTest extends AcceptanceTest{
      * When 새로운 구간의 생성을 요청하면
      * Then 새로운 구간 생성이 실패한다.
      */
-//    @DisplayName("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.")
-//    @Test
-//    void validateSectionUpStation() {
-//        // given
-//        long sectionUpStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
-//        long sectionDownStationId = 지하철역_생성요청("당산역").jsonPath().getLong("id");
-//        int distance = 5;
-//
-//        Map<String, String> params = new HashMap<>();
-//        params.put("upStationId", String.valueOf(sectionUpStationId));
-//        params.put("downStationId", String.valueOf(sectionDownStationId));
-//        params.put("distance", String.valueOf(distance));
-//
-//        // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .body(params)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().post("/lines/" + lineId + "/sections")
-//                .then().log().all().extract();
-//
-//        // then
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-//    }
+    @DisplayName("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 한다.")
+    @Test
+    void validateSectionUpStation() {
+        // given
+        long 당산역 = 지하철역_생성요청("당산역").jsonPath().getLong("id");
+        long 영등포구청역 = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
+
+        SectionRequest request = SectionRequest.builder()
+                .upStationId(당산역)
+                .downStationId(영등포구청역)
+                .distance(5)
+                .build();
+
+        // when
+        ExtractableResponse<Response> response = 지하철노선_구간생성_요청(이호선, request);
+
+        // then
+        요청_실패(response);
+    }
 
     /**
      * Given 지하철 노선 생성을 요청 하고
@@ -94,23 +92,17 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void validateSectionDownStation() {
         // given
-        int distance = 7;
+        SectionRequest request = SectionRequest.builder()
+                .upStationId(이호선_하행역)
+                .downStationId(이호선_상행역)
+                .distance(5)
+                .build();
 
-//        Map<String, String> params = new HashMap<>();
-//        params.put("upStationId", String.valueOf(firstDownStationId));
-//        params.put("downStationId", String.valueOf(upStationId));
-//        params.put("distance", String.valueOf(distance));
-//
-//        // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .body(params)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().post("/lines/" + lineId + "/sections")
-//                .then().log().all().extract();
-//
-//        // then
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        // when
+        ExtractableResponse<Response> 지하철노선_구간생성_응답 = 지하철노선_구간생성_요청(이호선, request);
+
+        // then
+        요청_실패(지하철노선_구간생성_응답);
     }
 
     /**
@@ -122,28 +114,20 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void createSection() {
         // given
-        long sectionDownStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
-        int distance = 3;
+        long 영등포구청역 = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
 
-//        Map<String, String> params = new HashMap<>();
-//        params.put("upStationId", String.valueOf(firstDownStationId));
-//        params.put("downStationId", String.valueOf(sectionDownStationId));
-//        params.put("distance", String.valueOf(distance));
-//
-//        // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .body(params)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .when().post("/lines/" + lineId + "/sections")
-//                .then().log().all().extract();
-//
-//        ExtractableResponse<Response> findLineResponse = 지하철노선_단건조회(lineId);
-//
-//        // then
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-//        assertThat(findLineResponse.jsonPath().getList("stations").size()).isEqualTo(3);
+        SectionRequest request = SectionRequest.builder()
+                .upStationId(이호선_하행역)
+                .downStationId(영등포구청역)
+                .distance(5)
+                .build();
 
+        // when
+        ExtractableResponse<Response> 지하철노선_구간생성_응답 = 지하철노선_구간생성_요청(이호선, request);
+        ExtractableResponse<Response> 지하철노선_단건조회_응답 = 지하철노선_단건조회_요청(이호선);
+
+        // then
+        지하철노선_구간생성_요청_성공(지하철노선_구간생성_응답, 지하철노선_단건조회_응답);
     }
 
     /**
@@ -154,17 +138,11 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선에 구간이 1개인 경우 역 삭제를 할 수 없다")
     @Test
     void validateDeleteSection_OneSection() {
-        // given
-//        long stationId = firstDownStationId;
-//
-//        // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
-//                .then().log().all().extract();
-//
-//        // then
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        // when
+        ExtractableResponse<Response> 지하철노선_역삭제_응답 = 지하철노선_역삭제_요청(이호선, 이호선_상행역);
+
+        // then
+        요청_실패(지하철노선_역삭제_응답);
     }
 
     /**
@@ -178,19 +156,19 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void validateDeleteSection_NonDownStation() {
         // given
-//        long sectionDownStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
-//
-//        SectionRequest sectionRequest = new SectionRequest(firstDownStationId, sectionDownStationId, 5);
-//        지하철노선_구간생성요청(lineId, sectionRequest);
-//
-//        // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .when().delete("/lines/" + lineId + "/sections?stationId=" + upStationId)
-//                .then().log().all().extract();
-//
-//        // then
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        long 영등포구청역 = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
+
+        SectionRequest sectionRequest = SectionRequest.builder()
+                .upStationId(이호선_하행역)
+                .downStationId(영등포구청역)
+                .build();
+        지하철노선_구간생성_요청(이호선, sectionRequest);
+
+        // when
+        ExtractableResponse<Response> 지하철노선_역삭제_응답 = 지하철노선_역삭제_요청(이호선, 이호선_상행역);
+
+        // then
+        요청_실패(지하철노선_역삭제_응답);
     }
 
     /**
@@ -203,18 +181,18 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void deleteSection() {
         // given
-//        long sectionDownStationId = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
-//
-//        SectionRequest sectionRequest = new SectionRequest(firstDownStationId, sectionDownStationId, 5);
-//        지하철노선_구간생성요청(lineId, sectionRequest);
-//
-//        // when
-//        ExtractableResponse<Response> response = RestAssured
-//                .given().log().all()
-//                .when().delete("/lines/" + lineId + "/sections?stationId=" + sectionDownStationId)
-//                .then().log().all().extract();
-//
-//        // then
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        long 영등포구청역 = 지하철역_생성요청("영등포구청역").jsonPath().getLong("id");
+
+        SectionRequest sectionRequest = SectionRequest.builder()
+                .upStationId(이호선_하행역)
+                .downStationId(영등포구청역)
+                .build();
+        지하철노선_구간생성_요청(이호선, sectionRequest);
+
+        // when
+        ExtractableResponse<Response> 지하철노선_역삭제_응답 = 지하철노선_역삭제_요청(이호선, 영등포구청역);
+
+        // then
+        삭제요청_성공(지하철노선_역삭제_응답);
     }
 }

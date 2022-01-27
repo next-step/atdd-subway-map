@@ -9,16 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SectionRequest {
     private Long lineId;
-    private String upStationName;
-    private String downStationName;
+    private Long upStationId;
+    private Long downStationId;
     private int distance;
 
     @Builder
-    private SectionRequest(Long lineId, String upStationName,
-                          String downStationName, int distance) {
+    private SectionRequest(Long lineId, Long upStationId, Long downStationId, int distance) {
         this.lineId = lineId;
-        this.upStationName = upStationName;
-        this.downStationName = downStationName;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 }
