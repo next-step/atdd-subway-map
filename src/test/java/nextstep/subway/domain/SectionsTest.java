@@ -7,16 +7,15 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class SectionsTest extends SectionFixData {
-    private static int DEFAULT_DISTANCE = 5;
 
     @DisplayName("구간 등록 시에 상행역이 아닌 하행역 등록은 예외")
     @Test
     void matchDownStationException() {
         // given
-        Station station1 = createStation("강남역");
-        Station station2 = createStation("역삼역");
-        Station station3 = createStation("잠실역");
-        Station station4 = createStation("잠실새내역");
+        Station station1 = createStation(FIRST_STATION_NAME);
+        Station station2 = createStation(SECOND_STATION_NAME);
+        Station station3 = createStation(THIRD_STATION_NAME);
+        Station station4 = createStation(FOURTH_STATION_NAME);
 
         Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
         Section section = createSection(station4, station4);
@@ -31,9 +30,9 @@ public class SectionsTest extends SectionFixData {
     @Test
     void matchAllStationException() {
         // given
-        Station station1 = createStation("강남역");
-        Station station2 = createStation("역삼역");
-        Station station3 = createStation("잠실역");
+        Station station1 = createStation(FIRST_STATION_NAME);
+        Station station2 = createStation(SECOND_STATION_NAME);
+        Station station3 = createStation(THIRD_STATION_NAME);
 
         Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
         Section section = createSection(station3, station1);
@@ -48,11 +47,12 @@ public class SectionsTest extends SectionFixData {
     @Test
     void lastSectionDelete() {
         // given
-        Station station1 = createStation("강남역");
-        Station station2 = createStation("역삼역");
-        Station station3 = createStation("잠실역");
+        Station station1 = createStation(FIRST_STATION_NAME);
+        Station station2 = createStation(SECOND_STATION_NAME);
+        Station station3 = createStation(THIRD_STATION_NAME);
 
-        Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
+        Sections sections = createSections(createSection(station1, station2)
+                                            , createSection(station2, station3));
 
         // when
         sections.deleteStation(station3);
@@ -65,11 +65,12 @@ public class SectionsTest extends SectionFixData {
     @Test
     void notLastSectionDeleteException() {
         // given
-        Station station1 = createStation("강남역");
-        Station station2 = createStation("역삼역");
-        Station station3 = createStation("잠실역");
+        Station station1 = createStation(FIRST_STATION_NAME);
+        Station station2 = createStation(SECOND_STATION_NAME);
+        Station station3 = createStation(THIRD_STATION_NAME);
 
-        Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
+        Sections sections = createSections(createSection(station1, station2)
+                                            , createSection(station2, station3));
 
         // when, then
         assertThatThrownBy(() -> sections.deleteStation(station1))
@@ -81,8 +82,8 @@ public class SectionsTest extends SectionFixData {
     @Test
     void sectionSizeOneDeleteException() {
         // given
-        Station station1 = createStation("강남역");
-        Station station2 = createStation("역삼역");
+        Station station1 = createStation(FIRST_STATION_NAME);
+        Station station2 = createStation(SECOND_STATION_NAME);
 
         Sections sections = createSections(createSection(station1, station2));
 

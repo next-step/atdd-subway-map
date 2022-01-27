@@ -5,16 +5,11 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.steps.LineSteps;
 import nextstep.subway.acceptance.steps.SectionSteps;
 import nextstep.subway.acceptance.steps.StationSteps;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -24,10 +19,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String FIRST_COLOR = "bg-red-700";
     private static final String RESPONSE_HEADER_LOCATION = "Location";
     private static final int DEFAULT_DISTANCE = 5;
-    private static String FIRST_STATION_NAME = "강남역";
-    private static String SECOND_STATION_NAME = "양재역";
-    private static String THIRD_STATION_NAME = "양재시민의숲";
-    private static String FOURTH_STATION_NAME = "판교역";
+    private static final String FIRST_STATION_NAME = "강남역";
+    private static final String SECOND_STATION_NAME = "양재역";
+    private static final String THIRD_STATION_NAME = "양재시민의숲";
+    private static final String FOURTH_STATION_NAME = "판교역";
 
     /**
      * When 지하철 노선 생성을 요청 하면

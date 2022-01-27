@@ -13,8 +13,8 @@ public class SectionTest extends SectionFixData{
     void createSection() {
         // given
         Line line = createLine();
-        Station upStation = createStation("강남역");
-        Station downStation = createStation("역삼역");
+        Station upStation = createStation(FIRST_STATION_NAME);
+        Station downStation = createStation(SECOND_STATION_NAME);
 
         // when
         Section section = createSection(upStation, downStation);

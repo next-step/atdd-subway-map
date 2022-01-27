@@ -23,14 +23,6 @@ public class SectionSteps {
         return CommonRestAssured.delete(url);
     }
 
-    public static ExtractableResponse<Response> modify(String url, String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return CommonRestAssured.modify(url, params);
-    }
-
     private static String getSectionUrl(String resource) {
         return resource + SECTION_URL;
     }
