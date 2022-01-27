@@ -37,4 +37,8 @@ public class LineRequest {
     public int getDistance() {
         return distance;
     }
+
+    public boolean hasSectionInformation() {
+        return upStationId != null && downStationId != null;
+    }
 }

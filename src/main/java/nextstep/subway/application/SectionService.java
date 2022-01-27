@@ -28,6 +28,6 @@ public class SectionService {
 
         Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
         line.extend(section);
-        return new SectionResponse();
+        return SectionResponse.fromSection(section);
     }
 }

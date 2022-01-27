@@ -33,7 +33,31 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
     public boolean isStartWith(Station other) {
-        return upStation.equals(other);
+        return other == null || upStation.equals(other);
+    }
+
+    public boolean isEndWith(Station other) {
+        return downStation.equals(other);
     }
 }

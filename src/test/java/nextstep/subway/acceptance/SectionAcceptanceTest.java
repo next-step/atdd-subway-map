@@ -18,6 +18,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private static final Long INVALID_ID = -1L;
     private SectionRequestBuilder defaultSectionRequestBuilder;
     private Long lineId;
+    private Long firstUpStationId;
 
     @Override
     @BeforeEach
@@ -26,6 +27,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> upStationResponse = StationSteps.executeStationCreateRequest("강남역");
         Long upStationId = upStationResponse.jsonPath().getLong("id");
+        firstUpStationId = upStationId;
 
         ExtractableResponse<Response> downStationResponse = StationSteps.executeStationCreateRequest("판교역");
         Long downStationId = downStationResponse.jsonPath().getLong("id");
@@ -115,7 +117,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("하행역이 노선에 이미 등록되어 있을 때")
     @Test
     void createAlreadyConsistsDownStationSection() {
+        SectionRequest request = defaultSectionRequestBuilder.withDownStationId(firstUpStationId).build();
+        ExtractableResponse<Response> response = SectionSteps.executeSectionCreateRequest(lineId, request);
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).contains("Illegal Section");
     }
 
     /**
@@ -125,7 +131,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록")
     @Test
     void createSection() {
+        SectionRequest request = defaultSectionRequestBuilder.build();
+        ExtractableResponse<Response> response = SectionSteps.executeSectionCreateRequest(lineId, request);
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 }
 

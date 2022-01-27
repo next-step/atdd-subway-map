@@ -3,23 +3,23 @@ package nextstep.subway.application.dto;
 import nextstep.subway.domain.Line;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private StationResponse upStation;
-    private StationResponse downStation;
+    private List<StationResponse> stations;
     private int distance;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    private LineResponse(Long id, String name, String color, StationResponse upStation, StationResponse downStation, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(Long id, String name, String color, List<StationResponse> stations, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.stations = stations;
         this.distance = distance;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
@@ -30,8 +30,7 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                StationResponse.fromStation(line.getUpStation()),
-                StationResponse.fromStation(line.getDownStation()),
+                line.getStations().stream().map(StationResponse::fromStation).collect(Collectors.toList()),
                 line.getDistance(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
@@ -50,12 +49,8 @@ public class LineResponse {
         return color;
     }
 
-    public StationResponse getUpStation() {
-        return upStation;
-    }
-
-    public StationResponse getDownStation() {
-        return downStation;
+    public List<StationResponse> getStations() {
+        return stations;
     }
 
     public int getDistance() {
