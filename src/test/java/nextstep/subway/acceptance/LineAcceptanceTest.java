@@ -1,7 +1,5 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.step.LineStep.구간_삭제;
-import static nextstep.subway.step.LineStep.구간_생성;
 import static nextstep.subway.step.LineStep.노선_목록_조회;
 import static nextstep.subway.step.LineStep.노선_변경;
 import static nextstep.subway.step.LineStep.노선_삭제;
@@ -213,16 +211,26 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 생성이 실패한다.
      */
     @Test
-    @DisplayName("중복이름으로 지하철 노선 생성 실패")
+    @DisplayName("중복트 이름으로 지하철 노선 생성 실패")
     void duplicationLineNameExceptionTest() {
         // given
-        RequestMethod.post(DEFAULT_PATH, param1);
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id, DEFAULT_DISTANCE);
 
         // when
-        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, param1);
+        ExtractableResponse<Response> 홍대역 = 역_생성("홍대역");
+        ExtractableResponse<Response> 신촌역 = 역_생성("신촌역");
+
+        Long 홍대역_id = 홍대역.jsonPath().getLong("id");
+        Long 신촌역_id = 신촌역.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
 }
