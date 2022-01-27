@@ -147,7 +147,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String modifyName = "구분당선";
         LineAndSectionResponse createResponse = callCreateAndFind(params);
         Map modifyParams = new HashMap();
-        modifyParams.put("id", createResponse.getLineId());
+        modifyParams.put("id", String.valueOf(createResponse.getLineId()));
         modifyParams.put("name", modifyName);
         modifyParams.put("color", "blue");
 

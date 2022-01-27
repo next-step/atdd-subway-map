@@ -34,7 +34,7 @@ public class StationQueryService {
                 station.getCreatedDate(), station.getModifiedDate());
     }
 
-    public Station findStationsById(long id) {
+    private Station findStationsById(long id) {
         return stationRepository.findById(id)
                 .orElseThrow(() -> new StationNotFoundException(id));
     }

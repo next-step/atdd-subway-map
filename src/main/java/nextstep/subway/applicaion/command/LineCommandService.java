@@ -2,11 +2,12 @@ package nextstep.subway.applicaion.command;
 
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.applicaion.query.LineQueryService;
-import nextstep.subway.applicaion.query.StationQueryService;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.line.DuplicateLineException;
+import nextstep.subway.exception.station.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +17,14 @@ public class LineCommandService {
 
     private final LineRepository lineRepository;
     private final LineQueryService lineQueryService;
-    private final StationQueryService stationQueryService;
+    private final StationRepository stationRepository;
 
     public LineCommandService(LineRepository lineRepository,
                               LineQueryService lineQueryService,
-                              StationQueryService stationQueryService) {
+                              StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.lineQueryService = lineQueryService;
-        this.stationQueryService = stationQueryService;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -31,8 +32,8 @@ public class LineCommandService {
             throw new DuplicateLineException(request.getName());
         }
 
-        Station upStation = stationQueryService.findStationsById(request.getUpStationId());
-        Station downStation = stationQueryService.findStationsById(request.getDownStationId());
+        Station upStation = findStationsById(request.getUpStationId());
+        Station downStation = findStationsById(request.getDownStationId());
 
         Line line = lineRepository.save(
                 Line.of(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
@@ -48,8 +49,8 @@ public class LineCommandService {
 
     public LineAndSectionResponse addSection(long lineId, SectionRequest request) {
         Line line = lineQueryService.findLineById(lineId);
-        Station upStation = stationQueryService.findStationsById(request.getUpStationId());
-        Station downStation = stationQueryService.findStationsById(request.getDownStationId());
+        Station upStation = findStationsById(request.getUpStationId());
+        Station downStation = findStationsById(request.getDownStationId());
 
         line.addSection(upStation, downStation, request.getDistance());
 
@@ -58,7 +59,7 @@ public class LineCommandService {
 
     public void deleteSection(long lineId, long stationId) {
         Line line = lineQueryService.findLineById(lineId);
-        Station deleteStation = stationQueryService.findStationsById(stationId);
+        Station deleteStation = findStationsById(stationId);
         line.deleteStation(deleteStation);
     }
 
@@ -69,6 +70,11 @@ public class LineCommandService {
 
     public void deleteLine(long id) {
         lineRepository.deleteById(id);
+    }
+
+    private Station findStationsById(long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new StationNotFoundException(id));
     }
 
 }
