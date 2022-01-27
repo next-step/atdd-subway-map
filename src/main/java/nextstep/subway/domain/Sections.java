@@ -1,8 +1,11 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.domain.exception.CannotAddSectionException;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,34 @@ import java.util.List;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<Section> sections = new ArrayList<>();
+
+    public void add(Section section) {
+        if (!sections.isEmpty()) {
+            addableUpStation(section);
+            addableDownStation(section);
+        }
+        sections.add(section);
+    }
+
+    private void addableUpStation(Section section) {
+        Section lastSection = sections.get(sections.size() - 1);
+
+        if (!lastSection.isAddableLastSection(section)) {
+            String lastStationName = lastSection.downStationName();
+            String addUpStationName = section.upStationName();
+            throw new CannotAddSectionException(lastStationName, addUpStationName);
+        }
+    }
+
+    private void addableDownStation(Section section) {
+        Station downStation = section.getDownStation();
+        boolean containsStation = sections.stream()
+                .anyMatch(section1 -> section1.containsStation(downStation));
+        if (containsStation) {
+            throw new CannotAddSectionException(section.downStationName());
+        }
+    }
 
 }

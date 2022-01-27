@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Section extends BaseEntity {
@@ -23,4 +24,58 @@ public class Section extends BaseEntity {
 
     private int distance;
 
+    protected Section() {
+    }
+
+    private Section(Line line, Station upStation, Station downStation, int distance) {
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public static Section of(Line line, Station upStation, Station downStation, int distance) {
+        return new Section(line, upStation, downStation, distance);
+    }
+
+    public boolean isAddableLastSection(Section section) {
+        return this.downStation.equals(section.getUpStation());
+    }
+
+    public String upStationName() {
+        return upStation.getName();
+    }
+
+    public String downStationName() {
+        return downStation.getName();
+    }
+
+    public boolean containsStation(Station station) {
+        return this.upStation.equals(station) || this.downStation.equals(station);
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return distance == section.distance && Objects.equals(id, section.id) && Objects.equals(line, section.line) && Objects.equals(getUpStation(), section.getUpStation()) && Objects.equals(getDownStation(), section.getDownStation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, line, getUpStation(), getDownStation(), distance);
+    }
 }

@@ -2,6 +2,7 @@ package nextstep.subway.ui.exception;
 
 import nextstep.subway.applicaion.exception.DuplicationNameException;
 import nextstep.subway.applicaion.exception.EntityNotFoundException;
+import nextstep.subway.domain.exception.CannotAddSectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,7 +21,12 @@ public class ControllerExceptionHandler {
     public ResponseEntity<String> entityNotFoundException(EntityNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(exception.getMessage());
+    }
 
+    @ExceptionHandler(CannotAddSectionException.class)
+    public ResponseEntity<String> cannotAddSectionException(CannotAddSectionException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
     }
 
 }
