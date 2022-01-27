@@ -29,13 +29,13 @@ public class LineQueryService {
                 .collect(toList());
     }
 
-    public LineAndSectionResponse findLine(Long id) {
+    public LineAndSectionResponse findLine(long id) {
         Line line = findLineById(id);
 
         return createShowLineResponse(line);
     }
 
-    public Line findLineById(Long id) {
+    public Line findLineById(long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException());
     }

@@ -28,13 +28,13 @@ public class StationQueryService {
                 .collect(Collectors.toList());
     }
 
-    public StationResponse showStationById(Long id) {
+    public StationResponse showStationById(long id) {
         Station station = findStationsById(id);
         return new StationResponse(station.getId(), station.getName(),
                 station.getCreatedDate(), station.getModifiedDate());
     }
 
-    public Station findStationsById(Long id) {
+    public Station findStationsById(long id) {
         return stationRepository.findById(id)
                 .orElseThrow(() -> new StationNotFoundException(id));
     }

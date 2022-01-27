@@ -46,7 +46,7 @@ public class LineCommandService {
         );
     }
 
-    public LineAndSectionResponse addSection(Long lineId, SectionRequest request) {
+    public LineAndSectionResponse addSection(long lineId, SectionRequest request) {
         Line line = lineQueryService.findLineById(lineId);
         Station upStation = stationQueryService.findStationsById(request.getUpStationId());
         Station downStation = stationQueryService.findStationsById(request.getDownStationId());
@@ -56,18 +56,18 @@ public class LineCommandService {
         return lineQueryService.createShowLineResponse(line);
     }
 
-    public void deleteSection(Long lineId, Long stationId) {
+    public void deleteSection(long lineId, long stationId) {
         Line line = lineQueryService.findLineById(lineId);
         Station deleteStation = stationQueryService.findStationsById(stationId);
         line.deleteStation(deleteStation);
     }
 
-    public void updateLine(Long id, UpdateLineRequest request) {
+    public void updateLine(long id, UpdateLineRequest request) {
         Line line = lineQueryService.findLineById(id);
         line.updateInfo(request.getName(), request.getColor());
     }
 
-    public void deleteLine(Long id) {
+    public void deleteLine(long id) {
         lineRepository.deleteById(id);
     }
 
