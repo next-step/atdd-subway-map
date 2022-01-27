@@ -1,8 +1,7 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.*;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +15,27 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    public LineService(final LineRepository lineRepository) {
+    public LineService(final LineRepository lineRepository, final StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
     public LineSaveResponse saveLine(final LineSaveRequest lineRequest) {
         validateDuplicatedLineName(lineRequest.getName());
         validateDuplicatedLineColor(lineRequest.getColor());
         final Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+
+        final Station upStation = findByStationById(lineRequest.getUpStationId());
+        final Station downStation = findByStationById(lineRequest.getDownStationId());
+        line.addSection(new Section(line, upStation, downStation, lineRequest.getDistance()));
         return new LineSaveResponse(line);
+    }
+
+    private Station findByStationById(final Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new EntityNotFoundException("empty station occurred"));
     }
 
     @Transactional(readOnly = true)

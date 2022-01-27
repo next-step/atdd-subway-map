@@ -58,6 +58,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철역(상행) 생성을 요청 하고
+     * And 새로운 지하철역(하행) 생성을 요청 하고
+     * When 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 성공한다.
+     */
+    @DisplayName("지하철역이 없을 때, 지하철 노선 생성")
+    @Test
+    void createLineExcludeStation() {
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_생성을_요청한다(신분당선, 빨강색, "1", "2", 강남_역삼_거리);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.body().jsonPath().get("message").equals("empty station occurred"))
+        );
+    }
+
+    /**
      * When 공백 이름을 가진 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 실패한다.
      */
