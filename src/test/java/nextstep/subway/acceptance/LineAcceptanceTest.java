@@ -5,22 +5,15 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static nextstep.subway.acceptance.LineSteps.*;
 import static nextstep.subway.acceptance.StationSteps.*;
-import static nextstep.subway.utils.RestAssuredRequest.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    private static final String LINES_PATH = "/lines";
-
     private Long 강남역id;
     private Long 양재역id;
     private Long 판교역id;
@@ -36,43 +29,21 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void initParam() {
-        강남역id = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
-        양재역id = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
-        판교역id = 지하철역_생성_요청(판교역).jsonPath().getLong("id");
-        역삼역id = 지하철역_생성_요청(역삼역).jsonPath().getLong("id");
+        강남역id = 지하철_노선_id(지하철역_생성_요청(강남역));
+        양재역id = 지하철_노선_id(지하철역_생성_요청(양재역));
+        판교역id = 지하철_노선_id(지하철역_생성_요청(판교역));
+        역삼역id = 지하철_노선_id(지하철역_생성_요청(역삼역));
 
-        신분당선 = new HashMap<>();
-        신분당선.put("name", "신분당선");
-        신분당선.put("color", "bg-red-600");
-        신분당선.put("upStationId", String.valueOf(강남역id));
-        신분당선.put("downStationId", String.valueOf(양재역id));
-        신분당선.put("distance", String.valueOf(1600));
-
-        이호선 = new HashMap<>();
-        이호선.put("name", "2호선");
-        이호선.put("color", "bg-green-600");
-        이호선.put("upStationId", String.valueOf(강남역id));
-        이호선.put("downStationId", String.valueOf(역삼역id));
-        이호선.put("distance", String.valueOf(1600));
+        신분당선 = 지하철_노선_파라미터("신분당선", "bg-red-600", 강남역id, 양재역id, 1600);
+        이호선 = 지하철_노선_파라미터("2호선", "bg-green-600", 강남역id, 역삼역id, 1600);
 
         구분당선 = new HashMap<>();
         구분당선.put("name", "구분당선");
         구분당선.put("color", "bg-blue-600");
 
-        양재_판교_구간 = new HashMap<>();
-        양재_판교_구간.put("upStationId", String.valueOf(양재역id));
-        양재_판교_구간.put("downStationId", String.valueOf(판교역id));
-        양재_판교_구간.put("distance", String.valueOf(12700));
-
-        역삼_판교_구간 = new HashMap<>();
-        역삼_판교_구간.put("upStationId", String.valueOf(역삼역id));
-        역삼_판교_구간.put("downStationId", String.valueOf(판교역id));
-        역삼_판교_구간.put("distance", String.valueOf(999));
-
-        양재_강남_구간 = new HashMap<>();
-        양재_강남_구간.put("upStationId", String.valueOf(양재역id));
-        양재_강남_구간.put("downStationId", String.valueOf(강남역id));
-        양재_강남_구간.put("distance", String.valueOf(999));
+        양재_판교_구간 = 구간_파라미터(양재역id, 판교역id, 12700);
+        역삼_판교_구간 = 구간_파라미터(역삼역id, 판교역id, 999);
+        양재_강남_구간 = 구간_파라미터(양재역id, 강남역id, 999);
     }
 
     /**
@@ -199,8 +170,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 구간_등록_요청(uri, 양재_판교_구간);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_등록_요청(신분당선id, 양재_판교_구간);
 
         // then
         구간_등록됨(response, 양재_판교_구간);
@@ -219,8 +190,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 구간_등록_요청(uri, 역삼_판교_구간);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_등록_요청(신분당선id, 역삼_판교_구간);
 
         // then
         구간_등록_실패됨(response);
@@ -239,8 +210,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = 구간_등록_요청(uri, 양재_강남_구간);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_등록_요청(신분당선id, 양재_강남_구간);
 
         // then
         구간_등록_실패됨(response);
@@ -258,11 +229,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     void removeSection() {
         // given
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
-        String uri = createResponse.header("Location");
-        구간_등록되어_있음(uri, 양재_판교_구간);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        구간_등록되어_있음(신분당선id, 양재_판교_구간);
 
         // when
-        ExtractableResponse<Response> response = 구간_제거_요청(uri, 판교역id);
+        ExtractableResponse<Response> response = 구간_제거_요청(신분당선id, 판교역id);
 
         // then
         구간_제거됨(response);
@@ -280,11 +251,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     void removeSectionFailNotLastStation() {
         // given
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
-        String uri = createResponse.header("Location");
-        구간_등록되어_있음(uri, 양재_판교_구간);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        구간_등록되어_있음(신분당선id, 양재_판교_구간);
 
         // when
-        ExtractableResponse<Response> response = 구간_제거_요청(uri, 양재역id);
+        ExtractableResponse<Response> response = 구간_제거_요청(신분당선id, 양재역id);
 
         // then
         구간_제거_실패됨(response);
@@ -301,113 +272,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     void removeSectionFailUniqueSection() {
         // given
         ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
-        String uri = createResponse.header("Location");
 
         // when
-        ExtractableResponse<Response> response = 구간_제거_요청(uri, 양재역id);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_제거_요청(신분당선id, 양재역id);
 
         // then
         구간_제거_실패됨(response);
-    }
-
-    private void 구간_제거_실패됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.BAD_REQUEST);
-    }
-
-    private void 구간_제거됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.NO_CONTENT);
-    }
-
-    private ExtractableResponse<Response> 구간_제거_요청(String uri, Long stationId) {
-        return delete(uri + "/sections?stationId=" + stationId);
-    }
-
-    private ExtractableResponse<Response> 구간_등록되어_있음(String uri, Map<String, String> params) {
-        ExtractableResponse<Response> response = 구간_등록_요청(uri, params);
-        구간_등록됨(response, params);
-        return response;
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
-        return post(params, LINES_PATH);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
-        return get(LINES_PATH);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(String uri) {
-        return get(uri);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(String uri, Map<String, String> params) {
-        return put(uri, params);
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_삭제_요청(String uri) {
-        return delete(uri);
-    }
-
-    private ExtractableResponse<Response> 구간_등록_요청(String uri, Map<String, String> params) {
-        return post(params, uri + "/sections");
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(Map<String, String> params) {
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
-        지하철_노선_생성됨(response, params);
-
-        return response;
-    }
-
-    private void 지하철_노선_생성됨(ExtractableResponse<Response> response, Map<String, String> params) {
-        응답_요청_확인(response, HttpStatus.CREATED);
-        assertThat(response.header("Location")).isNotBlank();
-        assertThat(response.jsonPath().getList("stations.id", String.class)).containsExactly(params.get("upStationId"), params.get("downStationId"));
-    }
-
-    private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> ... createResponses) {
-        List<String> createdNames = Arrays.stream(createResponses)
-                .map(createResponse -> createResponse.jsonPath().getString("name"))
-                .collect(Collectors.toList());
-        List<String> createdColors = Arrays.stream(createResponses)
-                .map(createResponse -> createResponse.jsonPath().getString("color"))
-                .collect(Collectors.toList());
-
-        응답_요청_확인(response, HttpStatus.OK);
-        assertThat(response.jsonPath().getList("name")).isEqualTo(createdNames);
-        assertThat(response.jsonPath().getList("color")).isEqualTo(createdColors);
-    }
-
-    private void 지하철_노선_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> createResponse) {
-        응답_요청_확인(response, HttpStatus.OK);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(createResponse.jsonPath().getString("name"));
-    }
-
-    private void 지하철_노선_수정됨(ExtractableResponse<Response> response, ExtractableResponse<Response> showResponse, Map<String, String> updateParams) {
-        응답_요청_확인(response, HttpStatus.OK);
-        응답_요청_확인(showResponse, HttpStatus.OK);
-        assertThat(showResponse.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
-        assertThat(showResponse.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
-    }
-
-    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.NO_CONTENT);
-    }
-
-    private void 지하철_노선_이름_중복됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.CONFLICT);
-    }
-
-    private void 구간_등록됨(ExtractableResponse<Response> response, Map<String, String> params) {
-        응답_요청_확인(response, HttpStatus.CREATED);
-        assertThat(response.header("Location")).isNotBlank();
-    }
-
-    private void 구간_등록_실패됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.BAD_REQUEST);
-    }
-
-    private void 응답_요청_확인(ExtractableResponse<Response> response, HttpStatus httpStatus) {
-        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 }
