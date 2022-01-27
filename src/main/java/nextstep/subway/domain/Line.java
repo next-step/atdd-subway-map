@@ -2,10 +2,9 @@ package nextstep.subway.domain;
 
 import org.apache.logging.log4j.util.Strings;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -14,6 +13,9 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     protected Line() {
     }
