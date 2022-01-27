@@ -8,7 +8,9 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
@@ -67,4 +69,12 @@ public class Sections {
         }
     }
 
+    public List<Station> stations() {
+        List<Station> stations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        stations.add(getLastSection().getDownStation());
+
+        return Collections.unmodifiableList(stations);
+    }
 }

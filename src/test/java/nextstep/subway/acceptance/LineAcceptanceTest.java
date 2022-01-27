@@ -9,6 +9,8 @@ import java.util.List;
 
 import static nextstep.subway.acceptance.AssertSteps.httpStatusCode_검증;
 import static nextstep.subway.acceptance.LineFixture.*;
+import static nextstep.subway.acceptance.StationFixture.서울역;
+import static nextstep.subway.acceptance.StationFixture.시청역;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
@@ -98,11 +100,13 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         int statusCode = response.statusCode();
         String findLineName = response.jsonPath().get("name");
+        List<String> namesOfStations = response.jsonPath().getList("stations.name");
 
         //then
         assertAll(
                 () -> httpStatusCode_검증(statusCode, OK.value()),
-                () -> assertThat(findLineName).isEqualTo(일호선_이름)
+                () -> assertThat(findLineName).isEqualTo(일호선_이름),
+                () -> assertThat(namesOfStations).containsExactly(시청역, 서울역)
         );
     }
 

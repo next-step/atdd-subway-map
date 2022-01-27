@@ -81,10 +81,11 @@ public class LineService {
         return stationRepository.findById(stationId).orElseThrow(EntityExistsException::new);
     }
 
-    public void removeSection(Long lineId, Long stationId) {
+    public LineResponse removeSection(Long lineId, Long stationId) {
         Line line = findById(lineId);
         Station station = findStationById(stationId);
 
         line.removeSection(station);
+        return LineResponse.from(line);
     }
 }

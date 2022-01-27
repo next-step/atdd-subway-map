@@ -1,5 +1,7 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
@@ -8,12 +10,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static nextstep.subway.acceptance.AssertSteps.httpStatusCode_검증;
 import static nextstep.subway.acceptance.LineFixture.이호선_색상;
 import static nextstep.subway.acceptance.LineFixture.이호선_이름;
 import static nextstep.subway.acceptance.SectionSteps.*;
 import static nextstep.subway.acceptance.StationFixture.*;
 import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_요청_응답;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("노선 구간 관리 기능")
@@ -144,12 +150,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
         SectionRequest 선릉역_삭제_요청 = SectionRequest.valueOf(선릉역.getId(), 이호선.getId());
 
         //when
-        int statusCode = 구간_삭제_요청_응답_HttpStatusCode(선릉역_삭제_요청);
+        ExtractableResponse<Response> response = SectionSteps.구간_삭제_요청(선릉역_삭제_요청);
+
+        int statusCode = response.statusCode();
+        List<String> namesOfStations = response.jsonPath().getList("stations.name");
+
 
         //then
-        httpStatusCode_검증(statusCode, NO_CONTENT.value());
-
+        assertAll(
+                () -> httpStatusCode_검증(statusCode, OK.value()),
+                () -> assertThat(namesOfStations).containsExactly(StationFixture.강남역, StationFixture.역삼역)
+        );
     }
-
 
 }
