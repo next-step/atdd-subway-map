@@ -8,8 +8,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvice {
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> argumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(LineException.class)
+    public ResponseEntity<ErrorResponse> lineException(LineException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(StationException.class)
+    public ResponseEntity<ErrorResponse> stationExcpetion(StationException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(SectionException.class)
+    public ResponseEntity<ErrorResponse> sectionExcpetion(SectionException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
     }
 }
