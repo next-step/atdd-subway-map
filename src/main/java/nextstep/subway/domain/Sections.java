@@ -12,6 +12,7 @@ import java.util.List;
 public class Sections {
     private static String DOWN_STATION_REGISTERED_ERROR_MASSAGE = "하행역만 상행역으로 등록될 수 있습니다.";
     private static String SECTION_STATION_REGISTERED_ERROR_MASSAGE = "이미 구간에 등록되어 있습니다.";
+    private static String NOT_LAST_STATION_ERROR_MASSAGE = "마지막 하행역이 아닙니다.";
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
@@ -40,6 +41,26 @@ public class Sections {
         if (matchAllStation(downStation)) {
             throw new SectionException(SECTION_STATION_REGISTERED_ERROR_MASSAGE);
         }
+    }
+
+    public void deleteStation(Station station) {
+        validationDeleteStation(station);
+        Section lastSection = sections.get(lastIndex());
+        sections.remove(lastSection);
+    }
+
+    private void validationDeleteStation(Station station) {
+        if (!isLastDownStation(station)) {
+            throw new SectionException(NOT_LAST_STATION_ERROR_MASSAGE);
+        }
+    }
+
+    private boolean isLastDownStation(Station station) {
+        return sections.get(lastIndex()).getDownStation().equals(station);
+    }
+
+    private int lastIndex() {
+        return sections.size() - 1;
     }
 
     private boolean matchDownStation(Station station) {

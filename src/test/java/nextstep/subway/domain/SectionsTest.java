@@ -4,9 +4,7 @@ import nextstep.subway.exception.SectionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 public class SectionsTest extends SectionFixData {
     private static int DEFAULT_DISTANCE = 5;
@@ -29,7 +27,6 @@ public class SectionsTest extends SectionFixData {
                 .hasMessage("하행역만 상행역으로 등록될 수 있습니다.");
     }
 
-
     @DisplayName("이미 구간에 등록된 역은 하행역 등록 시 예외")
     @Test
     void matchAllStationException() {
@@ -46,4 +43,40 @@ public class SectionsTest extends SectionFixData {
                 .isInstanceOf(SectionException.class)
                 .hasMessage("이미 구간에 등록되어 있습니다.");
     }
+
+    @DisplayName("마지막 구간 하행역 제거")
+    @Test
+    void lastSectionDelete() {
+        // given
+        Station station1 = createStation("강남역");
+        Station station2 = createStation("역삼역");
+        Station station3 = createStation("잠실역");
+
+        Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
+
+        // when
+        sections.deleteStation(station3);
+
+        // then
+        assertThat(sections.getStations().size()).isEqualTo(2);
+    }
+
+
+    @DisplayName("마지막 구간 하행역이 아니면 제거 요청 시 예외")
+    @Test
+    void notLastSectionDeleteException() {
+        // given
+        Station station1 = createStation("강남역");
+        Station station2 = createStation("역삼역");
+        Station station3 = createStation("잠실역");
+
+        Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
+
+        // when, then
+        assertThatThrownBy(() -> sections.deleteStation(station3))
+                .isInstanceOf(SectionException.class)
+                .hasMessage("이미 구간에 등록되어 있습니다.");
+    }
+
+
 }

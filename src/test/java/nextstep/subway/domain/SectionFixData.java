@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SectionFixData {
@@ -18,6 +19,6 @@ public class SectionFixData {
     }
 
     public static Sections createSections(Section ...sections) {
-        return new Sections(Arrays.asList(sections));
+        return new Sections(new ArrayList<>(Arrays.asList(sections)));
     }
 }
