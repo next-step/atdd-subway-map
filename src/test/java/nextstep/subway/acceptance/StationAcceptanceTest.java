@@ -1,5 +1,7 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.utils.StationAcceptanceTest.지하철역_생성;
+import static nextstep.subway.utils.StationAcceptanceTest.지하철역_조회;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
