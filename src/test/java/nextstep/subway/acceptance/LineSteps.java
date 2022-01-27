@@ -90,6 +90,10 @@ public class LineSteps {
                 .extract();
     }
 
+    public static String 지하철_노선이_구간_등록되어_있음(final String lineId, final String upStationId, final String downStationId, final int distance) {
+        return 지하철_노선_구간_등록을_요청한다(lineId, upStationId, downStationId, distance).jsonPath().get("id").toString();
+    }
+
     public static ExtractableResponse<Response> 지하철_노선_구간_등록을_요청한다(final String lineId, final String upStationId, final String downStationId, final int distance) {
         final Map<String, String> params = 지하철_노선_구간_데이터를_만든다(upStationId, downStationId, distance);
         return RestAssured.given().log().all()
@@ -108,5 +112,15 @@ public class LineSteps {
         params.put(DOWN_STATION_ID, downStationId);
         params.put(DISTANCE, String.valueOf(distance));
         return params;
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_구간을_삭제_요청한다(final String uri) {
+        return RestAssured.given().log().all()
+                .accept(ContentType.ANY)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete(String.format(uri))
+                .then().log().all()
+                .extract();
     }
 }
