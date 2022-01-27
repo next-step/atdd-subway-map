@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.SectionDetailResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 
 import javax.persistence.*;
@@ -38,7 +39,7 @@ public class Line extends BaseEntity {
     }
 
     public List<StationResponse> getStationDtoList() {
-        return sections.getStations().stream()
+        return sections.getAllStations().stream()
                 .map(StationResponse::from)
                 .collect(Collectors.toList());
     }
@@ -58,5 +59,21 @@ public class Line extends BaseEntity {
         if (color != null && !this.color.equals(color)) {
             this.color = color;
         }
+    }
+
+    public boolean hasStation(Station downStation) {
+        return sections.hasStation(downStation);
+    }
+
+    public boolean hasAnyMatchedDownStation(Station station) {
+        return sections.hasAnyMatchedDownStation(station);
+    }
+
+    public boolean isEmptySections() {
+        return sections.isEmpty();
+    }
+
+    public List<SectionDetailResponse> getSectionsResponse() {
+        return sections.getSectionDetailResponseList();
     }
 }

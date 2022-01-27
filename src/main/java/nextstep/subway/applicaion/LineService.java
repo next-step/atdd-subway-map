@@ -1,12 +1,8 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineDetailResponse;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.*;
 import nextstep.subway.handler.error.custom.BusinessException;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.handler.error.custom.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,24 +14,24 @@ import static nextstep.subway.handler.error.custom.ErrorCode.*;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository,
+                       SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new BusinessException(FOUND_DUPLICATED_NAME);
         }
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        Line savedLine = lineRepository.save(new Line(request.getName(), request.getColor()));
+
+        return LineResponse.from(savedLine);
     }
 
     @Transactional(readOnly = true)
@@ -47,12 +43,11 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineDetailResponse getLine(Long id) {
-        return LineDetailResponse.from(lineRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID)));
+        return LineDetailResponse.from(findLineById(id));
     }
 
     public void patchLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
+        Line line = findLineById(id);
         line.modify(lineRequest.getName(), lineRequest.getColor());
     }
 
@@ -61,5 +56,30 @@ public class LineService {
             throw new BusinessException(LINE_NOT_FOUND_BY_ID);
         }
         lineRepository.deleteById(id);
+    }
+
+    public SectionResponse createSection(Long lineId, Long upStationId, Long downStationId, int distance) {
+        return SectionResponse.from(sectionRepository.save(
+                        Section.of(
+                                findLineById(lineId),
+                                findStationById(upStationId),
+                                findStationById(downStationId),
+                                distance)
+                )
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<SectionDetailResponse> getSections(Long id) {
+        return findLineById(id).getSectionsResponse();
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
+    }
+
+    private Station findStationById(Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new BusinessException(STATION_NOT_FOUND_BY_ID));
     }
 }
