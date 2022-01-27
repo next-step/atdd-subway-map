@@ -89,4 +89,24 @@ public class LineSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_구간_등록을_요청한다(final String lineId, final String upStationId, final String downStationId, final int distance) {
+        final Map<String, String> params = 지하철_노선_구간_데이터를_만든다(upStationId, downStationId, distance);
+        return RestAssured.given().log().all()
+                .body(params)
+                .accept(ContentType.ANY)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(String.format("/lines/%s/sections", lineId))
+                .then().log().all()
+                .extract();
+    }
+
+    private static Map<String, String> 지하철_노선_구간_데이터를_만든다(final String upStationId, final String downStationId, final int distance) {
+        final Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", String.valueOf(distance));
+        return params;
+    }
 }

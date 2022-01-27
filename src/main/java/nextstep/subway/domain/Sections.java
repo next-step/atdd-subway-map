@@ -25,7 +25,7 @@ public class Sections {
 
     private void validateSection(final Section section) {
         if (validateUpStation(section.getUpStation()) || validateDownStation(section.getDownStation())) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("invalid station occurred");
         }
     }
 
