@@ -9,5 +9,5 @@ public interface StationRepository extends JpaRepository<Station, Long> {
     @Override
     List<Station> findAll();
 
-    Station findByName(String name);
+    Optional<Station> findByName(String name);
 }

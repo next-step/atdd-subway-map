@@ -27,24 +27,24 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
-    public Long getDownStationId() {
-        return getStationIds().get(getStationIds().size() - 1);
+    public Station getDownStation() {
+        return getStations().get(getStations().size() - 1);
     }
 
     public Section getLastSection() {
         return sections.get(sections.size() - 1);
     }
 
-    public boolean isRegisteredStation(Long stationId) {
-        return getStationIds().contains(stationId);
+    public boolean isRegisteredStation(Station station) {
+        return getStations().contains(station);
     }
 
     public boolean canDelete() {
         return sections.size() > 1;
     }
 
-    public boolean isDownStation(Long stationId) {
-        return stationId == getDownStationId();
+    public boolean isDownStation(Station station) {
+        return getDownStation().equals(station);
     }
 
 }

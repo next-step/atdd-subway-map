@@ -2,6 +2,8 @@ package nextstep.subway.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface LineRepository extends JpaRepository<Line, Long> {
-    Line findByName(String name);
+    Optional<Line> findByName(String name);
 }

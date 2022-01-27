@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
@@ -12,14 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@RequiredArgsConstructor
 @Transactional
+@Service
 public class StationService {
-    private StationRepository stationRepository;
-
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+    private final StationRepository stationRepository;
 
     public StationResponse saveStation(StationRequest stationRequest) {
         validateDuplicateStationName(stationRequest.getName());
@@ -37,9 +35,9 @@ public class StationService {
     }
 
     private void validateDuplicateStationName(String name) {
-       if(stationRepository.findByName(name) != null) {
-           throw new BadRequestException("중복된 역 이름입니다.");
-       }
+        stationRepository.findByName(name).ifPresent(station -> {
+            throw new BadRequestException("해당 역은 이미 존재합니다.");
+        });
     }
 
     @Transactional(readOnly = true)
@@ -57,12 +55,7 @@ public class StationService {
 
     public Station findById(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("존재하지 않는 역입니다."));
-    }
-
-    public Station findById(Long id, String exceptionMessage) {
-        return stationRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException(exceptionMessage));
+                .orElseThrow(() -> new BadRequestException("존재하지 않는 역입니다. stationId: " + id));
     }
 
 }
