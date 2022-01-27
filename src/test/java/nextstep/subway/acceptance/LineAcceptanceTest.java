@@ -192,13 +192,16 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 삭제")
     @Test
-    void deleteLine() {
-        //given
-        ExtractableResponse<Response> createResponse = RequestMethod.post(DEFAULT_PATH, param1);
+    void deleteLineTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
 
         // when
-        ExtractableResponse<Response> response = RequestMethod.delete(
-             DEFAULT_PATH + "/" + createResponse.jsonPath().getString("id"));
+        ExtractableResponse<Response> response = 노선_삭제(DEFAULT_PATH + "/" + 신분당선_id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
