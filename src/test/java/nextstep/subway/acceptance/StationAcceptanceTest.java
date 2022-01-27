@@ -38,8 +38,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationStepFeature.callCreateStation(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        StationStepFeature.checkCreateStation(response);
     }
 
     /**
@@ -57,7 +56,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationStepFeature.callCreateStation(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        StationStepFeature.checkCreateStationFail(response);
     }
 
     /**
@@ -76,9 +75,9 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationStepFeature.callFindStationByUri(location);
 
         // then
-        String stationName = response.jsonPath().getString("name");
+        StationStepFeature.checkFindStation(response);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        String stationName = response.jsonPath().getString("name");
         assertThat(stationName).isEqualTo(GANGNAM_STATION_NAME);
     }
 
@@ -98,7 +97,9 @@ class StationAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = StationStepFeature.callFindAllStation();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        // then
+        StationStepFeature.checkFindStation(response);
+
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(GANGNAM_STATION_NAME, YEOKSAM_STATION_NAME);
     }
@@ -119,7 +120,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationStepFeature.callDeleteStation(location);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        StationStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
 }

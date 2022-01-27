@@ -4,10 +4,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.StationResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class StationStepFeature {
 
@@ -71,6 +74,23 @@ public class StationStepFeature {
         result.put(CREATE_STATION_NAME_PARAM_KEY, name);
 
         return result;
+    }
+
+    public static void checkCreateStation(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    public static void checkCreateStationFail(ExtractableResponse<Response> response) {
+        checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    public static void checkFindStation(ExtractableResponse<Response> response) {
+        checkResponseStatus(response.statusCode(), HttpStatus.OK);
+    }
+
+    public static void checkResponseStatus(int statusCode, HttpStatus httpStatus) {
+        assertThat(statusCode).isEqualTo(httpStatus.value());
     }
 
 }
