@@ -9,7 +9,6 @@ import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,13 +27,19 @@ public class LineService {
         if (lineRepository.existsByName(request.getName())) {
             throw new DuplicationNameException();
         }
-        Station upStation = findStationById(request.getUpStationId());
-        Station downStation = findStationById(request.getDownStationId());
+
         Line line = new Line(request.getName(), request.getColor());
-        Section section = Section.of(line, upStation, downStation, request.getDistance());
+        Section section = createSection(request, line);
         line.addSection(section);
         lineRepository.save(line);
+
         return LineResponse.from(line);
+    }
+
+    private Section createSection(LineRequest request, Line line) {
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+        return Section.of(line, upStation, downStation, request.getDistance());
     }
 
     @Transactional(readOnly = true)
@@ -78,7 +83,7 @@ public class LineService {
     }
 
     private Station findStationById(Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(EntityExistsException::new);
+        return stationRepository.findById(stationId).orElseThrow(EntityNotFoundException::new);
     }
 
     public LineResponse removeSection(Long lineId, Long stationId) {
