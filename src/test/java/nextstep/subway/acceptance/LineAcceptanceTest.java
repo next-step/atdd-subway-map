@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.step.LineStep.구간_삭제;
 import static nextstep.subway.step.LineStep.구간_생성;
 import static nextstep.subway.step.LineStep.노선_목록_조회;
 import static nextstep.subway.step.LineStep.노선_변경;
@@ -334,6 +335,114 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then 구간 등록에 실패 한다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * scenario: 지하철 노선에 구간을 제거 성공 (지하철 노선에 등록된 마지막 역(하행 종점역)만 제거)
+     * given 역이 3개 이상인 지하철 노선이 등록되어 있고
+     * when  해당 지하철 노선의 하행 종점역을 제거 요청하면
+     * then  노선 구간이 제거 된다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간을 제거 성공 (지하철 노선에 등록된 마지막 역(하행 종점역)만 제거)")
+    void deleteSectionTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+        Long 신촌역_id = 역_생성(신촌역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
+
+        SectionRequest request = new SectionRequest(역삼역_id, 신촌역_id, DEFAULT_DISTANCE);
+
+        구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections", request);
+
+        // when
+        ExtractableResponse<Response> response = 구간_삭제(DEFAULT_PATH + "/" + 신분당선_id + "/sections",
+            "stationId", 신촌역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * scenario: 지하철 노선에 구간을 제거 실패 (지하철 노선의 구간이 2개인 경우)
+     *      given 역이 2개인 지하철 노선이 등록되어 있고
+     *      when  해당 지하철노선의 하행 종점역을 제거 요청하면
+     *      then  노선 구간이 제거가 실패 한다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간을 제거 실패 (지하철 노선의 구간이 2개인 경우)")
+    void failDeleteSectionTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
+
+        // when
+        ExtractableResponse<Response> response = 구간_삭제(DEFAULT_PATH + "/" + 신분당선_id + "/sections",
+            "stationId", 역삼역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * scenario: 지하철 노선에 구간을 제거 실패 (하행 종점역이 아닌 역을 제거)
+     *      given 역이 3개 이상인 지하철 노선이 등록되어 있고
+     *      when  해당 지하철 노선의 하행 종점역이 아닌 역을 제거 요청하면
+     *      then  노선 구간이 제거가 실패 한다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간을 제거 실패 (하행 종점역이 아닌 역을 제거)")
+    void failDeleteSectionNotLastStationTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+        Long 신촌역_id = 역_생성(신촌역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
+
+        SectionRequest request = new SectionRequest(역삼역_id, 신촌역_id, DEFAULT_DISTANCE);
+
+        구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections", request);
+
+        // when
+        ExtractableResponse<Response> response = 구간_삭제(DEFAULT_PATH + "/" + 신분당선_id + "/sections",
+            "stationId", 역삼역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * scenario: 등록된 구간을 통해 역 목록 조회 기능 given 역이 2개 이상인 지하철 노선이 등록되어 있고 when  해당 노선의 구간을 요청하면 then 해당
+     * 노선과 노선에 등록된 구간을 순서대로 정렬하여 상행 종점부터 하행 종점까지 목록을 응답 한다
+     */
+    @Test
+    @DisplayName("등록된 구간을 통해 역 목록 조회 기능")
+    void showStationsTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+        Long 신촌역_id = 역_생성(신촌역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
+
+        SectionRequest request = new SectionRequest(역삼역_id, 신촌역_id, DEFAULT_DISTANCE);
+
+        구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections", request);
+
+        // when
+        ExtractableResponse<Response> response = 노선_목록_조회(DEFAULT_PATH);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
 }
