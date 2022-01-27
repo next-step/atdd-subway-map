@@ -41,12 +41,12 @@ public class Sections {
         return sections.get(sections.size() - 1);
     }
 
-    private void addableDownStation(Section section) {
-        Station downStation = section.getDownStation();
+    private void addableDownStation(Section addSection) {
+        Station downStation = addSection.getDownStation();
         boolean containsStation = sections.stream()
-                .anyMatch(section1 -> section1.containsStation(downStation));
+                .anyMatch(section -> section.containsStation(downStation));
         if (containsStation) {
-            throw new CannotAddSectionException(section.downStationName());
+            throw new CannotAddSectionException(addSection.downStationName());
         }
     }
 
