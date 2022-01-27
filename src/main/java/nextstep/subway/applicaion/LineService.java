@@ -52,7 +52,7 @@ public class LineService {
             // 4. line을 save한다.
             lineRepository.save(line);
 
-            return LineSaveResponse.createLineResponse(line, section);
+            return LineSaveResponse.createLineResponse(line);
         }
 
         throw new DuplicateRegistrationRequestException(String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));

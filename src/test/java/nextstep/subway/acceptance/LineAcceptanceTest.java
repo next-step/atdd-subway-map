@@ -55,7 +55,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_생성_응답.header("Location")).isEqualTo("/lines/1");
     }
 
-
     /**
      * Given 지하철역 생성을 요청하고,
      * Given 새로운 지하철역 생성을 요청하고,
