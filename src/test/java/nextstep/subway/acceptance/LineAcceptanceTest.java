@@ -116,22 +116,28 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
-     * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
+     * Then 두 노선이 포함된 지하철
+     * 노선 목록을 응답받는다
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
-    void getLines() {
-        //given
-        RequestMethod.post(DEFAULT_PATH, param1);
-        RequestMethod.post(DEFAULT_PATH, param2);
+    void getLinesTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
 
-        //when
-        ExtractableResponse<Response> response = RequestMethod.get(DEFAULT_PATH);
+        노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id, DEFAULT_DISTANCE);
 
-        //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).contains(PARAM1_NAME_VALUE, PARAM2_NAME_VALUE);
-        assertThat(response.jsonPath().getList("color")).contains(PARAM1_COLOR_VALUE, PARAM2_COLOR_VALUE);
+        Long 신촌역_id = 역_생성(신촌역).jsonPath().getLong(JSON_PATH_ID);
+        Long 교대역_id = 역_생성(교대역).jsonPath().getLong(JSON_PATH_ID);
+
+        노선_생성(수인분당선, SUINBUNDANGLINE_COLOR, 신촌역_id, 교대역_id, DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = 노선_목록_조회(DEFAULT_PATH);
+
+        // then
+        assertThat(response.jsonPath().getList("name")).containsExactly(신분당선, 수인분당선);
     }
 
     /**
