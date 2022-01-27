@@ -16,7 +16,7 @@ public class SectionValidator {
     }
 
     public static void properDelete(Section section, Station station) {
-        if(!section.hasDownStation(station)) {
+        if (!section.hasDownStation(station)) {
             throw new BusinessException(STATION_IS_NOT_LATEST);
         }
     }
