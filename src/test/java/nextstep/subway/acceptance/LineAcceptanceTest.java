@@ -54,9 +54,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank()
-                .isEqualTo("/lines/1");
+        LineStepFeature.checkCreateLine(response);
     }
 
     /**
@@ -74,7 +72,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        LineStepFeature.checkCreateLineFail(response);
     }
 
     /**
@@ -97,12 +95,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
 
         // then
+        LineStepFeature.checkFindLine(response);
+
         List<LineAndSectionResponse> responses = response.jsonPath()
                 .getList(".", LineAndSectionResponse.class);
         LineAndSectionResponse response1 = responses.get(0);
         LineAndSectionResponse response2 = responses.get(1);
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         assertThat(response1.getLineName()).isEqualTo(SHINBUNDANG_LINE_NAME);
         assertThat(response2.getLineName()).isEqualTo(NUMBER2_LINE_NAME);
@@ -130,8 +128,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineName = response.jsonPath()
                 .getString("name");
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.body()).isNotNull();
+        LineStepFeature.checkFindLine(response);
         assertThat(lineName).contains(SHINBUNDANG_LINE_NAME);
     }
 
@@ -155,6 +152,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> responseUpdate = LineStepFeature.callUpdateLines(modifyParams);
 
         // then
+        LineStepFeature.checkResponseStatus(responseUpdate.statusCode(), HttpStatus.NO_CONTENT);
+
         ExtractableResponse<Response> response = LineStepFeature.callGetLines();
         List<String> lineNames = response.jsonPath()
                 .getList(".", LineAndSectionResponse.class)
@@ -162,7 +161,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .map(LineAndSectionResponse::getLineName)
                 .collect(toList());
 
-        assertThat(responseUpdate.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(lineNames).contains(modifyName);
         assertThat(lineNames).doesNotContain(SHINBUNDANG_LINE_NAME);
     }
@@ -184,7 +182,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callUpdateLines(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -202,7 +200,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callDeleteLines(createResponse.getLineId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -221,9 +219,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank()
-                .isEqualTo("/lines/1");
+        LineStepFeature.checkCreateLine(response);
     }
 
     /**
@@ -242,7 +238,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), nonhyeon.getId(), gangnam.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -261,7 +257,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), gangnam.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -280,7 +276,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), nonhyeon.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
 
@@ -299,7 +295,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -318,7 +314,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -4,10 +4,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineAndSectionResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineStepFeature {
 
@@ -153,6 +156,23 @@ public class LineStepFeature {
         result.put(CREATE_LINE_DISTANCE_PARAM_KEY, String.valueOf(distance));
 
         return result;
+    }
+
+    public static void checkCreateLine(ExtractableResponse<Response> response) {
+        checkResponseStatus(response.statusCode(), HttpStatus.CREATED);
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    public static void checkCreateLineFail(ExtractableResponse<Response> response) {
+        checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    public static void checkFindLine(ExtractableResponse<Response> response) {
+        checkResponseStatus(response.statusCode(), HttpStatus.OK);
+    }
+
+    public static void checkResponseStatus(int statusCode, HttpStatus httpStatus) {
+        assertThat(statusCode).isEqualTo(httpStatus.value());
     }
 
 }
