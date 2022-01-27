@@ -62,7 +62,6 @@ public class Line extends BaseEntity {
         if (!sections.contains(section)) {
             sections.add(section);
         }
-        section.applyToLine(this);
     }
 
     public Section findSection(Long stationId) {
