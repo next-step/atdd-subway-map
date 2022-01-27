@@ -101,10 +101,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .getList(".", LineAndSectionResponse.class);
         LineAndSectionResponse response1 = responses.get(0);
         LineAndSectionResponse response2 = responses.get(1);
-
         assertThat(response1.getLineName()).isEqualTo(SHINBUNDANG_LINE_NAME);
         assertThat(response2.getLineName()).isEqualTo(NUMBER2_LINE_NAME);
-
         assertThat(response1.getStations().size()).isEqualTo(3);
         assertThat(response2.getStations().size()).isEqualTo(2);
     }
@@ -125,10 +123,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineStepFeature.callGetLines(location);
 
         // then
+        LineStepFeature.checkFindLine(response);
+
         String lineName = response.jsonPath()
                 .getString("name");
-
-        LineStepFeature.checkFindLine(response);
         assertThat(lineName).contains(SHINBUNDANG_LINE_NAME);
     }
 
@@ -160,7 +158,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .stream()
                 .map(LineAndSectionResponse::getLineName)
                 .collect(toList());
-
         assertThat(lineNames).contains(modifyName);
         assertThat(lineNames).doesNotContain(SHINBUNDANG_LINE_NAME);
     }
