@@ -322,4 +322,39 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.header("Location")).isNotBlank()
         );
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 하행종점이 아닌 상행역으로 새로운 구간 등록 요청을 하면
+     * Then 지하철 노선에 새로운 구간 추가가 실패한다.
+     */
+    @DisplayName("하행 종점이 아닌 상행역으로 지하철 노선 구간 등록")
+    @Test
+    void addSectionExclude() {
+        final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
+        final String 양재시민의숲역_번호 = 지하철_역_생성_되어있음(양재시민의숲역);
+
+        final ExtractableResponse<Response> lineSaveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
+        final String 신분당선_번호 = lineSaveResponse.jsonPath().get("id").toString();
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("upStationId", 강남역_번호);
+        params.put("downStationId", 양재시민의숲역_번호);
+        params.put("distance", String.valueOf(양재_양재시민의숲_거리));
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .accept(ContentType.ANY)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post(String.format("/lines/%s/sections", 신분당선_번호))
+                .then().log().all()
+                .extract();
+
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.body().jsonPath().get("message").equals("invalid station occurred"))
+        );
+    }
 }
