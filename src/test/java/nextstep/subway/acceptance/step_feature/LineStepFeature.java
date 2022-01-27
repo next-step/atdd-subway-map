@@ -76,7 +76,7 @@ public class LineStepFeature {
                 .body(lineParams)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put(LINE_BASE_URI + "/" + String.valueOf(lineParams.get("id")))
+                .put(LINE_BASE_URI + "/" + lineParams.get("id"))
                 .then()
                 .log()
                 .all()
