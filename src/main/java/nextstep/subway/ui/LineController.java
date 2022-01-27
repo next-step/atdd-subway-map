@@ -3,6 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.request.LineRequest;
 import nextstep.subway.applicaion.dto.response.LineResponse;
+import nextstep.subway.applicaion.dto.response.LineSaveResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,16 @@ public class LineController {
         this.lineService = lineService;
     }
 
+    @PostMapping("/test")
+    public ResponseEntity<LineSaveResponse> createLineTest(@RequestBody LineRequest lineRequest) {
+        LineSaveResponse response = lineService.saveLineTest(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
+    }
+
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         LineResponse response = lineService.saveLine(lineRequest);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/lines/" + response.getId())).build();
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,5 +62,15 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> createSection(@PathVariable("id") Long lineId, @RequestBody LineRequest lineRequest) {
+        // 1. lineId로 해당 라인을 조회한다.
+        // 2. 상행역을 생성한다.
+        // 3. 하행역을 생성한다.
+        // 4. 구간을 생성한다.
+        // 5. 구간을 저장한다.
+        return null;
     }
 }

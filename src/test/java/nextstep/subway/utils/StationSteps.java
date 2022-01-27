@@ -28,7 +28,7 @@ public class StationSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역_삭제_요청(String stationId) {
+    public static ExtractableResponse<Response> 지하철역_삭제_요청(Long stationId) {
         return RestAssured
                 .given().log().all()
                 .when().delete("/stations/" + stationId)
@@ -36,8 +36,8 @@ public class StationSteps {
                 .extract();
     }
 
-    public static String getStationId(ExtractableResponse<Response> response) {
+    public static Long getStationId(ExtractableResponse<Response> response) {
         String[] split = response.header("Location").split("/");
-        return split[split.length - 1];
+        return Long.valueOf(split[split.length - 1]);
     }
 }

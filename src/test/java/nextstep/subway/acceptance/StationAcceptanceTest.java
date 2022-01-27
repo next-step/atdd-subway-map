@@ -28,7 +28,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
 
         // then
-        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.FOUND.value());
+        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(지하철역_생성_응답.header("Location")).isNotBlank();
     }
 
@@ -63,7 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
 
         // when
-        String stationId = StationSteps.getStationId(지하철역_생성_응답);
+        Long stationId = StationSteps.getStationId(지하철역_생성_응답);
         ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
 
         // then
@@ -77,7 +77,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 존재하지_않는_지하철역_삭제() {
         // when
-        String stationId = "2";
+        Long stationId = 2L;
         ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
 
         // then

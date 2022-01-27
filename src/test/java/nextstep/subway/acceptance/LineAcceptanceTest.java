@@ -4,6 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.utils.LineSteps;
+import nextstep.subway.utils.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -23,31 +24,63 @@ class LineAcceptanceTest extends AcceptanceTest {
     String 색상_5호선 = "보라색";
 
     /**
-     * When 지하철 노선 생성을 요청하면
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청한다.
+     * When 지하철 노선 생성을 요청하면,
      * Then 지하철 노선 생성이 성공한다.
+     * Then 생성된 노선에는 상행 종점과 하행 종점 번호와 번호 간 거리도 생성된다.
      */
     @Test
     void 지하철_노선_생성() {
+        // given
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+        System.out.println("가양역_ID = " + 가양역_ID);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        System.out.println("증미역_ID = " + 증미역_ID);
+
+        int distance = 10;
+
         // when
-        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 지하철_노선_생성_응답 =
+                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // then
-        assertThat(지하철_노선_생성_응답.statusCode()).isEqualTo(HttpStatus.FOUND.value());
+//        assertThat(지하철_노선_생성_응답.statusCode()).isEqualTo(HttpStatus.FOUND.value());
+        assertThat(지하철_노선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(지하철_노선_생성_응답.header("Location")).isEqualTo("/lines/1");
     }
 
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * Given 새로운 지하철 노선 생성을 요청 하고
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
+     * Given 지하철 노선 생성을 요청 하고,
+     * Given 새로운 지하철 노선 생성을 요청 하고,
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
      */
     @Test
     void 지하철_노선_목록_조회() {
         // given
-        LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
-        LineSteps.지하철_노선_생성_요청(노선_5호선, 색상_5호선);
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+
+        ExtractableResponse<Response> 화곡역_생성_응답 = StationSteps.지하철역_생성_요청("화곡역");
+        Long 화곡역_ID = StationSteps.getStationId(화곡역_생성_응답);
+
+        ExtractableResponse<Response> 까치산역_생성_응답 = StationSteps.지하철역_생성_요청("까치산역");
+        Long 까치산역_ID = StationSteps.getStationId(까치산역_생성_응답);
+
+        int distance = 10;
+
+        LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
+        LineSteps.지하철_노선_생성_요청(노선_5호선, 색상_5호선, 화곡역_ID, 까치산역_ID, distance);
 
         // when
         ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = LineSteps.지하철_노선_목록_조회_요청();
@@ -61,14 +94,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
+     * Given 지하철 노선 생성을 요청 하고,
      * When 생성한 지하철 노선 조회를 요청 하면
      * Then 생성한 지하철 노선을 응답받는다
      */
     @Test
     void 지하철_노선_조회() {
         // given
-        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+
+        int distance = 10;
+
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // when
         String lineId = LineSteps.getLineId(지하철_노선_생성_응답);
@@ -82,13 +125,24 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 지하철 노선도를 조회하면
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
+     * When 지하철 노선도를 조회하면,
      * Then 지하철 노선 조회가 실패한다.
      */
     @Test
     void 존재하지_않는_노선_조회() {
         // given
-        LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+
+        int distance = 10;
+
+        // given
+        LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // when
         String lineId = "2";
@@ -101,14 +155,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 지하철 노선의 정보 수정을 요청 하면
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
+     * Given 지하철 노선 생성을 요청 하고,
+     * When 지하철 노선의 정보 수정을 요청 하면,
      * Then 지하철 노선의 정보 수정은 성공한다.
      */
     @Test
     void 지하철_노선_수정() {
         // given
-        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+        System.out.println("가양역_ID = " + 가양역_ID);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        System.out.println("증미역_ID = " + 증미역_ID);
+
+        int distance = 10;
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
+
 
         // when
         String lineId = LineSteps.getLineId(지하철_노선_생성_응답);
@@ -141,6 +207,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
      * Given 지하철 노선 생성을 요청 하고
      * When 생성한 지하철 노선 삭제를 요청 하면
      * Then 생성한 지하철 노선 삭제가 성공한다.
@@ -148,7 +216,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제() {
         // given
-        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+        System.out.println("가양역_ID = " + 가양역_ID);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        System.out.println("증미역_ID = " + 증미역_ID);
+
+        int distance = 10;
+
+        ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // when
         String lineId = LineSteps.getLineId(지하철_노선_생성_응답);
@@ -178,6 +256,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
      * Given 지하철 노선 생성을 요청하고,
      * When 같은 이름으로 지하철 노선 생성을 요청하면,
      * Then 지하철 노선 생성이 실패한다.
@@ -185,10 +265,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 중복_이름으로_지하철_노선_생성() {
         // given
-        LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+        System.out.println("가양역_ID = " + 가양역_ID);
+
+        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청("증미역");
+        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        System.out.println("증미역_ID = " + 증미역_ID);
+
+        int distance = 10;
+
+        LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // when
-        ExtractableResponse<Response> 지하철_노선_중복_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선);
+        ExtractableResponse<Response> 지하철_노선_중복_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // then
         assertThat(지하철_노선_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
