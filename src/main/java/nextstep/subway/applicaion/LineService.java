@@ -55,7 +55,7 @@ public class LineService {
     }
 
     private void existsStation(Long upStationId) {
-        if (upStationId == null || !stationRepository.existsById(upStationId)) {
+        if (upStationId == null) {
             throw new NotExistedStationException("[notExist]:stationId");
         }
     }
