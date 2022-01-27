@@ -1,19 +1,19 @@
 package nextstep.subway.applicaion.dto;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class LineRequest {
 
     private String name;
     private String color;
 
-    @NotEmpty
+    @NotNull
     private Long upStationId;
 
-    @NotEmpty
+    @NotNull
     private Long downStationId;
 
-    @NotEmpty
+    @NotNull
     private int distance;
 
     protected LineRequest() {

@@ -78,6 +78,41 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * scenario: 지하철 노선에 구간 등록 성공 (새로 등록할 구간의 상행역은 기존 구간의 하행이된다)
+     * Given 지하철 노선에 구간이 등록되어 있고
+     * When  기존 노선의 하행역이 새로운 구간의 상행역 & 새로운 노선의 하행역은 등록되어 있지 않은 역이면
+     * Then  구간 등록에 성공 한다
+     */
+    @Test
+    @DisplayName("지하철 노선 구간 등록 성공 테스트")
+    void addSectionTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        ExtractableResponse<Response> response = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE);
+
+        String 신분당선_id = response.jsonPath().getString(JSON_PATH_ID);
+
+        // when
+        Long 교대역_id = 역_생성(교대역).jsonPath().getLong(JSON_PATH_ID);
+
+        SectionRequest sectionRequest = new SectionRequest(역삼역_id, 교대역_id, DEFAULT_DISTANCE);
+
+        ExtractableResponse<Response> sectionRegisterResponse = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(sectionRequest)
+            .when()
+            .post(DEFAULT_PATH + "/" + 신분당선_id + "/sections")
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(sectionRegisterResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
