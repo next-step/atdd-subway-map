@@ -14,12 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineStepDefinition {
 
-    public static Long 상행_지하철역_생성_요청(String upStationName) {
-        return 지하철역_생성_요청(upStationName).body().jsonPath().getLong("id");
-    }
-
-    public static Long 하행_지하철역_생성_요청(String downStationName) {
-        return 지하철역_생성_요청(downStationName).body().jsonPath().getLong("id");
+    public static Long 지하철역_생성_요청_id_반환(String name) {
+        return 지하철역_생성_요청(name).body().jsonPath().getLong("id");
     }
 
     public static Map<String, String> 지하철_노선_파라미터_생성(

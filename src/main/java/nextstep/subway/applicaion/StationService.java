@@ -43,11 +43,14 @@ public class StationService {
 
     private void checkDuplicated(String name) {
         stationRepository.findByName(name).ifPresent(s -> {
-            throw new EntityDuplicateException();
+            throw new EntityDuplicateException(name);
         });
     }
 
     public Station findStationById(Long id) {
-        return stationRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return stationRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException(id);
+                });
     }
 }

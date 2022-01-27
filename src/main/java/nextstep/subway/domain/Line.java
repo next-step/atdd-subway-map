@@ -1,8 +1,9 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.error.exception.InvalidValueException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,27 +27,17 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public boolean isValidNewSection(Long upStationId, Long downStationId) {
-        return sections.isEmpty() ||
-                doesMatchLastDownStation(upStationId) &&
-                doesNotContains(downStationId);
+    public void validateNewSection(Long upStationId, Long downStationId) {
+        if (!sections.isEmpty() &&
+                doesNotMatchLastDownStation(upStationId) ||
+                doesContains(downStationId)) {
+            throw new InvalidValueException();
+        }
     }
 
     public void sortedSections() {
         Section firstSection = getFirstSection();
-        sections.remove(firstSection);
-        sections.add(0, firstSection);
-
-        for (int i = 0; i < sections.size() - 1; i++) {
-            Station downStation = sections.get(i).getDownStation();
-            for (int j = i + 1; j < sections.size(); j++) {
-                Station upStation = sections.get(j).getUpStation();
-                if (downStation.equals(upStation)) {
-                    Collections.swap(sections, i + 1, j);
-                    break;
-                }
-            }
-        }
+        sections = new Sections(sections).sorted(firstSection);
     }
 
     private Section getFirstSection() {
@@ -67,14 +58,14 @@ public class Line extends BaseEntity {
                 .getDownStation();
     }
 
-    private boolean doesNotContains(Long downStationId) {
-        return sections.stream().noneMatch(s ->
+    private boolean doesContains(Long downStationId) {
+        return sections.stream().anyMatch(s ->
                 downStationId.equals(s.getUpStation().getId()) ||
                 downStationId.equals(s.getDownStation().getId()));
     }
 
-    private boolean doesMatchLastDownStation(Long upStationId) {
-        return upStationId.equals(getLastDownStation().getId());
+    private boolean doesNotMatchLastDownStation(Long upStationId) {
+        return !upStationId.equals(getLastDownStation().getId());
     }
 
     public void addSection(Section section) {
@@ -95,9 +86,21 @@ public class Line extends BaseEntity {
         sections.remove(section);
     }
 
-    public boolean isPossibleToRemove(Section section) {
-        return sections.size() > 1 &&
-                section.getDownStation().equals(getLastDownStation());
+    public void validatePossibleToRemove(Section section) {
+        if (sections.size() <= 1 ||
+                !section.getDownStation().equals(getLastDownStation())) {
+            throw new InvalidValueException(section.getId());
+        }
+    }
+
+    public List<Station> getStations() {
+        sortedSections();
+
+        List<Station> stations = new ArrayList<>();
+        stations.add(sections.get(0).getUpStation());
+        sections.forEach(s -> stations.add(s.getDownStation()));
+
+        return stations;
     }
 
     public Long getId() {
@@ -119,15 +122,5 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() {
         return sections;
-    }
-
-    public List<Station> getStations() {
-        sortedSections();
-
-        List<Station> stations = new ArrayList<>();
-        stations.add(sections.get(0).getUpStation());
-        sections.forEach(s -> stations.add(s.getDownStation()));
-
-        return stations;
     }
 }

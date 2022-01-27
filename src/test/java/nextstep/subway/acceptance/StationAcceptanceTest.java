@@ -1,22 +1,25 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static nextstep.subway.acceptance.StationStepDefinition.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+    String 강남역 = "강남역";;
+    ExtractableResponse<Response> createResponse;
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        createResponse = 지하철역_생성_요청(강남역);
+    }
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -25,12 +28,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
-        // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
-
         // then
-        지하철역_생성_완료(response);
-        assertThat(response.header("Location")).isNotBlank();
+        지하철역_생성_완료(createResponse);
+        assertThat(createResponse.header("Location")).isNotBlank();
     }
 
     /**
@@ -43,9 +43,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        String 강남역 = "강남역";
         String 역삼역 = "역삼역";
-        지하철역_생성_요청(강남역);
         지하철역_생성_요청(역삼역);
 
         // when
@@ -64,9 +62,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
-        // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청("강남역");
-
         // when
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = 지하철역_삭제_요청(uri);
@@ -84,10 +79,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철역 생성")
     @Test
     void createStationWithDuplicateName() {
-        // given
-        String 강남역 = "강남역";
-        지하철역_생성_요청(강남역);
-
         // when
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역);
 
