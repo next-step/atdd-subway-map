@@ -117,6 +117,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).isEqualTo(LineRequestBuilder.DEFAULT_LINE_NAME);
         assertThat(response.jsonPath().getString("color")).isEqualTo(LineRequestBuilder.DEFAULT_LINE_COLOR);
+        assertThat(response.jsonPath().getString("stations")).contains(UP_STATION_NAME, DOWN_STATION_NAME);
     }
 
     /**
