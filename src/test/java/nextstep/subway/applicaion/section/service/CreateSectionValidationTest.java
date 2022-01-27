@@ -5,7 +5,6 @@ import nextstep.subway.applicaion.section.domain.Section;
 import nextstep.subway.applicaion.section.exception.DownStationInvalidException;
 import nextstep.subway.applicaion.section.exception.UpStationInvalidException;
 import nextstep.subway.applicaion.station.domain.Station;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,54 +16,47 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CreateSectionValidationTest {
 
-	SectionValidation sectionValidation;
-
 	static Stream<Arguments> provideInvalidDownStationSectionParameter() {
-		final Line 신분당선 = Line.of("신분당선", "red");
-		final Station 강남역 = Station.of("강남역");
-		final Station 판교역 = Station.of("판교역");
-		final Station 양재역 = Station.of("양재역");
+        final Line 신분당선 = Line.of("신분당선", "red");
+        final Station 강남역 = Station.of("강남역");
+        final Station 판교역 = Station.of("판교역");
+        final Station 양재역 = Station.of("양재역");
 
-		final Section 강남_판교_구간 = Section.of(강남역, 판교역, 10);
-		final Section 양재_판교_구간 = Section.of(양재역, 판교역, 10);
+        final Section 강남_판교_구간 = Section.of(강남역, 판교역, 10);
+        final Section 양재_판교_구간 = Section.of(양재역, 판교역, 10);
 
-		// 상행 종점역과 / 하행 종점역을 추가
-		신분당선.addSection(강남_판교_구간);
+        // 상행 종점역과 / 하행 종점역을 추가
+        신분당선.addSection(강남_판교_구간);
 
-		return Stream.of(
-				Arguments.of(
-						신분당선,
-						양재_판교_구간.getDownStation()
-				)
-		);
+        return Stream.of(
+                Arguments.of(
+                        신분당선,
+                        양재_판교_구간
+                )
+        );
 	}
 
 	static Stream<Arguments> provideInvalidUpStationSectionParameter() {
-		final Line 신분당선 = Line.of("신분당선", "red");
-		final Station 강남역 = Station.of("강남역");
-		final Station 양재역 = Station.of("양재역");
-		final Station 판교역 = Station.of("판교역");
-		final Station 정자역 = Station.of("정자역");
-		final Section 강남_양재_구간 = Section.of(강남역, 양재역, 10);
-		final Section 양재_정자_구간 = Section.of(양재역, 정자역, 10);
+        final Line 신분당선 = Line.of("신분당선", "red");
+        final Station 강남역 = Station.of("강남역");
+        final Station 양재역 = Station.of("양재역");
+        final Station 판교역 = Station.of("판교역");
+        final Station 정자역 = Station.of("정자역");
+        final Section 강남_양재_구간 = Section.of(강남역, 양재역, 10);
+        final Section 양재_정자_구간 = Section.of(양재역, 정자역, 10);
 
-		// 양재역이 신분당선의 하행 종점역이 아님
-		final Section 양재_판교_구간 = Section.of(양재역, 판교역, 10);
+        // 양재역이 신분당선의 하행 종점역이 아님
+        final Section 양재_판교_구간 = Section.of(양재역, 판교역, 10);
 
-		신분당선.addSection(강남_양재_구간);
-		신분당선.addSection(양재_정자_구간);
+        신분당선.addSection(강남_양재_구간);
+        신분당선.addSection(양재_정자_구간);
 
-		return Stream.of(
-				Arguments.of(
-						신분당선,
-						양재_판교_구간.getUpStation()
+        return Stream.of(
+                Arguments.of(
+                        신분당선,
+						양재_판교_구간
 				)
 		);
-	}
-
-	@BeforeEach
-	void setUp() {
-		sectionValidation = new SectionValidation();
 	}
 
 	/**
@@ -74,10 +66,9 @@ class CreateSectionValidationTest {
 	@DisplayName("구간 등록시 하행역 오류")
 	@ParameterizedTest
 	@MethodSource("provideInvalidDownStationSectionParameter")
-	void invalidDownStationTest(Line 신분당선, Station 판교역) {
-		assertThatThrownBy(() -> sectionValidation.validateCreateDownStation(신분당선, 판교역))
-				.isInstanceOf(DownStationInvalidException.class)
-				.describedAs(판교역.getName());
+	void invalidDownStationTest(Line 신분당선, Section 양재_판교_구간) {
+		assertThatThrownBy(() -> 신분당선.addSection(양재_판교_구간))
+				.isInstanceOf(DownStationInvalidException.class);
 	}
 
 	/**
@@ -87,8 +78,8 @@ class CreateSectionValidationTest {
 	@DisplayName("구간 등록시 상행역 오류")
 	@ParameterizedTest
 	@MethodSource("provideInvalidUpStationSectionParameter")
-	void invalidUpStationTest(Line 신분당선, Station 양재역) {
-		assertThatThrownBy(() -> sectionValidation.validateCreateUpStation(신분당선, 양재역))
+	void invalidUpStationTest(Line 신분당선, Section 양재_판교_구간) {
+		assertThatThrownBy(() -> 신분당선.addSection(양재_판교_구간))
 				.isInstanceOf(UpStationInvalidException.class);
 	}
 

@@ -6,6 +6,8 @@ import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.line.dto.LineResponse;
 import nextstep.subway.applicaion.line.repository.LineRepository;
 import nextstep.subway.applicaion.section.domain.Section;
+import nextstep.subway.applicaion.section.dto.SectionRequest;
+import nextstep.subway.applicaion.section.dto.SectionResponse;
 import nextstep.subway.applicaion.station.domain.Station;
 import nextstep.subway.applicaion.station.repository.StationRepository;
 import org.springframework.stereotype.Service;
@@ -30,37 +32,22 @@ public class LineService {
 
 		final Line line = request.toEntity();
 
-		final Line sectionAddedLine = addSection(line, request);
+		final Line sectionAddedLine = addLastStationSection(line, request);
 
 		return LineResponse.from(
 				lineRepository.save(
 						sectionAddedLine));
 	}
 
-	private Line addSection(Line line, LineRequest request) {
-		if (request.isStationNotProvided()) {
-			return line;
-		}
-		final Station upStation = getUpStation(request);
-		final Station downStation = getDownStation(request);
+	public SectionResponse saveSection(long lineId, SectionRequest sectionRequest) {
+		Line line = findLineById(lineId);
+		Station downStation = getStation(sectionRequest.getDownStationId());
+		Station upStation = getStation(sectionRequest.getUpStationId());
+		Section createdSection = Section.of(upStation, downStation, sectionRequest.getDistance());
 
-		line.addSection(Section.of(upStation, downStation, request.getDistance()));
-		return line;
-	}
-
-	private Station getUpStation(LineRequest request) {
-		return stationRepository.findById(request.getUpStationId())
-				.orElseThrow(EntityNotFoundException::new);
-	}
-
-	private Station getDownStation(LineRequest request) {
-		return stationRepository.findById(request.getDownStationId())
-				.orElseThrow(EntityNotFoundException::new);
-	}
-
-	private Line findLineById(long id) {
-		return lineRepository.findById(id)
-				.orElseThrow(EntityNotFoundException::new);
+		line.addSection(createdSection);
+		lineRepository.save(line);
+		return SectionResponse.from(line.getLastSection());
 	}
 
 	public LineResponse updateLine(long id, LineRequest request) {
@@ -77,6 +64,27 @@ public class LineService {
 		lineRepository.deleteById(id);
 	}
 
+	private Line addLastStationSection(Line line, LineRequest request) {
+		if (request.isStationNotProvided()) {
+			return line;
+		}
+		final Station upStation = getStation(request.getUpStationId());
+		final Station downStation = getStation(request.getDownStationId());
+
+		line.addSection(Section.of(upStation, downStation, request.getDistance()));
+		return line;
+	}
+
+	private Station getStation(long stationId) {
+		return stationRepository.findById(stationId)
+				.orElseThrow(EntityNotFoundException::new);
+	}
+
+	private Line findLineById(long id) {
+		return lineRepository.findById(id)
+				.orElseThrow(EntityNotFoundException::new);
+	}
+
 	private void validateUpdateLine(long id, LineRequest line) {
 		if (lineRepository.existsByNameAndIdIsNot(line.getName(), id)) {
 			throw new UniqueKeyExistsException(line.getName());
@@ -88,4 +96,11 @@ public class LineService {
 			throw new UniqueKeyExistsException(line.getName());
 		}
 	}
+
+	public void deleteSection(long lineId, long toRemoveLastDownStationId) {
+		final Line line = findLineById(lineId);
+		Station toRemoveLastDownStation = getStation(toRemoveLastDownStationId);
+		line.removeSection(toRemoveLastDownStation);
+	}
+
 }

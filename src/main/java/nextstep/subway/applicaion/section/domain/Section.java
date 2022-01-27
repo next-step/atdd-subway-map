@@ -37,10 +37,7 @@ public class Section {
 	}
 
 	public static Section of(Station upStation, Station downStation, int distance) {
-		final Section section = new Section(upStation, downStation, distance);
-		downStation.addDownStationSection(section);
-		upStation.addUpStationSection(section);
-		return section;
+		return new Section(upStation, downStation, distance);
 	}
 
 	public Long getId() {
@@ -78,27 +75,11 @@ public class Section {
 		return upStation.getId();
 	}
 
-	public boolean isOnLine(Line otherLine) {
-		return otherLine.equals(line);
-	}
-
-	public void setDownStation(Station station) {
-		downStation = station;
-	}
-
-	public void setUpStation(Station station) {
-		upStation = station;
+	public boolean hasStation(Station station) {
+		return upStation.equals(station) || downStation.equals(station);
 	}
 
 	public boolean isDownStation(Station station) {
 		return downStation.equals(station);
-	}
-
-	public boolean isUpStation(Station station) {
-		return upStation.equals(station);
-	}
-
-	public boolean hasStation(Station station) {
-		return upStation.equals(station) || downStation.equals(station);
 	}
 }

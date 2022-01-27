@@ -1,12 +1,8 @@
 package nextstep.subway.applicaion.station.domain;
 
 import nextstep.subway.applicaion.domain.BaseEntity;
-import nextstep.subway.applicaion.line.domain.Line;
-import nextstep.subway.applicaion.section.domain.Section;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -18,12 +14,6 @@ public class Station extends BaseEntity {
 
 	@Column(unique = true)
 	private String name;
-
-	@OneToMany(mappedBy = "upStation", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-	private List<Section> upStationSection = new ArrayList<>();
-
-	@OneToMany(mappedBy = "downStation", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-	private List<Section> downStationSection = new ArrayList<>();
 
 	protected Station() {
 	}
@@ -44,13 +34,6 @@ public class Station extends BaseEntity {
 		return name;
 	}
 
-	public boolean isLastDownStation(Line line) {
-		return upStationSection.stream()
-				.noneMatch(section -> section.isOnLine(line))
-				&& downStationSection.stream()
-				.anyMatch(section -> section.isOnLine(line));
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -64,21 +47,4 @@ public class Station extends BaseEntity {
 		return Objects.hash(name);
 	}
 
-	public void addDownStationSection(Section section) {
-		if (!downStationSection.contains(section)) {
-			downStationSection.add(section);
-		}
-		if (!section.isDownStation(this)) {
-			section.setDownStation(this);
-		}
-	}
-
-	public void addUpStationSection(Section section) {
-		if (!upStationSection.contains(section)) {
-			upStationSection.add(section);
-		}
-		if (!section.isUpStation(this)) {
-			section.setUpStation(this);
-		}
-	}
 }

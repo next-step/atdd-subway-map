@@ -41,4 +41,29 @@ public class Sections {
 	public boolean isEmpty() {
 		return sections.isEmpty();
 	}
+
+	public boolean isLastDownStation(Station station) {
+		return getLastDownStation().equals(station);
+	}
+
+	private Station getLastDownStation() {
+		return getLastSection().getDownStation();
+	}
+
+	public void removeSectionOfLastDownStation(Station toRemoveLastDownStation) {
+		Section toRemoveSection = sections.stream()
+				.filter(section -> section.isDownStation(toRemoveLastDownStation))
+				.findFirst()
+				.orElseThrow(IllegalArgumentException::new);
+
+		sections.remove(toRemoveSection);
+	}
+
+	public boolean hasNoSection() {
+		return sections.isEmpty();
+	}
+
+	public Section getLastSection() {
+		return sections.get(sections.size() - 1);
+	}
 }

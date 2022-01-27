@@ -4,6 +4,8 @@ import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.line.dto.LineResponse;
 import nextstep.subway.applicaion.line.service.LineQueryService;
 import nextstep.subway.applicaion.line.service.LineService;
+import nextstep.subway.applicaion.section.dto.SectionRequest;
+import nextstep.subway.applicaion.section.dto.SectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +28,7 @@ public class LineController {
 		final LineResponse line = lineService.saveLine(lineRequest);
 
 		return ResponseEntity
-				.created(getCreateStatusHeader(line))
+				.created(URI.create("/lines/" + line.getId()))
 				.body(line);
 	}
 
@@ -62,8 +64,22 @@ public class LineController {
 				.build();
 	}
 
-	private URI getCreateStatusHeader(LineResponse line) {
-		return URI.create("/lines/" + line.getId());
+	@PostMapping("/lines/{lineId}/sections")
+	public ResponseEntity<SectionResponse> createSection(@PathVariable long lineId, @RequestBody SectionRequest sectionRequest) {
+		SectionResponse sectionResponse = lineService.saveSection(lineId, sectionRequest);
+
+		return ResponseEntity
+				.created(URI.create("/lines/" + lineId + "/section/" + sectionResponse.getId()))
+				.body(sectionResponse);
+	}
+
+	@DeleteMapping("/lines/{lineId}/sections")
+	public ResponseEntity<SectionResponse> removeLine(@PathVariable long lineId, @RequestParam long stationId) {
+		lineService.deleteSection(lineId, stationId);
+
+		return ResponseEntity
+				.noContent()
+				.build();
 	}
 
 }
