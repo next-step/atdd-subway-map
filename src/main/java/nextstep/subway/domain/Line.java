@@ -1,7 +1,10 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.StationResponse;
+
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -10,6 +13,9 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -31,8 +37,10 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Station> getStations() {
-        return null;
+    public List<StationResponse> getStationDtoList() {
+        return sections.getStations().stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList());
     }
 
     public void modify(String name, String color) {
