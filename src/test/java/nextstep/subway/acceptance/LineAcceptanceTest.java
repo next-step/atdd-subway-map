@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.step.LineStep.구간_생성;
 import static nextstep.subway.step.LineStep.노선_목록_조회;
 import static nextstep.subway.step.LineStep.노선_변경;
 import static nextstep.subway.step.LineStep.노선_삭제;
@@ -231,6 +232,108 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+
+    /**
+     * scenario: 지하철 노선에 구간 등록 성공 (새로 등록할 구간의 상행역은 기존 구간의 하행이된다)
+     * given 지하철 노선에 구간이 등록되어 있고
+     * when  기존 노선의 하행역이 새로운 구간의 상행역 & 새로운 노선의 하행역은 등록되어 있지 않은 역이면
+     * then  구간 등록에 성공 한다
+     */
+    @Test
+    @DisplayName("지하철 노선 구간 등록 성공")
+    void registerSectionTest() {
+        // given 지하철 노선에 구간이 등록되어 있고
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+        Long 신촌역_id = 역_생성(신촌역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id, DEFAULT_DISTANCE)
+            .jsonPath().getString(JSON_PATH_ID);
+
+        // when
+        SectionRequest request = new SectionRequest(역삼역_id, 신촌역_id, DEFAULT_DISTANCE);
+        ExtractableResponse<Response> response = 구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections",
+            request);
+
+        // then
+        assertThat(response.jsonPath().getList("stations.name")).containsExactly(강남역, 역삼역, 신촌역);
+    }
+
+    /**
+     * scenario: 지하철 노선에 구간 등록 실패 (기존 노선이 없는 경우)
+     * given
+     * when  추가 할 기존 노선이 없다면
+     * then  구간 등록에 실패 한다
+     */
+    @Test
+    @DisplayName("지하철 노선 구간 등록 실패 (기존 노선이 없는 경우)")
+    void failRegisterNotFoundLineTest() {
+        //given
+        //when
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        SectionRequest request = new SectionRequest(강남역_id, 역삼역_id, DEFAULT_DISTANCE);
+        ExtractableResponse<Response> response = 구간_생성(DEFAULT_PATH + "/" + 1 + "/sections",
+            request);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
+     * scenario: 지하철 노선에 구간 등록 실패 (새로운 구간의 상행역이 기존 노선의 하행역이 아닌 경우)
+     * given 지하철 노선에 구간이 등록되어 있고
+     * when 기존 노선의 하행역이 새로운 구간의 상행역이 아니라면
+     * then  구간 등록에 실패 한다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간 등록 실패 (새로운 구간의 상행역이 기존 노선의 하행역이 아닌 경우)")
+    void failRegisterSectionNotLastStationTest() {
+        // given 지하철 노선에 구간이 등록 되어 있고
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
+
+        // when 기존 노선의 하행역이 아닌 구간을 등록하면
+        SectionRequest request = new SectionRequest(강남역_id, 역삼역_id, DEFAULT_DISTANCE);
+
+        ExtractableResponse<Response> response = 구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections",
+            request);
+
+        // then 구간 등록에 실패 한다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * scenario: 지하철 노선에 구간 등록 실패 (새로 등록할 구간의 하행역이 기존 구간에 존재하는 경우)
+     * given 지하철 노선에 구간이 등록되어 있고
+     * when
+     * 새로운 노선의 하행역이 기존 노선에 등록되어 있다면
+     * then  구간 등록에 실패 한다
+     */
+    @Test
+    @DisplayName("지하철 노선에 구간 등록 실패 (새로 등록할 구간의 하행역이 기존 구간에 존재하는 경우)")
+    void failRegisterSectionAlredyRegistedStationTest() {
+        // given 지하철 노선에 구간이 등록 되어 있고
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
+
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
+
+        // when 등록할 구간의 하행역이 이미 노선에 등록된 역이라면
+        SectionRequest request = new SectionRequest(역삼역_id, 강남역_id, DEFAULT_DISTANCE);
+
+        ExtractableResponse<Response> response = 구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections",
+            request);
+
+        // then 구간 등록에 실패 한다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 }
