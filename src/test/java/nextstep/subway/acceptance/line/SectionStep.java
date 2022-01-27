@@ -1,5 +1,8 @@
 package nextstep.subway.acceptance.line;
 
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
@@ -8,8 +11,6 @@ import io.restassured.specification.RequestSpecification;
 import nextstep.subway.acceptance.AbstractStep;
 import nextstep.subway.line.domain.dto.SectionRequest;
 import nextstep.subway.line.domain.model.Distance;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SectionStep extends AbstractStep {

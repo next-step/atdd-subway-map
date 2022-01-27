@@ -1,18 +1,20 @@
 package nextstep.subway.acceptance.line;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.Arrays;
-import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.station.StationStep;
-import nextstep.subway.line.domain.dto.LineRequest;
-import nextstep.subway.utils.AcceptanceTestThen;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.acceptance.station.StationStep;
+import nextstep.subway.line.domain.dto.LineRequest;
+import nextstep.subway.utils.AcceptanceTestThen;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {

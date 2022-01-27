@@ -8,7 +8,9 @@ public class SectionRequest {
     private long downStationId;
     private Distance distance;
 
-    @JsonCreator
+    private SectionRequest() {
+    }
+
     private SectionRequest(long upStationId, long downStationId, Distance distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;

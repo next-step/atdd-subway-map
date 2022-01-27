@@ -1,18 +1,18 @@
 package nextstep.subway.acceptance.line;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import java.util.Arrays;
-import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.station.StationStep;
-import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.utils.AcceptanceTestThen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.acceptance.station.StationStep;
+import nextstep.subway.common.exception.ErrorMessage;
+import nextstep.subway.utils.AcceptanceTestThen;
 
 @DisplayName("지하철 구간 관리")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -56,6 +56,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> lineFindResponse = lineStep.지하철_노선_조회_요청(1L);
         AcceptanceTestThen.fromWhen(createResponse)
                           .equalsHttpStatus(HttpStatus.CREATED);
+        AcceptanceTestThen.fromWhen(lineFindResponse)
+                          .equalsHttpStatus(HttpStatus.OK);
     }
 
     /**

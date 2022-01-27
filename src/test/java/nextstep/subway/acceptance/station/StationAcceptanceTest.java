@@ -1,22 +1,22 @@
 package nextstep.subway.acceptance.station;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.List;
-import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.common.exception.ColumnName;
-import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.utils.AcceptanceTestThen;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.common.exception.ColumnName;
+import nextstep.subway.common.exception.ErrorMessage;
+import nextstep.subway.utils.AcceptanceTestThen;
+
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-
     @Autowired
     private StationStep stationStep;
 

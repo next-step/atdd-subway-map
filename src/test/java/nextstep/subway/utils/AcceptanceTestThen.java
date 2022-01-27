@@ -1,11 +1,13 @@
 package nextstep.subway.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import org.springframework.http.HttpStatus;
 
 public class AcceptanceTestThen {
     private static final String LOCATION_KEY_IN_HEADER = "Location";

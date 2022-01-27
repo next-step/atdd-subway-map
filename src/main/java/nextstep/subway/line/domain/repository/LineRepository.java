@@ -4,6 +4,7 @@ import java.util.Optional;
 import nextstep.subway.line.domain.model.Line;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
     boolean existsByName(String name);
@@ -13,5 +14,5 @@ public interface LineRepository extends JpaRepository<Line, Long> {
         + " JOIN FETCH s.upStation"
         + " JOIN FETCH s.downStation"
         + " WHERE l.id = :id")
-    Optional<Line> findByIdWithStations(long id);
+    Optional<Line> findByIdWithStations(@Param("id") Long id);
 }

@@ -68,7 +68,7 @@ public class Sections {
     }
 
     private Optional<ErrorMessage> checkRemovable(long sectionId) {
-        if (values.size() <= 1) {
+        if (values.size() <= 1) { // 지하철 구간이 1개 이하 있따면 Exception 발생
             return Optional.of(ErrorMessage.BELOW_MIN_SECTION_SIZE);
         }
         if (!matchLastSectionId(sectionId)) {

@@ -10,7 +10,8 @@ public class LineRequest {
     private Long downStationId;
     private Distance distance;
 
-    @JsonCreator
+    private LineRequest() {}
+
     private LineRequest(String name, String color, long upStationId, long downStationId, Distance distance) {
         this.name = name;
         this.color = color;

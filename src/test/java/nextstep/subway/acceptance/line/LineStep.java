@@ -1,5 +1,8 @@
 package nextstep.subway.acceptance.line;
 
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
@@ -8,8 +11,6 @@ import io.restassured.specification.RequestSpecification;
 import nextstep.subway.acceptance.AbstractStep;
 import nextstep.subway.line.domain.dto.LineRequest;
 import nextstep.subway.line.domain.model.Distance;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 
 @Service
 public class LineStep extends AbstractStep {
@@ -46,18 +47,18 @@ public class LineStep extends AbstractStep {
             RestAssured.given().log().all()
                        .body(request)
                        .contentType(MediaType.APPLICATION_JSON_VALUE);
-        return request(given, Method.PUT, specificUrl(lineId));
+        return request(given, Method.PUT, specificRequestUrl(lineId));
     }
 
     public ExtractableResponse<Response> 지하철_노선_조회_요청(long lineId) {
-        return request(Method.GET, specificUrl(lineId));
+        return request(Method.GET, specificRequestUrl(lineId));
     }
 
     public ExtractableResponse<Response> 지하철_노선_삭제_요청(long lineId) {
-        return request(Method.DELETE, specificUrl(lineId));
+        return request(Method.DELETE, specificRequestUrl(lineId));
     }
 
-    private String specificUrl(long lineId) {
+    private String specificRequestUrl(long lineId) {
         return String.format(SPECIFIC_URL_FORMAT, lineId);
     }
 

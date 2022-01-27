@@ -1,5 +1,8 @@
 package nextstep.subway.acceptance.station;
 
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
@@ -7,8 +10,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import nextstep.subway.acceptance.AbstractStep;
 import nextstep.subway.station.domain.dto.StationRequest;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 
 @Service
 public class StationStep extends AbstractStep {
@@ -34,10 +35,10 @@ public class StationStep extends AbstractStep {
     }
 
     public ExtractableResponse<Response> 지하철_역_삭제_요청(long lineId) {
-        return request(Method.DELETE, requestUrl(lineId));
+        return request(Method.DELETE, specificRequestUrl(lineId));
     }
 
-    private String requestUrl(long lineId) {
+    private String specificRequestUrl(long lineId) {
         return String.format(SPECIFIC_URL_FORMAT, lineId);
     }
 }
