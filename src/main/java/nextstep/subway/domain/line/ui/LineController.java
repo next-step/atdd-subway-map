@@ -1,7 +1,11 @@
-package nextstep.subway.ui;
+package nextstep.subway.domain.line.ui;
 
-import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.line.LineService;
+import nextstep.subway.domain.line.dto.LineDetailResponse;
+import nextstep.subway.domain.line.dto.LineRequest;
+import nextstep.subway.domain.line.dto.LineResponse;
+import nextstep.subway.domain.section.dto.SectionDetailResponse;
+import nextstep.subway.domain.section.dto.SectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/lines")
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;

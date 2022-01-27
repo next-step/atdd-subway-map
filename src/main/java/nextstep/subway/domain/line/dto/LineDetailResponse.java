@@ -1,6 +1,7 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.domain.line.dto;
 
-import nextstep.subway.domain.Line;
+import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.station.dto.StationResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

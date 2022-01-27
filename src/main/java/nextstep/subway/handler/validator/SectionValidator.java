@@ -1,7 +1,7 @@
 package nextstep.subway.handler.validator;
 
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
+import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.station.Station;
 import nextstep.subway.handler.error.custom.BusinessException;
 
 import static nextstep.subway.handler.error.custom.ErrorCode.*;

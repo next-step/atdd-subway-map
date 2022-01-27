@@ -1,6 +1,9 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.section;
 
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.domain.BaseEntity;
+import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.station.dto.StationResponse;
 import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.*;
@@ -8,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Entity
-public class Section extends BaseEntity{
+public class Section extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -67,10 +70,7 @@ public class Section extends BaseEntity{
         if (upStation.equals(downStation)) {
             return true;
         }
-        if (downStation.equals(downStation)) {
-            return true;
-        }
-        return false;
+        return downStation.equals(downStation);
     }
 
     public void push(List<Station> stations) {

@@ -1,7 +1,14 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.domain.line;
 
-import nextstep.subway.applicaion.dto.*;
-import nextstep.subway.domain.*;
+import nextstep.subway.domain.line.dto.LineDetailResponse;
+import nextstep.subway.domain.line.dto.LineRequest;
+import nextstep.subway.domain.line.dto.LineResponse;
+import nextstep.subway.domain.section.Section;
+import nextstep.subway.domain.section.SectionRepository;
+import nextstep.subway.domain.section.dto.SectionDetailResponse;
+import nextstep.subway.domain.section.dto.SectionResponse;
+import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.handler.error.custom.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

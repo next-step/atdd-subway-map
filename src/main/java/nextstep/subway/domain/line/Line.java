@@ -1,7 +1,10 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.line;
 
-import nextstep.subway.applicaion.dto.SectionDetailResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.domain.BaseEntity;
+import nextstep.subway.domain.section.Sections;
+import nextstep.subway.domain.section.dto.SectionDetailResponse;
+import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.station.dto.StationResponse;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,7 +19,7 @@ public class Line extends BaseEntity {
     private String color;
 
     @Embedded
-    private Sections sections = new Sections();
+    private final Sections sections = new Sections();
 
     public Line() {
     }

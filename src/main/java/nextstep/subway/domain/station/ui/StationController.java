@@ -1,8 +1,8 @@
-package nextstep.subway.ui;
+package nextstep.subway.domain.station.ui;
 
-import nextstep.subway.applicaion.StationService;
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.domain.station.StationService;
+import nextstep.subway.domain.station.dto.StationRequest;
+import nextstep.subway.domain.station.dto.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 public class StationController {
-    private StationService stationService;
+    private final StationService stationService;
 
     public StationController(StationService stationService) {
         this.stationService = stationService;

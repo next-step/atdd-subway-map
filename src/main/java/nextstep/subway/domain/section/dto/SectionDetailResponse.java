@@ -1,18 +1,19 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.domain.section.dto;
 
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Section;
+import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.section.Section;
+import nextstep.subway.domain.station.dto.StationResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class SectionDetailResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private List<StationResponse> stations;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<StationResponse> stations;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
     private SectionDetailResponse(Long id, String name, String color, List<StationResponse> stations, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;

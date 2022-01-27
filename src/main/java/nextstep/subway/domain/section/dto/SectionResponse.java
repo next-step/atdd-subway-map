@@ -1,11 +1,11 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.domain.section.dto;
 
-import nextstep.subway.domain.Section;
+import nextstep.subway.domain.section.Section;
 
 public class SectionResponse {
-    private String downStationId;
-    private String upStationId;
-    private int distance;
+    private final String downStationId;
+    private final String upStationId;
+    private final int distance;
 
     private SectionResponse(Long downStationId, Long upStationId, int distance) {
         this.downStationId = String.valueOf(downStationId);

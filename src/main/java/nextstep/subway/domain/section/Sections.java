@@ -1,6 +1,7 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.section;
 
-import nextstep.subway.applicaion.dto.SectionDetailResponse;
+import nextstep.subway.domain.section.dto.SectionDetailResponse;
+import nextstep.subway.domain.station.Station;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
