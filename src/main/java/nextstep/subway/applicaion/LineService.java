@@ -29,17 +29,17 @@ public class LineService {
         }
 
         Line line = new Line(request.getName(), request.getColor());
-        Section section = createSection(request, line);
+        Section section = createSection(line, request.getUpStationId(), request.getDownStationId(), request.getDistance());
         line.addSection(section);
-        lineRepository.save(line);
 
+        lineRepository.save(line);
         return LineResponse.from(line);
     }
 
-    private Section createSection(LineRequest request, Line line) {
-        Station upStation = findStationById(request.getUpStationId());
-        Station downStation = findStationById(request.getDownStationId());
-        return Section.of(line, upStation, downStation, request.getDistance());
+    private Section createSection(Line line, Long upStationId, Long downStationId, int distance) {
+        Station upStation = findStationById(upStationId);
+        Station downStation = findStationById(downStationId);
+        return Section.of(line, upStation, downStation, distance);
     }
 
     @Transactional(readOnly = true)
@@ -71,13 +71,9 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public void addSection(Long lineId, SectionRequest sectionRequest) {
+    public void addSection(Long lineId, SectionRequest request) {
         Line line = findById(lineId);
-
-        Station upStation = findStationById(sectionRequest.getUpStationId());
-        Station downStation = findStationById(sectionRequest.getDownStationId());
-
-        Section section = Section.of(line, upStation, downStation, sectionRequest.getDistance());
+        Section section = createSection(line, request.getUpStationId(), request.getDownStationId(), request.getDistance());
 
         line.addSection(section);
     }
