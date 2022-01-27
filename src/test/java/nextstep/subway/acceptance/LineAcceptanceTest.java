@@ -168,16 +168,21 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 수정")
     @Test
-    void updateLine() {
-        //given
-        ExtractableResponse<Response> createResponse = RequestMethod.post(DEFAULT_PATH, param1);
+    void updateLineTest() {
+        // given
+        Long 강남역_id = 역_생성(강남역).jsonPath().getLong(JSON_PATH_ID);
+        Long 역삼역_id = 역_생성(역삼역).jsonPath().getLong(JSON_PATH_ID);
 
+        String 신분당선_id = 노선_생성(신분당선, SINBUNDANGLINE_COLOR, 강남역_id, 역삼역_id,
+            DEFAULT_DISTANCE).jsonPath().getString(JSON_PATH_ID);
         // when
-        ExtractableResponse<Response> response = RequestMethod.put(
-            DEFAULT_PATH + "/" + createResponse.jsonPath().getString("id"), param2);
+        ChangeLineRequest request = new ChangeLineRequest("뉴 신분당선", "bg-red-700");
 
-        // then
+        ExtractableResponse<Response> response = 노선_변경(DEFAULT_PATH + "/" + 신분당선_id, request);
+
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo("뉴 신분당선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-700");
     }
 
     /**
