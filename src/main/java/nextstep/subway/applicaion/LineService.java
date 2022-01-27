@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static java.util.stream.Collectors.*;
-import static nextstep.subway.common.consts.LineConsts.*;
 
 @Service
 @Transactional
@@ -33,7 +32,7 @@ public class LineService {
 
         Line line = new Line(request.getName(), request.getColor());
         Section section = new Section(upStation, downStation, request.getDistance());
-        line.addSection(section);
+        line.createSection(section);
 
         Line saveLine = lineRepository.save(line);
         return new LineResponse(saveLine);
@@ -61,14 +60,12 @@ public class LineService {
         lineRepository.delete(findLine);
     }
 
-
     public void addSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findLineWithSectionsById(lineId);
         Station upStation = getStationById(request.getUpStationId());
         Station downStation = getStationById(request.getDownStationId());
 
-        Section newSection = line.newSection(upStation,downStation,request);
-        line.addSection(newSection);
+        line.addSection(upStation,downStation,request);
     }
 
     public void deleteSection(Long lineId, Long stationId) {

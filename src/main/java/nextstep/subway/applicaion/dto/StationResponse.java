@@ -32,13 +32,7 @@ public class StationResponse {
     }
 
 
-    public static List<StationResponse> toDtos(List<Section> sections) {
-        Set<Station> stations = new HashSet<>();
-        sections.
-            forEach(section -> {
-                stations.add(section.getUpStation());
-                stations.add(section.getDownStation());
-            });
+    public static List<StationResponse> toDtos(Set<Station> stations) {
         return stations.stream()
                 .map(StationResponse::new)
                 .collect(toList());

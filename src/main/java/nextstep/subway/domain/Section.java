@@ -2,7 +2,9 @@ package nextstep.subway.domain;
 
 import javax.persistence.*;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Section {
@@ -58,4 +60,7 @@ public class Section {
     public List<Long> getStationIds() {
         return Arrays.asList(upStation.getId(),downStation.getId());
     }
+
+
+
 }

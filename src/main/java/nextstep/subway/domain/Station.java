@@ -46,10 +46,10 @@ public class Station extends BaseEntity {
         return !Objects.equals(id, stationId);
     }
 
-    public void notEqualsIn(List<Long> stationIdsInLine) {
-        boolean isEqual = stationIdsInLine.stream()
+    public void notExistsIn(List<Long> stationIdsInLine) {
+        boolean existsInLine = stationIdsInLine.stream()
                 .anyMatch(id -> Objects.equals(id, this.id));
-        if (isEqual){
+        if (existsInLine) {
             throw new IllegalArgumentException("이미 노선에 존재하는 역 입니다. 추가 하실 수 없습니다.");
         }
     }
