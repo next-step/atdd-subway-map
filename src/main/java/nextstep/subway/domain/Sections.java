@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Sections {
     private List<Section> sections;
@@ -10,7 +11,17 @@ public class Sections {
         this.sections = sections;
     }
 
-    public List<Section> sorted(Section firstSection) {
+    private Section getFirstSection() {
+        return sections.stream()
+                .filter(us ->
+                        sections.stream().noneMatch(ds ->
+                                ds.getDownStation().equals(us.getUpStation())))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    public List<Section> sorted() {
+        Section firstSection = getFirstSection();
         sections.remove(firstSection);
         sections.add(0, firstSection);
 

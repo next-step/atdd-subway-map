@@ -36,17 +36,7 @@ public class Line extends BaseEntity {
     }
 
     public void sortedSections() {
-        Section firstSection = getFirstSection();
-        sections = new Sections(sections).sorted(firstSection);
-    }
-
-    private Section getFirstSection() {
-        return sections.stream()
-                .filter(us ->
-                        sections.stream().noneMatch(ds ->
-                                ds.getDownStation().equals(us.getUpStation())))
-                .collect(Collectors.toList())
-                .get(0);
+        sections = new Sections(sections).sorted();
     }
 
     private Station getLastDownStation() {
