@@ -3,7 +3,7 @@ package nextstep.subway.domain;
 import javax.persistence.*;
 
 @Entity
-public class Section {
+public class Section extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,5 +31,33 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public boolean isDownStation(final Station station) {
+        return downStation.equals(station);
+    }
+
+    public boolean isAnyStation(final Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 }

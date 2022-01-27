@@ -304,8 +304,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 신분당선_번호 = lineSaveResponse.jsonPath().get("id").toString();
 
         final Map<String, String> params = new HashMap<>();
-        params.put("downStationId", 양재역_번호);
-        params.put("upStationId", 양재시민의숲역_번호);
+        params.put("upStationId", 양재역_번호);
+        params.put("downStationId", 양재시민의숲역_번호);
         params.put("distance", String.valueOf(양재_양재시민의숲_거리));
 
         final ExtractableResponse<Response> response = RestAssured.given().log().all()

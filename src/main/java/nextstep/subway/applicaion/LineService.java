@@ -33,11 +33,6 @@ public class LineService {
         return new LineSaveResponse(line);
     }
 
-    private Station findByStationById(final Long upStationId) {
-        return stationRepository.findById(upStationId)
-                .orElseThrow(() -> new EntityNotFoundException("empty station occurred"));
-    }
-
     @Transactional(readOnly = true)
     public List<LineReadAllResponse> findAllLine() {
         return lineRepository.findAll().stream()
@@ -46,15 +41,15 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineReadResponse findLine(final Long id) {
-        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public LineReadResponse findLine(final Long lineId) {
+        final Line line = findLineById(lineId);
         return new LineReadResponse(line, Collections.EMPTY_LIST);
     }
 
-    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
+    public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
         validateDuplicatedLineName(lineUpdateRequest.getName());
         validateDuplicatedLineColor(lineUpdateRequest.getColor());
-        final Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        final Line line = findLineById(lineId);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
@@ -72,5 +67,24 @@ public class LineService {
         if (lineRepository.existsByColor(lineColor)) {
             throw new EntityExistsException("duplicate line color occurred");
         }
+    }
+
+    public SectionSaveResponse addSection(final Long lineId, final SectionAddRequest sectionAddRequest) {
+        final Line line = findLineById(lineId);
+        final Station downStation = findByStationById(sectionAddRequest.getDownStationId());
+        final Station upStation = findByStationById(sectionAddRequest.getUpStationId());
+        final Section section = new Section(line, upStation, downStation, sectionAddRequest.getDistance());
+        line.addSection(section);
+        return new SectionSaveResponse(section);
+    }
+
+    private Line findLineById(final Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("empty line occurred"));
+    }
+
+    private Station findByStationById(final Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new EntityNotFoundException("empty station occurred"));
     }
 }
