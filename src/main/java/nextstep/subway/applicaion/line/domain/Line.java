@@ -2,10 +2,10 @@ package nextstep.subway.applicaion.line.domain;
 
 import nextstep.subway.applicaion.domain.BaseEntity;
 import nextstep.subway.applicaion.section.domain.Section;
+import nextstep.subway.applicaion.section.domain.Sections;
 import nextstep.subway.applicaion.station.domain.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,8 +21,8 @@ public class Line extends BaseEntity {
 	@Column(nullable = true)
 	private String color;
 
-	@OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-	private List<Section> sections = new ArrayList<>();
+	@Embedded
+	private Sections sections = new Sections();
 
 	protected Line() {
 	}
@@ -55,7 +55,7 @@ public class Line extends BaseEntity {
 
 	public void addSection(Section section) {
 		if (!sections.contains(section)) {
-			sections.add(section);
+			this.sections.add(section);
 		}
 		if (!this.equals(section.getLine())) {
 			section.setLine(this);
@@ -63,16 +63,15 @@ public class Line extends BaseEntity {
 	}
 
 	public List<Section> getSections() {
-		return sections;
+		return sections.getSections();
 	}
 
 	public boolean hasStation(Station station) {
-		return sections.stream()
-				.anyMatch(section -> section.hasStation(station));
+		return sections.hasStation(station);
 	}
 
 	public boolean hasOnlyOneSection() {
-		return sections.size() == 1;
+		return sections.hasOnlyOneSection();
 	}
 
 	public boolean hasNoSections() {
