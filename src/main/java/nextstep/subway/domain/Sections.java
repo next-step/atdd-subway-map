@@ -13,6 +13,8 @@ public class Sections {
     private static String DOWN_STATION_REGISTERED_ERROR_MASSAGE = "하행역만 상행역으로 등록될 수 있습니다.";
     private static String SECTION_STATION_REGISTERED_ERROR_MASSAGE = "이미 구간에 등록되어 있습니다.";
     private static String NOT_LAST_STATION_ERROR_MASSAGE = "마지막 하행역이 아닙니다.";
+    private static String DELETE_SECTION_SIZE_ERROR_MASSAGE = "구간이 하나라 삭제가 불가능합니다.";
+    private static int MINIMUM_SIZE = 1;
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
@@ -53,6 +55,14 @@ public class Sections {
         if (!isLastDownStation(station)) {
             throw new SectionException(NOT_LAST_STATION_ERROR_MASSAGE);
         }
+
+        if (isMinimumSectionSize()) {
+            throw new SectionException(DELETE_SECTION_SIZE_ERROR_MASSAGE);
+        }
+    }
+
+    private boolean isMinimumSectionSize() {
+        return sections.size() == MINIMUM_SIZE;
     }
 
     private boolean isLastDownStation(Station station) {

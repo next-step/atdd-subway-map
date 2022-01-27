@@ -61,7 +61,6 @@ public class SectionsTest extends SectionFixData {
         assertThat(sections.getStations().size()).isEqualTo(2);
     }
 
-
     @DisplayName("마지막 구간 하행역이 아니면 제거 요청 시 예외")
     @Test
     void notLastSectionDeleteException() {
@@ -73,10 +72,23 @@ public class SectionsTest extends SectionFixData {
         Sections sections = createSections(createSection(station1, station2), createSection(station2, station3));
 
         // when, then
-        assertThatThrownBy(() -> sections.deleteStation(station3))
+        assertThatThrownBy(() -> sections.deleteStation(station1))
                 .isInstanceOf(SectionException.class)
-                .hasMessage("이미 구간에 등록되어 있습니다.");
+                .hasMessage("마지막 하행역이 아닙니다.");
     }
 
+    @DisplayName("구간이 하나면 제거 요청 시 예외")
+    @Test
+    void sectionSizeOneDeleteException() {
+        // given
+        Station station1 = createStation("강남역");
+        Station station2 = createStation("역삼역");
 
+        Sections sections = createSections(createSection(station1, station2));
+
+        // when, then
+        assertThatThrownBy(() -> sections.deleteStation(station2))
+                .isInstanceOf(SectionException.class)
+                .hasMessage("구간이 하나라 삭제가 불가능합니다.");
+    }
 }
