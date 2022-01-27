@@ -1,6 +1,6 @@
 package nextstep.subway.error.exception;
 
-public class BusinessException extends RuntimeException{
+public abstract class BusinessException extends RuntimeException{
     private final ErrorCode errorCode;
 
     public BusinessException(String message, ErrorCode errorCode) {
