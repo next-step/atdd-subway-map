@@ -116,6 +116,10 @@ public class Line extends BaseEntity {
     }
 
     public List<StationResponse> getAllStations() {
+        if (sections.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Station> allStation = sections.
             stream()
             .map(Section::getUpStation)
