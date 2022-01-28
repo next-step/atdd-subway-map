@@ -3,7 +3,10 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.dto.response.LineResponse;
+import nextstep.subway.domain.Station;
 import nextstep.subway.utils.LineSteps;
+import nextstep.subway.utils.SectionSteps;
 import nextstep.subway.utils.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,11 +61,14 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철역 생성을 요청하고,
+     *   AND 새로운 지하철역 생성을 요청하고,
+     *   AND 지하철 노선 생성을 요청 하고,
      * Given 새로운 지하철역 생성을 요청하고,
-     * Given 지하철 노선 생성을 요청 하고,
-     * Given 새로운 지하철 노선 생성을 요청 하고,
-     * When 지하철 노선 목록 조회를 요청 하면
-     * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
+     *   AND 새로운 지하철역 생성을 요청하고,
+     *   AND 지하철 노선 생성을 요청 하고,
+     *  When 지하철 노선 목록 조회를 요청 하면
+     *  Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
+     *  Then 생성한 지하철 노선에 해당하는 역을 구간 기준 오름차순으로 응답한다.
      */
     @Test
     void 지하철_노선_목록_조회() {
@@ -91,16 +97,21 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(지하철_노선_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = 지하철_노선_목록_조회_응답.jsonPath().getList("name");
+        List<String> lineColors = 지하철_노선_목록_조회_응답.jsonPath().getList("color");
         List<String> expectedLineNames = asList(노선_9호선, 노선_5호선);
+        List<String> expectedLineColors = asList(색상_9호선, 색상_5호선);
         assertThat(lineNames).containsAll(expectedLineNames);
+        assertThat(lineColors).containsAll(expectedLineColors);
     }
 
     /**
      * Given 지하철역 생성을 요청하고,
-     * Given 새로운 지하철역 생성을 요청하고,
-     * Given 지하철 노선 생성을 요청 하고,
-     * When 생성한 지하철 노선 조회를 요청 하면
-     * Then 생성한 지하철 노선을 응답받는다
+     *   AND 새로운 지하철역 생성을 요청하고,
+     *   AND 지하철 노선 생성을 요청 하고,
+     *   AND 새로운 지하철역 생성을 요청하고,
+     *   AND 기존의 지하철 노선에 구간 등록을 요청하고,
+     *  When 생성한 지하철 노선 조회를 요청 하면
+     *  Then 생성한 지하철 노선에 해당하는 역을 구간 기준 오름차순으로 응답한다.
      */
     @Test
     void 지하철_노선_조회() {
@@ -114,9 +125,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         int distance = 10;
 
         ExtractableResponse<Response> 지하철_노선_생성_응답 = LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
+        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
+
+        ExtractableResponse<Response> 화곡역_생성_응답 = StationSteps.지하철역_생성_요청(화곡역);
+        Long 화곡역_ID = StationSteps.getStationId(화곡역_생성_응답);
+        int distance2 = 5;
+        SectionSteps.지하철_구간_생성_요청(lineId, 증미역_ID, 화곡역_ID, distance2);
 
         // when
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 지하철_노선_조회_응답 = LineSteps.지하철_노선_조회_요청(lineId);
 
         // then
@@ -124,6 +140,12 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         String lineName = 지하철_노선_조회_응답.jsonPath().getString("name");
         assertThat(lineName).isEqualTo(노선_9호선);
+
+        String lineColor = 지하철_노선_조회_응답.jsonPath().getString("color");
+        assertThat(lineColor).isEqualTo(색상_9호선);
+
+        List<Station> stations = 지하철_노선_조회_응답.jsonPath().getList("stations", Station.class);
+        assertThat(stations.size()).isEqualTo(3);
     }
 
     /**

@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.response.LineSaveResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
+import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.DuplicateRegistrationRequestException;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,10 +29,12 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineSaveResponse saveLine(LineRequest request) throws DuplicateRegistrationRequestException, NotFoundRequestException {
@@ -62,15 +67,18 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(LineResponse::createLineResponse)
+                .map(line -> {
+                    List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
+                    return LineResponse.createLineResponse1(line, sections);
+                })
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLineById(Long id) throws NotFoundRequestException {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
-
-        return LineResponse.createLineResponse(line);
+        List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
+        return LineResponse.createLineResponse1(line, sections);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) throws NotFoundRequestException {
