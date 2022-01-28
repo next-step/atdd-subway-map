@@ -1,25 +1,47 @@
 package nextstep.subway.acceptance;
 
-import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import nextstep.subway.applicaion.dto.ShowLineResponse;
+import nextstep.subway.acceptance.step_feature.LineStepFeature;
+import nextstep.subway.acceptance.step_feature.StationStepFeature;
+import nextstep.subway.applicaion.dto.LineAndSectionResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
+import static nextstep.subway.acceptance.step_feature.LineStepFeature.callCreateAndFind;
+import static nextstep.subway.acceptance.step_feature.LineStepFeature.*;
+import static nextstep.subway.acceptance.step_feature.StationStepFeature.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    private static final String SHINBUNDANG_NAME = "신분당선";
-    private static final String NUMBER2_LINE_NAME = "2호선";
+    private StationResponse gangnam;
+    private StationResponse yeoksam;
+    private StationResponse nonhyeon;
+    private StationResponse pangyo;
+    private Map<String, String> params;
+
+    @BeforeEach
+    void setUpStation() {
+        gangnam = StationStepFeature.callCreateAndFind(GANGNAM_STATION_NAME);
+        yeoksam = StationStepFeature.callCreateAndFind(YEOKSAM_STATION_NAME);
+        nonhyeon = StationStepFeature.callCreateAndFind(NONHYEON_STATION_NAME);
+        pangyo = StationStepFeature.callCreateAndFind(PANGYO_STATION_NAME);
+        params = LineStepFeature.createLineParams(SHINBUNDANG_LINE_NAME,
+                SHINBUNDANG_LINE_COLOR,
+                gangnam.getId(),
+                yeoksam.getId(),
+                10);
+    }
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -28,16 +50,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        Map<String, String> shinbundangLine = createShinbundangLine();
-
         // when
-        ExtractableResponse<Response> response = callCreateLines(shinbundangLine);
+        ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank()
-            .isEqualTo("/lines/1");
+        LineStepFeature.checkCreateLine(response);
     }
 
     /**
@@ -49,14 +66,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine_duplicate_fail() {
         // given
-        Map<String, String> shinbundangLine = createShinbundangLine();
-        callCreateLines(shinbundangLine);
+        LineStepFeature.callCreateLines(params);
 
         // when
-        ExtractableResponse<Response> response = callCreateLines(shinbundangLine);
+        ExtractableResponse<Response> response = LineStepFeature.callCreateLines(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        LineStepFeature.checkCreateLineFail(response);
     }
 
     /**
@@ -69,24 +85,26 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Map<String, String> shinbundangLine = createShinbundangLine();
-        Map<String, String> number2Line = createNumber2Line();
-        callCreateLines(shinbundangLine);
-        callCreateLines(number2Line);
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
+
+        Map<String, String> number2Line = createLineParams(NUMBER2_LINE_NAME, "green", nonhyeon.getId(), pangyo.getId(), 10);
+        LineStepFeature.callCreateLines(number2Line);
 
         // when
-        ExtractableResponse<Response> response = callGetLines();
+        ExtractableResponse<Response> response = LineStepFeature.callGetLines();
 
         // then
-        List<String> lineNames = response.jsonPath()
-            .getList(".", ShowLineResponse.class)
-            .stream()
-            .map(ShowLineResponse::getLineName)
-            .collect(toList());
+        LineStepFeature.checkFindLine(response);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(lineNames).contains(SHINBUNDANG_NAME, NUMBER2_LINE_NAME);
-
+        List<LineAndSectionResponse> responses = response.jsonPath()
+                .getList(".", LineAndSectionResponse.class);
+        LineAndSectionResponse response1 = responses.get(0);
+        LineAndSectionResponse response2 = responses.get(1);
+        assertThat(response1.getLineName()).isEqualTo(SHINBUNDANG_LINE_NAME);
+        assertThat(response2.getLineName()).isEqualTo(NUMBER2_LINE_NAME);
+        assertThat(response1.getStations().size()).isEqualTo(3);
+        assertThat(response2.getStations().size()).isEqualTo(2);
     }
 
     /**
@@ -98,19 +116,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Map<String, String> shinbundangLine = createShinbundangLine();
-        callCreateLines(shinbundangLine);
+        ExtractableResponse<Response> create = callCreateLines(params);
+        String location = create.header("Location");
 
         // when
-        ExtractableResponse<Response> response = callGetLines(1);
+        ExtractableResponse<Response> response = LineStepFeature.callGetLines(location);
 
         // then
-        String lineName = response.jsonPath()
-            .getString("name");
+        LineStepFeature.checkFindLine(response);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.body()).isNotNull();
-        assertThat(lineName).contains(SHINBUNDANG_NAME);
+        String lineName = response.jsonPath()
+                .getString("name");
+        assertThat(lineName).contains(SHINBUNDANG_LINE_NAME);
     }
 
     /**
@@ -122,28 +139,27 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Map<String, String> shinbundangLine = createShinbundangLine();
-        callCreateLines(shinbundangLine);
-
-        Map<String, String> param = new HashMap<>();
-        param.put("id", "1");
-        param.put("name", "구분당선");
-        param.put("color", "blue");
+        String modifyName = "구분당선";
+        LineAndSectionResponse createResponse = callCreateAndFind(params);
+        Map modifyParams = new HashMap();
+        modifyParams.put("id", String.valueOf(createResponse.getLineId()));
+        modifyParams.put("name", modifyName);
+        modifyParams.put("color", "blue");
 
         // when
-        ExtractableResponse<Response> responseUpdate = callUpdateLines(param);
+        ExtractableResponse<Response> responseUpdate = LineStepFeature.callUpdateLines(modifyParams);
 
         // then
-        ExtractableResponse<Response> response = callGetLines();
-        List<String> lineNames = response.jsonPath()
-            .getList(".", ShowLineResponse.class)
-            .stream()
-            .map(ShowLineResponse::getLineName)
-            .collect(toList());
+        LineStepFeature.checkResponseStatus(responseUpdate.statusCode(), HttpStatus.NO_CONTENT);
 
-        assertThat(responseUpdate.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(lineNames).contains("구분당선");
-        assertThat(lineNames).doesNotContain(SHINBUNDANG_NAME);
+        ExtractableResponse<Response> response = LineStepFeature.callGetLines();
+        List<String> lineNames = response.jsonPath()
+                .getList(".", LineAndSectionResponse.class)
+                .stream()
+                .map(LineAndSectionResponse::getLineName)
+                .collect(toList());
+        assertThat(lineNames).contains(modifyName);
+        assertThat(lineNames).doesNotContain(SHINBUNDANG_LINE_NAME);
     }
 
     /**
@@ -154,16 +170,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine_fail() {
         // given
-        Map<String, String> param = new HashMap<>();
-        param.put("id", "1");
-        param.put("name", "구분당선");
-        param.put("color", "blue");
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "1");
+        params.put("name", "구분당선");
+        params.put("color", "blue");
 
         // when
-        ExtractableResponse<Response> response = callUpdateLines(param);
+        ExtractableResponse<Response> response = LineStepFeature.callUpdateLines(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -175,98 +191,127 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Map<String, String> shinbundangLine = createShinbundangLine();
-        callCreateLines(shinbundangLine);
+        LineAndSectionResponse createResponse = callCreateAndFind(params);
 
         // when
-        ExtractableResponse<Response> response = callDeleteLines(1);
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteLines(createResponse.getLineId());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
-    private ExtractableResponse<Response> callCreateLines(Map<String, String> lineParams) {
-        return RestAssured.given()
-            .log()
-            .all()
-            .body(lineParams)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("lines")
-            .then()
-            .log()
-            .all()
-            .extract();
+    /**
+     * Given 지하철 역을 생성한다
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이며, 새로운 구간의 하행역이 노선에 등록되지 않은 구간을 생성한다
+     * Then 지하철 노선 구간 추가가 성공한다
+     */
+    @DisplayName("노선에 구간 추가")
+    @Test
+    void addSection() {
+        // given
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
+
+        // then
+        LineStepFeature.checkCreateLine(response);
     }
 
-    private ExtractableResponse<Response> callGetLines() {
-        return RestAssured.given()
-            .log()
-            .all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("lines")
-            .then()
-            .log()
-            .all()
-            .extract();
+    /**
+     * Given 지하철 역을 생성한다
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 새로운 구간의 상행역이 현재 등록되어있는 하행 종점역이 아닌 구간을 등록한다
+     * Then 구간 추가가 실패한다
+     */
+    @DisplayName("노선에 구간 추가 - 기존 하행역과, 새로운 상행선이 동일하지 않으면 실패")
+    @Test
+    void addSection_validateDownStation() {
+        // given
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), nonhyeon.getId(), gangnam.getId());
+
+        // then
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
-    private ExtractableResponse<Response> callGetLines(long id) {
-        return RestAssured.given()
-            .log()
-            .all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("lines/" + id)
-            .then()
-            .log()
-            .all()
-            .extract();
+    /**
+     * Given 지하철 역을 생성한다
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 새로운 구간의 하행역은 현재 등록되어있는 역이다
+     * Then 구간 추가가 실패한다
+     */
+    @DisplayName("노선에 구간 추가 - 새로운 구간의 하행역이 현재 등록되어있는 역이면 실패")
+    @Test
+    void addSection_validateAlreadyRegisteredStation() {
+        // given
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), gangnam.getId());
+
+        // then
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
-    private ExtractableResponse<Response> callUpdateLines(Map<String, String> lineParams) {
-        return RestAssured.given()
-            .log()
-            .all()
-            .body(lineParams)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .put("lines/" + lineParams.get("id"))
-            .then()
-            .log()
-            .all()
-            .extract();
-    }
+    /**
+     * Given 3개의 역을 이용하여 지하철 노선 생성한다
+     * When 마지막 역을 삭제한다
+     * Then 구간 삭제 성공
+     */
+    @DisplayName("노선의 마지막역은 삭제 가능하다")
+    @Test
+    void deleteSection() {
+        // given
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
-    private ExtractableResponse<Response> callDeleteLines(long id) {
-        return RestAssured.given()
-            .log()
-            .all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .delete("lines/" + id)
-            .then()
-            .log()
-            .all()
-            .extract();
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), nonhyeon.getId());
+
+        // then
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
 
-    private Map<String, String> createShinbundangLine() {
-        Map<String, String> result = new HashMap();
-        result.put("name", SHINBUNDANG_NAME);
-        result.put("color", "red");
+    /**
+     * Given 2개의 역을 이용하여 지하철 노선 생성한다
+     * When 노선의 구간(마지막 역)을 삭제한다
+     * Then 구간 삭제가 실패한다
+     */
+    @DisplayName("노선에 구간은 최소 1개가 유지되어야 한다")
+    @Test
+    void deleteSection_minimumSection() {
+        // given
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
 
-        return result;
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
+
+        // then
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
-    private Map<String, String> createNumber2Line() {
-        Map<String, String> result = new HashMap();
-        result.put("name", NUMBER2_LINE_NAME);
-        result.put("color", "green");
+    /**
+     * Given 3개의 역을 이용하여 지하철 노선 생성한다
+     * When 마지막 역이 아닌 역을 삭제한다
+     * Then 구간 삭제 실패
+     */
+    @DisplayName("마지막 역만 삭제 가능하다")
+    @Test
+    void deleteSection_LastDownStation() {
+        // given
+        LineAndSectionResponse lineResponse = LineStepFeature.callCreateAndFind(params);
+        LineStepFeature.callAddSection(lineResponse.getLineId(), yeoksam.getId(), nonhyeon.getId());
 
-        return result;
+        // when
+        ExtractableResponse<Response> response = LineStepFeature.callDeleteSection(lineResponse.getLineId(), yeoksam.getId());
+
+        // then
+        LineStepFeature.checkResponseStatus(response.statusCode(), HttpStatus.BAD_REQUEST);
     }
 
 }
