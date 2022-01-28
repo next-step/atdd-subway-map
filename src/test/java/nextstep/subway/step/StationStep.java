@@ -20,4 +20,22 @@ public class StationStep {
             .extract();
     }
 
+    public static ExtractableResponse<Response> 역_조회() {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get(PATH)
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 역_삭제(String path) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete(path)
+            .then().log().all()
+            .extract();
+    }
+
 }
