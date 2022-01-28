@@ -3,8 +3,6 @@ package nextstep.subway.domain;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {

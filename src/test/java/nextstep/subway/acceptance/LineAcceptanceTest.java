@@ -311,7 +311,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.body().jsonPath().get("message").equals("invalid station occurred"))
+                () -> assertThat(response.body().jsonPath().get("message").equals("invalid add station"))
         );
     }
 
@@ -366,7 +366,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.body().jsonPath().get("message").equals("invalid station occurred"))
+                () -> assertThat(response.body().jsonPath().get("message").equals("invalid remove section"))
         );
     }
 
@@ -390,7 +390,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.body().jsonPath().get("message").equals("invalid station occurred"))
+                () -> assertThat(response.body().jsonPath().get("message").equals("invalid remove section"))
         );
     }
 }

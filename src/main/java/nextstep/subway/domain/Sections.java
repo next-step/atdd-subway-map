@@ -9,8 +9,8 @@ import java.util.List;
 @Embeddable
 public class Sections {
 
-    private static final int EMPTY_SIZE = 0;
     private static final int GAP_SIZE = 1;
+    private static final int AVAILABLE_REMOVE_SIZE = 1;
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
@@ -23,33 +23,45 @@ public class Sections {
         this.sections.add(section);
     }
 
+    private void validateAddSection(final Section section) {
+        if (isAvailableUpStation(section.getUpStation()) || isAvailableDownStation(section.getDownStation())) {
+            throw new IllegalArgumentException("invalid add section");
+        }
+    }
+
+    private boolean isAvailableUpStation(final Station upStation) {
+        if (sections.isEmpty()) {
+            return false; // 3항 사용 X
+        }
+        return isNotDownStation(upStation);
+    }
+
+    private boolean isAvailableDownStation(final Station downStation) {
+        return sections.stream()
+                .anyMatch(it -> it.isAnyStation(downStation));
+    }
+
     public void remove(final Station station) {
         validateRemoveSection(station);
-        this.sections.remove(sections.get(sections.size() - GAP_SIZE));
+        this.sections.remove(lastSection());
     }
 
     private void validateRemoveSection(final Station station) {
-        if (sections.size() <= 1 || !sections.get(sections.size() - GAP_SIZE).isDownStation(station)) {
-            throw new IllegalArgumentException("invalid station occurred");
+        if (isAvailableRemove() || isNotDownStation(station)) {
+            throw new IllegalArgumentException("invalid remove section");
         }
     }
 
-    private void validateAddSection(final Section section) {
-        if (validateUpStation(section.getUpStation()) || validateDownStation(section.getDownStation())) {
-            throw new IllegalArgumentException("invalid station occurred");
-        }
+    private boolean isAvailableRemove() {
+        return sections.size() <= AVAILABLE_REMOVE_SIZE;
     }
 
-    private boolean validateUpStation(final Station upStation) {
-        if (sections.size() == EMPTY_SIZE) {
-            return false;
-        }
-        final Section last = sections.get(sections.size() - GAP_SIZE);
-        return !last.isDownStation(upStation);
+    private boolean isNotDownStation(final Station upStation) {
+        final Section lastSection = lastSection(); // 디미터 법칙 고려
+        return !lastSection.isDownStation(upStation);
     }
 
-    private boolean validateDownStation(final Station downStation) {
-        return sections.stream()
-                .anyMatch(it -> it.isAnyStation(downStation));
+    private Section lastSection() {
+        return sections.get(sections.size() - GAP_SIZE);
     }
 }
