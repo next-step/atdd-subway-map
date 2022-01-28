@@ -42,86 +42,67 @@ class SectionAcceptanceTest extends AcceptanceTest {
         이호선 = LineSteps.createLine(lineRequest).as(LineResponse.class);
     }
 
-    /**
-     * Given 강남-역삼 구간이 등록된 노선 생성 요청을 하고 <br>
-     * When 하행 종점역과 일치하지 않는 상행역(선릉)으로 구간 생성 요청을 하면 <br>
-     * Then 구간 생성이 실패한다.
-     */
     @DisplayName("하행 종점역과 신규 상행역 불일치")
     @Test
     void 노선_구간_생성_실패_하행종점역_상행역_불일치_예외() {
         //given
-        SectionRequest sectionRequest = 신규_구간(이호선, 선릉역, 역삼역);
+        SectionRequest 신규_구간_요청 = 신규_구간(이호선, 선릉역, 역삼역);
 
         //when
-        int statusCode = 구간_생성_요청_응답_HttpStatusCode(sectionRequest);
+        int statusCode = 구간_생성_요청_응답_HttpStatusCode(신규_구간_요청);
 
         //then
         httpStatusCode_검증(statusCode, BAD_REQUEST.value());
 
     }
 
-    /**
-     * Given 강남-역삼 구간이 등록된 노선 생성 요청을 하고 <br>
-     * When 이미 구간으로 등록된 역(강남)을 하행역(강남)으로 구간 생성 요청을 하면 <br>
-     * Then 구간 생성이 실패한다.
-     */
     @DisplayName("구간에 등록되어 있는 역을 신규 하행역 생성 예외")
     @Test
     void 이미_등록된_역을_하행역으로_생성_예외() {
         //given
-        SectionRequest sectionRequest = 신규_구간(이호선, 강남역, 선릉역);
+        SectionRequest 신규_구간_요청 = 신규_구간(이호선, 강남역, 선릉역);
 
         //when
-        int statusCode = 구간_생성_요청_응답_HttpStatusCode(sectionRequest);
+        int statusCode = 구간_생성_요청_응답_HttpStatusCode(신규_구간_요청);
 
         //then
         httpStatusCode_검증(statusCode, BAD_REQUEST.value());
 
     }
 
-    /**
-     * Given 노선 생성 요청을 하고 <br>
-     * When 구간 생성 요청을 하면 <br>
-     * Then 구간 생성이 성공한다.
-     */
     @DisplayName("노선 구간 생성")
     @Test
     void 노선_구간_생성() {
         //given
-        SectionRequest sectionRequest = 신규_구간(이호선, 역삼역, 선릉역);
+        SectionRequest 신규_구간_요청 = 신규_구간(이호선, 역삼역, 선릉역);
 
         //when
-        int statusCode = 구간_생성_요청_응답_HttpStatusCode(sectionRequest);
+        ExtractableResponse<Response> 구간_생성_요청_응답 = 구간_생성_요청(신규_구간_요청);
+
+        int statusCode = 구간_생성_요청_응답.statusCode();
+        List<String> namesOfStations = 구간_생성_요청_응답.jsonPath().getList("stations.name");
 
         //then
-        httpStatusCode_검증(statusCode, CREATED.value());
+        assertAll(
+            () -> httpStatusCode_검증(statusCode, CREATED.value()),
+            () -> assertThat(namesOfStations).containsExactly(StationFixture.강남역, StationFixture.역삼역, StationFixture.선릉역)
+        );
     }
 
-    /**
-     * Given 강남-역삼 구간이 등록된 노선 생성 요청을 하고 <br>
-     * When 구간 삭제 요청을 하면 <br>
-     * Then 구간 삭제 실패한다.
-     */
     @DisplayName("구간이 1개만 남은 경우 구간 삭제 실패")
     @Test
     void 구간_삭제_실패_예외() {
         //given
-        SectionRequest sectionRequest = SectionRequest.valueOf(역삼역.getId(), 이호선.getId());
+        SectionRequest 노선_삭제_요청 = SectionRequest.valueOf(역삼역.getId(), 이호선.getId());
 
         //when
-        int statusCode = 구간_삭제_요청_응답_HttpStatusCode(sectionRequest);
+        int statusCode = 구간_삭제_요청_응답_HttpStatusCode(노선_삭제_요청);
 
         //then
         httpStatusCode_검증(statusCode, BAD_REQUEST.value());
 
     }
 
-    /**
-     * Given 강남-역삼-선릉 구간이 등록된 노선 생성 요청을 하고 <br>
-     * When 하행 종점 역이 아닌 구간 삭제 요청을 하면 <br>
-     * Then 구간 삭제 실패한다.
-     */
     @DisplayName("하행 종점역이 아닌 경우 삭제 실패")
     @Test
     void 구간_삭제_실패_하행_종점역_예외() {
@@ -137,11 +118,6 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
     }
 
-    /**
-     * Given 강남-역삼-선릉 구간이 등록된 노선 생성 요청을 하고 <br>
-     * When 구간 삭제 요청을 하면 <br>
-     * Then 구간 삭제 성공한다.
-     */
     @DisplayName("하행 종점역 삭제")
     @Test
     void 구간_삭제() {
@@ -154,7 +130,6 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         int statusCode = response.statusCode();
         List<String> namesOfStations = response.jsonPath().getList("stations.name");
-
 
         //then
         assertAll(

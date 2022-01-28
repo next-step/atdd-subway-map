@@ -42,10 +42,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         이호선 = LineRequest.of(이호선_이름, 이호선_색상, 강남역.getId(), 역삼역.getId(), 0);
     }
 
-    /**
-     * When 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 성공한다.
-     */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
@@ -58,11 +54,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * when 동일한 이름의 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 실패 한다.
-     */
     @DisplayName("지하철 노선 중복 이름 생성 실패")
     @Test
     void createLineDuplicationNameException() {
@@ -76,12 +67,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         httpStatusCode_검증(statusCode, CONFLICT.value());
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * Given 새로운 지하철 노선 생성을 요청 하고
-     * When 지하철 노선 목록 조회를 요청 하면
-     * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
-     */
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
@@ -90,10 +75,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         LineSteps.createLine(이호선);
 
         //when
-        ExtractableResponse<Response> response = LineSteps.findLines();
+        ExtractableResponse<Response> 노선_목록_조회_응답 = LineSteps.findLines();
 
-        int statusCode = response.statusCode();
-        List<String> namesOfLines = response.jsonPath().getList("name");
+        int statusCode = 노선_목록_조회_응답.statusCode();
+        List<String> namesOfLines = 노선_목록_조회_응답.jsonPath().getList("name");
 
         //then
         assertAll(
@@ -103,24 +88,19 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 조회를 요청 하면
-     * Then 생성한 지하철 노선을 응답받는다
-     */
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
         //given
-        ExtractableResponse<Response> lineNo1 = LineSteps.createLine(일호선);
-        String uri = lineNo1.header("Location");
+        ExtractableResponse<Response> 노선_생성_응답 = LineSteps.createLine(일호선);
+        String uri = 노선_생성_응답.header("Location");
 
         //when
-        ExtractableResponse<Response> response = LineSteps.findLines(uri);
+        ExtractableResponse<Response> 노선_조회_응답 = LineSteps.findLines(uri);
 
-        int statusCode = response.statusCode();
-        String findLineName = response.jsonPath().get("name");
-        List<String> namesOfStations = response.jsonPath().getList("stations.name");
+        int statusCode = 노선_조회_응답.statusCode();
+        String findLineName = 노선_조회_응답.jsonPath().get("name");
+        List<String> namesOfStations = 노선_조회_응답.jsonPath().getList("stations.name");
 
         //then
         assertAll(
@@ -130,23 +110,18 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 지하철 노선의 정보 수정을 요청 하면
-     * Then 지하철 노선의 정보 수정은 성공한다.
-     */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
         //given
-        ExtractableResponse<Response> redLine = LineSteps.createLine(일호선);
-        String uri = redLine.header("Location");
+        ExtractableResponse<Response> 노선_생성_응답 = LineSteps.createLine(일호선);
+        String uri = 노선_생성_응답.header("Location");
 
         //when
-        ExtractableResponse<Response> response = LineSteps.updateLine(uri, 이호선);
+        ExtractableResponse<Response> 노선_수정_응답 = LineSteps.updateLine(uri, 이호선);
 
-        int statusCode = response.statusCode();
-        String updatedName = response.jsonPath().get("name");
+        int statusCode = 노선_수정_응답.statusCode();
+        String updatedName = 노선_수정_응답.jsonPath().get("name");
 
         //then
         assertAll(
@@ -155,22 +130,17 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 생성한 지하철 노선 삭제를 요청 하면
-     * Then 생성한 지하철 노선 삭제가 성공한다.
-     */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
         //given
-        ExtractableResponse<Response> redLine = LineSteps.createLine(일호선);
-        String uri = redLine.header("Location");
+        ExtractableResponse<Response> 노선_생성_응답 = LineSteps.createLine(일호선);
+        String uri = 노선_생성_응답.header("Location");
 
         //when
-        ExtractableResponse<Response> response = LineSteps.deleteLine(uri);
+        ExtractableResponse<Response> 노선_삭제_응답 = LineSteps.deleteLine(uri);
 
-        int statusCode = response.statusCode();
+        int statusCode = 노선_삭제_응답.statusCode();
 
         //then
         httpStatusCode_검증(statusCode, NO_CONTENT.value());
