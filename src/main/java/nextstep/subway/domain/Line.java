@@ -1,6 +1,5 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.Section;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.exception.DeleteSectionException;
 import nextstep.subway.exception.SectionNotValidException;
@@ -8,8 +7,6 @@ import nextstep.subway.exception.SectionNotValidException;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
@@ -20,8 +17,8 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -44,7 +41,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return sections.getAllSections();
     }
 
     public void update(String name, String color) {
@@ -69,43 +66,29 @@ public class Line extends BaseEntity {
     }
 
     public boolean validateUpStation(Station upStation) {
-        if (this.sections.isEmpty()) {
+        if (sections.isEmpty()) {
             return true;
         }
 
-        return getLastDownStation() == upStation;
+        return sections.getLastDownStation() == upStation;
     }
 
     public boolean validateDownStation(Station downStation) {
-        Function<Section, Station> getDownStation = Section::getDownStation;
-        Function<Section, Station> getUpStation = Section::getUpStation;
+        List<Station> upStations = sections.getSectionStations(Section::getUpStation);
+        List<Station> downStations = sections.getSectionStations(Section::getDownStation);
 
-        if (getSectionStations(getUpStation).contains(downStation)) {
+        if (upStations.contains(downStation)) {
             return false;
         }
 
-        return !getSectionStations(getDownStation).contains(downStation);
+        return !downStations.contains(downStation);
     }
 
-    private List<Station> getSectionStations(Function<Section, Station> func) {
-        return sections
-            .stream()
-            .map(func)
-            .collect(Collectors.toList());
-    }
-
-    private Station getLastDownStation() {
-        return sections
-            .stream()
-            .map(Section::getDownStation)
-            .reduce((a, b) -> b)
-            .orElseThrow(() -> new NoSuchElementException("하행 종점역이 없습니다."));
-    }
 
     public void deleteSection(long lastDownStationId) {
-        Station lastDownStation = getLastDownStation();
+        Station lastDownStation = sections.getLastDownStation();
 
-        if (sections.size() <= 1) {
+        if (!sections.isAvailableDelete()) {
             throw new DeleteSectionException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
         }
 
@@ -113,10 +96,7 @@ public class Line extends BaseEntity {
             throw new DeleteSectionException("구간에 일치하는 하행 종점역이 없습니다.");
         }
 
-        Section delete = sections.stream()
-            .filter(section -> section.getDownStation() == lastDownStation)
-            .findFirst()
-            .orElseThrow(() -> new DeleteSectionException("마지막 역(하행 종점역)만 제거할 수 있습니다."));
+        Section delete = sections.getByDownStation(lastDownStation);
 
         sections.remove(delete);
     }
@@ -126,14 +106,7 @@ public class Line extends BaseEntity {
             return new ArrayList<>();
         }
 
-        List<Station> allStation = sections.
-            stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toList());
-
-        allStation.add(getLastDownStation());
-
-        return allStation
+        return sections.getAllStations()
             .stream()
             .map(StationResponse::ofStation)
             .collect(Collectors.toList());

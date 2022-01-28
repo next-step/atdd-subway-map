@@ -1,7 +1,5 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.domain;
 
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 import nextstep.subway.exception.SameStationException;
 
 import javax.persistence.*;
