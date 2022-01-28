@@ -25,8 +25,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = getParamsStationMap("뚝섬역");
-        ExtractableResponse<Response> response = 지하철역_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철역_생성_요청("뚝섬역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -44,12 +43,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         // given
-        Map<String, String> params = getParamsStationMap("뚝섬역");
-        지하철역_생성_요청(params);
+        지하철역_생성_요청("뚝섬역");
 
         //given
-        Map<String, String> params2 = getParamsStationMap("연신내역");
-        지하철역_생성_요청(params2);
+        지하철역_생성_요청("연신내역");
 
         // when
         ExtractableResponse<Response> response = 지하철역_조회_요청();
@@ -73,9 +70,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = getParamsStationMap("뚝섬역");
         ExtractableResponse<Response> response
-                                = 지하철역_생성_요청(params);
+                                = 지하철역_생성_요청("뚝섬역");
 
         // when
         response = RestAssured
@@ -104,12 +100,12 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 중복 이름으로 생성 불가")
     void duplicated_station_name_interdict() {
         //given
-        Map<String, String> 뚝섬역 = getParamsStationMap("뚝섬역");
-        지하철역_생성_요청(뚝섬역);
+
+        지하철역_생성_요청("뚝섬역");
 
         //when
         ExtractableResponse<Response> response
-                        = 지하철역_생성_요청(뚝섬역);
+                        = 지하철역_생성_요청("뚝섬역");
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

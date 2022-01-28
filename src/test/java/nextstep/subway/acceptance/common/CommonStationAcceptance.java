@@ -10,19 +10,13 @@ import java.util.Map;
 
 public class CommonStationAcceptance {
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         return RestAssured
                 .given().log().all()
-                .body(params)
+                .body(getParamsStationMap(name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all().extract();
-    }
-
-    public static Map<String, String> getParamsStationMap(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return params;
     }
 
     public static ExtractableResponse<Response> 지하철역_조회_요청() {
@@ -31,5 +25,20 @@ public class CommonStationAcceptance {
                 .when().get("/stations")
                 .then().log().all().extract();
     }
+
+
+    public static Map<String, String> getParamsStationMap(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        return params;
+    }
+
+
+    public static String 지하철_생성_후_아이디_추출(String stationName) {
+        return 지하철역_생성_요청(stationName)
+                .jsonPath()
+                .getString("id");
+    }
+
 
 }
