@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
@@ -27,6 +28,13 @@ public class GlobalExceptionAdvice {
         logger.warn("IllegalArgumentException", e);
         return makeErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException e) {
+        logger.warn("NoSuchElementException", e);
+        return makeErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {

@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.station.application.dto;
 
 import javax.validation.constraints.NotBlank;
 
@@ -8,5 +8,8 @@ public class StationRequest {
 
     public String getName() {
         return name;
+    }
+
+    public StationRequest() {
     }
 }

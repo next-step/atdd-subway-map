@@ -23,6 +23,9 @@ dependencies {
 	// log
 	implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 
+	// sql log
+	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0")
+
 	// validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
