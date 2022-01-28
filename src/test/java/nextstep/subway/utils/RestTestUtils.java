@@ -36,7 +36,11 @@ public class RestTestUtils {
                 .extract();
     }
 
-    public static URI getLocationURI(ExtractableResponse<Response> fixtureResponse) {
-        return URI.create(fixtureResponse.header("Location"));
+    public static URI getLocationURI(ExtractableResponse<Response> response) {
+        return URI.create(response.header("Location"));
+    }
+
+    public static Long getCreatedResourceId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }
