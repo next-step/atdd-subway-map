@@ -19,6 +19,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private SectionRequestBuilder defaultSectionRequestBuilder;
     private Long lineId;
     private Long firstUpStationId;
+    private Long downStationId;
+    private Long extendedStationId;
 
     @Override
     @BeforeEach
@@ -30,10 +32,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         firstUpStationId = upStationId;
 
         ExtractableResponse<Response> downStationResponse = StationSteps.executeStationCreateRequest("판교역");
-        Long downStationId = downStationResponse.jsonPath().getLong("id");
+        downStationId = downStationResponse.jsonPath().getLong("id");
 
         ExtractableResponse<Response> extendedStationResponse = StationSteps.executeStationCreateRequest("광교역");
-        Long extendedStationId = extendedStationResponse.jsonPath().getLong("id");
+        extendedStationId = extendedStationResponse.jsonPath().getLong("id");
 
         LineRequestBuilder lineRequestBuilder = LineRequestBuilder.ofDefault()
                 .withUpStationId(upStationId)
@@ -159,6 +161,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간이 하나인 노선이 있을 때 구간 삭제 요청")
     @Test
     void deleteOnlyOneSection() {
+        ExtractableResponse<Response> response = SectionSteps.executeSectionDeleteRequest(lineId, downStationId);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).contains("Violation Line policy");
     }
 
     /**

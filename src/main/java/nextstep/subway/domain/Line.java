@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.domain.exception.LineException;
 import nextstep.subway.domain.exception.SectionException;
 
 import javax.persistence.*;
@@ -76,6 +77,14 @@ public class Line extends BaseEntity {
         if (!isDownStation(station)) {
             throw SectionException.ofIllegalDownStation(station);
         }
+
+        if (hasOnlyOneSection()) {
+            throw LineException.ofSectionSize();
+        }
+    }
+
+    private boolean hasOnlyOneSection() {
+        return sections.size() == 1;
     }
 
     private boolean isDownStation(Station station) {
