@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.common.exception.DuplicateAttributeException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -81,6 +82,24 @@ public class LineService {
         line.update(lineRequest.getName(), lineRequest.getColor());
 
         return LineResponse.of(line);
+    }
+
+    public void addStationToLine(Long lienId, SectionRequest sectionRequest) {
+        var line = lineRepository.findById(lienId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + lienId));
+
+        var upStationId = sectionRequest.getUpStationId();
+        var downStationId = sectionRequest.getDownStationId();
+        var distance = sectionRequest.getDistance();
+
+        var upStation = stationRepository.findById(upStationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + upStationId ));
+        var downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + downStationId));
+
+        var section = new Section(upStation, downStation, distance);
+        section.setLine(line);
+        line.addSection(section);
     }
 
     private boolean isLineNamePresent(String lineName) {
