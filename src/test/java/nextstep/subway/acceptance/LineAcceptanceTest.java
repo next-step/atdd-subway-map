@@ -51,7 +51,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getString("name")).isEqualTo(lineRequest.getName());
         assertThat(response.jsonPath().getString("color")).isEqualTo(lineRequest.getColor());
         assertThat(response.jsonPath().getString("stations")).contains(UP_STATION_NAME, DOWN_STATION_NAME);
-        assertThat(response.jsonPath().getInt("distance")).isEqualTo(lineRequest.getDistance());
     }
 
     /**

@@ -20,4 +20,7 @@ public class SectionException extends RuntimeException {
     public static SectionException ofIllegalDownStation(Station station) {
         return new SectionException("Illegal Station; Requested downStation is not Line's downStation");
     }
+    public static SectionException ofSectionSize() {
+        return new SectionException("Violation Line policy; Have to left one section");
+    }
 }

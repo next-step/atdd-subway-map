@@ -8,10 +8,6 @@ public class LineException extends RuntimeException {
         super(message);
     }
 
-    public static LineException ofSectionSize() {
-        return new LineException("Violation Line policy; Have to left one section");
-    }
-
     public static class NotFound extends LineException {
         public NotFound(Long id) {
             super("Not found line; id=" + id);
