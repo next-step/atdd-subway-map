@@ -333,16 +333,43 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 양재시민의숲역_번호 = 지하철_역_생성_되어있음(양재시민의숲역);
 
         final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
-        final ExtractableResponse<Response> addResponse = 지하철_노선_구간_등록을_요청한다(신분당선_번호, 양재역_번호, 양재시민의숲역_번호, 양재_양재시민의숲_거리);
-        final String uri = addResponse.header("Location");
+        지하철_노선_구간_등록을_요청한다(신분당선_번호, 양재역_번호, 양재시민의숲역_번호, 양재_양재시민의숲_거리);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_구간을_삭제_요청한다(uri);
+        final ExtractableResponse<Response> response = 지하철_노선_구간을_삭제_요청한다(신분당선_번호, 양재시민의숲역_번호);
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(response.header("Date")).isNotBlank()
+        );
+    }
+
+    /***
+     * Given 지하철 노선 생성을 요청 하고
+     * And 지하철 노선 구간을 등록하고
+     * And 새로운 지하철 노선 구간을 등록하고
+     * When 지하철 노선 중간 구간 제거 요청을 하면
+     * Then 지하철 노선 구간 제거에 실패한다.
+     */
+    @DisplayName("지하철 노선 중간 구간 제거")
+    @Test
+    void removeLineInvalidMiddleStation() {
+        // given
+        final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
+        final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
+        final String 양재시민의숲역_번호 = 지하철_역_생성_되어있음(양재시민의숲역);
+
+        final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
+        지하철_노선_구간_등록을_요청한다(신분당선_번호, 양재역_번호, 양재시민의숲역_번호, 양재_양재시민의숲_거리);
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_노선_구간을_삭제_요청한다(신분당선_번호, 양재역_번호);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.body().jsonPath().get("message").equals("invalid station occurred"))
         );
     }
 }

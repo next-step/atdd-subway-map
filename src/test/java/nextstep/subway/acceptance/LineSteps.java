@@ -114,12 +114,13 @@ public class LineSteps {
         return params;
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_구간을_삭제_요청한다(final String uri) {
+    public static ExtractableResponse<Response> 지하철_노선_구간을_삭제_요청한다(final String lineId, final String stationId) {
         return RestAssured.given().log().all()
                 .accept(ContentType.ANY)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .delete(String.format(uri))
+                .queryParam("stationId", stationId)
+                .delete(String.format("/lines/%s/sections", lineId))
                 .then().log().all()
                 .extract();
     }
