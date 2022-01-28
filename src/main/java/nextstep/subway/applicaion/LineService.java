@@ -5,6 +5,8 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.common.exception.DuplicateAttributeException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,22 +16,42 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
+    private final StationRepository stationRepository;
+
+    public LineService(
+            final LineRepository lineRepository,
+            final StationRepository stationRepository
+    ) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse createLine(LineRequest request) {
         var requestName = request.getName();
         var requestColor = request.getColor();
+        var requestUpStationId = request.getUpStationId();
+        var requestDownStationId = request.getDownStationId();
+        var distance = request.getDistance();
 
         if (isLineNamePresent(requestName)) {
             throw new DuplicateAttributeException("이미 존재하는 노선 명: " + requestName);
         }
 
-        Line line = lineRepository.save(new Line(requestName, requestColor));
-        return LineResponse.of(line);
+        var section = new Section(
+                stationRepository.findById(requestUpStationId).orElseThrow(),
+                stationRepository.findById(requestDownStationId).orElseThrow(),
+                distance
+        );
+
+        var line = new Line(requestName, requestColor);
+        Line savedLine = lineRepository.save(line);
+
+        section.setLine(savedLine);
+        line.getSections().add(section);
+
+        return LineResponse.of(savedLine);
     }
 
     public void deleteLineById(Long id) {

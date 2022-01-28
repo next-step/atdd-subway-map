@@ -1,19 +1,30 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
     private String name;
+
     private String color;
 
-    public Line() {
+    @OneToMany(
+            mappedBy = "line",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<Section> sections = new ArrayList<>();
+
+    protected Line() {
     }
 
     public Line(String name, String color) {
@@ -33,8 +44,50 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        verifyCanBeAdded(section);
+        section.setLine(this);
+        sections.add(section);
+    }
+
+    private void verifyCanBeAdded(Section section) {
+        if (sections.isEmpty()) {
+            throw new IllegalArgumentException("비어있는 노선에 구간을 추가할 수 없습니다.");
+        }
+
+        var lastStop = sections.get(sections.size() - 1);
+        if (!lastStop.getDownStation().equals(section.getUpStation())) {
+            throw new IllegalArgumentException("새로운 구간의 상행역이 해당 노선의 하행 종점역이 아닙니다.");
+        }
+
+        var downStation = section.getDownStation();
+        if (sections.stream().map(Section::getUpStation).anyMatch(station -> station.equals(downStation))
+                || sections.stream().map(Section::getDownStation).anyMatch(station -> station.equals(downStation))) {
+            throw new IllegalArgumentException("새로운 구간의 하행역이 해당 노선에 이미 등록되어있습니다.");
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof Line))
+            return false;
+        var line = (Line) obj;
+        return Objects.equals(this.id, line.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
