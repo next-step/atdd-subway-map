@@ -185,7 +185,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     private void 노선_조회_완료(ExtractableResponse<Response> response, Map<String, Object> params) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         var lineName = response.jsonPath().getString("name");
+        var stations = response.jsonPath().getList("stations");
         assertThat(lineName).isEqualTo(params.get("name"));
+        assertThat(stations.size()).isEqualTo(2);
     }
 
     private void 노선_수정_완료(ExtractableResponse<Response> response, Map<String, Object> modifyParams) {
