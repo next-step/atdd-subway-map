@@ -9,8 +9,6 @@ import static nextstep.subway.acceptance.StationSteps.*;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-    private static final String STATIONS_PATH = "/stations";
-
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.

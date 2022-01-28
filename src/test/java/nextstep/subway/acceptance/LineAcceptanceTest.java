@@ -181,7 +181,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Scenario: 구간 등록(비정상적인 시나리오)
      * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
      * When 잘못된 구간 등록(상행:역삼역, 하행:판교역) 요청하면
-     * Then 구간 등록이 성공한다.
+     * Then 구간 등록이 실패한다.
      */
     @DisplayName("구간 등록 실패 - 새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 함.")
     @Test
@@ -201,7 +201,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Scenario: 구간 등록(비정상적인 시나리오)
      * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
      * When 잘못된 구간 등록(상행:양재역, 하행:강남역) 요청하면
-     * Then 구간 등록이 성공한다.
+     * Then 구간 등록이 실패한다.
      */
     @DisplayName("구간 등록 실패 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
     @Test

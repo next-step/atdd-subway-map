@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
+    private static final int FIRST_INDEX = 0;
+    private static final int LAST_INDEX_OPERAND = 1;
+    private static final int MIN_SECTION_SIZE = 1;
+
     @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
@@ -20,14 +24,14 @@ public class Sections {
 
     public void remove(Station station) {
         validateRemoveSection(station);
-        sections.remove(sections.size() - 1);
+        sections.remove(lastIndex());
     }
 
     public List<Station> stationList() {
         List<Station> stationList = sections.stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toList());
-        stationList.add(0, firstStation());
+        stationList.add(FIRST_INDEX, firstStation());
 
         return Collections.unmodifiableList(stationList);
     }
@@ -56,11 +60,15 @@ public class Sections {
     }
 
     private Station firstStation() {
-        return sections.get(0).getUpStation();
+        return sections.get(FIRST_INDEX).getUpStation();
     }
 
     private Station lastStation() {
-        return sections.get(sections.size() - 1).getDownStation();
+        return sections.get(lastIndex()).getDownStation();
+    }
+
+    private int lastIndex() {
+        return sections.size() - LAST_INDEX_OPERAND;
     }
 
     private void validateRemoveSection(Station station) {
@@ -75,7 +83,7 @@ public class Sections {
     }
 
     private void checkLastSectionCondition() {
-        if (sections.size() == 1) {
+        if (sections.size() == MIN_SECTION_SIZE) {
             throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없습니다.");
         }
     }

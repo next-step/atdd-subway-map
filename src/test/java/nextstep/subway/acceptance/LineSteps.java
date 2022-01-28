@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 import static nextstep.subway.utils.RestAssuredRequest.*;
 import static nextstep.subway.utils.RestAssuredRequest.delete;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineSteps {
@@ -80,32 +82,37 @@ public class LineSteps {
     public static void 지하철_노선_생성됨(ExtractableResponse<Response> response, Map<String, String> params) {
         응답_요청_확인(response, HttpStatus.CREATED);
         assertThat(response.header("Location")).isNotBlank();
-        assertThat(response.jsonPath().getList("stations.id", String.class)).containsExactly(params.get("upStationId"), params.get("downStationId"));
+        assertThat(jsonPath(response).getList("stations.id", String.class)).containsExactly(params.get("upStationId"), params.get("downStationId"));
     }
 
     public static void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> ... createResponses) {
         List<String> createdNames = Arrays.stream(createResponses)
-                .map(createResponse -> createResponse.jsonPath().getString("name"))
+                .map(createResponse -> jsonPath(createResponse).getString("name"))
                 .collect(Collectors.toList());
         List<String> createdColors = Arrays.stream(createResponses)
-                .map(createResponse -> createResponse.jsonPath().getString("color"))
+                .map(createResponse -> jsonPath(createResponse).getString("color"))
+                .collect(Collectors.toList());
+        List<List<Object>> createdStations = Arrays.stream(createResponses)
+                .map(createResponse -> jsonPath(createResponse).getList("stations"))
                 .collect(Collectors.toList());
 
         응답_요청_확인(response, HttpStatus.OK);
-        assertThat(response.jsonPath().getList("name")).isEqualTo(createdNames);
-        assertThat(response.jsonPath().getList("color")).isEqualTo(createdColors);
+        assertThat(jsonPath(response).getList("name")).isEqualTo(createdNames);
+        assertThat(jsonPath(response).getList("color")).isEqualTo(createdColors);
+        assertThat(jsonPath(response).get("stations").equals(createdStations)).isTrue();
     }
 
     public static void 지하철_노선_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> createResponse) {
         응답_요청_확인(response, HttpStatus.OK);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(createResponse.jsonPath().getString("name"));
+        assertThat(jsonPath(response).getString("name")).isEqualTo(jsonPath(createResponse).getString("name"));
+        assertThat(jsonPath(response).get("stations").equals(jsonPath(createResponse).get("stations"))).isTrue();
     }
 
     public static void 지하철_노선_수정됨(ExtractableResponse<Response> response, ExtractableResponse<Response> showResponse, Map<String, String> updateParams) {
         응답_요청_확인(response, HttpStatus.OK);
         응답_요청_확인(showResponse, HttpStatus.OK);
-        assertThat(showResponse.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
-        assertThat(showResponse.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
+        assertThat(jsonPath(showResponse).getString("name")).isEqualTo(updateParams.get("name"));
+        assertThat(jsonPath(showResponse).getString("color")).isEqualTo(updateParams.get("color"));
     }
 
     public static void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
@@ -138,6 +145,10 @@ public class LineSteps {
     }
 
     public static Long 지하철_노선_id(ExtractableResponse<Response> createResponse) {
-        return createResponse.jsonPath().getLong("id");
+        return jsonPath(createResponse).getLong("id");
+    }
+
+    private static JsonPath jsonPath(ExtractableResponse<Response> response) {
+        return response.jsonPath();
     }
 }
