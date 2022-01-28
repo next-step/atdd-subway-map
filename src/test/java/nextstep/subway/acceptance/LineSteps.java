@@ -3,22 +3,26 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.MediaType;
-
-import java.util.Map;
 
 public class LineSteps {
 
     private static final String LINES_URI = "/lines";
 
-    public static ExtractableResponse<Response> createLine(Map<String, String> param) {
+    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
-                .body(param)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(LINES_URI)
                 .then().log().all()
                 .extract();
+    }
+
+    public static int 노선_생성_요청_응답_HttpStatusCode(LineRequest lineRequest) {
+        ExtractableResponse<Response> response = createLine(lineRequest);
+        return response.statusCode();
     }
 
     public static ExtractableResponse<Response> findLines() {
@@ -37,9 +41,9 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> updateLine(String uri, Map<String, String> line) {
+    public static ExtractableResponse<Response> updateLine(String uri, LineRequest lineRequest) {
         return RestAssured.given().log().all()
-                .body(line)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(uri)
@@ -54,4 +58,5 @@ public class LineSteps {
                 .then().log().all()
                 .extract();
     }
+
 }
