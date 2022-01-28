@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.exception.LineException;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +22,12 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return LineResponse.fromLine(line);
+        Line line = new Line(request.getName(), request.getColor());
+        if (lineRepository.exists(Example.of(line))) {
+            throw new LineException.Duplicated(line);
+        }
+        Line created = lineRepository.save(line);
+        return LineResponse.fromLine(created);
     }
 
     public List<LineResponse> findAllLines() {

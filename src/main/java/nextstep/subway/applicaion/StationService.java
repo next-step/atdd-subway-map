@@ -4,6 +4,8 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.exception.StationException;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +22,12 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        Station station = new Station(stationRequest.getName());
+        if (stationRepository.exists(Example.of(station))) {
+            throw new StationException.Duplicated(station);
+        }
+        Station created = stationRepository.save(station);
+        return StationResponse.fromStation(created);
     }
 
     @Transactional(readOnly = true)
@@ -29,7 +35,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::fromStation)
                 .collect(Collectors.toList());
     }
 
@@ -37,12 +43,4 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
-    }
 }
