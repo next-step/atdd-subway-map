@@ -81,4 +81,9 @@ public class LineService {
 
         return sectionRepository.save(section);
     }
+
+    public void deleteSectionByEndDownStationId(Long lineId, Long endDownStationId) {
+        Line line = findLineById(lineId);
+        line.deleteSection(stationService.findStationById(endDownStationId));
+    }
 }

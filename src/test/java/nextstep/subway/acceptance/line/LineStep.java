@@ -21,6 +21,10 @@ public class LineStep {
                 .build(), POST);
     }
 
+    public static ExtractableResponse<Response> 노선_조회_요청(Long 노선Id) {
+        return RestTestUtils.요청_테스트(URI.create(String.format("/lines/%d", 노선Id)), GET);
+    }
+
     public static ExtractableResponse<Response> 노선_전체_조회_요청() {
         return RestTestUtils.요청_테스트(URI.create("/lines"), GET);
     }

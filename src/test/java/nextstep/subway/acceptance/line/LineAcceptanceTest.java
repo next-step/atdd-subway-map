@@ -13,10 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.http.Method.*;
-import static nextstep.subway.acceptance.line.LineStep.노선_생성_요청;
-import static nextstep.subway.acceptance.line.LineStep.노선_전체_조회_요청;
+import static nextstep.subway.acceptance.line.LineStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -71,6 +72,38 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(jsonPath.getList("id")).containsExactly(2, 1);
         assertThat(jsonPath.getList("name")).containsExactly("2호선", "신분당선");
         assertThat(jsonPath.getList("color")).containsExactly("bg-green-600", "bg-red-600");
+    }
+
+    /**
+     * Given 상행 종점역, 하행 종점역을 생성하고
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 생성된 노선에 구간을 등록 하고
+     * When 지하철 노선 조회를 요청 하면
+     * Then 등록된 구간의 모든 역 목록이 포함된 지하철 노선을 응답받는다
+     */
+    @DisplayName("등록된 구간의 모든 역 목록이 포함된 지하철 노선 조회")
+    @Test
+    void getLineWithStations() {
+        //given
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        int 거리 = 1000;
+
+        Long 구간_상행역Id = 하행종점역Id;
+        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
+        SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
+
+        //when
+        ExtractableResponse<Response> response = 노선_조회_요청(노선Id);
+
+        //then
+        JsonPath jsonPath = response.jsonPath();
+        List<Map<String, Object>> stations = jsonPath.getList("stations");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(stations.size()).isEqualTo(3);
+        assertThat(stations.stream().map(station -> station.get("name"))).containsExactly("모란역", "수진역", "신흥역");
     }
 //
 

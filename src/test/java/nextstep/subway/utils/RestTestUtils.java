@@ -23,6 +23,19 @@ public class RestTestUtils {
         return createResponseExtractableResponse(uri, httpMethod, requestSpecification);
     }
 
+    public static ExtractableResponse<Response> 요청_테스트_WithQueryParams(URI uri, Map<String, ?> bodyParams, Map<String, ?> queryParams, Method httpMethod) {
+        RequestSpecification requestSpecification = createRequestSpecificationWithLog();
+        if (!bodyParams.isEmpty()) {
+            requestSpecification.body(bodyParams);
+        }
+
+        if (!queryParams.isEmpty()) {
+            requestSpecification.queryParams(queryParams);
+        }
+
+        return createResponseExtractableResponse(uri, httpMethod, requestSpecification);
+    }
+
     private static RequestSpecification createRequestSpecificationWithLog() {
         return RestAssured.given().log().all();
     }

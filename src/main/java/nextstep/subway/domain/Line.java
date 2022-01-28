@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.exception.EmptySectionException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -8,6 +10,7 @@ import java.util.Set;
 
 @Entity
 public class Line extends BaseEntity {
+    private final static int END_STATIONS_SIZE = 2;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,6 +54,22 @@ public class Line extends BaseEntity {
         return section;
     }
 
+    public void deleteSection(Station station) {
+        if (hasOnlyEndStations()) {
+            throw new IllegalArgumentException("노선 구간에 종점역만 존재하여 더 이상 구간을 삭제할 수 없습니다.");
+        }
+
+        if (isNotEndDownStation(station)) {
+            throw new IllegalArgumentException("삭제할 구간은 하행종점역 구간이 아닙니다.");
+        }
+
+        this.sections.remove(getLastSection());
+    }
+
+    private boolean hasOnlyEndStations() {
+        return getFlatStations().size() == END_STATIONS_SIZE;
+    }
+
     public List<Station> getFlatStations() {
         if (isEmptySections()) {
             return new ArrayList<>();
@@ -71,21 +90,25 @@ public class Line extends BaseEntity {
                 .anyMatch(section -> section.isExistAnyStation(station));
     }
 
-    private boolean isNotEndDownStation(Station station) {
-        return !getEndDownStation().equals(station);
+    public boolean isNotEndDownStation(Station station) {
+        try {
+            return !getEndDownStation().equals(station);
+        } catch (EmptySectionException exception) {
+            return true;
+        }
     }
 
     private boolean isEmptySections() {
         return sections.isEmpty();
     }
 
-    private Station getEndDownStation() {
+    private Station getEndDownStation() throws EmptySectionException {
         return getLastSection().getDownStation();
     }
 
     private Section getLastSection() {
         if (isEmptySections()) { //Defensive
-            throw new IllegalArgumentException("section이 존재하지 않습니다.");
+            throw new EmptySectionException();
         }
 
         int sectionLastIndex = sections.size() - 1;
