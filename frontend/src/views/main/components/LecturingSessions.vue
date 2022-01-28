@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { SESSION_STATUS } from '@/utils/constants'
+import {SESSION_STATUS} from '@/utils/constants'
 import SessionList from '@/views/main/components/SessionList'
 
 export default {

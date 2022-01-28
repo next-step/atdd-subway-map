@@ -43,10 +43,10 @@
 
 <script>
 import FavoriteDeleteButton from '@/views/favorite/components/FavoriteDeleteButton'
-import { FETCH_FAVORITES } from '@/store/shared/actionTypes'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
+import {FETCH_FAVORITES} from '@/store/shared/actionTypes'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
 
 export default {
   name: 'Favorites',

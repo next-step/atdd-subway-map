@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
-import { CREATE_FAVORITE } from '@/store/shared/actionTypes'
+import {mapActions, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
+import {CREATE_FAVORITE} from '@/store/shared/actionTypes'
 
 export default {
   name: 'AddFavoriteButton',

@@ -49,10 +49,10 @@
 
 <script>
 import validator from '@/utils/validator'
-import { CREATE_STATION, DELETE_STATION, FETCH_STATIONS } from '@/store/shared/actionTypes'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
+import {CREATE_STATION, DELETE_STATION, FETCH_STATIONS} from '@/store/shared/actionTypes'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
 
 export default {
   name: 'StationPage',

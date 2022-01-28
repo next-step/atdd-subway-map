@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { SESSION_STATUS, ENROLL_STATUS } from '@/utils/constants'
+import {ENROLL_STATUS, SESSION_STATUS} from '@/utils/constants'
 import SessionCard from '@/views/main/components/SessionCard'
 
 export default {

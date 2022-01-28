@@ -1,5 +1,5 @@
-import { SET_FAVORITES } from '@/store/shared/mutationTypes'
-import { CREATE_FAVORITE, DELETE_FAVORITE, FETCH_FAVORITES } from '@/store/shared/actionTypes'
+import {SET_FAVORITES} from '@/store/shared/mutationTypes'
+import {CREATE_FAVORITE, DELETE_FAVORITE, FETCH_FAVORITES} from '@/store/shared/actionTypes'
 import FavoriteService from '@/api/modules/favorite'
 
 const state = {

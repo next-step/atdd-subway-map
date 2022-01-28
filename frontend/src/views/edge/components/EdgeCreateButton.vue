@@ -76,12 +76,20 @@
 
 <script>
 import Dialog from '@/components/dialogs/Dialog'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
 import dialog from '@/mixins/dialog'
 import validator from '@/utils/validator'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { CREATE_EDGE, CREATE_LINE, DELETE_LINE, EDIT_LINE, FETCH_LINE, FETCH_LINES, FETCH_STATIONS } from '@/store/shared/actionTypes'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {
+  CREATE_EDGE,
+  CREATE_LINE,
+  DELETE_LINE,
+  EDIT_LINE,
+  FETCH_LINE,
+  FETCH_LINES,
+  FETCH_STATIONS
+} from '@/store/shared/actionTypes'
 
 export default {
   name: 'EdgeCreateButton',

@@ -60,10 +60,10 @@
 
 <script>
 import validator from '@/utils/validator'
-import { mapActions, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { CREATE_LINE, DELETE_LINE, EDIT_LINE, FETCH_LINES } from '@/store/shared/actionTypes'
-import { LINE_COLORS } from '@/utils/constants'
+import {mapActions, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {CREATE_LINE, DELETE_LINE, EDIT_LINE, FETCH_LINES} from '@/store/shared/actionTypes'
+import {LINE_COLORS} from '@/utils/constants'
 
 export default {
   name: 'LineForm',

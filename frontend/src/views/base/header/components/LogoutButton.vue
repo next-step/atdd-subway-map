@@ -9,9 +9,9 @@
 
 <script>
 import MenuListItem from '@/components/menus/MenuListItem'
-import { SET_ACCESS_TOKEN, SET_MEMBER, SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { mapMutations } from 'vuex'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
+import {SET_ACCESS_TOKEN, SET_MEMBER, SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {mapMutations} from 'vuex'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
 
 export default {
   name: 'LogoutButton',

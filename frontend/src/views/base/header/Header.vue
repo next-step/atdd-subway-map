@@ -16,7 +16,7 @@
 <script>
 import ButtonMenu from '@/components/menus/ButtonMenu'
 import LogoutButton from '@/views/base/header/components/LogoutButton'
-import { mapGetters } from 'vuex'
+import {mapGetters} from 'vuex'
 import MyPageButton from '@/views/base/header/components/MyPageButton'
 import FavoritesButton from '@/views/base/header/components/FavoritesButton'
 

@@ -1,5 +1,5 @@
-import { SET_MAP } from '@/store/shared/mutationTypes'
-import { FETCH_MAP } from '@/store/shared/actionTypes'
+import {SET_MAP} from '@/store/shared/mutationTypes'
+import {FETCH_MAP} from '@/store/shared/actionTypes'
 import MapService from '@/api/modules/map'
 
 const state = {

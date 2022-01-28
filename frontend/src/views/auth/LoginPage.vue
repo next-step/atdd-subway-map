@@ -48,10 +48,10 @@
 
 <script>
 import validator from '@/utils/validator'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { LOGIN } from '@/store/shared/actionTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {LOGIN} from '@/store/shared/actionTypes'
 
 export default {
   name: 'LoginPage',

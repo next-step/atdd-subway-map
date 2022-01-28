@@ -68,10 +68,10 @@
 
 <script>
 import validator from '@/utils/validator'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
-import { CREATE_MEMBER } from '@/store/shared/actionTypes'
-import { mapActions, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
+import {CREATE_MEMBER} from '@/store/shared/actionTypes'
+import {mapActions, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
 
 export default {
   name: 'JoinPage',

@@ -17,8 +17,8 @@
 
 <script>
 import IconButton from '@/components/buttons/IconButton'
-import { mapGetters, mapMutations } from 'vuex'
-import { SHOW_MENU } from '@/store/shared/mutationTypes'
+import {mapGetters, mapMutations} from 'vuex'
+import {SHOW_MENU} from '@/store/shared/mutationTypes'
 
 export default {
   name: 'IconMenu',

@@ -1,5 +1,5 @@
-import { SET_STATIONS } from '@/store/shared/mutationTypes'
-import { CREATE_STATION, DELETE_STATION, FETCH_STATIONS } from '@/store/shared/actionTypes'
+import {SET_STATIONS} from '@/store/shared/mutationTypes'
+import {CREATE_STATION, DELETE_STATION, FETCH_STATIONS} from '@/store/shared/actionTypes'
 import StationService from '@/api/modules/station'
 
 const state = {

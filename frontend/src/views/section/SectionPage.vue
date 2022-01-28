@@ -57,11 +57,11 @@
 
 <script>
 import SectionCreateButton from '@/views/section/components/SectionCreateButton'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { FETCH_LINE, FETCH_LINES } from '@/store/shared/actionTypes'
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+import {FETCH_LINE, FETCH_LINES} from '@/store/shared/actionTypes'
 import SectionDeleteButton from '@/views/section/components/SectionDeleteButton'
-import { SNACKBAR_MESSAGES } from '@/utils/constants'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
+import {SNACKBAR_MESSAGES} from '@/utils/constants'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
 
 export default {
   name: 'SectionPage',

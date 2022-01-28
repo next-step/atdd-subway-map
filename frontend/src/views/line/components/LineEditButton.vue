@@ -49,13 +49,13 @@
 </template>
 
 <script>
-import { LINE_COLORS, SNACKBAR_MESSAGES } from '@/utils/constants'
+import {LINE_COLORS, SNACKBAR_MESSAGES} from '@/utils/constants'
 import Dialog from '@/components/dialogs/Dialog'
 import dialog from '@/mixins/dialog'
 import validator from '@/utils/validator'
-import { mapActions, mapMutations } from 'vuex'
-import { SHOW_SNACKBAR } from '@/store/shared/mutationTypes'
-import { EDIT_LINE, FETCH_LINES } from '@/store/shared/actionTypes'
+import {mapActions, mapMutations} from 'vuex'
+import {SHOW_SNACKBAR} from '@/store/shared/mutationTypes'
+import {EDIT_LINE, FETCH_LINES} from '@/store/shared/actionTypes'
 
 export default {
   name: 'LineEditButton',
