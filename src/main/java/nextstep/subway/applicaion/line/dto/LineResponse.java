@@ -32,7 +32,7 @@ public class LineResponse {
 				line.getId(),
 				line.getName(),
 				line.getColor(),
-				StationResponse.ofSections(line),
+				StationResponse.ofSections(line.getSections()),
 				line.getCreatedDate(),
 				line.getModifiedDate());
 	}

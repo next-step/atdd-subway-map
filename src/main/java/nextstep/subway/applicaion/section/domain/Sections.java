@@ -7,6 +7,10 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 @Embeddable
 public class Sections {
@@ -65,5 +69,16 @@ public class Sections {
 
 	public Section getLastSection() {
 		return sections.get(sections.size() - 1);
+	}
+
+	public List<Station> getStations() {
+		if (sections.isEmpty()) {
+			return emptyList();
+		}
+		return Stream.concat(
+						sections.stream().map(Section::getUpStation),
+						Stream.of(getLastDownStation()))
+				.collect(toList());
+
 	}
 }

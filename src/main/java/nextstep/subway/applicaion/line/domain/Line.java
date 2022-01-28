@@ -9,7 +9,6 @@ import nextstep.subway.applicaion.section.exception.UpStationInvalidException;
 import nextstep.subway.applicaion.station.domain.Station;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -67,8 +66,8 @@ public class Line extends BaseEntity {
 		}
 	}
 
-	public List<Section> getSections() {
-		return sections.getSections();
+	public Sections getSections() {
+		return sections;
 	}
 
 	public boolean hasStation(Station station) {
