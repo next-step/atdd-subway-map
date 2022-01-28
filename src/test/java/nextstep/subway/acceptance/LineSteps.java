@@ -52,24 +52,24 @@ public class LineSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_조회를_요청한다(final String uri) {
+    public static ExtractableResponse<Response> 지하철_노선_조회를_요청한다(final String lineId) {
         return RestAssured.given().log().all()
                 .accept(ContentType.JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get(uri)
+                .get("/lines/" + lineId)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_변경을_요청한다(final String uri, final String updatedName, final String updatedColor) {
+    public static ExtractableResponse<Response> 지하철_노선_변경을_요청한다(final String lineId, final String updatedName, final String updatedColor) {
         final Map<String, String> params = 지하철_노선_변경_데이터를_만든다(updatedName, updatedColor);
         return RestAssured.given().log().all()
                 .accept(ContentType.ANY)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
                 .when()
-                .put(uri) // 모든 데이터를 변경하고 있어서 put 으로 했습니다.
+                .put("/lines/" + lineId)
                 .then().log().all()
                 .extract();
     }
@@ -81,11 +81,11 @@ public class LineSteps {
         return params;
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_삭제를_요청한다(final String uri) {
+    public static ExtractableResponse<Response> 지하철_노선_삭제를_요청한다(final String lineId) {
         return RestAssured.given().log().all()
                 .accept(ContentType.ANY)
                 .when()
-                .delete(uri)
+                .delete("/lines/" + lineId)
                 .then().log().all()
                 .extract();
     }

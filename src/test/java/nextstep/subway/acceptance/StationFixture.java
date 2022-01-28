@@ -10,5 +10,6 @@ public class StationFixture {
 
     public static final String STATION_NAME = "name";
 
-    private StationFixture() {}
+    private StationFixture() {
+    }
 }

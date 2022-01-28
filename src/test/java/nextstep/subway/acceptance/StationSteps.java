@@ -42,10 +42,10 @@ public class StationSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_역_삭제를_요청한다(final String uri) {
+    public static ExtractableResponse<Response> 지하철_역_삭제를_요청한다(final String stationId) {
         return RestAssured.given().log().all()
                 .when()
-                .delete(uri)
+                .delete("/stations/" + stationId)
                 .then().log().all()
                 .extract();
     }

@@ -101,11 +101,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        final ExtractableResponse<Response> createResponse = 지하철_역_생성을_요청한다(강남역);
-        final String uri = createResponse.header("Location");
+        final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_역_삭제를_요청한다(uri);
+        final ExtractableResponse<Response> response = 지하철_역_삭제를_요청한다(강남역_번호);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

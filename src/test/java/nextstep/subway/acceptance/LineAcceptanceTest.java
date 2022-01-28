@@ -201,11 +201,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
         final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
-        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
-        final String uri = saveResponse.header("Location");
+        final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_조회를_요청한다(uri);
+        final ExtractableResponse<Response> response = 지하철_노선_조회를_요청한다(신분당선_번호);
 
         // then
         assertAll(
@@ -230,11 +229,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
         final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
-        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
-        final String uri = saveResponse.header("Location");
+        final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // when
-        final ExtractableResponse<Response> updateResponse = 지하철_노선_변경을_요청한다(uri, 구분당선, 파랑색);
+        final ExtractableResponse<Response> updateResponse = 지하철_노선_변경을_요청한다(신분당선_번호, 구분당선, 파랑색);
 
         // then
         assertAll(
@@ -255,11 +253,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String 강남역_번호 = 지하철_역_생성_되어있음(강남역);
         final String 양재역_번호 = 지하철_역_생성_되어있음(양재역);
 
-        final ExtractableResponse<Response> saveResponse = 지하철_노선_생성을_요청한다(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
-        final String uri = saveResponse.header("Location");
+        final String 신분당선_번호 = 지하철_노선이_생성되어_있음(신분당선, 빨강색, 강남역_번호, 양재역_번호, 강남_양재_거리);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_삭제를_요청한다(uri);
+        final ExtractableResponse<Response> response = 지하철_노선_삭제를_요청한다(신분당선_번호);
 
         // then
         assertAll(
