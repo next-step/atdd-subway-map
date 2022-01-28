@@ -33,6 +33,11 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
     public void addSection(Section section) {
         this.sections.add(section);
         section.setLine(this);
@@ -52,10 +57,5 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() {
         return sections;
-    }
-
-    public void update(String name, String color) {
-        this.name = name;
-        this.color = color;
     }
 }

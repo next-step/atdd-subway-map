@@ -30,21 +30,27 @@ public class SectionService {
         // 1. lineId로 해당 라인을 조회한다.
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundRequestException(String.format(LineService.LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, lineId)));
-//
+
 //        // 2. 상행역을 조회한다.
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, request.getUpStationId())));
-//
+
 //        // 3. 하행역을 조회한다.
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, request.getDownStationId())));
-//
+
 //        // 4. 구간을 생성한다.
         Section section = new Section(line, upStation, downStation, request.getDistance());
         line.addSection(section);
-//
+
 //        // 5. 구간을 save한다.
         sectionRepository.save(section);
         return SectionResponse.createSectionResponse(section, lineId);
+    }
+
+    public void deleteStationById(Long lineId, Long stationId) {
+        Section section = sectionRepository.findByDownStationId(stationId);
+        stationRepository.deleteById(stationId);
+        sectionRepository.delete(section);
     }
 }

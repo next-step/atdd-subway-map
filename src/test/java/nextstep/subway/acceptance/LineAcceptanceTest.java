@@ -29,6 +29,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     String 화곡역 = "화곡역";
 
     /**
+     * Scenario 지하철 노선 생성
      * Given 지하철역 생성을 요청하고,
      * Given 새로운 지하철역 생성을 요청한다.
      * When 지하철 노선 생성을 요청하면,
