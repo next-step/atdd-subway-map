@@ -81,6 +81,8 @@ public class Line extends BaseEntity {
         if (hasOnlyOneSection()) {
             throw LineException.ofSectionSize();
         }
+
+        sections.remove(sections.size() - 1);
     }
 
     private boolean hasOnlyOneSection() {

@@ -174,6 +174,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 삭제")
     @Test
     void deleteSection() {
+        SectionRequest request = defaultSectionRequestBuilder.build();
+        SectionSteps.executeSectionCreateRequest(lineId, request);
+
+        ExtractableResponse<Response> response = SectionSteps.executeSectionDeleteRequest(lineId, extendedStationId);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
 
