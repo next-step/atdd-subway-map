@@ -21,5 +21,12 @@ public class SectionStep {
                 .extract();
     }
 
-
+    public static ExtractableResponse<Response> 구간_삭제_요청(String lineUri, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete(lineUri + PATH + "?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+    }
 }

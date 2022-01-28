@@ -35,6 +35,26 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    @DisplayName("지하철 노선에 구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        var stationParams = StationFixture.역삼역;
+        StationStep.역_생성_요청(stationParams);
+
+        var lineCreateResponse = 신분당선_생성_완료();
+        var params = SectionFixture.of(2L, 3L, 10);
+
+        var lineUri = lineCreateResponse.header("Location");
+        SectionStep.구간_생성_요청(lineUri, params);
+
+        // when
+        var response = SectionStep.구간_삭제_요청(lineUri, 3L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
 
     private ExtractableResponse<Response> 신분당선_생성_완료() {
         var station1 = StationFixture.신논현역;
