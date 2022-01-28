@@ -68,7 +68,6 @@ class LineAcceptanceTest extends AcceptanceTest {
      *   AND 지하철 노선 생성을 요청 하고,
      *  When 지하철 노선 목록 조회를 요청 하면
      *  Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
-     *  Then 생성한 지하철 노선에 해당하는 역을 구간 기준 오름차순으로 응답한다.
      */
     @Test
     void 지하철_노선_목록_조회() {

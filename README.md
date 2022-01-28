@@ -293,15 +293,15 @@ public void update(String name, String color) {
 
 - [x]  **http 응답 코드 개선하기**
 - [x]  **예외 처리에서 try catch 대신 @ExceptionHandler 사용하기**
-- [x]  예외 메시지를 View 객체인  ResponseStation과 같은 곳에 담지 말기. 연관성이 없는 것이다.
+- [x]  예외 메시지를 View 객체인  ResponseStation과 같은 곳에 담지 말기. 연관성이 없는 것이다.  
   → 따로 ExeptionDto 클래스를 반환 하도록 개선했음.
 - [ ]  `**if (*ObjectUtils*.*isEmpty*(findLine)) {` 로 체크하지 말고 existsByXXX 쿼리 메서드로 개선하기**
 - [ ]  이와 같은 것은 StationResponse 객체 안에서 정팩 팩토리 메서드로 분리?
 
 ```java
-if (ObjectUtils.isEmpty(findStation)) {
-            Station station = stationRepository.save(new Station(request.getName()));
-            return createStationResponse(station);
+if (ObjectUtils.isEmpty(findStation)) {  
+            Station station = stationRepository.save(new Station(request.getName()));  
+            return createStationResponse(station);  
 ```
 
 - [x]  **매직 리터럴 없애기. 실수의 여지를 제공하게 됨.
@@ -314,12 +314,14 @@ if (ObjectUtils.isEmpty(findStation)) {
 
 ---
 
-- [x]  ~~지하철 노선 생성 시 필요한 인자 추가하기~~  
-  → 구간 조회 구현하고 구간 조회해서 종점 번호와 거리 검증 테스트하기.  
-  → 존재하지 않는 역은 예외 처리하기 : Service 로직
+- [x]  지하철 노선 생성 시 필요한 인자 추가하기  
+  `→ 구간 조회 구현하고 구간 조회해서 종점 번호와 거리 검증 테스트하기.`  
+  `→ 존재하지 않는 역은 예외 처리하기 : Service 로직`
 - [x]  지하철 노선에 구간을 등록하는 기능 구현
 - [x]  지하철 노선에 구간을 제거하는 기능 구현
-- [ ]  지하철 노선에 등록된 구간을 통해 역 목록을 조회하는 기능 구현
+- [x]  지하철 노선에 등록된 구간을 통해 역 목록을 조회하는 기능 구현  
+  `→ 전체 목록 조회 시 stations를 jasonPath로 어떻게 가져오지? 검증을 하고픈데  
+  안가져와지네. Line이 두개라서 그럼.`
 - [ ]  구간 등록 / 제거 시 예외 케이스에 대한 인수 테스트 작성
 
 - 이번 단계는 요구사항을 가지고 직접 인수 조건을 도출하기
@@ -342,10 +344,20 @@ Feature: 지하철 노선 관리
      Given 지하철역 생성을 요청하고,
        AND 새로운 지하철역 생성을 요청하고,
        AND 지하철 노선 생성을 요청 하고,
-       AND 새로운 지하철역 생성을 요청하고,
+       AND 새로운 지하철역 생성을 요청하고,``
        AND 기존의 지하철 노선에 구간 등록을 요청하고,
       When 생성한 지하철 노선 조회를 요청 하면
       Then 생성한 지하철 노선에 해당하는 역을 구간 기준 오름차순으로 응답한다.
+        
+  Scenario 지하철 노선 조회 
+     Given 지하철역 생성을 요청하고,
+       AND 새로운 지하철역 생성을 요청하고,
+       AND 지하철 노선 생성을 요청 하고,
+     Given 새로운 지하철역 생성을 요청하고,
+       AND 새로운 지하철역 생성을 요청하고,
+       AND 지하철 노선 생성을 요청 하고,
+      When 지하철 노선 목록 조회를 요청 하면
+      Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
 
 Feature: 지하철 구간 관리
         
