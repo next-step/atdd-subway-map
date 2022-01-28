@@ -4,7 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.request.SectionRequest;
-import nextstep.subway.ui.path.SubwayPath;
+import nextstep.subway.ui.LineController;
 import org.springframework.http.MediaType;
 
 public class SectionStep {
@@ -19,7 +19,7 @@ public class SectionStep {
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-						.when().post(SubwayPath.LINES + SubwayPath.ID + SubwayPath.SECTIONS, lineId)
+						.when().post(LineController.LINES + LineController.ID + LineController.SECTIONS, lineId)
 						.then().log().all()
 						.extract();
 	}
@@ -28,7 +28,7 @@ public class SectionStep {
 
 		return RestAssured
 						.given().queryParam("stationId",sectionId).log().all()
-						.when().delete(SubwayPath.LINES  + SubwayPath.ID + SubwayPath.SECTIONS, lineId)
+						.when().delete(LineController.LINES  + LineController.ID + LineController.SECTIONS, lineId)
 						.then().log().all()
 						.extract();
 	}
