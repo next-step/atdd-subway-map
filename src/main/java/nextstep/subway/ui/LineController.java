@@ -33,31 +33,31 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineWithStationResponse> getLine(@PathVariable Long id) {
+    public ResponseEntity<LineWithStationResponse> getLine(@PathVariable long id) {
         LineWithStationResponse line = lineService.getLine(id);
         return ResponseEntity.ok().body(line);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> editLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+    public ResponseEntity<Void> editLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
         lineService.editLine(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable long id) {
         lineService.deleteLine(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> saveSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<Void> createSection(@PathVariable long id, @RequestBody SectionRequest sectionRequest) {
         lineService.createSection(id, sectionRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable long id, @RequestParam long stationId) {
         lineService.deleteSection(id, stationId);
         return ResponseEntity.noContent().build();
     }
