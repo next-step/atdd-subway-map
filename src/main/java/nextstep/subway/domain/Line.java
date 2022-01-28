@@ -59,6 +59,11 @@ public class Line extends BaseEntity {
         sections.add(section);
     }
 
+    public void remove(Station station) {
+        verifyCanBeDeleted(station);
+        sections.remove(sections.size() - 1);
+    }
+
     private void verifyCanBeAdded(Section section) {
         if (sections.isEmpty()) {
             throw new IllegalArgumentException("비어있는 노선에 구간을 추가할 수 없습니다.");
@@ -73,6 +78,16 @@ public class Line extends BaseEntity {
         if (sections.stream().map(Section::getUpStation).anyMatch(station -> station.equals(downStation))
                 || sections.stream().map(Section::getDownStation).anyMatch(station -> station.equals(downStation))) {
             throw new IllegalArgumentException("새로운 구간의 하행역이 해당 노선에 이미 등록되어있습니다.");
+        }
+    }
+
+    private void verifyCanBeDeleted(Station station) {
+        if (sections.size() <= 1) {
+            throw new IllegalStateException("노선에 구간이 부족하여 역을 삭제할 수 없습니다.");
+        }
+
+        if (!sections.get(sections.size() - 1).getDownStation().equals(station)) {
+            throw new IllegalArgumentException("삭제하려는 역은 해당 노선 마지막 구간의 하행역이 아닙니다.");
         }
     }
 

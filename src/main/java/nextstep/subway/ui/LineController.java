@@ -62,5 +62,14 @@ public class LineController {
         lineService.addStationToLine(lineId, sectionRequest);
     }
 
+    @DeleteMapping("/{lineId}/sections")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeLineStation(
+            @PathVariable Long lineId,
+            @RequestParam Long stationId
+    ) {
+        lineService.popStationToLine(lineId, stationId);
+    }
+
 
 }

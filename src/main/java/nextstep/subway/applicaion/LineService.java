@@ -84,9 +84,9 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    public void addStationToLine(Long lienId, SectionRequest sectionRequest) {
-        var line = lineRepository.findById(lienId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + lienId));
+    public void addStationToLine(Long lineId, SectionRequest sectionRequest) {
+        var line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + lineId));
 
         var upStationId = sectionRequest.getUpStationId();
         var downStationId = sectionRequest.getDownStationId();
@@ -100,6 +100,16 @@ public class LineService {
         var section = new Section(upStation, downStation, distance);
         section.setLine(line);
         line.addSection(section);
+    }
+
+    public void popStationToLine(Long lineId, Long stationId) {
+        var line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선 id: " + lineId));
+
+        var station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + stationId));
+
+        line.remove(station);
     }
 
     private boolean isLineNamePresent(String lineName) {
