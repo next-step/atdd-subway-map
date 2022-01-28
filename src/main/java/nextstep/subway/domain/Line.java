@@ -39,7 +39,7 @@ public class Line extends BaseEntity {
     }
 
     private void validateUpStation(Station upStation) {
-        if (!sections.isLastStaion(upStation)) {
+        if (!sections.isLastStation(upStation)) {
             throw new RegisterStationException();
         }
     }

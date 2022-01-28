@@ -32,7 +32,7 @@ public class Sections {
         sections.add(new Section(upStation, downStation, distance));
     }
 
-    public boolean isLastStaion(Station station) {
+    public boolean isLastStation(Station station) {
         Section lastSection = getLastSection();
 
         return lastSection.isDownStation(station);
@@ -75,7 +75,9 @@ public class Sections {
         List<Station> stations = new ArrayList<>();
         sections.forEach(station -> stations.addAll(station.getStations()));
 
-        return stations.stream().distinct().collect(Collectors.toList());
+        return stations.stream()
+            .distinct()
+            .collect(Collectors.toList());
     }
 
 }

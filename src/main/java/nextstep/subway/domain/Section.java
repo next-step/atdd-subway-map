@@ -27,7 +27,7 @@ public class Section extends BaseEntity {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Station downStation;
 
-    private int distane;
+    private int distance;
 
     protected Section() {
     }
@@ -36,7 +36,7 @@ public class Section extends BaseEntity {
         validateSection(upStation, downStation, distane);
         this.upStation = upStation;
         this.downStation = downStation;
-        this.distane = distane;
+        this.distance = distane;
     }
 
     private void validateSection(Station upStation, Station downStation, int distane) {
