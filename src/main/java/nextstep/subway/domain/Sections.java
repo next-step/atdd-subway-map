@@ -37,16 +37,16 @@ public class Sections {
     }
 
     public List<Long> getAllStations() {
-        List<Long> results = new ArrayList<>();
+        List<Long> allStationIds = new ArrayList<>();
 
         List<Long> upStationIds = sections.stream()
                 .map(Section::getUpStationId)
                 .collect(Collectors.toList());
 
-        results.addAll(upStationIds);
-        results.add(lastSection().getDownStationId());
+        allStationIds.addAll(upStationIds);
+        allStationIds.add(lastSection().getDownStationId());
 
-        return results;
+        return allStationIds;
     }
 
     public void deleteSection(final Long stationId) {

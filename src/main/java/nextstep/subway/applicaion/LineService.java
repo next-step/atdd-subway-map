@@ -47,7 +47,7 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineStationResponse searchLine(final Long lineId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
+        Line line = getLine(lineId);
         List<Station> stations = stationRepository.findAllById(line.getAllStations());
 
         return new LineStationResponse(line, stations);
@@ -56,17 +56,18 @@ public class LineService {
     @Transactional
     public void updateLine(final LineUpdateRequest request) {
         boolean existLineName = lineRepository.existsByName(request.getName());
-        Line line = lineRepository.findById(request.getId()).orElseThrow(IllegalArgumentException::new);
+        Line line = getLine(request.getId());
 
-        if (existLineName && !line.equalsName(request.getName())) {
-            throw new IllegalArgumentException();
-        }
-
-        line.update(request.getName(), request.getColor());
+        line.update(existLineName, request.getName(), request.getColor());
     }
 
     @Transactional
     public void deleteLine(final Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional(readOnly = true)
+    public Line getLine(final Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
     }
 }

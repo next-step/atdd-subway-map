@@ -37,7 +37,11 @@ public class Line extends BaseEntity {
         this(name, color, new Sections(new Section(upStationId, downStationId, distance)));
     }
 
-    public void update(final String name, final String color) {
+    public void update(final boolean existLineName, final String name, final String color) {
+        if (existLineName && !this.name.equals(name)) {
+            throw new IllegalArgumentException();
+        }
+
         this.name = name;
         this.color = color;
     }

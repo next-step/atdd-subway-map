@@ -1,19 +1,18 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.utils.LineAcceptanceHelper.노선_생성;
-import static nextstep.subway.utils.LineAcceptanceHelper.노선_조회;
-import static nextstep.subway.utils.SectionAcceptanceHelper.구간_제거;
-import static nextstep.subway.utils.SectionAcceptanceHelper.구간_추가;
-import static nextstep.subway.utils.StationAcceptanceTest.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineStationResponse;
+import nextstep.subway.utils.CustomRestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @DisplayName("지하철 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -81,5 +80,49 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(lineStationResponse.getStationResponses()).extracting(LineStationResponse.Station::getId).containsExactly(Long.valueOf(강남역_id), Long.valueOf(삼성역_id)),
                 () -> assertThat(lineStationResponse.getStationResponses()).extracting(LineStationResponse.Station::getName).containsExactly("강남역", "삼성역")
         );
+    }
+
+    private ExtractableResponse<Response> 노선_조회(final String createdLineId) {
+        return CustomRestAssured.get("/lines/" + createdLineId);
+    }
+
+    private ExtractableResponse<Response> 노선_생성(final String lineName, final String lineColor, String upStationId, String downStationId, String distance) {
+        return CustomRestAssured.post("/lines/", lineCreateParams(lineName, lineColor, upStationId, downStationId, distance));
+    }
+
+    private ExtractableResponse<Response> 구간_추가(final String upStationId, final String downStationId, final String lineId, String distance) {
+        Map<String, String> params = sectionAddParams(upStationId, downStationId, distance);
+
+        return CustomRestAssured.post("/lines/" + lineId + "/sections", params);
+    }
+
+    private ExtractableResponse<Response> 구간_제거(final String lineId, String stationId) {
+        return CustomRestAssured.delete("/lines/" + lineId + "/sections?stationId=" + stationId);
+    }
+
+    private ExtractableResponse<Response> 지하철역_생성(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return CustomRestAssured.post("/stations", params);
+    }
+
+    private Map<String, String> sectionAddParams(final String upStationId, final String downStationId, final String distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("distance", distance);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        return params;
+    }
+
+    private Map<String, String> lineCreateParams(final String lineName, final String lineColor, String upStationId, String downStationId, String distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", lineColor);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return params;
     }
 }
