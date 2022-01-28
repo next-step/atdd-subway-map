@@ -92,12 +92,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/lines/1")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_조회(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -119,7 +114,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
+        long lineId = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성())
+            .as(LineResponse.class).getId();
 
         LineRequest editParams = LineRequest.of(
             "구분당선",
@@ -127,13 +123,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(editParams)
-            .when()
-            .put("/lines/1")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_수정(lineId, editParams);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -148,15 +138,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
+        long lineId = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성())
+            .as(LineResponse.class).getId();
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .delete("/lines/1")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_삭제(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
