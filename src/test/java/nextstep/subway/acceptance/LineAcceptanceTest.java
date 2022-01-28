@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -69,8 +70,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         Long lineId = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성()).body().as(LineResponse.class).getId();
-        Long stationId1 = StationSteps.지하철역_생성("미금역").body().as(LineResponse.class).getId();
-        Long stationId2 = StationSteps.지하철역_생성("정자역").body().as(LineResponse.class).getId();
+        Long stationId1 = StationSteps.지하철역_생성("미금역").body().as(StationResponse.class).getId();
+        Long stationId2 = StationSteps.지하철역_생성("정자역").body().as(StationResponse.class).getId();
         SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
 
         // when
