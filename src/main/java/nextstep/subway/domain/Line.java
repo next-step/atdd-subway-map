@@ -2,10 +2,13 @@ package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.Section;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.exception.DeleteSectionException;
+import nextstep.subway.exception.SectionNotValidException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,11 +54,11 @@ public class Line extends BaseEntity {
 
     public void addSection(Section section) {
         if (!validateUpStation(section.getUpStation())) {
-            throw new IllegalArgumentException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
+            throw new SectionNotValidException("새로운 구간의 상행역은 현재 등록되어있는 하행 종점역이어야 합니다.");
         }
 
         if (!validateDownStation(section.getDownStation())) {
-            throw new IllegalArgumentException("하행역은 현재 등록되어있는 역일 수 없습니다.");
+            throw new SectionNotValidException("하행역은 현재 등록되어있는 역일 수 없습니다.");
         }
 
         sections.add(section);
@@ -96,12 +99,12 @@ public class Line extends BaseEntity {
             .stream()
             .map(Section::getDownStation)
             .reduce((a, b) -> b)
-            .orElseThrow(() -> new IllegalArgumentException("하행 종점역이 없습니다."));
+            .orElseThrow(() -> new NoSuchElementException("하행 종점역이 없습니다."));
     }
 
     public void deleteSection(Long lastDownStationId) {
         if (sections.size() <= 1) {
-            throw new IllegalArgumentException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
+            throw new DeleteSectionException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
         }
 
         Station lastDownStation = getLastDownStation();
@@ -110,7 +113,7 @@ public class Line extends BaseEntity {
             .filter(section -> section.getDownStation() == lastDownStation)
             .filter(section -> section.getDownStation().getId().equals(lastDownStationId))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("마지막 역(하행 종점역)만 제거할 수 있습니다."));
+            .orElseThrow(() -> new DeleteSectionException("마지막 역(하행 종점역)만 제거할 수 있습니다."));
 
         sections.remove(delete);
     }

@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
+import nextstep.subway.exception.SameStationException;
 
 import javax.persistence.*;
 
@@ -43,7 +44,7 @@ public class Section {
 
     public Section(Station upStation, Station downStation, int distance) {
         if (upStation == downStation) {
-            throw new IllegalArgumentException("상행역과 하행역이 같을 수 없습니다.");
+            throw new SameStationException("상행역과 하행역이 같을 수 없습니다.");
         }
 
         this.upStation = upStation;

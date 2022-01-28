@@ -7,6 +7,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicateLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("이미 존재하는 노선입니다.");
+            throw new DuplicateLineException();
         }
 
         Line line = lineRepository.save(request.toEntity());
