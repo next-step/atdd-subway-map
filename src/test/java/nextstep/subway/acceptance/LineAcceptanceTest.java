@@ -9,7 +9,6 @@ import static nextstep.subway.step.LineStep.노선_생성;
 import static nextstep.subway.step.StationStep.역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.ChangeLineRequest;
@@ -18,7 +17,6 @@ import nextstep.subway.utils.RequestMethod;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -65,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Then 생성에 실패한다
      */
     @Test
-    @DisplayName("지하철 노선 생성 실패")
+    @DisplayName("노선 생성 시 두 종점역을 모두 입력하지 않으면 지하철 노선 생성 실패 한다")
     void createLineExceptionTest() {
         //give
         String failParam = "fail";
@@ -100,13 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         SectionRequest sectionRequest = new SectionRequest(역삼역_id, 교대역_id, DEFAULT_DISTANCE);
 
-        ExtractableResponse<Response> sectionRegisterResponse = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(sectionRequest)
-            .when()
-            .post(DEFAULT_PATH + "/" + 신분당선_id + "/sections")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> sectionRegisterResponse = 구간_생성(DEFAULT_PATH + "/" + 신분당선_id + "/sections", sectionRequest);
 
         // then
         assertThat(sectionRegisterResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
