@@ -2,8 +2,10 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.step.StationStep;
 import nextstep.subway.fixture.LineFixture;
 import nextstep.subway.acceptance.step.LineStep;
+import nextstep.subway.fixture.StationFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
+        var station1 = StationFixture.신논현역;
+        var station2 = StationFixture.강남역;
+        StationStep.역_생성_요청(station1);
+        StationStep.역_생성_요청(station2);
+
         var params = LineFixture.신분당선;
 
         // when
@@ -43,11 +50,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        var params1 = LineFixture.신분당선;
-        var createResponse1 = LineStep.노선_생성_요청(params1);
+        var station1 = StationFixture.신논현역;
+        var station2 = StationFixture.강남역;
+        var station3 = StationFixture.역삼역;
+        StationStep.역_생성_요청(station1);
+        StationStep.역_생성_요청(station2);
+        StationStep.역_생성_요청(station3);
 
-        var params2 = LineFixture.구분당선;
-        var createResponse2 = LineStep.노선_생성_요청(params2);
+        var params1 = LineFixture.신분당선;
+        LineStep.노선_생성_요청(params1);
+
+        var params2 = LineFixture.이호선;
+        LineStep.노선_생성_요청(params2);
 
         // when
         var response = LineStep.노선_목록_조회_요청();
@@ -65,6 +79,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
+        var station1 = StationFixture.신논현역;
+        var station2 = StationFixture.강남역;
+        StationStep.역_생성_요청(station1);
+        StationStep.역_생성_요청(station2);
+
         var params = LineFixture.신분당선;
         var createResponse = LineStep.노선_생성_요청(params);
 
@@ -85,11 +104,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
+        var station1 = StationFixture.신논현역;
+        var station2 = StationFixture.강남역;
+        StationStep.역_생성_요청(station1);
+        StationStep.역_생성_요청(station2);
+
         var params = LineFixture.신분당선;
         var createResponse = LineStep.노선_생성_요청(params);
 
         // when
-        var modifyParams = LineFixture.구분당선;
+        var modifyParams = LineFixture.이호선;
 
         var uri = createResponse.header("Location");
         var response = LineStep.노선_수정_요청(uri, modifyParams);
@@ -107,6 +131,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
+        var station1 = StationFixture.신논현역;
+        var station2 = StationFixture.강남역;
+        StationStep.역_생성_요청(station1);
+        StationStep.역_생성_요청(station2);
+
         var params = LineFixture.신분당선;
         var createResponse = LineStep.노선_생성_요청(params);
 
@@ -127,6 +156,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         // given
+        var station1 = StationFixture.신논현역;
+        var station2 = StationFixture.강남역;
+        StationStep.역_생성_요청(station1);
+        StationStep.역_생성_요청(station2);
+
         var params = LineFixture.신분당선;
         var createResponse = LineStep.노선_생성_요청(params);
 
@@ -142,19 +176,19 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    private void 노선_목록_조회_완료(ExtractableResponse<Response> response, Map<String, String>... paramsArgs) {
+    private void 노선_목록_조회_완료(ExtractableResponse<Response> response, Map<String, Object>... paramsArgs) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         var lineNames = response.jsonPath().getList("name");
         assertThat(lineNames).contains(Arrays.stream(paramsArgs).map(m -> m.get("name")).toArray());
     }
 
-    private void 노선_조회_완료(ExtractableResponse<Response> response, Map<String, String> params) {
+    private void 노선_조회_완료(ExtractableResponse<Response> response, Map<String, Object> params) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         var lineName = response.jsonPath().getString("name");
         assertThat(lineName).isEqualTo(params.get("name"));
     }
 
-    private void 노선_수정_완료(ExtractableResponse<Response> response, Map<String, String> modifyParams) {
+    private void 노선_수정_완료(ExtractableResponse<Response> response, Map<String, Object> modifyParams) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         var lineName = response.jsonPath().getString("name");
         assertThat(lineName).isEqualTo(modifyParams.get("name"));

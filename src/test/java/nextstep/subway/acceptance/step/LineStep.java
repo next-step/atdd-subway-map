@@ -11,7 +11,7 @@ public class LineStep {
 
     private static final String PATH = "/lines";
 
-    public static ExtractableResponse<Response> 노선_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 노선_생성_요청(Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(ContentType.JSON)
@@ -39,7 +39,7 @@ public class LineStep {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 노선_수정_요청(String uri, Map<String, String> params) {
+    public static ExtractableResponse<Response> 노선_수정_요청(String uri, Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
