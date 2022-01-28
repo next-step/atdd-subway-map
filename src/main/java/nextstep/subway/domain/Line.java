@@ -11,14 +11,15 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
     @Embedded
-    private Sections sections = new Sections();
+    private Sections sections;
 
     public Line() {
     }
 
-    public Line(String name, String color) {
+    public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
+        this.sections = Sections.withStation(new Section(this, upStation, downStation, distance));
     }
 
     public Long getId() {

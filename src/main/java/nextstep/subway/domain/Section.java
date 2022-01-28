@@ -53,11 +53,7 @@ public class Section extends BaseEntity {
         return distance;
     }
 
-    public boolean isStartWith(Station other) {
-        return other == null || upStation.equals(other);
-    }
-
-    public boolean isEndWith(Station other) {
-        return downStation.equals(other);
+    public boolean hasStation(Station other) {
+        return upStation.equals(other) || downStation.equals(other);
     }
 }

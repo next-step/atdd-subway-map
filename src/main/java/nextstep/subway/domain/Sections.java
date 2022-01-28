@@ -15,6 +15,16 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
+    public Sections() {
+    }
+
+    private Sections(Section section) {
+        this.sections.add(section);
+    }
+
+    public static Sections withStation(Section section) {
+        return new Sections(section);
+    }
 
     public void add(Section section) {
         if (!isCurrentDownStation(section.getUpStation())) {
@@ -63,6 +73,6 @@ public class Sections {
     }
 
     private boolean isComposedOf(Station station) {
-        return sections.stream().anyMatch(section -> section.isStartWith(station) || section.isEndWith(station));
+        return sections.stream().anyMatch(section -> section.hasStation(station));
     }
 }

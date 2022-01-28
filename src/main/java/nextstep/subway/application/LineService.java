@@ -5,6 +5,7 @@ import nextstep.subway.application.dto.LineResponse;
 import nextstep.subway.application.dto.SectionRequest;
 import nextstep.subway.domain.*;
 import nextstep.subway.domain.exception.LineException;
+import nextstep.subway.domain.exception.StationException;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,26 +17,26 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final SectionService sectionService;
+    private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, SectionService sectionService) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.sectionService = sectionService;
+        this.stationRepository = stationRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line line = new Line(request.getName(), request.getColor());
+        SectionRequest sectionRequest = new SectionRequest(request.getUpStationId(), request.getDownStationId(), request.getDistance());
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+                .orElseThrow(() -> new StationException.NotFound(sectionRequest.getUpStationId()));
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                .orElseThrow(() -> new StationException.NotFound(sectionRequest.getDownStationId()));
+        Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
 
         if (lineRepository.exists(Example.of(line))) {
             throw new LineException.Duplicated(line);
         }
 
         Line created = lineRepository.save(line);
-
-        if (request.hasSectionInformation()) {
-            sectionService.saveSection(created.getId(), new SectionRequest(request.getUpStationId(), request.getDownStationId(), request.getDistance()));
-        }
-
         return LineResponse.fromLine(created);
     }
 
