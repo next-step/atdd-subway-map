@@ -41,20 +41,35 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineReadResponse findLine(final Long lineId) {
-        final Line line = findLineById(lineId);
+    public LineReadResponse findLine(final Long id) {
+        final Line line = findLineById(id);
         return new LineReadResponse(line, Collections.EMPTY_LIST);
     }
 
-    public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
+    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
         validateDuplicatedLineName(lineUpdateRequest.getName());
         validateDuplicatedLineColor(lineUpdateRequest.getColor());
-        final Line line = findLineById(lineId);
+        final Line line = findLineById(id);
         line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     public void delete(final Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public SectionSaveResponse addSection(final Long lidneId, final SectionAddRequest sectionAddRequest) {
+        final Line line = findLineById(lidneId);
+        final Station downStation = findByStationById(sectionAddRequest.getDownStationId());
+        final Station upStation = findByStationById(sectionAddRequest.getUpStationId());
+        final Section section = new Section(line, upStation, downStation, sectionAddRequest.getDistance());
+        line.addSection(section);
+        return new SectionSaveResponse(section);
+    }
+
+    public void removeSection(final Long id, final Long downEndStationId) {
+        final Line line = findLineById(id);
+        final Station downEndStation = findByStationById(downEndStationId);
+        line.removeSection(downEndStation);
     }
 
     private void validateDuplicatedLineName(final String lineName) {
@@ -67,15 +82,6 @@ public class LineService {
         if (lineRepository.existsByColor(lineColor)) {
             throw new EntityExistsException("duplicate line color occurred");
         }
-    }
-
-    public SectionSaveResponse addSection(final Long lineId, final SectionAddRequest sectionAddRequest) {
-        final Line line = findLineById(lineId);
-        final Station downStation = findByStationById(sectionAddRequest.getDownStationId());
-        final Station upStation = findByStationById(sectionAddRequest.getUpStationId());
-        final Section section = new Section(line, upStation, downStation, sectionAddRequest.getDistance());
-        line.addSection(section);
-        return new SectionSaveResponse(section);
     }
 
     private Line findLineById(final Long lineId) {

@@ -19,11 +19,22 @@ public class Sections {
     }
 
     public void add(final Section section) {
-        validateSection(section);
+        validateAddSection(section);
         this.sections.add(section);
     }
 
-    private void validateSection(final Section section) {
+    public void remove(final Station station) {
+        validateRemoveSection(station);
+        this.sections.remove(sections.get(sections.size() - GAP_SIZE));
+    }
+
+    private void validateRemoveSection(final Station station) {
+        if (sections.size() <= 1 || !sections.get(sections.size() - GAP_SIZE).isDownStation(station)) {
+            throw new IllegalArgumentException("invalid station occurred");
+        }
+    }
+
+    private void validateAddSection(final Section section) {
         if (validateUpStation(section.getUpStation()) || validateDownStation(section.getDownStation())) {
             throw new IllegalArgumentException("invalid station occurred");
         }
