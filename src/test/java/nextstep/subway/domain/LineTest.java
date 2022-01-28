@@ -66,9 +66,23 @@ class LineTest {
         // when
         List<StationResponse> allStations = line.getAllStations();
 
-        assertThat(allStations.size()).isEqualTo(3);
+        assertThat(allStations).hasSize(3);
         assertThat(allStations.get(0).getName()).isEqualTo(station1.getName());
         assertThat(allStations.get(1).getName()).isEqualTo(station2.getName());
         assertThat(allStations.get(2).getName()).isEqualTo(station3.getName());
+    }
+
+    @DisplayName("노선 구간 추가 ")
+    @Test
+    void 노선에_구간_추가() {
+        Station station1 = new Station("강남역");
+        Station station2 = new Station("역삼역");
+        Section section = new Section(station1, station2, 10);
+        Line line = new Line("2호선", "bg-green-600");
+
+        line.addSection(section);
+
+        assertThat(line.getSections()).hasSize(1);
+        assertThat(line.getAllStations()).hasSize(2);
     }
 }
