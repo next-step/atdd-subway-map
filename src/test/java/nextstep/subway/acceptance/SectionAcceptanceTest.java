@@ -3,7 +3,9 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -60,10 +62,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void validateUpStation() {
         // given
-        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
-        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
-        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
-        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().jsonPath().getLong("id");
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().as(LineResponse.class).getId();
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().as(StationResponse.class).getId();
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().as(StationResponse.class).getId();
+        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().as(StationResponse.class).getId();
         SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
 
         // when
@@ -84,9 +86,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void validateDownStation() {
         // given
-        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
-        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
-        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().as(LineResponse.class).getId();
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().as(StationResponse.class).getId();
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().as(StationResponse.class).getId();
         SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
 
         // when
@@ -107,10 +109,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
-        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
-        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
-        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().jsonPath().getLong("id");
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().as(LineResponse.class).getId();
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().as(StationResponse.class).getId();
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().as(StationResponse.class).getId();
+        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().as(StationResponse.class).getId();
         ExtractableResponse<Response> response1 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
         ExtractableResponse<Response> response2 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId2, stationId3, 5), lineId);
 
@@ -132,10 +134,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionValidateLastDownStation() {
         // given
-        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
-        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
-        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
-        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().jsonPath().getLong("id");
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().as(LineResponse.class).getId();
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().as(StationResponse.class).getId();
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().as(StationResponse.class).getId();
+        Long stationId3 = StationSteps.지하철역_생성("선릉역").body().as(StationResponse.class).getId();
         ExtractableResponse<Response> response1 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
         ExtractableResponse<Response> response2 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId2, stationId3, 5), lineId);
 
@@ -157,9 +159,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSingleSection() {
         // given
-        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().jsonPath().getLong("id");
-        Long stationId1 = StationSteps.지하철역_생성("강남역").body().jsonPath().getLong("id");
-        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().jsonPath().getLong("id");
+        Long lineId = LineSteps.지하철_노선_생성(LineSteps.이호선_요청_생성()).body().as(LineResponse.class).getId();
+        Long stationId1 = StationSteps.지하철역_생성("강남역").body().as(StationResponse.class).getId();
+        Long stationId2 = StationSteps.지하철역_생성("역삼역").body().as(StationResponse.class).getId();
         ExtractableResponse<Response> response1 = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId2, 10), lineId);
 
         // when
