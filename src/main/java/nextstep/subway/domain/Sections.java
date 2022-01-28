@@ -4,11 +4,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
 
+    private static final int FIRST = 0;
     private static final int GAP_SIZE = 1;
     private static final int AVAILABLE_REMOVE_SIZE = 1;
 
@@ -63,5 +66,18 @@ public class Sections {
 
     private Section lastSection() {
         return sections.get(sections.size() - GAP_SIZE);
+    }
+
+    public List<Station> getStations() {
+        if (sections.isEmpty()) {
+            return new ArrayList<>();
+        }
+        final List<Station> stations = sections.stream()
+                .map(it -> it.getDownStation())
+                .collect(Collectors.toList());
+        final Section firstSection = sections.get(FIRST);
+        final Station upEndStation = firstSection.getUpStation();
+        stations.add(upEndStation);
+        return Collections.unmodifiableList(stations);
     }
 }

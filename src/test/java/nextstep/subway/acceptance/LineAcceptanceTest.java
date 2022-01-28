@@ -213,7 +213,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.header("Date")).isNotBlank(),
                 () -> assertThat(response.body().jsonPath().get("id").equals(1)).isTrue(),
                 () -> assertThat(response.body().jsonPath().get(LINE_NAME).equals(신분당선)).isTrue(),
-                () -> assertThat(response.body().jsonPath().get(LINE_COLOR).equals(빨강색)).isTrue()
+                () -> assertThat(response.body().jsonPath().get(LINE_COLOR).equals(빨강색)).isTrue(),
+                () -> assertThat(response.jsonPath().getList("stations.name")).contains(강남역, 양재역)
         );
     }
 

@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,14 +35,14 @@ public class LineService {
     @Transactional(readOnly = true)
     public List<LineReadAllResponse> findAllLine() {
         return lineRepository.findAll().stream()
-                .map(line -> new LineReadAllResponse(line, Collections.EMPTY_LIST))
+                .map(LineReadAllResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineReadResponse findLine(final Long id) {
         final Line line = findLineById(id);
-        return new LineReadResponse(line, Collections.EMPTY_LIST);
+        return LineReadResponse.of(line);
     }
 
     public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
