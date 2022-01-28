@@ -1,0 +1,43 @@
+package nextstep.subway.acceptance;
+
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static nextstep.subway.fixture.TLine.신분당선;
+import static nextstep.subway.steps.LineSteps.지하철_노선_생성_요청;
+import static nextstep.subway.steps.SectionSteps.구간_등록_성공;
+import static nextstep.subway.steps.SectionSteps.지하철_구간_등록_요청;
+import static nextstep.subway.steps.StationSteps.지하철_역_생성_요청;
+
+@DisplayName("지하철 노선 구간 관리 기능")
+public class SectionAcceptanceTest extends AcceptanceTest {
+
+    @BeforeEach
+    void setup() {
+        지하철_역_생성_요청("역1");
+        지하철_역_생성_요청("역2");
+        지하철_역_생성_요청("역3");
+    }
+
+    /**
+     * 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성 노선 하행역과 이어지는 구간 등록을 요청하면
+     * Then 지하철 노선 구간 등록이 성공한다.
+     */
+    @DisplayName("구간 등록")
+    @Test
+    void addSection() {
+        // given
+        지하철_노선_생성_요청(신분당선);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청();
+
+        // then
+        구간_등록_성공(response);
+    }
+}

@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.exception.LineNameDuplicatedException;
 import nextstep.subway.applicaion.exception.LineNotFoundException;
 import nextstep.subway.applicaion.exception.NotFoundException;
@@ -39,6 +40,17 @@ public class LineService {
 
         Line savedLine = lineRepository.save(line);
         return LineResponse.fromEntity(savedLine);
+    }
+
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        lineRepository.findById(lineId)
+                .orElseThrow(() -> new LineNotFoundException(lineId))
+                .addSection(
+                        createSection(
+                                sectionRequest.getUpStationId(),
+                                sectionRequest.getDownStationId(),
+                                sectionRequest.getDistance())
+                );
     }
 
     private Section createSection(Long upStationId, Long downStationId, int distance) {
