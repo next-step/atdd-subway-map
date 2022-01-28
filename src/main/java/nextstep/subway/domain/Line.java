@@ -102,16 +102,19 @@ public class Line extends BaseEntity {
             .orElseThrow(() -> new NoSuchElementException("하행 종점역이 없습니다."));
     }
 
-    public void deleteSection(Long lastDownStationId) {
+    public void deleteSection(long lastDownStationId) {
+        Station lastDownStation = getLastDownStation();
+
         if (sections.size() <= 1) {
             throw new DeleteSectionException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
         }
 
-        Station lastDownStation = getLastDownStation();
+        if (!lastDownStation.isSameStation(lastDownStationId)) {
+            throw new DeleteSectionException("구간에 일치하는 하행 종점역이 없습니다.");
+        }
 
         Section delete = sections.stream()
             .filter(section -> section.getDownStation() == lastDownStation)
-            .filter(section -> section.getDownStation().getId().equals(lastDownStationId))
             .findFirst()
             .orElseThrow(() -> new DeleteSectionException("마지막 역(하행 종점역)만 제거할 수 있습니다."));
 
