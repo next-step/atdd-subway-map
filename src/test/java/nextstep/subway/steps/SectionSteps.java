@@ -17,4 +17,13 @@ public class SectionSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> executeSectionDeleteRequest(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
+                .then().log().body()
+                .extract();
+    }
+
 }

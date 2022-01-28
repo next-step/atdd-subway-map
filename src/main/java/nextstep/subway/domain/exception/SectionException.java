@@ -1,6 +1,7 @@
 package nextstep.subway.domain.exception;
 
 import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Station;
 
 public class SectionException extends RuntimeException {
 
@@ -14,5 +15,9 @@ public class SectionException extends RuntimeException {
 
     public static SectionException ofIllegalDownStation(Section section) {
         return new SectionException("Illegal Section; Requested downStation already belongs to the Line");
+    }
+
+    public static SectionException ofIllegalDownStation(Station station) {
+        return new SectionException("Illegal Station; Requested downStation is not Line's downStation");
     }
 }

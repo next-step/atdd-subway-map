@@ -72,6 +72,16 @@ public class Line extends BaseEntity {
         sections.add(section);
     }
 
+    public void shorten(Station station) {
+        if (!isDownStation(station)) {
+            throw SectionException.ofIllegalDownStation(station);
+        }
+    }
+
+    private boolean isDownStation(Station station) {
+        return station.equals(getDownStation());
+    }
+
     private boolean isComposedOf(Station station) {
         return sections.stream().anyMatch(section -> section.isStartWith(station) || section.isEndWith(station));
     }

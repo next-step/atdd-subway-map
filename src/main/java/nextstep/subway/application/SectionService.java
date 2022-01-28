@@ -30,4 +30,11 @@ public class SectionService {
         line.extend(section);
         return SectionResponse.fromSection(section);
     }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new LineException.NotFound(lineId));
+        Station station = stationRepository.findById(stationId).
+                orElseThrow(() -> new StationException.NotFound(stationId));
+        line.shorten(station);
+    }
 }

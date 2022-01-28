@@ -145,6 +145,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("하행 종점역이 아닌 역에 대한 구간 삭제 요청")
     @Test
     void deleteNotDownStationSection() {
+        ExtractableResponse<Response> response = SectionSteps.executeSectionDeleteRequest(lineId, firstUpStationId);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).contains("Illegal Station");
     }
 
     /**
