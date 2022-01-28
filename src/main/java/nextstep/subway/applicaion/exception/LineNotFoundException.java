@@ -1,10 +1,10 @@
 package nextstep.subway.applicaion.exception;
 
-public class LineNotFoundException extends RuntimeException {
+public class LineNotFoundException extends NotFoundException {
 
-    private static final String MSG_INVALID_LINE_ID = "INVALID LINE id: %s";
+    private static final String TYPE = "LINE";
 
     public LineNotFoundException(Long id) {
-        super(String.format(MSG_INVALID_LINE_ID, id));
+        super(TYPE, id);
     }
 }

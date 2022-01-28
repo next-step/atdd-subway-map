@@ -1,6 +1,6 @@
 package nextstep.subway.ui.advice;
 
-import nextstep.subway.applicaion.exception.LineNotFoundException;
+import nextstep.subway.applicaion.exception.NotFoundException;
 import nextstep.subway.applicaion.exception.NameDuplicatedException;
 import nextstep.subway.ui.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(LineNotFoundException.class)
-    public ErrorResponse handleLineNotFoundException(LineNotFoundException e) {
+    @ExceptionHandler(NotFoundException.class)
+    public ErrorResponse handleLineNotFoundException(NotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 }
