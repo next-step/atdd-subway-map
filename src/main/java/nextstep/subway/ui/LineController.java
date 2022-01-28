@@ -1,8 +1,10 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.dto.LineAndSectionResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +23,8 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        LineResponse lineResponse = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,5 +52,12 @@ public class LineController {
         lineService.deleteLine(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{id}/sections")
+    public ResponseEntity<LineAndSectionResponse> saveSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineAndSectionResponse lineAndSectionResponse = lineService.saveSection(id, sectionRequest);
+
+        return ResponseEntity.created(URI.create("/lines/" + lineAndSectionResponse.getLineId())).body(lineAndSectionResponse);
     }
 }
