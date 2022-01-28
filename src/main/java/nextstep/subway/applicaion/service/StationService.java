@@ -1,9 +1,9 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.service;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.dto.request.StationRequest;
+import nextstep.subway.applicaion.dto.response.StationResponse;
+import nextstep.subway.domain.Entity.Station;
+import nextstep.subway.domain.Repository.StationRepository;
 import nextstep.subway.exception.DuplicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;

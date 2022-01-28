@@ -1,4 +1,4 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.Entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +12,8 @@ public class Station extends BaseEntity {
     private Long id;
     private String name;
 
-    public Station() {
+    protected Station() {
+        //
     }
 
     public Station(String name) {

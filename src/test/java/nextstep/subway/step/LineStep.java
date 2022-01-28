@@ -3,20 +3,25 @@ package nextstep.subway.step;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.request.LineRequest;
+import nextstep.subway.ui.LineController;
 import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LineStep {
 
 	// 생성
-	public static ExtractableResponse<Response> saveLine(final String color, final String name) {
-		Map<String, String> request = request(color, name);
+	public static ExtractableResponse<Response> saveLine(
+					final String color,
+					final String name,
+					final Long upStationId,
+					final Long downStationId,
+					final int distance
+	) {
+		LineRequest request = request(color, name, upStationId, downStationId, distance);
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-						.when().post("/lines")
+						.when().post(LineController.LINES)
 						.then().log().all()
 						.extract();
 	}
@@ -26,7 +31,7 @@ public class LineStep {
 
 		return RestAssured
 						.given().log().all()
-						.when().get("/lines/{id}", id)
+						.when().get(LineController.LINES + LineController.ID, id)
 						.then().log().all()
 						.extract();
 
@@ -37,19 +42,26 @@ public class LineStep {
 
 		return RestAssured
 						.given().log().all()
-						.when().get("/lines")
+						.when().get(LineController.LINES)
 						.then().log().all()
 						.extract();
 	}
 
 
 	// 수정
-	public static ExtractableResponse<Response> updateLine(final String color, final String name, final Integer id) {
-		Map<String, String> request = request(color, name);
+	public static ExtractableResponse<Response> updateLine(
+					final String color,
+					final String name,
+					final Integer id,
+					final Long upStationId,
+					final Long downStationId,
+					final int distance
+	) {
+		LineRequest request = request(color, name, upStationId, downStationId, distance);
 
 		return RestAssured
 						.given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE).log().all()
-						.when().put("/lines/{id}", id)
+						.when().put(LineController.LINES + LineController.ID, id)
 						.then().log().all()
 						.extract();
 	}
@@ -59,17 +71,20 @@ public class LineStep {
 
 		return RestAssured
 						.given().log().all()
-						.when().delete("/lines/{id}", 1)
+						.when().delete(LineController.LINES + LineController.ID, 1)
 						.then().log().all()
 						.extract();
 	}
 
 	// 요청을 생성하는 메소드
-	public static Map<String, String> request(final String color, final String name) {
-		Map<String, String> request = new HashMap<>();
-		request.put("color", color);
-		request.put("name", name);
+	public static LineRequest request(
+					final String color,
+					final String name,
+					final Long upStationId,
+					final Long downStationId,
+					final int distance
+	) {
 
-		return request;
+		return new LineRequest(color, name, upStationId, downStationId, distance);
 	}
 }
