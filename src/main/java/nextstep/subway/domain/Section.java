@@ -64,10 +64,10 @@ public class Section {
     }
 
     public boolean isSameDownStation(Long stationId) {
-        return downStation.isSmaeStation(stationId);
+        return downStation.isSameStation(stationId);
     }
 
     public boolean isSameUpStation(Long stationId) {
-        return upStation.isSmaeStation(stationId);
+        return upStation.isSameStation(stationId);
     }
 }
