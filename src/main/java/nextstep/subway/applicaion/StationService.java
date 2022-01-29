@@ -46,11 +46,17 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+        return StationResponse.builder()
+                .id(station.getId())
+                .name(station.getName())
+                .createdDate(station.getCreatedDate())
+                .modifiedDate(station.getModifiedDate())
+                .build();
+    }
+
+    public List<StationResponse> createStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(this::createStationResponse)
+                .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -20,10 +21,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, StationService stationService) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -63,13 +66,17 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
+        List<StationResponse> stationResponses = stationService.createStationResponses(
+                line.getSections()
+                        .getAllStations()
+        );
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
                 .createdDate(line.getCreatedDate())
                 .modifiedDate(line.getModifiedDate())
-                .stations(line.getSections().getAllStations())
+                .stations(stationResponses)
                 .build();
     }
 

@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
 import lombok.Builder;
-import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +9,7 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private List<Station> stations;
+    private List<StationResponse> stations;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
@@ -21,7 +20,7 @@ public class LineResponse {
             String color,
             LocalDateTime createdDate,
             LocalDateTime modifiedDate,
-            List<Station> stations
+            List<StationResponse> stations
     ) {
         this.id = id;
         this.name = name;
@@ -51,7 +50,7 @@ public class LineResponse {
         return modifiedDate;
     }
 
-    public List<Station> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 }
