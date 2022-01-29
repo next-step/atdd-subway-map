@@ -1,6 +1,7 @@
 package nextstep.subway.ui.advice;
 
 import nextstep.subway.exception.InvalidDownStationException;
+import nextstep.subway.exception.InvalidUpStationException;
 import nextstep.subway.exception.NameDuplicatedException;
 import nextstep.subway.exception.NotFoundException;
 import nextstep.subway.ui.dto.ErrorResponse;
@@ -26,7 +27,8 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
-            InvalidDownStationException.class
+            InvalidDownStationException.class,
+            InvalidUpStationException.class
     })
     public ErrorResponse handleInvalidRequest(Exception e) {
         return new ErrorResponse(e.getMessage());

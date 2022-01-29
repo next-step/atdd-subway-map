@@ -19,6 +19,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         지하철_역_생성_요청("역1");
         지하철_역_생성_요청("역2");
         지하철_역_생성_요청("역3");
+        지하철_역_생성_요청("역4");
     }
 
     /**
@@ -54,6 +55,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_등록_요청(3L, 1L, 10);
+
+        // then
+        구간_등록_실패(response);
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성 노선 하행역과 이어지지 않는 구간 등록을 요청하면
+     * Then 지하철 노선 구간 등록이 실패한다.
+     */
+    @DisplayName("구간 등록 실패 - 기존 노선과 이어지지 않는 구간")
+    @Test
+    void addSectionDoesNotConnectedToPrevious() {
+        // given
+        지하철_노선_생성_요청(신분당선);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(3L, 4L, 10);
 
         // then
         구간_등록_실패(response);

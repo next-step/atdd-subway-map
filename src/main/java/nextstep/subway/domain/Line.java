@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.exception.InvalidDownStationException;
+import nextstep.subway.exception.InvalidUpStationException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -42,13 +43,33 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        validateSection(section);
+        if (!sections.isEmpty()) {
+            validateNewSection(section);
+        }
+
         this.sections.add(section);
         section.setLine(this);
     }
 
-    private void validateSection(Section section) {
+    private void validateNewSection(Section section) {
+        validateUpStation(section.getUpStation());
         validateDownStation(section.getDownStation());
+    }
+
+    private void validateUpStation(Station upStation) {
+        boolean isConnectedStation = getLastDownStation().equals(upStation);
+
+        if (!isConnectedStation) {
+            throw new InvalidUpStationException(upStation.getName());
+        }
+    }
+
+    private Station getLastDownStation() {
+        return getLastSection().getDownStation();
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size() - 1);
     }
 
     private void validateDownStation(Station downStation) {
