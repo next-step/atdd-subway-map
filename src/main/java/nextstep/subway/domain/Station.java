@@ -12,7 +12,7 @@ public class Station extends BaseEntity {
     private Long id;
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {
