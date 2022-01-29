@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.StationUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,24 +30,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     public void setup() {
-        노선에_속한_상행역 = Long.valueOf(
-                지하철_역_생성_요청(지하철_역_데이터_생성("상행역"))
-                        .jsonPath()
-                        .get("id")
-                        .toString()
-        );
-        노선에_속한_하행역 = Long.valueOf(
-                지하철_역_생성_요청(지하철_역_데이터_생성("하행역"))
-                        .jsonPath()
-                        .get("id")
-                        .toString()
-        );
-        노선에_속하지_않은_새로운역 = Long.valueOf(
-                지하철_역_생성_요청(지하철_역_데이터_생성("새로운역"))
-                        .jsonPath()
-                        .get("id")
-                        .toString()
-        );
+        노선에_속한_상행역 = 지하철_역_데이터_생성("상행역");
+        노선에_속한_하행역 = 지하철_역_데이터_생성("하행역");
+        노선에_속하지_않은_새로운역 = 지하철_역_데이터_생성("새로운역");
 
         지하철_노선 = Long.valueOf(
                 지하철_노선_생성요청(
@@ -58,6 +44,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                         .jsonPath()
                         .get("id")
                         .toString());
+    }
+
+    private Long 지하철_역_데이터_생성(String name) {
+        return Long.valueOf(
+                지하철_역_생성_요청(StationUtils.지하철_역_데이터_생성(name))
+                        .jsonPath()
+                        .get("id")
+                        .toString()
+        );
     }
 
     /**
@@ -86,7 +81,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
-        // todo 기능 구현
     }
 
     /**
@@ -97,6 +91,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("잘못된 하행역으로 구간 생성 시 에러")
     @Test
     void createSectionException1() {
+        // todo exception
     }
 
     /**
