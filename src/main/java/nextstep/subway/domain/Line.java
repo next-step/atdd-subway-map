@@ -12,6 +12,9 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private int distance;
 
     public Line() {
     }
