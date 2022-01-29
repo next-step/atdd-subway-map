@@ -32,9 +32,9 @@ public class SectionStepUtil {
 
     private static Map<String, Object> 구간파라미터생성(Long 상행종점, Long 하행종점, int 종점간거리) {
         Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 상행종점);
-        params.put("downStationId", 하행종점);
-        params.put("distance", 종점간거리);
+        params.put(LineStepUtil.노선_상행역_키, 상행종점);
+        params.put(LineStepUtil.노선_하행역_키, 하행종점);
+        params.put(LineStepUtil.노선_역간_거리_키, 종점간거리);
         return params;
     }
 

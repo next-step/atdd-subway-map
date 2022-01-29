@@ -36,12 +36,16 @@ public class LineStepUtil {
         return 겟_요청(url);
     }
 
+    public static ExtractableResponse<Response> 노선삭제(String url) {
+        return 딜리트_요청(url);
+    }
+
     public static ExtractableResponse<Response> 노선생성(Map<String, Object> param) {
         return 포스트_요청(기본주소, param);
     }
 
     public static ExtractableResponse<Response> 노선수정(ExtractableResponse<Response> createResponse) {
-        Map<String, Object> updateParam = 노선파라미터생성(수정노선, 수정색상, 상행종점, 하행종점, 종점간거리);
+        Map<String, Object> updateParam = 노선파라미터생성(수정노선, 수정색상, null, null, 0);
         ExtractableResponse<Response> updateResponse = 풋_요청(createResponse.header(HttpHeaders.LOCATION), updateParam);
         return updateResponse;
     }
