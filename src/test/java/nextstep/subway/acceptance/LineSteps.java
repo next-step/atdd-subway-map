@@ -103,4 +103,13 @@ public class LineSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_제거_요청(final Long lineId, final Long downStationId) {
+        return RestAssured.given().log().all()
+                .queryParam("stationId", downStationId)
+                .when()
+                .delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
 }

@@ -246,4 +246,82 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 구간 등록을 요청 하고
+     * When 지하철 구간 제거를 요청 하면
+     * Then 지하철 구간 제거가 성공 한다.
+     */
+    @DisplayName("지하철 구간 제거")
+    @Test
+    void removeSection() {
+        // given
+        final String 잠실역 = "잠실역";
+        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+        final ExtractableResponse<Response> createStationResponse = 지하철_역_생성_요청(잠실역);
+
+        final long lineId = createLineResponse.jsonPath().getLong("id");
+        final long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
+        final long downStationId = createStationResponse.jsonPath().getLong("id");
+        지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, downStationId);
+
+        // then
+        final ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(String.format("/lines/%d", lineId));
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(getLineResponse.jsonPath().getList("stations.name")).doesNotContain(잠실역)
+        );
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 구간 등록을 요청 하고
+     * When 하행 종점 역이 아닌 지하철 구간 제거를 요청 하면
+     * Then 지하철 구간 제거가 실패 한다.
+     */
+    @DisplayName("하행 종점 역이 아닌 지하철 구간 제거")
+    @Test
+    void removeSectionWithoutEndingStation() {
+        // given
+        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+        final ExtractableResponse<Response> createStationResponse = 지하철_역_생성_요청("잠실역");
+
+        final long lineId = createLineResponse.jsonPath().getLong("id");
+        final long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
+        final long downStationId = createStationResponse.jsonPath().getLong("id");
+        지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, upStationId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 하행 종점 역으로 지하철 구간 제거를 요청 하면
+     * Then 지하철 구간 제거가 실패 한다.
+     */
+    @DisplayName("구간이 한 개인 지하철 구간 제거")
+    @Test
+    void removeOnlyOneSection() {
+        // given
+        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+
+        final long lineId = createLineResponse.jsonPath().getLong("id");
+        final long EndingStationId = createLineResponse.jsonPath().getLong("stations[1].id");
+
+        // when
+        final ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, EndingStationId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
