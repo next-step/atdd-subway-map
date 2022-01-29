@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class LineValidator {
+public class LineValidator implements Validator<Line> {
 
     private final LineRepository lineRepository;
 
@@ -16,9 +16,9 @@ public class LineValidator {
         this.lineRepository = lineRepository;
     }
 
-    public void validateLine(final String name, final String color) {
-        validateName(name);
-        validateColor(color);
+    public void validate(final Line line) {
+        validateName(line.getName());
+        validateColor(line.getColor());
     }
 
     public void validateName(final String name) {

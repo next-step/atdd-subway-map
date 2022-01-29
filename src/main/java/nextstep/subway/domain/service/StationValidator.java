@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class StationValidator {
+public class StationValidator implements Validator<Station> {
 
     private final StationRepository stationRepository;
 
@@ -15,11 +15,11 @@ public class StationValidator {
         this.stationRepository = stationRepository;
     }
 
-    public void validateStation(final String name) {
-        validateName(name);
+    public void validate(final Station station) {
+        validateName(station.getName());
     }
 
-    public void validateName(final String name) {
+    private void validateName(final String name) {
         final List<Station> stations = stationRepository.findByName(name);
         if (!stations.isEmpty()) {
             throw new DuplicateArgumentException("중복된 이름 입니다.");

@@ -1,6 +1,6 @@
 package nextstep.subway.domain.entity;
 
-import nextstep.subway.domain.service.LineValidator;
+import nextstep.subway.domain.service.Validator;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,13 +19,11 @@ public class Line extends BaseEntity {
     public Line() {
     }
 
-    public Line(final String name,
-                final String color,
-                final LineValidator lineValidator) {
-        lineValidator.validateLine(name, color);
-
+    public Line(final String name, final String color, final Validator<Line> lineValidator) {
         this.name = name;
         this.color = color;
+
+        lineValidator.validate(this);
     }
 
     public Long getId() {
@@ -40,10 +38,10 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public void change(final String name, final String color, final LineValidator lineValidator) {
-        lineValidator.validateLine(name, color);
-
+    public void change(final String name, final String color, final Validator<Line> lineValidator) {
         this.name = name;
         this.color = color;
+
+        lineValidator.validate(this);
     }
 }

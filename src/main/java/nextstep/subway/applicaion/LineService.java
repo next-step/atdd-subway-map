@@ -4,7 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.entity.Line;
 import nextstep.subway.domain.repository.LineRepository;
-import nextstep.subway.domain.service.LineValidator;
+import nextstep.subway.domain.service.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final LineValidator lineValidator;
+    private final Validator<Line> lineValidator;
 
-    public LineService(final LineRepository lineRepository, final LineValidator lineValidator) {
+    public LineService(final LineRepository lineRepository, final Validator<Line> lineValidator) {
         this.lineRepository = lineRepository;
         this.lineValidator = lineValidator;
     }
