@@ -32,11 +32,25 @@ public class SectionSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .param("stationId", stationId)
+                .delete("/lines/1/sections")
+                .then().log().all()
+                .extract();
+    }
+
     public static void 구간_등록_성공(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     public static void 구간_등록_실패(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    public static void 구간_삭제_성공(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }

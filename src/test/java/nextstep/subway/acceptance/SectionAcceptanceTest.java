@@ -61,20 +61,22 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * 지하철 노선에서 구간을 삭제한다.
      * Given 지하철 노선 생성을 요청 하고
      * When 생성 노선 하행역과 이어지지 않는 구간 등록을 요청하면
      * Then 지하철 노선 구간 등록이 실패한다.
      */
-    @DisplayName("구간 등록 실패 - 기존 노선과 이어지지 않는 구간")
+    @DisplayName("구간 삭제")
     @Test
     void addSectionDoesNotConnectedToPrevious() {
         // given
         지하철_노선_생성_요청(신분당선);
+        지하철_구간_등록_요청(2L, 3L, 10);
 
         // when
-        ExtractableResponse<Response> response = 지하철_구간_등록_요청(3L, 4L, 10);
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(3L);
 
         // then
-        구간_등록_실패(response);
+        구간_삭제_성공(response);
     }
 }
