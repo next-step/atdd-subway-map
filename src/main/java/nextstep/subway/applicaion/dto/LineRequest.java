@@ -14,4 +14,16 @@ public class LineRequest {
     public String getColor() {
         return color;
     }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
 }
