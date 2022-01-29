@@ -11,6 +11,7 @@ public class LineRequest {
     private Long upStationId;
     @NotNull
     private Long downStationId;
+    @NotNull
     private Distance distance;
 
     public String getName() {

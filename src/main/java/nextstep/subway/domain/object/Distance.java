@@ -1,6 +1,6 @@
 package nextstep.subway.domain.object;
 
-import nextstep.subway.exception.NotExistedStationException;
+import java.security.InvalidParameterException;
 
 public class Distance {
     int value;
@@ -15,7 +15,7 @@ public class Distance {
 
     public void checkDistanceLessThanZero() {
         if (this.value < 0) {
-            throw new NotExistedStationException("[notValid]:distance");
+            throw new InvalidParameterException();
         }
     }
 }

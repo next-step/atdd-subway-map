@@ -2,12 +2,13 @@ package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.exception.NotExistedStationException;
+import nextstep.subway.exception.DuplicatedException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,15 +36,9 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineRequest lineRequest) {
-        try {
-            lineRequest.getDistance().checkDistanceLessThanZero();
-            LineResponse line = lineService.saveLine(lineRequest);
-            return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-        } catch (NotExistedStationException | EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
-        }
+        lineRequest.getDistance().checkDistanceLessThanZero();
+        LineResponse line = lineService.saveLine(lineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
@@ -72,22 +67,24 @@ public class LineController {
 
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody @Valid SectionRequest sectionRequest) {
-        try {
             sectionRequest.getDistance().checkDistanceLessThanZero();
             lineService.saveSection(id, sectionRequest);
             return ResponseEntity.created(URI.create("/lines/" + id + "/section")).build();
-        } catch (InvalidParameterException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
-        }
     }
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam("stationId") @NotNull Long stationId) {
-        try {
             lineService.deleteSection(id, stationId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (InvalidParameterException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
-        }
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class, InvalidParameterException.class})
+    public ResponseEntity<Void> getUnprocessableEntityStateEntity() {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
+    }
+
+    @ExceptionHandler(DuplicatedException.class)
+    public ResponseEntity<Void> getConflictEntity() {
+        return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
     }
 }
