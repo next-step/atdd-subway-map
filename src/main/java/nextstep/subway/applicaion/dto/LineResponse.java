@@ -38,6 +38,18 @@ public class LineResponse {
         return color;
     }
 
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }

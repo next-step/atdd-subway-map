@@ -21,7 +21,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private Long 노선에_속한_상행역;
     private Long 노선에_속한_하행역;
     private Long 노선에_속하지_않은_새로운역;
+    private Long 지하철_노선;
+
+
     private static final Integer 거리 = 1;
+
 
     @BeforeEach
     public void setup() {
@@ -44,7 +48,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                         .toString()
         );
 
-        지하철_노선_생성요청(지하철_노선_데이터_생성("1호선", "blue", 노선에_속한_상행역, 노선에_속한_하행역, 거리));
+        지하철_노선 = Long.valueOf(
+                지하철_노선_생성요청(
+                        지하철_노선_데이터_생성("1호선",
+                                "blue",
+                                노선에_속한_상행역,
+                                노선에_속한_하행역,
+                                거리))
+                        .jsonPath()
+                        .get("id")
+                        .toString());
     }
 
     /**
@@ -57,8 +70,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void createSection() {
         // given
         final Map<String, Object> params = new HashMap<>();
-        params.put("downStationId", 노선에_속한_하행역);
-        params.put("upStationId", 노선에_속하지_않은_새로운역);
+        params.put("upStationId", 노선에_속한_하행역);
+        params.put("downStationId", 노선에_속하지_않은_새로운역);
         params.put("distance", 거리);
 
         // when
@@ -66,7 +79,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/sections")
+                .post("/lines/" + 지하철_노선 + "/sections")
                 .then().log().all()
                 .extract();
 
