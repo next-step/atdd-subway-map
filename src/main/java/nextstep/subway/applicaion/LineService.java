@@ -24,21 +24,14 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         final String name = request.getName();
-        final String color = request.getColor();
 
         if (lineRepository.existsByName(name)) {
-            throw new IllegalArgumentException(String.format("이미 존재하는 노선입니다. %s : %s", name, color));
+            throw new IllegalArgumentException(String.format("이미 존재하는 노선입니다. %s", request));
         }
 
-        Line line = lineRepository.save(new Line(name, color));
-        return new LineResponse
-                .Builder()
-                .id(line.getId())
-                .name(line.getName())
-                .color(line.getColor())
-                .createdDate(line.getCreatedDate())
-                .modifiedDate(line.getModifiedDate())
-                .build();
+        Line line = lineRepository.save(this.fromLine(request));
+
+        return this.createLineResponse(line);
     }
 
     @Transactional(readOnly = true)
@@ -75,8 +68,21 @@ public class LineService {
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
+                .upStationId(line.getUpStationId())
+                .downStationId(line.getDownStationId())
+                .distance(line.getDistance())
                 .createdDate(line.getCreatedDate())
                 .modifiedDate(line.getModifiedDate())
                 .build();
+    }
+
+    private Line fromLine(LineRequest lineRequest) {
+        return new Line(
+                lineRequest.getName(),
+                lineRequest.getColor(),
+                lineRequest.getUpStationId(),
+                lineRequest.getDownStationId(),
+                lineRequest.getDistance()
+        );
     }
 }

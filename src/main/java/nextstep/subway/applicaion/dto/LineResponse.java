@@ -6,16 +6,22 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private Integer distance;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
     public LineResponse() {
     }
 
-    private LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(Long id, String name, String color, Long upStationId, Long downStationId, Integer distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
@@ -44,6 +50,9 @@ public class LineResponse {
         private Long id;
         private String name;
         private String color;
+        private Long upStationId;
+        private Long downStationId;
+        private Integer distance;
         private LocalDateTime createdDate;
         private LocalDateTime modifiedDate;
 
@@ -62,6 +71,21 @@ public class LineResponse {
             return this;
         }
 
+        public Builder upStationId(Long upStationId) {
+            this.upStationId = upStationId;
+            return this;
+        }
+
+        public Builder downStationId(Long downStationId) {
+            this.downStationId = downStationId;
+            return this;
+        }
+
+        public Builder distance(Integer distance) {
+            this.distance = distance;
+            return this;
+        }
+
         public Builder createdDate(LocalDateTime createdDate) {
             this.createdDate = createdDate;
             return this;
@@ -73,12 +97,18 @@ public class LineResponse {
         }
 
         public LineResponse build() {
-            if (id == null || name == null || color == null
-            || createdDate == null || modifiedDate == null) {
+            if (id == null
+                    || name == null
+                    || color == null
+                    || upStationId == null
+                    || downStationId == null
+                    || distance == null
+                    || createdDate == null
+                    || modifiedDate == null) {
                 throw new IllegalArgumentException("Cannot create LineResponse");
             }
 
-            return new LineResponse(id, name, color, createdDate, modifiedDate);
+            return new LineResponse(id, name, color, upStationId, downStationId, distance, createdDate, modifiedDate);
         }
     }
 }

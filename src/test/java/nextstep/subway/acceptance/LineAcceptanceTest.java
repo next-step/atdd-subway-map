@@ -13,6 +13,10 @@ import static nextstep.subway.utils.LineUtils.*;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
+    private static final Map<String, Object> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4", 1L, 1L, 3);
+    private static final Map<String, Object> SEVEN_LINE = 지하철_노선_데이터_생성("7호선", "green darken-3", 2L, 2L, 2);
+
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -20,8 +24,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
 
         // when
         final ExtractableResponse<Response> response = 지하철_노선_생성요청(ONE_LINE);
@@ -40,8 +42,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        final Map<String, String> LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
-        final Map<String, String> NEW_LINE = 지하철_노선_데이터_생성("7호선", "green darken-3");
+        final Map<String, Object> LINE = ONE_LINE;
+        final Map<String, Object> NEW_LINE = SEVEN_LINE;
 
         지하철_노선_생성요청(Arrays.asList(LINE, NEW_LINE));
 
@@ -63,7 +65,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         final String ONE_LINE_NAME = "1호선";
 
-        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성(ONE_LINE_NAME, "blue darken-4");
         final ExtractableResponse<Response> createResponse = 지하철_노선_생성요청(ONE_LINE);
 
         // when
@@ -83,12 +84,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
         final ExtractableResponse<Response> response = 지하철_노선_생성요청(ONE_LINE);
 
         // when
         final String uri = response.header("Location");
-        final Map<String, String> editedLine = 지하철_노선_데이터_생성("7호선", "green darken-3");
+        final Map<String, Object> editedLine = SEVEN_LINE;
 
         final ExtractableResponse<Response> editResponse = 지하철_노선_수정요청(editedLine, uri);
 
@@ -105,7 +105,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
         final ExtractableResponse<Response> response = 지하철_노선_생성요청(ONE_LINE);
 
         // when
@@ -120,7 +119,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateCheck() {
         // given
-        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
         지하철_노선_생성요청(ONE_LINE);
 
         // when

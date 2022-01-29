@@ -39,6 +39,7 @@ public class LineRequest {
         return distance;
     }
 
+
     public static class Builder {
         private String name;
         private String color;
@@ -72,7 +73,11 @@ public class LineRequest {
         }
 
         public LineRequest build() {
-            if (name == null || color == null || upStationId == null || downStationId == null || distance == null) {
+            if (name == null
+                    || color == null
+                    || upStationId == null
+                    || downStationId == null
+                    || distance == null) {
                 throw new IllegalArgumentException("Cannot create LineRequest");
             }
 

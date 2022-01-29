@@ -27,6 +27,8 @@ public class LineController {
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -42,7 +44,13 @@ public class LineController {
 
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> editLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        return ResponseEntity.ok().body(lineService.editLineById(id, lineRequest));
+        try {
+            return ResponseEntity.ok().body(lineService.editLineById(id, lineRequest));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DeleteMapping(path = "{id}")
