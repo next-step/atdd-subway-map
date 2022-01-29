@@ -2,11 +2,11 @@ package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Sections;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 public class LineResponse {
@@ -27,9 +27,9 @@ public class LineResponse {
     }
 
     public static LineResponse of(Line line) {
-        List<Section> sections = line.getSections();
+        Sections sections = line.getSections();
         Set<StationResponse> result = new LinkedHashSet<>();
-        for (Section section : sections) {
+        for (Section section : sections.getSections()) {
             result.add(StationResponse.of(section.getUpStation()));
             result.add(StationResponse.of(section.getDownStation()));
         }

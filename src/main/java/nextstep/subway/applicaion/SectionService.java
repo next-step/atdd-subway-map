@@ -25,7 +25,7 @@ public class SectionService {
     @Transactional
     public Section createSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findById(lineId).orElseThrow(NotFoundException::new);
-        if (!line.isDownStation(request.getUpStationId())) {
+        if (line.isNotDownStation(request.getUpStationId())) {
             throw new IllegalSectionException();
         }
 
