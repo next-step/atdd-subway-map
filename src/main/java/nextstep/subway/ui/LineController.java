@@ -57,4 +57,10 @@ public class LineController {
         SectionResponse sectionResponse = lineService.saveSection(id, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + sectionResponse.getSectionId())).body(sectionResponse);
     }
+
+    @DeleteMapping(value = "/lines/{id}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

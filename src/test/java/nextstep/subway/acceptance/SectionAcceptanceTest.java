@@ -69,6 +69,63 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Given 등록된 구간이 2개 이상일때
+     * When 하행 종점역을 제거 요청하면
+     * Then 요청이 성공한다.
+     */
+    @DisplayName("구간 제거 성공")
+    @Test
+    void should_return_204_when_request_to_delete_section() {
+        // given
+        var newDownStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재시민의숲");
+        var distance = "10";
+        구간_등록_요청(downStationId, newDownStationId, distance);
+
+        // when
+        var response = 구간_제거_요청(newDownStationId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 등록된 구간이 1개일때
+     * When 하행 종점역을 제거 요청하면
+     * Then 요청이 실패한다.
+     */
+    @DisplayName("구간이 1개일 경우 제거 실패")
+    @Test
+    void should_return_400_when_section_is_only_one() {
+        // when
+        var response = 구간_제거_요청(downStationId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 등록된 구간이 2개 이상일때
+     * When 등록되지 않은 역을 제거 요청하면
+     * Then 요청이 실패한다.
+     */
+    @DisplayName("미등록된 역 제거 실패")
+    @Test
+    void should_return_400_when_request_to_delete_unregistered_station() {
+        // given
+        var newDownStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재시민의숲");
+        var distance = "10";
+        구간_등록_요청(downStationId, newDownStationId, distance);
+
+        var unregisteredStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("청계산입구");
+
+        // when
+        var response = 구간_제거_요청(unregisteredStationId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private ExtractableResponse<Response> 구간_등록_요청(String upStationId, String downStationId, String distance) {
         var params = Map.of(
                 "upStationId", upStationId,
@@ -87,5 +144,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    private ExtractableResponse<Response> 구간_제거_요청(String newDownStationId) {
+        var uri = uriOfLine + "/sections?stationId=" + newDownStationId;
+
+        return RestAssured.given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete(uri)
+                .then()
+                .extract();
+    }
 
 }

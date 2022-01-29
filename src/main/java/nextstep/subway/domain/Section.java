@@ -42,7 +42,15 @@ public class Section {
         return upStation;
     }
 
+    public Station getDownStation() {
+        return downStation;
+    }
+
     public boolean isConnectable(Section section) {
         return downStation.equals(section.getUpStation());
+    }
+
+    public boolean isEqualToDownStation(Station station){
+        return downStation.equals(station);
     }
 }

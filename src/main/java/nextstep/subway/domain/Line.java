@@ -49,6 +49,16 @@ public class Line extends BaseEntity {
         sections.add(section);
     }
 
+    public void removeSection(Station station){
+        Section lastSection = sections.get(sections.size()-1);
+
+        if(!lastSection.isEqualToDownStation(station) || sections.size() == 1){
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+
+        sections.remove(lastSection);
+    }
+
     private void verifyConnectable(Section section) {
         if (sections.isEmpty()) {
             throw new IllegalArgumentException("잘못된 요청입니다.");

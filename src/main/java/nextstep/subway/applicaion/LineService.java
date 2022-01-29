@@ -82,4 +82,11 @@ public class LineService {
 
         return SectionResponse.of(savedSection.getId());
     }
+
+    public void deleteSection(Long id, Long stationId){
+        Station station = stationService.findById(stationId);
+        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+
+        line.removeSection(station);
+    }
 }
