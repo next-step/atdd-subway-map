@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static nextstep.subway.utils.HttpRequestTestUtil.딜리트_요청;
 import static nextstep.subway.utils.LineStepUtil.기본주소;
 import static nextstep.subway.utils.LineStepUtil.*;
 import static nextstep.subway.utils.StationStepUtil.*;
@@ -25,7 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
+
     static Stream<Arguments> 노선파라미터_제공() {
+        final int 종점간거리 = 2;
+        final Long 상행종점 = 1L;
+        final Long 하행종점 = 2L;
+
         return Stream.of(
                 Arguments.of(노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리),
                         노선파라미터생성(새로운노선, 새로운색상, 상행종점, 하행종점, 종점간거리))
@@ -154,7 +158,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 노선생성(노선_파라미터);
 
         //when
-        ExtractableResponse<Response> response = 딜리트_요청(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 노선삭제(createResponse.header(HttpHeaders.LOCATION));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

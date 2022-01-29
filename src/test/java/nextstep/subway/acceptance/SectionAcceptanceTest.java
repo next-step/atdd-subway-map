@@ -16,8 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionAcceptanceTest extends AcceptanceTest {
 
-    public Long 상행종점;
-    public Long 하행종점;
+    final int 종점간거리 = 2;
+    private Long 상행종점;
+    private Long 하행종점;
 
     /**
      * Given 노선 생성을 요청한다.

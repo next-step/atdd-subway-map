@@ -25,10 +25,6 @@ public class LineStepUtil {
     public static final String 노선_하행역_키 = "downStationId";
     public static final String 노선_역간_거리_키 = "distance";
 
-    public static final int 종점간거리 = 2;
-    public static Long 상행종점 = 1L;
-    public static Long 하행종점 = 2L;
-
     private LineStepUtil() {
     }
 
