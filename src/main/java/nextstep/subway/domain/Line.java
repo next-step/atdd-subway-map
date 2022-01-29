@@ -1,9 +1,14 @@
 package nextstep.subway.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 
@@ -14,6 +19,9 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
