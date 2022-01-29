@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicateException;
+import nextstep.subway.exception.NoElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,12 +59,11 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        return LineResponse.of(line);
+        return LineResponse.of(findById(id));
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Line line = findById(id);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
@@ -74,7 +74,7 @@ public class LineService {
     public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Line line = findById(id);
         Section section = new Section(upStation, downStation, sectionRequest.getDistance());
 
         line.addSection(section);
@@ -85,8 +85,12 @@ public class LineService {
 
     public void deleteSection(Long id, Long stationId){
         Station station = stationService.findById(stationId);
-        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        Line line = findById(id);
 
         line.removeSection(station);
+    }
+
+    private Line findById(Long id){
+        return lineRepository.findById(id).orElseThrow(NoElementException::new);
     }
 }
