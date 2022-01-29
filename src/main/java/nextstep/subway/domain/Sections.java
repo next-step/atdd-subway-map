@@ -25,7 +25,6 @@ public class Sections {
        return sections.size() == 1;
     }
 
-
     public void deleteSection(Long stationId) {
         if (isLastSection()) {
             throw new BusinessException("마지막 구간 삭제 불가", HttpStatus.BAD_REQUEST);
@@ -37,9 +36,12 @@ public class Sections {
     private void deleteSection(Long stationId, int count) {
         int lastDownStation = 1;
         if (count == lastDownStation) {
-            Section findSection = sections.stream().filter(section ->
+            Section findSection = sections
+                    .stream()
+                    .filter(section ->
                             section.isSameDownStation(stationId))
-                    .findFirst().orElse(null);
+                    .findFirst()
+                    .orElse(null);
             sections.remove(findSection);
             return;
         }
