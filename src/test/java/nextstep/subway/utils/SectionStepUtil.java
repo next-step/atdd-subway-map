@@ -11,7 +11,6 @@ import static nextstep.subway.utils.HttpRequestTestUtil.포스트_요청;
 
 public class SectionStepUtil {
 
-    public static final int 새로운하행종점 = 3;
     private static final String 기본구간주소 = "/lines/1/sections";
     private static final String 쿼리스트링 = "/?stationId=";
 

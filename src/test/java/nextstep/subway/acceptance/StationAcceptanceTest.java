@@ -37,7 +37,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(createResponse.header("Location")).isNotBlank();
+        assertThat(createResponse.header(HttpHeaders.LOCATION)).isNotBlank();
     }
 
     /**
@@ -55,7 +55,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역조회(기본주소);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).contains(기존지하철, 새로운지하철);
+        assertThat(response.jsonPath().getList(지하철_역_이름_키)).contains(기존지하철, 새로운지하철);
     }
 
     /**

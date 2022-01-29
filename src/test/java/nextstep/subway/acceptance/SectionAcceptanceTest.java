@@ -27,8 +27,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @BeforeEach
     void setup() {
-        상행종점 = 지하철역생성(기존지하철).jsonPath().getLong("id");
-        하행종점 = 지하철역생성(새로운지하철).jsonPath().getLong("id");
+        상행종점 = 지하철역생성(기존지하철).jsonPath().getLong(지하철_역_아이디_키);
+        하행종점 = 지하철역생성(새로운지하철).jsonPath().getLong(지하철_역_아이디_키);
         노선_생성_결과 = 노선생성(노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리));
     }
 
@@ -43,7 +43,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void 새로운_구간_등록_테스트() {
         //given
         ExtractableResponse<Response> 아무개 = 지하철역생성("아무개");
-        Long 지하철역_ID = 아무개.jsonPath().getLong("id");
+        Long 지하철역_ID = 아무개.jsonPath().getLong(지하철_역_아이디_키);
 
         //when
         ExtractableResponse<Response> response = 구간등록(하행종점, 지하철역_ID, 종점간거리);
@@ -91,11 +91,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void 하행종점_구간_삭제() {
         //given
         ExtractableResponse<Response> 아무개 = 지하철역생성("아무개");
-        Long 지하철역_ID = 아무개.jsonPath().getLong("id");
+        Long 지하철역_ID = 아무개.jsonPath().getLong(지하철_역_아이디_키);
         ExtractableResponse<Response> 구간등록 = 구간등록(하행종점, 지하철역_ID, 종점간거리);
 
         //when
-        Long 하행_지하철역_ID = 구간등록.jsonPath().getLong("downStation.id");
+        Long 하행_지하철역_ID = 구간등록.jsonPath().getLong("downStation." + 지하철_역_아이디_키);
         ExtractableResponse<Response> response = 구간삭제요청(하행_지하철역_ID);
 
         //then
@@ -114,7 +114,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void 하행종점_구간만_삭제가능() {
         //given
         ExtractableResponse<Response> 아무개 = 지하철역생성("아무개");
-        Long 지하철역_ID = 아무개.jsonPath().getLong("id");
+        Long 지하철역_ID = 아무개.jsonPath().getLong(지하철_역_아이디_키);
         구간등록(하행종점, 지하철역_ID, 종점간거리);
 
         //when
