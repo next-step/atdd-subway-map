@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.exception.NotFoundException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,8 @@ public class LineService {
         final String name = request.getName();
         final String color = request.getColor();
 
-        if (lineRepository.findByName(name).isPresent()) {
-            throw new RuntimeException(String.format("이미 존재하는 노선입니다. %s : %s", name, color));
+        if (lineRepository.existsByName(name)) {
+            throw new IllegalArgumentException(String.format("이미 존재하는 노선입니다. %s : %s", name, color));
         }
 
         Line line = lineRepository.save(new Line(name, color));
@@ -51,19 +52,22 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
         final Line foundLine = lineRepository.findById(id).orElseThrow(
-                () -> new RuntimeException(String.format("해당하는 노선을 찾을 수 없습니다. id : %s", id)));
+                () -> new NotFoundException(id));
         return createLineResponse(foundLine);
     }
 
     @Transactional
     public LineResponse editLineById(long id, @RequestBody LineRequest lineRequest) {
         Line foundLine = lineRepository.findById(id).orElseThrow(
-                () -> new RuntimeException(String.format("해당하는 노선을 찾을 수 없습니다. id : %s", id)));
+                () -> new NotFoundException(id));
         foundLine.updateLine(lineRequest.getName(), lineRequest.getColor());
         final Line savedLine = lineRepository.save(foundLine);
         return createLineResponse(savedLine);
     }
 
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
@@ -73,9 +77,5 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
-    }
-
-    public void deleteLineById(Long id) {
-        lineRepository.deleteById(id);
     }
 }
