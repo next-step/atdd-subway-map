@@ -5,38 +5,45 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static nextstep.subway.utils.RestAssuredRequest.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.StationSteps.*;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    private static final String LINES_PATH = "/lines";
+    private Long 강남역id;
+    private Long 양재역id;
+    private Long 판교역id;
+    private Long 역삼역id;
 
     private Map<String, String> 신분당선;
     private Map<String, String> 이호선;
     private Map<String, String> 구분당선;
 
+    private Map<String, String> 양재_판교_구간;
+    private Map<String, String> 역삼_판교_구간;
+    private Map<String, String> 양재_강남_구간;
+
     @BeforeEach
     void initParam() {
-        신분당선 = new HashMap<>();
-        신분당선.put("name", "신분당선");
-        신분당선.put("color", "bg-red-600");
+        강남역id = 지하철_노선_id(지하철역_생성_요청(강남역));
+        양재역id = 지하철_노선_id(지하철역_생성_요청(양재역));
+        판교역id = 지하철_노선_id(지하철역_생성_요청(판교역));
+        역삼역id = 지하철_노선_id(지하철역_생성_요청(역삼역));
 
-        이호선 = new HashMap<>();
-        이호선.put("name", "2호선");
-        이호선.put("color", "bg-green-600");
+        신분당선 = 지하철_노선_파라미터("신분당선", "bg-red-600", 강남역id, 양재역id, 1600);
+        이호선 = 지하철_노선_파라미터("2호선", "bg-green-600", 강남역id, 역삼역id, 1600);
 
         구분당선 = new HashMap<>();
         구분당선.put("name", "구분당선");
         구분당선.put("color", "bg-blue-600");
+
+        양재_판교_구간 = 구간_파라미터(양재역id, 판교역id, 12700);
+        역삼_판교_구간 = 구간_파라미터(역삼역id, 판교역id, 999);
+        양재_강남_구간 = 구간_파라미터(양재역id, 강남역id, 999);
     }
 
     /**
@@ -50,7 +57,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
-        지하철_노선_생성됨(response);
+        지하철_노선_생성됨(response, 신분당선);
     }
 
     /**
@@ -150,72 +157,127 @@ class LineAcceptanceTest extends AcceptanceTest {
         지하철_노선_이름_중복됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, String> params) {
-        return post(params, LINES_PATH);
+    /**
+     * Scenario: 구간 등록(정상적인 시나리오)
+     * Given 지하철 노선 생성 요청 하고
+     * When 구간 등록 요청하면
+     * Then 구간 등록이 성공한다.
+     */
+    @DisplayName("구간 등록")
+    @Test
+    void addSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+
+        // when
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_등록_요청(신분당선id, 양재_판교_구간);
+
+        // then
+        구간_등록됨(response, 양재_판교_구간);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
-        return get(LINES_PATH);
+    /**
+     * Scenario: 구간 등록(비정상적인 시나리오)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * When 잘못된 구간 등록(상행:역삼역, 하행:판교역) 요청하면
+     * Then 구간 등록이 실패한다.
+     */
+    @DisplayName("구간 등록 실패 - 새로운 구간의 상행역은 해당 노선의 하행 종점역이어야 함.")
+    @Test
+    void addSectionFailUpStation() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+
+        // when
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_등록_요청(신분당선id, 역삼_판교_구간);
+
+        // then
+        구간_등록_실패됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(String uri) {
-        return get(uri);
+    /**
+     * Scenario: 구간 등록(비정상적인 시나리오)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * When 잘못된 구간 등록(상행:양재역, 하행:강남역) 요청하면
+     * Then 구간 등록이 실패한다.
+     */
+    @DisplayName("구간 등록 실패 - 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @Test
+    void addSectionFailDownStation() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+
+        // when
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_등록_요청(신분당선id, 양재_강남_구간);
+
+        // then
+        구간_등록_실패됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(String uri, Map<String, String> params) {
-        return put(uri, params);
+    /**
+     * Scenario: 구간 제거(정상적인 시나리오)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * Given 신분당선에 구간 등록(상행:양재역, 하행:판교역) 요청 하고
+     * When 구간(판교역) 제거 요청하면
+     * Then 구간(양재_판교_구간) 제거가 성공한다.
+     */
+    @DisplayName("구간 제거")
+    @Test
+    void removeSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        구간_등록되어_있음(신분당선id, 양재_판교_구간);
+
+        // when
+        ExtractableResponse<Response> response = 구간_제거_요청(신분당선id, 판교역id);
+
+        // then
+        구간_제거됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_삭제_요청(String uri) {
-        return delete(uri);
+    /**
+     * Scenario: 구간 제거(실패 - 하행 좀점역 이외의 역 제거)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * Given 신분당선에 구간 등록(상행:양재역, 하행:판교역) 요청 하고
+     * When 구간(양재역) 제거 요청하면
+     * Then 구간 제거가 실패한다.
+     */
+    @DisplayName("구간 제거 실패 - 하행 종점역 이외의 역을 제거")
+    @Test
+    void removeSectionFailNotLastStation() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        구간_등록되어_있음(신분당선id, 양재_판교_구간);
+
+        // when
+        ExtractableResponse<Response> response = 구간_제거_요청(신분당선id, 양재역id);
+
+        // then
+        구간_제거_실패됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_등록되어_있음(Map<String, String> params) {
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(params);
-        지하철_노선_생성됨(response);
+    /**
+     * Scenario: 구간 제거(실패 - 구간 1개일 때 제거)
+     * Given 지하철 노선 생성(상행:강남역, 하행:양재역) 요청 하고
+     * When 구간(양재역) 제거 요청하면
+     * Then 구간 제거가 실패한다.
+     */
+    @DisplayName("구간 제거 실패 - 하행 종점역 이외의 역을 제거")
+    @Test
+    void removeSectionFailUniqueSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 지하철_노선_등록되어_있음(신분당선);
 
-        return response;
-    }
+        // when
+        Long 신분당선id = 지하철_노선_id(createResponse);
+        ExtractableResponse<Response> response = 구간_제거_요청(신분당선id, 양재역id);
 
-    private void 지하철_노선_생성됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.CREATED);
-        assertThat(response.header("Location")).isNotBlank();
-    }
-
-    private void 지하철_노선_목록_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> ... createResponses) {
-        List<String> createdNames = Arrays.stream(createResponses)
-                .map(createResponse -> createResponse.jsonPath().getString("name"))
-                .collect(Collectors.toList());
-        List<String> createdColors = Arrays.stream(createResponses)
-                .map(createResponse -> createResponse.jsonPath().getString("color"))
-                .collect(Collectors.toList());
-
-        응답_요청_확인(response, HttpStatus.OK);
-        assertThat(response.jsonPath().getList("name")).isEqualTo(createdNames);
-        assertThat(response.jsonPath().getList("color")).isEqualTo(createdColors);
-    }
-
-    private void 지하철_노선_조회됨(ExtractableResponse<Response> response, ExtractableResponse<Response> createResponse) {
-        응답_요청_확인(response, HttpStatus.OK);
-        assertThat(response.jsonPath().getString("name")).isEqualTo(createResponse.jsonPath().getString("name"));
-    }
-
-    private void 지하철_노선_수정됨(ExtractableResponse<Response> response, ExtractableResponse<Response> showResponse, Map<String, String> updateParams) {
-        응답_요청_확인(response, HttpStatus.OK);
-        응답_요청_확인(showResponse, HttpStatus.OK);
-        assertThat(showResponse.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
-        assertThat(showResponse.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
-    }
-
-    private void 지하철_노선_삭제됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.NO_CONTENT);
-    }
-
-    private void 지하철_노선_이름_중복됨(ExtractableResponse<Response> response) {
-        응답_요청_확인(response, HttpStatus.CONFLICT);
-    }
-
-    private void 응답_요청_확인(ExtractableResponse<Response> response, HttpStatus httpStatus) {
-        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+        // then
+        구간_제거_실패됨(response);
     }
 }
