@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class LineValidator implements Validator<Line> {
@@ -17,11 +19,12 @@ public class LineValidator implements Validator<Line> {
     }
 
     public void validate(final Line line) {
-        validateName(line.getName());
+        validateName(line);
         validateColor(line.getColor());
     }
 
-    public void validateName(final String name) {
+    private void validateName(final Line line) {
+        final String name = line.getName();
         if (Objects.isNull(name)) {
             throw new IllegalArgumentException("노선의 이름은 필수 입니다.");
         }
@@ -29,13 +32,15 @@ public class LineValidator implements Validator<Line> {
             throw new IllegalArgumentException("노선의 이름은 1 자 이상 이어야 합니다.");
         }
 
-        final List<Line> lines = lineRepository.findByName(name);
+        final List<Line> lines = lineRepository.findByName(name).stream()
+                .filter(Predicate.not(line::equals))
+                .collect(Collectors.toList());
         if (!lines.isEmpty()) {
             throw new DuplicateArgumentException("중복된 이름 입니다.");
         }
     }
 
-    public void validateColor(final String color) {
+    private void validateColor(final String color) {
         if (Objects.isNull(color)) {
             throw new IllegalArgumentException("노선의 색상은 필수 입니다.");
         }
