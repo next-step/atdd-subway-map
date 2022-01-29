@@ -1,22 +1,21 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.section;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.Map;
-
+import static nextstep.subway.acceptance.line.LineSteps.*;
+import static nextstep.subway.acceptance.section.SectionSteps.구간_등록_요청;
+import static nextstep.subway.acceptance.section.SectionSteps.구간_제거_요청;
+import static nextstep.subway.acceptance.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
-    private String uriOfLine;
+    private String lineId;
     private String upStationId;
     private String downStationId;
     private String distance;
@@ -24,10 +23,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        upStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("강남역");
-        downStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재역");
+        upStationId = 지하철_역_생성_요청_및_위치_반환("강남역");
+        downStationId = 지하철_역_생성_요청_및_위치_반환("양재역");
         distance = "5";
-        uriOfLine = LineSteps.지하철_노선_생성_요청("신분당선", "red", upStationId, downStationId, distance).header("Location");
+        lineId = 지하철_노선_생성_요청("신분당선", "red", upStationId, downStationId, distance).header("Location").split("/")[2];
     }
 
     /**
@@ -39,11 +38,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void should_return_201_when_request_to_create_section() {
         // given
-        var newDownStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재시민의숲");
+        var newDownStationId = 지하철_역_생성_요청_및_위치_반환("양재시민의숲");
         var distance = "10";
 
         // when
-        var response = 구간_등록_요청(downStationId, newDownStationId, distance);
+        var response = 구간_등록_요청(lineId, downStationId, newDownStationId, distance);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -58,12 +57,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void should_return_400_when_request_to_create_section_that_contain_unregistered_up_station() {
         // given
-        var unregisteredUpStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("청계산입구");
-        var newDownStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재시민의숲");
+        var unregisteredUpStationId = 지하철_역_생성_요청_및_위치_반환("청계산입구");
+        var newDownStationId = 지하철_역_생성_요청_및_위치_반환("양재시민의숲");
         var distance = "7";
 
         // when
-        var response = 구간_등록_요청(unregisteredUpStationId, newDownStationId, distance);
+        var response = 구간_등록_요청(lineId, unregisteredUpStationId, newDownStationId, distance);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -78,12 +77,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void should_return_204_when_request_to_delete_section() {
         // given
-        var newDownStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재시민의숲");
+        var newDownStationId = 지하철_역_생성_요청_및_위치_반환("양재시민의숲");
         var distance = "10";
-        구간_등록_요청(downStationId, newDownStationId, distance);
+        구간_등록_요청(lineId, downStationId, newDownStationId, distance);
 
         // when
-        var response = 구간_제거_요청(newDownStationId);
+        var response = 구간_제거_요청(lineId, newDownStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -98,7 +97,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void should_return_400_when_section_is_only_one() {
         // when
-        var response = 구간_제거_요청(downStationId);
+        var response = 구간_제거_요청(lineId, downStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -113,46 +112,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void should_return_400_when_request_to_delete_unregistered_station() {
         // given
-        var newDownStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("양재시민의숲");
+        var newDownStationId = 지하철_역_생성_요청_및_위치_반환("양재시민의숲");
         var distance = "10";
-        구간_등록_요청(downStationId, newDownStationId, distance);
+        구간_등록_요청(lineId, downStationId, newDownStationId, distance);
 
-        var unregisteredStationId = StationSteps.지하철_역_생성_요청_및_위치_반환("청계산입구");
+        var unregisteredStationId = 지하철_역_생성_요청_및_위치_반환("청계산입구");
 
         // when
-        var response = 구간_제거_요청(unregisteredStationId);
+        var response = 구간_제거_요청(lineId, unregisteredStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    private ExtractableResponse<Response> 구간_등록_요청(String upStationId, String downStationId, String distance) {
-        var params = Map.of(
-                "upStationId", upStationId,
-                "downStationId", downStationId,
-                "distance", distance
-        );
-
-        var uri = uriOfLine + "/sections";
-
-        return RestAssured.given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(uri)
-                .then()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 구간_제거_요청(String newDownStationId) {
-        var uri = uriOfLine + "/sections?stationId=" + newDownStationId;
-
-        return RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete(uri)
-                .then()
-                .extract();
     }
 
 }

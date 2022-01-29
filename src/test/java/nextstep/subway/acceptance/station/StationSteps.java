@@ -1,8 +1,9 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.utils.ResponseUtil;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class StationSteps {
     }
 
     public static String 지하철_역_생성_요청_및_위치_반환(String name){
-        return 지하철_역_생성_요청(name).header("Location").split("/")[2];
+        return ResponseUtil.ID_추출(지하철_역_생성_요청(name));
     }
 
 }
