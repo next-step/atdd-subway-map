@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-import static nextstep.subway.utils.HttpRequestTestUtil.딜리트_요청;
 import static nextstep.subway.utils.StationStepUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,7 +52,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         지하철역생성(새로운지하철);
 
         // when
-        ExtractableResponse<Response> response = 지하철역조회();
+        ExtractableResponse<Response> response = 지하철역조회(기본주소);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("name")).contains(기존지하철, 새로운지하철);
@@ -68,7 +67,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역삭제_테스트() {
         // when
-        ExtractableResponse<Response> response = 딜리트_요청(createResponse.header(HttpHeaders.LOCATION));
+        ExtractableResponse<Response> response = 지하철역삭제(createResponse.header(HttpHeaders.LOCATION));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

@@ -6,8 +6,7 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.utils.HttpRequestTestUtil.겟_요청;
-import static nextstep.subway.utils.HttpRequestTestUtil.포스트_요청;
+import static nextstep.subway.utils.HttpRequestTestUtil.*;
 
 public class StationStepUtil {
 
@@ -20,8 +19,12 @@ public class StationStepUtil {
         return 포스트_요청(기본주소, params);
     }
 
-    public static ExtractableResponse<Response> 지하철역조회() {
-        return 겟_요청(기본주소);
+    public static ExtractableResponse<Response> 지하철역조회(String url) {
+        return 겟_요청(url);
+    }
+
+    public static ExtractableResponse<Response> 지하철역삭제(String url) {
+        return 딜리트_요청(url);
     }
 
     private static Map<String, Object> 지하철역파라미터생성(String 지하철역) {
