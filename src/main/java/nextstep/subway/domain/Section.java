@@ -2,7 +2,6 @@ package nextstep.subway.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,10 +20,10 @@ public class Section extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Station upStation;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Station downStation;
 
     private int distance;
