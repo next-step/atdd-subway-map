@@ -22,7 +22,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     private String distance;
 
     @BeforeEach
-    void set(){
+    public void setUp(){
+        super.setUp();
         upStationId = StationSteps.지하철_역_생성_요청("강남역").header("Location").split("/")[2];
         downStationId = StationSteps.지하철_역_생성_요청("양재역").header("Location").split("/")[2];
         distance = "5";

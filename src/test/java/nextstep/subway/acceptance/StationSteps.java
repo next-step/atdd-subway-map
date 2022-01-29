@@ -21,4 +21,9 @@ public class StationSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static String 지하철_역_생성_요청_및_위치_반환(String name){
+        return 지하철_역_생성_요청(name).header("Location").split("/")[2];
+    }
+
 }

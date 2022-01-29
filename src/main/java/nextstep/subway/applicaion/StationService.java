@@ -38,6 +38,11 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+    }
+
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
@@ -52,8 +57,8 @@ public class StationService {
     }
 
     private void validateNameDuplicated(String name) {
-        if(stationRepository.existsByName(name)){
-            throw new DuplicateException("Duplicate "+ name);
+        if (stationRepository.existsByName(name)) {
+            throw new DuplicateException("Duplicate " + name);
         }
     }
 }

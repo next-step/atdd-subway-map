@@ -1,10 +1,8 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Column;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -16,12 +14,16 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
+
     public Line() {
     }
 
-    public Line(String name, String color) {
+    public Line(String name, String color, List<Section> sections) {
         this.name = name;
         this.color = color;
+        this.sections = sections;
     }
 
     public Long getId() {
@@ -40,4 +42,21 @@ public class Line extends BaseEntity {
         this.name = name;
         this.color = color;
     }
+
+    public void addSection(Section section) {
+        verifyConnectable(section);
+        section.setLine(this);
+        sections.add(section);
+    }
+
+    private void verifyConnectable(Section section) {
+        if (sections.isEmpty()) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+        Section lastSection = sections.get(sections.size() - 1);
+        if (!lastSection.isConnectable(section)) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+    }
+
 }
