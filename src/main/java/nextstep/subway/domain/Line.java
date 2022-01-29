@@ -42,6 +42,18 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
+    public void removeSection(Long stationId) {
+        if (isLastStation(stationId)) {
+            sections.remove(getLastSection());
+        }
+    }
+
+    private boolean isLastStation(Long stationId) {
+        return getLastSection().getDownStation()
+                .getId()
+                .equals(stationId);
+    }
+
     public void addSection(Section section) {
         if (!sections.isEmpty()) {
             validateNewSection(section);
