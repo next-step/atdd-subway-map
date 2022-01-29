@@ -2,13 +2,17 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.entity.Line;
+import nextstep.subway.domain.entity.Station;
 import nextstep.subway.domain.repository.LineRepository;
+import nextstep.subway.domain.repository.StationRepository;
 import nextstep.subway.domain.service.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,17 +20,28 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
     private final Validator<Line> lineValidator;
 
-    public LineService(final LineRepository lineRepository, final Validator<Line> lineValidator) {
+    public LineService(final LineRepository lineRepository,
+                       final StationRepository stationRepository,
+                       final Validator<Line> lineValidator) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
         this.lineValidator = lineValidator;
     }
 
     public LineResponse saveLine(final LineRequest request) {
+        final Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(NoSuchElementException::new);
+        final Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(NoSuchElementException::new);
         final Line line = lineRepository.save(new Line(
                 request.getName(),
                 request.getColor(),
+                upStation,
+                downStation,
+                request.getDistance(),
                 lineValidator
         ));
 
@@ -63,6 +78,14 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                line.getStations().stream()
+                        .map(station -> new StationResponse(
+                                station.getId(),
+                                station.getName(),
+                                station.getCreatedDate(),
+                                station.getModifiedDate()
+                        ))
+                        .collect(Collectors.toList()),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
