@@ -26,6 +26,8 @@ public class Sections {
     }
 
     public void addSection(Section section) {
+        validationSectionStation(section);
+
         sections.add(section);
     }
 
@@ -39,12 +41,12 @@ public class Sections {
         return result;
     }
 
-    public void validationSectionStation(Station upStation, Station downStation) {
-        if (!matchDownStation(upStation)) {
+    private void validationSectionStation(Section section) {
+        if (!matchDownStation(section.getUpStation())) {
             throw new SectionException(DOWN_STATION_REGISTERED_ERROR_MASSAGE);
         }
 
-        if (matchAllStation(downStation)) {
+        if (matchAllStation(section.getDownStation())) {
             throw new SectionException(SECTION_STATION_REGISTERED_ERROR_MASSAGE);
         }
     }
@@ -79,8 +81,7 @@ public class Sections {
 
     private boolean matchDownStation(Station station) {
         return sections.size() == 0
-                || sections.stream()
-                        .anyMatch(sec -> sec.matchDownStation(station));
+                || isLastDownStation(station);
     }
 
     private boolean matchAllStation(Station station) {

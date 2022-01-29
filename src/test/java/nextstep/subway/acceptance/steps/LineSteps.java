@@ -9,10 +9,13 @@ import java.util.Map;
 public class LineSteps {
     private static final String URL = "/lines";
 
-    public static ExtractableResponse<Response> create(String name, String color) {
-        Map<String, String> params = new HashMap<>();
+    public static ExtractableResponse<Response> create(String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
 
         return CommonRestAssured.create(URL, params);
     }
