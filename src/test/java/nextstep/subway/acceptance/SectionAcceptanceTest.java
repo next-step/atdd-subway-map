@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private static final int 동천역_강남역_거리 = 3;
     private static final int 동천역_양재역_거리 = 5;
 
+    private Long 강남역_아이디, 미금역_아이디, 양재역_아이디, 동천역_아이디;
+
+    @BeforeEach
+    void beforeEach() {
+        강남역_아이디 = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
+        미금역_아이디 = 지하철역_생성_요청(미금역).jsonPath().getLong("id");
+        양재역_아이디 = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
+        동천역_아이디 = 지하철역_생성_요청(동천역).jsonPath().getLong("id");
+    }
+
     /**
      * When 구간 생성을 요청 하면
      * Then 구간 생성이 성공한다.
@@ -33,12 +44,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection() {
         // given
-        Long 양재역_아이디 = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
-        Long 강남역_아이디 = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
-        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(신분당선, BG_RED_600
-                , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
-                , 양재역_아이디
-                , 미금역_양재역_거리);
+        ExtractableResponse<Response> lineResponse =
+                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
 
         // when
         ExtractableResponse<Response> createResponse =
@@ -56,13 +63,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("해당 노선의 하행 종점역이 아닌 새로운 구간 생성")
     @Test
     void notSubSection() {
-        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(신분당선, BG_RED_600
-                , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
-                , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
-                , 미금역_양재역_거리);
-
-        Long 동천역_아이디 = 지하철역_생성_요청(동천역).jsonPath().getLong("id");
-        Long 강남역_아이디 = 지하철역_생성_요청(강남역).jsonPath().getLong("id");
+        ExtractableResponse<Response> lineResponse =
+                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
 
         // when
         ExtractableResponse<Response> createResponse =
@@ -79,13 +81,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("이미 등록된 역을 하행역으로 새로운 구간 생성")
     @Test
     void duplicateSection() {
-        ExtractableResponse<Response> lineResponse = 지하철_노선_생성_요청(신분당선, BG_RED_600
-                , 지하철역_생성_요청(미금역).jsonPath().getLong("id")
-                , 지하철역_생성_요청(양재역).jsonPath().getLong("id")
-                , 미금역_양재역_거리);
-
-        Long 동천역_아이디 = 지하철역_생성_요청(동천역).jsonPath().getLong("id");
-        Long 양재역_아이디 = 지하철역_생성_요청(양재역).jsonPath().getLong("id");
+        ExtractableResponse<Response> lineResponse =
+                지하철_노선_생성_요청(신분당선, BG_RED_600, 미금역_아이디, 양재역_아이디, 미금역_양재역_거리);
 
         // when
         ExtractableResponse<Response> createResponse =

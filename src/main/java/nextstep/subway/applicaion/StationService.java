@@ -52,9 +52,7 @@ public class StationService {
         );
     }
 
-    @Transactional(readOnly = true)
-    public boolean isDuplicatedNameOfStation(String name) {
-        Optional<Station> station = stationRepository.findByName(name);
-        return station.isPresent();
+    private boolean isDuplicatedNameOfStation(String name) {
+        return stationRepository.existsByName(name);
     }
 }

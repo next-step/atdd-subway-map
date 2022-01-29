@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedNameException;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -45,6 +47,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                null,
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
@@ -78,14 +81,14 @@ public class LineService {
     }
 
     public LineResponse saveSection(Line line, LineRequest request) {
-        Section section = new Section(line, makeStation(request.getUpStationId())
-                                        , makeStation(request.getDownStationId()), request.getDistance());
+        Section section = new Section(line, findStation(request.getUpStationId())
+                                        , findStation(request.getDownStationId()), request.getDistance());
         line.getSections().add(section);
         lineRepository.save(line);
         return createLineResponse(line);
     }
 
-    public Station makeStation(Long stationId) {
+    public Station findStation(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
     }
 }
