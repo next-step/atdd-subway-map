@@ -137,6 +137,59 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("노선에 구간 추가")
+    @Test
+    void addNewStationSectionTest(){
+        // given
+        // 노선을 생성하고 해당 노선에 종점역을 추가한 후
+
+        // when
+        // 해당 노선에 상, 하선의 구간 추가를 요청하면
+
+        // then
+        // 구간 추가가 성공한다.
+    }
+
+
+    @DisplayName("노선에 구간 추가")
+    @Test
+    void addFirstSectionTest(){
+        // Given
+        // 노선을 생성하고
+
+        // when
+        // 해당 노선에 구간을 추가하면
+
+        // then
+        // 구간 추가가 성공한다.
+    }
+
+    @DisplayName("노선 구간 제거")
+    @Test
+    void deleteStationSectionTest(){
+        // given
+        // 노선을 생성하고 해당 노선에 구간을 추가한 후
+
+        // when
+        // 해당 구간을 삭제하면
+
+        // then
+        // 구간이 삭제된다.
+    }
+
+    @DisplayName("노선 구간 제거 실패")
+    @Test
+    void deleteIgnoredStationSectionTest(){
+        // given
+        // 노선을 생성하고 해당 노선에 구간을 추가한 후
+
+        // when
+        // 해당 구간을 삭제하면
+
+        // then
+        // 구간이 삭제된다.
+    }
+
     /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
     static ExtractableResponse<Response> lineCreateRequest(String name, String color) {
 
