@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.utils.ApiUtil;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -393,8 +393,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     static Map<String, String> GTXA노선_구간_삭제_연신내;
     static Map<String, String> GTXA노선_구간_삭제_서울역;
 
-    @BeforeAll
-    public static void 초기화() {
+    @BeforeEach
+    public void 초기화() {
         연신내역 = new HashMap<>();
         연신내역.put("name", "연신내");
         서울역 = new HashMap<>();
