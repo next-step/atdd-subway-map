@@ -4,8 +4,6 @@ import nextstep.subway.domain.service.Validator;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -16,8 +14,8 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private final Sections sections = new Sections();
 
     public Line() {
     }
@@ -49,20 +47,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Station> getStations() {
-        final Map<Station, Station> stationMap = sections.stream().collect(Collectors.toMap(Section::getUpStation, Section::getDownStation));
-        final Set<Station> upStations = stationMap.keySet();
-        final Set<Station> downStations = new HashSet<>(stationMap.values());
-
-        final List<Station> stations = new ArrayList<>();
-        Station nextStation = upStations.stream()
-                .filter(Predicate.not(downStations::contains))
-                .findAny().orElseThrow(IllegalStateException::new);
-        while (upStations.contains(nextStation)) {
-            stations.add(nextStation);
-            nextStation = stationMap.get(nextStation);
-        }
-        stations.add(nextStation);
-        return stations;
+        return sections.getStations();
     }
 
     public void change(final String name, final String color, final Validator<Line> lineValidator) {
