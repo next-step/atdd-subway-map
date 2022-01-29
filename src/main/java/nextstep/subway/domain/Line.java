@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -99,5 +100,13 @@ public class Line extends BaseEntity {
                 .collect(Collectors.toList());
         stations.add(getLastSection().getDownStation());
         return stations;
+    }
+
+    public void removeStation(Station station) {
+        if (getSections().size() <= 1) { throw new InvalidParameterException(); }
+
+        Section lastSection = getLastSection();
+        if (!lastSection.getDownStation().equals(station)) { throw new InvalidParameterException(); }
+        getSections().remove(lastSection);
     }
 }
