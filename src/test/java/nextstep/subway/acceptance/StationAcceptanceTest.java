@@ -1,22 +1,19 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.step.StationStep.역_삭제;
+import static nextstep.subway.step.StationStep.역_생성;
+import static nextstep.subway.step.StationStep.역_조회;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import nextstep.subway.utils.RequestMethod;
-import nextstep.subway.utils.RequestParams;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-
-    private static final String DEFAULT_PATH = "/stations";
-    private static final String DEFAULT_NAME_KEY = "name";
-    private static final String DEFAULT_NAME_VALUE = "강남역";
 
     /**
      * When 지하철역 생성을 요청 하면 Then 지하철역 생성이 성공한다.
@@ -25,10 +22,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        RequestParams params = createDefaultParams();
-
         // when
-        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, params);
+        ExtractableResponse<Response> response = 역_생성("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,19 +41,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        RequestParams params1 = new RequestParams(DEFAULT_NAME_KEY, "강남역");
-        RequestMethod.post(DEFAULT_PATH, params1);
-
-        RequestParams params2 = new RequestParams(DEFAULT_NAME_KEY, "역삼역");
-        RequestMethod.post(DEFAULT_PATH, params2);
+        역_생성("강남역");
+        역_생성("역삼역");
 
         // when
-        ExtractableResponse<Response> response = RequestMethod.get(DEFAULT_PATH);
-
-        List<String> stationNames = response.jsonPath().getList(DEFAULT_NAME_KEY);
+        List<String> stationNames = 역_조회().jsonPath().getList("name");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(stationNames).containsExactly("강남역", "역삼역");
     }
 
@@ -71,11 +60,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        RequestParams params = createDefaultParams();
-        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, params);
+        ExtractableResponse<Response> response = 역_생성("강남역");
 
         // when
-        ExtractableResponse<Response> deleteResponse = RequestMethod.delete(response.header("Location"));
+        ExtractableResponse<Response> deleteResponse = 역_삭제(response.header("Location"));
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -90,17 +78,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철역 생성시 실패")
     void duplicationStationNameExceptionTest() {
         //given
-        RequestParams params = createDefaultParams();
-        RequestMethod.post(DEFAULT_PATH, params);
+        역_생성("강남역");
 
         //when
-        ExtractableResponse<Response> response = RequestMethod.post(DEFAULT_PATH, params);
+        ExtractableResponse<Response> response = 역_생성("강남역");
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
-    private static RequestParams createDefaultParams() {
-        return new RequestParams(DEFAULT_NAME_KEY, DEFAULT_NAME_VALUE);
-    }
 }
