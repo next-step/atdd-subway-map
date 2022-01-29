@@ -22,7 +22,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     private static final String 강남역 = "강남역";
     private static final String 역삼역 = "역삼역";
 
-    /** When 지하철역 생성을 요청 하면 Then 지하철역 생성이 성공한다. */
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
@@ -34,10 +33,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.header(LOCATION)).isNotBlank();
     }
 
-    /**
-     * Given 지하철역 생성을 요청 하고 Given 새로운 지하철역 생성을 요청 하고 When 지하철역 목록 조회를 요청 하면 Then 두 지하철역이 포함된 지하철역
-     * 목록을 응답받는다
-     */
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
@@ -58,12 +53,12 @@ class StationAcceptanceTest extends AcceptanceTest {
                         .all()
                         .extract();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
 
-    /** Given 지하철역 생성을 요청 하고 When 생성한 지하철역 삭제를 요청 하면 Then 생성한 지하철역 삭제가 성공한다. */
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
@@ -78,7 +73,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-    /** Given 지하철역 생성을 요청 하고 When 같은 이름으로 지하철역 생성을 요청 하면 Then 지하철역 생성이 실패한다. */
+
     @DisplayName("중복된 이름으로 역을 생성할 수 없다.")
     @Test
     void duplicateNameCreationTest() {
@@ -89,10 +84,8 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> duplicateCreationResponse = stationCreateRequest(강남역);
 
         // then
-        // TODO question: Bad request vs conflict 어떤 status가 맞을지 애매하네요.
-        // 전 일단 bad_request로...
         assertThat(duplicateCreationResponse.statusCode())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+                .isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     static ExtractableResponse<Response> stationCreateRequest(String name) {

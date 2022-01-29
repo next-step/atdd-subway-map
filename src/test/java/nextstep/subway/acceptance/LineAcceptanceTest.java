@@ -25,7 +25,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String COLOR = "color";
     private static final String LOCATION = "Location";
 
-    /** When 지하철 노선 생성을 요청 하면 Then 지하철 노선 생성이 성공한다. */
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
@@ -37,10 +36,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.header(LOCATION)).isNotBlank();
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고 Given 새로운 지하철 노선 생성을 요청 하고 When 지하철 노선 목록 조회를 요청 하면 Then 두 노선이 포함된 지하철
-     * 노선 목록을 응답받는다
-     */
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
@@ -67,7 +62,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(stationNames).contains(LINE_NAME_A, LINE_NAME_B);
     }
 
-    /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 조회를 요청 하면 Then 생성한 지하철 노선을 응답받는다 */
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
@@ -78,12 +72,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> readLineResponse = specificLineReadRequest(uri);
 
+        // then
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String responseLineName = readLineResponse.jsonPath().getString(NAME);
         assertThat(responseLineName).isEqualTo(LINE_NAME_A);
     }
 
-    /** Given 지하철 노선 생성을 요청 하고 When 지하철 노선의 정보 수정을 요청 하면 Then 지하철 노선의 정보 수정은 성공한다. */
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
@@ -109,7 +103,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(readUpdatedLineColor).isEqualTo(updateLineColor);
     }
 
-    /** Given 지하철 노선 생성을 요청 하고 When 생성한 지하철 노선 삭제를 요청 하면 Then 생성한 지하철 노선 삭제가 성공한다. */
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
@@ -129,7 +122,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(readDeletedLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    /** Given 지하철 노선 생성을 요청 하고 When 같은 이름으로 지하철 노선 생성을 요청 하면 Then 지하철 노선 생성이 실패한다. */
     @DisplayName("중복된 이름으로 노선을 생성할 수 없다.")
     @Test
     void duplicateNameCreationTest() {
@@ -140,6 +132,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> duplicateCreationResponse =
                 lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
 
+        // then
         assertThat(duplicateCreationResponse.statusCode())
                 .isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
