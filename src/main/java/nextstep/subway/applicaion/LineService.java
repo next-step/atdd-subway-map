@@ -21,7 +21,7 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    @Transactional
+
     public LineResponse saveLine(LineRequest request) {
         final String name = request.getName();
         final String color = request.getColor();
@@ -56,7 +56,6 @@ public class LineService {
         return createLineResponse(foundLine);
     }
 
-    @Transactional
     public LineResponse editLineById(long id, @RequestBody LineRequest lineRequest) {
         Line foundLine = lineRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(id));

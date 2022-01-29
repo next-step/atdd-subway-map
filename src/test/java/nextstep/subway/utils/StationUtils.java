@@ -67,7 +67,7 @@ public class StationUtils {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    public static void 생성요청_Station_name_list와_생성된_Station_name_list가_동일함(List<ExtractableResponse<Response>> requestList, ExtractableResponse<Response> responseList) {
+    public static void 생성요청한_지하철역들과_생성된_지하철역_목록이_동일함(List<ExtractableResponse<Response>> requestList, ExtractableResponse<Response> responseList) {
         final List<String> requestNames = requestList.stream()
                 .map(r -> r.body())
                 .map(r -> r.jsonPath().get("name"))
@@ -85,7 +85,7 @@ public class StationUtils {
     }
 
     public static void 중복이름으로_지하철_역_생성_실패함(ExtractableResponse<Response> duplicateResponse) {
-        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     public static void 삭제요청한_지하철_역이_존재하지_않음(ExtractableResponse<Response> response) {

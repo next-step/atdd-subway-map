@@ -21,10 +21,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
 
         // when
-        final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
+        final ExtractableResponse<Response> response = 지하철_노선_생성요청(ONE_LINE);
 
         // then
         생성_요청한_지하철_노선_생성됨(response);
@@ -40,10 +40,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        final Map<String, String> line = 지하철_노선_데이터_생성("1호선", "blue darken-4");
-        final Map<String, String> newLine = 지하철_노선_데이터_생성("7호선", "green darken-3");
+        final Map<String, String> LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final Map<String, String> NEW_LINE = 지하철_노선_데이터_생성("7호선", "green darken-3");
 
-        지하철_노선_생성요청(Arrays.asList(line, newLine));
+        지하철_노선_생성요청(Arrays.asList(LINE, NEW_LINE));
 
         // when
         final ExtractableResponse<Response> responseList = 지하철_모든_노선_목록요청();
@@ -61,17 +61,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        final String line1Name = "1호선";
+        final String ONE_LINE_NAME = "1호선";
 
-        final Map<String, String> line1 = 지하철_노선_데이터_생성(line1Name, "blue darken-4");
-        final ExtractableResponse<Response> createResponse = 지하철_노선_생성요청(line1);
+        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성(ONE_LINE_NAME, "blue darken-4");
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성요청(ONE_LINE);
 
         // when
         final String uri = createResponse.header("Location");
         final ExtractableResponse<Response> getResponse = 지하철_노선_목록요청(uri);
 
         // then
-        생성요청한_지하철_노선이_포함된_응답을_받음(getResponse, line1Name);
+        생성요청한_지하철_노선이_포함된_응답을_받음(getResponse, ONE_LINE_NAME);
     }
 
     /**
@@ -83,8 +83,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
-        final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
+        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final ExtractableResponse<Response> response = 지하철_노선_생성요청(ONE_LINE);
 
         // when
         final String uri = response.header("Location");
@@ -105,8 +105,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
-        final ExtractableResponse<Response> response = 지하철_노선_생성요청(line1);
+        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        final ExtractableResponse<Response> response = 지하철_노선_생성요청(ONE_LINE);
 
         // when
         final String uri = response.header("Location");
@@ -116,20 +116,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         삭제요청한_지하철_노선이_존재하지_않음(deleteResponse);
     }
 
-    /**
-     * Given 지하철 노선 생성을 요청 하고
-     * When 같은 이름으로 지하철 노선 생성을 요청 하면
-     * Then 지하철 노선 생성이 실패한다.
-     */
     @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
     void duplicateCheck() {
         // given
-        final Map<String, String> line1 = 지하철_노선_데이터_생성("1호선", "blue darken-4");
-        지하철_노선_생성요청(line1);
+        final Map<String, String> ONE_LINE = 지하철_노선_데이터_생성("1호선", "blue darken-4");
+        지하철_노선_생성요청(ONE_LINE);
 
         // when
-        final ExtractableResponse<Response> duplicateResponse = 지하철_노선_생성요청(line1);
+        final ExtractableResponse<Response> duplicateResponse = 지하철_노선_생성요청(ONE_LINE);
 
         // then
         중복이름으로_지하철_노선_생성_실패함(duplicateResponse);

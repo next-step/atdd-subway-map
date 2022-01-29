@@ -98,7 +98,7 @@ public class LineUtils {
     }
 
     public static void 중복이름으로_지하철_노선_생성_실패함(ExtractableResponse<Response> duplicateResponse) {
-        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     public static void 삭제요청한_지하철_노선이_존재하지_않음(ExtractableResponse<Response> response) {

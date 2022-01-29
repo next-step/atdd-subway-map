@@ -52,7 +52,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> responseList = Station_목록_요청();
 
         // then
-        생성요청_Station_name_list와_생성된_Station_name_list가_동일함(requestList, responseList);
+        생성요청한_지하철역들과_생성된_지하철역_목록이_동일함(requestList, responseList);
     }
 
     /**
