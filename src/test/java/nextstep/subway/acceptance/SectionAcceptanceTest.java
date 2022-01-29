@@ -51,7 +51,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         ExtractableResponse<Response> 노선_조회_결과 = 노선조회(노선_생성_결과.header(HttpHeaders.LOCATION));
-        assertThat(노선_조회_결과.jsonPath().getList("stations." + 노선_이름_키).size()).isEqualTo(4);
+        assertThat(노선_조회_결과.jsonPath().getList("stations." + 노선_이름_키).size()).isEqualTo(3);
     }
 
     /**
