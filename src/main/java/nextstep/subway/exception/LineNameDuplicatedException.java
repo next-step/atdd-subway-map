@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion.exception;
+package nextstep.subway.exception;
 
 public class LineNameDuplicatedException extends NameDuplicatedException {
     public LineNameDuplicatedException(String name) {

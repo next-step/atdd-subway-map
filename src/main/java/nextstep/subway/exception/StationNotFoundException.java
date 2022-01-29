@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion.exception;
+package nextstep.subway.exception;
 
 public class StationNotFoundException extends NotFoundException {
 
