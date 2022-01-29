@@ -7,6 +7,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.DuplicateException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,9 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new DuplicateException("중복된 이름으로 지하철 노선을 생성할 수 없습니다.");
+        }
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return LineResponse.from(line);
     }
