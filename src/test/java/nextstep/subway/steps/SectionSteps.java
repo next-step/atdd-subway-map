@@ -13,11 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SectionSteps {
 
-    public static ExtractableResponse<Response> 지하철_구간_등록_요청() {
+    private static final String 상행역 = "upStationId";
+    private static final String 하행역 = "downStationId";
+    private static final String 역간_거리 = "distance";
+
+    public static ExtractableResponse<Response> 지하철_구간_등록_요청(Long 역1, Long 역2, int 거리) {
         Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", 10);
+        params.put(상행역, 역1);
+        params.put(하행역, 역2);
+        params.put(역간_거리, 거리);
 
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -30,5 +34,9 @@ public class SectionSteps {
 
     public static void 구간_등록_성공(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    public static void 구간_등록_실패(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

@@ -58,4 +58,8 @@ public class Section {
     public void setLine(Line line) {
         this.line = line;
     }
+
+    public boolean contains(Station station) {
+        return this.upStation.equals(station) || this.downStation.equals(station);
+    }
 }
