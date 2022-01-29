@@ -17,7 +17,6 @@ public class StationService {
 		this.stationRepository = stationRepository;
 	}
 
-	@Transactional
 	public StationResponse saveStation(StationRequest requestStation) {
 		if (isStationExists(requestStation)) {
 			throw new UniqueKeyExistsException(requestStation.getName());
@@ -27,7 +26,6 @@ public class StationService {
 		return StationResponse.from(station);
 	}
 
-	@Transactional
 	public void deleteStationById(Long id) {
 		stationRepository.deleteById(id);
 	}
