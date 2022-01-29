@@ -1,9 +1,6 @@
 package nextstep.subway.ui.advice;
 
-import nextstep.subway.exception.InvalidDownStationException;
-import nextstep.subway.exception.InvalidUpStationException;
-import nextstep.subway.exception.NameDuplicatedException;
-import nextstep.subway.exception.NotFoundException;
+import nextstep.subway.exception.*;
 import nextstep.subway.ui.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,7 +25,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
             InvalidDownStationException.class,
-            InvalidUpStationException.class
+            InvalidUpStationException.class,
+            RemoveSectionFailException.class
     })
     public ErrorResponse handleInvalidRequest(Exception e) {
         return new ErrorResponse(e.getMessage());

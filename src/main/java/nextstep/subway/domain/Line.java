@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import nextstep.subway.exception.InvalidDownStationException;
 import nextstep.subway.exception.InvalidUpStationException;
+import nextstep.subway.exception.RemoveSectionFailException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -43,8 +44,15 @@ public class Line extends BaseEntity {
     }
 
     public void removeSection(Long stationId) {
+        validateSectionCount();
         if (isLastStation(stationId)) {
             sections.remove(getLastSection());
+        }
+    }
+
+    private void validateSectionCount() {
+        if (sections.size() == 1) {
+            throw new RemoveSectionFailException();
         }
     }
 
