@@ -31,13 +31,14 @@ public class LineService {
         }
 
         Line line = lineRepository.save(new Line(name, color));
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return new LineResponse
+                .Builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -69,12 +70,13 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return new LineResponse
+                .Builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .build();
     }
 }
