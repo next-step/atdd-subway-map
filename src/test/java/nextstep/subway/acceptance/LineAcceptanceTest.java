@@ -196,6 +196,30 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 추가될 지하철 역 생성을 요청 하고
+     * Given 추가될 지하철 역 생성을 요청 하고
+     * When 추가된 역으로 지하철 노선 구간 생성을 요청 하면
+     * Then 새로운 지하철 노선의 구간이 추가된다.
+     */
+    @DisplayName("조회 안되는 역으로 구간 등록 시 예외처리")
+    @Test
+    void notFindSectionStation() {
+        // given
+        Long upStationId = getStationId(StationSteps.create(FIRST_STATION_NAME));
+        Long downStationId = getStationId(StationSteps.create(SECOND_STATION_NAME));
+
+        ExtractableResponse<Response> line = LineSteps.create(FIRST_LINE_NAME, FIRST_LINE_COLOR, upStationId, downStationId, DEFAULT_DISTANCE);
+
+        // when
+        ExtractableResponse<Response> response = SectionSteps.create(line.header(RESPONSE_HEADER_LOCATION), downStationId, 100L, DEFAULT_DISTANCE);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     /**
      * Given 지하철 역 생성을 요청 하고
      * Given 지하철 역 생성을 요청 하고

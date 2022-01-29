@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private static String DUPLICATE_NAME_ERROR_MASSAGE = "사용중인 노선 이름입니다.";
-    private static String NOT_FIND_MASSAGE = "존재하지 않습니다.";
+    private static String NOT_FIND_STATION_MASSAGE = "지하철 역이 존재하지 않습니다.";
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
@@ -88,7 +88,7 @@ public class LineService {
 
     private Station findStationById(Long stationId) {
         return stationRepository.findById(stationId)
-                                .orElseThrow(() -> new StationException(NOT_FIND_MASSAGE));
+                                .orElseThrow(() -> new StationException(NOT_FIND_STATION_MASSAGE));
     }
 
     private LineResponse createLineResponse(Line line) {
