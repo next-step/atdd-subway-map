@@ -68,7 +68,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("구간 삭제")
     @Test
-    void addSectionDoesNotConnectedToPrevious() {
+    void removeSection() {
         // given
         지하철_노선_생성_요청(신분당선);
         지하철_구간_등록_요청(2L, 3L, 10);
@@ -78,5 +78,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         구간_삭제_성공(response);
+    }
+
+    /**
+     * 노선에 구간이 한 개 남은 경우 실패한다.
+     * Given 지하철 노선 생성을 요청 하고
+     * When 구간 제거를 요청하면
+     * Then 지하철 노선 구간 제거가 실패한다.
+     */
+    @DisplayName("구간 삭제 실패 - 노선에 구간이 한 개 남은 경우")
+    @Test
+    void removeSectionFail() {
+        // given
+        지하철_노선_생성_요청(신분당선);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(2L);
+
+        // then
+        구간_삭제_실패(response);
     }
 }
