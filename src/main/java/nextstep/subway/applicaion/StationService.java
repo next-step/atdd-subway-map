@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.DuplicateException;
+import nextstep.subway.exception.NoElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,7 @@ public class StationService {
 
     @Transactional(readOnly = true)
     public Station findById(Long id) {
-        return stationRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        return stationRepository.findById(id).orElseThrow(NoElementException::new);
     }
 
     public void deleteStationById(Long id) {

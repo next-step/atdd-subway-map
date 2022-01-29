@@ -20,10 +20,11 @@ public class Line extends BaseEntity {
     public Line() {
     }
 
-    public Line(String name, String color, List<Section> sections) {
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.sections = sections;
+        section.setLine(this);
+        this.sections.add(section);
     }
 
     public Long getId() {

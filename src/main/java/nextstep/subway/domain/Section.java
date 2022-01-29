@@ -47,7 +47,7 @@ public class Section {
     }
 
     public boolean isConnectable(Section section) {
-        return downStation.equals(section.getUpStation());
+        return section.getUpStation().equals(downStation);
     }
 
     public boolean isEqualToDownStation(Station station){

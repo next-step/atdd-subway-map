@@ -33,15 +33,10 @@ public class LineService {
         Long downStationId = request.getDownStationId();
         int distance = request.getDistance();
 
-        Station upStation = stationService.findById(upStationId);
-        Station downStation = stationService.findById(downStationId);
-        Section section = new Section(upStation, downStation, distance);
-
         validateNameDuplicated(name);
 
-        Line line = lineRepository.save(new Line(name, color, List.of(section)));
-        section.setLine(line);
-        sectionRepository.save(section);
+        Section section = convertToSection(upStationId, downStationId, distance);
+        Line line = lineRepository.save(new Line(name, color, section));
 
         return LineResponse.of(line);
     }
@@ -72,10 +67,12 @@ public class LineService {
     }
 
     public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
-        Station upStation = stationService.findById(sectionRequest.getUpStationId());
-        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        Long upStationId = sectionRequest.getUpStationId();
+        Long downStationId = sectionRequest.getDownStationId();
+        int distance = sectionRequest.getDistance();
+
+        Section section = convertToSection(upStationId, downStationId, distance);
         Line line = findById(id);
-        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
 
         line.addSection(section);
         Section savedSection = sectionRepository.save(section);
@@ -93,4 +90,11 @@ public class LineService {
     private Line findById(Long id){
         return lineRepository.findById(id).orElseThrow(NoElementException::new);
     }
+
+    private Section convertToSection(Long upStationId, Long downStationId, int distance) {
+        Station upStation = stationService.findById(upStationId);
+        Station downStation = stationService.findById(downStationId);
+        return new Section(upStation, downStation, distance);
+    }
+
 }
