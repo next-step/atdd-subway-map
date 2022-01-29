@@ -77,14 +77,4 @@ public class LineController {
             lineService.deleteSection(id, stationId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-    @ExceptionHandler({EntityNotFoundException.class, InvalidParameterException.class})
-    public ResponseEntity<Void> getUnprocessableEntityStateEntity() {
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
-    }
-
-    @ExceptionHandler(DuplicatedException.class)
-    public ResponseEntity<Void> getConflictEntity() {
-        return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
-    }
 }

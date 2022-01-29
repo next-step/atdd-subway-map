@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class StationService {
 
     private void checkDuplication(StationRequest stationRequest) {
         if (stationRepository.existsByName(stationRequest.getName())) {
-            throw new IllegalArgumentException("[duplication]:name");
+            throw new DuplicatedException();
         }
     }
 
