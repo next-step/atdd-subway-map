@@ -31,13 +31,12 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario 새로운 구간을 등록한다
      * Given 상행이 될 지하철 역 생성
      * Given 노선 등록을 요청한다
      * When 새로운 구간 등록을 요청한다
      * Then  구간 등록이 완료된다.
      */
-    @DisplayName("새로운 구간 등록")
+    @DisplayName("새로운 구간을 등록한다")
     @Test
     void 새로운_구간_등록_테스트() {
         //given
@@ -53,11 +52,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario 새로운 구간의 상행은 기존 구간의 하행과 일치해야한다.
      * When  새로운 상행이 기존의 하행과 일치하지 않는 구간 등록을 요청한다
      * Then  구간 등록이 실패한다
      */
-    @DisplayName("새로운 구간 등록")
+    @DisplayName("새로운 구간의 상행은 기존 구간의 하행과 일치해야한다.")
     @Test
     void 잘못된_상행_하행_구간_등록_테스트() {
         //when
@@ -67,11 +65,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario 기존 구간에 없는 역을 새로운 구간의 하행역으로 생성은 불가하다.
      * When  등록되지않은 하행역 구간을 요청한다.
      * Then  구간 등록이 실패한다
      */
-    @DisplayName("새로운 구간 등록")
+    @DisplayName("기존 구간에 없는 역을 새로운 구간의 하행역으로 생성은 불가하다.")
     @Test
     void 등록안된_하행구간_등록_테스트() {
         //when
@@ -82,12 +79,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario 마지막 구간만 삭제가 가능하다.
      * Given 구간 등록을 요청한다
      * When  하행 종점인 구간 삭제를 요청한다.
      * Then 삭제 된다.
      */
-    @DisplayName("하행 종점인 구간 삭제를 요청한다")
+    @DisplayName("마지막 구간만 삭제가 가능하다.")
     @Test
     void 하행종점_구간_삭제() {
         //given
@@ -106,12 +102,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
 
     /**
-     * Scenario 마지막 구간만 삭제가 가능하다.
      * Given 구간 등록을 요청한다
      * When  하행 종점이 아닌 구간 삭제를 요청한다.
      * Then 삭제 되지 않는다.
      */
-    @DisplayName("하행 종점 구간만 삭제가 가능하다")
+    @DisplayName("마지막 구간만 삭제가 가능하다.")
     @Test
     void 하행종점_구간만_삭제가능() {
         //given
@@ -129,11 +124,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario 하나 남은 구간은 삭제가 불가능하다
      * When  하나 남은 구간을 삭제 요청한다.
      * Then 삭제 요청이 실패한다.
      */
-    @DisplayName("마지막 구간만 삭제가 가능하다")
+    @DisplayName("하나 남은 구간은 삭제가 불가능하다")
     @Test
     void 마지막_구간만_삭제가능() {
         //when
