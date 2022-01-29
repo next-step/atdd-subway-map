@@ -4,17 +4,18 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.error.exception.EntityDuplicateException;
+import nextstep.subway.error.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -41,10 +42,15 @@ public class StationService {
     }
 
     private void checkDuplicated(String name) {
-        Optional<Station> findStation = stationRepository.findByName(name);
-        if (findStation.isPresent()) {
-            throw new RuntimeException("해당 지하철역이 이미 존재합니다.");
-        }
+        stationRepository.findByName(name).ifPresent(s -> {
+            throw new EntityDuplicateException(name);
+        });
     }
 
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException(id);
+                });
+    }
 }
