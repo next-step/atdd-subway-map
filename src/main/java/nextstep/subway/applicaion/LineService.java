@@ -1,12 +1,10 @@
 package nextstep.subway.applicaion;
 
-import javassist.bytecode.DuplicateMemberException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.exception.DuplicatedLineException;
-import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +23,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         checkDuplication(request);
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(new Line(request));
         return LineResponse.of(line);
     }
 
@@ -58,5 +56,9 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         lineRepository.delete(line);
+    }
+
+    public void addSection(LineRequest lineRequest) {
+
     }
 }
