@@ -71,7 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_상행_정보없음);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -90,7 +90,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_하행_정보없음);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
