@@ -26,8 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선의 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest{
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
 
     long 이호선;
     long 이호선_상행역;

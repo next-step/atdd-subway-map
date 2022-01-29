@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Station;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +22,7 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
-        Station upStation = stationService.findById(request.getUpStationId());
-        Station downStation = stationService.findById(request.getDownStationId());
-        StationsDto stationsDto = new StationsDto(upStation, downStation);
-
-        LineResponse line = lineService.saveLine(request, stationsDto);
+        LineResponse line = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -54,13 +51,8 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<SectionResponse> addSection(@RequestBody SectionRequest request,
                                                       @PathVariable("id") Long lineId) {
-        Station upStation = stationService.findById(request.getUpStationId());
-        Station downStation = stationService.findById(request.getDownStationId());
-        StationsDto stationsDto = new StationsDto(upStation, downStation);
-
-        SectionResponse section = lineService.addSection(lineId, stationsDto, request.getDistance());
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId()))
-                .body(section);
+        lineService.addSection(lineId, request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}/sections")
