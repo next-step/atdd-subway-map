@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.LineException;
+import nextstep.subway.exception.StationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private static String DUPLICATE_NAME_ERROR_MASSAGE = "사용중인 노선 이름입니다.";
+    private static String NOT_FIND_STATION_MASSAGE = "지하철 역이 존재하지 않습니다.";
 
-    private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
     public LineService(LineRepository lineRepository,
                        StationRepository stationRepository) {
@@ -32,6 +34,7 @@ public class LineService {
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
+        line.addSection(createSection(line, request));
         return createLineResponse(line);
     }
 
@@ -61,13 +64,8 @@ public class LineService {
 
     public void saveSection(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).get();
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).get();
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).get();
 
-        line.validationSectionStation(upStation, downStation);
-
-        Section section = createSection(line, upStation, downStation, lineRequest.getDistance());
-        line.addSection(section);
+        line.addSection(createSection(line, lineRequest));
     }
 
     public void deleteSectionById(Long id, Long stationId) {
@@ -76,13 +74,21 @@ public class LineService {
         line.deleteSectionById(station);
     }
 
-    private Section createSection(Line line, Station upStation, Station downStation, int distance) {
+    private Section createSection(Line line, LineRequest lineRequest) {
+        Station upStation = findStationById(lineRequest.getUpStationId());
+        Station downStation = findStationById(lineRequest.getDownStationId());
+
         return new Section(
                 line,
                 upStation,
                 downStation,
-                distance
+                lineRequest.getDistance()
         );
+    }
+
+    private Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId)
+                                .orElseThrow(() -> new StationException(NOT_FIND_STATION_MASSAGE));
     }
 
     private LineResponse createLineResponse(Line line) {

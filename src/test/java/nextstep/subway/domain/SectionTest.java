@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
+@DisplayName("구간 관리")
 public class SectionTest extends SectionFixData{
     private static int DEFAULT_DISTANCE = 5;
 
@@ -12,7 +13,7 @@ public class SectionTest extends SectionFixData{
     @Test
     void createSection() {
         // given
-        Line line = createLine();
+        createLine();
         Station upStation = createStation(FIRST_STATION_NAME);
         Station downStation = createStation(SECOND_STATION_NAME);
 
