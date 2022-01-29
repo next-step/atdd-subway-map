@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nextstep.subway.utils.HttpRequestTestUtil.*;
-import static nextstep.subway.utils.StationStepUtil.테스트준비_지하철역들생성;
 
 public class LineStepUtil {
 
@@ -26,18 +25,10 @@ public class LineStepUtil {
     private LineStepUtil() {
     }
 
-    public static ExtractableResponse<Response> 테스트준비_노선등록() {
-        테스트준비_지하철역들생성();
-        return 기존노선생성();
-    }
-
     public static ExtractableResponse<Response> 노선조회(String url) {
         return 겟_요청(url);
     }
 
-    public static ExtractableResponse<Response> 기존노선생성() {
-        return 노선생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리);
-    }
 
     public static ExtractableResponse<Response> 새로운노선생성() {
         return 노선생성(새로운노선, 새로운색상, 상행종점, 하행종점, 종점간거리);

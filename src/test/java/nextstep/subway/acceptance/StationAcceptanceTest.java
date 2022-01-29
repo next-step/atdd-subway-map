@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.exception.DuplicationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
+    ExtractableResponse<Response> createResponse;
+
+    /**
+     * Given 지하철역 생성을 요청 하면
+     */
+    @BeforeEach
+    void setup() {
+        createResponse = 지하철역생성(기존지하철);
+    }
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -23,15 +34,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역생성_테스트() {
         // when
-        ExtractableResponse<Response> response = 기존지하철역생성();
+        // setUp
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.header("Location")).isNotBlank();
     }
 
     /**
-     * Given 지하철역 생성을 요청 하고
      * Given 새로운 지하철역 생성을 요청 하고
      * When 지하철역 목록 조회를 요청 하면
      * Then 두 지하철역이 포함된 지하철역 목록을 응답받는다
@@ -40,9 +50,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역목록조회_테스트() {
         /// given
-        기존지하철역생성();
-
-        새로운지하철역생성(새로운지하철);
+        지하철역생성(새로운지하철);
 
         // when
         ExtractableResponse<Response> response = 지하철역조회();
@@ -59,9 +67,6 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 삭제")
     @Test
     void 지하철역삭제_테스트() {
-        // given
-        ExtractableResponse<Response> createResponse = 기존지하철역생성();
-
         // when
         ExtractableResponse<Response> response = 딜리트_요청(createResponse.header(HttpHeaders.LOCATION));
 
@@ -77,11 +82,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복된 지하철 역은 생성이 실패한다")
     @Test
     void 중복된지하철역생성_테스트() {
-        //given
-        기존지하철역생성();
-
         //when
-        ExtractableResponse<Response> response = 기존지하철역생성();
+        ExtractableResponse<Response> response = 지하철역생성(기존지하철);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());

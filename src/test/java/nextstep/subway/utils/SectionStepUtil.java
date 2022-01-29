@@ -24,7 +24,7 @@ public class SectionStepUtil {
     }
 
 
-    public static ExtractableResponse<Response> 새로운구간등록(Long 상행종점, Long 하행종점, int 종점간거리) {
+    public static ExtractableResponse<Response> 구간등록(Long 상행종점, Long 하행종점, int 종점간거리) {
         Map<String, Object> 구간파라미터생성 = 구간파라미터생성(상행종점, 하행종점, 종점간거리);
 
         return 포스트_요청(기본구간주소, 구간파라미터생성);
