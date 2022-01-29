@@ -41,4 +41,8 @@ public class Sections {
         return getStations().stream()
                 .anyMatch(station -> station.equals(downStation));
     }
+
+    public void deleteLastSection() {
+        sections.remove(sections.size() - 1);
+    }
 }

@@ -102,4 +102,14 @@ public class LineService {
 
         return LineAndSectionResponse.of(line);
     }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
+
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_STATION));
+
+        line.deleteSection(station);
+    }
 }
