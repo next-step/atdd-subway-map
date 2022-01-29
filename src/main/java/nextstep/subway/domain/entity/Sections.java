@@ -28,8 +28,8 @@ public class Sections {
         final Station upStation = section.getUpStation();
         final Station downStation = section.getDownStation();
 
-        final Station EndingStation = getEndingStation();
-        if (!EndingStation.equals(upStation)) {
+        final Station endingStation = getEndingStation();
+        if (!endingStation.equals(upStation)) {
             throw new IllegalArgumentException("노선에 등록된 하행 종점 역이 아닌 역을 상행 역으로 설정할 수 없습니다.");
         }
 
