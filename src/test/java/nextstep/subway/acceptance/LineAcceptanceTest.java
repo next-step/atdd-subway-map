@@ -43,7 +43,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 		// when
 		ExtractableResponse<Response> response = 지하철_노선_생성("신분당선", "bg-red-600");
 		// then
-		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
 	/**

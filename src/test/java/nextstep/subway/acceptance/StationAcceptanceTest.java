@@ -42,7 +42,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> secondResponse = 지하철역_생성("강남역");
 
         // then
-        assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
