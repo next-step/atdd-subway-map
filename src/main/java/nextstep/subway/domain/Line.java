@@ -13,7 +13,7 @@ public class Line extends BaseEntity {
     private String color;
 
     @Embedded
-    private Sections sections = new Sections();
+    private Sections sections;
 
     protected Line() {
     }
@@ -48,6 +48,10 @@ public class Line extends BaseEntity {
         }
 
         return stations;
+    }
+
+    public void validationSectionStation(Station upStation, Station downStation) {
+        sections.validationSectionStation(upStation, downStation);
     }
 
     public void deleteSectionById(Station station) {
