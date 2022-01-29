@@ -99,7 +99,7 @@ public class LineSteps {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(requestParams)
                 .when()
-                .post(String.format("/lines/%d/sections", lineId))
+                .post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
     }
