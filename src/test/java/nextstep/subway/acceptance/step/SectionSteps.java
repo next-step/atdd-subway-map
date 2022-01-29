@@ -21,7 +21,7 @@ public class SectionSteps {
                 .body(line)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/line/{id}/sections", lineId)
+                .post("/lines/{id}/sections", lineId)
                 .then()
                 .log().all().extract();
     }

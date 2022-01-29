@@ -31,15 +31,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final int distance = 100;
 
         // given
-        final Long upStationId = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
-        final Long downStationId = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
-        final Long sectionDownStationId = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
+        final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
+        final Long 판교역_번호 = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
 
         // when
-        final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, distance)
+        final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
                 .jsonPath().getLong(번호);
 
-        ExtractableResponse<Response> createResponse = SectionSteps.지하철_구간_생성_요청(lineId, downStationId, sectionDownStationId, distance);
+        ExtractableResponse<Response> createResponse = SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());

@@ -60,4 +60,8 @@ public class Line extends BaseEntity {
     public boolean isNotEqualDownStation(Station upStation) {
         return upStation.equals(sections.getLastDownStation());
     }
+
+    public boolean existStation(Station downStation) {
+        return sections.existStation(downStation);
+    }
 }

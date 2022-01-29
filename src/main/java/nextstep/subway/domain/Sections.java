@@ -36,4 +36,9 @@ public class Sections {
 
         return stationList;
     }
+
+    public boolean existStation(Station downStation) {
+        return getStations().stream()
+                .anyMatch(station -> station.equals(downStation));
+    }
 }
