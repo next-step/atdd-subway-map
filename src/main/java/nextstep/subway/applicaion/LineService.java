@@ -20,21 +20,17 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
     private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
         this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
         checkDuplicatedName(request);
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(EntityNotFoundException::new);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
         Line line = lineRepository.save(
                 Line.builder()
                         .name(request.getName())
@@ -91,18 +87,15 @@ public class LineService {
     }
 
     public void saveSection(Long id, SectionRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(EntityNotFoundException::new);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         line.addSection(upStation, downStation, request.getDistance());
     }
 
     public void deleteSection(Long id, long stationId) {
-        Station station = stationRepository.findById(stationId)
-                .orElseThrow(EntityNotFoundException::new);
+        Station station = stationService.findById(stationId);
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         line.removeSection(station);

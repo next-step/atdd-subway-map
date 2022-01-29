@@ -8,6 +8,7 @@ import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,5 +59,10 @@ public class StationService {
         return stations.stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Station findById(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
