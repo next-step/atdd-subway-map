@@ -84,6 +84,13 @@ public class LineService {
         line.addSection(new Section(line, upStation, downStation, request.getDistance()));
     }
 
+    public void removeSection(final Long id, final Long stationId) {
+        final Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        final Station station = stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
+
+        line.removeSection(station);
+    }
+
     private LineResponse createLineResponse(final Line line) {
         return new LineResponse(
                 line.getId(),

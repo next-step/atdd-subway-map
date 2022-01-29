@@ -40,6 +40,22 @@ public class Sections {
         sections.add(section);
     }
 
+    public void remove(final Station station) {
+        final Station endingStation = getEndingStation();
+        if (!endingStation.equals(station)) {
+            throw new IllegalArgumentException("하행 종점 역이 아니면 제거할 수 없습니다.");
+        }
+
+        if (sections.size() <= 1) {
+            throw new IllegalArgumentException("구간이 한 개 이하면 제거할 수 없습니다.");
+        }
+
+        final Section section = sections.stream()
+                .filter(_section -> _section.getDownStation().equals(station))
+                .findAny().orElseThrow(IllegalStateException::new);
+        sections.remove(section);
+    }
+
     public List<Station> getStations() {
         final Map<Station, Station> stationMap = getStationMap();
         final Map<String, Set<Station>> stationSetMap = getStationSetMap(stationMap);
