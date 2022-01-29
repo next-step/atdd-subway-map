@@ -2,10 +2,7 @@ package nextstep.subway.domain;
 
 import org.apache.logging.log4j.util.Strings;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Line extends BaseEntity {
@@ -14,6 +11,9 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
     }
@@ -37,6 +37,14 @@ public class Line extends BaseEntity {
         }
     }
 
+    public void addSection(final Section section) {
+        sections.add(section);
+    }
+
+    public void removeSection(final Station downEndStation) {
+        sections.remove(downEndStation);
+    }
+
     public Long getId() {
         return id;
     }
@@ -47,6 +55,10 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public Sections getSections() {
+        return sections;
     }
 
     public void update(final String name, final String color) {

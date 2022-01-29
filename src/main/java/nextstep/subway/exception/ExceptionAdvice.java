@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class ExceptionAdvice {
@@ -18,7 +19,14 @@ public class ExceptionAdvice {
     protected ResponseEntity<ErrorResponse> handleEntityExistsException(final EntityExistsException entityExistsException) {
         final String errorMessage = entityExistsException.getMessage();
         log.error("EntityExistsException : {}", errorMessage);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(errorMessage));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErrorResponse(errorMessage));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleEntityNotFoundException(final EntityNotFoundException entityNotFoundException) {
+        final String errorMessage = entityNotFoundException.getMessage();
+        log.error("EntityNotFoundException : {}", errorMessage);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(errorMessage));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
