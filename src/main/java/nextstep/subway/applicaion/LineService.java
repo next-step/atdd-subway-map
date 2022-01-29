@@ -5,15 +5,12 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
-import nextstep.subway.exception.NotExistedStationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,7 +68,7 @@ public class LineService {
                 .color(line.getColor())
                 .createdDate(line.getCreatedDate())
                 .modifiedDate(line.getModifiedDate())
-                .stations(line.getStations())
+                .stations(line.getSections().getAllStations())
                 .build();
     }
 
@@ -92,8 +89,6 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        if (!line.equalsLastDownStation(upStation)) { throw new InvalidParameterException(); }
-        if (line.checkDuplicatedDownStation(downStation))  { throw new InvalidParameterException(); }
         line.addSection(upStation, downStation, request.getDistance());
     }
 
@@ -102,6 +97,6 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        line.removeStation(station);
+        line.removeSection(station);
     }
 }

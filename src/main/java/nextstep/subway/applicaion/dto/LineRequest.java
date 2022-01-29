@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.applicaion.object.Distance;
+import nextstep.subway.domain.object.Distance;
 
 import javax.validation.constraints.NotNull;
 

@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion.object;
+package nextstep.subway.domain.object;
 
 import nextstep.subway.exception.NotExistedStationException;
 

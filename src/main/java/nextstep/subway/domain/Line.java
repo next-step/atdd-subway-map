@@ -1,20 +1,15 @@
 package nextstep.subway.domain;
 
 import lombok.Builder;
-import nextstep.subway.applicaion.object.Distance;
+import nextstep.subway.domain.object.Distance;
+import nextstep.subway.domain.object.Sections;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -26,8 +21,8 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private final List<Section> sections = new ArrayList<>();
+    @Embedded
+    private final Sections sections = new Sections();
 
     public Line() {
     }
@@ -51,7 +46,7 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSections() { return sections; }
+    public Sections getSections() { return sections; }
 
     public void addSection(Station upStation, Station downStation, Distance distance) {
         Section section = Section.builder()
@@ -60,7 +55,14 @@ public class Line extends BaseEntity {
                 .downStation(downStation)
                 .distance(distance.getValue())
                 .build();
+
+        sections.validateAddSection(upStation, downStation);
         sections.add(section);
+    }
+
+    public void removeSection(Station station) {
+        sections.validateRemoval(station);
+        this.sections.removeLastSection();
     }
 
     public void update(String name, String color) {
@@ -71,42 +73,5 @@ public class Line extends BaseEntity {
         if (color != null && !color.isEmpty()) {
             this.color = color;
         }
-    }
-
-    public Section getLastSection() {
-        return sections.get(sections.size() - 1);
-    }
-
-    public boolean equalsLastDownStation(Station upStation) {
-        return getLastSection().getDownStation().equals(upStation);
-    }
-
-    public boolean checkDuplicatedDownStation(Station downStation) {
-        boolean duplicatedDownStationYn = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet())
-                .contains(downStation);
-        boolean duplicatedUpStationYn = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet())
-                .contains(downStation);
-        return duplicatedDownStationYn || duplicatedUpStationYn;
-    }
-
-    public List<Station> getStations() {
-        List<Station> stations = sections.stream()
-                .sorted(Comparator.comparing(Section::getId))
-                .map(Section::getUpStation)
-                .collect(Collectors.toList());
-        stations.add(getLastSection().getDownStation());
-        return stations;
-    }
-
-    public void removeStation(Station station) {
-        if (getSections().size() <= 1) { throw new InvalidParameterException(); }
-
-        Section lastSection = getLastSection();
-        if (!lastSection.getDownStation().equals(station)) { throw new InvalidParameterException(); }
-        getSections().remove(lastSection);
     }
 }
