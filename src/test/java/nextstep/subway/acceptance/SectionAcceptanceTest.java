@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.exception.NotLastSectionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.utils.LineStepUtil.*;
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SectionAcceptanceTest extends AcceptanceTest {
 
     final int 종점간거리 = 2;
+    ExtractableResponse<Response> 노선_생성_결과;
     private Long 상행종점;
     private Long 하행종점;
 
@@ -27,7 +29,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void setup() {
         상행종점 = 지하철역생성(기존지하철).jsonPath().getLong("id");
         하행종점 = 지하철역생성(새로운지하철).jsonPath().getLong("id");
-        노선생성(노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리));
+        노선_생성_결과 = 노선생성(노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리));
     }
 
     /**
@@ -48,7 +50,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
+        ExtractableResponse<Response> 노선_조회_결과 = 노선조회(노선_생성_결과.header(HttpHeaders.LOCATION));
+        assertThat(노선_조회_결과.jsonPath().getList("stations." + 노선_이름_키).size()).isEqualTo(4);
     }
 
     /**

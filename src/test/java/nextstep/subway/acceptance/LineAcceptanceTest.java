@@ -58,6 +58,8 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> 노선조회 = 노선조회(response.header(HttpHeaders.LOCATION));
+        assertThat(노선조회.jsonPath().getString(노선_이름_키)).isEqualTo(기존노선);
     }
 
     /**
