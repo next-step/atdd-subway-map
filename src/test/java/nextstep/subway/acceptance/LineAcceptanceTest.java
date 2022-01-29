@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -84,8 +85,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
+        final String 강남역 = "강남역";
+        final String 역삼역 = "역삼역";
+        final ExtractableResponse<Response> upStationCreateResponse = 지하철_역_생성_요청(강남역);
+        final ExtractableResponse<Response> downStationCreateResponse = 지하철_역_생성_요청(역삼역);
+
         final String 신분당선 = "신분당선";
-        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선, "bg-red-600");
+        final ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(
+                신분당선,
+                "bg-red-600",
+                upStationCreateResponse.jsonPath().getLong("id"),
+                downStationCreateResponse.jsonPath().getLong("id"),
+                1
+        );
 
         // when
         final String path = createResponse.header("Location");
@@ -96,7 +108,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(responseBody.getLong("id")).isNotNull(),
-                () -> assertThat(responseBody.getString("name")).isEqualTo(신분당선)
+                () -> assertThat(responseBody.getString("name")).isEqualTo(신분당선),
+                () -> assertThat(responseBody.getList("stations.name")).contains(강남역, 역삼역)
         );
     }
 
