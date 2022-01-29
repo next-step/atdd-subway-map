@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineStationResponse;
 import nextstep.subway.utils.CustomRestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,9 +26,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String lineName = "이름";
         String lineColor = "빨간색";
+        String upStationId = "1";
+        String downStationId = "2";
+        String distance = "123";
 
         //when
-        ExtractableResponse<Response> result = 노선_생성(lineName, lineColor);
+        ExtractableResponse<Response> result = 노선_생성(lineName, lineColor, upStationId, downStationId, distance);
 
         //then
         assertAll(
@@ -39,7 +43,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청 하고
-     *
+     * <p>
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
@@ -50,14 +54,20 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given1 지하철 노선 생성
         String lineName1 = "이름";
         String lineColor1 = "빨간색";
+        String upStationId1 = "1";
+        String downStationId1 = "2";
+        String distance1 = "123";
 
-        노선_생성(lineName1, lineColor1);
+        노선_생성(lineName1, lineColor1, upStationId1, downStationId1, distance1);
 
         //given2 새로운 지하철 노선 생성
         String lineName2 = "이름2";
         String lineColor2 = "빨간색2";
+        String upStationId2 = "1";
+        String downStationId2 = "2";
+        String distance2 = "123";
 
-        노선_생성(lineName2, lineColor2);
+        노선_생성(lineName2, lineColor2, upStationId2, downStationId2, distance2);
 
         //when
         ExtractableResponse<Response> result = CustomRestAssured.get("/lines/");
@@ -81,16 +91,22 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given
         String lineName = "이름";
         String lineColor = "빨간색";
-        String createdLineId = 노선_생성(lineName, lineColor).jsonPath().getString("id");
+        String 강남역_id = 지하철역_생성("강남역").jsonPath().getString("id");
+        String 삼성역_id = 지하철역_생성("삼성역").jsonPath().getString("id");
+        String distance = "123";
+        String createdLineId = 노선_생성(lineName, lineColor, 강남역_id, 삼성역_id, distance).jsonPath().getString("id");
+
 
         //when
         ExtractableResponse<Response> result = 노선_조회(createdLineId);
 
         //then
+        LineStationResponse lineStationResponse = result.as(LineStationResponse.class);
         assertAll(
-                () -> assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(result.jsonPath().getString("name")).isEqualTo(lineName),
-                () -> assertThat(result.jsonPath().getString("color")).isEqualTo(lineColor)
+                () -> assertThat(lineStationResponse.getName()).isEqualTo("이름"),
+                () -> assertThat(lineStationResponse.getColor()).isEqualTo("빨간색"),
+                () -> assertThat(lineStationResponse.getStationResponses()).extracting(LineStationResponse.Station::getId).containsExactly(Long.valueOf(강남역_id), Long.valueOf(삼성역_id)),
+                () -> assertThat(lineStationResponse.getStationResponses()).extracting(LineStationResponse.Station::getName).containsExactly("강남역", "삼성역")
         );
     }
 
@@ -105,10 +121,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given1 지하철 노선 생성
         String lineName = "이름";
         String lineColor = "빨간색";
+        String upStationId = "1";
+        String downStationId = "2";
+        String distance = "123";
         String updateLineName = "이름2";
         String updateLineColor = "빨간색2";
 
-        String createdLineId = 노선_생성(lineName, lineColor).jsonPath().getString("id");
+        String createdLineId = 노선_생성(lineName, lineColor, upStationId, downStationId, distance).jsonPath().getString("id");
 
         //when
         ExtractableResponse<Response> updateLineResult = 노선_정보_변경(createdLineId, updateLineName, updateLineColor);
@@ -134,8 +153,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given1 지하철 노선 생성
         String lineName = "이름";
         String lineColor = "빨간색";
+        String upStationId = "1";
+        String downStationId = "2";
+        String distance = "123";
 
-        String createdLineId = 노선_생성(lineName, lineColor).jsonPath().getString("id");
+        String createdLineId = 노선_생성(lineName, lineColor, upStationId, downStationId, distance).jsonPath().getString("id");
 
         //when
         ExtractableResponse<Response> deleteResult = CustomRestAssured.delete("/lines/" + createdLineId);
@@ -159,10 +181,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         //given1 지하철 노선 생성
         String lineName = "이름";
         String lineColor = "빨간색";
-        노선_생성(lineName, lineColor);
+        String upStationId = "1";
+        String downStationId = "2";
+        String distance = "123";
+        노선_생성(lineName, lineColor, upStationId, downStationId, distance);
 
         //when
-        ExtractableResponse<Response> result = 노선_생성(lineName, lineColor);
+        ExtractableResponse<Response> result = 노선_생성(lineName, lineColor, upStationId, downStationId, distance);
 
         //then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -178,15 +203,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateDuplicateLine() {
         //given1 지하철 노선 생성
-        String lineName = "이름1";
+        String firstLineName = "이름1";
         String lineColor = "빨간색";
-        String lineName2 = "이름2";
+        String secondLineName = "이름2";
+        String upStationId = "1";
+        String downStationId = "2";
+        String distance = "123";
 
-        노선_생성(lineName, lineColor);
-        String createdLineId = 노선_생성(lineName2, lineColor).jsonPath().getString("id");
+        노선_생성(firstLineName, lineColor, upStationId, downStationId, distance);
+        String createdLineId = 노선_생성(secondLineName, lineColor, upStationId, downStationId, distance).jsonPath().getString("id");
 
         //when
-        ExtractableResponse<Response> result = 노선_정보_변경(createdLineId, lineName, lineColor);
+        ExtractableResponse<Response> result = 노선_정보_변경(createdLineId, firstLineName, lineColor);
 
         //then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -196,18 +224,37 @@ class LineAcceptanceTest extends AcceptanceTest {
         return CustomRestAssured.get("/lines/" + createdLineId);
     }
 
-    private ExtractableResponse<Response> 노선_생성(final String lineName, final String lineColor) {
-        return CustomRestAssured.post("/lines/", createParams(lineName, lineColor));
+    private ExtractableResponse<Response> 노선_생성(final String lineName, final String lineColor, String upStationId, String downStationId, String distance) {
+        return CustomRestAssured.post("/lines/", lineCreateParams(lineName, lineColor, upStationId, downStationId, distance));
     }
 
     private ExtractableResponse<Response> 노선_정보_변경(final String id, final String name, final String color) {
-        return CustomRestAssured.put("/lines/" + id, createParams(name, color));
+        return CustomRestAssured.put("/lines/" + id, lineUpdateParams(name, color));
     }
 
-    private Map<String, String> createParams(final String lineName, final String lineColor) {
+    private ExtractableResponse<Response> 지하철역_생성(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return CustomRestAssured.post("/stations", params);
+    }
+
+    private Map<String, String> lineCreateParams(final String lineName, final String lineColor, String upStationId, String downStationId, String distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", lineName);
         params.put("color", lineColor);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return params;
+    }
+
+    private Map<String, String> lineUpdateParams(final String lineName, final String lineColor) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", lineColor);
+
         return params;
     }
 }

@@ -42,6 +42,10 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public Station getStation(Long stationId){
+        return stationRepository.findById(stationId).orElseThrow(IllegalArgumentException::new);
+    }
+
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(station);
     }
