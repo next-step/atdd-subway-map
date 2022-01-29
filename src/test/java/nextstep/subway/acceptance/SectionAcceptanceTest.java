@@ -98,4 +98,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // then
         구간_삭제_실패(response);
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * AND 구간 등록을 요청한 뒤
+     * When 마지막 구간이 아닌 구간 제거를 요청하면
+     * Then 지하철 노선 구간 제거가 실패한다.
+     */
+    @DisplayName("구간 삭제 실패 - 마지막 구간이 아닌 경우")
+    @Test
+    void removeSectionFailNotLastSection() {
+        // given
+        지하철_노선_생성_요청(신분당선);
+        지하철_구간_등록_요청(2L, 3L, 10);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(1L);
+
+        // then
+        구간_삭제_실패(response);
+    }
 }

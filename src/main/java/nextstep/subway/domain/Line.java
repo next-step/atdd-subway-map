@@ -10,6 +10,8 @@ import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
+    private static final int MIN_SECTIONS_SIZE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,20 +47,24 @@ public class Line extends BaseEntity {
 
     public void removeSection(Long stationId) {
         validateSectionCount();
-        if (isLastStation(stationId)) {
-            sections.remove(getLastSection());
+        validateIsLastStation(stationId);
+        sections.remove(getLastSection());
+    }
+
+    private void validateIsLastStation(Long stationId) {
+        if (!isLastStation(stationId)) {
+            throw new RemoveSectionFailException();
         }
     }
 
     private void validateSectionCount() {
-        if (sections.size() == 1) {
+        if (sections.size() == MIN_SECTIONS_SIZE) {
             throw new RemoveSectionFailException();
         }
     }
 
     private boolean isLastStation(Long stationId) {
-        return getLastSection().getDownStation()
-                .getId()
+        return getLastDownStation().getId()
                 .equals(stationId);
     }
 
