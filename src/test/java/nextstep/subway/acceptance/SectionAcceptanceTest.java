@@ -26,10 +26,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void setup() {
         상행종점 = 지하철역생성(기존지하철).jsonPath().getLong("id");
         하행종점 = 지하철역생성(새로운지하철).jsonPath().getLong("id");
-        노선생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리);
+        노선생성(노선파라미터생성(기존노선, 기존색상, 상행종점, 하행종점, 종점간거리));
     }
 
     /**
+     * Scenario 새로운 구간을 등록한다
      * Given 상행이 될 지하철 역 생성
      * Given 노선 등록을 요청한다
      * When 새로운 구간 등록을 요청한다
@@ -51,6 +52,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Scenario 새로운 구간의 상행은 기존 구간의 하행과 일치해야한다.
      * When  새로운 상행이 기존의 하행과 일치하지 않는 구간 등록을 요청한다
      * Then  구간 등록이 실패한다
      */
@@ -64,8 +66,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     *  When  등록되지않은 하행역 구간을 요청한다.
-     *  Then  구간 등록이 실패한다
+     * Scenario 기존 구간에 없는 역을 새로운 구간의 하행역으로 생성은 불가하다.
+     * When  등록되지않은 하행역 구간을 요청한다.
+     * Then  구간 등록이 실패한다
      */
     @DisplayName("새로운 구간 등록")
     @Test
@@ -78,11 +81,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Scenario 마지막 구간만 삭제가 가능하다.
      * Given 구간 등록을 요청한다
      * When  하행 종점인 구간 삭제를 요청한다.
      * Then 삭제 된다.
      */
-
     @DisplayName("하행 종점인 구간 삭제를 요청한다")
     @Test
     void 하행종점_구간_삭제() {
@@ -102,11 +105,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
 
     /**
+     * Scenario 마지막 구간만 삭제가 가능하다.
      * Given 구간 등록을 요청한다
      * When  하행 종점이 아닌 구간 삭제를 요청한다.
      * Then 삭제 되지 않는다.
      */
-
     @DisplayName("하행 종점 구간만 삭제가 가능하다")
     @Test
     void 하행종점_구간만_삭제가능() {
@@ -125,11 +128,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario 마지막 구간은 삭제가 불가능하다
+     * Scenario 하나 남은 구간은 삭제가 불가능하다
      * When  하나 남은 구간을 삭제 요청한다.
      * Then 삭제 요청이 실패한다.
      */
-
     @DisplayName("마지막 구간만 삭제가 가능하다")
     @Test
     void 마지막_구간만_삭제가능() {
