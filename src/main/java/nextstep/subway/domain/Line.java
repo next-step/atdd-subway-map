@@ -38,6 +38,10 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
@@ -68,5 +72,4 @@ public class Line extends BaseEntity {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
     }
-
 }
