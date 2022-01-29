@@ -49,8 +49,9 @@ public class Sections {
     }
 
     public int countStation(Long stationId){
-       return (int) sections.stream().filter(section ->
-                section.isSameUpStation(stationId) || section.isSameDownStation(stationId))
+        return (int) sections.stream()
+                .filter(section ->
+                        section.isSameUpStation(stationId) || section.isSameDownStation(stationId))
                 .count();
     }
 
