@@ -1,5 +1,8 @@
 package nextstep.subway.domain;
 
+import lombok.Builder;
+import nextstep.subway.applicaion.object.Distance;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,9 +31,11 @@ public class Line extends BaseEntity {
     public Line() {
     }
 
-    public Line(String name, String color) {
+    @Builder
+    public Line(String name, String color, Station upStation, Station downStation, Distance distance) {
         this.name = name;
         this.color = color;
+        addSection(upStation, downStation, distance);
     }
 
     public Long getId() {
@@ -47,9 +52,14 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() { return sections; }
 
-    public void addSection(Section section) {
+    public void addSection(Station upStation, Station downStation, Distance distance) {
+        Section section = Section.builder()
+                .line(this)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance.getValue())
+                .build();
         sections.add(section);
-        section.setLine(this);
     }
 
     public void update(String name, String color) {

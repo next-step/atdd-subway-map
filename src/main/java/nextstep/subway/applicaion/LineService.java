@@ -34,14 +34,15 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        Section section = Section.builder()
-                .line(line)
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(request.getDistance().getValue())
-                .build();
-        line.addSection(section);
+        Line line = lineRepository.save(
+                Line.builder()
+                        .name(request.getName())
+                        .color(request.getColor())
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .distance(request.getDistance())
+                        .build()
+        );
         return createLineResponse(line);
     }
 
@@ -93,13 +94,7 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         if (!line.equalsLastDownStation(upStation)) { throw new InvalidParameterException(); }
         if (line.checkDuplicatedDownStation(downStation))  { throw new InvalidParameterException(); }
-        Section section = Section.builder()
-                .line(line)
-                .upStation(upStation)
-                .downStation(downStation)
-                .distance(request.getDistance().getValue())
-                .build();
-        line.addSection(section);
+        line.addSection(upStation, downStation, request.getDistance());
     }
 
     public void deleteSection(Long id, long stationId) {
