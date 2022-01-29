@@ -49,7 +49,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 구간등록(하행종점, 지하철역_ID, 종점간거리);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태_값_검사(response, HttpStatus.CREATED);
         ExtractableResponse<Response> 노선_조회_결과 = 노선조회(노선_생성_결과.header(HttpHeaders.LOCATION));
         assertThat(노선_조회_결과.jsonPath().getList("stations." + 노선_이름_키).size()).isEqualTo(3);
     }
@@ -64,7 +64,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //when
         ExtractableResponse<Response> response = 구간등록(상행종점, 하행종점, 종점간거리);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        상태_값_검사(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -78,7 +78,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 없는지하철역 = Long.MAX_VALUE;
         ExtractableResponse<Response> response = 구간등록(하행종점, 없는지하철역, 종점간거리);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        //ten
+        상태_값_검사(response, HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -99,8 +100,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 구간삭제요청(하행_지하철역_ID);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
+        상태_값_검사(response, HttpStatus.NO_CONTENT);
     }
 
 
@@ -121,9 +121,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 구간삭제요청(하행종점);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("message")).isEqualTo(NotLastSectionException.MESSAGE);
-
+        상태_값_검사(response, HttpStatus.BAD_REQUEST);
+        예외_검사(response, NotLastSectionException.MESSAGE);
     }
 
     /**
@@ -137,9 +136,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 구간삭제요청(하행종점);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("message")).isEqualTo("마지막 구간 삭제 불가");
-
+        상태_값_검사(response, HttpStatus.BAD_REQUEST);
+        예외_검사(response, "마지막 구간 삭제 불가");
     }
 
 }

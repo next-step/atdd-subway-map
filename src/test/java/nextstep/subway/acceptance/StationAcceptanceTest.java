@@ -36,7 +36,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         // setUp
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태_값_검사(createResponse, HttpStatus.CREATED);
         assertThat(createResponse.header(HttpHeaders.LOCATION)).isNotBlank();
     }
 
@@ -53,9 +53,8 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = 지하철역조회(기본주소);
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList(지하철_역_이름_키)).contains(기존지하철, 새로운지하철);
+        상태_값_검사(response, HttpStatus.OK);
+        리스트_값_검사(response, 지하철_역_이름_키, 기존지하철, 새로운지하철);
     }
 
     /**
@@ -70,7 +69,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역삭제(createResponse.header(HttpHeaders.LOCATION));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태_값_검사(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -85,7 +84,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철역생성(기존지하철);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
+        상태_값_검사(response, HttpStatus.CONFLICT);
+        예외_검사(response, DuplicationException.MESSAGE);
     }
 }

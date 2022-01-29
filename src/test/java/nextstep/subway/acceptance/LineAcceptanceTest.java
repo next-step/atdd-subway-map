@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 import static nextstep.subway.utils.LineStepUtil.기본주소;
 import static nextstep.subway.utils.LineStepUtil.*;
 import static nextstep.subway.utils.StationStepUtil.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -57,9 +56,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선생성(노선_파라미터);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태_값_검사(response, HttpStatus.CREATED);
         ExtractableResponse<Response> 노선조회 = 노선조회(response.header(HttpHeaders.LOCATION));
-        assertThat(노선조회.jsonPath().getString(노선_이름_키)).isEqualTo(기존노선);
+        단일_값_검사(노선조회, 노선_이름_키, 기존노선);
     }
 
     /**
@@ -73,7 +72,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선생성(노선파라미터생성(새로운노선, 새로운색상, Long.MAX_VALUE, Long.MIN_VALUE, Integer.MAX_VALUE));
 
         //then
-        assertThat(response.jsonPath().getString("message")).isEqualTo(NotFoundException.MESSAGE);
+        예외_검사(response, NotFoundException.MESSAGE);
     }
 
 
@@ -96,8 +95,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선조회(기본주소);
 
         //then
-        assertThat(response.jsonPath().getList(노선_이름_키)).contains(첫_노선_파라미터.get(노선_이름_키), 두번째_노선_파라미터.get(노선_이름_키));
-        assertThat(response.jsonPath().getList(노선_색상_키)).contains(첫_노선_파라미터.get(노선_색상_키), 두번째_노선_파라미터.get(노선_색상_키));
+        리스트_값_검사(response, 노선_이름_키, String.valueOf(첫_노선_파라미터.get(노선_이름_키)), String.valueOf(두번째_노선_파라미터.get(노선_이름_키)));
+        리스트_값_검사(response, 노선_색상_키, String.valueOf(첫_노선_파라미터.get(노선_색상_키)), String.valueOf(두번째_노선_파라미터.get(노선_색상_키)));
     }
 
     /**
@@ -117,10 +116,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선조회(createResponse.header(HttpHeaders.LOCATION));
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getString(노선_이름_키)).isEqualTo(노선_파라미터.get(노선_이름_키));
-        assertThat(response.jsonPath().getList("stations." + 노선_이름_키)).contains(기존지하철, 새로운지하철);
-
+        상태_값_검사(response, HttpStatus.OK);
+        단일_값_검사(response, 노선_이름_키, String.valueOf(노선_파라미터.get(노선_이름_키)));
+        리스트_값_검사(response, "stations." + 노선_이름_키, 기존지하철, 새로운지하철);
     }
 
     /**
@@ -141,9 +139,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         //then
         ExtractableResponse<Response> response = 노선조회(createResponse.header(HttpHeaders.LOCATION));
 
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getString(노선_이름_키)).isEqualTo(수정노선);
+        상태_값_검사(updateResponse, HttpStatus.OK);
+        상태_값_검사(response, HttpStatus.OK);
+        단일_값_검사(response, 노선_이름_키, 수정노선);
     }
 
 
@@ -163,7 +161,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선삭제(createResponse.header(HttpHeaders.LOCATION));
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태_값_검사(response, HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -183,8 +181,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 노선생성(노선_파라미터);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(response.jsonPath().getString("message")).isEqualTo(DuplicationException.MESSAGE);
+        상태_값_검사(response, HttpStatus.CONFLICT);
+        예외_검사(response, DuplicationException.MESSAGE);
     }
 
 }
