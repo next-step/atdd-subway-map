@@ -10,6 +10,7 @@ import java.util.Map;
 
 import static nextstep.subway.acceptance.LineStepDefinition.*;
 import static nextstep.subway.acceptance.SectionStepDefinition.*;
+import static nextstep.subway.acceptance.StationStepDefinition.*;
 
 @DisplayName("지하철 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -23,8 +24,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void setUp() {
         super.setUp();
 
-        강남역 = 지하철역_생성_요청_id_반환("강남역");
-        양재역 = 지하철역_생성_요청_id_반환("양재역");
+        강남역 = 지하철역_생성_요청("강남역").body().jsonPath().getLong("id");
+        양재역 = 지하철역_생성_요청("양재역").body().jsonPath().getLong("id");
         lineParams = 지하철_노선_파라미터_생성(
                 "신분당선",
                 "bg-red-600",
@@ -47,7 +48,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection() {
         // given
-        Long 양재시민의숲역 = 지하철역_생성_요청_id_반환("양재시민의숲역");
+        Long 양재시민의숲역 = 지하철역_생성_요청("양재시민의숲역").body().jsonPath().getLong("id");
 
         // when
         Map<String, String> params = 지하철_구간_파라미터_생성(양재역, 양재시민의숲역, 10);
@@ -70,8 +71,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSectionWithInvalidUpStation() {
         // given
-        Long 청계산입구역 = 지하철역_생성_요청_id_반환("청계산입구역");
-        Long 양재시민의숲역 = 지하철역_생성_요청_id_반환("양재시민의숲역");
+        Long 청계산입구역 = 지하철역_생성_요청("청계산입구역").body().jsonPath().getLong("id");
+        Long 양재시민의숲역 = 지하철역_생성_요청("양재시민의숲역").body().jsonPath().getLong("id");
 
         // when
         Map<String, String> params = 지하철_구간_파라미터_생성(청계산입구역, 양재시민의숲역, 10);
@@ -112,7 +113,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        Long 양재시민의숲역 = 지하철역_생성_요청_id_반환("양재시민의숲역");
+        Long 양재시민의숲역 = 지하철역_생성_요청("양재시민의숲역").body().jsonPath().getLong("id");
         Map<String, String> params = 지하철_구간_파라미터_생성(양재역, 양재시민의숲역, 10);
         ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(lineId, params);
         Long downStationId = createResponse.body().jsonPath().getLong("downStationId");
@@ -137,7 +138,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSectionWithInvalidDownStation() {
         // given
-        Long 양재시민의숲역 = 지하철역_생성_요청_id_반환("양재시민의숲역");
+        Long 양재시민의숲역 = 지하철역_생성_요청("양재시민의숲역").body().jsonPath().getLong("id");
         Map<String, String> params = 지하철_구간_파라미터_생성(양재역, 양재시민의숲역, 10);
         ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(lineId, params);
 

@@ -30,9 +30,9 @@ public class LineService {
 
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         addSection(line.getId(),new SectionRequest(
-                        lineRequest.getUpStationId(),
-                        lineRequest.getDownStationId(),
-                        lineRequest.getDistance()));
+                lineRequest.getUpStationId(),
+                lineRequest.getDownStationId(),
+                lineRequest.getDistance()));
 
         return LineResponse.of(line);
     }
@@ -56,6 +56,13 @@ public class LineService {
         Line line = findById(id);
         List<StationResponse> stations = getStationResponses(line);
         return LineResponse.of(line, stations);
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException(id);
+                });
     }
 
     private List<StationResponse> getStationResponses(Line line) {
@@ -93,15 +100,7 @@ public class LineService {
 
     public void removeSection(Long lineId, Long stationId) {
         Line line = findById(lineId);
-        Section section = line.findSection(stationId);
-        line.validatePossibleToRemove(section);
-        line.removeSection(section);
+        line.removeSection(stationId);
     }
 
-    private Line findById(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException(id);
-                });
-    }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.LineStepDefinition.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.acceptance.StationStepDefinition.지하철역_생성_요청;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -23,8 +23,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        강남역 = 지하철역_생성_요청_id_반환("강남역");
-        양재역 = 지하철역_생성_요청_id_반환("양재역");
+        강남역 = 지하철역_생성_요청("강남역").body().jsonPath().getLong("id");
+        양재역 = 지하철역_생성_요청("양재역").body().jsonPath().getLong("id");
+
         createParams = 지하철_노선_파라미터_생성(
                 신분당선,
                 "bg-red-600",
@@ -59,8 +60,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Long 신도림역 = 지하철역_생성_요청_id_반환("신도림역");
-        Long 문래역 = 지하철역_생성_요청_id_반환("문래역");
+        Long 신도림역 = 지하철역_생성_요청("신도림역").body().jsonPath().getLong("id");
+        Long 문래역 = 지하철역_생성_요청("문래역").body().jsonPath().getLong("id");
         String 호선2 = "2호선";
         Map<String, String> params = 지하철_노선_파라미터_생성(
                 호선2,

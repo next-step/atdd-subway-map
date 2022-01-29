@@ -6,16 +6,12 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import static nextstep.subway.acceptance.StationStepDefinition.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LineStepDefinition {
-
-    public static Long 지하철역_생성_요청_id_반환(String name) {
-        return 지하철역_생성_요청(name).body().jsonPath().getLong("id");
-    }
 
     public static Map<String, String> 지하철_노선_파라미터_생성(
             String name,
