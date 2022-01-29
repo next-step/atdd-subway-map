@@ -30,7 +30,6 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         checkDuplicatedName(request);
-        checkDistanceLessThanZero(request.getDistance());
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId())
@@ -40,7 +39,7 @@ public class LineService {
                 .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(request.getDistance())
+                .distance(request.getDistance().getValue())
                 .build();
         line.addSection(section);
         return createLineResponse(line);
@@ -49,12 +48,6 @@ public class LineService {
     private void checkDuplicatedName(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("[duplication]:name");
-        }
-    }
-
-    private void checkDistanceLessThanZero(int distance) {
-        if (distance < 0) {
-            throw new NotExistedStationException("[notValid]:distance");
         }
     }
 
@@ -104,7 +97,7 @@ public class LineService {
                 .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(request.getDistance())
+                .distance(request.getDistance().getValue())
                 .build();
         line.addSection(section);
     }

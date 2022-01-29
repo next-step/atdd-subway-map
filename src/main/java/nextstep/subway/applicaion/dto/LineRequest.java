@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
+import nextstep.subway.applicaion.object.Distance;
+
 import javax.validation.constraints.NotNull;
 
 public class LineRequest {
@@ -9,7 +11,7 @@ public class LineRequest {
     private Long upStationId;
     @NotNull
     private Long downStationId;
-    private int distance;
+    private Distance distance;
 
     public String getName() {
         return name;
@@ -27,7 +29,7 @@ public class LineRequest {
         return downStationId;
     }
 
-    public int getDistance() {
+    public Distance getDistance() {
         return distance;
     }
 }

@@ -36,6 +36,7 @@ public class LineController {
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineRequest lineRequest) {
         try {
+            lineRequest.getDistance().checkDistanceLessThanZero();
             LineResponse line = lineService.saveLine(lineRequest);
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
         } catch (NotExistedStationException | EntityNotFoundException e) {
@@ -72,6 +73,7 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody @Valid SectionRequest sectionRequest) {
         try {
+            sectionRequest.getDistance().checkDistanceLessThanZero();
             lineService.saveSection(id, sectionRequest);
             return ResponseEntity.created(URI.create("/lines/" + id + "/section")).build();
         } catch (InvalidParameterException e) {
