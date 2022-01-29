@@ -26,10 +26,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        final Map<String, String> params = Station_데이터_생성(강남역);
+        final Map<String, Object> params = 지하철_역_데이터_생성(강남역);
 
         // when
-        ExtractableResponse<Response> response = Station_생성_요청(params);
+        ExtractableResponse<Response> response = 지하철_역_생성_요청(params);
 
         // then
         생성요청한_지하철역이_생성됨(response);
@@ -45,8 +45,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        final List<Map<String, String>> params = Station_데이터_생성(Arrays.asList(강남역, 역삼역));
-        final List<ExtractableResponse<Response>> requestList = Station_생성_요청(params);
+        final List<Map<String, Object>> params = 지하철_역_데이터_생성(Arrays.asList(강남역, 역삼역));
+        final List<ExtractableResponse<Response>> requestList = 지하철_역_생성_요청(params);
 
         // when
         ExtractableResponse<Response> responseList = Station_목록_요청();
@@ -64,8 +64,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = Station_데이터_생성(강남역);
-        ExtractableResponse<Response> createResponse = Station_생성_요청(params);
+        Map<String, Object> params = 지하철_역_데이터_생성(강남역);
+        ExtractableResponse<Response> createResponse = 지하철_역_생성_요청(params);
 
         // when
         String uri = createResponse.header("Location");
@@ -85,11 +85,11 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateCheck() {
         // given
-        Map<String, String> params = Station_데이터_생성(강남역);
-        Station_생성_요청(params);
+        Map<String, Object> params = 지하철_역_데이터_생성(강남역);
+        지하철_역_생성_요청(params);
 
         // when
-        ExtractableResponse<Response> duplicateResponse = Station_생성_요청(params);
+        ExtractableResponse<Response> duplicateResponse = 지하철_역_생성_요청(params);
 
         // then
         중복이름으로_지하철_역_생성_실패함(duplicateResponse);
