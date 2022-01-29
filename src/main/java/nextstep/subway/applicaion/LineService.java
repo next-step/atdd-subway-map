@@ -27,9 +27,6 @@ public class LineService {
         final Line line = lineRepository.save(new Line(
                 request.getName(),
                 request.getColor(),
-                request.getUpStationId(),
-                request.getDownStationId(),
-                request.getDistance(),
                 lineValidator
         ));
 
@@ -66,9 +63,6 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getUpStationId(),
-                line.getDownStationId(),
-                line.getDistance(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
