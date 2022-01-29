@@ -45,4 +45,28 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(createResponse.header("Location")).isNotBlank();
     }
+
+    /**
+     * Given 지하철 노선과 구간이 있는 상태에서
+     * When 생성한 지하철 마지막 구간 삭제를 요청 하면
+     * Then 생성한 지하철 구간 삭제가 성공한다.
+     */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void deleteSection() {
+        final int distance = 100;
+
+        // given
+        final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
+        final Long 판교역_번호 = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
+
+        // when
+        final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
+                .jsonPath().getLong(번호);
+
+        ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 판교역_번호);
+
+        assertThat(deleteReponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }

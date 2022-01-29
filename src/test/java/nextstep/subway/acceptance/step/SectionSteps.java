@@ -34,4 +34,16 @@ public class SectionSteps {
                 거리, distance
         );
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(Long lineId, Long stationId) {
+
+        return RestAssured
+                .given().log().all()
+                .param("stationId", stationId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/{id}/sections", lineId)
+                .then()
+                .log().all().extract();
+    }
 }
