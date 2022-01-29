@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.entity.Line;
+import nextstep.subway.domain.entity.Section;
 import nextstep.subway.domain.entity.Station;
 import nextstep.subway.domain.repository.LineRepository;
 import nextstep.subway.domain.repository.StationRepository;
@@ -71,6 +72,16 @@ public class LineService {
 
     public void deleteLineById(final Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public void addSection(final Long id, final LineRequest request) {
+        final Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        final Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(NoSuchElementException::new);
+        final Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(NoSuchElementException::new);
+
+        line.addSection(new Section(line, upStation, downStation, request.getDistance()));
     }
 
     private LineResponse createLineResponse(final Line line) {
