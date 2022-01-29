@@ -30,8 +30,6 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         checkDuplicatedName(request);
-        existsStation(request.getUpStationId());
-        existsStation(request.getDownStationId());
         checkDistanceLessThanZero(request.getDistance());
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -51,12 +49,6 @@ public class LineService {
     private void checkDuplicatedName(LineRequest request) {
         if (lineRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("[duplication]:name");
-        }
-    }
-
-    private void existsStation(Long upStationId) {
-        if (upStationId == null) {
-            throw new NotExistedStationException("[notExist]:stationId");
         }
     }
 
@@ -100,8 +92,6 @@ public class LineService {
     }
 
     public void saveSection(Long id, SectionRequest request) {
-        existsStation(request.getUpStationId());
-        existsStation(request.getDownStationId());
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(request.getDownStationId())
@@ -119,8 +109,7 @@ public class LineService {
         line.addSection(section);
     }
 
-    public void deleteSection(Long id, Long stationId) {
-        existsStation(stationId);
+    public void deleteSection(Long id, long stationId) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.findById(id)

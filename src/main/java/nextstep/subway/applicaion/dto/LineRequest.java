@@ -1,9 +1,13 @@
 package nextstep.subway.applicaion.dto;
 
+import javax.validation.constraints.NotNull;
+
 public class LineRequest {
     private String name;
     private String color;
+    @NotNull
     private Long upStationId;
+    @NotNull
     private Long downStationId;
     private int distance;
 
@@ -15,11 +19,11 @@ public class LineRequest {
         return color;
     }
 
-    public Long getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 

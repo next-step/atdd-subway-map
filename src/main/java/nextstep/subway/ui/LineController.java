@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -31,11 +34,11 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineRequest lineRequest) {
         try {
             LineResponse line = lineService.saveLine(lineRequest);
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-        } catch (NotExistedStationException e) {
+        } catch (NotExistedStationException | EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY.value()).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
@@ -67,7 +70,7 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody @Valid SectionRequest sectionRequest) {
         try {
             lineService.saveSection(id, sectionRequest);
             return ResponseEntity.created(URI.create("/lines/" + id + "/section")).build();
@@ -77,7 +80,7 @@ public class LineController {
     }
 
     @DeleteMapping("/{id}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam("stationId") Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam("stationId") @NotNull Long stationId) {
         try {
             lineService.deleteSection(id, stationId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
