@@ -158,4 +158,92 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * When 노선에 등록된 하행 종점 역을 상행 역으로
+     * When 새로 생성한 역을 하행 역으로
+     * When 지하철 구간 등록을 요청 하면
+     * Then 지하철 구간 등록이 성공 한다.
+     */
+    @DisplayName("지하철 구간 등록")
+    @Test
+    void addSection() {
+        // given
+        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+        final String 세_번째역 = "잠실역";
+        final ExtractableResponse<Response> createStationResponse1 = 지하철_역_생성_요청(세_번째역);
+        final String 네_번째역 = "사당역";
+        final ExtractableResponse<Response> createStationResponse2 = 지하철_역_생성_요청(네_번째역);
+        final long lineId = createLineResponse.jsonPath().getLong("id");
+
+        // when
+        long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
+        long downStationId = createStationResponse1.jsonPath().getLong("id");
+        final ExtractableResponse<Response> response1 = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+        upStationId = downStationId;
+        downStationId = createStationResponse2.jsonPath().getLong("id");
+        final ExtractableResponse<Response> response2 = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+
+        // then
+        final ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(String.format("/lines/%d", lineId));
+        final JsonPath getLineResponseBody = getLineResponse.jsonPath();
+        assertAll(
+                () -> assertThat(response1.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(getLineResponseBody.getString("stations[2].name")).isEqualTo(세_번째역),
+                () -> assertThat(getLineResponseBody.getString("stations[3].name")).isEqualTo(네_번째역)
+        );
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * Given 지하철 역 생성을 요청 하고
+     * When 새로 생성한 역을 상행 역으로
+     * When 새로 생성한 역을 하행 역으로
+     * When 지하철 구간 등록을 요청 하면
+     * Then 지하철 구간 등록이 실패 한다.
+     */
+    @DisplayName("노선에 등록된 하행 종점 역이 아닌 역을 상행 역 으로 지하철 구간 등록")
+    @Test
+    void addSectionWithUpStationNoContains() {
+        // given
+        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+        final ExtractableResponse<Response> createUpStationResponse = 지하철_역_생성_요청("잠실역");
+        final ExtractableResponse<Response> createDownStationResponse = 지하철_역_생성_요청("사당역");
+        final long lineId = createLineResponse.jsonPath().getLong("id");
+
+        // when
+        final long upStationId = createUpStationResponse.jsonPath().getLong("id");
+        final long downStationId = createDownStationResponse.jsonPath().getLong("id");
+        final ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 노선에 등록된 하행 종점 역을 상행 역으로
+     * When 이미 노선에 구간 으로 등록된 역을 하행 역으로
+     * When 지하철 구간 등록을 요청 하면
+     * Then 지하철 구간 등록이 실패 한다.
+     */
+    @DisplayName("이미 노선에 구간 으로 등록된 역을 하행 역으로 지하철 구간 등록")
+    @Test
+    void addSectionWithDownStationContains() {
+        // given
+        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+        final long lineId = createLineResponse.jsonPath().getLong("id");
+
+        // when
+        final long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
+        final long downStationId = createLineResponse.jsonPath().getLong("stations[0].id");
+        final ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
