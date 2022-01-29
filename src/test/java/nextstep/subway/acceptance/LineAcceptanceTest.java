@@ -83,10 +83,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getLine() {
 		// given
-		지하철_노선_생성("신분당선", "bg-red-600");
+		ExtractableResponse<Response> createResponse = 지하철_노선_생성("신분당선", "bg-red-600");
+		LineResponse createLine = createResponse.jsonPath().getObject(".", LineResponse.class);
 
 		// when
-		ExtractableResponse<Response> response = 지하철_노선_조회(1L);
+		ExtractableResponse<Response> response = 지하철_노선_조회(createLine.getId());
 
 		// then
 		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -103,7 +104,8 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void updateLine() {
 		// given
-		지하철_노선_생성("신분당선", "bg-red-600");
+		ExtractableResponse<Response> createResponse = 지하철_노선_생성("신분당선", "bg-red-600");
+		LineResponse createLine = createResponse.jsonPath().getObject(".", LineResponse.class);
 
 		Map<String, String> params = new HashMap<>();
 		params.put("name", "구분당선");
@@ -114,13 +116,13 @@ class LineAcceptanceTest extends AcceptanceTest {
 			.given().log().all()
 			.body(params)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().put("/lines/{id}", 1L)
+			.when().put("/lines/{id}", createLine.getId())
 			.then().log().all().extract();
 
 		// then
 		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-		ExtractableResponse<Response> selectResponse = 지하철_노선_조회(1L);
+		ExtractableResponse<Response> selectResponse = 지하철_노선_조회(createLine.getId());
 
 		LineResponse lineResponse = selectResponse.jsonPath().getObject(".", LineResponse.class);
 		Assertions.assertThat(lineResponse.getName()).isEqualTo("구분당선");
@@ -136,12 +138,13 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		지하철_노선_생성("신분당선", "bg-red-600");
+		ExtractableResponse<Response> createResponse = 지하철_노선_생성("신분당선", "bg-red-600");
+		LineResponse lineResponse = createResponse.jsonPath().getObject(".", LineResponse.class);
 
 		// when
 		ExtractableResponse<Response> response =RestAssured
 			.given().log().all()
-			.when().delete("/lines/{id}", 1L)
+			.when().delete("/lines/{id}", lineResponse.getId())
 			.then().log().all().extract();
 
 		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
