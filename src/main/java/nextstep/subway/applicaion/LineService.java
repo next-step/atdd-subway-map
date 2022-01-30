@@ -1,14 +1,17 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.request.LineRequest;
+import nextstep.subway.applicaion.dto.request.SectionRequest;
 import nextstep.subway.applicaion.dto.response.LineResponse;
 import nextstep.subway.applicaion.dto.response.LineSaveResponse;
+import nextstep.subway.applicaion.dto.response.SectionResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.BadRequestException;
 import nextstep.subway.exception.DuplicateRegistrationRequestException;
 import nextstep.subway.exception.NotFoundRequestException;
 import org.springframework.stereotype.Service;
@@ -36,11 +39,10 @@ public class LineService {
     }
 
     public LineSaveResponse saveLine(LineRequest request) throws DuplicateRegistrationRequestException, NotFoundRequestException {
-        // 전제 조건 : 역이 먼저 생성되어 있어야 함.
         Line findLine = lineRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findLine)) {
-            Station upStation = findStationById(request.getUpStationId());
-            Station downStation = findStationById(request.getDownStationId());
+            Station upStation = findStation(request.getUpStationId());
+            Station downStation = findStation(request.getDownStationId());
             Line line = Line.createLine(request.getName(), request.getColor());
 
             Section section = Section.createNewLineSection(line, upStation, downStation, request.getDistance());
@@ -54,6 +56,7 @@ public class LineService {
         throw new DuplicateRegistrationRequestException(String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
@@ -65,29 +68,60 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) throws NotFoundRequestException {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
+        Line line = findLine(id);
         List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
         return LineResponse.createLineResponse1(line, sections);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) throws NotFoundRequestException {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
-
+        Line line = findLine(id);
         line.update(lineRequest.getName(), lineRequest.getColor());
+
         LineResponse.createLineResponse(line);
     }
 
     public void deleteLineById(Long id) throws NotFoundRequestException {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
-
+        Line line = findLine(id);
         lineRepository.delete(line);
     }
 
-    private Station findStationById(Long upStationId) {
+    public SectionResponse saveSection(Long lineId, SectionRequest request) throws NotFoundRequestException, BadRequestException {
+        Line line = findLine(lineId);
+        Station upStation = findStation(request.getUpStationId());
+        Station downStation = findStation(request.getDownStationId());
+
+        Section section = Section.createAddSection(line, upStation, downStation, request.getDistance());
+        line.addSection(section);
+
+        sectionRepository.save(section);
+        return SectionResponse.createSectionResponse(section, lineId);
+    }
+
+    public void deleteStationById(Long lineId, Long stationId) {
+        Line line = findLine(lineId);
+        Station downEndStation = line.getSections().get(line.getSections().size() - 1).getDownStation();
+        Section section = sectionRepository.findByDownStationId(stationId);
+
+        if (!downEndStation.equals(section.getDownStation())) {
+            throw new BadRequestException("구간 삭제는 하행 종점역만 삭제할 수 있습니다.");
+        }
+
+        if (line.getSections().size() == 1) {
+            throw new BadRequestException("구간 삭제는 구간이 2개 이상이어야 합니다.");
+        }
+
+        stationRepository.deleteById(stationId);
+        sectionRepository.delete(section);
+    }
+
+    private Line findLine(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundRequestException(String.format(LineService.LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, lineId)));
+    }
+
+    private Station findStation(Long upStationId) {
         return stationRepository.findById(upStationId)
                 .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, upStationId)));
     }
