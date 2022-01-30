@@ -65,6 +65,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
                 .jsonPath().getLong(번호);
 
+        SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
+
         ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 판교역_번호);
 
         assertThat(deleteReponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

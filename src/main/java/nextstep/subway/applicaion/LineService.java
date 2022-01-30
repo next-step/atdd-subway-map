@@ -91,11 +91,11 @@ public class LineService {
                 .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_STATION));
 
         if (line.isNotEqualDownStation(upStation)) {
-            new IllegalArgumentException("노선의 하행선이 구간의 상행선과 다릅니다.");
+            throw new IllegalArgumentException("노선의 하행선이 구간의 상행선과 다릅니다.");
         }
 
         if (line.existStation(downStation)) {
-            new IllegalArgumentException("해당 역은 이미 노선에 등록되어 있습니다.");
+            throw new IllegalArgumentException("해당 역은 이미 노선에 등록되어 있습니다.");
         }
 
         line.addSection(upStation, downStation, sectionRequest.getDistance());

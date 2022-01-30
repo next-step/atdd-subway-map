@@ -58,7 +58,7 @@ public class Line extends BaseEntity {
     }
 
     public boolean isNotEqualDownStation(Station upStation) {
-        return upStation.equals(sections.getLastDownStation());
+        return !upStation.equals(sections.getLastDownStation());
     }
 
     public boolean existStation(Station downStation) {
@@ -67,11 +67,11 @@ public class Line extends BaseEntity {
 
     public void deleteSection(Station station) {
         if (haveOnlySection()) {
-            new IllegalArgumentException("구간이 1개인 경우 삭제가 불가합니다.");
+            throw new IllegalArgumentException("구간이 1개인 경우 삭제가 불가합니다.");
         }
 
         if (isNotEqualDownStation(station)) {
-            new IllegalArgumentException("해당 역은 마지막 구간에 등록되어 있지 않습니다.");
+            throw new IllegalArgumentException("해당 역은 마지막 구간에 등록되어 있지 않습니다.");
         }
 
         sections.deleteLastSection();
