@@ -10,10 +10,13 @@ public class Section extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long lineId;
     private Long downStationId;
     private Long upStationId;
+
     private Integer distance;
+
 
     public Section() {
 

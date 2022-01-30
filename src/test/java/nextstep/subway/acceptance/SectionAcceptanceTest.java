@@ -90,8 +90,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("잘못된 하행역으로 구간 생성 시 에러")
     @Test
-    void createSectionException1() {
-        // todo exception
+    void sectionCreationExceptionWithInvalidDownStation() {
+        // given
+        final Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 노선에_속한_하행역);
+        params.put("downStationId", 노선에_속한_상행역);
+        params.put("distance", 거리);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 지하철_노선 + "/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -101,37 +117,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("잘못된 상행역으로 구간 생성 시 에러")
     @Test
-    void createSectionException2() {
-    }
+    void sectionCreationExceptionWithInvalidUpStation() {
+        // given
+        final Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 노선에_속한_상행역);
+        params.put("downStationId", 노선에_속하지_않은_새로운역);
+        params.put("distance", 거리);
 
-    /**
-     * given 상행역으로 상행 종점이면서, 하행 역으로 구간 데이터 생성
-     * when 구간 데이터 생성 요청
-     * then 구간 데이터 생성 에러 (새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.)
-     * then 구간 데이터 생성 에러 (새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.)
-     */
-    @DisplayName("잘못된 상,하행역으로 구간 생성 시 에러")
-    @Test
-    void createSectionException3() {
-    }
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 지하철_노선 + "/sections")
+                .then().log().all()
+                .extract();
 
-    /**
-     * given 새로운 역으로 상행 종점이면서, 상행 역으로 구간 데이터 생성
-     * when 구간 데이터 생성 요청
-     * then 구간 데이터 생성 에러 (새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.)
-     * then 구간 데이터 생성 에러 (새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.)
-     */
-    @Test
-    void createSectionException4() {
-    }
-
-    /**
-     * given 새로운 역으로 상행 종점이면서, 하행 역으로 구간 데이터 생성
-     * when 구간 데이터 생성 요청
-     * then 구간 데이터 생성 에러 (새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.)
-     * then 구간 데이터 생성 에러 (새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.)
-     */
-    @Test
-    void createSectionException5() {
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }

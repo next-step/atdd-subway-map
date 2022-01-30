@@ -23,7 +23,7 @@ public class StationService {
     public StationResponse saveStation(StationRequest stationRequest) {
         final String name = stationRequest.getName();
 
-        if (stationRepository.findByName(name).isPresent()) {
+        if (stationRepository.existsByName(name)) {
             throw new IllegalArgumentException(String.format("이미 존재하는 역입니다. : %s", name));
         }
 
