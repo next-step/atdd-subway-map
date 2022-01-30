@@ -1,9 +1,9 @@
-package nextstep.subway.acceptance.station;
+package nextstep.subway.acceptance.test.utils;
 
 import lombok.Builder;
 import nextstep.subway.utils.BaseParams;
 
-public class StationParams {
+public class Stations {
     public static 지하철역_생성_파람 연신내역;
     public static 지하철역_생성_파람 서울역;
     public static 지하철역_생성_파람 삼성역;

@@ -3,12 +3,12 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.line.LineParams;
-import nextstep.subway.acceptance.station.StationParams;
+import nextstep.subway.acceptance.test.utils.Lines;
+import nextstep.subway.acceptance.test.utils.Stations;
 import org.springframework.http.MediaType;
 
 public class ApiUtil {
-    public static ExtractableResponse<Response> 지하철_노선_생성_API(LineParams.지하철_노선_생성_파람 params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_API(Lines.지하철_노선_생성_파람 params) {
         return RestAssured.given().log().all()
                 .body(params.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -37,7 +37,7 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_API(Long id, LineParams.지하철_노선_수정_파람 updateParams) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_API(Long id, Lines.지하철_노선_수정_파람 updateParams) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
                 .body(updateParams.toMap())
@@ -58,7 +58,7 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_구간_등록_API(Long id, LineParams.지하철_구간_생성_파람 params) {
+    public static ExtractableResponse<Response> 지하철_노선_구간_등록_API(Long id, Lines.지하철_구간_생성_파람 params) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
                 .body(params.toMap())
@@ -69,7 +69,7 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_API(Long id, LineParams.지하철_구간_삭제_파람 params) {
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_API(Long id, Lines.지하철_구간_삭제_파람 params) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
                 .params(params.toMap())
@@ -80,7 +80,7 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성_API(StationParams.지하철역_생성_파람 params) {
+    public static ExtractableResponse<Response> 지하철역_생성_API(Stations.지하철역_생성_파람 params) {
         return RestAssured.given().log().all()
                 .body(params.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

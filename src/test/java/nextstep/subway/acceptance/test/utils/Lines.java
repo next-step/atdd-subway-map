@@ -1,24 +1,24 @@
-package nextstep.subway.acceptance.line;
+package nextstep.subway.acceptance.test.utils;
 
 import lombok.Builder;
 import nextstep.subway.utils.BaseParams;
 
-public class LineParams {
-    static 지하철_노선_생성_파람 GTXA노선_연신내_서울역;
-    static 지하철_노선_생성_파람 GTXA노선_상행_정보없음;
-    static 지하철_노선_생성_파람 GTXA노선_하행_정보없음;
-    static 지하철_노선_생성_파람 GTXA노선_거리_음수;
-    static 지하철_노선_생성_파람 신분당선;
+public class Lines {
+    public static 지하철_노선_생성_파람 GTXA노선_연신내_서울역;
+    public static 지하철_노선_생성_파람 GTXA노선_상행_정보없음;
+    public static 지하철_노선_생성_파람 GTXA노선_하행_정보없음;
+    public static 지하철_노선_생성_파람 GTXA노선_거리_음수;
+    public static 지하철_노선_생성_파람 신분당선;
 
-    static 지하철_노선_수정_파람 노선색상;
+    public static 지하철_노선_수정_파람 노선색상;
 
-    static 지하철_구간_생성_파람 GTXA노선_구간_서울역_삼성역;
-    static 지하철_구간_생성_파람 GTXA노선_구간_연신내역_삼성역;
-    static 지하철_구간_생성_파람 GTXA노선_구간_서울역_연신내역;
+    public static 지하철_구간_생성_파람 GTXA노선_구간_서울역_삼성역;
+    public static 지하철_구간_생성_파람 GTXA노선_구간_연신내역_삼성역;
+    public static 지하철_구간_생성_파람 GTXA노선_구간_서울역_연신내역;
 
-    static 지하철_구간_삭제_파람 GTXA노선_구간_삭제_삼성역;
-    static 지하철_구간_삭제_파람 GTXA노선_구간_삭제_연신내;
-    static 지하철_구간_삭제_파람 GTXA노선_구간_삭제_서울역;
+    public static 지하철_구간_삭제_파람 GTXA노선_구간_삭제_삼성역;
+    public static 지하철_구간_삭제_파람 GTXA노선_구간_삭제_연신내;
+    public static 지하철_구간_삭제_파람 GTXA노선_구간_삭제_서울역;
 
     private static final String DEFAULT_NAME = "GTX-A";
     private static final String DEFAULT_COLOR = "bg-red-900";
