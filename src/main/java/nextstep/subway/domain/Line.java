@@ -48,6 +48,21 @@ public class Line extends BaseEntity {
         section.setLine(this);
     }
 
+    public void deleteSection(Long stationId) {
+        Station downEndStation = getSections().get(getSections().size() - 1).getDownStation();
+        validateDelete(stationId, downEndStation);
+    }
+
+    private void validateDelete(Long stationId, Station downEndStation) {
+        if (!downEndStation.getId().equals(stationId)) {
+            throw new BadRequestException("구간 삭제는 하행 종점역만 삭제할 수 있습니다.");
+        }
+
+        if (getSections().size() == 1) {
+            throw new BadRequestException("구간 삭제는 구간이 2개 이상이어야 합니다.");
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -75,17 +90,5 @@ public class Line extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getName(), getColor(), getSections());
-    }
-
-    public void deleteSection(Long stationId) {
-        Station downEndStation = getSections().get(getSections().size() - 1).getDownStation();
-
-        if (!downEndStation.getId().equals(stationId)) {
-            throw new BadRequestException("구간 삭제는 하행 종점역만 삭제할 수 있습니다.");
-        }
-
-        if (getSections().size() == 1) {
-            throw new BadRequestException("구간 삭제는 구간이 2개 이상이어야 합니다.");
-        }
     }
 }

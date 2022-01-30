@@ -1,6 +1,5 @@
 package nextstep.subway.domain;
 
-import javassist.tools.web.BadHttpRequest;
 import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.CascadeType;
