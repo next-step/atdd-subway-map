@@ -41,8 +41,8 @@ public class LineService {
 
 	public SectionResponse saveSection(long lineId, SectionRequest sectionRequest) {
 		Line line = findLineById(lineId);
-		Station downStation = getStation(sectionRequest.getDownStationId());
-		Station upStation = getStation(sectionRequest.getUpStationId());
+		Station downStation = findStation(sectionRequest.getDownStationId());
+		Station upStation = findStation(sectionRequest.getUpStationId());
 		Section createdSection = Section.of(upStation, downStation, sectionRequest.getDistance());
 
 		line.addSection(createdSection);
@@ -68,14 +68,14 @@ public class LineService {
 		if (request.isStationNotProvided()) {
 			return line;
 		}
-		final Station upStation = getStation(request.getUpStationId());
-		final Station downStation = getStation(request.getDownStationId());
+		final Station upStation = findStation(request.getUpStationId());
+		final Station downStation = findStation(request.getDownStationId());
 
 		line.addSection(Section.of(upStation, downStation, request.getDistance()));
 		return line;
 	}
 
-	private Station getStation(long stationId) {
+	private Station findStation(long stationId) {
 		return stationRepository.findById(stationId)
 				.orElseThrow(EntityNotFoundException::new);
 	}
@@ -99,7 +99,7 @@ public class LineService {
 
 	public void deleteSection(long lineId, long toRemoveLastDownStationId) {
 		final Line line = findLineById(lineId);
-		Station toRemoveLastDownStation = getStation(toRemoveLastDownStationId);
+		Station toRemoveLastDownStation = findStation(toRemoveLastDownStationId);
 		line.removeSection(toRemoveLastDownStation);
 	}
 
