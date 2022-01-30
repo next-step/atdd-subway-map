@@ -17,7 +17,14 @@ public class Sections {
     private final static String DOWN_STATION_SET = "DOWN_STATION_SET";
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private final List<Section> sections = new ArrayList<>();
+    private List<Section> sections = new ArrayList<>();
+
+    public Sections() {
+    }
+
+    public Sections(final List<Section> sections) {
+        this.sections = sections;
+    }
 
     public void add(final Section section) {
         if (sections.isEmpty()) {

@@ -25,6 +25,11 @@ public class Station extends BaseEntity {
         stationValidator.validate(this);
     }
 
+    public Station(final Long id, final String name, final Validator<Station> stationValidator) {
+        this(name, stationValidator);
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
