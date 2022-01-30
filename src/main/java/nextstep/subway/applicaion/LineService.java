@@ -103,6 +103,14 @@ public class LineService {
         return LineAndSectionResponse.of(line);
     }
 
+    @Transactional(readOnly = true)
+    public LineAndSectionResponse findLineInAllSections(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
+
+        return LineAndSectionResponse.of(line);
+    }
+
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
