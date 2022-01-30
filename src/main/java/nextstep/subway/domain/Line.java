@@ -1,9 +1,12 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.exception.InvalidDownStationException;
+import nextstep.subway.exception.InvalidUpStationException;
+import nextstep.subway.exception.RemoveSectionFailException;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -12,17 +15,13 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
     }
 
     public Line(String name, String color) {
-        this.name = name;
-        this.color = color;
-    }
-
-    public Line(Long id, String name, String color) {
-        this.id = id;
         this.name = name;
         this.color = color;
     }
@@ -42,5 +41,18 @@ public class Line extends BaseEntity {
     public void change(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        section.setLine(this);
+        sections.addSection(section);
+    }
+
+    public void removeSection(Long stationId) {
+        sections.removeSection(stationId);
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 }

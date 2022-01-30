@@ -2,15 +2,25 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.steps.StationSteps;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
 import static nextstep.subway.fixture.TLine.*;
 import static nextstep.subway.steps.LineSteps.*;
+import static nextstep.subway.steps.StationSteps.지하철_역_생성_요청;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    @BeforeEach
+    void setup() {
+        지하철_역_생성_요청("역1");
+        지하철_역_생성_요청("역2");
+        지하철_역_생성_요청("역3");
+    }
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -37,13 +47,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         지하철_노선_생성_요청(신분당선);
-        지하철_노선_생성_요청(_2호선);
+        지하철_노선_생성_요청(구분당선);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then
-        노선_목록_조회_성공(response, 신분당선, _2호선);
+        노선_목록_조회_성공(response, 신분당선, 구분당선);
     }
 
     /**
@@ -87,11 +97,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(구분당선);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
 
         // when
         String uri = createResponse.header(HttpHeaders.LOCATION);
-        ExtractableResponse<Response> response = 지하철_노선_변경_요청(uri, 신분당선);
+        ExtractableResponse<Response> response = 지하철_노선_변경_요청(uri, 구분당선);
 
         // then
         노선_변경_성공(response);
@@ -120,7 +130,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(구분당선);
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청(신분당선);
 
         // when
         String uri = createResponse.header(HttpHeaders.LOCATION);
@@ -139,10 +149,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicatedStationName() {
         // given
-        지하철_노선_생성_요청(구분당선);
+        지하철_노선_생성_요청(신분당선);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성_요청(구분당선);
+        ExtractableResponse<Response> response = 지하철_노선_생성_요청(신분당선);
 
         // then
         노선_생성_실패_중복(response);

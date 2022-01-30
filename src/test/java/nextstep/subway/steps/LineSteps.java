@@ -18,11 +18,17 @@ public class LineSteps {
 
     private static final String 노선_이름 = "name";
     private static final String 노선_색 = "color";
+    private static final String 노선_상행역 = "upStationId";
+    private static final String 노선_하행역 = "downStationId";
+    private static final String 노선_거리 = "distance";
 
     public static ExtractableResponse<Response> 지하철_노선_생성_요청(TLine line) {
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put(노선_이름, line.이름);
         params.put(노선_색, line.색);
+        params.put(노선_상행역, line.상행역);
+        params.put(노선_하행역, line.하행역);
+        params.put(노선_거리, line.거리);
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -53,8 +59,8 @@ public class LineSteps {
 
     public static ExtractableResponse<Response> 지하철_노선_변경_요청(String uri, TLine line) {
         Map<String, String> params = new HashMap<>();
-        params.put("name", line.이름);
-        params.put("color", line.색);
+        params.put(노선_이름, line.이름);
+        params.put(노선_색, line.색);
 
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -1,21 +1,10 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.domain.Line;
+public class SectionRequest {
 
-public class LineRequest {
-    private String name;
-    private String color;
     private Long upStationId;
     private Long downStationId;
     private int distance;
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
 
     public Long getUpStationId() {
         return upStationId;
@@ -29,7 +18,4 @@ public class LineRequest {
         return distance;
     }
 
-    public Line toEntity() {
-        return new Line(name, color);
-    }
 }

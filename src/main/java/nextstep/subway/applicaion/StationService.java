@@ -2,7 +2,8 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.applicaion.exception.StationNameDuplicatedException;
+import nextstep.subway.exception.StationNameDuplicatedException;
+import nextstep.subway.exception.StationNotFoundException;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,12 @@ public class StationService {
         return stations.stream()
                 .map(StationResponse::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Station findStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new StationNotFoundException(stationId));
     }
 
     public void deleteStationById(Long id) {
