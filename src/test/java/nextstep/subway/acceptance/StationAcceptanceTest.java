@@ -1,19 +1,13 @@
 package nextstep.subway.acceptance;
 
-import nextstep.subway.acceptance.rest.BaseCrudStep;
+import nextstep.subway.fixture.StationFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.acceptance.step.StationStep.*;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
-
-    private final String STATION_PATH = "/stations";
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -23,14 +17,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        var params = giveMeStationRequest("강남역");
+        var 역1 = StationFixture.강남역;
 
         // when
-        var response = BaseCrudStep.createResponse(STATION_PATH, params);
+        var 역_생성_응답 = 역_생성_요청(역1);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        역_생성_완료(역_생성_응답);
     }
 
     /**
@@ -43,18 +36,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        var params1 = giveMeStationRequest("강남역");
-        var createResponse1 = BaseCrudStep.createResponse(STATION_PATH, params1);
+        var 역1 = StationFixture.강남역;
+        역_생성_요청(역1);
 
-        var params2 = giveMeStationRequest("역삼역");
-        var createResponse2 = BaseCrudStep.createResponse(STATION_PATH, params2);
+        var 역2 = StationFixture.역삼역;
+        역_생성_요청(역2);
 
         // when
-        var response = BaseCrudStep.readResponse(STATION_PATH);
+        var 역_목록_조회_응답 = 역_목록_조회_요청();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(params1.get("name"), params2.get("name"));
+        역_목록_조회_완료(역_목록_조회_응답, 역1, 역2);
     }
 
     /**
@@ -66,15 +57,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        var params = giveMeStationRequest("강남역");
-        var createResponse = BaseCrudStep.createResponse(STATION_PATH, params);
+        var 역_생성_응답 = 역_생성_요청(StationFixture.강남역);
 
         // when
-        String uri = createResponse.header("Location");
-        var response = BaseCrudStep.deleteResponse(uri);
+        String uri = 역_생성_응답.header("Location");
+        var 역_삭제_응답 = 역_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        역_삭제_완료(역_삭제_응답);
     }
 
     /**
@@ -86,17 +76,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        var params = giveMeStationRequest("강남역");
-        var createResponse = BaseCrudStep.createResponse(STATION_PATH, params);
+        var 역1 = StationFixture.강남역;
+        역_생성_요청(역1);
 
         // when
-        var response = BaseCrudStep.createResponse(STATION_PATH, params);
+        var 역_생성_응답 = 역_생성_요청(역1);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        중복된_역_생성_예외(역_생성_응답);
     }
 
-    private Map<String, String> giveMeStationRequest(String name) {
-        return Map.of("name", name);
-    }
 }
