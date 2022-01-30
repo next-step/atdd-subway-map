@@ -21,7 +21,7 @@ public class Line extends BaseEntity {
     private Line() {
     }
 
-    public Line(String name, String color) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
     }
@@ -49,6 +49,18 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     public void update(String name, String color) {
