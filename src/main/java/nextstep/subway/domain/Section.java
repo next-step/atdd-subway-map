@@ -30,6 +30,14 @@ public class Section {
         this.distance = distance;
     }
 
+    public boolean isConnectable(Section section) {
+        return section.getUpStation().equals(downStation);
+    }
+
+    public boolean isEqualToDownStation(Station station){
+        return downStation.equals(station);
+    }
+
     public Long getId() {
         return id;
     }
@@ -44,13 +52,5 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
-    }
-
-    public boolean isConnectable(Section section) {
-        return section.getUpStation().equals(downStation);
-    }
-
-    public boolean isEqualToDownStation(Station station){
-        return downStation.equals(station);
     }
 }
