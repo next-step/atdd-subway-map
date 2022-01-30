@@ -1,18 +1,18 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import static nextstep.subway.acceptance.LineSteps.createLineRequest;
+import static nextstep.subway.acceptance.LineSteps.deleteLineRequest;
+import static nextstep.subway.acceptance.LineSteps.getLineRequest;
+import static nextstep.subway.acceptance.LineSteps.getLinesRequest;
+import static nextstep.subway.acceptance.LineSteps.updateLineRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -24,9 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        String name = "신분당선";
-        String color = "bg-red-600";
-        ExtractableResponse<Response> response = createLineRequest(name, color);
+        ExtractableResponse<Response> response = createLineRequest("신분당선", "bg-red-600");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,12 +50,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         createLineRequest(name2, color2);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/lines")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = getLinesRequest();
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
@@ -75,20 +68,16 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name = "신분당선";
         String color = "bg-red-600";
-        createLineRequest(name, color);
+        ExtractableResponse<Response> createResponse = createLineRequest(name, color);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .pathParam("id", 1)
-            .when()
-            .get("/lines/{id}")
-            .then().log().all()
-            .extract();
+        String uri = createResponse.header("Location");
+        ExtractableResponse<Response> response = getLineRequest(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getString("name")).contains("신분당선");
-        assertThat(response.jsonPath().getString("color")).contains("bg-red-600");
+        assertThat(response.jsonPath().getString("name")).contains(name);
+        assertThat(response.jsonPath().getString("color")).contains(color);
     }
 
     /**
@@ -107,19 +96,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         String newName = "구분당선";
         String newColor = "bg-blue-600";
-
-        Map<String, String> updateParams = new HashMap<>();
-        updateParams.put("name", newName);
-        updateParams.put("color", newColor);
-
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .body(updateParams)
-            .when()
-            .put(uri)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = updateLineRequest(uri, newName, newColor);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -140,29 +118,30 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .when()
-            .delete(uri)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = deleteLineRequest(uri);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> createLineRequest(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
+    /**
+     * Given 지하철역 생성을 요청 하고
+     * When 같은 이름으로 지하철역 생성을 요청 하면
+     * Then 지하철역 생성이 실패한다.
+     */
+    @DisplayName("중복이름으로 지하철 노선 생성")
+    @Test
+    void createDuplicatedLine() {
+        // given
+        String name = "신분당선";
+        String color = "bg-red-600";
+        createLineRequest(name, color);
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/lines")
-            .then().log().all()
-            .extract();
+        // when
+        ExtractableResponse<Response> response = createLineRequest(name, color);
 
-        return response;
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
+
 }
