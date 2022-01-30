@@ -36,4 +36,14 @@ public class SectionService {
         line.addSection(section);
         return new SectionResponse(sectionRepository.save(section));
     }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 노선을 찾을 수 없습니다. lineId:" + lineId));
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 역을 찾을 수 없습니다. stationId:" + stationId));
+
+        Section targetSection = line.removeSection(station);
+        sectionRepository.delete(targetSection);
+    }
 }

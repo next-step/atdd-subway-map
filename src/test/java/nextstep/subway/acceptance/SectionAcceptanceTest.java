@@ -16,20 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
 
-//    @DisplayName("지하철 노선 생성 시 구간 초기화 기능")
-//    @Test
-//    void createLineWithSection() {
-//        // given
-//        LineTestRequest lineTestRequest = LineTestStep.지하철_노선_요청_신분당선_데이터_생성하기();
-//
-//        // when
-//        ExtractableResponse<Response> response = LineTestStep.지하철_노선을_생성한다(lineTestRequest);
-//
-//        // then
-//        // 섹션 정보도 같이 들어갔는지 체크
-//    }
-
-
     @DisplayName("구간 등록 기능")
     @Test
     void createSection() {
@@ -73,6 +59,54 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = SectionTestStep.지하철역_구간_생성하기(sectionRequest, lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    @DisplayName("구간 제거 기능")
+    @Test
+    void deleteSection() {
+        // given
+        LineTestRequest lineRequest = LineTestStep.지하철_노선_요청_신분당선_데이터_생성하기();
+        Long 양재시민의숲역_id = StationTestStep.지하철역_생성_후_아이디_추출하기("양재시민의숲역");
+        Long lineId = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(lineRequest);
+        SectionTestRequest sectionRequest = new SectionTestRequest(lineRequest.getDownStationId(), 양재시민의숲역_id, 3);
+        SectionTestStep.지하철역_구간_생성하기(sectionRequest, lineId);
+
+        // when
+        ExtractableResponse<Response> response = SectionTestStep.지하철역_구간_삭제하기(lineId, 양재시민의숲역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("구간 제거 시 하행 종점역이 아닌 역을 요청했을 경우 실패")
+    @Test
+    void deleteSectionNotLastDownStationFail() {
+        // given
+        LineTestRequest lineRequest = LineTestStep.지하철_노선_요청_신분당선_데이터_생성하기();
+        Long 양재시민의숲역_id = StationTestStep.지하철역_생성_후_아이디_추출하기("양재시민의숲역");
+        Long lineId = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(lineRequest);
+        SectionTestRequest sectionRequest = new SectionTestRequest(lineRequest.getDownStationId(), 양재시민의숲역_id, 3);
+        SectionTestStep.지하철역_구간_생성하기(sectionRequest, lineId);
+
+        // when
+        ExtractableResponse<Response> response = SectionTestStep.지하철역_구간_삭제하기(lineId, lineRequest.getUpStationId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    @DisplayName("구간 제거 시 구간이 1개인 경우 역 삭제 불가")
+    @Test
+    void deleteOnlyOneSectionNotPossible() {
+        // given
+        LineTestRequest lineRequest = LineTestStep.지하철_노선_요청_신분당선_데이터_생성하기();
+        Long lineId = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(lineRequest);
+
+        // when
+        ExtractableResponse<Response> response = SectionTestStep.지하철역_구간_삭제하기(lineId, lineRequest.getDownStationId());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());

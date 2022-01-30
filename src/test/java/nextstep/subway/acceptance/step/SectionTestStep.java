@@ -18,4 +18,14 @@ public class SectionTestStep {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철역_구간_삭제하기(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId", stationId)
+                .when()
+                .delete("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
 }

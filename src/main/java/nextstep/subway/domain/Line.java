@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
+
+    public static final int MIN_SECTION_SIZE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,13 +49,6 @@ public class Line extends BaseEntity {
         }
     }
 
-    private Station getLastDownStation() {
-        if (sections.isEmpty()) {
-            return null;
-        }
-        return sections.get(sections.size() - 1).getDownStation();
-    }
-
     private List<Station> getAllStations() {
         if (sections.isEmpty()) {
             return Collections.emptyList();
@@ -63,6 +59,27 @@ public class Line extends BaseEntity {
                 .map(Section::getDownStation)
                 .collect(Collectors.toList()));
         return allStations;
+    }
+
+    public Section removeSection(Station station) {
+        checkPossibleRemovingSection(station);
+        return sections.remove(sections.size() - 1);
+    }
+
+    private void checkPossibleRemovingSection(Station station) {
+        if (sections.size() <= MIN_SECTION_SIZE) {
+            throw new IllegalUpdatingStateException("해당 노선의 구간이 " + MIN_SECTION_SIZE + "개 이하라 삭제하지 못합니다.");
+        }
+        if (!Objects.equals(getLastDownStation(), station)) {
+            throw new IllegalUpdatingStateException("해당 노선의 하행 종점역이 아니라 삭제하지 못합니다.");
+        }
+    }
+
+    private Station getLastDownStation() {
+        if (sections.isEmpty()) {
+            return null;
+        }
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
     public void update(String name, String color) {
