@@ -63,7 +63,9 @@ public class Line extends BaseEntity {
 
     public Section removeSection(Station station) {
         checkPossibleRemovingSection(station);
-        return sections.remove(sections.size() - 1);
+        Section removedSection = sections.remove(sections.size() - 1);
+        removedSection.updateLine(null);
+        return removedSection;
     }
 
     private void checkPossibleRemovingSection(Station station) {

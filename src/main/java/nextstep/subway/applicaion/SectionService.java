@@ -43,7 +43,6 @@ public class SectionService {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 역을 찾을 수 없습니다. stationId:" + stationId));
 
-        Section targetSection = line.removeSection(station);
-        sectionRepository.delete(targetSection);
+        line.removeSection(station);
     }
 }
