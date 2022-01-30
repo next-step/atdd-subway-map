@@ -65,6 +65,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록 시 하행역이 해당 노선에 등록되어 있을 때 실패 기능")
     @Test
     void createSectionDuplicateDownStationFail() {
+        // given
+        LineTestRequest lineRequest = LineTestStep.지하철_노선_요청_신분당선_데이터_생성하기();
+        Long lineId = LineTestStep.지하철_노선_생성한_후_아이디_추출하기(lineRequest);
+        SectionTestRequest sectionRequest = new SectionTestRequest(
+                lineRequest.getDownStationId(), lineRequest.getUpStationId(), 3);
 
+        // when
+        ExtractableResponse<Response> response = SectionTestStep.지하철역_구간_생성하기(sectionRequest, lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
