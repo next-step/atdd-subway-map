@@ -5,11 +5,14 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.step.LineSteps;
 import nextstep.subway.acceptance.step.SectionSteps;
 import nextstep.subway.acceptance.step.StationSteps;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -120,5 +123,39 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 양재역_번호);
 
         assertThat(deleteReponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 구간 생성을 요청 하고
+     * Given 새로운 지하철 구간 생성을 요청하고
+     * When 지하철 구간 목록 조회를 요청 하면
+     * Then 해당 노선의 모든 지하철 역 목록을 응답받는다
+     */
+    @DisplayName("지하철 구간 목록 조회")
+    @Test
+    void getSections() {
+        final int distance = 100;
+
+        final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
+        final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
+        final Long 판교역_번호 = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
+
+        final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
+                .jsonPath().getLong(번호);
+
+        SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
+
+        //when
+        ExtractableResponse<Response> searchResponse = SectionSteps.지하철_구간_조회_요청(lineId);
+
+        // then
+        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<String> stationNames = searchResponse.jsonPath().getList("stations", Station.class)
+                .stream()
+                .map(Station::getName)
+                .collect(Collectors.toList());
+
+        assertThat(stationNames).contains("광교역", "양재역", "판교역");
     }
 }
