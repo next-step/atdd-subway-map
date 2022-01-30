@@ -1,73 +1,85 @@
 package nextstep.subway.ui.controller;
 
+import nextstep.subway.application.dto.request.LineRequest;
+import nextstep.subway.application.dto.request.SectionRequest;
+import nextstep.subway.application.dto.response.LineResponse;
+import nextstep.subway.application.dto.response.SectionResponse;
+import nextstep.subway.application.service.LineQueryService;
+import nextstep.subway.application.service.LineService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.net.URI;
 import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
 
 @RestController
 public class LineController {
 
-    private final LineService lineService;
+	private final LineService lineService;
+	private final LineQueryService lineQueryServiceService;
 
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
-    }
+	public LineController(LineService lineService, LineQueryService lineQueryServiceService) {
+		this.lineService = lineService;
+		this.lineQueryServiceService = lineQueryServiceService;
+	}
 
-    @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        final LineResponse line = lineService.saveLine(lineRequest);
+	@PostMapping("/lines")
+	public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+		final LineResponse line = lineService.saveLine(lineRequest);
 
-        return ResponseEntity
-            .created(getCreateStatusHeader(line))
-            .body(line);
-    }
+		return ResponseEntity
+				.created(URI.create("/lines/" + line.getId()))
+				.body(line);
+	}
 
-    @GetMapping("/lines")
-    public ResponseEntity<List<LineResponse>> getAllLines() {
-        final List<LineResponse> allLines = lineService.getAllLines();
-        return ResponseEntity
-            .ok()
-            .body(allLines);
-    }
+	@GetMapping("/lines")
+	public ResponseEntity<List<LineResponse>> getAllLines() {
+		final List<LineResponse> allLines = lineQueryServiceService.getAllLines();
+		return ResponseEntity
+				.ok()
+				.body(allLines);
+	}
 
-    @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> getLine(@PathVariable long id) {
-        final LineResponse line = lineService.getLine(id);
-        return ResponseEntity
-            .ok()
-            .body(line);
-    }
+	@GetMapping("/lines/{id}")
+	public ResponseEntity<LineResponse> getLine(@PathVariable long id) {
+		final LineResponse line = lineQueryServiceService.getLine(id);
+		return ResponseEntity
+				.ok()
+				.body(line);
+	}
 
-    @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> updateLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
-        final LineResponse line = lineService.updateLine(id, lineRequest);
-        return ResponseEntity
-            .ok()
-            .body(line);
-    }
+	@PutMapping("/lines/{id}")
+	public ResponseEntity<LineResponse> updateLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
+		final LineResponse line = lineService.updateLine(id, lineRequest);
+		return ResponseEntity
+				.ok()
+				.body(line);
+	}
 
-    @DeleteMapping("/lines/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable long id) {
-        lineService.deleteLine(id);
-        return ResponseEntity
-            .noContent()
-            .build();
-    }
+	@DeleteMapping("/lines/{id}")
+	public ResponseEntity<Void> deleteLine(@PathVariable long id) {
+		lineService.deleteLine(id);
+		return ResponseEntity
+				.noContent()
+				.build();
+	}
 
-    private URI getCreateStatusHeader(LineResponse line) {
-        return URI.create("/lines/" + line.getId());
-    }
+	@PostMapping("/lines/{lineId}/sections")
+	public ResponseEntity<SectionResponse> createSection(@PathVariable long lineId, @RequestBody SectionRequest sectionRequest) {
+		SectionResponse sectionResponse = lineService.saveSection(lineId, sectionRequest);
+
+		return ResponseEntity
+				.created(URI.create("/lines/" + lineId + "/section/" + sectionResponse.getId()))
+				.body(sectionResponse);
+	}
+
+	@DeleteMapping("/lines/{lineId}/sections")
+	public ResponseEntity<SectionResponse> removeLine(@PathVariable long lineId, @RequestParam long stationId) {
+		lineService.deleteSection(lineId, stationId);
+
+		return ResponseEntity
+				.noContent()
+				.build();
+	}
 
 }
