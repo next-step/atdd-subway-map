@@ -3,42 +3,37 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class LineAcceptanceUtil {
-    public static ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
-        // given
-        Map<String, String> params = new HashMap<>();
-        params.put("color", color);
-        params.put("name", name);
-
+    public static ExtractableResponse<Response> 지하철_노선_생성_요청(LineRequest requestBody) {
         // when
         return RestAssured
                 .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(requestBody)
                 .when()
                 .post("/lines")
-                .then().log().all().extract();
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, String name, String color) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_요청(ExtractableResponse<Response> response, LineRequest requestBody) {
         String location = response.header("location");
-
-        Map<String, String> params = new HashMap<>();
-        params.put("color", color);
-        params.put("name", name);
 
         return RestAssured
                 .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(requestBody)
                 .when()
                 .put(location)
-                .then().log().all().extract();
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> 지하철_모든_노선_조회_요청() {
@@ -48,7 +43,10 @@ public class LineAcceptanceUtil {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .get("/lines")
-                .then().log().all().extract();
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> 지하철_특정_노선_조회_요청(ExtractableResponse<Response> response) {
@@ -60,7 +58,10 @@ public class LineAcceptanceUtil {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .get(location)
-                .then().log().all().extract();
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> 지하철_노선_삭제_요청(ExtractableResponse<Response> response) {
@@ -70,7 +71,10 @@ public class LineAcceptanceUtil {
                 .given()
                 .when()
                 .delete(location)
-                .then().log().all().extract();
+                .then()
+                .log()
+                .all()
+                .extract();
 
     }
 }

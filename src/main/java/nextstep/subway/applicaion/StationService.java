@@ -14,17 +14,27 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
+    }
+
+    public static StationResponse createStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName(),
+                station.getCreatedDate(),
+                station.getModifiedDate()
+        );
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
 
         String name = stationRequest.getName();
 
-        if (stationRepository.findByName(name).isPresent()) {
+        if (stationRepository.findByName(name)
+                             .isPresent()) {
             throw new StationDuplicateException();
         }
 
@@ -32,25 +42,16 @@ public class StationService {
         return createStationResponse(station);
     }
 
+    public void deleteStationById(Long id) {
+        stationRepository.deleteById(id);
+    }
+
     @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
-    }
-
-    public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+                       .map(StationService::createStationResponse)
+                       .collect(Collectors.toList());
     }
 }
