@@ -13,16 +13,16 @@ class LineTest {
     @Test
     void validateUpStation() {
         // given
-        Station station1 = new Station("강남역");
-        Station station2 = new Station("역삼역");
-        Station station3 = new Station("선릉역");
-        Section section = new Section(station1, station2, 10);
+        Station 강남역 = new Station("강남역");
+        Station 역삼역 = new Station("역삼역");
+        Station 선릉역 = new Station("선릉역");
+        Section section = new Section(강남역, 역삼역, 10);
         Line line = new Line("2호선", "bg-green-600");
 
         line.addSection(section);
 
         // when
-        Section newSection = new Section(station2, station3, 5);
+        Section newSection = new Section(역삼역, 선릉역, 5);
 
         // then
         assertThat(line.validateUpStation(newSection.getUpStation())).isEqualTo(true);
@@ -32,16 +32,16 @@ class LineTest {
     @Test
     void validateDownStation() {
         // given
-        Station station1 = new Station("강남역");
-        Station station2 = new Station("역삼역");
-        Station station3 = new Station("선릉역");
-        Section section = new Section(station1, station2, 10);
+        Station 강남역 = new Station("강남역");
+        Station 역삼역 = new Station("역삼역");
+        Station 선릉역 = new Station("선릉역");
+        Section section = new Section(강남역, 역삼역, 10);
         Line line = new Line("2호선", "bg-green-600");
 
         line.addSection(section);
 
         // when
-        Section newSection = new Section(station2, station1, 5);
+        Section newSection = new Section(역삼역, 강남역, 5);
 
         // then
         assertThat(line.validateDownStation(newSection.getDownStation())).isEqualTo(false);
@@ -52,11 +52,11 @@ class LineTest {
     void getAllStations() {
         // given
         // given
-        Station station1 = new Station("강남역");
-        Station station2 = new Station("역삼역");
-        Station station3 = new Station("선릉역");
-        Section section1 = new Section(station1, station2, 10);
-        Section section2 = new Section(station2, station3, 5);
+        Station 강남역 = new Station("강남역");
+        Station 역삼역 = new Station("역삼역");
+        Station 선릉역 = new Station("선릉역");
+        Section section1 = new Section(강남역, 역삼역, 10);
+        Section section2 = new Section(역삼역, 선릉역, 5);
         Line line = new Line("2호선", "bg-green-600");
 
         line.addSection(section1);
@@ -66,17 +66,17 @@ class LineTest {
         List<StationResponse> allStations = line.getAllStations();
 
         assertThat(allStations).hasSize(3);
-        assertThat(allStations.get(0).getName()).isEqualTo(station1.getName());
-        assertThat(allStations.get(1).getName()).isEqualTo(station2.getName());
-        assertThat(allStations.get(2).getName()).isEqualTo(station3.getName());
+        assertThat(allStations.get(0).getName()).isEqualTo(강남역.getName());
+        assertThat(allStations.get(1).getName()).isEqualTo(역삼역.getName());
+        assertThat(allStations.get(2).getName()).isEqualTo(선릉역.getName());
     }
 
     @DisplayName("노선 구간 추가 ")
     @Test
     void 노선에_구간_추가() {
-        Station station1 = new Station("강남역");
-        Station station2 = new Station("역삼역");
-        Section section = new Section(station1, station2, 10);
+        Station 강남역 = new Station("강남역");
+        Station 역삼역 = new Station("역삼역");
+        Section section = new Section(강남역, 역삼역, 10);
         Line line = new Line("2호선", "bg-green-600");
 
         line.addSection(section);
