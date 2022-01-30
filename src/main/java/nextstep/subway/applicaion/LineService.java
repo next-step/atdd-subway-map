@@ -95,25 +95,12 @@ public class LineService {
         Section section = Section.createAddSection(line, upStation, downStation, request.getDistance());
         line.addSection(section);
 
-        sectionRepository.save(section);
         return SectionResponse.createSectionResponse(section, lineId);
     }
 
     public void deleteStationById(Long lineId, Long stationId) {
         Line line = findLine(lineId);
-        Station downEndStation = line.getSections().get(line.getSections().size() - 1).getDownStation();
-        Section section = sectionRepository.findByDownStationId(stationId);
-
-        if (!downEndStation.equals(section.getDownStation())) {
-            throw new BadRequestException("구간 삭제는 하행 종점역만 삭제할 수 있습니다.");
-        }
-
-        if (line.getSections().size() == 1) {
-            throw new BadRequestException("구간 삭제는 구간이 2개 이상이어야 합니다.");
-        }
-
-        stationRepository.deleteById(stationId);
-        sectionRepository.delete(section);
+        line.deleteSection(stationId);
     }
 
     private Line findLine(Long lineId) {
