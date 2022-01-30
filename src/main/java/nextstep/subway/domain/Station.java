@@ -11,9 +11,6 @@ public class Station extends BaseEntity {
     @Column(unique = true)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Line line;
-
     public Station() {
     }
 
@@ -27,9 +24,5 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
-    }
-
-    public Line getLine() {
-        return line;
     }
 }
