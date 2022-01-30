@@ -25,7 +25,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
 
         // when
-        ExtractableResponse response = 지하철_노선_생성_요청("신분당선", "bg-red-600");
+        ExtractableResponse response = 지하철_노선_생성_요청("신분당선", "bg-red-600",
+                1L, 2L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -41,8 +42,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
 //        given
-        지하철_노선_생성_요청("신분당선", "bg-red-600");
-        지하철_노선_생성_요청("2호선", "bg-green-600");
+        지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
+        지하철_노선_생성_요청("2호선", "bg-green-600", 3L, 4L, 30);
 
 //        when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -65,7 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        지하철_노선_생성_요청("신분당선", "bg-red-600");
+        지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -88,7 +89,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        지하철_노선_생성_요청("신분당선", "bg-red-600");
+        지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
 
         // when
         Map<String, String> updateLineParam = new HashMap<>();
@@ -120,7 +121,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        지하철_노선_생성_요청("신분당선", "bg-red-600");
+        지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
 
         //when
         ExtractableResponse response = RestAssured.given().log().all()
@@ -145,19 +146,25 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createDuplicatedLine() {
 
         // given
-        지하철_노선_생성_요청("2호선", "green");
+        지하철_노선_생성_요청("2호선", "green", 1L, 2L, 10);
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("2호선", "green");
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("2호선", "green",
+                2L, 3L, 20);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color) {
+    public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId,
+                                                      Long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", Integer.toString(distance));
+
         return RestAssured
                 .given().log().all()
                 .body(params)
