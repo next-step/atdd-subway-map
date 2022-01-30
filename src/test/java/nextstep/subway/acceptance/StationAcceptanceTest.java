@@ -33,7 +33,7 @@ class StationAcceptanceTest extends AcceptanceTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        요청_응답을_확인한다(response, HttpStatus.CREATED);
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -54,7 +54,8 @@ class StationAcceptanceTest extends AcceptanceTest {
             .then().log().all()
             .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        요청_응답을_확인한다(response, HttpStatus.OK);
+
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역, 역삼역);
     }
@@ -70,7 +71,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationSteps.지하철역_삭제(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        요청_응답을_확인한다(response, HttpStatus.NO_CONTENT);
     }
 
     @DisplayName("지하철역 생성 중복 체크")
@@ -83,6 +84,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationSteps.지하철역_생성("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청_응답을_확인한다(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

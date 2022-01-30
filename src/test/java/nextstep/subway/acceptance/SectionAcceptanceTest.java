@@ -41,7 +41,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        요청_응답을_확인한다(response, HttpStatus.OK);
     }
 
     @DisplayName("구간 생성 상행역 에러 테스트")
@@ -58,7 +58,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = SectionSteps.지하철_구간_생성(new SectionRequest(stationId1, stationId3, 10), lineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청_응답을_확인한다(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DisplayName("하행역 중복 에러 테스트")
@@ -74,7 +74,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = SectionSteps.지하철_구간_생성(new SectionRequest(stationId2, stationId1, 10), lineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청_응답을_확인한다(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DisplayName("구간 제거")
@@ -92,7 +92,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제(lineId, stationId3);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        요청_응답을_확인한다(deleteResponse, HttpStatus.NO_CONTENT);
     }
 
     @DisplayName("구간 제거 시 마지막 역(하행 종점역)이 아닌 경우 에러가 발생한다.")
@@ -110,7 +110,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제(lineId, stationId2);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청_응답을_확인한다(deleteResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DisplayName("구간이 1개인 경우 역을 삭제하면 에러가 발생한다. ")
@@ -126,6 +126,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제(lineId, stationId2);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청_응답을_확인한다(deleteResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

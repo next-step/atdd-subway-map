@@ -35,7 +35,7 @@ class LineAcceptanceTest extends AcceptanceTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        요청_응답을_확인한다(response, HttpStatus.CREATED);
         assertThat(response.jsonPath().getLong("id")).isEqualTo(1);
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
@@ -60,7 +60,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         List<String> stationNames = response.jsonPath().getList("name");
         List<String> colors = response.jsonPath().getList("color");
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        요청_응답을_확인한다(response, HttpStatus.OK);
         assertThat(stationNames).contains("신분당선", "2호선");
         assertThat(colors).contains("bg-red-600", "bg-green-600");
     }
@@ -78,7 +78,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_조회(lineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        요청_응답을_확인한다(response, HttpStatus.OK);
         assertThat(response.jsonPath().getLong("id")).isEqualTo(1);
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
@@ -104,7 +104,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_수정(lineId, editParams);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        요청_응답을_확인한다(response, HttpStatus.OK);
     }
 
     @DisplayName("지하철 노선 삭제")
@@ -118,7 +118,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_삭제(lineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        요청_응답을_확인한다(response, HttpStatus.NO_CONTENT);
     }
 
     @DisplayName("지하철 노선 생성 중복 체크")
@@ -131,6 +131,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성(LineSteps.신분당선_요청_생성());
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        요청_응답을_확인한다(createResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
