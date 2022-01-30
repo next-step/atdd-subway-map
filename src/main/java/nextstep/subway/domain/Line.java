@@ -6,6 +6,7 @@ import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
+    public static final int SECTIONS_MIN_SIZE = 1;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,10 +39,10 @@ public class Line extends BaseEntity {
         sections.add(section);
     }
 
-    public void removeSection(Station station){
-        Section lastSection = sections.get(sections.size()-1);
+    public void removeSection(Station station) {
+        Section lastSection = sections.get(sections.size() - 1);
 
-        if(!lastSection.isEqualToDownStation(station) || sections.size() == 1){
+        if (!lastSection.isEqualToDownStation(station) || sections.size() == SECTIONS_MIN_SIZE) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
 
