@@ -10,7 +10,8 @@ import java.util.Map;
 
 public class SectionSteps {
 
-    public static ExtractableResponse<Response> 구간_생성_요청(Long line_id, Long upStationId, Long downStationId, int distance) {
+    public static ExtractableResponse<Response> 구간_생성_요청(
+            Long line_id, Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);

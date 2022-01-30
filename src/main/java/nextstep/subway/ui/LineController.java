@@ -3,7 +3,6 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.exception.DuplicatedNameException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,7 @@ public class LineController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) throws DuplicatedNameException {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) throws Exception {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -48,7 +47,7 @@ public class LineController extends BaseController {
     }
 
     @PostMapping(value = "/{id}/sections")
-    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @RequestBody LineRequest lineRequest) throws Exception {
         LineResponse line = lineService.addSection(id, lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }

@@ -17,21 +17,24 @@ import java.util.stream.Stream;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+
     private StationRepository stationRepository;
+    private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) throws DuplicatedNameException, NoSuchElementException {
+    public LineResponse saveLine(LineRequest request) throws Exception {
         if(isDuplicatedNameOfLine(request.getName())) {
             throw new DuplicatedNameException();
         }
 
         Line line = new Line(request.getName(), request.getColor());
-        return saveSection(line, request);
+        saveSection(line, request);
+        lineRepository.save(line);
+        return createLineResponse(line);
     }
 
     @Transactional(readOnly = true)
@@ -47,10 +50,19 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                null,
+                createStationResponse(line.getSections()),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    private List<StationResponse> createStationResponse(List<Section> sections) {
+            return sections.stream()
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
+                .map(station -> new StationResponse(station.getId(), station.getName()
+                                                    , station.getCreatedDate(), station.getModifiedDate()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -75,19 +87,19 @@ public class LineService {
         return line.isPresent();
     }
 
-    public LineResponse addSection(Long id, LineRequest request) {
+    public LineResponse addSection(Long id, LineRequest request) throws Exception {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        return saveSection(line, request);
-    }
-
-    public LineResponse saveSection(Line line, LineRequest request) {
-        Section section = new Section(line, findStation(request.getUpStationId())
-                                        , findStation(request.getDownStationId()), request.getDistance());
-        line.getSections().add(section);
-        lineRepository.save(line);
+        saveSection(line, request);
         return createLineResponse(line);
     }
 
+    public void saveSection(Line line, LineRequest request) throws Exception {
+        Section section = new Section(line, findStation(request.getUpStationId())
+                                        , findStation(request.getDownStationId()), request.getDistance());
+        line.registSection(section);
+    }
+
+    @Transactional(readOnly = true)
     public Station findStation(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
     }
