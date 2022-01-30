@@ -2,7 +2,6 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.entity.Line;
 import nextstep.subway.domain.entity.Section;
 import nextstep.subway.domain.entity.Station;
@@ -92,20 +91,6 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(final Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations().stream()
-                        .map(station -> new StationResponse(
-                                station.getId(),
-                                station.getName(),
-                                station.getCreatedDate(),
-                                station.getModifiedDate()
-                        ))
-                        .collect(Collectors.toList()),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return LineResponse.from(line);
     }
 }
