@@ -1,7 +1,9 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
+import nextstep.subway.acceptance.station.StationParams;
 import nextstep.subway.utils.ApiUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -23,11 +25,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_생성_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -44,12 +46,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_이름_중복_생성_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
@@ -64,11 +66,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_상행_등록정보_없음_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_상행_정보없음);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_상행_정보없음);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -83,11 +85,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_하행_등록정보_없음_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_하행_정보없음);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_하행_정보없음);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -102,11 +104,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_거리_정보_없음_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(GTXA노선_거리_음수);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_거리_음수);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -123,13 +125,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
-        ApiUtil.지하철역_생성_API(강남역);
-        ApiUtil.지하철역_생성_API(양재역);
-        ApiUtil.지하철_노선_생성_API(신분당선);
+        ApiUtil.지하철역_생성_API(StationParams.강남역);
+        ApiUtil.지하철역_생성_API(StationParams.양재역);
+        ApiUtil.지하철_노선_생성_API(LineParams.신분당선);
 
         // when
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_전체_리스트_조회_API();
@@ -151,9 +153,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회_테스트() {
         // given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_단건_조회_API(1L);
@@ -177,11 +179,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선역_조회_테스트() {
         // given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철역_생성_API(삼성역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
-        ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철역_생성_API(StationParams.삼성역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
+        ApiUtil.지하철_노선_구간_등록_API(1L, LineParams.GTXA노선_구간_서울역_삼성역);
 
         // when
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_단건_조회_API(1L);
@@ -205,12 +207,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정_테스트() {
         // given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_수정_API(1L, 노선색상);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_수정_API(1L, LineParams.노선색상);
 
         // then
         ExtractableResponse<Response> updatedLine = ApiUtil.지하철_노선_단건_조회_API(1L);
@@ -232,9 +234,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
         ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_삭제_API(1L);
@@ -252,13 +254,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_구간_등록_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철역_생성_API(삼성역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철역_생성_API(StationParams.삼성역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, LineParams.GTXA노선_구간_서울역_삼성역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -273,13 +275,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_구간_생성_시_기존_역의_하행역이_아닐경우_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철역_생성_API(삼성역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철역_생성_API(StationParams.삼성역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_연신내역_삼성역);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, LineParams.GTXA노선_구간_연신내역_삼성역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -294,12 +296,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_구간_생성_시_하행역이_이미_존재_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_연신내역);
+        ExtractableResponse<Response> response = ApiUtil.지하철_노선_구간_등록_API(1L, LineParams.GTXA노선_구간_서울역_연신내역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -315,14 +317,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_구간_삭제_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철역_생성_API(삼성역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
-        ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철역_생성_API(StationParams.삼성역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
+        ApiUtil.지하철_노선_구간_등록_API(1L, LineParams.GTXA노선_구간_서울역_삼성역);
 
         // when
-        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, GTXA노선_구간_삭제_삼성역);
+        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, LineParams.GTXA노선_구간_삭제_삼성역);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -338,14 +340,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_하행_종점_아닌_구간_삭제_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철역_생성_API(삼성역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
-        ApiUtil.지하철_노선_구간_등록_API(1L, GTXA노선_구간_서울역_삼성역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철역_생성_API(StationParams.삼성역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
+        ApiUtil.지하철_노선_구간_등록_API(1L, LineParams.GTXA노선_구간_서울역_삼성역);
 
         // when
-        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, GTXA노선_구간_삭제_연신내);
+        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, LineParams.GTXA노선_구간_삭제_연신내);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -361,109 +363,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_한_구간만_존재할_경우_삭제_방지_테스트() {
         //given
-        ApiUtil.지하철역_생성_API(연신내역);
-        ApiUtil.지하철역_생성_API(서울역);
-        ApiUtil.지하철_노선_생성_API(GTXA노선_연신내_서울역);
+        ApiUtil.지하철역_생성_API(StationParams.연신내역);
+        ApiUtil.지하철역_생성_API(StationParams.서울역);
+        ApiUtil.지하철_노선_생성_API(LineParams.GTXA노선_연신내_서울역);
 
         // when
-        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, GTXA노선_구간_삭제_서울역);
+        ExtractableResponse<Response> deleteResponse = ApiUtil.지하철_노선_구간_삭제_API(1L, LineParams.GTXA노선_구간_삭제_서울역);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
-    static Map<String, String> GTXA노선_연신내_서울역;
-    static Map<String, String> GTXA노선_상행_정보없음;
-    static Map<String, String> GTXA노선_하행_정보없음;
-    static Map<String, String> GTXA노선_거리_음수;
-    static Map<String, String> 신분당선;
-    static Map<String, String> 노선색상;
-
-    static Map<String, String> 연신내역;
-    static Map<String, String> 서울역;
-    static Map<String, String> 삼성역;
-    static Map<String, String> 강남역;
-    static Map<String, String> 양재역;
-
-    static Map<String, String> GTXA노선_구간_서울역_삼성역;
-    static Map<String, String> GTXA노선_구간_연신내역_삼성역;
-    static Map<String, String> GTXA노선_구간_서울역_연신내역;
-
-    static Map<String, String> GTXA노선_구간_삭제_삼성역;
-    static Map<String, String> GTXA노선_구간_삭제_연신내;
-    static Map<String, String> GTXA노선_구간_삭제_서울역;
-
     @BeforeEach
     public void 초기화() {
-        연신내역 = new HashMap<>();
-        연신내역.put("name", "연신내");
-        서울역 = new HashMap<>();
-        서울역.put("name", "서울역");
-        삼성역 = new HashMap<>();
-        삼성역.put("name", "삼성역");
-        강남역 = new HashMap<>();
-        강남역.put("name", "강남역");
-        양재역 = new HashMap<>();
-        양재역.put("name", "양재역");
-
-        GTXA노선_연신내_서울역 = new HashMap<>();
-        GTXA노선_연신내_서울역.put("name", "GTX-A");
-        GTXA노선_연신내_서울역.put("color", "bg-red-900");
-        GTXA노선_연신내_서울역.put("upStationId", "1");
-        GTXA노선_연신내_서울역.put("downStationId", "2");
-        GTXA노선_연신내_서울역.put("distance", "10");
-
-        GTXA노선_상행_정보없음 = new HashMap<>();
-        GTXA노선_상행_정보없음.put("name", "GTX-A");
-        GTXA노선_상행_정보없음.put("color", "bg-red-900");
-        GTXA노선_상행_정보없음.put("downStationId", "2");
-        GTXA노선_상행_정보없음.put("distance", "10");
-
-        GTXA노선_하행_정보없음 = new HashMap<>();
-        GTXA노선_하행_정보없음.put("name", "GTX-A");
-        GTXA노선_하행_정보없음.put("color", "bg-red-900");
-        GTXA노선_하행_정보없음.put("upStationId", "1");
-        GTXA노선_하행_정보없음.put("distance", "10");
-
-        GTXA노선_거리_음수 = new HashMap<>();
-        GTXA노선_거리_음수.put("name", "GTX-A");
-        GTXA노선_거리_음수.put("color", "bg-red-900");
-        GTXA노선_거리_음수.put("upStationId", "1");
-        GTXA노선_거리_음수.put("downStationId", "2");
-        GTXA노선_거리_음수.put("distance", "-1");
-
-        신분당선 = new HashMap<>();
-        신분당선.put("name", "신분당선");
-        신분당선.put("color", "bg-red-500");
-        신분당선.put("upStationId", "2");
-        신분당선.put("downStationId", "3");
-        신분당선.put("distance", "10");
-
-        노선색상 = new HashMap<>();
-        노선색상.put("color", "bg-red-800");
-
-        GTXA노선_구간_서울역_삼성역 = new HashMap<>();
-        GTXA노선_구간_서울역_삼성역.put("upStationId", "2");
-        GTXA노선_구간_서울역_삼성역.put("downStationId", "3");
-        GTXA노선_구간_서울역_삼성역.put("distance", "10");
-
-        GTXA노선_구간_연신내역_삼성역 = new HashMap<>();
-        GTXA노선_구간_연신내역_삼성역.put("upStationId", "1");
-        GTXA노선_구간_연신내역_삼성역.put("downStationId", "3");
-        GTXA노선_구간_연신내역_삼성역.put("distance", "10");
-
-        GTXA노선_구간_서울역_연신내역 = new HashMap<>();
-        GTXA노선_구간_서울역_연신내역.put("upStationId", "2");
-        GTXA노선_구간_서울역_연신내역.put("downStationId", "1");
-        GTXA노선_구간_서울역_연신내역.put("distance", "10");
-
-        GTXA노선_구간_삭제_삼성역 = new HashMap<>();
-        GTXA노선_구간_삭제_삼성역.put("stationId", "3");
-
-        GTXA노선_구간_삭제_연신내 = new HashMap<>();
-        GTXA노선_구간_삭제_연신내.put("stationId", "1");
-
-        GTXA노선_구간_삭제_서울역 = new HashMap<>();
-        GTXA노선_구간_삭제_서울역.put("stationId", "2");
+        LineParams.파람_초기화();
+        StationParams.파람_초기화();
     }
 }
