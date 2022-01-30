@@ -1,5 +1,6 @@
 package nextstep.subway.exception.handler;
 
+import nextstep.subway.exception.BadRequestException;
 import nextstep.subway.exception.DuplicateRegistrationRequestException;
 import nextstep.subway.exception.ExceptionDto;
 import nextstep.subway.exception.NotFoundRequestException;
@@ -25,5 +26,13 @@ public class ControllerExceptionHandler {
         exceptionDto.setMessage(e.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionDto);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionDto> handlerDuplicateRequestException(BadRequestException e) {
+        ExceptionDto exceptionDto = new ExceptionDto();
+        exceptionDto.setMessage(e.getMessage());
+
+        return ResponseEntity.badRequest().body(exceptionDto);
     }
 }

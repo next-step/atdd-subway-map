@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,20 +39,13 @@ public class LineService {
         // 전제 조건 : 역이 먼저 생성되어 있어야 함.
         Line findLine = lineRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findLine)) {
-            // 1. 각 역을 select한다.
-            Station upStation = stationRepository.findById(request.getUpStationId())
-                    .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, request.getUpStationId())));
-            Station downStation = stationRepository.findById(request.getDownStationId())
-                    .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, request.getDownStationId())));
-
-            // 2. 라인의 객체를 생성한다.
+            Station upStation = findStationById(request.getUpStationId());
+            Station downStation = findStationById(request.getDownStationId());
             Line line = new Line(request.getName(), request.getColor());
 
-            // 3. Section 객체에 셋팅한다.
-            Section section = new Section(line, upStation, downStation, request.getDistance());
+            Section section = Section.createNewLineSection(line, upStation, downStation, request.getDistance());
             line.addSection(section);
 
-            // 4. line을 save한다.
             lineRepository.save(line);
 
             return LineSaveResponse.createLineResponse(line);
@@ -94,5 +85,10 @@ public class LineService {
                 .orElseThrow(() -> new NotFoundRequestException(String.format(LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
 
         lineRepository.delete(line);
+    }
+
+    private Station findStationById(Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, upStationId)));
     }
 }
