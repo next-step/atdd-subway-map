@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
@@ -30,10 +29,16 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                convertToStationResponseList(line.getSections()),
+                convertToStationResponseList(line.getStations()),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    private static List<StationResponse> convertToStationResponseList(List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
     }
 
     public Long getId() {
@@ -58,17 +63,5 @@ public class LineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
-    }
-
-    private static List<StationResponse> convertToStationResponseList(List<Section> sections) {
-        List<StationResponse> stationResponses = sections.stream()
-                .map(Section::getUpStation)
-                .map(StationResponse::of)
-                .collect(Collectors.toList());
-
-        Station lastStation = sections.get(sections.size()-1).getDownStation();
-        stationResponses.add(StationResponse.of(lastStation));
-
-        return stationResponses;
     }
 }

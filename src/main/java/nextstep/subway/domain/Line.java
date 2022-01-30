@@ -50,7 +50,7 @@ public class Line extends BaseEntity {
         sections.remove(lastSection);
     }
 
-    public List<Station> getStations(){
+    public List<Station> getStations() {
         List<Station> stations = sections.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class Line extends BaseEntity {
         if (sections.isEmpty()) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
-        if(getStations().contains(section.getDownStation())){
+        if (getStations().contains(section.getDownStation())) {
             throw new IllegalArgumentException("기등록된 역은 하행역으로 등록할 수 없습니다.");
         }
 
@@ -84,10 +84,6 @@ public class Line extends BaseEntity {
 
     public String getColor() {
         return color;
-    }
-
-    public List<Section> getSections() {
-        return sections;
     }
 
 }
