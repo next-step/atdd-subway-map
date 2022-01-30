@@ -44,7 +44,7 @@ public class Line extends BaseEntity {
         Section lastSection = sections.get(sections.size() - 1);
 
         if (!lastSection.isEqualToDownStation(station) || sections.size() == SECTIONS_MIN_SIZE) {
-            throw new IllegalArgumentException("잘못된 요청입니다.");
+            throw new IllegalArgumentException("구간을 제거할 수 없습니다.");
         }
 
         sections.remove(lastSection);
@@ -62,7 +62,7 @@ public class Line extends BaseEntity {
 
     private void verifyConnectable(Section section) {
         if (sections.isEmpty()) {
-            throw new IllegalArgumentException("잘못된 요청입니다.");
+            throw new IllegalArgumentException("기존 구간이 없습니다.");
         }
         if (getStations().contains(section.getDownStation())) {
             throw new IllegalArgumentException("기등록된 역은 하행역으로 등록할 수 없습니다.");
@@ -70,7 +70,7 @@ public class Line extends BaseEntity {
 
         Section lastSection = sections.get(sections.size() - 1);
         if (!lastSection.isConnectable(section)) {
-            throw new IllegalArgumentException("잘못된 요청입니다.");
+            throw new IllegalArgumentException("상행역이 기등록된 하행 종점역과 일치하지 않습니다.");
         }
     }
 
