@@ -25,7 +25,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         checkDuplication(request);
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = lineRepository.save(Line.of(request));
         return LineResponse.of(line);
     }
 

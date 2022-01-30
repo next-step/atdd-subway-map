@@ -5,7 +5,7 @@ public class LineRequest {
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private int distance;           
+    private int distance;
 
     public String getName() {
         return name;
@@ -13,5 +13,17 @@ public class LineRequest {
 
     public String getColor() {
         return color;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
     }
 }
