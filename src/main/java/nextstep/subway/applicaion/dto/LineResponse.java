@@ -4,6 +4,7 @@ import nextstep.subway.domain.Line;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -31,6 +32,9 @@ public class LineResponse {
             line.getCreatedDate(),
             line.getModifiedDate(),
             line.getAllStations()
+                .stream()
+                .map(StationResponse::ofStation)
+                .collect(Collectors.toList())
         );
     }
 

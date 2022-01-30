@@ -1,13 +1,10 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.exception.DeleteSectionException;
 import nextstep.subway.exception.SectionNotValidException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -89,14 +86,11 @@ public class Line extends BaseEntity {
         sections.remove(lastDownStationId);
     }
 
-    public List<StationResponse> getAllStations() {
+    public List<Station> getAllStations() {
         if (sections.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return sections.getAllStations()
-            .stream()
-            .map(StationResponse::ofStation)
-            .collect(Collectors.toList());
+        return sections.getAllStations();
     }
 }

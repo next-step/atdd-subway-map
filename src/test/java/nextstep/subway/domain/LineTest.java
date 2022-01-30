@@ -63,7 +63,7 @@ class LineTest {
         line.addSection(section2);
 
         // when
-        List<StationResponse> allStations = line.getAllStations();
+        List<Station> allStations = line.getAllStations();
 
         assertThat(allStations).hasSize(3);
         assertThat(allStations.get(0).getName()).isEqualTo(강남역.getName());
