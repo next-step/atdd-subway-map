@@ -41,7 +41,7 @@ public class LineService {
         if (ObjectUtils.isEmpty(findLine)) {
             Station upStation = findStationById(request.getUpStationId());
             Station downStation = findStationById(request.getDownStationId());
-            Line line = new Line(request.getName(), request.getColor());
+            Line line = Line.createLine(request.getName(), request.getColor());
 
             Section section = Section.createNewLineSection(line, upStation, downStation, request.getDistance());
             line.addSection(section);
