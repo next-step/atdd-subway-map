@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 import static nextstep.subway.acceptance.LineSteps.*;
 import static nextstep.subway.acceptance.StationSteps.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -171,29 +173,27 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSection() {
         // given
-        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
         final String 세_번째역 = "잠실역";
-        final ExtractableResponse<Response> createStationResponse1 = 지하철_역_생성_요청(세_번째역);
         final String 네_번째역 = "사당역";
-        final ExtractableResponse<Response> createStationResponse2 = 지하철_역_생성_요청(네_번째역);
-        final long lineId = createLineResponse.jsonPath().getLong("id");
+        final JsonPath createLineResponseBody = 지하철_노선_생성_요청().jsonPath();
 
         // when
-        long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
-        long downStationId = createStationResponse1.jsonPath().getLong("id");
-        final ExtractableResponse<Response> response1 = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+        final long lineId = createLineResponseBody.getLong("id");
+        long upStationId = createLineResponseBody.getLong("stations[1].id");
+        long downStationId = 지하철_역_생성_요청(세_번째역).jsonPath().getLong("id");
+        final int statusCode1 = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1).statusCode();
+
         upStationId = downStationId;
-        downStationId = createStationResponse2.jsonPath().getLong("id");
-        final ExtractableResponse<Response> response2 = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+        downStationId = 지하철_역_생성_요청(네_번째역).jsonPath().getLong("id");
+        final int statusCode2 = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1).statusCode();
 
         // then
-        final ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(String.format("/lines/%d", lineId));
-        final JsonPath getLineResponseBody = getLineResponse.jsonPath();
+        final List<String> stationNames = 지하철_노선_조회_요청(String.format("/lines/%d", lineId)).jsonPath().getList("stations.name");
         assertAll(
-                () -> assertThat(response1.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-                () -> assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-                () -> assertThat(getLineResponseBody.getString("stations[2].name")).isEqualTo(세_번째역),
-                () -> assertThat(getLineResponseBody.getString("stations[3].name")).isEqualTo(네_번째역)
+                () -> assertThat(statusCode1).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(statusCode2).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(stationNames.get(2)).isEqualTo(세_번째역),
+                () -> assertThat(stationNames.get(3)).isEqualTo(네_번째역)
         );
     }
 
@@ -210,18 +210,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionWithUpStationNoContains() {
         // given
-        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
-        final ExtractableResponse<Response> createUpStationResponse = 지하철_역_생성_요청("잠실역");
-        final ExtractableResponse<Response> createDownStationResponse = 지하철_역_생성_요청("사당역");
-        final long lineId = createLineResponse.jsonPath().getLong("id");
+        final long lineId = 지하철_노선_생성_요청().jsonPath().getLong("id");
 
         // when
-        final long upStationId = createUpStationResponse.jsonPath().getLong("id");
-        final long downStationId = createDownStationResponse.jsonPath().getLong("id");
-        final ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+        final long upStationId = 지하철_역_생성_요청("잠실역").jsonPath().getLong("id");
+        final long downStationId = 지하철_역_생성_요청("사당역").jsonPath().getLong("id");
+        final int responseStatusCode = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1).statusCode();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(responseStatusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -235,16 +232,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void addSectionWithDownStationContains() {
         // given
-        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
-        final long lineId = createLineResponse.jsonPath().getLong("id");
+        final JsonPath createLineResponseBody = 지하철_노선_생성_요청().jsonPath();
 
         // when
-        final long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
-        final long downStationId = createLineResponse.jsonPath().getLong("stations[0].id");
-        final ExtractableResponse<Response> response = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
+        final long lineId = createLineResponseBody.getLong("id");
+        final long upStationId = createLineResponseBody.getLong("stations[1].id");
+        final long downStationId = createLineResponseBody.getLong("stations[0].id");
+        final int responseStatusCode = 지하철_구간_등록_요청(lineId, upStationId, downStationId, 1).statusCode();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(responseStatusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -259,22 +256,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     void removeSection() {
         // given
         final String 잠실역 = "잠실역";
-        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
-        final ExtractableResponse<Response> createStationResponse = 지하철_역_생성_요청(잠실역);
+        final JsonPath createLineResponseBody = 지하철_노선_생성_요청().jsonPath();
 
-        final long lineId = createLineResponse.jsonPath().getLong("id");
-        final long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
-        final long downStationId = createStationResponse.jsonPath().getLong("id");
+        final long lineId = createLineResponseBody.getLong("id");
+        final long upStationId = createLineResponseBody.getLong("stations[1].id");
+        final long downStationId = 지하철_역_생성_요청(잠실역).jsonPath().getLong("id");
         지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, downStationId);
+        final int responseStatusCode = 지하철_구간_제거_요청(lineId, downStationId).statusCode();
 
         // then
-        final ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(String.format("/lines/%d", lineId));
+        final List<String> stationNames = 지하철_노선_조회_요청(String.format("/lines/%d", lineId)).jsonPath().getList("stations.name");
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-                () -> assertThat(getLineResponse.jsonPath().getList("stations.name")).doesNotContain(잠실역)
+                () -> assertThat(responseStatusCode).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(stationNames).doesNotContain(잠실역)
         );
     }
 
@@ -289,19 +285,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeSectionWithoutEndingStation() {
         // given
-        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
-        final ExtractableResponse<Response> createStationResponse = 지하철_역_생성_요청("잠실역");
+        final JsonPath createLineResponseBody = 지하철_노선_생성_요청().jsonPath();
 
-        final long lineId = createLineResponse.jsonPath().getLong("id");
-        final long upStationId = createLineResponse.jsonPath().getLong("stations[1].id");
-        final long downStationId = createStationResponse.jsonPath().getLong("id");
+        final long lineId = createLineResponseBody.getLong("id");
+        final long upStationId = createLineResponseBody.getLong("stations[1].id");
+        final long downStationId = 지하철_역_생성_요청("잠실역").jsonPath().getLong("id");
         지하철_구간_등록_요청(lineId, upStationId, downStationId, 1);
 
         // when
-        final ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, upStationId);
+        final int responseStatusCod = 지하철_구간_제거_요청(lineId, upStationId).statusCode();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(responseStatusCod).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -313,15 +308,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeOnlyOneSection() {
         // given
-        final ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청();
+        final JsonPath createLineResponseBody = 지하철_노선_생성_요청().jsonPath();
 
-        final long lineId = createLineResponse.jsonPath().getLong("id");
-        final long EndingStationId = createLineResponse.jsonPath().getLong("stations[1].id");
+        final long lineId = createLineResponseBody.getLong("id");
+        final long EndingStationId = createLineResponseBody.getLong("stations[1].id");
 
         // when
-        final ExtractableResponse<Response> response = 지하철_구간_제거_요청(lineId, EndingStationId);
+        final int responseStatusCod = 지하철_구간_제거_요청(lineId, EndingStationId).statusCode();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(responseStatusCod).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
