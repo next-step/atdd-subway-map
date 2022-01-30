@@ -86,19 +86,7 @@ public class Line extends BaseEntity {
 
 
     public void deleteSection(long lastDownStationId) {
-        Station lastDownStation = sections.getLastDownStation();
-
-        if (!sections.isAvailableDelete()) {
-            throw new DeleteSectionException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
-        }
-
-        if (!lastDownStation.isSameStation(lastDownStationId)) {
-            throw new DeleteSectionException("구간에 일치하는 하행 종점역이 없습니다.");
-        }
-
-        Section delete = sections.getByDownStation(lastDownStation);
-
-        sections.remove(delete);
+        sections.remove(lastDownStationId);
     }
 
     public List<StationResponse> getAllStations() {

@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.DeleteSectionException;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -18,8 +20,20 @@ public class Sections {
         sections.add(section);
     }
 
-    public void remove(Section section) {
-        sections.remove(section);
+    public void remove(long lastDownStationId) {
+        Station lastDownStation = getLastDownStation();
+
+        if (!isAvailableDelete()) {
+            throw new DeleteSectionException("구간이 1개 이하인 경우 역을 삭제할 수 없습니다.");
+        }
+
+        if (!lastDownStation.isSameStation(lastDownStationId)) {
+            throw new DeleteSectionException("구간에 일치하는 하행 종점역이 없습니다.");
+        }
+
+        Section delete = getByDownStation(lastDownStation);
+
+        sections.remove(delete);
     }
 
     public List<Section> getAllSections() {
