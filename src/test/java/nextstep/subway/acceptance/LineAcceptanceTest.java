@@ -51,11 +51,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = LineTestStep.지하철_노선_목록을_조회한다();
 
-
         // then
-        LineTestStep.지하철_노선_목록_조회_시_두_노선이_있는지_검증하기(response,
-                Arrays.asList(이호선_요청.getColor(), 신분당선_요청.getColor()),
-                Arrays.asList(이호선_요청.getName(), 신분당선_요청.getName()));
+        LineTestStep.지하철_노선_목록_조회_시_두_노선이_있는지_검증하기(response, Arrays.asList(이호선_요청, 신분당선_요청));
     }
 
     @DisplayName("지하철 노선 조회")
@@ -69,8 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineTestStep.지하철_노선을_조회한다(신분당선_생성_아이디);
 
         // then
-        LineTestStep.지하철_노선_조회_성공_검증하기(
-                response, 신분당선_생성_아이디, 신분당선_요청.getColor(), 신분당선_요청.getName());
+        LineTestStep.지하철_노선_조회_성공_검증하기(response, 신분당선_생성_아이디, 신분당선_요청);
     }
 
     @DisplayName("지하철 노선 수정")

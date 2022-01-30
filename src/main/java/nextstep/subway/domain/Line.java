@@ -49,7 +49,7 @@ public class Line extends BaseEntity {
         }
     }
 
-    private List<Station> getAllStations() {
+    public List<Station> getAllStations() {
         if (sections.isEmpty()) {
             return Collections.emptyList();
         }

@@ -7,9 +7,11 @@ import nextstep.subway.acceptance.dto.LineTestRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,12 +28,11 @@ public class LineTestStep {
     }
 
     public static LineTestRequest 지하철_노선_요청_이호선_데이터_생성하기() {
-        Long 시청역_아이디 = StationTestStep.지하철역_생성_후_아이디_추출하기("시청역");
         return LineTestRequest.builder()
                 .color("bg-green-600")
                 .name("2호선")
-                .upStationId(시청역_아이디)
-                .downStationId(시청역_아이디)
+                .upStationId(StationTestStep.지하철역_생성_후_아이디_추출하기("시청역"))
+                .downStationId(StationTestStep.지하철역_생성_후_아이디_추출하기("성수역"))
                 .distance(48)
                 .build();
     }
@@ -86,6 +87,32 @@ public class LineTestStep {
         assertThat(lineStationsList).hasSizeGreaterThan(0);
     }
 
+    public static void 지하철_노선_목록_조회_시_두_노선이_있는지_검증하기(ExtractableResponse<Response> response,
+                                                     List<LineTestRequest> lineTestRequests) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<String> lineColors = response.jsonPath().getList("color");
+        assertThat(lineColors).containsExactlyElementsOf(lineTestRequests.stream()
+                .map(LineTestRequest::getColor)
+                .collect(Collectors.toList()));
+        List<String> lineNames = response.jsonPath().getList("name");
+        assertThat(lineNames).containsExactlyElementsOf(lineTestRequests.stream()
+                .map(LineTestRequest::getName)
+                .collect(Collectors.toList()));
+
+        List<List<Integer>> lineStationsNestedIds = response.jsonPath().getList("stations.id");
+        List<Long> lineStationsIds = lineStationsNestedIds.stream()
+                .flatMap(List::stream)
+                .map(Integer::longValue)
+                .collect(Collectors.toList());
+        List<Long> expectedStationsIds = lineTestRequests.stream()
+                .map(LineTestRequest::getUpStationId).collect(Collectors.toList());
+        expectedStationsIds.addAll(lineTestRequests.stream()
+                .map(LineTestRequest::getDownStationId)
+                .collect(Collectors.toList()));
+        assertThat(lineStationsIds).containsAll(expectedStationsIds);
+    }
+
     public static ExtractableResponse<Response> 지하철_노선을_조회한다(Long id) {
         return RestAssured
                 .given().log().all()
@@ -97,14 +124,17 @@ public class LineTestStep {
     }
 
     public static void 지하철_노선_조회_성공_검증하기(ExtractableResponse<Response> response,
-                                         Long id, String color, String name) {
+                                         Long lineId, LineTestRequest lineTestRequest) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         Integer receivedId = response.jsonPath().get("id");
-        assertThat(receivedId.longValue()).isEqualTo(id);
+        assertThat(receivedId.longValue()).isEqualTo(lineId);
         String receivedColor = response.jsonPath().get("color");
-        assertThat(receivedColor).isEqualTo(color);
+        assertThat(receivedColor).isEqualTo(lineTestRequest.getColor());
         String receivedName = response.jsonPath().get("name");
-        assertThat(receivedName).isEqualTo(name);
+        assertThat(receivedName).isEqualTo(lineTestRequest.getName());
+        List<Long> receivedStationsIds = response.jsonPath().getList("stations.id", Long.class);
+        assertThat(receivedStationsIds)
+                .containsExactly(lineTestRequest.getUpStationId(), lineTestRequest.getDownStationId());
     }
 
     public static ExtractableResponse<Response> 지하철_노선을_수정한다(Long lineId, String lineColor, String lineName) {
