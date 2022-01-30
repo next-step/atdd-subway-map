@@ -44,16 +44,19 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        sections.add(section);
         section.setLine(this);
     }
 
     public void deleteSection(Long stationId) {
-        Station downEndStation = getSections().get(getSections().size() - 1).getDownStation();
-        validateDelete(stationId, downEndStation);
+        Section lastSection = sections.get(getSections().size() - 1);
+
+        validateDelete(stationId);
+        sections.remove(lastSection);
     }
 
-    private void validateDelete(Long stationId, Station downEndStation) {
+    private void validateDelete(Long stationId) {
+        Station downEndStation = sections.get(sections.size() - 1).getDownStation();
         if (!downEndStation.getId().equals(stationId)) {
             throw new BadRequestException("구간 삭제는 하행 종점역만 삭제할 수 있습니다.");
         }
