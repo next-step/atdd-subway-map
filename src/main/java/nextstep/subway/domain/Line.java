@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -49,10 +50,24 @@ public class Line extends BaseEntity {
         sections.remove(lastSection);
     }
 
+    public List<Station> getStations(){
+        List<Station> stations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        Section lastSection = sections.get(sections.size() - 1);
+        stations.add(lastSection.getDownStation());
+
+        return stations;
+    }
+
     private void verifyConnectable(Section section) {
         if (sections.isEmpty()) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
+        if(getStations().contains(section.getDownStation())){
+            throw new IllegalArgumentException("기등록된 역은 하행역으로 등록할 수 없습니다.");
+        }
+
         Section lastSection = sections.get(sections.size() - 1);
         if (!lastSection.isConnectable(section)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
