@@ -74,10 +74,6 @@ public class Line extends BaseEntity {
 		return sections.hasOnlyOneSection();
 	}
 
-	public boolean hasNoSections() {
-		return sections.isEmpty();
-	}
-
 	public boolean isLastDownStation(Station station) {
 		return sections.isLastDownStation(station);
 	}

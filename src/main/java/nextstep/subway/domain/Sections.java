@@ -19,10 +19,6 @@ public class Sections {
 	public Sections() {
 	}
 
-	public List<Section> getSections() {
-		return sections;
-	}
-
 	public boolean contains(Section section) {
 		return sections.contains(section);
 	}
@@ -38,10 +34,6 @@ public class Sections {
 
 	public boolean hasOnlyOneSection() {
 		return sections.size() == 1;
-	}
-
-	public boolean isEmpty() {
-		return sections.isEmpty();
 	}
 
 	public boolean isLastDownStation(Station station) {
