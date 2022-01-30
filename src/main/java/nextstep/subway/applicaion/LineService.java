@@ -91,9 +91,7 @@ public class LineService {
         Line line = findLine(lineId);
         Station upStation = findStation(request.getUpStationId());
         Station downStation = findStation(request.getDownStationId());
-
         Section section = Section.createAddSection(line, upStation, downStation, request.getDistance());
-        line.addSection(section);
 
         return SectionResponse.createSectionResponse(section, lineId);
     }

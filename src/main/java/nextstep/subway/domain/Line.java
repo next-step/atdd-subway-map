@@ -49,9 +49,9 @@ public class Line extends BaseEntity {
     }
 
     public void deleteSection(Long stationId) {
-        Section lastSection = sections.get(getSections().size() - 1);
-
         validateDelete(stationId);
+
+        Section lastSection = sections.get(getSections().size() - 1);
         sections.remove(lastSection);
     }
 

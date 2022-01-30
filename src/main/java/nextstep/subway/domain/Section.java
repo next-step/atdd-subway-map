@@ -48,12 +48,16 @@ public class Section extends BaseEntity {
     }
 
     public static Section createAddSection(Line line, Station upStation, Station downStation, int distance) {
-        validateDownEndStationEqualsNewUpStation(line, upStation);
+        validateDownEndStationNotEqualsNewUpStation(line, upStation);
         validateNewDownEndStationAlReadyStation(line, downStation);
-        return new Section(line, upStation, downStation, distance);
+
+        Section section = new Section(line, upStation, downStation, distance);
+        line.addSection(section);
+
+        return section;
     }
 
-    private static void validateDownEndStationEqualsNewUpStation(Line line, Station upStation) {
+    private static void validateDownEndStationNotEqualsNewUpStation(Line line, Station upStation) {
         Station downEndStation = line.getSections().get(line.getSections().size() - 1).getDownStation();
         if (!upStation.equals(downEndStation)) {
             throw new BadRequestException(String.format("등록하는 구간의 상행역이 하행 종점역과 같아야 합니다. 하행 종점역 = %s, 상행역 = %s", downEndStation.getName(), upStation.getName()));
