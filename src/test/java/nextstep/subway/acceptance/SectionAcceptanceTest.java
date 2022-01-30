@@ -24,6 +24,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     final Map<String, String> 양재역 = Map.of(이름, "양재역");
     final Map<String, String> 판교역 = Map.of(이름, "판교역");
 
+    final int distance = 100;
+
     /**
      * When 지하철 구간 생성을 요청하면
      * Then 지하철 구간 생성이 성공한다.
@@ -31,8 +33,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 구간 생성")
     @Test
     void createSection() {
-        final int distance = 100;
-
         // given
         final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
@@ -57,8 +57,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 구간 삭제")
     @Test
     void deleteSection() {
-        final int distance = 100;
-
         // given
         final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
@@ -83,8 +81,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("마지막 구간 하행 종점이 아닌 역으로 구간 삭제 요청")
     @Test
     void deleteNotLastSection() {
-        final int distance = 100;
-
         // given
         final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
@@ -110,8 +106,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간이 하나만 있을 때 삭제 요청")
     @Test
     void deleteOnlyOneSection() {
-        final int distance = 100;
-
         // given
         final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
@@ -134,8 +128,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 구간 목록 조회")
     @Test
     void getSections() {
-        final int distance = 100;
-
         final Long 광교역_번호 = StationSteps.지하철_역_생성_요청(광교역).jsonPath().getLong(번호);
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
         final Long 판교역_번호 = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
