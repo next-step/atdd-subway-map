@@ -4,11 +4,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,5 +31,20 @@ public class LineResponse {
         this.stations = stations;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+    }
+
+    public static LineResponse of(Line line) {
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(
+                        line.getAllStation().stream()
+                                .map(StationResponse::of)
+                                .collect(Collectors.toList())
+                )
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .build();
     }
 }

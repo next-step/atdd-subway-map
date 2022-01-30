@@ -14,15 +14,11 @@ public class AcceptanceTest {
     public int port;
 
     @Autowired
-    private DatabaseCleanup databaseCleanup;
+    public DatabaseCleanup databaseCleanup;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-    }
-
-    @AfterEach
-    public void cleanUp() {
         databaseCleanup.execute();
     }
 }
