@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class CommonExceptionAdvice {
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler(value = {DataIntegrityViolationException.class, IllegalUpdatingStateException.class})
     public ResponseEntity<CommonExceptionResponse> handleDataIntegrityViolationException(Exception e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new CommonExceptionResponse(e));

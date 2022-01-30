@@ -22,7 +22,7 @@ public class SectionController {
     public ResponseEntity<SectionResponse> createSection(@PathVariable Long lineId,
                                                          @RequestBody SectionRequest sectionRequest) {
         SectionResponse section = sectionService.saveSection(sectionRequest, lineId);
-        return ResponseEntity.created(URI.create("lines/" + lineId + "sections" + section.getId()))
+        return ResponseEntity.created(URI.create("lines/" + lineId + "/sections/" + section.getId()))
                 .body(section);
     }
 }

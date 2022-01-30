@@ -1,8 +1,11 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.IllegalUpdatingStateException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Line extends BaseEntity {
@@ -24,8 +27,26 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
+        checkPossibleAddingSection(section);
         section.updateLine(this);
         sections.add(section);
+    }
+
+    private void checkPossibleAddingSection(Section section) {
+        if (sections.isEmpty()) {
+            return;
+        }
+        if (Objects.equals(getLastDownStation(), section.getUpStation())) {
+            return;
+        }
+        throw new IllegalUpdatingStateException("마지막 하행선이 요청한 구간의 상행선과 동일하지 않아 구간을 추가하지 못합니다.");
+    }
+
+    private Station getLastDownStation() {
+        if (sections.isEmpty()) {
+            return null;
+        }
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
     public void update(String name, String color) {
