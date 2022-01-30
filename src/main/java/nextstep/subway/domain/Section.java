@@ -22,6 +22,16 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
+    public Section(Station upStation, Station downStation, int distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public void updateLine(Line line) {
+        this.line = line;
+    }
+
     public Long getId() {
         return id;
     }
