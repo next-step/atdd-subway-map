@@ -16,37 +16,35 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection() {
         // given
-        var stationParams = StationFixture.역삼역;
-        역_생성_요청(stationParams);
+        역_생성_요청(StationFixture.역삼역);
 
-        var lineCreateResponse = 신분당선_생성_완료();
+        var 노선_생성_응답 = 신분당선_생성_완료();
 
         // when
-        var lineUri = lineCreateResponse.header("Location");
-        var params = SectionFixture.of(2L, 3L, 10);
-        var response = 구간_등록_요청(lineUri, params);
+        var lineUri = 노선_생성_응답.header("Location");
+        var 구간1 = SectionFixture.of(2L, 3L, 10);
+        var 구간_등록_응답 = 구간_등록_요청(lineUri, 구간1);
 
         // then
-        구간_등록_성공(response);
+        구간_등록_성공(구간_등록_응답);
     }
 
     @DisplayName("지하철 노선에 구간 삭제")
     @Test
     void deleteSection() {
         // given
-        var stationParams = StationFixture.역삼역;
-        역_생성_요청(stationParams);
+        역_생성_요청(StationFixture.역삼역);
 
-        var lineCreateResponse = 신분당선_생성_완료();
-        var params = SectionFixture.of(2L, 3L, 10);
+        var 노선_생성_응답 = 신분당선_생성_완료();
+        var 구간1 = SectionFixture.of(2L, 3L, 10);
 
-        var lineUri = lineCreateResponse.header("Location");
-        구간_등록_요청(lineUri, params);
+        var lineUri = 노선_생성_응답.header("Location");
+        구간_등록_요청(lineUri, 구간1);
 
         // when
-        var response = 구간_삭제_요청(lineUri, 3L);
+        var 구간_삭제_응답 = 구간_삭제_요청(lineUri, 3L);
 
         // then
-        구간_삭제_성공(response);
+        구간_삭제_성공(구간_삭제_응답);
     }
 }

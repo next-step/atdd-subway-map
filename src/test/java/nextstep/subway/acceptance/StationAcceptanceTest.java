@@ -17,13 +17,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // given
-        var params = StationFixture.강남역;
+        var 역1 = StationFixture.강남역;
 
         // when
-        var response = 역_생성_요청(params);
+        var 역_생성_응답 = 역_생성_요청(역1);
 
         // then
-        역_생성_완료(response);
+        역_생성_완료(역_생성_응답);
     }
 
     /**
@@ -36,16 +36,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        var params1 = StationFixture.강남역;
-        역_생성_요청(params1);
+        var 역1 = StationFixture.강남역;
+        역_생성_요청(역1);
 
-        var params2 = StationFixture.역삼역;
-        역_생성_요청(params2);
+        var 역2 = StationFixture.역삼역;
+        역_생성_요청(역2);
 
         // when
-        var response = 역_목록_조회_요청();
+        var 역_목록_조회_응답 = 역_목록_조회_요청();
 
-        역_목록_조회_완료(response, params1, params2);
+        역_목록_조회_완료(역_목록_조회_응답, 역1, 역2);
     }
 
     /**
@@ -57,15 +57,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        var params = StationFixture.강남역;
-        var createResponse = 역_생성_요청(params);
+        var 역_생성_응답 = 역_생성_요청(StationFixture.강남역);
 
         // when
-        String uri = createResponse.header("Location");
-        var response = 역_삭제_요청(uri);
+        String uri = 역_생성_응답.header("Location");
+        var 역_삭제_응답 = 역_삭제_요청(uri);
 
         // then
-        역_삭제_완료(response);
+        역_삭제_완료(역_삭제_응답);
     }
 
     /**
@@ -77,14 +76,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        var params = StationFixture.강남역;
-        역_생성_요청(params);
+        var 역1 = StationFixture.강남역;
+        역_생성_요청(역1);
 
         // when
-        var response = 역_생성_요청(params);
+        var 역_생성_응답 = 역_생성_요청(역1);
 
         // then
-        중복된_역_생성_예외(response);
+        중복된_역_생성_예외(역_생성_응답);
     }
 
 }

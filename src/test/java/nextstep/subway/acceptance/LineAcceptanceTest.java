@@ -20,18 +20,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // given
-        var station1 = StationFixture.신논현역;
-        var station2 = StationFixture.강남역;
-        역_생성_요청(station1);
-        역_생성_요청(station2);
+        역_생성_요청(StationFixture.신논현역);
+        역_생성_요청(StationFixture.강남역);
 
-        var params = LineFixture.신분당선;
+        var 노선1 = LineFixture.신분당선;
 
         // when
-        var response = 노선_생성_요청(params);
+        var 노선_생성_응답 = 노선_생성_요청(노선1);
 
         // then
-        노선_생성_완료(response);
+        노선_생성_완료(노선_생성_응답);
     }
 
     /**
@@ -44,24 +42,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        var station1 = StationFixture.신논현역;
-        var station2 = StationFixture.강남역;
-        var station3 = StationFixture.역삼역;
-        역_생성_요청(station1);
-        역_생성_요청(station2);
-        역_생성_요청(station3);
+        역_생성_요청(StationFixture.신논현역);
+        역_생성_요청(StationFixture.강남역);
+        역_생성_요청(StationFixture.역삼역);
 
-        var params1 = LineFixture.신분당선;
-        노선_생성_요청(params1);
+        var 노선1 = LineFixture.신분당선;
+        노선_생성_요청(노선1);
 
-        var params2 = LineFixture.이호선;
-        노선_생성_요청(params2);
+        var 노선2 = LineFixture.이호선;
+        노선_생성_요청(노선2);
 
         // when
-        var response = LineStep.노선_목록_조회_요청();
+        var 노선_목록_조회_응답 = LineStep.노선_목록_조회_요청();
 
         // then
-        노선_목록_조회_완료(response, params1, params2);
+        노선_목록_조회_완료(노선_목록_조회_응답, 노선1, 노선2);
     }
 
     /**
@@ -73,20 +68,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        var station1 = StationFixture.신논현역;
-        var station2 = StationFixture.강남역;
-        역_생성_요청(station1);
-        역_생성_요청(station2);
+        역_생성_요청(StationFixture.신논현역);
+        역_생성_요청(StationFixture.강남역);
 
-        var params = LineFixture.신분당선;
-        var createResponse = 노선_생성_요청(params);
+        var 노선1 = LineFixture.신분당선;
+        var 노선_생성_응답 = 노선_생성_요청(노선1);
 
         // when
-        var uri = createResponse.header("Location");
-        var response = LineStep.노선_조회_요청(uri);
+        var uri = 노선_생성_응답.header("Location");
+        var 노선_조회_응답 = LineStep.노선_조회_요청(uri);
 
         // then
-        노선_조회_완료(response, params);
+        노선_조회_완료(노선_조회_응답, 노선1);
     }
 
     /**
@@ -98,22 +91,20 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        var station1 = StationFixture.신논현역;
-        var station2 = StationFixture.강남역;
-        역_생성_요청(station1);
-        역_생성_요청(station2);
+        역_생성_요청(StationFixture.신논현역);
+        역_생성_요청(StationFixture.강남역);
 
-        var params = LineFixture.신분당선;
-        var createResponse = 노선_생성_요청(params);
+        var 노선1 = LineFixture.신분당선;
+        var 노선_생성_응답 = 노선_생성_요청(노선1);
 
         // when
-        var modifyParams = LineFixture.이호선;
+        var 노선2 = LineFixture.이호선;
 
-        var uri = createResponse.header("Location");
-        var response = LineStep.노선_수정_요청(uri, modifyParams);
+        var uri = 노선_생성_응답.header("Location");
+        var 노선_수정_응답 = LineStep.노선_수정_요청(uri, 노선2);
 
         // then
-        노선_수정_완료(response, modifyParams);
+        노선_수정_완료(노선_수정_응답, 노선2);
     }
 
     /**
@@ -125,20 +116,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        var station1 = StationFixture.신논현역;
-        var station2 = StationFixture.강남역;
-        역_생성_요청(station1);
-        역_생성_요청(station2);
+        역_생성_요청(StationFixture.신논현역);
+        역_생성_요청(StationFixture.강남역);
 
-        var params = LineFixture.신분당선;
-        var createResponse = 노선_생성_요청(params);
+        var 노선1 = LineFixture.신분당선;
+        var 노선_생성_응답 = 노선_생성_요청(노선1);
 
         // when
-        var uri = createResponse.header("Location");
-        var response = 노선_삭제_요청(uri);
+        var uri = 노선_생성_응답.header("Location");
+        var 노선_삭제_응답 = 노선_삭제_요청(uri);
 
         // then
-        노선_삭제_완료(response);
+        노선_삭제_완료(노선_삭제_응답);
     }
 
     /**
@@ -150,19 +139,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        var station1 = StationFixture.신논현역;
-        var station2 = StationFixture.강남역;
-        역_생성_요청(station1);
-        역_생성_요청(station2);
+        역_생성_요청(StationFixture.신논현역);
+        역_생성_요청(StationFixture.강남역);
 
-        var params = LineFixture.신분당선;
-        노선_생성_요청(params);
+        var 노선1 = LineFixture.신분당선;
+        노선_생성_요청(노선1);
 
         // when
-        var response = 노선_생성_요청(params);
+        var 노선_생성_응답 = 노선_생성_요청(노선1);
 
         // then
-        중복된_노선_생성_예외(response);
+        중복된_노선_생성_예외(노선_생성_응답);
     }
 
 }
