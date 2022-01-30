@@ -3,14 +3,14 @@ package nextstep.subway.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.line.LineParams;
+import nextstep.subway.acceptance.station.StationParams;
 import org.springframework.http.MediaType;
 
-import java.util.Map;
-
 public class ApiUtil {
-    public static ExtractableResponse<Response> 지하철_노선_생성_API(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_생성_API(LineParams.지하철_노선_생성_파람 params) {
         return RestAssured.given().log().all()
-                .body(params)
+                .body(params.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -37,10 +37,10 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_수정_API(Long id, Map<String, String> updateParams) {
+    public static ExtractableResponse<Response> 지하철_노선_수정_API(Long id, LineParams.지하철_노선_수정_파람 updateParams) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
-                .body(updateParams)
+                .body(updateParams.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put("/lines/{id}")
@@ -58,10 +58,10 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_구간_등록_API(Long id, Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_구간_등록_API(Long id, LineParams.지하철_구간_생성_파람 params) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
-                .body(params)
+                .body(params.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/{id}/sections")
@@ -69,10 +69,10 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_API(Long id, Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_노선_구간_삭제_API(Long id, LineParams.지하철_구간_삭제_파람 params) {
         return RestAssured.given().log().all()
                 .pathParam("id", id)
-                .params(params)
+                .params(params.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .delete("/lines/{id}/sections")
@@ -80,9 +80,9 @@ public class ApiUtil {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성_API(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철역_생성_API(StationParams.지하철역_생성_파람 params) {
         return RestAssured.given().log().all()
-                .body(params)
+                .body(params.toMap())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")

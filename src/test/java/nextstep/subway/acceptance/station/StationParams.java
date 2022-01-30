@@ -1,28 +1,43 @@
 package nextstep.subway.acceptance.station;
 
-import java.util.HashMap;
-import java.util.Map;
+import lombok.Builder;
+import nextstep.subway.utils.BaseParams;
 
 public class StationParams {
-    public static Map<String, String> 연신내역;
-    public static Map<String, String> 서울역;
-    public static Map<String, String> 삼성역;
-    public static Map<String, String> 강남역;
-    public static Map<String, String> 양재역;
-    public static Map<String, String> 역삼역;
+    public static 지하철역_생성_파람 연신내역;
+    public static 지하철역_생성_파람 서울역;
+    public static 지하철역_생성_파람 삼성역;
+    public static 지하철역_생성_파람 강남역;
+    public static 지하철역_생성_파람 양재역;
+    public static 지하철역_생성_파람 역삼역;
 
     public static void 파람_초기화() {
-        연신내역 = new HashMap<>();
-        연신내역.put("name", "연신내");
-        서울역 = new HashMap<>();
-        서울역.put("name", "서울역");
-        삼성역 = new HashMap<>();
-        삼성역.put("name", "삼성역");
-        강남역 = new HashMap<>();
-        강남역.put("name", "강남역");
-        양재역 = new HashMap<>();
-        양재역.put("name", "양재역");
-        역삼역 = new HashMap<>();
-        역삼역.put("name", "역삼역");
+        연신내역 = 지하철역_생성_파람.builder()
+                .name("연신내")
+                .build();
+        서울역 = 지하철역_생성_파람.builder()
+                .name("서울역")
+                .build();
+        삼성역 = 지하철역_생성_파람.builder()
+                .name("삼성역")
+                .build();
+        강남역 = 지하철역_생성_파람.builder()
+                .name("강남역")
+                .build();
+        양재역 = 지하철역_생성_파람.builder()
+                .name("양재역")
+                .build();
+        역삼역 = 지하철역_생성_파람.builder()
+                .name("역삼역")
+                .build();
+    }
+
+    public static class 지하철역_생성_파람 extends BaseParams {
+        private final String name;
+
+        @Builder
+        지하철역_생성_파람(String name) {
+            this.name = name;
+        }
     }
 }
