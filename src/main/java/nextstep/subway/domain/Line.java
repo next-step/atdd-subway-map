@@ -1,9 +1,5 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.application.exception.DownStationInvalidException;
-import nextstep.subway.application.exception.InvalidSectionRemovalException;
-import nextstep.subway.application.exception.UpStationInvalidException;
-
 import javax.persistence.*;
 
 @Entity
@@ -52,7 +48,7 @@ public class Line extends BaseEntity {
 	}
 
 	public void addSection(Section section) {
-		validateAppendingSection(section);
+		sections.validateAppendingSection(section);
 
 		if (!sections.contains(section)) {
 			this.sections.add(section);
@@ -66,66 +62,8 @@ public class Line extends BaseEntity {
 		return sections;
 	}
 
-	public boolean hasStation(Station station) {
-		return sections.hasStation(station);
-	}
-
-	public boolean hasOnlyOneSection() {
-		return sections.hasOnlyOneSection();
-	}
-
-	public boolean isLastDownStation(Station station) {
-		return sections.isLastDownStation(station);
-	}
-
 	public void removeSection(Station toRemoveLastDownStation) {
-		validateLineHasOnlyOneSection();
-		validateStationIsLastDownStation(toRemoveLastDownStation);
-	}
-
-	/**
-	 * 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
-	 */
-	public void validateLineHasOnlyOneSection() {
-		if (hasOnlyOneSection()) {
-			throw new InvalidSectionRemovalException(this);
-		}
-	}
-
-	/**
-	 * 지하철 노선에 등록된 마지막 역(하행 종점역)만 제거할 수 있다.
-	 */
-	public void validateStationIsLastDownStation(Station toRemoveStation) {
-		if (!sections.isLastDownStation(toRemoveStation)) {
-			throw new InvalidSectionRemovalException(toRemoveStation);
-		}
-		sections.removeSectionOfLastDownStation(toRemoveStation);
-	}
-
-	private void validateAppendingSection(Section section) {
-		if (sections.hasNoSection()) {
-			return;
-		}
-		validateAppendingDownStation(section.getDownStation());
-		validateAppendingUpStation(section.getUpStation());
-	}
-
-	/**
-	 * 새로운 구간의 하행역은 등록될 노선에 등록되어 있는 역일 수 없다.
-	 */
-	private void validateAppendingDownStation(Station downStation) {
-		if (hasStation(downStation)) {
-			throw new DownStationInvalidException(downStation.getName());
-		}
-	}
-
-	/**
-	 * 새로운 구간의 상행역은 등록될 노선의 하행 종점역이어야 한다.
-	 */
-	public void validateAppendingUpStation(Station upStation) {
-		if (!isLastDownStation(upStation)) {
-			throw new UpStationInvalidException(upStation.getName());
-		}
+		sections.removeSection(toRemoveLastDownStation);
 	}
 
 	public Section getLastSection() {

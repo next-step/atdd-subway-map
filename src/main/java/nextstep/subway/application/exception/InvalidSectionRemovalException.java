@@ -1,14 +1,13 @@
 package nextstep.subway.application.exception;
 
-import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
 
 import static java.lang.String.format;
 
 public class InvalidSectionRemovalException extends BadRequestException {
 
-	public InvalidSectionRemovalException(Line line) {
-		super(format("line (%s) has only one section", line.getName()));
+	public InvalidSectionRemovalException() {
+		super("line has only one section");
 	}
 
 	public InvalidSectionRemovalException(Station station) {
