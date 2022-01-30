@@ -1,19 +1,13 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import nextstep.subway.acceptance.step.StationStep;
-import nextstep.subway.fixture.LineFixture;
 import nextstep.subway.acceptance.step.LineStep;
+import nextstep.subway.fixture.LineFixture;
 import nextstep.subway.fixture.StationFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.acceptance.step.LineStep.*;
+import static nextstep.subway.acceptance.step.StationStep.역_생성_요청;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -28,13 +22,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         var station1 = StationFixture.신논현역;
         var station2 = StationFixture.강남역;
-        StationStep.역_생성_요청(station1);
-        StationStep.역_생성_요청(station2);
+        역_생성_요청(station1);
+        역_생성_요청(station2);
 
         var params = LineFixture.신분당선;
 
         // when
-        var response = LineStep.노선_생성_요청(params);
+        var response = 노선_생성_요청(params);
 
         // then
         노선_생성_완료(response);
@@ -53,15 +47,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         var station1 = StationFixture.신논현역;
         var station2 = StationFixture.강남역;
         var station3 = StationFixture.역삼역;
-        StationStep.역_생성_요청(station1);
-        StationStep.역_생성_요청(station2);
-        StationStep.역_생성_요청(station3);
+        역_생성_요청(station1);
+        역_생성_요청(station2);
+        역_생성_요청(station3);
 
         var params1 = LineFixture.신분당선;
-        LineStep.노선_생성_요청(params1);
+        노선_생성_요청(params1);
 
         var params2 = LineFixture.이호선;
-        LineStep.노선_생성_요청(params2);
+        노선_생성_요청(params2);
 
         // when
         var response = LineStep.노선_목록_조회_요청();
@@ -81,11 +75,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         var station1 = StationFixture.신논현역;
         var station2 = StationFixture.강남역;
-        StationStep.역_생성_요청(station1);
-        StationStep.역_생성_요청(station2);
+        역_생성_요청(station1);
+        역_생성_요청(station2);
 
         var params = LineFixture.신분당선;
-        var createResponse = LineStep.노선_생성_요청(params);
+        var createResponse = 노선_생성_요청(params);
 
         // when
         var uri = createResponse.header("Location");
@@ -106,11 +100,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         var station1 = StationFixture.신논현역;
         var station2 = StationFixture.강남역;
-        StationStep.역_생성_요청(station1);
-        StationStep.역_생성_요청(station2);
+        역_생성_요청(station1);
+        역_생성_요청(station2);
 
         var params = LineFixture.신분당선;
-        var createResponse = LineStep.노선_생성_요청(params);
+        var createResponse = 노선_생성_요청(params);
 
         // when
         var modifyParams = LineFixture.이호선;
@@ -133,18 +127,18 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         var station1 = StationFixture.신논현역;
         var station2 = StationFixture.강남역;
-        StationStep.역_생성_요청(station1);
-        StationStep.역_생성_요청(station2);
+        역_생성_요청(station1);
+        역_생성_요청(station2);
 
         var params = LineFixture.신분당선;
-        var createResponse = LineStep.노선_생성_요청(params);
+        var createResponse = 노선_생성_요청(params);
 
         // when
         var uri = createResponse.header("Location");
-        var response = LineStep.노선_삭제_요청(uri);
+        var response = 노선_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        노선_삭제_완료(response);
     }
 
     /**
@@ -158,41 +152,17 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         var station1 = StationFixture.신논현역;
         var station2 = StationFixture.강남역;
-        StationStep.역_생성_요청(station1);
-        StationStep.역_생성_요청(station2);
+        역_생성_요청(station1);
+        역_생성_요청(station2);
 
         var params = LineFixture.신분당선;
-        var createResponse = LineStep.노선_생성_요청(params);
+        노선_생성_요청(params);
 
         // when
-        var response = LineStep.노선_생성_요청(params);
+        var response = 노선_생성_요청(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        중복된_노선_생성_예외(response);
     }
 
-    private void 노선_생성_완료(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
-    }
-
-    private void 노선_목록_조회_완료(ExtractableResponse<Response> response, Map<String, Object>... paramsArgs) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        var lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).contains(Arrays.stream(paramsArgs).map(m -> m.get("name")).toArray());
-    }
-
-    private void 노선_조회_완료(ExtractableResponse<Response> response, Map<String, Object> params) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        var lineName = response.jsonPath().getString("name");
-        var stations = response.jsonPath().getList("stations");
-        assertThat(lineName).isEqualTo(params.get("name"));
-        assertThat(stations.size()).isEqualTo(2);
-    }
-
-    private void 노선_수정_완료(ExtractableResponse<Response> response, Map<String, Object> modifyParams) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        var lineName = response.jsonPath().getString("name");
-        assertThat(lineName).isEqualTo(modifyParams.get("name"));
-    }
 }

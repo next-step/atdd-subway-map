@@ -41,16 +41,15 @@ public class LineService {
         }
 
         var section = new Section(
-                stationRepository.findById(requestUpStationId).orElseThrow(),
-                stationRepository.findById(requestDownStationId).orElseThrow(),
+                stationRepository.findById(requestUpStationId)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + requestUpStationId)),
+                stationRepository.findById(requestDownStationId)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + requestDownStationId)),
                 distance
         );
 
-        var line = new Line(requestName, requestColor);
-        Line savedLine = lineRepository.save(line);
-
-        section.setLine(savedLine);
-        line.getSections().add(section);
+        var savedLine = lineRepository.save(new Line(requestName, requestColor));
+        savedLine.init(section);
 
         return LineResponse.of(savedLine);
     }
@@ -93,7 +92,7 @@ public class LineService {
         var distance = sectionRequest.getDistance();
 
         var upStation = stationRepository.findById(upStationId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + upStationId ));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + upStationId));
         var downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 역 id: " + downStationId));
 

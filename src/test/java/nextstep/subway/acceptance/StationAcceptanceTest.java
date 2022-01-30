@@ -1,18 +1,10 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import nextstep.subway.fixture.StationFixture;
-import nextstep.subway.acceptance.step.StationStep;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.acceptance.step.StationStep.*;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -28,7 +20,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         var params = StationFixture.강남역;
 
         // when
-        var response = StationStep.역_생성_요청(params);
+        var response = 역_생성_요청(params);
 
         // then
         역_생성_완료(response);
@@ -45,13 +37,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         var params1 = StationFixture.강남역;
-        var createResponse1 = StationStep.역_생성_요청(params1);
+        역_생성_요청(params1);
 
         var params2 = StationFixture.역삼역;
-        var createResponse2 = StationStep.역_생성_요청(params2);
+        역_생성_요청(params2);
 
         // when
-        var response = StationStep.역_목록_조회_요청();
+        var response = 역_목록_조회_요청();
 
         역_목록_조회_완료(response, params1, params2);
     }
@@ -66,14 +58,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     void deleteStation() {
         // given
         var params = StationFixture.강남역;
-        var createResponse = StationStep.역_생성_요청(params);
+        var createResponse = 역_생성_요청(params);
 
         // when
         String uri = createResponse.header("Location");
-        var response = StationStep.역_삭제_요청(uri);
+        var response = 역_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        역_삭제_완료(response);
     }
 
     /**
@@ -86,23 +78,13 @@ class StationAcceptanceTest extends AcceptanceTest {
     void createStationWithDuplicateName() {
         // given
         var params = StationFixture.강남역;
-        var createResponse = StationStep.역_생성_요청(params);
+        역_생성_요청(params);
 
         // when
-        var response = StationStep.역_생성_요청(params);
+        var response = 역_생성_요청(params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        중복된_역_생성_예외(response);
     }
 
-    private void 역_생성_완료(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
-    }
-
-    private void 역_목록_조회_완료(ExtractableResponse<Response> response, Map<String, String>... paramsArgs) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(Arrays.stream(paramsArgs).map(m -> m.get("name")).toArray(String[]::new));
-    }
 }
