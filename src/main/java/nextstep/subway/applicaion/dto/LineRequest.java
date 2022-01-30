@@ -3,15 +3,15 @@ package nextstep.subway.applicaion.dto;
 public class LineRequest {
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Integer distance;
+    private long upStationId;
+    private long downStationId;
+    private int distance;
 
     public LineRequest() {
 
     }
 
-    private LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    private LineRequest(String name, String color, long upStationId, long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -27,15 +27,15 @@ public class LineRequest {
         return color;
     }
 
-    public Long getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 
@@ -43,9 +43,9 @@ public class LineRequest {
     public static class Builder {
         private String name;
         private String color;
-        private Long upStationId;
-        private Long downStationId;
-        private Integer distance;
+        private long upStationId;
+        private long downStationId;
+        private int distance;
 
         public Builder name(String name) {
             this.name = name;
@@ -75,9 +75,9 @@ public class LineRequest {
         public LineRequest build() {
             if (name == null
                     || color == null
-                    || upStationId == null
-                    || downStationId == null
-                    || distance == null) {
+                    || upStationId == 0
+                    || downStationId == 0
+                    || distance == 0) {
                 throw new IllegalArgumentException("Cannot create LineRequest");
             }
 

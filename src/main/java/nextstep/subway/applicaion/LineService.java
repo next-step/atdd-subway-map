@@ -45,14 +45,14 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
-        final Line foundLine = lineRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(id));
+        final Line foundLine = lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(id));
         return createLineResponse(foundLine);
     }
 
     public LineResponse editLineById(long id, @RequestBody LineRequest lineRequest) {
-        Line foundLine = lineRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(id));
+        Line foundLine = lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(id));
         foundLine.updateLine(lineRequest.getName(), lineRequest.getColor());
         final Line savedLine = lineRepository.save(foundLine);
         return createLineResponse(savedLine);

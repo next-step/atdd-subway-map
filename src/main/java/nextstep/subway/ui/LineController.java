@@ -38,12 +38,12 @@ public class LineController {
     }
 
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> getLine(@PathVariable long id) {
         return ResponseEntity.ok().body(lineService.findLineById(id));
     }
 
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> editLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> editLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
         try {
             return ResponseEntity.ok().body(lineService.editLineById(id, lineRequest));
         } catch (IllegalArgumentException e) {
@@ -54,7 +54,7 @@ public class LineController {
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
