@@ -9,6 +9,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
@@ -77,5 +78,22 @@ public class Sections {
                 .ifPresent(s -> {
                     throw new InvalidDownStationException(station.getName());
                 });
+    }
+
+    public List<Station> getStations() {
+        List<Station> stations = new ArrayList<>();
+        stations.add(getFirstStation());
+        stations.addAll(
+                sections.stream()
+                        .map(Section::getDownStation)
+                        .collect(Collectors.toList())
+        );
+
+        return stations;
+    }
+
+    private Station getFirstStation() {
+        return sections.get(0)
+                .getUpStation();
     }
 }
