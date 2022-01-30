@@ -36,8 +36,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
-        ExtractableResponse<Response> createResponse1 = 지하철역_생성_요청(강남역);
-        ExtractableResponse<Response> createResponse2 = 지하철역_생성_요청(역삼역);
+        지하철역_생성_요청(강남역);
+        지하철역_생성_요청(역삼역);
         ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
         assertThat(response.statusCode()).isEqualTo(OK.value());
         assertThat(response.jsonPath().getList("name")).contains(강남역, 역삼역);
@@ -64,7 +64,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철역 생성")
     @Test
     void createDuplicateStation()  {
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
+        지하철역_생성_요청(강남역);
         ExtractableResponse<Response> failResponse = 지하철역_생성_요청(강남역);
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
     }

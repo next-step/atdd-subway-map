@@ -3,8 +3,6 @@ package nextstep.subway.domain;
 import nextstep.subway.applicaion.dto.LineRequest;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
@@ -14,14 +12,16 @@ public class Line extends BaseEntity {
     @Column(unique = true)
     private String name;
     private String color;
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
-    public Line() {
+    protected Line() {
     }
 
-    public static Line of(final LineRequest lineRequest) {
-        return new Line(lineRequest.getName(), lineRequest.getColor());
+    public static Line of(final LineRequest lineRequest, final Station upStation, final Station downStation, int distance) {
+        Line newLine = new Line(lineRequest.getName(), lineRequest.getColor());
+        newLine.sections.addFirst(Section.of(newLine, upStation, downStation, distance));
+        return newLine;
     }
 
     private Line(String name, String color) {
@@ -32,6 +32,14 @@ public class Line extends BaseEntity {
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+    }
+
+    public void removeSection(Long stationId) {
+        this.sections.remove(stationId);
     }
 
     public Long getId() {
@@ -46,7 +54,7 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 }

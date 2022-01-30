@@ -16,18 +16,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public final class LineEntitiesHelper {
 
     private static final String REQUEST_URI = "/lines";
-    public static final Line 이호선 = Line.builder()
-            .name("이호선")
-            .color("bg-green-600")
-            .build();
-    public static final Line 신분당선 = Line.builder()
-            .name("신분당선")
-            .color("bg-red-600")
-            .build();
 
-    public static ExtractableResponse<Response> 노선_생성_요청(Line line) {
+    public static ExtractableResponse<Response> 노선_생성_요청(Map<String, Object> params) {
         return RestAssured.given().log().all()
-                .body(newLine(line))
+                .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(REQUEST_URI)
@@ -51,9 +43,9 @@ public final class LineEntitiesHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 노선_수정_요청(Line line, String uri) {
+    public static ExtractableResponse<Response> 노선_수정_요청(Map<String, Object> params, String uri) {
         return RestAssured.given().log().all()
-                .body(newLine(line))
+                .body(params)
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
                 .put(uri)
@@ -69,10 +61,13 @@ public final class LineEntitiesHelper {
                 .extract();
     }
 
-    private static Map<String, Object> newLine(Line line) {
+    public static Map<String, Object> newLine(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, Object> params = new HashMap<>();
-        params.put("name", line.getName());
-        params.put("color", line.getColor());
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
         return params;
     }
 }

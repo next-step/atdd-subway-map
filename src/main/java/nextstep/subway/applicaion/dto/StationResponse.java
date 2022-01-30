@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
@@ -24,10 +25,10 @@ public class StationResponse {
         );
     }
 
-    public static List<StationResponse> toStations(final List<Section> sections) {
+    public static List<StationResponse> toStations(final Sections sections) {
         List<Station> stations = Stream.concat(
-                sections.stream().map(Section::getUpStation),
-                sections.stream().map(Section::getDownStation)
+                sections.getSections().stream().map(Section::getUpStation),
+                sections.getSections().stream().map(Section::getDownStation)
         ).distinct().collect(Collectors.toList());
 
         return stations.stream()
