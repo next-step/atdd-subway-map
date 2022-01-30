@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.step.CommonSteps;
 import nextstep.subway.acceptance.step.LineSteps;
 import nextstep.subway.acceptance.step.StationSteps;
 import org.junit.jupiter.api.DisplayName;
@@ -87,7 +88,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> searchResponse = LineSteps.지하철_노선_조회_요청();
 
         // then
-        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        CommonSteps.요청_성공(searchResponse.statusCode());
 
         List<String> lineNames = searchResponse.jsonPath().getList(이름);
         assertThat(lineNames).contains("신분당선", "2호선");
@@ -111,7 +112,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> searchResponse = LineSteps.지하철_노선_조회_요청(uri);
 
         // then
-        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        CommonSteps.요청_성공(searchResponse.statusCode());
 
     }
 
@@ -137,7 +138,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_수정_요청(uri, params);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        CommonSteps.요청_성공(response.statusCode());
     }
 
     /**
@@ -158,6 +159,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = LineSteps.지하철_노선_삭제_요청(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        CommonSteps.요청_성공_컨텐츠_미제공(response.statusCode());
     }
 }

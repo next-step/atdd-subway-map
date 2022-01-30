@@ -2,13 +2,13 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.step.CommonSteps;
 import nextstep.subway.acceptance.step.LineSteps;
 import nextstep.subway.acceptance.step.SectionSteps;
 import nextstep.subway.acceptance.step.StationSteps;
 import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        CommonSteps.생성_성공(createResponse.statusCode());
         assertThat(createResponse.header("Location")).isNotBlank();
     }
 
@@ -62,15 +62,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
         final Long 판교역_번호 = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
 
-        // when
+
         final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
                 .jsonPath().getLong(번호);
 
         SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
 
+        // when
         ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 판교역_번호);
 
-        assertThat(deleteReponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        //then
+        CommonSteps.요청_성공_컨텐츠_미제공(deleteReponse.statusCode());
     }
 
     /**
@@ -86,15 +88,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final Long 양재역_번호 = StationSteps.지하철_역_생성_요청(양재역).jsonPath().getLong(번호);
         final Long 판교역_번호 = StationSteps.지하철_역_생성_요청(판교역).jsonPath().getLong(번호);
 
-        // when
         final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
                 .jsonPath().getLong(번호);
 
         SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
 
+        // when
         ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 광교역_번호);
 
-        assertThat(deleteReponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        // then
+        CommonSteps.잘못된_데이터_전달로_실패(deleteReponse.statusCode());
     }
 
 
@@ -116,7 +119,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 양재역_번호);
 
-        assertThat(deleteReponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        // then
+        CommonSteps.잘못된_데이터_전달로_실패(deleteReponse.statusCode());
     }
 
     /**
@@ -141,7 +145,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> searchResponse = SectionSteps.지하철_구간_조회_요청(lineId);
 
         // then
-        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        CommonSteps.요청_성공(searchResponse.statusCode());
 
         List<String> stationNames = searchResponse.jsonPath().getList("stations", Station.class)
                 .stream()

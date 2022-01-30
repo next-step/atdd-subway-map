@@ -2,10 +2,10 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.step.CommonSteps;
 import nextstep.subway.acceptance.step.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = StationSteps.지하철_역_생성_요청(강남역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        CommonSteps.생성_성공(response.statusCode());
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -47,7 +47,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = StationSteps.지하철_역_생성_요청(강남역);
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        CommonSteps.데이터_기존재로_실패(createResponse.statusCode());
     }
 
     /**
@@ -66,7 +66,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> searchResponse = StationSteps.지하철_역_조회_요청();
 
-        assertThat(searchResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        CommonSteps.요청_성공(searchResponse.statusCode());
         List<String> stationNames = searchResponse.jsonPath().getList(이름);
         assertThat(stationNames).contains(강남역.get(이름), 역삼역.get(이름));
     }
@@ -87,6 +87,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> deleteResponse = StationSteps.지하철_역_삭제_요청(uri);
 
         // then
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        CommonSteps.요청_성공_컨텐츠_미제공(deleteResponse.statusCode());
     }
 }
