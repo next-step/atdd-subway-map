@@ -39,6 +39,10 @@ public class Sections {
         return last().getDownStation();
     }
 
+    public Long lastDownStationId() {
+        return last().getDownStationId();
+    }
+
     public boolean equalsLastDownStation(Station upStation) {
         return this.lastDownStation().equals(upStation);
     }
@@ -76,19 +80,19 @@ public class Sections {
         return !checkDuplicatedDownStation(section.getDownStation());
     }
 
-    public void removeLastSection(Station station) {
-        if (!validateRemoveSection(station)) {
+    public void removeLastSection(Long stationId) {
+        if (!validateRemoveSection(stationId)) {
             throw new InvalidParameterException();
         }
         this.values.remove(last());
     }
 
-    public boolean validateRemoveSection(Station station) {
+    public boolean validateRemoveSection(Long stationId) {
         if (isSmallerMinimumSize()) {
             return false;
         }
 
-        return lastDownStation().equals(station);
+        return lastDownStationId().equals(stationId);
     }
 
 

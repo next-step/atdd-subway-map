@@ -90,10 +90,9 @@ public class LineService {
         line.addSection(upStation, downStation, request.getDistance());
     }
 
-    public void deleteSection(Long id, long stationId) {
-        Station station = stationService.findById(stationId);
+    public void deleteSection(Long id, Long stationId) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        line.removeSection(station);
+        line.removeSection(stationId);
     }
 }

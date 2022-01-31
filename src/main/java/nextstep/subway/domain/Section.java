@@ -57,6 +57,10 @@ public class Section extends BaseEntity {
         return downStation;
     }
 
+    public Long getDownStationId() {
+        return downStation.getId();
+    }
+
     public Distance getDistance() {
         return distance;
     }
