@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.StationAcceptanceTest.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -23,7 +24,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-
+        //given
+        지하철_역_생성_요청("강남");
+        지하철_역_생성_요청("역삼");
         // when
         ExtractableResponse response = 지하철_노선_생성_요청("신분당선", "bg-red-600",
                 1L, 2L, 10);
@@ -156,8 +159,42 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * When 지하철 구간 생성을 요청하면
+     * Then 지하철 구간 생성을 한다.
+     */
+    @DisplayName("지하철 구간 생성")
+    @Test
+    void addSection() {
+
+        // given
+        지하철_역_생성_요청("강남");
+        지하철_역_생성_요청("역삼");
+        지하철_역_생성_요청("건대");
+
+        지하철_노선_생성_요청("2호선", "green", 1L, 2L, 10);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", "2");
+        params.put("downStationId", "3");
+        params.put("distance", "20");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
     public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId,
                                                       Long downStationId, int distance) {
+
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -169,7 +206,8 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
+                .when()
+                .post("/lines")
                 .then().log().all().extract();
     }
 }
