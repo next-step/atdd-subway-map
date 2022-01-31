@@ -15,4 +15,16 @@ public class SubwayException {
 			super(message, code);
 		}
 	}
+
+	public static class NotFoundException extends BusinessException {
+		private static final String DEFAULT_ERROR_MESSAGE = "Can not found";
+
+		public NotFoundException() {
+			super(DEFAULT_ERROR_MESSAGE, HttpStatus.NO_CONTENT.value());
+		}
+
+		public NotFoundException(String message, int code) {
+			super(message, code);
+		}
+	}
 }

@@ -1,17 +1,12 @@
 package nextstep.subway.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import nextstep.subway.applicaion.dto.LineRequest;
 
 @Entity
 public class Line extends BaseEntity {
@@ -48,4 +43,14 @@ public class Line extends BaseEntity {
         this.name = name;
         this.color = color;
     }
+
+    public void addStationToSection(Station upStation, Station downStation, int distance) {
+        Section section = new Section(this, upStation, downStation, distance);
+        sections.add(section);
+    }
+
+    public List<Station> getStations(){
+        return this.sections.getStations();
+    }
+
 }

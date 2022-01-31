@@ -10,7 +10,7 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Sections {
 
-	@OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "line", cascade = {CascadeType.ALL})
 	private List<Section> sections = new ArrayList<>();
 
 	public Sections() {
@@ -22,5 +22,20 @@ public class Sections {
 
 	public void remove(Section section) {
 		this.sections.remove(section);
+	}
+
+	public void addAll(Section upSection, Section downSection) {
+		this.sections.add(upSection);
+		this.sections.add(downSection);
+	}
+
+	public List<Station> getStations(){
+		List<Station> stations = new ArrayList<>();
+		for (Section section : sections){
+			stations.add(section.getUpStation());
+			stations.add(section.getDownStation());
+		}
+
+		return stations;
 	}
 }
