@@ -6,13 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import java.util.List;
+
+import static nextstep.subway.acceptance.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String STATION_NAME_01 = "강남역";
-    private static final String STATION_NAME_02 = "역삼역";
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
 
     /**
      * When 지하철역 생성을 요청 하면
@@ -22,8 +24,7 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> createResponse =
-                StationSteps.지하철역_생성_요청(STATION_NAME_01);
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -40,16 +41,16 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         /// given
-        StationSteps.지하철역_생성_요청(STATION_NAME_01);
-        StationSteps.지하철역_생성_요청(STATION_NAME_02);
+        지하철역_생성_요청(강남역);
+        지하철역_생성_요청(역삼역);
 
         // when
-        ExtractableResponse<Response> getResponse = StationSteps.지하철역_조회_요청();
+        ExtractableResponse<Response> getResponse = 지하철역_조회_요청();
 
         // then
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = getResponse.jsonPath().getList("name");
-        assertThat(stationNames).contains(STATION_NAME_01, STATION_NAME_02);
+        assertThat(stationNames).contains(강남역, 역삼역);
     }
 
     /**
@@ -61,12 +62,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse =
-                StationSteps.지하철역_생성_요청(STATION_NAME_01);
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(강남역);
 
         // when
-        ExtractableResponse<Response> deleteResponse =
-                StationSteps.지하철역_삭제_요청(createResponse.header("Location"));
+        ExtractableResponse<Response> deleteResponse = 지하철역_삭제_요청(createResponse.header("Location"));
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -81,11 +80,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateStation() {
         // given
-        StationSteps.지하철역_생성_요청(STATION_NAME_01);
+        지하철역_생성_요청(강남역);
 
         // when
-        ExtractableResponse<Response> duplicateResponse =
-                StationSteps.지하철역_생성_요청(STATION_NAME_01);
+        ExtractableResponse<Response> duplicateResponse = 지하철역_생성_요청(강남역);
 
         // then
         assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
