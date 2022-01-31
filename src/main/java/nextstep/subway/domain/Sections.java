@@ -50,6 +50,7 @@ public class Sections {
         Section lastSection = getLastSection();
         validateIsExistSection(lastSection);
         validateLastSection(lastSection, stationId);
+        validateMinimumSizeOfSection();
         sections.remove(lastSection);
     }
 
@@ -62,6 +63,12 @@ public class Sections {
     private void validateLastSection(Section lastSection, Long stationId) {
         if(lastSection.getDownStation().getId() != stationId) {
             throw new ValidationException("마지막 구간의 하행 종점역이 아닙니다.");
+        }
+    }
+
+    private void validateMinimumSizeOfSection() {
+        if(sections.size() <= DELETION_MINIMUM_SIZE) {
+            throw new ValidationException("구간이 1개 이하인 경우 삭제할 수 없습니다.");
         }
     }
 
