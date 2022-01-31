@@ -13,6 +13,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 public class StationSteps {
 	private static Map<String, StationRequest> initDataMap = new HashMap<String, StationRequest>(){
 		{
+			put("교대역", new StationRequest("교대역"));
 			put("강남역", new StationRequest("강남역"));
 			put("역삼역", new StationRequest("역삼역"));
 		}
@@ -70,5 +71,22 @@ public class StationSteps {
 
 	public static StationRequest 지하철역_데이터(String name) {
 		return new StationRequest(initDataMap.getOrDefault(name, initDataMap.get("강남역")));
+	}
+
+	public enum Station {
+		교대역("교대역"),
+		강남역("강남역"),
+		역삼역("역삼역")
+		;
+
+		private String name;
+
+		Station(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
 	}
 }

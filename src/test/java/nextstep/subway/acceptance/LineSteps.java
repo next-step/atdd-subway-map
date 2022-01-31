@@ -15,6 +15,7 @@ public class LineSteps {
 	private static Map<String, LineRequest> initDataMap = new HashMap<String, LineRequest>() {
 		{
 			put("신분당선", new LineRequest("신분당선", "bg-red-600"));
+			put("1호선", new LineRequest("1호선", "bg-blue-600"));
 			put("2호선", new LineRequest("2호선", "bg-green-600"));
 		}
 	};
@@ -70,5 +71,22 @@ public class LineSteps {
 
 	public static LineRequest 노선_데이터(String name) {
 		return new LineRequest(initDataMap.getOrDefault(name, initDataMap.get("신분당선")));
+	}
+
+	public enum Line {
+		신분당선("신분당선"),
+		일호선("1호선"),
+		이호선("2호선")
+		;
+
+		private String name;
+
+		Line(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
 	}
 }

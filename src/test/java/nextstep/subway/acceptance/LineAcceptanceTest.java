@@ -15,10 +15,10 @@ import nextstep.subway.applicaion.dto.LineRequest;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    private final String 신분당선 = "신분당선";
-    private final String 이호선 = "2호선";
+    private final String 신분당선 = LineSteps.Line.신분당선.getName();
+    private final String 이호선 = LineSteps.Line.이호선.getName();
 
-    /**
+    /**`
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
      */

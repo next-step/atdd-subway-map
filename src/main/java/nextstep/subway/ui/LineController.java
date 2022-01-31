@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 
 @RestController
 @RequestMapping("/lines")
