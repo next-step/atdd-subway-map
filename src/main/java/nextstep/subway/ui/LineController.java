@@ -47,7 +47,7 @@ public class LineController extends BaseController {
     }
 
     @PostMapping(value = "/{id}/sections")
-    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @RequestBody LineRequest lineRequest) throws Exception {
+    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.addSection(id, lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId() + "/sections")).body(line);
     }

@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.exception.ValidationException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class Sections {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
+    private int DELETION_MINIMUM_SIZE = 1;
 
     public Sections() {
     }
@@ -45,7 +47,22 @@ public class Sections {
     }
 
     public void deleteSection(Long stationId) {
-        sections.removeIf(s -> (s.getDownStation().getId() == stationId));
+        Section lastSection = getLastSection();
+        validateIsExistSection(lastSection);
+        validateLastSection(lastSection, stationId);
+        sections.remove(lastSection);
+    }
+
+    private void validateIsExistSection(Section lastSection) {
+        if(lastSection == null) {
+            throw new ValidationException("구간이 존재하지 않습니다.");
+        }
+    }
+
+    private void validateLastSection(Section lastSection, Long stationId) {
+        if(lastSection.getDownStation().getId() != stationId) {
+            throw new ValidationException("마지막 구간의 하행 종점역이 아닙니다.");
+        }
     }
 
 }

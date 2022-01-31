@@ -76,7 +76,7 @@ public class LineService {
         return line.isPresent();
     }
 
-    public LineResponse addSection(Long id, LineRequest request) throws Exception {
+    public LineResponse addSection(Long id, LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
         saveSection(line, request);
         return createLineResponse(line);
