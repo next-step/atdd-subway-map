@@ -3,12 +3,14 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.LineAcceptanceUtil.*;
+import static nextstep.subway.acceptance.SectionAcceptanceUtil.지하철_구간_등록_요청;
 import static nextstep.subway.acceptance.StationAcceptanceUtil.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -70,12 +72,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         ExtractableResponse<Response> response = 지하철_노선_생성_요청(new LineRequest("신분당선", "bg-red-600", 4L, 2L, 10));
+        String lineLocation = response.header("location");
+        지하철_구간_등록_요청(lineLocation, new SectionRequest("3", "2", 10));
+
         // when
         ExtractableResponse<Response> response2 = 지하철_특정_노선_조회_요청(response);
 
         // then
-        assertThat(response2.jsonPath()
-                            .getString("name")).isEqualTo("신분당선");
+        assertAll(
+                () -> assertThat(response2.jsonPath()
+                                          .getString("name")).isEqualTo("신분당선"),
+                () -> assertThat(response2.jsonPath()
+                                          .getList("stations.name")).containsExactly("신촌역", "강남역", "부평역")
+        );
     }
 
     /**

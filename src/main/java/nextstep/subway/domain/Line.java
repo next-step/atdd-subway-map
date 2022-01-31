@@ -58,8 +58,12 @@ public class Line extends BaseEntity {
         List<Station> stations = new ArrayList<>();
 
         for (Section s : sectionList) {
-            stations.add(s.getUpStation());
-            stations.add(s.getDownStation());
+            if(!stations.contains(s.getUpStation())) {
+                stations.add(s.getUpStation());
+            }
+            if(!stations.contains(s.getDownStation())) {
+                stations.add(s.getDownStation());
+            }
         }
 
         return stations;
