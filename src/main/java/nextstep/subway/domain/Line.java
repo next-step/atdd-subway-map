@@ -50,7 +50,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return Collections.unmodifiableList(sections);
+        return sections;
     }
 
     public void addSection(Section section) {

@@ -51,4 +51,10 @@ public class LineModifyController {
         sectionUpdateService.addSection(id, sectionRequest);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId){
+        sectionUpdateService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

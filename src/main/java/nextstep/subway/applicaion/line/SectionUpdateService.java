@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.line;
 
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.line.LineModifyService;
 import nextstep.subway.applicaion.station.StationReadService;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
@@ -28,5 +29,10 @@ public class SectionUpdateService {
     Station downStation = stationReadService.findSpecificStation(sectionRequest.getDownStationId());
     Section section = new Section(upStation, downStation, sectionRequest.getDistance());
     lineModifyService.addSection(id, section);
+  }
+
+  public void deleteSection(Long id, Long stationId){
+    Station downStation = stationReadService.findSpecificStation(stationId);
+    lineModifyService.deleteSection(id, stationId);
   }
 }

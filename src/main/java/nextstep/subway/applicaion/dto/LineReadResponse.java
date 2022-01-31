@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.domain.Line;
@@ -17,7 +18,7 @@ public class LineReadResponse extends BaseLineResponse {
             LocalDateTime createdDate,
             LocalDateTime modifiedDate) {
         super(id, name, color, createdDate, modifiedDate);
-        this.stations = stations;
+        this.stations = Collections.unmodifiableList(stations);
     }
 
     public static LineReadResponse of(Line line) {
