@@ -25,6 +25,7 @@ public class LineCreationService {
 
     @Transactional
     public LineCreateResponse saveLine(LineRequest lineRequest) {
+        // TODO Validation 코드들 공통 부분은 클래스로 빼기
         // Not null Validation
         Objects.nonNull(lineRequest.getUpStationId());
         Objects.nonNull(lineRequest.getDownStationId());

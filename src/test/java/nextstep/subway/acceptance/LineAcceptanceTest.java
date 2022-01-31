@@ -203,7 +203,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(duplicateCreationResponse.statusCode())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+                .isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     @DisplayName("노선에 구간 추가")
@@ -250,32 +250,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    @DisplayName("노선에 구간 추가 실패")
-    @Test
-    void addFailedNewStationSectionTest() {
-        // given
-        // 노선을 생성하고 해당 노선에 종점역을 추가한 후
-        ExtractableResponse<Response> createFirstStationResponse =
-          StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-          StationRequest.stationCreateRequest("역삼역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> response =
-          lineCreateRequest(
-            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
-
-
-        // when
-        // 해당 노선의 상행 종점에 구간 추가를 요청하면
-
-
-        // then
-        // 구간 추가가 실패한다.
-    }
-
     @DisplayName("노선 구간 제거")
     @Test
     void deleteStationSectionTest() {
@@ -300,27 +274,4 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 구간이 삭제된다.
     }
 
-    @DisplayName("노선 구간 제거 실패")
-    @Test
-    void deleteIgnoredStationSectionTest() {
-        // given
-        // 노선을 생성하고 해당 노선에 두 구간을 추가한 후
-        ExtractableResponse<Response> createFirstStationResponse =
-          StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-          StationRequest.stationCreateRequest("역삼역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> response =
-          lineCreateRequest(
-            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
-
-        // when
-        // 중간 구간을 삭제하면
-
-        // then
-        // 구간 삭제에 실패한다.
-    }
 }
