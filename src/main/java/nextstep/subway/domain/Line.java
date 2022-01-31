@@ -4,6 +4,10 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @Entity
 // 쿼리 캐싱이 안되는건 어쩔 수 없지만, 전체를 업데이트하다가 사이드 이펙트가 날 수 있기 때문에 미리 DynamicUpdate를 적용한다.
 @DynamicUpdate
@@ -15,6 +19,9 @@ public class Line extends BaseEntity {
     @Column(unique = true)
     private String name;
     private String color;
+
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {}
 
@@ -38,5 +45,13 @@ public class Line extends BaseEntity {
     public void changeLineInformation(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public List<Section> getSections() {
+        return Collections.unmodifiableList(sections);
+    }
+
+    public void addSection(Section section){
+        sections.add(section);
     }
 }

@@ -21,4 +21,11 @@ public class Section {
   private Station downStation;
 
   private int distance;
+
+  public Section(Line line, Station upStation, Station downStation, int distance) {
+    this.line = line;
+    this.upStation = upStation;
+    this.downStation = downStation;
+    this.distance = distance;
+  }
 }

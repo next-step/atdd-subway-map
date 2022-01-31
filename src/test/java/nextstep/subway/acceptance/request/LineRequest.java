@@ -13,13 +13,19 @@ public class LineRequest {
   public static final String NAME = "name";
   public static final String COLOR = "color";
   public static final String LOCATION = "Location";
+  public static final String UP_STATION_ID = "upStationId";
+  public static final String DOWN_STATION_ID = "downStationId";
+  public static final String DISTANCE = "distance";
 
   /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
   public static ExtractableResponse<Response> lineCreateRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
 
-    Map<String, String> createRequest = new HashMap<>();
+    Map<String, Object> createRequest = new HashMap<>();
     createRequest.put(NAME, name);
     createRequest.put(COLOR, color);
+    createRequest.put(UP_STATION_ID, upStationId);
+    createRequest.put(UP_STATION_ID, downStationId);
+    createRequest.put(DISTANCE, distance);
     return RestAssured.given()
       .log()
       .all()

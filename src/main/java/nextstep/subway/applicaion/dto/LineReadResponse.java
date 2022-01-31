@@ -1,36 +1,32 @@
 package nextstep.subway.applicaion.dto;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Section;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class LineReadResponse extends BaseLineResponse {
-
-    private final List<String> stations;
 
     public LineReadResponse(
             Long id,
             String name,
             String color,
+            List<Section> sections,
             LocalDateTime createdDate,
-            LocalDateTime modifiedDate,
-            List<String> stations) {
-        super(id, name, color, createdDate, modifiedDate);
-        this.stations = Collections.unmodifiableList(stations);
+            LocalDateTime modifiedDate
+            ) {
+        super(id, name, color, sections, createdDate, modifiedDate);
     }
 
-    public List<String> getStations() {
-        return stations;
-    }
-
-    public static LineReadResponse of(Line line, List<String> stations) {
+    public static LineReadResponse of(Line line) {
         return new LineReadResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
+                line.getSections(),
                 line.getCreatedDate(),
-                line.getModifiedDate(),
-                stations);
+                line.getModifiedDate()
+        );
     }
 }

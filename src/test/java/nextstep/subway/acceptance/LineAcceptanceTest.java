@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import groovy.util.logging.Slf4j;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

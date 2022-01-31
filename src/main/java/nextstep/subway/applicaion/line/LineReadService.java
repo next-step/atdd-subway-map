@@ -20,14 +20,14 @@ public class LineReadService {
 
     public List<LineReadResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(line -> LineReadResponse.of(line, Collections.EMPTY_LIST))
+                .map(line -> LineReadResponse.of(line))
                 .collect(Collectors.toList());
     }
 
     public LineReadResponse findSpecificLine(Long id) {
         return lineRepository
                 .findById(id)
-                .map(line -> LineReadResponse.of(line, Collections.EMPTY_LIST))
+                .map(line -> LineReadResponse.of(line))
                 .orElseThrow(NotFoundException::new);
     }
 }
