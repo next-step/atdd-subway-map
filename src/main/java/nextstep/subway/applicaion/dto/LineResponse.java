@@ -48,7 +48,7 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getFlatStations(),
+                line.getStations(),
                 line.getCreatedDate(),
                 line.getModifiedDate());
     }
