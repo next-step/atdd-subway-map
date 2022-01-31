@@ -32,8 +32,12 @@ public class Sections {
         return this.values.get(this.values.size() - 1);
     }
 
+    public Station lastDownStation() {
+        return last().getDownStation();
+    }
+
     public boolean equalsLastDownStation(Station upStation) {
-        return this.last().getDownStation().equals(upStation);
+        return this.lastDownStation().equals(upStation);
     }
 
     public boolean checkDuplicatedDownStation(Station downStation) {
@@ -53,7 +57,7 @@ public class Sections {
                 .sorted(Comparator.comparing(Section::getId))
                 .map(Section::getUpStation)
                 .collect(Collectors.toList());
-        stations.add(last().getDownStation());
+        stations.add(lastDownStation());
         return stations;
     }
 
@@ -78,7 +82,7 @@ public class Sections {
     public void validateRemoval(Station station) {
         if (isSmallerMinimumSize()) { throw new InvalidParameterException(); }
 
-        if (!last().getDownStation().equals(station)) {
+        if (!lastDownStation().equals(station)) {
             throw new InvalidParameterException();
         }
     }
