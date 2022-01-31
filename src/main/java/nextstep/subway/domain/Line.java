@@ -24,13 +24,13 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
+    public Line(String name, String color, PairedStations pairedStations, int distance) {
         this(name, color);
-        addSection(upStation, downStation, distance);
+        addSection(pairedStations, distance);
     }
 
-    public Section addSection(Station upStation, Station downStation, int distance) {
-        Section section = new Section(this, upStation, downStation, distance);
+    public Section addSection(PairedStations pairedStations, int distance) {
+        Section section = new Section(this, pairedStations.getUpStation(), pairedStations.getDownStation(), distance);
         return sections.add(section);
     }
 

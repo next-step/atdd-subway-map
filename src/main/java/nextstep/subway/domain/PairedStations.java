@@ -14,7 +14,7 @@ public class PairedStations {
     }
 
     private boolean isEqualStations(Station upStation, Station downStation) {
-        return upStation.getId().equals(downStation.getId());
+        return upStation.equals(downStation);
     }
 
     public Station getUpStation() {

@@ -34,12 +34,9 @@ public class LineService {
             throw new AlreadyRegisteredLineException(lineName);
         }
 
-        PairedStations pairedStations = stationService.createPairedStations(request.getUpStationId(), request.getDownStationId());
-
         Line line = lineRepository.save(new Line(request.getName(),
                 request.getColor(),
-                pairedStations.getUpStation(),
-                pairedStations.getDownStation(),
+                new PairedStations(stationService.findStationById(request.getUpStationId()), stationService.findStationById(request.getDownStationId())),
                 request.getDistance()));
 
         return LineResponse.fromEntity(line);
@@ -77,7 +74,7 @@ public class LineService {
         Station upStation = stationService.findStationById(request.getUpStationId());
         Station downStation = stationService.findStationById(request.getDownStationId());
 
-        Section section = line.addSection(upStation, downStation, request.getDistance());
+        Section section = line.addSection(new PairedStations(upStation, downStation), request.getDistance());
 
         return sectionRepository.save(section);
     }
