@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.DuplicateException;
+import nextstep.subway.exception.NoElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class StationService {
         validateNameDuplicated(name);
 
         Station station = stationRepository.save(new Station(name));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
@@ -34,26 +35,22 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(NoElementException::new);
     }
 
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
-    }
-
     private void validateNameDuplicated(String name) {
-        if(stationRepository.existsByName(name)){
-            throw new DuplicateException("Duplicate "+ name);
+        if (stationRepository.existsByName(name)) {
+            throw new DuplicateException("Duplicate " + name);
         }
     }
 }
