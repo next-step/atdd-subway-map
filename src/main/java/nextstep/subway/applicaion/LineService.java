@@ -59,6 +59,6 @@ public class LineService {
     }
 
     private boolean isExistLineName(String name) {
-        return lineRepository.findByName(name).isPresent();
+        return lineRepository.existsByName(name);
     }
 }

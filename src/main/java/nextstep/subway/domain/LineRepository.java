@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
     Optional<Line> findByName(String name);
+    Boolean existsByName(String name);
 }

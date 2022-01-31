@@ -44,6 +44,6 @@ public class StationService {
     }
 
     private boolean isExistStationName(String name) {
-        return stationRepository.findByName(name).isPresent();
+        return stationRepository.existsByName(name);
     }
 }
