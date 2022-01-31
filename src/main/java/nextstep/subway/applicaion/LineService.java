@@ -17,13 +17,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
-    private SectionRepository sectionRepository;
     private LineVerificationService lineVerificationService;
     private StationService stationService;
 
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, LineVerificationService lineVerificationService, StationService stationService) {
+    public LineService(LineRepository lineRepository, LineVerificationService lineVerificationService, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
         this.lineVerificationService = lineVerificationService;
         this.stationService = stationService;
     }
@@ -76,7 +74,7 @@ public class LineService {
 
         Section section = line.addSection(new PairedStations(upStation, downStation), request.getDistance());
 
-        return sectionRepository.save(section);
+        return section;
     }
 
     public void deleteSectionByEndDownStationId(Long lineId, Long endDownStationId) {
