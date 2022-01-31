@@ -24,7 +24,7 @@ import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 
 @DisplayName("구간 관리 기능")
-public class SectionAcceptanceTest extends AcceptanceTest{
+public class SectionAcceptanceTest extends AcceptanceTest {
 
 	StationResponse 강남역;
 	StationResponse 양재역;
@@ -37,7 +37,8 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 		양재역 = 지하철역_생성("양재역").jsonPath().getObject(".", StationResponse.class);
 		정자역 = 지하철역_생성("정자역").jsonPath().getObject(".", StationResponse.class);
 
-		신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역.getId(), 양재역.getId()).jsonPath().getObject(".", LineResponse.class);;
+		신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 강남역.getId(), 양재역.getId()).jsonPath().getObject(".", LineResponse.class);
+		;
 	}
 
 	/**
@@ -73,7 +74,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 		지하철_노선에_등록한_구간이_포함(response, Arrays.asList(강남역.getId(), 양재역.getId(), 정자역.getId()));
 	}
-	
+
 	/**
 	 * Scenario
 	 * 구간 제거 기능
@@ -105,11 +106,34 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 		ExtractableResponse<Response> response = RestAssured
 			.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().delete("/lines/" + 신분당선.getId() + "/sections?stationId=" + 강남역.getId())
+			.when().delete("/lines/" + 신분당선.getId() + "/sections?stationId=" + 정자역.getId())
 			.then().log().all().extract();
 
 		// then
 		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+	}
+
+	@DisplayName("구간 삭제 - 에러케이스")
+	@Test
+	void deleteWithWrongCondition() {
+		SectionRequest request = new SectionRequest(양재역.getId(), 정자역.getId(), 3);
+		RestAssured
+			.given().log().all()
+			.body(request)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().post("/lines/" + 신분당선.getId() + "/sections")
+			.then().log().all().extract();
+
+		// when
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().delete("/lines/" + 신분당선.getId() + "/sections?stationId=" + 강남역.getId())
+			.then().log().all().extract();
+
+		// then
+		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+
 	}
 
 	private void 지하철_노선에_등록한_구간이_포함(ExtractableResponse<Response> response, List<Long> expectedStationIds) {

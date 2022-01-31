@@ -11,8 +11,8 @@ public class SubwayException {
 			super(DEFAULT_ERROR_MESSAGE, HttpStatus.BAD_REQUEST.value());
 		}
 
-		public DuplicatedNameException(String message, int code) {
-			super(message, code);
+		public DuplicatedNameException(String message) {
+			super(message, HttpStatus.BAD_REQUEST.value());
 		}
 	}
 
@@ -23,20 +23,20 @@ public class SubwayException {
 			super(DEFAULT_ERROR_MESSAGE, HttpStatus.NO_CONTENT.value());
 		}
 
-		public NotFoundException(String message, int code) {
-			super(message, code);
+		public NotFoundException(String message) {
+			super(message, HttpStatus.NO_CONTENT.value());
 		}
 	}
 
 	public static class CanNotDeleteException extends BusinessException {
-		private static final String DEFAULT_ERROR_MESSAGE = "Can not found";
+		private static final String DEFAULT_ERROR_MESSAGE = "Can not Delete";
 
 		public CanNotDeleteException() {
-			super(DEFAULT_ERROR_MESSAGE, HttpStatus.CONTINUE.value());
+			super(DEFAULT_ERROR_MESSAGE, HttpStatus.CONFLICT.value());
 		}
 
-		public CanNotDeleteException(String message, int code) {
-			super(message, code);
+		public CanNotDeleteException(String message) {
+			super(message, HttpStatus.CONFLICT.value());
 		}
 	}
 }

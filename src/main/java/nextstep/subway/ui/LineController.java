@@ -1,9 +1,7 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.SectionRequest;
+import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
+import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 
 @RestController
 @RequestMapping("/lines")
@@ -60,12 +60,13 @@ public class LineController {
 	}
 
 	@PostMapping("/{lineId}/sections")
-	public ResponseEntity<LineResponse> addSection(@PathVariable("lineId") Long lineId, @RequestBody SectionRequest sectionRequest) {
+	public ResponseEntity<LineResponse> addSection(@PathVariable("lineId") Long lineId,
+		@RequestBody SectionRequest sectionRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(lineService.addNewSection(lineId, sectionRequest));
 	}
 
 	@DeleteMapping("/{lineId}/sections")
-	public ResponseEntity<Void> removeLineStation(@PathVariable Long lineId, @RequestParam Long stationId){
+	public ResponseEntity<Void> removeLineStation(@PathVariable Long lineId, @RequestParam Long stationId) {
 		lineService.removeSectionByStationId(lineId, stationId);
 		return ResponseEntity.ok().build();
 	}
