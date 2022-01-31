@@ -16,8 +16,4 @@ public class LineVerificationService {
     public boolean isExistByName(String name) {
         return lineRepository.existsByName(name);
     }
-
-    public boolean isExistById(Long id) {
-        return lineRepository.existsById(id);
-    }
 }
