@@ -2,6 +2,7 @@ package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.object.Distance;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class SectionRequest {
@@ -9,6 +10,7 @@ public class SectionRequest {
     private Long upStationId;
     @NotNull
     private Long downStationId;
+    @Valid
     private Distance distance;
 
     public long getUpStationId() {

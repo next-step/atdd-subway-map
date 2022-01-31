@@ -1,9 +1,19 @@
 package nextstep.subway.domain.object;
 
-import java.security.InvalidParameterException;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+@Embeddable
+@NoArgsConstructor
 public class Distance {
-    private int value;
+    @Column
+    @Min(0)
+    @NotNull
+    private Integer value;
 
     public Distance(int value) {
         this.value = value;
@@ -11,11 +21,5 @@ public class Distance {
 
     public int getValue() {
         return this.value;
-    }
-
-    public void checkDistanceLessThanZero() {
-        if (this.value < 0) {
-            throw new InvalidParameterException();
-        }
     }
 }

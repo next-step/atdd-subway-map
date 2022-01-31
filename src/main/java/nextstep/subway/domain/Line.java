@@ -53,7 +53,7 @@ public class Line extends BaseEntity {
                 .line(this)
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(distance.getValue())
+                .distance(distance)
                 .build();
 
         sections.validateAddSection(upStation, downStation);

@@ -2,6 +2,7 @@ package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.object.Distance;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class LineRequest {
@@ -11,7 +12,7 @@ public class LineRequest {
     private Long upStationId;
     @NotNull
     private Long downStationId;
-    @NotNull
+    @Valid
     private Distance distance;
 
     public String getName() {

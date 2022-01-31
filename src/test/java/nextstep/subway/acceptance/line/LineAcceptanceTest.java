@@ -24,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 생성 테스트")
     @Test
-    void 지하철_노선_생성_테스트(Stations.지하철역_생성_파람 연신내역, Stations.지하철역_생성_파람 서울역) {
+    void 지하철_노선_생성_테스트() {
         //given
         ApiUtil.지하철역_생성_API(Stations.연신내역);
         ApiUtil.지하철역_생성_API(Stations.서울역);
@@ -74,7 +74,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(Lines.GTXA노선_상행_정보없음);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**
@@ -93,11 +93,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = ApiUtil.지하철_노선_생성_API(Lines.GTXA노선_하행_정보없음);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**
-     * When 지하철 노선 생성을 요청 했을 때 노선 거리 정보가 없으면,
+     * When 지하철 노선 생성을 요청 했을 때 노선 거리 정보가 없거나 음수이면,
      * Then 지하철 노선 생성이 실패한다.
      * @see nextstep.subway.ui.LineController#createLine
      */
