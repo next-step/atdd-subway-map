@@ -20,8 +20,8 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) throws DuplicatedNameException {
-        if(isDuplicatedNameOfStation(stationRequest.getName())) {
+    public StationResponse saveStation(StationRequest stationRequest) {
+        if(stationRepository.existsByName(stationRequest.getName())) {
             throw new DuplicatedNameException();
         }
 
@@ -51,7 +51,4 @@ public class StationService {
         );
     }
 
-    private boolean isDuplicatedNameOfStation(String name) {
-        return stationRepository.existsByName(name);
-    }
 }

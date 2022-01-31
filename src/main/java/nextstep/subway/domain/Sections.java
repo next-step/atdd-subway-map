@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.StationResponse;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +30,17 @@ public class Sections {
         sections.add(section);
     }
 
-    public List<Station> getStationList() {
+    public List<Station> createStationList() {
         return this.sections.stream()
                 .flatMap(s -> Stream.of(s.getUpStation(), s.getDownStation()))
                 .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<StationResponse> createStationResponseList() {
+        return createStationList().stream()
+                .map(station -> new StationResponse(station.getId(), station.getName()
+                        , station.getCreatedDate(), station.getModifiedDate()))
                 .collect(Collectors.toList());
     }
 

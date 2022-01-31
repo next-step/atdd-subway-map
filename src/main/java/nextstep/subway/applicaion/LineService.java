@@ -26,7 +26,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) throws Exception {
+    public LineResponse saveLine(LineRequest request) {
         if(isDuplicatedNameOfLine(request.getName())) {
             throw new DuplicatedNameException();
         }
@@ -50,19 +50,10 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                createStationResponse(line.getSections()),
+                line.getSections(),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
-    }
-
-    private List<StationResponse> createStationResponse(List<Section> sections) {
-            return sections.stream()
-                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .distinct()
-                .map(station -> new StationResponse(station.getId(), station.getName()
-                                                    , station.getCreatedDate(), station.getModifiedDate()))
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +84,7 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    public void saveSection(Line line, LineRequest request) throws Exception {
+    private void saveSection(Line line, LineRequest request) {
         Section section = new Section(line, findStation(request.getUpStationId())
                                         , findStation(request.getDownStationId()), request.getDistance());
         line.registSection(section);

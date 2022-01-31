@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.exception.RegistrationException;
 
 import javax.persistence.*;
@@ -37,8 +38,8 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSections() {
-        return sections.getSections();
+    public List<StationResponse> getSections() {
+        return sections.createStationResponseList();
     }
 
     public void updateLine(String name, String color) {
@@ -46,21 +47,21 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public void registSection(Section section) throws Exception {
+    public void registSection(Section section) {
         verifyNewUpStationIsDownStation(section);
         verifyStationAlreadyRegistered(section);
         sections.addSection(section);
     }
 
-    private void verifyNewUpStationIsDownStation(Section section) throws RegistrationException {
+    private void verifyNewUpStationIsDownStation(Section section) {
         Section lastSection = sections.getLastSection();
         if(lastSection != null && !lastSection.getDownStation().equals(section.getUpStation())) {
             throw new RegistrationException("새로운 구간이 해당 노선의 하행 종점역이 아닙니다.");
         }
     }
 
-    private void verifyStationAlreadyRegistered(Section section) throws RegistrationException {
-        List<Station> stationList = sections.getStationList();
+    private void verifyStationAlreadyRegistered(Section section) {
+        List<Station> stationList = sections.createStationList();
         if(stationList.contains(section.getDownStation())) {
             throw new RegistrationException("새로운 구간의 하행역이 해당 노선에 이미 등록된 역 입니다.");
         }
