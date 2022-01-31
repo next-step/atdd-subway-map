@@ -4,6 +4,7 @@ import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class SectionResponse {
 
@@ -77,5 +78,30 @@ public class SectionResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SectionResponse response = (SectionResponse) o;
+        return getDistance() == response.getDistance() && Objects.equals(getId(), response.getId()) &&
+               Objects.equals(getLineId(), response.getLineId()) &&
+               Objects.equals(getUpStationId(), response.getUpStationId()) &&
+               Objects.equals(getUpStationName(), response.getUpStationName()) &&
+               Objects.equals(getDownStationId(), response.getDownStationId()) &&
+               Objects.equals(getDownStationName(), response.getDownStationName()) &&
+               Objects.equals(getCreatedDate(), response.getCreatedDate()) &&
+               Objects.equals(getModifiedDate(), response.getModifiedDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getLineId(), getUpStationId(), getUpStationName(),
+                        getDownStationId(), getDownStationName(), getDistance(), getCreatedDate(), getModifiedDate());
     }
 }

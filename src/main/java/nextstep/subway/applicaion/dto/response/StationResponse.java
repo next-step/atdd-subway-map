@@ -57,7 +57,8 @@ public class StationResponse {
         }
         StationResponse that = (StationResponse) o;
         return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) &&
-               Objects.equals(getCreatedDate(), that.getCreatedDate()) && Objects.equals(getModifiedDate(), that.getModifiedDate());
+               Objects.equals(getCreatedDate(), that.getCreatedDate()) &&
+               Objects.equals(getModifiedDate(), that.getModifiedDate());
     }
 
     @Override

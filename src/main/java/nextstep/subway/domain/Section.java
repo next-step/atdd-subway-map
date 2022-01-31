@@ -61,7 +61,7 @@ public class Section extends BaseEntity {
         Station downEndStation = line.getSections().get(line.getSections().size() - 1).getDownStation();
         if (!upStation.equals(downEndStation)) {
             throw new BadRequestException(
-                    String.format("등록하는 구간의 상행역이 하행 종점역과 같아야 합니다. 하행 종점역 = %s, 상행역 = %s",
+                    String.format(Sections.THE_UP_STATION_AND_DOWN_END_STATIONS_DIFFERENT_EXCEPTION_MESSAGE,
                             downEndStation.getName(), upStation.getName()
                     )
             );
@@ -73,7 +73,7 @@ public class Section extends BaseEntity {
         for (Section section : sections) {
             if (downStation.equals(section.getUpStation()) || downStation.equals(section.getDownStation())) {
                 throw new BadRequestException(
-                        String.format("등록하는 구간의 하행 종점역이 이미 구간에 존재하는 역입니다. 등록하는 하행 종점역 = %s",
+                        String.format(Sections.STATIONS_WHERE_DOWN_END_STATION_ALREADY_EXCEPTION_MESSAGE,
                                 downStation.getName()
                         )
                 );
