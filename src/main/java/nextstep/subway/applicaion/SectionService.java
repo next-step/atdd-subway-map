@@ -63,6 +63,10 @@ public class SectionService {
                                       .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
 
 
+        if(findLine.getSectionList().size() == 1){
+            throw new NotRemoveStationException("구간이 1개인 경우 역을 삭제할 수 없다.");
+        }
+
         boolean isExistStation = false;
         for (Section section : findLine.getSectionList()) {
             Long findDownStationId = section.getDownStation()
@@ -71,7 +75,7 @@ public class SectionService {
                                           .getId();
 
             if (deleteStationId.equals(findUpStationId)) {
-                throw new NotRemoveStationException();
+                throw new NotRemoveStationException("지하철 노선에 등록된 하행 종점역만 제거할 수 있다.");
             }
 
             if (deleteStationId.equals(findDownStationId)) {
@@ -80,7 +84,7 @@ public class SectionService {
         }
 
         if (!isExistStation) {
-            throw new NotRemoveStationException();
+            throw new NotRemoveStationException("지하철 노선에 등록된 역만 제거할 수 있다.");
         }
 
 

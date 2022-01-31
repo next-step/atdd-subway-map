@@ -10,6 +10,10 @@ public class NotRemoveStationException extends RuntimeException{
         super(REASON);
     }
 
+    public NotRemoveStationException(String message) {
+        super(message);
+    }
+
     public HttpStatus getStatusCode() {
         return statusCode;
     }

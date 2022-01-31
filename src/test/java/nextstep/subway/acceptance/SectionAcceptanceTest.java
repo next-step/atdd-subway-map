@@ -58,13 +58,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선의 구간 제거")
     @Test
     void removeSection() {
-        String deleteDownStationLocation = lineLocation + "/sections?stationId=2";
+        지하철_구간_등록_요청(lineLocation, new SectionRequest("3", "2", 10));
+
+        String deleteDownStationLocation = lineLocation + "/sections?stationId=3";
         ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteDownStationLocation);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("지하철 노선에 등록역만 제거할 수 있다.")
+    @DisplayName("지하철 노선에 등록된 역만 제거할 수 있다.")
     @Test
     void removeSection2(){
         String deleteNotExistStationLocation = lineLocation + "/sections?stationId=999999";
@@ -91,4 +93,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void removeSection5(){
+        String deleteLocation = lineLocation + "/sections?stationId=2";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteLocation);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 }
