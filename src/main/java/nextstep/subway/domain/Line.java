@@ -1,11 +1,6 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Line extends BaseEntity {
@@ -14,29 +9,17 @@ public class Line extends BaseEntity {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     private Line() {
     }
 
-    private Line(String name, String color) {
+    public Line(String name, String color,Section section) {
         this.name = name;
         this.color = color;
-    }
-
-    private Line(String name, String color, Long upStationId, Long downStationId, int distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-    }
-
-    public static Line of(LineRequest lineRequest) {
-        return new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(), lineRequest.getDistance());
+        this.sections.addSection(section);
     }
 
     public Long getId() {
@@ -51,20 +34,16 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public Sections getSections() {
+        return sections;
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(section);
     }
 }
