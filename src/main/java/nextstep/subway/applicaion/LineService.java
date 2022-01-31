@@ -53,20 +53,20 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineResponse> findAllLines() {
+    public List<LineAndSectionResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(LineResponse::of)
+                .map(LineAndSectionResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public LineResponse findLine(Long id) {
+    public LineAndSectionResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
 
-        return LineResponse.of(line);
+        return LineAndSectionResponse.of(line);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
