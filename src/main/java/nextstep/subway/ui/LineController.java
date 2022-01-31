@@ -4,7 +4,7 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.domain.Line;
+import nextstep.subway.exception.DuplicatedLineException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/lines")
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;
@@ -57,5 +57,10 @@ public class LineController {
     public ResponseEntity<HttpStatus> deleteSection(@PathVariable Long id) {
         lineService.deleteSection(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(DuplicatedLineException.class)
+    public ResponseEntity<HttpStatus> duplicatedCheck() {
+        return ResponseEntity.badRequest().build();
     }
 }
