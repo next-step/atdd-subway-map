@@ -87,7 +87,7 @@ public class LineService {
 
         Station station = findStationById(stationId);
 
-        line.deleteSection(station);
+        line.removeSection(station);
     }
 
     private Section createSection(Line line, Long upStationId, Long downStationId, int distance) {

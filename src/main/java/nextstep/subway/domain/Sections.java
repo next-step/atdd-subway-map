@@ -32,17 +32,24 @@ public class Sections {
 		sections.add(section);
 	}
 
-	public void removeSection(Long sectionId) {
-
+	public void removeSection(Station station) {
+		validEmpty();
+		validDownStation(station);
+		sections.removeIf(row -> row.getDownStation().equals(station));
 	}
 
-	private boolean isValidEmpty() {
+	private void validEmpty() {
 		if(sections.isEmpty() || sections.size() == 1) {
-
-
-			
+			throw new IllegalEntityException(ExceptionMessage.NOT_REMOVE_SECTION.getMessage());
 		}
-		return true;
+	}
+
+	private void validDownStation(Station station) {
+		Section lastSection = sections.get(sections.size() - 1);
+
+		if(!lastSection.isDownStation(station)) {
+			throw new IllegalEntityException(ExceptionMessage.NOT_REMOVE_SECTION.getMessage());
+		}
 	}
 
 	private boolean isValidContainDownStation(Section section) {
@@ -52,9 +59,5 @@ public class Sections {
 
 	public List<Section> getSections() {
 		return Collections.unmodifiableList(sections);
-	}
-
-	public void deleteSetion(Station station) {
-		sections.removeIf(row -> row.getDownStation().equals(station));
 	}
 }

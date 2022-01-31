@@ -103,6 +103,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철_구간_삭제() {
 		// given
+		SectionSteps.지하철_구간_등록_요청(이호선.getId(), SectionRequest.of(교대역.getId(), 역삼역.getId(), 6));
 		SectionSteps.지하철_구간_등록_요청(이호선.getId(), SectionRequest.of(역삼역.getId(), 강남역.getId(), 6));
 
 		// when
@@ -110,5 +111,50 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
+	/**
+	 * Feature: 구간 제거 조건 체크
+	 * Scenario: 지하철 노선에 구간을 제거하는 기능
+	 *
+	 * Given 지하철 노선이 등록되어 있다.
+	 * AND 지하철역이 등록되어 있다.
+	 * When 지하철 노선에 역 삭제시 하행 종점역이 아니라면
+	 * Then 지하철역 삭제가 실패한다.
+	 */
+	@DisplayName("지하철 구간 삭제 에러_1")
+	@Test
+	void 지하철_구간_마지막_구간_삭제_조건() {
+		// given
+		SectionSteps.지하철_구간_등록_요청(이호선.getId(), SectionRequest.of(교대역.getId(), 역삼역.getId(), 6));
+		SectionSteps.지하철_구간_등록_요청(이호선.getId(), SectionRequest.of(역삼역.getId(), 강남역.getId(), 6));
+
+		// when
+		ExtractableResponse<Response> response = SectionSteps.지하철_구간_삭제_요청(이호선.getId(), 역삼역.getId());
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.EXPECTATION_FAILED.value());
+	}
+
+	/**
+	 * Feature: 구간 제거 조건 체크
+	 * Scenario: 지하철 노선에 구간을 제거하는 기능
+	 *
+	 * Given 지하철 노선이 등록되어 있다.
+	 * AND 지하철역이 등록되어 있다.
+	 * When 지하철 노선에 역 삭제시 구간이 1개라면
+	 * Then 지하철역 삭제가 실패한다.
+	 */
+	@DisplayName("지하철 구간 삭제 에러_2")
+	@Test
+	void 지하철_구간_1개_삭제_조건() {
+		// given
+		SectionSteps.지하철_구간_등록_요청(이호선.getId(), SectionRequest.of(교대역.getId(), 역삼역.getId(), 6));
+
+		// when
+		ExtractableResponse<Response> response = SectionSteps.지하철_구간_삭제_요청(이호선.getId(), 역삼역.getId());
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.EXPECTATION_FAILED.value());
 	}
 }
