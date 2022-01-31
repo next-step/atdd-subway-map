@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-    Line findByName(String name);
+    boolean existsByName(String name);
 
     List<Line> findAll();
 }

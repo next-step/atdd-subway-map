@@ -35,23 +35,23 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request)
             throws DuplicateRegistrationRequestException, NotFoundRequestException {
-        Line findLine = lineRepository.findByName(request.getName());
-        if (ObjectUtils.isEmpty(findLine)) {
-            Station upStation = stationService.findStationById(request.getUpStationId());
-            Station downStation = stationService.findStationById(request.getDownStationId());
-            Line line = Line.createLine(request.getName(), request.getColor());
-
-            Section section = Section.createNewLineSection(line, upStation, downStation, request.getDistance());
-            line.addSection(section);
-
-            lineRepository.save(line);
-
-            return LineResponse.createLineResponse(line);
+        boolean existsLine = lineRepository.existsByName(request.getName());
+        if (existsLine) {
+            throw new DuplicateRegistrationRequestException(
+                    String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName())
+            );
         }
 
-        throw new DuplicateRegistrationRequestException(
-                String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName())
-        );
+        Station upStation = stationService.findStationById(request.getUpStationId());
+        Station downStation = stationService.findStationById(request.getDownStationId());
+        Line line = Line.createLine(request.getName(), request.getColor());
+
+        Section section = Section.createNewLineSection(line, upStation, downStation, request.getDistance());
+        line.addSection(section);
+
+        lineRepository.save(line);
+
+        return LineResponse.createLineResponse(line);
     }
 
     @Transactional(readOnly = true)

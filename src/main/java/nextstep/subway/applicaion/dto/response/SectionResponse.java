@@ -17,7 +17,7 @@ public class SectionResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public SectionResponse(Long id, Long lineId, Station upStation, Station downStation, int distance,
+    private SectionResponse(Long id, Long lineId, Station upStation, Station downStation, int distance,
                            LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.lineId = lineId;

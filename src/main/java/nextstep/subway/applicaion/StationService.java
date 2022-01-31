@@ -27,15 +27,15 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest request) throws DuplicateRegistrationRequestException {
-        Station findStation = stationRepository.findByName(request.getName());
-        if (ObjectUtils.isEmpty(findStation)) {
-            Station station = stationRepository.save(Station.createStation(request.getName()));
-            return StationResponse.createStationResponse(station);
+        boolean existsStation = stationRepository.existsByName(request.getName());
+        if (existsStation) {
+            throw new DuplicateRegistrationRequestException(
+                    String.format(STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName())
+            );
         }
 
-        throw new DuplicateRegistrationRequestException(
-                String.format(STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName())
-        );
+        Station station = stationRepository.save(Station.createStation(request.getName()));
+        return StationResponse.createStationResponse(station);
     }
 
     @Transactional(readOnly = true)
