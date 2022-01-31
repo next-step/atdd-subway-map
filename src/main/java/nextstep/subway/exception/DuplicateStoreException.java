@@ -1,10 +1,10 @@
 package nextstep.subway.exception;
 
-public class DuplicateStoreException extends IllegalArgumentException{
-	private static final String DEFAULT_MESSAGE = "중복된 값이 존재합니다.";
+import nextstep.subway.ui.ExceptionMessage;
 
+public class DuplicateStoreException extends IllegalArgumentException{
 	public DuplicateStoreException() {
-		super(DEFAULT_MESSAGE);
+		super(ExceptionMessage.DUPLICATE_VALUE.getMessage());
 	}
 
 	public DuplicateStoreException(String message) {
