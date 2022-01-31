@@ -1,9 +1,7 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.domain.station;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.station.dto.StationRequest;
+import nextstep.subway.domain.station.dto.StationResponse;
 import nextstep.subway.handler.error.custom.BusinessException;
 import nextstep.subway.handler.error.custom.ErrorCode;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -43,11 +41,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+        return StationResponse.from(station);
     }
 }

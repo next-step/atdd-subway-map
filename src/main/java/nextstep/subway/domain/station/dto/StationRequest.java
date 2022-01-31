@@ -1,9 +1,6 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.domain.station.dto;
 
 public class StationRequest {
-    public static StationRequest from(String name) {
-        return new StationRequest(name);
-    }
     private String name;
 
     public StationRequest() {

@@ -13,11 +13,20 @@ public class LineRequestStep {
     private final static String BODY_ELEMENT_NAME = "name";
     private final static String BODY_ELEMENT_COLOR = "color";
     private final static String BODY_ELEMENT_ID = "id";
+    private final static String BODY_UP_STATION_ID = "upStationId";
+    private final static String BODY_DOWN_STATION_ID = "downStationId";
+    private final static String BODY_DISTANCE = "distance";
 
-    public static ExtractableResponse<Response> 노선_생성(TestLine line) {
-        Map<String, String> params = createRequestBody(line);
+    public static ExtractableResponse<Response> 노선_생성(TestLine line, Long 역1, Long 역2, int 거리) {
+        Map<String, Object> params = new HashMap<>();
 
-        ExtractableResponse<Response> response = RestAssured
+        insertRequestBody(params, BODY_ELEMENT_NAME, line.getName());
+        insertRequestBody(params, BODY_ELEMENT_COLOR, line.getColor());
+        insertRequestBody(params, BODY_UP_STATION_ID, 역1);
+        insertRequestBody(params, BODY_DOWN_STATION_ID, 역2);
+        insertRequestBody(params, BODY_DISTANCE, 거리);
+
+        return RestAssured
                 .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -28,19 +37,14 @@ public class LineRequestStep {
 
                 .then().log().all()
                 .extract();
-        return response;
     }
 
-    private static Map<String, String> createRequestBody(TestLine line) {
-        Map<String, String> params = new HashMap<>();
-        params.put(BODY_ELEMENT_NAME, line.getName());
-        params.put(BODY_ELEMENT_COLOR, line.getColor());
-
-        return params;
+    private static void insertRequestBody(Map<String, Object> params, String key, Object value) {
+        params.put(key, value);
     }
 
     public static ExtractableResponse<Response> 노선_목록_조회() {
-        ExtractableResponse<Response> response = RestAssured
+        return RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
 
@@ -49,7 +53,6 @@ public class LineRequestStep {
 
                 .then().log().all()
                 .extract();
-        return response;
     }
 
     public static ExtractableResponse<Response> 노선_조회(Long id) {
@@ -90,7 +93,7 @@ public class LineRequestStep {
     }
 
     public static ExtractableResponse<Response> 노선_삭제(Long deletedId) {
-        ExtractableResponse<Response> response = RestAssured
+        return RestAssured
                 .given()
                 .accept(MediaType.ALL_VALUE)
 
@@ -99,6 +102,5 @@ public class LineRequestStep {
 
                 .then().log().all()
                 .extract();
-        return response;
     }
 }
