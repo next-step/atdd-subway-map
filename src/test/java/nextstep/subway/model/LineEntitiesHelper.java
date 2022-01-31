@@ -3,20 +3,23 @@ package nextstep.subway.model;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.model.StationEntitiesHelper.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public final class LineEntitiesHelper {
 
     private static final String REQUEST_URI = "/lines";
 
-    public static ExtractableResponse<Response> 노선_생성_요청(Line line) {
+    public static ExtractableResponse<Response> 노선_생성_요청(Map<String, Object> params) {
         return RestAssured.given().log().all()
-                .body(newLine(line))
+                .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(REQUEST_URI)
@@ -40,9 +43,9 @@ public final class LineEntitiesHelper {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 노선_수정_요청(Line line, String uri) {
+    public static ExtractableResponse<Response> 노선_수정_요청(Map<String, Object> params, String uri) {
         return RestAssured.given().log().all()
-                .body(newLine(line))
+                .body(params)
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
                 .put(uri)
@@ -58,10 +61,13 @@ public final class LineEntitiesHelper {
                 .extract();
     }
 
-    private static Map<String, String> newLine(Line line) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", line.name());
-        params.put("color", line.getColor());
+    public static Map<String, Object> newLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
         return params;
     }
 }

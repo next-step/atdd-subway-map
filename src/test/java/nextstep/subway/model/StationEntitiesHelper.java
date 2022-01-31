@@ -11,8 +11,17 @@ import java.util.Map;
 public final class StationEntitiesHelper {
 
     private static final String REQUEST_URI = "/stations";
+    public static final String 교대역 = "교대역";
     public static final String 강남역 = "강남역";
     public static final String 역삼역 = "역삼역";
+    public static final String 선릉역 = "선릉역";
+    public static final String 판교역 = "판교역";
+    public static final String 정자역 = "정자역";
+
+    public static Long 지하철역_생성_요청후_아이디_조회(String name) {
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청(name);
+        return createResponse.jsonPath().getLong("id");
+    }
 
     public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
         return RestAssured.given().log().all()

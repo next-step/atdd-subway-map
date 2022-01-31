@@ -11,6 +11,11 @@ public class NextStepException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    public NextStepException(final ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }

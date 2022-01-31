@@ -2,17 +2,38 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.model.Line.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import static nextstep.subway.model.LineEntitiesHelper.*;
+import static nextstep.subway.model.StationEntitiesHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
 import static org.apache.http.HttpHeaders.LOCATION;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private Long 역삼역_ID;
+    private Long 강남역_ID;
+    private Long 정자역_ID;
+    private Long 판교역_ID;
+    private Map<String, Object> 신분당선 = new HashMap<>();
+    private Map<String, Object> 이호선 = new HashMap<>();
+
+    @BeforeEach
+    void setFixtures() {
+        역삼역_ID = 지하철역_생성_요청후_아이디_조회(역삼역);
+        강남역_ID = 지하철역_생성_요청후_아이디_조회(강남역);
+        정자역_ID = 지하철역_생성_요청후_아이디_조회(정자역);
+        판교역_ID = 지하철역_생성_요청후_아이디_조회(판교역);
+        신분당선 = newLine("신분당선", "bg-red-600", 정자역_ID, 판교역_ID, 5);
+        이호선 = newLine("이호선", "bg-green-600", 강남역_ID, 역삼역_ID, 2);
+    }
 
     /**
      * When 지하철 노선 생성을 요청 하면
@@ -21,12 +42,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // when
         ExtractableResponse<Response> response = 노선_생성_요청(신분당선);
-
-        // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
-        assertThat(response.jsonPath().getString("color")).isEqualTo(신분당선.getColor());
         assertThat(response.header(LOCATION)).isNotBlank();
     }
 
@@ -39,18 +56,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        // given
-        ExtractableResponse<Response> createResponse1 = 노선_생성_요청(이호선);
-
-        // and
-        ExtractableResponse<Response> createResponse2 = 노선_생성_요청(신분당선);
-
-        // when
+        노선_생성_요청(이호선);
+        노선_생성_요청(신분당선);
         ExtractableResponse<Response> response = 노선_목록_조회_요청();
-
-        // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
-        assertThat(response.jsonPath().getList("name")).contains(이호선.name(), 신분당선.name());
+        assertThat(response.jsonPath().getList("name")).contains(이호선.get("name"), 신분당선.get("name"));
     }
 
     /**
@@ -61,15 +71,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> response = 노선_단건_조회_요청(createResponse.header(LOCATION));
-
-        // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
-        assertThat(response.jsonPath().getString("name")).isEqualTo(이호선.name());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(이호선.get("name"));
     }
 
     /**
@@ -80,19 +85,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> updateResponse = 노선_수정_요청(신분당선, createResponse.header(LOCATION));
-
-        // then
         ExtractableResponse<Response> findResponse = 노선_단건_조회_요청(createResponse.header(LOCATION));
-
         assertThat(updateResponse.statusCode()).isEqualTo(OK.value());
         assertThat(findResponse.statusCode()).isEqualTo(OK.value());
-        assertThat(findResponse.jsonPath().getString("name")).isEqualTo(신분당선.name());
-        assertThat(findResponse.jsonPath().getString("color")).isEqualTo(신분당선.getColor());
+        assertThat(findResponse.jsonPath().getString("name")).isEqualTo(신분당선.get("name"));
+        assertThat(findResponse.jsonPath().getString("color")).isEqualTo(신분당선.get("color"));
     }
 
     /**
@@ -103,13 +102,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        // given
         ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
         ExtractableResponse<Response> response = 노선_삭제_요청(createResponse.header(LOCATION));
-
-        // then
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
 
@@ -118,16 +112,11 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 같은 이름으로 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 실패한다.
      */
-    @DisplayName("중복이름으로 지하철 노선 생성")
+    @DisplayName("중복이름으로 지하철 노선 생성시 실패")
     @Test
     void createDuplicateLine() {
-        // given
-        ExtractableResponse<Response> createResponse = 노선_생성_요청(이호선);
-
-        // when
+        노선_생성_요청(이호선);
         ExtractableResponse<Response> failResponse = 노선_생성_요청(이호선);
-
-        // then
         assertThat(failResponse.statusCode()).isEqualTo(BAD_REQUEST.value());
     }
 }

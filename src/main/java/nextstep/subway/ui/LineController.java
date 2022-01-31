@@ -3,6 +3,8 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.exception.ValidationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +32,7 @@ public class LineController {
         if(bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
-        final LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -53,6 +55,26 @@ public class LineController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable final Long id) {
         lineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> createSection(
+            @PathVariable final Long id,
+            @Valid @RequestBody final SectionRequest sectionRequest,
+            BindingResult bindingResult
+    ) {
+        if(bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
+        SectionResponse section = lineService.addSection(sectionRequest, id);
+        final URI uri = URI.create("/lines/" + id + "/sections?downStationId=" + section.getDownStationId());
+        return ResponseEntity.created(uri).body(section);
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable final Long id, @RequestParam final Long downStationId) {
+        lineService.deleteSection(id, downStationId);
         return ResponseEntity.noContent().build();
     }
 }
