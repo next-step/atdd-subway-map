@@ -10,6 +10,9 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(value = LogicException.class)
     public ResponseEntity<String> exception(LogicException exception) {
-        return new ResponseEntity<>(exception.getLogicError().getErrMsg(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(
+                exception.getLogicError().getError(),
+                exception.getLogicError().getHttpStatus()
+        );
     }
 }
