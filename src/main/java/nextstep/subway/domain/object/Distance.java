@@ -3,7 +3,7 @@ package nextstep.subway.domain.object;
 import java.security.InvalidParameterException;
 
 public class Distance {
-    int value;
+    private int value;
 
     public Distance(int value) {
         this.value = value;
