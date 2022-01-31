@@ -20,27 +20,27 @@ public class LineRequests {
                 .body(makeCreationAndUpdateRequestBody(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post(LINE_PATH_PREFIX.getType())
+                .post("/lines")
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> readLineListRequest(String url) {
+    public static ExtractableResponse<Response> readLineListRequest() {
+        return RestAssured.given().log().all().when().get("/lines").then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> specificLineReadRequest(Long lineId) {
         return RestAssured.given()
                 .log()
                 .all()
                 .when()
-                .get(LINE_PATH_PREFIX.getType())
+                .get("/lines/{lineId}", lineId)
                 .then()
                 .log()
                 .all()
                 .extract();
-    }
-
-    public static ExtractableResponse<Response> specificLineReadRequest(String url) {
-        return RestAssured.given().log().all().when().get(url).then().log().all().extract();
     }
 
     public static ExtractableResponse<Response> lineUpdateRequest(

@@ -1,9 +1,9 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.requests.LineRequests.LOCATION;
 import static nextstep.subway.acceptance.requests.LineRequests.specificLineReadRequest;
 import static nextstep.subway.acceptance.requests.SectionRequests.*;
 import static nextstep.subway.acceptance.requests.StationRequest.stationCreateRequest;
+import static nextstep.subway.acceptance.type.GeneralNameType.*;
 import static nextstep.subway.acceptance.type.LineNameType.*;
 import static nextstep.subway.acceptance.type.StationNameType.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,22 +22,25 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addNewStationSectionTest() {
         // given
-        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong("id");
-        Long downStationId = stationCreateRequest(역삼역.stationName()).jsonPath().getLong("id");
-        Long newDownStationId = stationCreateRequest(선릉역.stationName()).jsonPath().getLong("id");
+        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
+        Long downStationId =
+                stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
+        Long newDownStationId =
+                stationCreateRequest(선릉역.stationName()).jsonPath().getLong(ID.getType());
 
-        String uri =
+        Long lineId =
                 lineCreateRequest(
                                 NEW_BUN_DANG_LINE.lineName(),
                                 NEW_BUN_DANG_LINE.lineColor(),
                                 upStationId,
                                 downStationId,
                                 FIRST_DISTANCE)
-                        .header(LOCATION);
+                        .jsonPath()
+                        .getLong(ID.getType());
 
         // when
         ExtractableResponse<Response> newSectionResponse =
-                sectionAddRequest(uri, downStationId, newDownStationId, 3);
+                sectionAddRequest(lineId, downStationId, newDownStationId, 3);
 
         // then
         assertThat(newSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -47,33 +50,27 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStationSectionTest() {
         // given
-        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong("id");
-        Long downStationId = stationCreateRequest(역삼역.stationName()).jsonPath().getLong("id");
-        Long newDownStationId = stationCreateRequest(선릉역.stationName()).jsonPath().getLong("id");
+        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
+        Long downStationId =
+                stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
+        Long newDownStationId =
+                stationCreateRequest(선릉역.stationName()).jsonPath().getLong(ID.getType());
 
-        ExtractableResponse<Response> response =
-                lineCreateRequest(
-                        NEW_BUN_DANG_LINE.lineName(),
-                        NEW_BUN_DANG_LINE.lineColor(),
-                        upStationId,
-                        downStationId,
-                        FIRST_DISTANCE);
-
-        String uri =
+        Long lineId =
                 lineCreateRequest(
                                 NEW_BUN_DANG_LINE.lineName(),
                                 NEW_BUN_DANG_LINE.lineColor(),
                                 upStationId,
                                 downStationId,
                                 FIRST_DISTANCE)
-                        .header(LOCATION);
+                        .jsonPath()
+                        .getLong(ID.getType());
 
-        ExtractableResponse<Response> newSectionResponse =
-                sectionAddRequest(uri, downStationId, newDownStationId, 3);
+        sectionAddRequest(lineId, downStationId, newDownStationId, 3);
 
         // when
         ExtractableResponse<Response> deleteSectionResponse =
-                sectionDeleteRequest(uri, newDownStationId);
+                sectionDeleteRequest(lineId, newDownStationId);
 
         // then
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -82,20 +79,21 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("노선 구간 조회")
     @Test
     void listSectionsFromQueryToLineTest() {
-        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong("id");
-        Long downStationId = stationCreateRequest(역삼역.stationName()).jsonPath().getLong("id");
+        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
+        Long downStationId =
+                stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
 
-        ExtractableResponse<Response> response =
+        Long lineId =
                 lineCreateRequest(
-                        NEW_BUN_DANG_LINE.lineName(),
-                        NEW_BUN_DANG_LINE.lineColor(),
-                        upStationId,
-                        downStationId,
-                        FIRST_DISTANCE);
+                                NEW_BUN_DANG_LINE.lineName(),
+                                NEW_BUN_DANG_LINE.lineColor(),
+                                upStationId,
+                                downStationId,
+                                FIRST_DISTANCE)
+                        .jsonPath()
+                        .getLong(ID.getType());
 
-        String lineUrl = response.header(LOCATION);
-
-        ExtractableResponse<Response> queryResponse = specificLineReadRequest(lineUrl);
+        ExtractableResponse<Response> queryResponse = specificLineReadRequest(lineId);
 
         assertThat(queryResponse.jsonPath().getList("stations.name", String.class))
                 .containsExactly(강남역.stationName(), 역삼역.stationName());

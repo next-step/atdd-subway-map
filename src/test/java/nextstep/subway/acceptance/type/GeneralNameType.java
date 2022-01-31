@@ -3,9 +3,7 @@ package nextstep.subway.acceptance.type;
 public enum GeneralNameType {
     NAME("name"),
     COLOR("color"),
-    ID("id"),
-    LINE_PATH_PREFIX("/lines"),
-    SECTION_PATH_PREFIX("/sections");
+    ID("id");
 
     private final String type;
 

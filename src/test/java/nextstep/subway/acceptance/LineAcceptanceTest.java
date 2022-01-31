@@ -36,7 +36,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         lineCreateRequest(SECOND_LINE.lineName(), SECOND_LINE.lineColor());
 
         // when
-        ExtractableResponse<Response> response = readLineListRequest(LINE_PATH_PREFIX.getType());
+        ExtractableResponse<Response> response = readLineListRequest();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -48,12 +48,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        String uri =
+        Long lineId =
                 lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
-                        .header(LOCATION);
+                        .jsonPath()
+                        .getLong(ID.getType());
 
         // when
-        ExtractableResponse<Response> readLineResponse = specificLineReadRequest(uri);
+        ExtractableResponse<Response> readLineResponse = specificLineReadRequest(lineId);
 
         // then
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -96,8 +97,6 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         // addition: to verify deleted contents
-        ExtractableResponse<Response> readDeletedLineResponse = specificLineReadRequest(uri);
-        assertThat(readDeletedLineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("중복된 이름으로 노선을 생성할 수 없다.")

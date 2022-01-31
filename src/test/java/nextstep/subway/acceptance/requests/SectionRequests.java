@@ -26,7 +26,7 @@ public class SectionRequests {
                                 name, color, upStationId, downStationId, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post(LINE_PATH_PREFIX.getType())
+                .post("/lines")
                 .then()
                 .log()
                 .all()
@@ -34,27 +34,27 @@ public class SectionRequests {
     }
 
     public static ExtractableResponse<Response> sectionAddRequest(
-            String uri, Long upStationId, Long downStationId, int distance) {
+            Long lindId, Long upStationId, Long downStationId, int distance) {
         return RestAssured.given()
                 .log()
                 .all()
                 .body(makeSectionAddRequestBody(upStationId, downStationId, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post(uri + "/sections")
+                .post("/lines/{lineId}/sections", lindId)
                 .then()
                 .log()
                 .all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> sectionDeleteRequest(String uri, Long stationId) {
+    public static ExtractableResponse<Response> sectionDeleteRequest(Long lineId, Long stationId) {
         return RestAssured.given()
                 .log()
                 .all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .delete(uri + SECTION_PATH_PREFIX.getType() + "?stationId={}", stationId)
+                .delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
                 .then()
                 .log()
                 .all()
