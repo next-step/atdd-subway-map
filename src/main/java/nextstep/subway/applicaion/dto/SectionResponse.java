@@ -4,9 +4,9 @@ import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
 
 public class SectionResponse {
-    private Station upStation;
-    private Station downStation;
-    private int distance;
+    private final Station upStation;
+    private final Station downStation;
+    private final int distance;
 
     public SectionResponse(Station upStation, Station downStation, int distance) {
         this.upStation = upStation;

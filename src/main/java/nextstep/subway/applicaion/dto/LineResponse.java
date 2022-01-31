@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LineResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private List<SectionResponse> sectionResponses;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<SectionResponse> sectionResponses;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
     private LineResponse(Long id, String name, String color, List<SectionResponse> sectionResponses,
                          LocalDateTime createdDate, LocalDateTime modifiedDate) {

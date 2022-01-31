@@ -4,14 +4,13 @@ import javax.persistence.*;
 
 @Entity
 public class Line extends BaseEntity {
+    @Embedded
+    private final Sections sections = new Sections();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String color;
-
-    @Embedded
-    private final Sections sections = new Sections();
 
     private Line() {
     }
