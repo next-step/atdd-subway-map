@@ -5,6 +5,7 @@ import nextstep.subway.domain.line.dto.LineDetailResponse;
 import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.line.dto.LineResponse;
 import nextstep.subway.domain.section.dto.SectionDetailResponse;
+import nextstep.subway.domain.section.dto.SectionRequest;
 import nextstep.subway.domain.section.dto.SectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,9 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = lineService.saveLine(lineRequest.getName(), lineRequest.getColor(),
+                lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -35,17 +38,13 @@ public class LineController {
     @GetMapping("/{lineId}")
     public ResponseEntity<LineDetailResponse> getLine(@PathVariable(name = "lineId") Long id) {
         LineDetailResponse lineDetailResponse = lineService.getLine(id);
-
-        if (lineDetailResponse == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(lineDetailResponse);
     }
 
     @PatchMapping("/{lineId}")
     public ResponseEntity patchLine(@PathVariable(name = "lineId") Long id,
                                     @RequestBody LineRequest lineRequest) {
-        lineService.patchLine(id, lineRequest);
+        lineService.patchLine(id, lineRequest.getName(), lineRequest.getColor());
         return ResponseEntity.ok().build();
     }
 
@@ -57,7 +56,7 @@ public class LineController {
 
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(@PathVariable(value = "lineId") Long lineId,
-                                                         @RequestBody LineRequest request) {
+                                                         @RequestBody SectionRequest request) {
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/"))
                 .body(lineService
                         .createSection(lineId, request.getUpStationId(), request.getDownStationId(), request.getDistance()));

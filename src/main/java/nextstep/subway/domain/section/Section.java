@@ -4,7 +4,6 @@ import nextstep.subway.domain.BaseEntity;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.dto.StationResponse;
-import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -16,13 +15,13 @@ public class Section extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Station upStation;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
     private int distance;
@@ -30,16 +29,14 @@ public class Section extends BaseEntity {
     public Section() {
     }
 
-    private Section(Line line, Station upStation, Station downStation, int distance) {
-        this.line = line;
+    private Section(Station upStation, Station downStation, int distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
     }
 
-    public static Section of(Line line, Station upStation, Station downStation, int distance) {
-        SectionValidator.proper(line, upStation, downStation, distance);
-        return new Section(line, upStation, downStation, distance);
+    public static Section of(Station upStation, Station downStation, int distance) {
+        return new Section(upStation, downStation, distance);
     }
 
     public Long getId() {
@@ -79,5 +76,9 @@ public class Section extends BaseEntity {
 
     public List<StationResponse> getStationsResponse() {
         return Arrays.asList(StationResponse.from(upStation), StationResponse.from(downStation));
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
     }
 }

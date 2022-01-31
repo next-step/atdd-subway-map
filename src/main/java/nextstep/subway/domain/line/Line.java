@@ -1,14 +1,15 @@
 package nextstep.subway.domain.line;
 
 import nextstep.subway.domain.BaseEntity;
+import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.Sections;
-import nextstep.subway.domain.section.dto.SectionDetailResponse;
 import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.station.dto.StationResponse;
+import nextstep.subway.handler.error.custom.BusinessException;
+import nextstep.subway.handler.error.custom.ErrorCode;
+import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -19,7 +20,7 @@ public class Line extends BaseEntity {
     private String color;
 
     @Embedded
-    private final Sections sections = new Sections();
+    private Sections sections;
 
     public Line() {
     }
@@ -27,6 +28,7 @@ public class Line extends BaseEntity {
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
+        this.sections = new Sections();
     }
 
     public Long getId() {
@@ -41,10 +43,8 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<StationResponse> getStationDtoList() {
-        return sections.getAllStations().stream()
-                .map(StationResponse::from)
-                .collect(Collectors.toList());
+    public List<Station> getStationList() {
+        return sections.getAllStations();
     }
 
     public void modify(String name, String color) {
@@ -76,11 +76,27 @@ public class Line extends BaseEntity {
         return sections.isEmpty();
     }
 
-    public List<SectionDetailResponse> getSectionsResponse() {
-        return sections.getSectionDetailResponseList();
+    public Sections getSections() {
+        return this.sections;
+    }
+
+    public List<Section> getSectionList() {
+        return this.sections.getSectionList();
     }
 
     public void deleteSection(Station station) {
+        if (sections.hasOneSection()) {
+            throw new BusinessException(ErrorCode.REMAINED_SECTION_ONLY_ONE);
+        }
         sections.delete(station);
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+        section.setLine(this);
+    }
+
+    public void validateSection(Station upStation, Station downStation, int distance) {
+        SectionValidator.proper(this, upStation, downStation, distance);
     }
 }

@@ -1,7 +1,6 @@
 package nextstep.subway.domain.line;
 
 import nextstep.subway.domain.line.dto.LineDetailResponse;
-import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.line.dto.LineResponse;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.SectionRepository;
@@ -10,6 +9,7 @@ import nextstep.subway.domain.section.dto.SectionResponse;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.handler.error.custom.BusinessException;
+import nextstep.subway.handler.validator.SectionValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +32,15 @@ public class LineService {
         this.sectionRepository = sectionRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        if (lineRepository.existsByName(request.getName())) {
+    public LineResponse saveLine(String lineName, String lineColor, Long upStationId, Long downStationId, int distance) {
+        if (lineRepository.existsByName(lineName)) {
             throw new BusinessException(FOUND_DUPLICATED_NAME);
         }
-        Line savedLine = lineRepository.save(new Line(request.getName(), request.getColor()));
+
+        Line savedLine = new Line(lineName, lineColor);
+        pushSection(savedLine, extractFirstSection(upStationId, downStationId, distance));
+
+        lineRepository.save(savedLine);
 
         return LineResponse.from(savedLine);
     }
@@ -53,9 +57,9 @@ public class LineService {
         return LineDetailResponse.from(findLineById(id));
     }
 
-    public void patchLine(Long id, LineRequest lineRequest) {
+    public void patchLine(Long id, String lineName, String lineColor) {
         Line line = findLineById(id);
-        line.modify(lineRequest.getName(), lineRequest.getColor());
+        line.modify(lineName, lineColor);
     }
 
     public void deleteLine(Long id) {
@@ -66,23 +70,51 @@ public class LineService {
     }
 
     public SectionResponse createSection(Long lineId, Long upStationId, Long downStationId, int distance) {
-        return SectionResponse.from(sectionRepository.save(
-                        Section.of(
-                                findLineById(lineId),
-                                findStationById(upStationId),
-                                findStationById(downStationId),
-                                distance)
-                )
-        );
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
+        Section createdSection = extractSection(line, upStationId, downStationId, distance);
+        pushSection(line, createdSection);
+
+        return SectionResponse.from(createdSection);
     }
 
     @Transactional(readOnly = true)
     public List<SectionDetailResponse> getSections(Long id) {
-        return findLineById(id).getSectionsResponse();
+        Line selectedLine = findLineById(id);
+
+        return selectedLine.getSectionList()
+                .stream()
+                .map(SectionDetailResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        line.deleteSection(findStationById(stationId));
+    }
+
+    private void pushSection(Line line, Section createdSection) {
+        line.addSection(createdSection);
     }
 
     private Line findLineById(Long lineId) {
         return lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
+    }
+
+    private Section extractSection(Line line, Long upStationId, Long downStationId, int distance) {
+        Station upStation = findStationById(upStationId);
+        Station downStation = findStationById(downStationId);
+
+        line.validateSection(upStation, downStation, distance);
+
+        return Section.of(upStation, downStation, distance);
+    }
+
+    private Section extractFirstSection(Long upStationId, Long downStationId, int distance) {
+        Station upStation = findStationById(upStationId);
+        Station downStation = findStationById(downStationId);
+
+        validateFirstSection(upStation, downStation, distance);
+        return Section.of(upStation, downStation, distance);
     }
 
     private Station findStationById(Long upStationId) {
@@ -90,8 +122,10 @@ public class LineService {
                 .orElseThrow(() -> new BusinessException(STATION_NOT_FOUND_BY_ID));
     }
 
-    public void deleteSection(Long lineId, Long stationId) {
-        Line line = findLineById(lineId);
-        line.deleteSection(findStationById(stationId));
+    private void validateFirstSection(Station upStation, Station downStation, int distance) {
+        if (sectionRepository.existsByUpStationAndDownStation(upStation, downStation)) {
+            throw new BusinessException(SECTION_ALREADY_EXISTS);
+        }
+        SectionValidator.proper(distance);
     }
 }

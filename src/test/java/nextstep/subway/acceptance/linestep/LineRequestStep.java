@@ -13,12 +13,18 @@ public class LineRequestStep {
     private final static String BODY_ELEMENT_NAME = "name";
     private final static String BODY_ELEMENT_COLOR = "color";
     private final static String BODY_ELEMENT_ID = "id";
+    private final static String BODY_UP_STATION_ID = "upStationId";
+    private final static String BODY_DOWN_STATION_ID = "downStationId";
+    private final static String BODY_DISTANCE = "distance";
 
-    public static ExtractableResponse<Response> 노선_생성(TestLine line) {
+    public static ExtractableResponse<Response> 노선_생성(TestLine line, Long 역1, Long 역2, int 거리) {
         Map<String, Object> params = new HashMap<>();
 
         insertRequestBody(params, BODY_ELEMENT_NAME, line.getName());
         insertRequestBody(params, BODY_ELEMENT_COLOR, line.getColor());
+        insertRequestBody(params, BODY_UP_STATION_ID, 역1);
+        insertRequestBody(params, BODY_DOWN_STATION_ID, 역2);
+        insertRequestBody(params, BODY_DISTANCE, 거리);
 
         return RestAssured
                 .given().log().all()
