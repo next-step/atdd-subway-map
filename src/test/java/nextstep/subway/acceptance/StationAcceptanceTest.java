@@ -1,17 +1,16 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-
-import java.util.List;
-
 import static nextstep.subway.acceptance.request.StationRequest.PATH_PREFIX;
 import static nextstep.subway.acceptance.request.StationRequest.stationCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
@@ -82,8 +81,6 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> duplicateCreationResponse = stationCreateRequest(강남역);
 
         // then
-        assertThat(duplicateCreationResponse.statusCode())
-                .isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(duplicateCreationResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
-
 }

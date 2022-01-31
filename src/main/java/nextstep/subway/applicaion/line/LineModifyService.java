@@ -1,16 +1,12 @@
 package nextstep.subway.applicaion.line;
 
-import nextstep.subway.applicaion.dto.LineCreateResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Section;
 import nextstep.subway.exception.DuplicateCreationException;
 import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional

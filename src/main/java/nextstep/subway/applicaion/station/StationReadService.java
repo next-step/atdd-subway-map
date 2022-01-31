@@ -2,7 +2,6 @@ package nextstep.subway.applicaion.station;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
@@ -27,8 +26,7 @@ public class StationReadService {
     }
 
     // 어플리케이션 서비스에서 사용하기 때문에 Station 을 Response 로 사용
-    public Station findSpecificStation(Long id){
+    public Station findSpecificStation(Long id) {
         return stationRepository.findById(id).orElseThrow(() -> new NotFoundException());
     }
-
 }

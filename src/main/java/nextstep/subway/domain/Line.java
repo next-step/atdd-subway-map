@@ -1,12 +1,10 @@
 package nextstep.subway.domain;
 
-import javax.persistence.*;
-
-import org.hibernate.annotations.DynamicUpdate;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.persistence.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 // 쿼리 캐싱이 안되는건 어쩔 수 없지만, 전체를 업데이트하다가 사이드 이펙트가 날 수 있기 때문에 미리 DynamicUpdate를 적용한다.
@@ -18,9 +16,13 @@ public class Line extends BaseEntity {
 
     @Column(unique = true)
     private String name;
+
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "line",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {}
@@ -51,7 +53,7 @@ public class Line extends BaseEntity {
         return Collections.unmodifiableList(sections);
     }
 
-    public void addSection(Section section){
+    public void addSection(Section section) {
         sections.add(section);
     }
 }

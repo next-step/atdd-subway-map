@@ -1,7 +1,6 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
-
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity

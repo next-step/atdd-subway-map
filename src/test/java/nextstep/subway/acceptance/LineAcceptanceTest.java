@@ -1,18 +1,16 @@
 package nextstep.subway.acceptance;
 
-import groovy.util.logging.Slf4j;
+import static nextstep.subway.acceptance.request.LineRequest.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import nextstep.subway.acceptance.request.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
-
-import static nextstep.subway.acceptance.request.LineRequest.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -23,19 +21,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String LINE_COLOR_B = "bg-green-600";
     private static final int FIRST_DISTANCE = 2;
 
-
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createFirstStationResponse =
+                StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+                StationRequest.stationCreateRequest("역삼역");
 
         Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
 
         // when 지하철 노선(상행 종점 구간, 하행 종점 구간 포함) 생성을 요청 하면
-        ExtractableResponse<Response> response = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        ExtractableResponse<Response> response =
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,16 +47,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
-        ExtractableResponse<Response> createThirdStationResponse = StationRequest.stationCreateRequest("양재역");
+        ExtractableResponse<Response> createFirstStationResponse =
+                StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+                StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createThirdStationResponse =
+                StationRequest.stationCreateRequest("양재역");
 
         Long upStationAId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationAId = createSecondStationResponse.jsonPath().getLong("id");
         Long downStationBId = createThirdStationResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> responseA = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationAId, downStationAId, FIRST_DISTANCE);
-        ExtractableResponse<Response> responseB = lineCreateRequest(LINE_NAME_B, LINE_COLOR_B, upStationAId, downStationBId, FIRST_DISTANCE);
+        ExtractableResponse<Response> responseA =
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationAId, downStationAId, FIRST_DISTANCE);
+        ExtractableResponse<Response> responseB =
+                lineCreateRequest(
+                        LINE_NAME_B, LINE_COLOR_B, upStationAId, downStationBId, FIRST_DISTANCE);
 
         // when
         ExtractableResponse<Response> response =
@@ -79,14 +87,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createFirstStationResponse =
+                StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+                StationRequest.stationCreateRequest("역삼역");
 
         Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
 
         // when 지하철 노선(상행 종점 구간, 하행 종점 구간 포함) 생성을 요청 하면
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        ExtractableResponse<Response> createResponse =
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         String uri = createResponse.header(LOCATION);
         // when
@@ -102,13 +114,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createFirstStationResponse =
+                StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+                StationRequest.stationCreateRequest("역삼역");
 
         Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        ExtractableResponse<Response> createResponse =
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         String uri = createResponse.header(LOCATION);
         // when
@@ -133,13 +149,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createFirstStationResponse =
+                StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+                StationRequest.stationCreateRequest("역삼역");
 
         Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        ExtractableResponse<Response> createResponse =
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
         String uri = createResponse.header(LOCATION);
@@ -158,17 +178,22 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateNameCreationTest() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createFirstStationResponse =
+                StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+                StationRequest.stationCreateRequest("역삼역");
 
         Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        ExtractableResponse<Response> createResponse =
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
         ExtractableResponse<Response> duplicateCreationResponse =
-          lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+                lineCreateRequest(
+                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // then
         assertThat(duplicateCreationResponse.statusCode())
@@ -177,7 +202,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("노선에 구간 추가")
     @Test
-    void addNewStationSectionTest(){
+    void addNewStationSectionTest() {
         // given
         // 노선을 생성하고 해당 노선에 종점역을 추가한 후
 
@@ -188,10 +213,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 구간 추가가 성공한다.
     }
 
-
     @DisplayName("노선에 구간 추가")
     @Test
-    void addFirstSectionTest(){
+    void addFirstSectionTest() {
         // Given
         // 노선을 생성하고
 
@@ -204,7 +228,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("노선 구간 제거")
     @Test
-    void deleteStationSectionTest(){
+    void deleteStationSectionTest() {
         // given
         // 노선을 생성하고 해당 노선에 구간을 추가한 후
 
@@ -217,7 +241,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("노선 구간 제거 실패")
     @Test
-    void deleteIgnoredStationSectionTest(){
+    void deleteIgnoredStationSectionTest() {
         // given
         // 노선을 생성하고 해당 노선에 구간을 추가한 후
 
@@ -227,5 +251,4 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         // 구간이 삭제된다.
     }
-
 }
