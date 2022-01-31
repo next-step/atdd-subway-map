@@ -11,16 +11,16 @@ public class LineResponse {
     private final Long id;
     private final String name;
     private final String color;
-    private final List<SectionResponse> sectionResponses;
+    private final List<SectionResponse> sectionsResponse;
     private final LocalDateTime createdDate;
     private final LocalDateTime modifiedDate;
 
-    private LineResponse(Long id, String name, String color, List<SectionResponse> sectionResponses,
+    private LineResponse(Long id, String name, String color, List<SectionResponse> sectionsResponse,
                          LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sectionResponses = sectionResponses;
+        this.sectionsResponse = sectionsResponse;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
     }
