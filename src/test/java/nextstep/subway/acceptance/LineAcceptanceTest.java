@@ -6,11 +6,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import nextstep.subway.acceptance.request.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -210,20 +215,39 @@ class LineAcceptanceTest extends AcceptanceTest {
           StationRequest.stationCreateRequest("강남역");
         ExtractableResponse<Response> createSecondStationResponse =
           StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createThirdStationResponse =
+          StationRequest.stationCreateRequest("선릉역");
 
         Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
         Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+        Long newDownStationId = createThirdStationResponse.jsonPath().getLong("id");
 
         ExtractableResponse<Response> response =
           lineCreateRequest(
             LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
-        // when
-        // 해당 노선에 구간 추가를 요청하면
+        String uri = response.header(LOCATION);
 
+        Map<String, Object> createRequest = new HashMap<>();
+        createRequest.put(UP_STATION_ID, downStationId);
+        createRequest.put(DOWN_STATION_ID, newDownStationId);
+        createRequest.put(DISTANCE, 3);
+
+        // when
+        ExtractableResponse<Response> newSectionResponse = RestAssured.given()
+          .log()
+          .all()
+          .body(createRequest)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .when()
+          .post(uri + "/sections")
+          .then()
+          .log()
+          .all()
+          .extract();
 
         // then
-        // 구간 추가가 성공한다.
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     @DisplayName("노선에 구간 추가 실패")
@@ -243,12 +267,13 @@ class LineAcceptanceTest extends AcceptanceTest {
           lineCreateRequest(
             LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
+
         // when
-        // 해당 노선에 구간 추가를 요청하면
+        // 해당 노선의 상행 종점에 구간 추가를 요청하면
 
 
         // then
-        // 구간 추가가 성공한다.
+        // 구간 추가가 실패한다.
     }
 
     @DisplayName("노선 구간 제거")
