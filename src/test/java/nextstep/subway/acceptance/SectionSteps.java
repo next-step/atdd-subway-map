@@ -26,4 +26,13 @@ public class SectionSteps {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 구간_제거_요청(String uri, Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete(uri + "?stationId=" + stationId)
+                .then().log().all()
+                .extract();
+    }
+
 }
