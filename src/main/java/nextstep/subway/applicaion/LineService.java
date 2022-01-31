@@ -63,7 +63,7 @@ public class LineService {
         return lines.stream()
                 .map(line -> {
                     List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
-                    return LineResponse.createLineResponse1(line, sections);
+                    return LineResponse.createLineAddSectionResponse(line, sections);
                 })
                 .collect(Collectors.toList());
     }
@@ -72,7 +72,7 @@ public class LineService {
     public LineResponse findLineById(Long id) throws NotFoundRequestException {
         Line line = findLine(id);
         List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
-        return LineResponse.createLineResponse1(line, sections);
+        return LineResponse.createLineAddSectionResponse(line, sections);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) throws NotFoundRequestException {
@@ -96,7 +96,7 @@ public class LineService {
         return SectionResponse.createSectionResponse(section, lineId);
     }
 
-    public void deleteStationById(Long lineId, Long stationId) {
+    public void deleteSectionById(Long lineId, Long stationId) {
         Line line = findLine(lineId);
         line.deleteSection(stationId);
     }
