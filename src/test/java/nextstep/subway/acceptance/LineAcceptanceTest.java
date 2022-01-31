@@ -219,7 +219,32 @@ class LineAcceptanceTest extends AcceptanceTest {
             LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
-        // 해당 노선에 상, 하선의 구간 추가를 요청하면
+        // 해당 노선에 구간 추가를 요청하면
+
+
+        // then
+        // 구간 추가가 성공한다.
+    }
+
+    @DisplayName("노선에 구간 추가 실패")
+    @Test
+    void addFailedNewStationSectionTest() {
+        // given
+        // 노선을 생성하고 해당 노선에 종점역을 추가한 후
+        ExtractableResponse<Response> createFirstStationResponse =
+          StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+          StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response =
+          lineCreateRequest(
+            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+
+        // when
+        // 해당 노선에 구간 추가를 요청하면
 
 
         // then
