@@ -62,7 +62,7 @@ public class Sections {
     }
 
     public void validateAddSection(Station upStation, Station downStation) {
-        if (values.size() == 0) {
+        if (values.isEmpty()) {
             return;
         }
 
@@ -76,7 +76,7 @@ public class Sections {
     }
 
     public void validateRemoval(Station station) {
-        if (this.values.size() <= 1) { throw new InvalidParameterException(); }
+        if (isSmallerMinimumSize()) { throw new InvalidParameterException(); }
 
         if (!last().getDownStation().equals(station)) {
             throw new InvalidParameterException();
@@ -85,5 +85,9 @@ public class Sections {
 
     public void removeLastSection() {
         this.values.remove(last());
+    }
+
+    private boolean isSmallerMinimumSize() {
+        return this.values.size() <= 1;
     }
 }
