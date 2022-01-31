@@ -39,18 +39,27 @@ public class Line extends BaseEntity {
         return color;
     }
 
+    public List<Station> getStations(){
+        return this.sections.getStations();
+    }
+
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
     }
 
     public void addStationToSection(Station upStation, Station downStation, int distance) {
-        Section section = new Section(this, upStation, downStation, distance);
-        sections.add(section);
+        Section upSection = new Section(this, null, upStation, 0);
+        Section downSection = new Section(this, upStation, downStation, distance);
+
+        sections.addAll(upSection, downSection);
     }
 
-    public List<Station> getStations(){
-        return this.sections.getStations();
+    public void addNewSection(Section newSection) {
+        sections.add(newSection);
     }
 
+    public List<Section> getSections() {
+        return this.sections.getSections();
+    }
 }

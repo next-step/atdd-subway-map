@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -37,5 +38,30 @@ public class Sections {
 		}
 
 		return stations;
+	}
+
+	public List<Section> getSections() {
+		List<Section> stations = new ArrayList<>();
+		Optional<Section> firstStation = findUpSection();
+
+		while (firstStation.isPresent()) {
+			Section section = firstStation.get();
+			stations.add(section);
+			firstStation = findDownSection(section.getDownStation());
+		}
+
+		return stations;
+	}
+
+	private Optional<Section> findUpSection() {
+		return this.sections.stream()
+			.filter(section -> section.getUpStation() == null)
+			.findFirst();
+	}
+
+	private Optional<Section> findDownSection(Station downStation) {
+		return this.sections.stream()
+			.filter(section -> section.getUpStation() == downStation)
+			.findFirst();
 	}
 }
