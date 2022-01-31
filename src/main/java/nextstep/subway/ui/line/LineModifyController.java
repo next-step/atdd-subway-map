@@ -21,7 +21,9 @@ public class LineModifyController {
     private final LineModifyService lineModifyService;
 
     public LineModifyController(
-            LineCreationService lineCreationService, SectionUpdateService sectionUpdateService, LineModifyService lineModifyService) {
+            LineCreationService lineCreationService,
+            SectionUpdateService sectionUpdateService,
+            LineModifyService lineModifyService) {
         this.lineCreationService = lineCreationService;
         this.sectionUpdateService = sectionUpdateService;
         this.lineModifyService = lineModifyService;
@@ -47,13 +49,14 @@ public class LineModifyController {
     }
 
     @PostMapping("{id}/sections")
-    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest){
+    public ResponseEntity<Void> addSection(
+            @PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         sectionUpdateService.addSection(id, sectionRequest);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("{id}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId){
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
         sectionUpdateService.deleteSection(id, stationId);
         return ResponseEntity.noContent().build();
     }

@@ -1,7 +1,6 @@
 package nextstep.subway.domain;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.persistence.*;
 import org.hibernate.annotations.DynamicUpdate;

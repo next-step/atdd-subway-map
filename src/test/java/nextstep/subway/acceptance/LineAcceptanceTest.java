@@ -6,16 +6,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import nextstep.subway.acceptance.request.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -202,8 +197,6 @@ class LineAcceptanceTest extends AcceptanceTest {
                         LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // then
-        assertThat(duplicateCreationResponse.statusCode())
-                .isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(duplicateCreationResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
-
 }

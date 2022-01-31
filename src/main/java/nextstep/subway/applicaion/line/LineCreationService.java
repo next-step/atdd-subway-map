@@ -17,8 +17,7 @@ public class LineCreationService {
     private final StationReadService stationReadService;
 
     public LineCreationService(
-            LineModifyService lineModifyService,
-            StationReadService stationReadService) {
+            LineModifyService lineModifyService, StationReadService stationReadService) {
         this.lineModifyService = lineModifyService;
         this.stationReadService = stationReadService;
     }
