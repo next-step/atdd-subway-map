@@ -69,10 +69,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
 
         // when
-        ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 판교역_번호);
+        ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제_요청(lineId, 판교역_번호);
 
         //then
-        CommonSteps.요청_성공_컨텐츠_미제공(deleteReponse.statusCode());
+        CommonSteps.요청_성공_컨텐츠_미제공(deleteResponse.statusCode());
     }
 
     /**
@@ -94,10 +94,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         SectionSteps.지하철_구간_생성_요청(lineId, 양재역_번호, 판교역_번호, distance);
 
         // when
-        ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 광교역_번호);
+        ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제_요청(lineId, 광교역_번호);
 
         // then
-        CommonSteps.잘못된_데이터_전달로_실패(deleteReponse.statusCode());
+        CommonSteps.잘못된_데이터_전달로_실패(deleteResponse.statusCode());
     }
 
 
@@ -117,10 +117,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final Long lineId = LineSteps.지하철_노선_생성_요청("신분당선", "bg-red-600", 광교역_번호, 양재역_번호, distance)
                 .jsonPath().getLong(번호);
 
-        ExtractableResponse<Response> deleteReponse = SectionSteps.지하철_구간_삭제_요청(lineId, 양재역_번호);
+        ExtractableResponse<Response> deleteResponse = SectionSteps.지하철_구간_삭제_요청(lineId, 양재역_번호);
 
         // then
-        CommonSteps.잘못된_데이터_전달로_실패(deleteReponse.statusCode());
+        CommonSteps.잘못된_데이터_전달로_실패(deleteResponse.statusCode());
     }
 
     /**
