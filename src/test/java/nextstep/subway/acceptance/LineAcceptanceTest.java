@@ -259,22 +259,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 지하철 노선의 정보 삭제을 요청 하면
-     * Then 지하철 노선이 삭제되지 않는다.
-     */
-    @Test
-    void 존재하지_않는_노선_삭제() {
-        // when
-        Long lineId = 2L;
-        ExtractableResponse<Response> 지하철_노선_삭제_응답 = LineSteps.지하철_노선_삭제_요청(lineId);
-
-        // then
-        assertThat(지하철_노선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(지하철_노선_삭제_응답.jsonPath().getString("message"))
-                .isEqualTo(String.format(LineService.LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, lineId));
-    }
-
-    /**
      * Given 지하철역 생성을 요청하고,
      * Given 새로운 지하철역 생성을 요청하고,
      * Given 지하철 노선 생성을 요청하고,

@@ -86,8 +86,7 @@ public class LineService {
     }
 
     public void deleteLineById(Long id) throws NotFoundRequestException {
-        Line line = findLine(id);
-        lineRepository.delete(line);
+        lineRepository.deleteById(id);
     }
 
     public SectionResponse saveSection(Long lineId, SectionRequest request)
