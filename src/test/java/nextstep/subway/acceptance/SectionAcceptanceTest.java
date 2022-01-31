@@ -28,6 +28,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private static final int 동천역_수지구청역_거리 = 3;
 
     private Long 강남역_아이디, 양재역_아이디, 양재시민의숲역_아이디, 동천역_아이디, 수지구청역_아이디, 신분당선_아이디;
+    private String 신분당선_구간_URI;
 
     @BeforeEach
     void beforeEach() {
@@ -36,7 +37,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         양재시민의숲역_아이디 = 지하철역_생성_요청(양재시민의숲역).jsonPath().getLong("id");
         동천역_아이디 = 지하철역_생성_요청(동천역).jsonPath().getLong("id");
         수지구청역_아이디 = 지하철역_생성_요청(수지구청역).jsonPath().getLong("id");
-        신분당선_아이디 = 지하철_노선_생성_요청(신분당선, BG_RED_600, 강남역_아이디, 양재역_아이디, 강남역_양재역_거리).jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 지하철_노선_생성_요청 = 지하철_노선_생성_요청(신분당선, BG_RED_600, 강남역_아이디, 양재역_아이디, 강남역_양재역_거리);
+        신분당선_아이디 = 지하철_노선_생성_요청.jsonPath().getLong("id");
+        신분당선_구간_URI = 지하철_노선_생성_요청.header("Location") + "/sections";
     }
 
     /**
@@ -111,6 +115,20 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> deleteResponse = 구간_제거_요청(createResponse.header("Location"), 양재역_아이디);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * When 노선에 구간이 1개인 경우 구간 제거 요청 시
+     * Then 구간 제거가 실패한다.
+     */
+    @DisplayName("노선에 구간이 1개인 경우 구간 제거")
+    @Test
+    void deleteWhenExistOnlyOneSection() {
+        // when
+        ExtractableResponse<Response> deleteResponse = 구간_제거_요청(신분당선_구간_URI, 양재역_아이디);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
