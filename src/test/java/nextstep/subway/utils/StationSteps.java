@@ -36,6 +36,10 @@ public class StationSteps {
                 .extract();
     }
 
+    public static Long 지하철역_생성_요청_ID_반환(String stationName) {
+        return StationSteps.getStationId(StationSteps.지하철역_생성_요청(stationName));
+    }
+
     public static Long getStationId(ExtractableResponse<Response> response) {
         String[] split = response.header("Location").split("/");
         return Long.valueOf(split[split.length - 1]);

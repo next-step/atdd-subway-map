@@ -66,7 +66,12 @@ public class LineSteps {
                 .extract();
     }
 
-    public static Long getLineId(ExtractableResponse<Response> response) {
+    public static Long 지하철역_노선_생성_요청_ID_반환(String lineName, String lineColor, Long upStationId, Long downStationId, int distance) {
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(lineName, lineColor, upStationId, downStationId, distance);
+        return LineSteps.getLineId(response);
+    }
+
+    private static Long getLineId(ExtractableResponse<Response> response) {
         String[] split = response.header("Location").split("/");
         return Long.valueOf(split[split.length - 1]);
     }

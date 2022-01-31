@@ -2,7 +2,6 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.domain.Station;
 import nextstep.subway.utils.LineSteps;
 import nextstep.subway.utils.SectionSteps;
 import nextstep.subway.utils.StationSteps;
@@ -33,27 +32,18 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_생성() {
         // given
-        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
-        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
-
-        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청(증미역);
-        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        Long 가양역_ID = StationSteps.지하철역_생성_요청_ID_반환(가양역);
+        Long 증미역_ID = StationSteps.지하철역_생성_요청_ID_반환(증미역);
         int distance1 = 10;
 
-        ExtractableResponse<Response> 지하철_노선_생성_응답 =
-                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
+        Long lineId = LineSteps.지하철역_노선_생성_요청_ID_반환(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
 
-        ExtractableResponse<Response> 등촌역_생성_응답 = StationSteps.지하철역_생성_요청(등촌역);
-        Long 등촌역_ID = StationSteps.getStationId(등촌역_생성_응답);
+        Long 등촌역_ID = StationSteps.지하철역_생성_요청_ID_반환(등촌역);
         int distance2 = 5;
 
         // when
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
-        Long upStationId = 증미역_ID;
-        Long downStationId = 등촌역_ID;
-
         ExtractableResponse<Response> 노선_9호선_2구간_응답 =
-                SectionSteps.지하철_구간_생성_요청(lineId, upStationId, downStationId, distance2);
+                SectionSteps.지하철_구간_생성_요청(lineId, 증미역_ID, 등촌역_ID, distance2);
 
         // then
         assertThat(노선_9호선_2구간_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -63,8 +53,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
         Long expectedDownStationId = 노선_9호선_2구간_응답.jsonPath().getLong("downStationId");
         int expectedDistance = 노선_9호선_2구간_응답.jsonPath().getInt("distance");
         assertThat(expectedLineId).isEqualTo(lineId);
-        assertThat(expectedUpStationId).isEqualTo(upStationId);
-        assertThat(expectedDownStationId).isEqualTo(downStationId);
+        assertThat(expectedUpStationId).isEqualTo(증미역_ID);
+        assertThat(expectedDownStationId).isEqualTo(등촌역_ID);
         assertThat(expectedDistance).isEqualTo(distance2);
     }
 
@@ -81,23 +71,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_생성_실패_상행역과_하행_종점역이_다른_경우() {
         // given
-        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
-        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
-        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청(증미역);
-        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        Long 가양역_ID = StationSteps.지하철역_생성_요청_ID_반환(가양역);
+        Long 증미역_ID = StationSteps.지하철역_생성_요청_ID_반환(증미역);
         int distance1 = 10;
 
-        ExtractableResponse<Response> 지하철_노선_생성_응답 =
-                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
+        Long lineId = LineSteps.지하철역_노선_생성_요청_ID_반환(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
 
-        ExtractableResponse<Response> 등촌역_생성_응답 = StationSteps.지하철역_생성_요청(등촌역);
-        Long 등촌역_ID = StationSteps.getStationId(등촌역_생성_응답);
-        ExtractableResponse<Response> 염창역_생성_응답 = StationSteps.지하철역_생성_요청(염창역);
-        Long 염창역_ID = StationSteps.getStationId(염창역_생성_응답);
+        Long 등촌역_ID = StationSteps.지하철역_생성_요청_ID_반환(등촌역);
+        Long 염창역_ID = StationSteps.지하철역_생성_요청_ID_반환(염창역);
         int distance2 = 5;
 
         // when
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 노선_9호선_2구간_응답 =
                 SectionSteps.지하철_구간_생성_요청(lineId, 등촌역_ID, 염창역_ID, distance2);
 
@@ -116,17 +100,13 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_생성_실패_새로운_구간의_하행역이_현재_등록되어_있는_구간의_역일_경우() {
         // given
-        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
-        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
-        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청(증미역);
-        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        Long 가양역_ID = StationSteps.지하철역_생성_요청_ID_반환(가양역);
+        Long 증미역_ID = StationSteps.지하철역_생성_요청_ID_반환(증미역);
         int distance = 10;
 
-        ExtractableResponse<Response> 지하철_노선_생성_응답 =
-                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
+        Long lineId = LineSteps.지하철역_노선_생성_요청_ID_반환(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
 
         // when
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
         ExtractableResponse<Response> 노선_9호선_2구간_응답 =
                 SectionSteps.지하철_구간_생성_요청(lineId, 증미역_ID, 가양역_ID, distance);
 
@@ -147,21 +127,14 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_삭제() {
         // given
-        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
-        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
-
-        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청(증미역);
-        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        Long 가양역_ID = StationSteps.지하철역_생성_요청_ID_반환(가양역);
+        Long 증미역_ID = StationSteps.지하철역_생성_요청_ID_반환(증미역);
         int distance1 = 10;
 
-        ExtractableResponse<Response> 지하철_노선_생성_응답 =
-                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
+        Long lineId = LineSteps.지하철역_노선_생성_요청_ID_반환(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
 
-        ExtractableResponse<Response> 등촌역_생성_응답 = StationSteps.지하철역_생성_요청(등촌역);
-        Long 등촌역_ID = StationSteps.getStationId(등촌역_생성_응답);
+        Long 등촌역_ID = StationSteps.지하철역_생성_요청_ID_반환(등촌역);
         int distance2 = 5;
-
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
 
         SectionSteps.지하철_구간_생성_요청(lineId, 증미역_ID, 등촌역_ID, distance2);
 
@@ -185,21 +158,14 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_삭제_실패_하행_종점역이_아닌_역을_제거할_경우() {
         // given
-        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
-        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
-
-        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청(증미역);
-        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
+        Long 가양역_ID = StationSteps.지하철역_생성_요청_ID_반환(가양역);
+        Long 증미역_ID = StationSteps.지하철역_생성_요청_ID_반환(증미역);
         int distance1 = 10;
 
-        ExtractableResponse<Response> 지하철_노선_생성_응답 =
-                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
+        Long lineId = LineSteps.지하철역_노선_생성_요청_ID_반환(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
 
-        ExtractableResponse<Response> 등촌역_생성_응답 = StationSteps.지하철역_생성_요청(등촌역);
-        Long 등촌역_ID = StationSteps.getStationId(등촌역_생성_응답);
+        Long 등촌역_ID = StationSteps.지하철역_생성_요청_ID_반환(등촌역);
         int distance2 = 5;
-
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
 
         SectionSteps.지하철_구간_생성_요청(lineId, 증미역_ID, 등촌역_ID, distance2);
 
@@ -221,17 +187,12 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_삭제_실패_구간이_1개인_경우() {
         // given
-        ExtractableResponse<Response> 가양역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
-        Long 가양역_ID = StationSteps.getStationId(가양역_생성_응답);
+        Long 가양역_ID = StationSteps.지하철역_생성_요청_ID_반환(가양역);
+        Long 증미역_ID = StationSteps.지하철역_생성_요청_ID_반환(증미역);
+        int distance = 10;
 
-        ExtractableResponse<Response> 증미역_생성_응답 = StationSteps.지하철역_생성_요청(증미역);
-        Long 증미역_ID = StationSteps.getStationId(증미역_생성_응답);
-        int distance1 = 10;
-
-        ExtractableResponse<Response> 지하철_노선_생성_응답 =
-                LineSteps.지하철_노선_생성_요청(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance1);
-
-        Long lineId = LineSteps.getLineId(지하철_노선_생성_응답);
+        Long lineId = LineSteps.지하철역_노선_생성_요청_ID_반환(노선_9호선, 색상_9호선, 가양역_ID, 증미역_ID, distance);
+        SectionSteps.지하철_구간_생성_요청(lineId, 가양역_ID, 증미역_ID, distance);
 
         // when
         ExtractableResponse<Response> 지하철_구간_삭제_요청_응답 = SectionSteps.지하철_구간_삭제_요청(lineId, 증미역_ID);
