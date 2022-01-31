@@ -3,7 +3,6 @@ package nextstep.subway.applicaion.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -17,7 +16,7 @@ public class LineResponse {
     private String name;
     private String color;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Set<Station> stations;
+    private Set<StationResponse> stations;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
@@ -30,7 +29,7 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    private LineResponse(Long id, String name, String color, Set<Station> stations,
+    private LineResponse(Long id, String name, String color, Set<StationResponse> stations,
                          LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
@@ -61,11 +60,11 @@ public class LineResponse {
         );
     }
 
-    private static Set<Station> getStations(List<Section> sections) {
-        Set<Station> stations = new LinkedHashSet<>();
+    private static Set<StationResponse> getStations(List<Section> sections) {
+        Set<StationResponse> stations = new LinkedHashSet<>();
         for (Section section : sections) {
-            stations.add(section.getUpStation());
-            stations.add(section.getDownStation());
+            stations.add(StationResponse.createStationResponse(section.getUpStation()));
+            stations.add(StationResponse.createStationResponse(section.getDownStation()));
         }
         return stations;
     }
@@ -82,7 +81,7 @@ public class LineResponse {
         return color;
     }
 
-    public Set<Station> getStations() {
+    public Set<StationResponse> getStations() {
         return Collections.unmodifiableSet(stations);
     }
 

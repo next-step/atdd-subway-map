@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.domain.Station;
+import nextstep.subway.applicaion.dto.response.StationResponse;
 import nextstep.subway.utils.LineSteps;
 import nextstep.subway.utils.SectionSteps;
 import nextstep.subway.utils.StationSteps;
@@ -106,7 +106,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * Given 지하철역 생성을 요청하고,
      *   AND 새로운 지하철역 생성을 요청하고,
      *   AND 지하철 노선 생성을 요청 하고,
-     *   AND 새로운 지하철역 생성을 요청하고,
+     * Given 새로운 지하철역 생성을 요청하고,
      *   AND 기존의 지하철 노선에 구간 등록을 요청하고,
      *  When 생성한 지하철 노선 조회를 요청 하면
      *  Then 생성한 지하철 노선에 해당하는 역을 구간 기준 오름차순으로 응답한다.
@@ -142,7 +142,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String lineColor = 지하철_노선_조회_응답.jsonPath().getString("color");
         assertThat(lineColor).isEqualTo(색상_9호선);
 
-        List<Station> stations = 지하철_노선_조회_응답.jsonPath().getList("stations", Station.class);
+        List<StationResponse> stations = 지하철_노선_조회_응답.jsonPath().getList("stations", StationResponse.class);
         assertThat(stations.size()).isEqualTo(3);
     }
 
