@@ -41,15 +41,11 @@ public class Sections {
     }
 
     public boolean checkDuplicatedDownStation(Station downStation) {
-        boolean duplicatedDownStationYn = this.values.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet())
-                .contains(downStation);
-        boolean duplicatedUpStationYn = this.values.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet())
-                .contains(downStation);
-        return duplicatedDownStationYn || duplicatedUpStationYn;
+        return this.values.stream()
+                .anyMatch(section ->
+                        section.getUpStation().equals(downStation) ||
+                                section.getDownStation().equals(downStation)
+                );
     }
 
     public List<Station> getAllStations() {
