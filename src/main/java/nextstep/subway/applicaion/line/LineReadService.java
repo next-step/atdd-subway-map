@@ -25,23 +25,29 @@ public class LineReadService {
 
     public List<LineReadResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(line -> makeLineReadResponse(line))
+                .map(this::makeLineReadResponse)
                 .collect(Collectors.toList());
     }
 
     public LineReadResponse findSpecificLine(Long id) {
         return lineRepository
                 .findById(id)
-                .map(line -> makeLineReadResponse(line))
+                .map(this::makeLineReadResponse)
                 .orElseThrow(NotFoundException::new);
     }
 
-    private LineReadResponse makeLineReadResponse(Line line){
-        return new LineReadResponse(line.getId(), line.getName(), line.getColor(), makeLineStationResponse(line.getSections()), line.getCreatedDate(), line.getModifiedDate());
+    private LineReadResponse makeLineReadResponse(Line line) {
+        return new LineReadResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                makeLineStationResponse(line.getSections()),
+                line.getCreatedDate(),
+                line.getModifiedDate());
     }
 
-    private List<StationResponse> makeLineStationResponse(List<Section> sections){
-        if(sections.isEmpty()) {
+    private List<StationResponse> makeLineStationResponse(List<Section> sections) {
+        if (sections.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -50,7 +56,7 @@ public class LineReadService {
         Station firstStation = sections.get(0).getUpStation();
         stationResponses.add(StationResponse.of(firstStation));
 
-        for(Section section: sections){
+        for (Section section : sections) {
             stationResponses.add(StationResponse.of(section.getDownStation()));
         }
 

@@ -30,9 +30,6 @@ public class Station extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Station{" +
-          "id=" + id +
-          ", name='" + name + '\'' +
-          '}';
+        return "Station{" + "id=" + id + ", name='" + name + '\'' + '}';
     }
 }

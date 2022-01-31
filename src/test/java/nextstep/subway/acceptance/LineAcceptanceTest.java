@@ -1,43 +1,27 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.step.LineRequest.*;
+import static nextstep.subway.acceptance.requests.LineRequests.*;
+import static nextstep.subway.acceptance.type.GeneralNameType.*;
+import static nextstep.subway.acceptance.type.LineNameType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import nextstep.subway.acceptance.step.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    // 자주 사용되는 문자열 상수로 분리
-    private static final String LINE_NAME_A = "신분당선";
-    private static final String LINE_COLOR_A = "bg-red-600";
-    private static final String LINE_NAME_B = "2호선";
-    private static final String LINE_COLOR_B = "bg-green-600";
-    private static final int FIRST_DISTANCE = 2;
 
-    // TODO: 역 없이 노선 생성이 가능할까?
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        // when 지하철 노선(상행 종점 구간, 하행 종점 구간 포함) 생성을 요청 하면
+        // when
         ExtractableResponse<Response> response =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -48,86 +32,45 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
-        ExtractableResponse<Response> createThirdStationResponse =
-                StationRequest.stationCreateRequest("양재역");
-
-        Long upStationAId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationAId = createSecondStationResponse.jsonPath().getLong("id");
-        Long downStationBId = createThirdStationResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> responseA =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationAId, downStationAId, FIRST_DISTANCE);
-        ExtractableResponse<Response> responseB =
-                lineCreateRequest(
-                        LINE_NAME_B, LINE_COLOR_B, upStationAId, downStationBId, FIRST_DISTANCE);
+        lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor());
+        lineCreateRequest(SECOND_LINE.lineName(), SECOND_LINE.lineColor());
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .log()
-                        .all()
-                        .when()
-                        .get(PATH_PREFIX)
-                        .then()
-                        .log()
-                        .all()
-                        .extract();
+        ExtractableResponse<Response> response = readLineListRequest(LINE_PATH_PREFIX.getType());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList(NAME);
-        assertThat(stationNames).contains(LINE_NAME_A, LINE_NAME_B);
+        List<String> stationNames = response.jsonPath().getList(NAME.getType());
+        assertThat(stationNames).contains(NEW_BUN_DANG_LINE.lineName(), SECOND_LINE.lineName());
     }
 
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
+        String uri =
+                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
+                        .header(LOCATION);
 
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        // when 지하철 노선(상행 종점 구간, 하행 종점 구간 포함) 생성을 요청 하면
-        ExtractableResponse<Response> createResponse =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
-
-        String uri = createResponse.header(LOCATION);
         // when
         ExtractableResponse<Response> readLineResponse = specificLineReadRequest(uri);
 
         // then
         assertThat(readLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String responseLineName = readLineResponse.jsonPath().getString(NAME);
-        assertThat(responseLineName).isEqualTo(LINE_NAME_A);
+        String responseLineName = readLineResponse.jsonPath().getString(NAME.getType());
+        String readUpdatedLineColor = readLineResponse.jsonPath().getString(COLOR.getType());
+        assertThat(responseLineName).isEqualTo(NEW_BUN_DANG_LINE.lineName());
+        assertThat(readUpdatedLineColor).isEqualTo(NEW_BUN_DANG_LINE.lineColor());
     }
 
     @DisplayName("지하철 노선 수정")
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
+        String uri =
+                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
+                        .header(LOCATION);
 
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> createResponse =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
-
-        String uri = createResponse.header(LOCATION);
         // when
         String updateLineName = "구분당선";
         String updateLineColor = "bg-blue-600";
@@ -136,35 +79,17 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // addition: to verify changed contents
-        ExtractableResponse<Response> readUpdatedLineResponse = specificLineReadRequest(uri);
-        assertThat(readUpdatedLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        String readUpdatedLineName = readUpdatedLineResponse.jsonPath().getString(NAME);
-        String readUpdatedLineColor = readUpdatedLineResponse.jsonPath().getString(COLOR);
-        assertThat(readUpdatedLineName).isEqualTo(updateLineName);
-        assertThat(readUpdatedLineColor).isEqualTo(updateLineColor);
     }
 
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> createResponse =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        String uri =
+                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
+                        .header(LOCATION);
 
         // when
-        String uri = createResponse.header(LOCATION);
-
         ExtractableResponse<Response> deleteResponse =
                 RestAssured.given().log().all().when().delete(uri).then().log().all().extract();
 
@@ -179,22 +104,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateNameCreationTest() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> createResponse =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+        String uri =
+                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
+                        .header(LOCATION);
 
         // when
         ExtractableResponse<Response> duplicateCreationResponse =
-                lineCreateRequest(
-                        LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor());
 
         // then
         assertThat(duplicateCreationResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
