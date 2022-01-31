@@ -4,7 +4,6 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.utils.RequestParamsBuilder;
 import nextstep.subway.utils.RestTestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,13 +17,20 @@ import java.util.Map;
 
 import static io.restassured.http.Method.*;
 import static nextstep.subway.acceptance.line.LineStep.*;
+import static nextstep.subway.acceptance.station.StationStep.지하철역_생성_요청;
+import static nextstep.subway.utils.RestTestUtils.요청_테스트;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    Long 상행_종점역;
+    Long 하행_종점역;
 
     @BeforeEach
     void 노선에_설정할_종점역_생성_요청() {
+        super.setUp();
+        상행_종점역 = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("잠실역"));
+        하행_종점역 = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("몽촌토성역"));
     }
 
     /**
@@ -35,9 +41,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        Long 상행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("잠실역"));
-        Long 하행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("몽촌토성역"));
         //when
+
         ExtractableResponse<Response> response = 노선_생성_요청("신분당선", "bg-red-600", 상행_종점역, 하행_종점역);
 
         // then
@@ -56,8 +61,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         //given
-        Long 상행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("잠실역"));
-        Long 하행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("몽촌토성역"));
         노선_생성_요청("신분당선", "bg-red-600", 상행_종점역, 하행_종점역);
         노선_생성_요청("2호선", "bg-green-600", 상행_종점역, 하행_종점역);
 
@@ -85,13 +88,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLineWithStations() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행_종점역, 하행_종점역));
         int 거리 = 1000;
 
-        Long 구간_상행역Id = 하행종점역Id;
-        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
+        Long 구간_상행역Id = 하행_종점역;
+        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("신흥역"));
         SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
 
         //when
@@ -103,7 +104,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(stations.size()).isEqualTo(3);
-        assertThat(stations.stream().map(station -> station.get("name"))).containsExactly("모란역", "수진역", "신흥역");
+        assertThat(stations.stream().map(station -> station.get("name"))).containsExactly("잠실역", "몽촌토성역", "신흥역");
     }
 //
 
@@ -117,13 +118,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
-        Long 상행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("잠실역"));
-        Long 하행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("몽촌토성역"));
         ExtractableResponse<Response> fixtureResponse = 노선_생성_요청("신분당선", "bg-red-600", 상행_종점역, 하행_종점역);
         URI fixtureLineUri = RestTestUtils.getLocationURI(fixtureResponse);
 
         //when
-        ExtractableResponse<Response> response = RestTestUtils.요청_테스트(fixtureLineUri, GET);
+        ExtractableResponse<Response> response = 요청_테스트(fixtureLineUri, GET);
 
         //then
         JsonPath jsonPath = response.jsonPath();
@@ -143,20 +142,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Long 상행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("잠실역"));
-        Long 하행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("몽촌토성역"));
         ExtractableResponse<Response> fixtureResponse = 노선_생성_요청("신분당선", "bg-red-600", 상행_종점역, 하행_종점역);
         URI fixtureLineUri = URI.create(fixtureResponse.header("Location"));
 
         //when
-        ExtractableResponse<Response> response = RestTestUtils.요청_테스트(fixtureLineUri, RequestParamsBuilder.<String>builder()
+        ExtractableResponse<Response> response = 요청_테스트(fixtureLineUri, RequestParamsBuilder.<String>builder()
                 .addParam("name", "구분당선")
                 .addParam("color", "bg-blue-600")
                 .build(), PUT);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        ExtractableResponse<Response> 업데이트_완료된_이후_조회_응답 = RestTestUtils.요청_테스트(fixtureLineUri, GET);
+        ExtractableResponse<Response> 업데이트_완료된_이후_조회_응답 = 요청_테스트(fixtureLineUri, GET);
         JsonPath jsonPath = 업데이트_완료된_이후_조회_응답.jsonPath();
         assertThat(jsonPath.getInt("id")).isEqualTo(1);
         assertThat(jsonPath.getString("name")).isEqualTo("구분당선");
@@ -174,13 +171,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        Long 상행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("잠실역"));
-        Long 하행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("몽촌토성역"));
         ExtractableResponse<Response> fixtureResponse = 노선_생성_요청("신분당선", "bg-red-600", 상행_종점역, 하행_종점역);
         URI fixtureLineUri = RestTestUtils.getLocationURI(fixtureResponse);
 
         //when
-        ExtractableResponse<Response> response = RestTestUtils.요청_테스트(fixtureLineUri, DELETE);
+        ExtractableResponse<Response> response = 요청_테스트(fixtureLineUri, DELETE);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -196,8 +191,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 중복이름으로_지하철노선을_생성하면_실패한다() {
         //given
-        Long 상행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("잠실역"));
-        Long 하행_종점역 = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("몽촌토성역"));
         String fixtureLineName = "신분당선";
         ExtractableResponse<Response> fixtureResponse = 노선_생성_요청(fixtureLineName, "bg-red-600", 상행_종점역, 하행_종점역);
 

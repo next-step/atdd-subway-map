@@ -3,12 +3,15 @@ package nextstep.subway.acceptance.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.station.StationStep;
 import nextstep.subway.utils.RestAssert;
 import nextstep.subway.utils.RestTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+
+import static nextstep.subway.acceptance.line.LineStep.노선_생성_요청;
+import static nextstep.subway.acceptance.line.SectionStep.구간_생성_요청;
+import static nextstep.subway.acceptance.station.StationStep.지하철역_생성_요청;
 
 @DisplayName("구간 관리 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -23,15 +26,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 구간생성() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
         int 거리 = 1000;
 
         Long 구간_상행역Id = 하행종점역Id;
-        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
+        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("신흥역"));
         //when
-        ExtractableResponse<Response> response = SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
+        ExtractableResponse<Response> response = 구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
 
         //then
         RestAssert.that(response)
@@ -48,15 +51,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 구간생성_유효성검증_구간_상행역은_노선의_하행_종점역() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
         int 거리 = 1000;
         Long 구간_상행역Id = 상행종점역Id; // 하행종점역이아닌 상행종점역으로 설정
-        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
+        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("신흥역"));
 
         //when
-        ExtractableResponse<Response> response = SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
+        ExtractableResponse<Response> response = 구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
 
         // then
         RestAssert.that(response)
@@ -76,23 +79,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 구간생성_유효성검증_구간_하행역은_노선에_등록되어있지않아야함() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
         int 거리 = 1000;
 
         Long 첫번째_구간_상행역Id = 하행종점역Id;
-        Long 첫번쨰_구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
-        SectionStep.구간_생성_요청(노선Id, 첫번째_구간_상행역Id, 첫번쨰_구간_하행역Id, 거리);
+        Long 첫번쨰_구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("신흥역"));
+        구간_생성_요청(노선Id, 첫번째_구간_상행역Id, 첫번쨰_구간_하행역Id, 거리);
 
         Long 두번째_구간_상행역Id = 첫번쨰_구간_하행역Id;
-        Long 두번쨰_구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("단대오거리역"));
-        SectionStep.구간_생성_요청(노선Id, 두번째_구간_상행역Id, 두번쨰_구간_하행역Id, 거리);
+        Long 두번쨰_구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("단대오거리역"));
+        구간_생성_요청(노선Id, 두번째_구간_상행역Id, 두번쨰_구간_하행역Id, 거리);
 
         Long 구간_상행역Id = 두번쨰_구간_하행역Id;
         Long 구간_하행역Id = 첫번째_구간_상행역Id;
         // when
-        ExtractableResponse<Response> response = SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
+        ExtractableResponse<Response> response = 구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
 
         // then
         RestAssert.that(response)
@@ -111,14 +114,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 구간_삭제_실패_삭제할_구간이_하행종점역이_아닐때() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
         int 거리 = 1000;
 
         Long 구간_상행역Id = 하행종점역Id;
-        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
-        SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
+        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("신흥역"));
+        구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
         //when
         ExtractableResponse<Response> response = SectionStep.구간_삭제_요청(노선Id, 상행종점역Id);
 
@@ -138,9 +141,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 구간_삭제_실패_오직_종점역만_존재할때() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
 
         //when
         ExtractableResponse<Response> response = SectionStep.구간_삭제_요청(노선Id, 상행종점역Id);
@@ -162,14 +165,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 구간_삭제_성공() {
         //given
-        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("모란역"));
-        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("수진역"));
-        Long 노선Id = RestTestUtils.getCreatedResourceId(LineStep.노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
+        Long 상행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("모란역"));
+        Long 하행종점역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("수진역"));
+        Long 노선Id = RestTestUtils.getCreatedResourceId(노선_생성_요청("8호선", "bg-pink-600", 상행종점역Id, 하행종점역Id));
         int 거리 = 1000;
 
         Long 구간_상행역Id = 하행종점역Id;
-        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(StationStep.지하철역_생성_요청("신흥역"));
-        SectionStep.구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
+        Long 구간_하행역Id = RestTestUtils.getCreatedResourceId(지하철역_생성_요청("신흥역"));
+        구간_생성_요청(노선Id, 구간_상행역Id, 구간_하행역Id, 거리);
 
         Long 최종_하행종점역Id = 구간_하행역Id;
 
