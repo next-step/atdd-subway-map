@@ -19,4 +19,15 @@ public class SectionAcceptanceUtil {
                 .all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철_구간_삭제_요청(String deleteLocation) {
+        return RestAssured
+                .given()
+                .when()
+                .delete(deleteLocation)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
 }

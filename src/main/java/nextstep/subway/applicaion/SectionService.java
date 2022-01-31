@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.exception.NewDownStationDuplicateException;
 import nextstep.subway.applicaion.exception.NotRegisterDownStationException;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SectionService {
@@ -55,4 +56,8 @@ public class SectionService {
         return sectionRepository.save(saveSection);
     }
 
+    @Transactional
+    public void delete(Long lineId, Long downStationId) {
+        sectionRepository.deleteByLineIdAndDownStationId(lineId, downStationId);
+    }
 }
