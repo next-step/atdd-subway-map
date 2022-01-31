@@ -103,9 +103,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateNameCreationTest() {
         // given
-        String uri =
-                lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
-                        .header(LOCATION.getType());
+        lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor());
 
         // when
         ExtractableResponse<Response> duplicateCreationResponse =
