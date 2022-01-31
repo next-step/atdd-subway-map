@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
@@ -15,6 +16,7 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Set<Station> stations;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
@@ -28,16 +30,6 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    public static LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
-    }
-
     private LineResponse(Long id, String name, String color, Set<Station> stations,
                          LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
@@ -46,6 +38,16 @@ public class LineResponse {
         this.stations = stations;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+    }
+
+    public static LineResponse createLineResponse(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getCreatedDate(),
+                line.getModifiedDate()
+        );
     }
 
     public static LineResponse createLineAddSectionResponse(Line line) {

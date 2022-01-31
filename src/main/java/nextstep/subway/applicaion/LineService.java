@@ -3,12 +3,10 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.request.LineRequest;
 import nextstep.subway.applicaion.dto.request.SectionRequest;
 import nextstep.subway.applicaion.dto.response.LineResponse;
-import nextstep.subway.applicaion.dto.response.LineSaveResponse;
 import nextstep.subway.applicaion.dto.response.SectionResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.exception.BadRequestException;
 import nextstep.subway.exception.DuplicateRegistrationRequestException;
@@ -35,7 +33,7 @@ public class LineService {
         this.lineRepository = lineRepository;
     }
 
-    public LineSaveResponse saveLine(LineRequest request)
+    public LineResponse saveLine(LineRequest request)
             throws DuplicateRegistrationRequestException, NotFoundRequestException {
         Line findLine = lineRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findLine)) {
@@ -48,7 +46,7 @@ public class LineService {
 
             lineRepository.save(line);
 
-            return LineSaveResponse.createLineResponse(line);
+            return LineResponse.createLineResponse(line);
         }
 
         throw new DuplicateRegistrationRequestException(

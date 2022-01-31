@@ -3,7 +3,6 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.response.LineResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.utils.LineSteps;
 import nextstep.subway.utils.SectionSteps;

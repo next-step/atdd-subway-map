@@ -4,7 +4,6 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.request.LineRequest;
 import nextstep.subway.applicaion.dto.request.SectionRequest;
 import nextstep.subway.applicaion.dto.response.LineResponse;
-import nextstep.subway.applicaion.dto.response.LineSaveResponse;
 import nextstep.subway.applicaion.dto.response.SectionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,8 +32,9 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineSaveResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineSaveResponse response = lineService.saveLine(lineRequest);
+//    public ResponseEntity<LineSaveResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+        LineResponse response = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 
