@@ -59,15 +59,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@DisplayName("구간 등록")
 	@Test
 	void createSection() {
-		SectionRequest request = new SectionRequest(양재역.getId(), 정자역.getId(), 3);
-
 		// when
-		ExtractableResponse<Response> response = RestAssured
-			.given().log().all()
-			.body(request)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines/" + 신분당선.getId() + "/sections")
-			.then().log().all().extract();
+		ExtractableResponse<Response> response = 구간_생성(양재역.getId(), 정자역.getId(), 3);
 
 		// then
 		// 새로운 역이 등록되었는지 확인
@@ -94,13 +87,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteSection() {
 		// given
-		SectionRequest request = new SectionRequest(양재역.getId(), 정자역.getId(), 3);
-		RestAssured
-			.given().log().all()
-			.body(request)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines/" + 신분당선.getId() + "/sections")
-			.then().log().all().extract();
+		구간_생성(양재역.getId(), 정자역.getId(), 3);
 
 		// when
 		ExtractableResponse<Response> response = RestAssured
@@ -116,13 +103,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@DisplayName("구간 삭제 - 에러케이스")
 	@Test
 	void deleteWithWrongCondition() {
-		SectionRequest request = new SectionRequest(양재역.getId(), 정자역.getId(), 3);
-		RestAssured
-			.given().log().all()
-			.body(request)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/lines/" + 신분당선.getId() + "/sections")
-			.then().log().all().extract();
+		구간_생성(양재역.getId(), 정자역.getId(), 3);
 
 		// when
 		ExtractableResponse<Response> response = RestAssured
@@ -170,5 +151,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 			.post("/stations")
 			.then().log().all()
 			.extract();
+	}
+
+	private ExtractableResponse<Response> 구간_생성(Long upStationId, Long downStationId, int distance) {
+		SectionRequest request = new SectionRequest(upStationId, downStationId, distance);
+
+		return RestAssured
+			.given().log().all()
+			.body(request)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().post("/lines/" + 신분당선.getId() + "/sections")
+			.then().log().all().extract();
 	}
 }
