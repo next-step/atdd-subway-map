@@ -1,35 +1,40 @@
 package nextstep.subway.acceptance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import nextstep.subway.acceptance.request.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static nextstep.subway.acceptance.request.LineRequest.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
     // 자주 사용되는 문자열 상수로 분리
-    private static final String PATH_PREFIX = "/lines";
     private static final String LINE_NAME_A = "신분당선";
     private static final String LINE_COLOR_A = "bg-red-600";
     private static final String LINE_NAME_B = "2호선";
     private static final String LINE_COLOR_B = "bg-green-600";
-    private static final String NAME = "name";
-    private static final String COLOR = "color";
-    private static final String LOCATION = "Location";
+    private static final int FIRST_DISTANCE = 2;
+
 
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        // when
-        ExtractableResponse<Response> response = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+        // given
+        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        // when 지하철 노선(상행 종점 구간, 하행 종점 구간 포함) 생성을 요청 하면
+        ExtractableResponse<Response> response = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -40,9 +45,16 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
+        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+        ExtractableResponse<Response> createThirdStationResponse = StationRequest.stationCreateRequest("양재역");
 
-        ExtractableResponse<Response> responseA = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
-        ExtractableResponse<Response> responseB = lineCreateRequest(LINE_NAME_B, LINE_COLOR_B);
+        Long upStationAId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationAId = createSecondStationResponse.jsonPath().getLong("id");
+        Long downStationBId = createThirdStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> responseA = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationAId, downStationAId, FIRST_DISTANCE);
+        ExtractableResponse<Response> responseB = lineCreateRequest(LINE_NAME_B, LINE_COLOR_B, upStationAId, downStationBId, FIRST_DISTANCE);
 
         // when
         ExtractableResponse<Response> response =
@@ -66,7 +78,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        // when 지하철 노선(상행 종점 구간, 하행 종점 구간 포함) 생성을 요청 하면
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         String uri = createResponse.header(LOCATION);
         // when
@@ -82,7 +101,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         String uri = createResponse.header(LOCATION);
         // when
@@ -107,7 +132,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
         String uri = createResponse.header(LOCATION);
@@ -126,11 +157,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateNameCreationTest() {
         // given
-        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+        ExtractableResponse<Response> createFirstStationResponse = StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse = StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> createResponse = lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
         ExtractableResponse<Response> duplicateCreationResponse =
-                lineCreateRequest(LINE_NAME_A, LINE_COLOR_A);
+          lineCreateRequest(LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // then
         assertThat(duplicateCreationResponse.statusCode())
@@ -190,45 +227,4 @@ class LineAcceptanceTest extends AcceptanceTest {
         // 구간이 삭제된다.
     }
 
-    /** 반복되는 생성 코드를 줄이기 위해 createRequest 를 따로 작성 */
-    static ExtractableResponse<Response> lineCreateRequest(String name, String color) {
-
-        Map<String, String> createRequest = new HashMap<>();
-        createRequest.put(NAME, name);
-        createRequest.put(COLOR, color);
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(createRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(PATH_PREFIX)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    static ExtractableResponse<Response> specificLineReadRequest(String url) {
-        return RestAssured.given().log().all().when().get(url).then().log().all().extract();
-    }
-
-    static ExtractableResponse<Response> lineUpdateRequest(String uri, String name, String color) {
-
-        Map<String, String> updateRequest = new HashMap<>();
-        updateRequest.put(NAME, name);
-        updateRequest.put(COLOR, color);
-
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(updateRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put(uri)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 }

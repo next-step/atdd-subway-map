@@ -1,23 +1,21 @@
 package nextstep.subway.acceptance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static nextstep.subway.acceptance.request.StationRequest.PATH_PREFIX;
+import static nextstep.subway.acceptance.request.StationRequest.stationCreateRequest;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String PATH_PREFIX = "/stations";
-    private static final String NAME = "name";
     private static final String LOCATION = "Location";
     private static final String 강남역 = "강남역";
     private static final String 역삼역 = "역삼역";
@@ -88,21 +86,4 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .isEqualTo(HttpStatus.CONFLICT.value());
     }
 
-    static ExtractableResponse<Response> stationCreateRequest(String name) {
-
-        Map<String, String> params = new HashMap<>();
-        params.put(NAME, name);
-
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(PATH_PREFIX)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
 }
