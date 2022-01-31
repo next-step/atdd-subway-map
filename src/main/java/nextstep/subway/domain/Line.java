@@ -63,14 +63,11 @@ public class Line extends BaseEntity {
                 .downStation(downStation)
                 .distance(distance)
                 .build();
-
-        sections.validateAddSection(upStation, downStation);
         sections.add(section);
     }
 
     public void removeSection(Station station) {
-        sections.validateRemoval(station);
-        this.sections.removeLastSection();
+        this.sections.removeLastSection(station);
     }
 
     public void update(String name, String color) {

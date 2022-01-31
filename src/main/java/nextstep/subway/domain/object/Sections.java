@@ -22,6 +22,9 @@ public class Sections {
     }
 
     public void add(Section section) {
+        if (!validateAddSection(section)) {
+            throw new InvalidParameterException();
+        }
         this.values.add(section);
     }
 
@@ -61,31 +64,33 @@ public class Sections {
         return this.values.size();
     }
 
-    public void validateAddSection(Station upStation, Station downStation) {
+    public boolean validateAddSection(Section section) {
         if (values.isEmpty()) {
-            return;
+            return true;
         }
 
-        if (!equalsLastDownStation(upStation)) {
-            throw new InvalidParameterException();
+        if (!equalsLastDownStation(section.getUpStation())) {
+            return false;
         }
 
-        if (checkDuplicatedDownStation(downStation)) {
-            throw new InvalidParameterException();
-        }
+        return !checkDuplicatedDownStation(section.getDownStation());
     }
 
-    public void validateRemoval(Station station) {
-        if (isSmallerMinimumSize()) { throw new InvalidParameterException(); }
-
-        if (!lastDownStation().equals(station)) {
+    public void removeLastSection(Station station) {
+        if (!validateRemoveSection(station)) {
             throw new InvalidParameterException();
         }
-    }
-
-    public void removeLastSection() {
         this.values.remove(last());
     }
+
+    public boolean validateRemoveSection(Station station) {
+        if (isSmallerMinimumSize()) {
+            return false;
+        }
+
+        return lastDownStation().equals(station);
+    }
+
 
     private boolean isSmallerMinimumSize() {
         return this.values.size() <= 1;
