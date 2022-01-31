@@ -24,7 +24,7 @@ public class LineRequest {
         createRequest.put(NAME, name);
         createRequest.put(COLOR, color);
         createRequest.put(UP_STATION_ID, upStationId);
-        createRequest.put(UP_STATION_ID, downStationId);
+        createRequest.put(DOWN_STATION_ID, downStationId);
         createRequest.put(DISTANCE, distance);
         return RestAssured.given()
                 .log()
