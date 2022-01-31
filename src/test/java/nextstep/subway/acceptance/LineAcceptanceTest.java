@@ -21,6 +21,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     private static final String LINE_COLOR_B = "bg-green-600";
     private static final int FIRST_DISTANCE = 2;
 
+    // TODO: 역 없이 노선 생성이 가능할까?
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
@@ -205,22 +206,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     void addNewStationSectionTest() {
         // given
         // 노선을 생성하고 해당 노선에 종점역을 추가한 후
+        ExtractableResponse<Response> createFirstStationResponse =
+          StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+          StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response =
+          lineCreateRequest(
+            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
         // 해당 노선에 상, 하선의 구간 추가를 요청하면
 
-        // then
-        // 구간 추가가 성공한다.
-    }
-
-    @DisplayName("노선에 구간 추가")
-    @Test
-    void addFirstSectionTest() {
-        // Given
-        // 노선을 생성하고
-
-        // when
-        // 해당 노선에 구간을 추가하면
 
         // then
         // 구간 추가가 성공한다.
@@ -231,6 +231,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     void deleteStationSectionTest() {
         // given
         // 노선을 생성하고 해당 노선에 구간을 추가한 후
+        ExtractableResponse<Response> createFirstStationResponse =
+          StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+          StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response =
+          lineCreateRequest(
+            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
         // 해당 구간을 삭제하면
@@ -243,12 +254,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteIgnoredStationSectionTest() {
         // given
-        // 노선을 생성하고 해당 노선에 구간을 추가한 후
+        // 노선을 생성하고 해당 노선에 두 구간을 추가한 후
+        ExtractableResponse<Response> createFirstStationResponse =
+          StationRequest.stationCreateRequest("강남역");
+        ExtractableResponse<Response> createSecondStationResponse =
+          StationRequest.stationCreateRequest("역삼역");
+
+        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
+        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response =
+          lineCreateRequest(
+            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
 
         // when
-        // 해당 구간을 삭제하면
+        // 중간 구간을 삭제하면
 
         // then
-        // 구간이 삭제된다.
+        // 구간 삭제에 실패한다.
     }
 }
