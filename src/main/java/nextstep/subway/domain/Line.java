@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.List;
 
 @Entity
 @Table(
@@ -54,8 +55,6 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public Sections getSections() { return sections; }
-
     public void addSection(Station upStation, Station downStation, Distance distance) {
         Section section = Section.builder()
                 .line(this)
@@ -64,6 +63,10 @@ public class Line extends BaseEntity {
                 .distance(distance)
                 .build();
         sections.add(section);
+    }
+
+    public List<Station> getAllStations() {
+        return this.sections.getAllStations();
     }
 
     public void removeSection(Station station) {

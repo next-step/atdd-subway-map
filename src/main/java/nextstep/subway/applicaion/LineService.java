@@ -61,10 +61,7 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses = stationService.createStationResponses(
-                line.getSections()
-                        .getAllStations()
-        );
+        List<StationResponse> stationResponses = stationService.createStationResponses(line.getAllStations());
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
