@@ -1,12 +1,10 @@
 package nextstep.subway.applicaion;
 
-import javassist.bytecode.DuplicateMemberException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedLineException;
-import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +16,21 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
-
-    public LineService(LineRepository lineRepository) {
+    private StationRepository stationRepository;
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        checkDuplication(request);
-        Line line = lineRepository.save(Line.of(request));
+    public LineResponse saveLine(LineRequest lineRequest) {
+        checkDuplication(lineRequest);
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        Section section = new Section(upStation,downStation,lineRequest.getDistance());
+        Line line = lineRepository.save(new Line(lineRequest.getName(),lineRequest.getColor(),section));
         return LineResponse.of(line);
     }
 
@@ -51,6 +56,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         line.update(lineRequest.getName(), lineRequest.getColor());
+        lineRepository.save(line);
         return LineResponse.of(line);
     }
 
@@ -58,5 +64,18 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         lineRepository.delete(line);
+    }
+
+    public LineResponse addSections(Long id, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Section section = new Section(upStation,downStation,sectionRequest.getDistance());
+        line.addSection(section);
+        lineRepository.save(line);
+        return LineResponse.of(line);
     }
 }
