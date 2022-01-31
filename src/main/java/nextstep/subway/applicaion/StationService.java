@@ -51,4 +51,9 @@ public class StationService {
 
         stationRepository.delete(station);
     }
+
+    public Station findStationById(Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, upStationId)));
+    }
 }
