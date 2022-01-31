@@ -132,6 +132,6 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> queryResponse = specificLineReadRequest(lineUrl);
 
-        assertThat(queryResponse.jsonPath().getList("station.name", String.class)).containsExactly(StationNames.강남역.stationName(), StationNames.역삼역.stationName());
+        assertThat(queryResponse.jsonPath().getList("stations.name", String.class)).containsExactly(StationNames.강남역.stationName(), StationNames.역삼역.stationName());
     }
 }

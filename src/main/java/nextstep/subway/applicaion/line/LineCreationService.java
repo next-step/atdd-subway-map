@@ -32,7 +32,7 @@ public class LineCreationService {
 
         Line line = lineModifyService.saveLine(lineRequest.getName(), lineRequest.getColor());
         Station upStation = stationReadService.findSpecificStation(lineRequest.getUpStationId());
-        Station downStation = stationReadService.findSpecificStation(lineRequest.getUpStationId());
+        Station downStation = stationReadService.findSpecificStation(lineRequest.getDownStationId());
 
         Section section = new Section(line, upStation, downStation, lineRequest.getDistance());
         line.addSection(section);

@@ -21,18 +21,7 @@ public class LineReadResponse extends BaseLineResponse {
         this.stations = Collections.unmodifiableList(stations);
     }
 
-    public static LineReadResponse of(Line line) {
-        return new LineReadResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getSections().stream()
-                        .map(
-                                section -> {
-                                    return StationResponse.of(section.getDownStation());
-                                })
-                        .collect(Collectors.toList()),
-                line.getCreatedDate(),
-                line.getModifiedDate());
-    }
+  public List<StationResponse> getStations() {
+    return Collections.unmodifiableList(stations);
+  }
 }
