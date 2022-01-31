@@ -99,4 +99,21 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * When 마지막 구간의 하행 종점역이 아닌 구간 제거 요청을 한 경우
+     * Then 구간 제거가 실패한다.
+     */
+    @DisplayName("마지막 구간의 하행 종점역이 아닌 구간 제거")
+    @Test
+    void notLastSection() {
+        // given
+        ExtractableResponse<Response> createResponse = 구간_생성_요청(신분당선_아이디, 양재역_아이디, 양재시민의숲역_아이디, 양재역_양재시민의숲역_거리);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 구간_제거_요청(createResponse.header("Location"), 양재역_아이디);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
 }
