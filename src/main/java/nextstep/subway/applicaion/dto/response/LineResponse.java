@@ -48,12 +48,12 @@ public class LineResponse {
         this.modifiedDate = modifiedDate;
     }
 
-    public static LineResponse createLineAddSectionResponse(Line line, List<Section> sections) {
+    public static LineResponse createLineAddSectionResponse(Line line) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                getStations(sections),
+                getStations(line.getSections()),
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );

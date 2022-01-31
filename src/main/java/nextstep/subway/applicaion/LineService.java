@@ -29,13 +29,10 @@ public class LineService {
 
     private final StationService stationService;
     private final LineRepository lineRepository;
-    private final SectionRepository sectionRepository;
 
-    public LineService(StationService stationService,
-                       LineRepository lineRepository, SectionRepository sectionRepository) {
+    public LineService(StationService stationService, LineRepository lineRepository) {
         this.stationService = stationService;
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     public LineSaveResponse saveLine(LineRequest request)
@@ -64,18 +61,14 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(line -> {
-                    List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
-                    return LineResponse.createLineAddSectionResponse(line, sections);
-                })
+                .map(LineResponse::createLineAddSectionResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long id) throws NotFoundRequestException {
         Line line = findLine(id);
-        List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
-        return LineResponse.createLineAddSectionResponse(line, sections);
+        return LineResponse.createLineAddSectionResponse(line);
     }
 
     public void updateLineById(Long id, LineRequest lineRequest) throws NotFoundRequestException {
