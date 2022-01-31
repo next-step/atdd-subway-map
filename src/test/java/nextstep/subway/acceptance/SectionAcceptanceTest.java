@@ -58,9 +58,37 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선의 구간 제거")
     @Test
     void removeSection() {
-        String deleteSectionLocation = lineLocation + "/sections?stationId=2";
-        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteSectionLocation);
+        String deleteDownStationLocation = lineLocation + "/sections?stationId=2";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteDownStationLocation);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선에 등록역만 제거할 수 있다.")
+    @Test
+    void removeSection2(){
+        String deleteNotExistStationLocation = lineLocation + "/sections?stationId=999999";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteNotExistStationLocation);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다.")
+    @Test
+    void removeSection3(){
+        String deleteUpStationLocation = lineLocation + "/sections?stationId=4";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteUpStationLocation);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선에 등록된 마지막 구간만 제거할 수 있다.")
+    @Test
+    void removeSection4(){
+        지하철_구간_등록_요청(lineLocation, new SectionRequest("3", "2", 10));
+        String deleteStationLocation = lineLocation + "/sections?stationId=2";
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(deleteStationLocation);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.exception.NewDownStationDuplicateException;
 import nextstep.subway.applicaion.exception.NotRegisterDownStationException;
+import nextstep.subway.applicaion.exception.NotRemoveStationException;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,32 @@ public class SectionService {
     }
 
     @Transactional
-    public void delete(Long lineId, Long downStationId) {
-        sectionRepository.deleteByLineIdAndDownStationId(lineId, downStationId);
+    public void delete(Long lineId, Long deleteStationId) {
+        Line findLine = lineRepository.findById(lineId)
+                                      .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
+
+
+        boolean isExistStation = false;
+        for (Section section : findLine.getSectionList()) {
+            Long findDownStationId = section.getDownStation()
+                                            .getId();
+            Long findUpStationId = section.getUpStation()
+                                          .getId();
+
+            if (deleteStationId.equals(findUpStationId)) {
+                throw new NotRemoveStationException();
+            }
+
+            if (deleteStationId.equals(findDownStationId)) {
+                isExistStation = true;
+            }
+        }
+
+        if (!isExistStation) {
+            throw new NotRemoveStationException();
+        }
+
+
+        sectionRepository.deleteByLineIdAndDownStationId(lineId, deleteStationId);
     }
 }

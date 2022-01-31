@@ -24,4 +24,13 @@ public class GlobalExceptionHandler {
                 .status(e.getStatusCode())
                 .body(response);
     }
+
+    @ExceptionHandler(NotRemoveStationException.class)
+    private ResponseEntity<ErrorResponse> handleNotRemoveStationException(NotRemoveStationException e) {
+        ErrorResponse response = new ErrorResponse(e.getStatusCode(), e.getReason());
+
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(response);
+    }
 }
