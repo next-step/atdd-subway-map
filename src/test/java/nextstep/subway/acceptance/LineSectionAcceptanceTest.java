@@ -1,7 +1,7 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.request.LineRequest.*;
-import static nextstep.subway.acceptance.request.LineRequest.lineCreateRequest;
+import static nextstep.subway.acceptance.step.LineRequest.*;
+import static nextstep.subway.acceptance.step.LineRequest.lineCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -9,7 +9,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import nextstep.subway.acceptance.request.StationRequest;
+import nextstep.subway.acceptance.step.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -25,16 +25,12 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void addNewStationSectionTest() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
-        ExtractableResponse<Response> createThirdStationResponse =
-                StationRequest.stationCreateRequest("선릉역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-        Long newDownStationId = createThirdStationResponse.jsonPath().getLong("id");
+        Long upStationId =
+                StationRequest.stationCreateRequest(StationNames.강남역.stationName()).jsonPath().getLong("id");
+        Long downStationId =
+          StationRequest.stationCreateRequest(StationNames.역삼역.stationName()).jsonPath().getLong("id");
+        Long newDownStationId =
+          StationRequest.stationCreateRequest(StationNames.선릉역.stationName()).jsonPath().getLong("id");
 
         ExtractableResponse<Response> response =
                 lineCreateRequest(
@@ -70,16 +66,12 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStationSectionTest() {
         // given
-        ExtractableResponse<Response> createFirstStationResponse =
-                StationRequest.stationCreateRequest("강남역");
-        ExtractableResponse<Response> createSecondStationResponse =
-                StationRequest.stationCreateRequest("역삼역");
-        ExtractableResponse<Response> createThirdStationResponse =
-                StationRequest.stationCreateRequest("선릉역");
-
-        Long upStationId = createFirstStationResponse.jsonPath().getLong("id");
-        Long downStationId = createSecondStationResponse.jsonPath().getLong("id");
-        Long newDownStationId = createThirdStationResponse.jsonPath().getLong("id");
+        Long upStationId =
+          StationRequest.stationCreateRequest(StationNames.강남역.stationName()).jsonPath().getLong("id");
+        Long downStationId =
+          StationRequest.stationCreateRequest(StationNames.역삼역.stationName()).jsonPath().getLong("id");
+        Long newDownStationId =
+          StationRequest.stationCreateRequest(StationNames.선릉역.stationName()).jsonPath().getLong("id");
 
         ExtractableResponse<Response> response =
                 lineCreateRequest(
@@ -122,5 +114,24 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         // TODO 노선 구간 삭제된 것에 대한 검증 필요
+    }
+
+    @DisplayName("노선 구간 조회")
+    @Test
+    void listSectionsFromQueryToLineTest() {
+        Long upStationId =
+          StationRequest.stationCreateRequest(StationNames.강남역.stationName()).jsonPath().getLong("id");
+        Long downStationId =
+          StationRequest.stationCreateRequest(StationNames.역삼역.stationName()).jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response =
+          lineCreateRequest(
+            LINE_NAME_A, LINE_COLOR_A, upStationId, downStationId, FIRST_DISTANCE);
+
+        String lineUrl = response.header(LOCATION);
+
+        ExtractableResponse<Response> queryResponse = specificLineReadRequest(lineUrl);
+
+        assertThat(queryResponse.jsonPath().getList("station.name", String.class)).containsExactly(StationNames.강남역.stationName(), StationNames.역삼역.stationName());
     }
 }

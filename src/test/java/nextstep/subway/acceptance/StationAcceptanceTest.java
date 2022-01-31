@@ -1,7 +1,7 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.request.StationRequest.PATH_PREFIX;
-import static nextstep.subway.acceptance.request.StationRequest.stationCreateRequest;
+import static nextstep.subway.acceptance.step.StationRequest.PATH_PREFIX;
+import static nextstep.subway.acceptance.step.StationRequest.stationCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;

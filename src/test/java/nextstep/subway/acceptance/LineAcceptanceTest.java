@@ -1,13 +1,13 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.request.LineRequest.*;
+import static nextstep.subway.acceptance.step.LineRequest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import nextstep.subway.acceptance.request.StationRequest;
+import nextstep.subway.acceptance.step.StationRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
