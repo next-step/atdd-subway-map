@@ -1,8 +1,8 @@
 # Requirements
 
-## [ ] Feature: 구간 조회 기능
+## [X] Feature: 구간 조회 기능
 
-### [ ] Scenario: 구간 조회 시 역 목록 조회 성공
+### [X] Scenario: 구간 조회 시 역 목록 조회 성공
 * Given 노선을 생성하고 해당 노선에 구간을 추가한 후
 * When 해당 구간을 삭제하면
 * Then 구간이 삭제된다.
@@ -38,9 +38,9 @@ Connection: close
 }
 ```
 
-## [ ] Feature: 지하철 노선 관리 기능
+## [X] Feature: 지하철 노선 관리 기능
 
-### [ ] Scenario: 노선에 하행 종점 구간 삭제
+### [X] Scenario: 노선에 하행 종점 구간 삭제
 * Given 노선을 생성하고 해당 노선에 구간을 추가한 후
 * When 구간 삭제를 요청하면
 * Then 구간이 삭제된다.
