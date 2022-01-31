@@ -9,9 +9,9 @@ public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private List<StationResponse> stations;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private List<StationResponse> stations;
 
     @Builder
     public LineResponse(
