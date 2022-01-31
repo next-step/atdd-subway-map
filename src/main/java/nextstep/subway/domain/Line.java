@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,7 +61,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections.getSections();
+        return Collections.unmodifiableList(sections.getSections());
     }
 
 

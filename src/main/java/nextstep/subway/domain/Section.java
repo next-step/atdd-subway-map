@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,35 +24,26 @@ public class Section extends BaseEntity {
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
-
-    private int distance;
+    @Embedded
+    private Stations stations;
 
     public Section() {
     }
 
-    private Section(Line line, Station upStation, Station downStation, int distance) {
+    private Section(Line line, Stations stations) {
         this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.stations = stations;
     }
 
     public static Section createNewLineSection(Line line, Station upStation, Station downStation, int distance) {
-        return new Section(line, upStation, downStation, distance);
+        return new Section(line, Stations.createStationsSection(upStation, downStation, distance));
     }
 
     public static Section createAddSection(Line line, Station upStation, Station downStation, int distance) {
         validateDownEndStationNotEqualsNewUpStation(line, upStation);
         validateNewDownEndStationAlReadyStation(line, downStation);
 
-        Section section = new Section(line, upStation, downStation, distance);
+        Section section = new Section(line, Stations.createStationsSection(upStation, downStation, distance));
         line.addSection(section);
 
         return section;
@@ -86,15 +78,15 @@ public class Section extends BaseEntity {
     }
 
     public Station getUpStation() {
-        return upStation;
+        return stations.getUpStation();
     }
 
     public Station getDownStation() {
-        return downStation;
+        return stations.getDownStation();
     }
 
     public int getDistance() {
-        return distance;
+        return stations.getDistance();
     }
 
     public void setLine(Line line) {
@@ -110,13 +102,12 @@ public class Section extends BaseEntity {
             return false;
         }
         Section section = (Section) o;
-        return getDistance() == section.getDistance() && Objects.equals(getId(), section.getId()) &&
-               Objects.equals(line, section.line) && Objects.equals(getUpStation(), section.getUpStation()) &&
-               Objects.equals(getDownStation(), section.getDownStation());
+        return Objects.equals(getId(), section.getId()) && Objects.equals(line, section.line) &&
+               Objects.equals(stations, section.stations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), line, getUpStation(), getDownStation(), getDistance());
+        return Objects.hash(getId(), line, stations);
     }
 }

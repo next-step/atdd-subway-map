@@ -101,7 +101,6 @@ public class SectionResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getLineId(), getUpStationId(), getUpStationName(),
-                        getDownStationId(), getDownStationName(), getDistance(), getCreatedDate(), getModifiedDate());
+        return Objects.hash(getId(), getLineId(), getUpStationId(), getUpStationName(), getDownStationId(), getDownStationName(), getDistance(), getCreatedDate(), getModifiedDate());
     }
 }

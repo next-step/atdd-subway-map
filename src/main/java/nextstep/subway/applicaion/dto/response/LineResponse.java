@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class LineResponse {
@@ -91,5 +92,27 @@ public class LineResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        LineResponse that = (LineResponse) o;
+        return Objects.equals(getId(), that.getId()) &&
+               Objects.equals(getName(), that.getName()) &&
+               Objects.equals(getColor(), that.getColor()) &&
+               Objects.equals(getStations(), that.getStations()) &&
+               Objects.equals(getCreatedDate(), that.getCreatedDate()) &&
+               Objects.equals(getModifiedDate(), that.getModifiedDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getColor(), getStations(), getCreatedDate(), getModifiedDate());
     }
 }
