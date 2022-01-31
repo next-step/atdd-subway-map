@@ -1,15 +1,11 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.BadRequestException;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,8 +20,8 @@ public class Line extends BaseEntity {
 
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() { }
 
@@ -44,26 +40,11 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        sections.add(section);
-        section.setLine(this);
+        this.sections.addSection(section, this);
     }
 
     public void deleteSection(Long stationId) {
-        validateDelete(stationId);
-
-        Section lastSection = sections.get(getSections().size() - 1);
-        sections.remove(lastSection);
-    }
-
-    private void validateDelete(Long stationId) {
-        Station downEndStation = sections.get(sections.size() - 1).getDownStation();
-        if (!downEndStation.getId().equals(stationId)) {
-            throw new BadRequestException("구간 삭제는 하행 종점역만 삭제할 수 있습니다.");
-        }
-
-        if (getSections().size() == 1) {
-            throw new BadRequestException("구간 삭제는 구간이 2개 이상이어야 합니다.");
-        }
+        sections.deleteSection(stationId);
     }
 
     public Long getId() {
@@ -79,8 +60,9 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return sections.getSections();
     }
+
 
     @Override
     public boolean equals(Object o) {

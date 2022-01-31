@@ -9,8 +9,10 @@ public class SectionResponse {
 
     private Long id;
     private Long lineId;
-    private Station upStation;
-    private Station downStation;
+    private Long upStationId;
+    private String upStationName;
+    private Long downStationId;
+    private String downStationName;
     private int distance;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
@@ -19,8 +21,11 @@ public class SectionResponse {
                            LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.lineId = lineId;
-        this.upStation = upStation;
-        this.downStation = downStation;
+
+        this.upStationId = upStation.getId();
+        this.upStationName = upStation.getName();
+        this.downStationId = downStation.getId();
+        this.downStationName = downStation.getName();
         this.distance = distance;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
@@ -46,12 +51,20 @@ public class SectionResponse {
         return lineId;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public Long getUpStationId() {
+        return upStationId;
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public String getUpStationName() {
+        return upStationName;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public String getDownStationName() {
+        return downStationName;
     }
 
     public int getDistance() {

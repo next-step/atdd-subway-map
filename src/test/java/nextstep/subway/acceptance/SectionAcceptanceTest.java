@@ -59,8 +59,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(노선_9호선_2구간_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         Long expectedLineId = 노선_9호선_2구간_응답.jsonPath().getLong("lineId");
-        Long expectedUpStationId = 노선_9호선_2구간_응답.jsonPath().getObject("upStation", Station.class).getId();
-        Long expectedDownStationId = 노선_9호선_2구간_응답.jsonPath().getObject("downStation", Station.class).getId();
+        Long expectedUpStationId = 노선_9호선_2구간_응답.jsonPath().getLong("upStationId");
+        Long expectedDownStationId = 노선_9호선_2구간_응답.jsonPath().getLong("downStationId");
         int expectedDistance = 노선_9호선_2구간_응답.jsonPath().getInt("distance");
         assertThat(expectedLineId).isEqualTo(lineId);
         assertThat(expectedUpStationId).isEqualTo(upStationId);
