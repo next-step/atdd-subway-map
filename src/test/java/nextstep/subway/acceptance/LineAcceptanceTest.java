@@ -45,8 +45,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
 //        given
-        지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
-        지하철_노선_생성_요청("2호선", "bg-green-600", 3L, 4L, 30);
+        지하철_역_생성_요청("강남");
+        지하철_역_생성_요청("역삼");
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
+        지하철_노선_생성_요청("2호선", "bg-red-600", 1L, 2L, 20);
+        지하철_노선_생성_요청("신분당선", "bg-green-600", 3L, 4L, 30);
 
 //        when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -69,6 +73,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         //given
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
         지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
 
         // when
@@ -92,6 +98,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         //given
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
         지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
 
         // when
@@ -124,6 +132,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         //given
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
         지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
 
         //when
@@ -147,7 +157,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("중복이름으로 지하철 노선 생성")
     @Test
     void createDuplicatedLine() {
-
         // given
         지하철_노선_생성_요청("2호선", "green", 1L, 2L, 10);
 
@@ -166,7 +175,6 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 구간 생성")
     @Test
     void addSection() {
-
         // given
         지하철_역_생성_요청("강남");
         지하철_역_생성_요청("역삼");
@@ -190,6 +198,32 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성한 지하철 노선 삭제를 요청 하면
+     * Then 생성한 지하철 노선 삭제가 성공한다.
+     */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void deleteSection() {
+        //given
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
+        지하철_노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 20);
+
+        //when
+        ExtractableResponse response = RestAssured.given().log().all()
+                .pathParam("id", 1L)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .delete("/lines/sections/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId,
