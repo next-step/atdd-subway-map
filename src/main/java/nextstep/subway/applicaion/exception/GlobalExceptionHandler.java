@@ -15,4 +15,13 @@ public class GlobalExceptionHandler {
                 .status(e.getStatusCode())
                 .body(response);
     }
+
+    @ExceptionHandler(NotRegisterDownStationException.class)
+    private ResponseEntity<ErrorResponse> handleNotRegisterDownStationException(NotRegisterDownStationException e) {
+        ErrorResponse response = new ErrorResponse(e.getStatusCode(), e.getReason());
+
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(response);
+    }
 }

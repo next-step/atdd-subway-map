@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.exception.NotRegisterDownStationException;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +20,21 @@ public class SectionService {
     public Section saveSection(Long lineId, SectionRequest sectionRequest) {
         Line findLine = lineRepository.findById(lineId)
                                       .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
-
         Long upStationId = Long.valueOf(sectionRequest.getUpStationId());
         Long downStationId = Long.valueOf(sectionRequest.getDownStationId());
+
+        boolean isExistDown = false;
+        for(Section section : findLine.getSectionList()){
+            if(section.getDownStation().getId().equals(upStationId)){
+                isExistDown = true;
+                break;
+            }
+        }
+
+        if(!isExistDown){
+            throw new NotRegisterDownStationException();
+        }
+
 
         Station upStation = stationRepository.findById(upStationId)
                                              .orElseThrow(() -> new RuntimeException("존재하지 않는 상행역 입니다."));

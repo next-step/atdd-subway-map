@@ -53,4 +53,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
+
+    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
+    @Test
+    void createSection2() {
+
+        // when: 신구간의 상행역이 등록되어있는 하행 종점역이 아닌 경우
+        SectionRequest requestBody = new SectionRequest("2", "4", 10);
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(requestBody)
+                .when()
+                .post(location + "/sections")
+                .then()
+                .log()
+                .all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
