@@ -4,7 +4,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.entity.Station;
 import nextstep.subway.domain.repository.StationRepository;
-import nextstep.subway.domain.service.StationNameValidator;
+import nextstep.subway.domain.service.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +16,15 @@ import java.util.stream.Collectors;
 public class StationService {
 
     private final StationRepository stationRepository;
-    private final StationNameValidator stationNameValidator;
+    private final Validator<Station> stationValidator;
 
-    public StationService(final StationRepository stationRepository, final StationNameValidator stationNameValidator) {
+    public StationService(final StationRepository stationRepository, final Validator<Station> stationValidator) {
         this.stationRepository = stationRepository;
-        this.stationNameValidator = stationNameValidator;
+        this.stationValidator = stationValidator;
     }
 
     public StationResponse saveStation(final StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName(), stationNameValidator));
+        Station station = stationRepository.save(new Station(stationRequest.getName(), stationValidator));
         return createStationResponse(station);
     }
 
@@ -42,11 +42,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(final Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+        return StationResponse.from(station);
     }
 }

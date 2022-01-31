@@ -1,12 +1,9 @@
 package nextstep.subway.domain.entity;
 
-import nextstep.subway.domain.service.LineNameValidator;
+import nextstep.subway.domain.service.Validator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Objects;
+import javax.persistence.*;
+import java.util.*;
 
 @Entity
 public class Line extends BaseEntity {
@@ -17,24 +14,24 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
+    @Embedded
+    private final Sections sections = new Sections();
+
     public Line() {
     }
 
-    public Line(final String name, final String color, final LineNameValidator lineNameValidator) {
-        lineNameValidator.validate(name);
-        validateColor(color);
-
+    public Line(final String name,
+                final String color,
+                final Station upStation,
+                final Station downStation,
+                final int distance,
+                final Validator<Line> lineValidator) {
         this.name = name;
         this.color = color;
-    }
 
-    private void validateColor(final String color) {
-        if (Objects.isNull(color)) {
-            throw new IllegalArgumentException("노선의 색상은 필수 입니다.");
-        }
-        if (color.isEmpty()) {
-            throw new IllegalArgumentException("노선의 색상은 1 자 이상 이어야 합니다.");
-        }
+        lineValidator.validate(this);
+
+        addSection(new Section(this, upStation, downStation, distance));
     }
 
     public Long getId() {
@@ -49,15 +46,35 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public void changeName(final String name, final LineNameValidator validator) {
-        validator.validate(name);
-
-        this.name = name;
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 
-    public void changeColor(final String color) {
-        validateColor(color);
-
+    public void change(final String name, final String color, final Validator<Line> lineValidator) {
+        this.name = name;
         this.color = color;
+
+        lineValidator.validate(this);
+    }
+
+    public void addSection(final Section section) {
+        this.sections.add(section);
+    }
+
+    public void removeSection(final Station station) {
+        this.sections.remove(station);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Line line = (Line) o;
+        return Objects.equals(id, line.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
