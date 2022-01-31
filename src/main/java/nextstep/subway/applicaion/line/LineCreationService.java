@@ -7,7 +7,6 @@ import nextstep.subway.applicaion.station.StationReadService;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
-import nextstep.subway.ui.section.SectionModifyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class LineCreationService {
     // 사용 도메인 서비스들
     private final LineModifyService lineModifyService;
-    private final SectionModifyService sectionService;
     private final StationReadService stationReadService;
 
     public LineCreationService(
             LineModifyService lineModifyService,
-            SectionModifyService sectionService,
             StationReadService stationReadService) {
         this.lineModifyService = lineModifyService;
-        this.sectionService = sectionService;
         this.stationReadService = stationReadService;
     }
 
