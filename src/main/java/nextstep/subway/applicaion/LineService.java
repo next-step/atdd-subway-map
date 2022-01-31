@@ -31,13 +31,15 @@ public class LineService {
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
 
-    public LineService(StationService stationService, LineRepository lineRepository, SectionRepository sectionRepository) {
+    public LineService(StationService stationService,
+                       LineRepository lineRepository, SectionRepository sectionRepository) {
         this.stationService = stationService;
         this.lineRepository = lineRepository;
         this.sectionRepository = sectionRepository;
     }
 
-    public LineSaveResponse saveLine(LineRequest request) throws DuplicateRegistrationRequestException, NotFoundRequestException {
+    public LineSaveResponse saveLine(LineRequest request)
+            throws DuplicateRegistrationRequestException, NotFoundRequestException {
         Line findLine = lineRepository.findByName(request.getName());
         if (ObjectUtils.isEmpty(findLine)) {
             Station upStation = stationService.findStationById(request.getUpStationId());
@@ -52,7 +54,9 @@ public class LineService {
             return LineSaveResponse.createLineResponse(line);
         }
 
-        throw new DuplicateRegistrationRequestException(String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));
+        throw new DuplicateRegistrationRequestException(
+                String.format(LINE_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName())
+        );
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +90,8 @@ public class LineService {
         lineRepository.delete(line);
     }
 
-    public SectionResponse saveSection(Long lineId, SectionRequest request) throws NotFoundRequestException, BadRequestException {
+    public SectionResponse saveSection(Long lineId, SectionRequest request)
+            throws NotFoundRequestException, BadRequestException {
         Line line = findLine(lineId);
         Station upStation = stationService.findStationById(request.getUpStationId());
         Station downStation = stationService.findStationById(request.getDownStationId());
@@ -102,6 +107,8 @@ public class LineService {
 
     private Line findLine(Long lineId) {
         return lineRepository.findById(lineId)
-                .orElseThrow(() -> new NotFoundRequestException(String.format(LineService.LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, lineId)));
+                .orElseThrow(() -> new NotFoundRequestException(
+                        String.format(LineService.LINE_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, lineId))
+                );
     }
 }

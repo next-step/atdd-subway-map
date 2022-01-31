@@ -1,11 +1,11 @@
 package nextstep.subway.applicaion.dto.response;
 
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Section;
 
 import java.time.LocalDateTime;
 
 public class LineSaveResponse {
+
     private Long id;
     private String name;
     private String color;

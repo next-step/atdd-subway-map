@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 public class LineResponse {
+
     private Long id;
     private String name;
     private String color;
@@ -37,7 +38,8 @@ public class LineResponse {
         );
     }
 
-    private LineResponse(Long id, String name, String color, Set<Station> stations, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(Long id, String name, String color, Set<Station> stations,
+                         LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;

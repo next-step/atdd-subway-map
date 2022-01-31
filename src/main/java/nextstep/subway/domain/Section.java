@@ -60,7 +60,11 @@ public class Section extends BaseEntity {
     private static void validateDownEndStationNotEqualsNewUpStation(Line line, Station upStation) {
         Station downEndStation = line.getSections().get(line.getSections().size() - 1).getDownStation();
         if (!upStation.equals(downEndStation)) {
-            throw new BadRequestException(String.format("등록하는 구간의 상행역이 하행 종점역과 같아야 합니다. 하행 종점역 = %s, 상행역 = %s", downEndStation.getName(), upStation.getName()));
+            throw new BadRequestException(
+                    String.format("등록하는 구간의 상행역이 하행 종점역과 같아야 합니다. 하행 종점역 = %s, 상행역 = %s",
+                            downEndStation.getName(), upStation.getName()
+                    )
+            );
         }
     }
 
@@ -68,7 +72,11 @@ public class Section extends BaseEntity {
         List<Section> sections = line.getSections();
         for (Section section : sections) {
             if (downStation.equals(section.getUpStation()) || downStation.equals(section.getDownStation())) {
-                throw new BadRequestException(String.format("등록하는 구간의 하행 종점역이 이미 구간에 존재하는 역입니다. 등록하는 하행 종점역 = %s", downStation.getName()));
+                throw new BadRequestException(
+                        String.format("등록하는 구간의 하행 종점역이 이미 구간에 존재하는 역입니다. 등록하는 하행 종점역 = %s",
+                                downStation.getName()
+                        )
+                );
             }
         }
     }
@@ -95,10 +103,16 @@ public class Section extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Section section = (Section) o;
-        return getDistance() == section.getDistance() && Objects.equals(getId(), section.getId()) && Objects.equals(line, section.line) && Objects.equals(getUpStation(), section.getUpStation()) && Objects.equals(getDownStation(), section.getDownStation());
+        return getDistance() == section.getDistance() && Objects.equals(getId(), section.getId()) &&
+               Objects.equals(line, section.line) && Objects.equals(getUpStation(), section.getUpStation()) &&
+               Objects.equals(getDownStation(), section.getDownStation());
     }
 
     @Override

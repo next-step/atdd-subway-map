@@ -33,7 +33,9 @@ public class StationService {
             return StationResponse.createStationResponse(station);
         }
 
-        throw new DuplicateRegistrationRequestException(String.format(STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName()));
+        throw new DuplicateRegistrationRequestException(
+                String.format(STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, request.getName())
+        );
     }
 
     @Transactional(readOnly = true)
@@ -47,13 +49,17 @@ public class StationService {
 
     public void deleteStationById(Long id) {
         Station station = stationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundRequestException(String.format(STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id)));
+                .orElseThrow(() -> new NotFoundRequestException(
+                        String.format(STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, id))
+                );
 
         stationRepository.delete(station);
     }
 
     public Station findStationById(Long upStationId) {
         return stationRepository.findById(upStationId)
-                .orElseThrow(() -> new NotFoundRequestException(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, upStationId)));
+                .orElseThrow(() -> new NotFoundRequestException(
+                        String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, upStationId))
+                );
     }
 }
