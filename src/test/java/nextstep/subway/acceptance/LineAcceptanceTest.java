@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import static nextstep.subway.acceptance.requests.LineRequests.*;
 import static nextstep.subway.acceptance.type.GeneralNameType.*;
+import static nextstep.subway.acceptance.type.GeneralNameType.LOCATION;
 import static nextstep.subway.acceptance.type.LineNameType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +26,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header(LOCATION)).isNotBlank();
+        assertThat(response.header(LOCATION.getType())).isNotBlank();
     }
 
     @DisplayName("지하철 노선 목록 조회")
@@ -70,7 +71,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String uri =
                 lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
-                        .header(LOCATION);
+                        .header(LOCATION.getType());
 
         // when
         String updateLineName = "구분당선";
@@ -88,7 +89,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String uri =
                 lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
-                        .header(LOCATION);
+                        .header(LOCATION.getType());
 
         // when
         ExtractableResponse<Response> deleteResponse =
@@ -96,7 +97,6 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        // addition: to verify deleted contents
     }
 
     @DisplayName("중복된 이름으로 노선을 생성할 수 없다.")
@@ -105,7 +105,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String uri =
                 lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor())
-                        .header(LOCATION);
+                        .header(LOCATION.getType());
 
         // when
         ExtractableResponse<Response> duplicateCreationResponse =

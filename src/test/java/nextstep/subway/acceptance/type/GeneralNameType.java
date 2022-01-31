@@ -3,7 +3,8 @@ package nextstep.subway.acceptance.type;
 public enum GeneralNameType {
     NAME("name"),
     COLOR("color"),
-    ID("id");
+    ID("id"),
+    LOCATION("location");
 
     private final String type;
 
