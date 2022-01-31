@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.exception.NewDownStationDuplicateException;
 import nextstep.subway.applicaion.exception.NotRegisterDownStationException;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
@@ -20,25 +21,33 @@ public class SectionService {
     public Section saveSection(Long lineId, SectionRequest sectionRequest) {
         Line findLine = lineRepository.findById(lineId)
                                       .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
-        Long upStationId = Long.valueOf(sectionRequest.getUpStationId());
-        Long downStationId = Long.valueOf(sectionRequest.getDownStationId());
+        Long newUpStationId = Long.valueOf(sectionRequest.getUpStationId());
+        Long newDownStationId = Long.valueOf(sectionRequest.getDownStationId());
 
         boolean isExistDown = false;
-        for(Section section : findLine.getSectionList()){
-            if(section.getDownStation().getId().equals(upStationId)){
+        for (Section section : findLine.getSectionList()) {
+            Long findDownStationId = section.getDownStation()
+                                            .getId();
+            Long findUpStationId = section.getUpStation()
+                                          .getId();
+
+            if (newUpStationId.equals(findDownStationId)) {
                 isExistDown = true;
-                break;
+            }
+
+            if (newDownStationId.equals(findDownStationId) || newDownStationId.equals(findUpStationId)) {
+                throw new NewDownStationDuplicateException();
             }
         }
 
-        if(!isExistDown){
+        if (!isExistDown) {
             throw new NotRegisterDownStationException();
         }
 
 
-        Station upStation = stationRepository.findById(upStationId)
+        Station upStation = stationRepository.findById(newUpStationId)
                                              .orElseThrow(() -> new RuntimeException("존재하지 않는 상행역 입니다."));
-        Station downStation = stationRepository.findById(downStationId)
+        Station downStation = stationRepository.findById(newDownStationId)
                                                .orElseThrow(() -> new RuntimeException("존재하지 않는 하행역 입니다."));
 
         Section saveSection = new Section(findLine, upStation, downStation);
