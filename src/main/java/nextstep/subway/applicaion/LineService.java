@@ -34,7 +34,10 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
 
         Section section = new Section(upStation, downStation, lineRequest.getDistance());
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), section));
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), section);
+        section.setLine(line);
+        lineRepository.save(line);
+
         return LineResponse.of(line);
     }
 
@@ -84,8 +87,11 @@ public class LineService {
     }
 
     public void deleteSection(Long id) {
+
         Section section = sectionRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
+        Line line = section.getLine();
+        line.getSections().getSections().stream().forEach(System.out::println);
         sectionRepository.delete(section);
     }
 }
