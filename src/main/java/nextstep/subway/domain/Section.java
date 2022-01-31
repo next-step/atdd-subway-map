@@ -8,7 +8,7 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinColumn(name = "line_id")
     private Line line;
 
@@ -41,5 +41,17 @@ public class Section {
 
     public Station getUpStation() {
         return upStation;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
