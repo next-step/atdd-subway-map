@@ -52,4 +52,11 @@ public class LineController {
     public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         return ResponseEntity.ok().body(lineService.addSections(id, sectionRequest));
     }
+
+    @DeleteMapping("/sections/{id}")
+    public ResponseEntity<HttpStatus> deleteSection(@PathVariable Long id) {
+        System.out.println("controller 진입");
+        lineService.deleteSection(id);
+        return ResponseEntity.noContent().build();
+    }
 }
