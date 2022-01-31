@@ -13,7 +13,7 @@ public class LineVerificationService {
         this.lineRepository = lineRepository;
     }
 
-    public boolean isExistStationByLineName(String lineName) {
-        return lineRepository.findByName(lineName).isPresent();
+    public boolean isExistByName(String name) {
+        return lineRepository.existsByName(name);
     }
 }

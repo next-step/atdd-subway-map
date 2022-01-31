@@ -23,6 +23,19 @@ public class RestTestUtils {
         return createResponseExtractableResponse(uri, httpMethod, requestSpecification);
     }
 
+    public static ExtractableResponse<Response> 요청_테스트_WithQueryParams(URI uri, Map<String, ?> bodyParams, Map<String, ?> queryParams, Method httpMethod) {
+        RequestSpecification requestSpecification = createRequestSpecificationWithLog();
+        if (!bodyParams.isEmpty()) {
+            requestSpecification.body(bodyParams);
+        }
+
+        if (!queryParams.isEmpty()) {
+            requestSpecification.queryParams(queryParams);
+        }
+
+        return createResponseExtractableResponse(uri, httpMethod, requestSpecification);
+    }
+
     private static RequestSpecification createRequestSpecificationWithLog() {
         return RestAssured.given().log().all();
     }
@@ -36,7 +49,11 @@ public class RestTestUtils {
                 .extract();
     }
 
-    public static URI getLocationURI(ExtractableResponse<Response> fixtureResponse) {
-        return URI.create(fixtureResponse.header("Location"));
+    public static URI getLocationURI(ExtractableResponse<Response> response) {
+        return URI.create(response.header("Location"));
+    }
+
+    public static Long getCreatedResourceId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }

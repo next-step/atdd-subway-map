@@ -1,17 +1,20 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
     private String color;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line() {
     }
@@ -19,6 +22,24 @@ public class Line extends BaseEntity {
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public Line(String name, String color, PairedStations pairedStations, int distance) {
+        this(name, color);
+        addSection(pairedStations, distance);
+    }
+
+    public Section addSection(PairedStations pairedStations, int distance) {
+        Section section = new Section(this, pairedStations.getUpStation(), pairedStations.getDownStation(), distance);
+        return sections.add(section);
+    }
+
+    public void deleteSection(Station station) {
+        sections.delete(station);
+    }
+
+    public List<Station> getStations() {
+        return sections.getFlatStations();
     }
 
     public Long getId() {

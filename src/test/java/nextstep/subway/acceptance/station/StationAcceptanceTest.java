@@ -1,8 +1,9 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.utils.RequestParamsBuilder;
 import nextstep.subway.utils.RestTestUtils;
 import org.junit.jupiter.api.DisplayName;

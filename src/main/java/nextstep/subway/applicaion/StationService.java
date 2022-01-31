@@ -2,12 +2,14 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.applicaion.exception.DuplicatedResourceException;
+import nextstep.subway.applicaion.exception.AlreadyRegisteredStationException;
+import nextstep.subway.domain.PairedStations;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +27,7 @@ public class StationService {
     public StationResponse saveStation(StationRequest stationRequest) {
         String stationName = stationRequest.getName();
         if (stationVerificationService.isExistStationByStationName(stationName)) {
-            throw new DuplicatedResourceException(String.format("이미 존재하는 역이 있습니다. [%s]", stationName));
+            throw new AlreadyRegisteredStationException(stationName);
         }
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));
@@ -41,6 +43,10 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
@@ -52,5 +58,9 @@ public class StationService {
                 station.getCreatedDate(),
                 station.getModifiedDate()
         );
+    }
+
+    public PairedStations createPairedStations(Long upStationId, Long downStationId) {
+        return new PairedStations(findStationById(upStationId), findStationById(downStationId));
     }
 }
