@@ -11,12 +11,12 @@ public class Line extends BaseEntity {
     private String color;
 
     @Embedded
-    private Sections sections = new Sections();
+    private final Sections sections = new Sections();
 
     private Line() {
     }
 
-    public Line(String name, String color,Section section) {
+    public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
         this.sections.addSection(section);

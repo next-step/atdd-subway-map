@@ -31,6 +31,7 @@ public class StationService {
             throw new DuplicatedStationException();
         }
     }
+
     @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         List<Station> stations = stationRepository.findAll();
