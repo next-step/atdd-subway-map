@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedLineException;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,12 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
     private StationRepository stationRepository;
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    private SectionRepository sectionRepository;
+
+    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -29,8 +33,8 @@ public class LineService {
         Station downStation = stationRepository.findById(lineRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        Section section = new Section(upStation,downStation,lineRequest.getDistance());
-        Line line = lineRepository.save(new Line(lineRequest.getName(),lineRequest.getColor(),section));
+        Section section = new Section(upStation, downStation, lineRequest.getDistance());
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), section));
         return LineResponse.of(line);
     }
 
@@ -73,9 +77,15 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
-        Section section = new Section(upStation,downStation,sectionRequest.getDistance());
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
         line.addSection(section);
         lineRepository.save(line);
         return LineResponse.of(line);
+    }
+
+    public void deleteSection(Long id) {
+        Section section = sectionRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        sectionRepository.delete(section);
     }
 }
