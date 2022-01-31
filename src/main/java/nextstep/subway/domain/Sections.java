@@ -44,4 +44,8 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
+    public void deleteSection(Long stationId) {
+        sections.removeIf(s -> (s.getDownStation().getId() == stationId));
+    }
+
 }

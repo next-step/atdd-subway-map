@@ -2,7 +2,6 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedNameException;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -94,4 +92,10 @@ public class LineService {
     public Station findStation(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(NoSuchElementException::new);
     }
+
+    public void deleteSection(Long id, Long stationId) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        line.deleteSection(stationId);
+    }
+
 }
