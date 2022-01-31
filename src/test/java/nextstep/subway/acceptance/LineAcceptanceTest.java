@@ -158,14 +158,18 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createDuplicatedLine() {
         // given
-        지하철_노선_생성_요청("2호선", "green", 1L, 2L, 10);
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
+        지하철_역_생성_요청("양재");
+
+        지하철_노선_생성_요청("신분당선", "green", 1L, 2L, 10);
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("2호선", "green",
+        ExtractableResponse<Response> createResponse = 지하철_노선_생성_요청("신분당선", "green",
                 2L, 3L, 20);
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
