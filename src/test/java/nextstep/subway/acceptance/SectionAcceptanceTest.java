@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
@@ -9,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import static nextstep.subway.acceptance.LineAcceptanceUtil.지하철_노선_생성_요청;
+import static nextstep.subway.acceptance.SectionAcceptanceUtil.지하철_구간_등록_요청;
 import static nextstep.subway.acceptance.StationAcceptanceUtil.지하철_역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,22 +33,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선에 구간 생성")
     @Test
     void createSection() {
-        // given: 역을 생성한다.
-        // and: 노선을 생성한다.
-        // when: 구간 생성을 요청하면
-        // then: 구간 생성이 성공한다.
-
-        SectionRequest requestBody = new SectionRequest("4", "2", 10);
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestBody)
-                .when()
-                .post(location + "/sections")
-                .then()
-                .log()
-                .all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(location, new SectionRequest("4", "2", 10));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
@@ -57,19 +41,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
     @Test
     void createSection2() {
-
-        // when: 신구간의 상행역이 등록되어있는 하행 종점역이 아닌 경우
-        SectionRequest requestBody = new SectionRequest("2", "4", 10);
-        ExtractableResponse<Response> response = RestAssured
-                .given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestBody)
-                .when()
-                .post(location + "/sections")
-                .then()
-                .log()
-                .all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(location, new SectionRequest("2", "4", 10));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
