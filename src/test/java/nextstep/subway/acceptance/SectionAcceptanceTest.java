@@ -66,7 +66,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 			.body(request)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().post("/lines/" + 신분당선.getId() + "/sections")
-			.then().log().all().extract();;
+			.then().log().all().extract();
 
 		// then
 		// 새로운 역이 등록되었는지 확인
@@ -92,24 +92,24 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 	@DisplayName("구간 삭제")
 	@Test
 	void deleteSection() {
-	}
+		// given
+		SectionRequest request = new SectionRequest(양재역.getId(), 정자역.getId(), 3);
+		RestAssured
+			.given().log().all()
+			.body(request)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().post("/lines/" + 신분당선.getId() + "/sections")
+			.then().log().all().extract();
 
-	/**
-	 * Scenario
-	 * 등록된 구간을 통해 역 목록 조회 기능
-	 *
-	 * When
-	 * 구간 조회를 요청하면
-	 *
-	 * Then
-	 * 구간에 등록된 역이 조회된다
-	 *
-	 * Condition
-	 * 지하철 노선 조회 시 등록된 역 목록을 함께 응답
-	 * 노선에 등록된 구간을 순서대로 정렬하여 상행 종점부터 하행 종점까지 목록을 응답하기
-	 */
-	@Test
-	void findStationsBySection() {
+		// when
+		ExtractableResponse<Response> response = RestAssured
+			.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().delete("/lines/" + 신분당선.getId() + "/sections?stationId=" + 강남역.getId())
+			.then().log().all().extract();
+
+		// then
+		Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 	}
 
 	private void 지하철_노선에_등록한_구간이_포함(ExtractableResponse<Response> response, List<Long> expectedStationIds) {

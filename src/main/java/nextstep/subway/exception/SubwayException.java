@@ -27,4 +27,16 @@ public class SubwayException {
 			super(message, code);
 		}
 	}
+
+	public static class CanNotDeleteException extends BusinessException {
+		private static final String DEFAULT_ERROR_MESSAGE = "Can not found";
+
+		public CanNotDeleteException() {
+			super(DEFAULT_ERROR_MESSAGE, HttpStatus.CONTINUE.value());
+		}
+
+		public CanNotDeleteException(String message, int code) {
+			super(message, code);
+		}
+	}
 }

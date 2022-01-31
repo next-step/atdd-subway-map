@@ -69,8 +69,12 @@ public class LineService {
 		return LineResponse.of(line);
 	}
 
-	private Section toSection(Line line, SectionRequest sectionRequest) {
+	public void removeSectionByStationId(Long lineId, Long stationId) {
+		Line line = lineRepository.findById(lineId).orElseThrow(SubwayException.NotFoundException::new);
+		line.removeSection(stationId);
+	}
 
+	private Section toSection(Line line, SectionRequest sectionRequest) {
 		Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
 			.orElseThrow(SubwayException.NotFoundException::new);
 		Station downStation = stationRepository.findById(sectionRequest.getDownStationId())

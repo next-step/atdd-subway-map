@@ -110,6 +110,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 		LineResponse lineResponse = response.jsonPath().getObject(".", LineResponse.class);
 		assertThat(lineResponse.getName()).isEqualTo("신분당선");
+
+		List<Long> sections = lineResponse.getSections().stream()
+			.map(SectionResponse::getId)
+			.collect(Collectors.toList());
+		assertThat(sections).containsAll(Arrays.asList(강남역.getId(), 정자역.getId()));
 	}
 
 	@DisplayName("지하철 노선의 구간 조회")

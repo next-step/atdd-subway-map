@@ -8,6 +8,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 
+import nextstep.subway.exception.SubwayException;
+
 @Embeddable
 public class Sections {
 
@@ -21,8 +23,19 @@ public class Sections {
 		this.sections.add(section);
 	}
 
-	public void remove(Section section) {
-		this.sections.remove(section);
+	public void remove(Long stationId) {
+		// 삭제할 역 찾기 -> 구간에서 상행선이나 하행선 중 삭제할 역과 같은 id. -> 하행선만 찾으면 된다
+		if (this.sections.stream()
+			.anyMatch(section -> section.getUpStation().getId().equals(stationId))) {
+			throw new SubwayException.CanNotDeleteException();
+		}
+
+		Section deleteSection = this.sections.stream()
+			.filter(section -> section.getDownStation().getId().equals(stationId))
+			.findFirst()
+			.orElseThrow(SubwayException.NotFoundException::new);
+
+		this.sections.remove(deleteSection);
 	}
 
 	public void addAll(Section upSection, Section downSection) {
