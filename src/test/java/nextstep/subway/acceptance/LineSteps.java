@@ -4,6 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import org.springframework.http.MediaType;
 
 import java.util.Map;
@@ -14,12 +16,25 @@ public class LineSteps {
         return 지하철노선_생성(lineRequest).jsonPath().getLong("id");
     }
 
+    public static LineResponse 지하철노선_생성_및_객체추출(LineRequest lineRequest) {
+        return 지하철노선_생성(lineRequest).as(LineResponse.class);
+    }
+
     public static ExtractableResponse<Response> 지하철노선_생성(LineRequest lineRequest) {
         return RestAssured
                 .given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철구간_생성(Long id, SectionRequest sectionRequest) {
+        return RestAssured
+                .given().log().all()
+                .body(sectionRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/" + id + "/sections")
                 .then().log().all().extract();
     }
 

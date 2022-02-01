@@ -3,6 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +25,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     public static final String 신분당선 = "신분당선";
     public static final String COLOR = "bg-red-600";
     public static final String 강남역 = "강남역";
-    public static final String 광교역 = "광교역";
+    public static final String 광교역 = "양재역";
     public static final int DISTANCE = 10;
     private LineRequest lineRequest;
 
@@ -38,10 +40,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @BeforeEach
-    public void init(){
+    public void init() {
         lineRequest = 지하철노선_생성_요청_파라미터();
     }
-    
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -182,4 +184,52 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * Given 지하철역을 생성하고
+     * When 지하철 구간 생성을 요청 하면
+     * Then 지하철 구간 생성이 성공한다.
+     */
+    @DisplayName("지하철 구간 등록")
+    @Test
+    void createStation() {
+        // given
+        LineResponse line = 지하철노선_생성_및_객체추출(lineRequest);
+        int size = line.getStations().size();
+        long upStationId = line.getStations().get(size - 1).getId();
+        long downStationId = 지하철역_생성_및_아이디추출("판교역");
+
+        SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10);
+        // when
+        ExtractableResponse<Response> createResponse = 지하철구간_생성(line.getId(), sectionRequest);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.header("Location")).isNotBlank();
+    }
+
+    /**
+     * Given 지하철 구간 생성을 요청 하고
+     * When 지하철 구간 제거를 요청 하면
+     * Then 지하철 구간 제거가 성공한다.
+     */
+    @DisplayName("지하철 구간 제거")
+    @Test
+    void getStations() {
+//        /// given
+//        String 역삼역 = "역삼역";
+//        String 강남역 = "강남역";
+//        지하철역_생성(강남역);
+//        지하철역_생성(역삼역);
+//
+//        // when
+//        ExtractableResponse<Response> readResponse = 지하철역_목록_조회();
+//
+//        assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+//        List<String> stationNames = readResponse.jsonPath().getList("name");
+//        assertThat(stationNames).contains(강남역, 역삼역);
+    }
+
+
 }
