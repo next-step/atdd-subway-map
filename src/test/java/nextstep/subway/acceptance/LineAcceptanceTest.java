@@ -1,22 +1,34 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.StationSteps.지하철역_생성_및_아이디추출;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private LineRequest lineRequest;
+
+    private LineRequest 지하철노선_생성_파라미터() {
+        String name = "신분당선";
+        String color = "bg-red-600";
+        long upStationId = 지하철역_생성_및_아이디추출("강남역");
+        long downStationId = 지하철역_생성_및_아이디추출("광교역");
+        int distance = 10;
+        return new LineRequest(name, color, upStationId, downStationId, distance);
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -25,7 +37,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> createResponse = 지하철노선_생성();
+        lineRequest = 지하철노선_생성_파라미터();
+        ExtractableResponse<Response> createResponse = 지하철노선_생성(lineRequest);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());

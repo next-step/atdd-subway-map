@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -14,6 +15,15 @@ public class LineSteps {
 
     public static ExtractableResponse<Response> 지하철노선_생성() {
         return 지하철노선_생성(DEFAULT_NAME, DEFAULT_COLOR);
+    }
+
+    public static ExtractableResponse<Response> 지하철노선_생성(LineRequest lineRequest) {
+        return RestAssured
+                .given().log().all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all().extract();
     }
 
     public static ExtractableResponse<Response> 지하철노선_생성(String name, String color) {

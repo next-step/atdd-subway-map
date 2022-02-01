@@ -2,8 +2,8 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.LogicError;
 import nextstep.subway.exception.LogicException;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -28,6 +30,10 @@ public class LineService {
         }
 
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        line.addSection(upStation, downStation, lineRequest.getDistance());
+
         return LineResponse.of(line);
     }
 
@@ -60,5 +66,9 @@ public class LineService {
 
     private boolean isExistLineName(String name) {
         return lineRepository.existsByName(name);
+    }
+
+    public LineResponse saveSection(SectionRequest sectionRequest) {
+        return null;
     }
 }
