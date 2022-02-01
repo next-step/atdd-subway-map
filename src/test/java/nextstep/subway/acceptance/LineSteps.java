@@ -10,7 +10,15 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
+import static nextstep.subway.acceptance.StationSteps.지하철역_생성_및_아이디추출;
+
 public class LineSteps {
+
+    public static LineRequest 지하철노선_생성_요청_파라미터(String name, String color, String upStation, String downStation, int distance) {
+        long upStationId = 지하철역_생성_및_아이디추출(upStation);
+        long downStationId = 지하철역_생성_및_아이디추출(downStation);
+        return new LineRequest(name, color, upStationId, downStationId, distance);
+    }
 
     public static Long 지하철노선_생성_및_아이디추출(LineRequest lineRequest) {
         return 지하철노선_생성(lineRequest).jsonPath().getLong("id");
