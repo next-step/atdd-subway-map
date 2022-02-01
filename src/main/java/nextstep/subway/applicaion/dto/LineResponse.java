@@ -2,9 +2,9 @@ package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Sections;
+import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +30,7 @@ public class LineResponse {
 
     public static LineResponse of(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), sectionsResponseMapper(line.getSections()),
-                stationResponseMapper(line.getSections()), line.getCreatedDate(), line.getModifiedDate());
+                stationResponseMapper(line), line.getCreatedDate(), line.getModifiedDate());
     }
 
     private static List<SectionResponse> sectionsResponseMapper(Sections sections) {
@@ -39,15 +39,9 @@ public class LineResponse {
                 .collect(Collectors.toList());
     }
 
-    private static List<StationResponse> stationResponseMapper(Sections sections) {
-        List<StationResponse> stationResponses = new ArrayList<>();
-        sections.getSections().stream()
-                .forEach(section -> {
-                    stationResponses.add(new StationResponse(section.getDownStation()));
-                    stationResponses.add(new StationResponse(section.getUpStation()));
-                });
-        List<StationResponse> result = stationResponses.stream().distinct().collect(Collectors.toList());
-        return result;
+    private static List<StationResponse> stationResponseMapper(Line line) {
+        List<Station> stations = line.getStations();
+        return stations.stream().map(station -> new StationResponse(station)).collect(Collectors.toList());
     }
 
     public Long getId() {
