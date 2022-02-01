@@ -38,6 +38,14 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> 지하철구간_삭제(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId", stationId)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().log().all().extract();
+    }
+
     public static ExtractableResponse<Response> 지하철노선_삭제(long id) {
         return RestAssured
                 .given().log().all()

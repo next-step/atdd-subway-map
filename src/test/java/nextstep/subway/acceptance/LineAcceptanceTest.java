@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.LineSteps.*;
+import static nextstep.subway.acceptance.LineSteps.지하철구간_생성;
 import static nextstep.subway.acceptance.StationSteps.지하철역_생성_및_아이디추출;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -196,10 +197,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     void createStation() {
         // given
         LineResponse line = 지하철노선_생성_및_객체추출(lineRequest);
-        int size = line.getStations().size();
-        long upStationId = line.getStations().get(size - 1).getId();
         long downStationId = 지하철역_생성_및_아이디추출("판교역");
 
+        int size = line.getStations().size();
+        long upStationId = line.getStations().get(size - 1).getId();
         SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10);
         // when
         ExtractableResponse<Response> createResponse = 지하철구간_생성(line.getId(), sectionRequest);
@@ -210,25 +211,29 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 지하철 구간 생성을 요청 하고
+     * Given 지하철 노선을 생성하고
+     * Given 지하철역을 생성하고
+     * Given 지하철 구간 생성을 요청 하면
      * When 지하철 구간 제거를 요청 하면
      * Then 지하철 구간 제거가 성공한다.
      */
     @DisplayName("지하철 구간 제거")
     @Test
     void getStations() {
-//        /// given
-//        String 역삼역 = "역삼역";
-//        String 강남역 = "강남역";
-//        지하철역_생성(강남역);
-//        지하철역_생성(역삼역);
-//
-//        // when
-//        ExtractableResponse<Response> readResponse = 지하철역_목록_조회();
-//
-//        assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-//        List<String> stationNames = readResponse.jsonPath().getList("name");
-//        assertThat(stationNames).contains(강남역, 역삼역);
+        // given
+        LineResponse line = 지하철노선_생성_및_객체추출(lineRequest);
+        long downStationId = 지하철역_생성_및_아이디추출("판교역");
+
+        int size = line.getStations().size();
+        long upStationId = line.getStations().get(size - 1).getId();
+        SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10);
+        지하철구간_생성(line.getId(), sectionRequest);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철구간_삭제(line.getId(), downStationId);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 
