@@ -66,10 +66,24 @@ class SectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 지하철구간_생성(line.getId(), sectionRequest);
 
         // then
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(createResponse.header("Location")).isNotBlank();
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * When 구간에 이미 등록되어있는 역이 포함된 구간 생성을 요청하면
+     * Then 지하철 구간 생성이 실패한다.
+     */
+    @DisplayName("지하철 구간 등록 실패 - 하행역이 해당노선에 이미 등록되어있음")
+    @Test
+    void createStationExistStationException() {
+        // when
+        downStationId = 1L;
+        SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10);
+        ExtractableResponse<Response> createResponse = 지하철구간_생성(line.getId(), sectionRequest);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given 지하철 구간 생성을 요청 하면
