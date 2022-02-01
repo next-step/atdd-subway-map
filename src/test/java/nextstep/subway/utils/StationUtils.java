@@ -46,7 +46,7 @@ public class StationUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> Station_목록_요청() {
+    public static ExtractableResponse<Response> 지하철_역_목록_요청() {
         return RestAssured.given().log().all()
                 .when()
                 .get("/stations")
@@ -54,7 +54,7 @@ public class StationUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> Station_삭제_요청(String uri) {
+    public static ExtractableResponse<Response> 지하철_역_삭제_요청(String uri) {
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)

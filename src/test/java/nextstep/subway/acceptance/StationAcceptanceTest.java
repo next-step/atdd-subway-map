@@ -49,7 +49,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         final List<ExtractableResponse<Response>> requestList = 지하철_역_생성_요청(params);
 
         // when
-        ExtractableResponse<Response> responseList = Station_목록_요청();
+        ExtractableResponse<Response> responseList = 지하철_역_목록_요청();
 
         // then
         생성요청한_지하철역들과_생성된_지하철역_목록이_동일함(requestList, responseList);
@@ -69,7 +69,7 @@ class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> deleteResponse = Station_삭제_요청(uri);
+        ExtractableResponse<Response> deleteResponse = 지하철_역_삭제_요청(uri);
 
         // then
         삭제요청한_지하철_역이_존재하지_않음(deleteResponse);
