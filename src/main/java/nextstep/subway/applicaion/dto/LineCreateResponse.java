@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import nextstep.subway.domain.Line;
 
 public class LineCreateResponse extends BaseLineResponse {
+
     public LineCreateResponse(
             Long id,
             String name,

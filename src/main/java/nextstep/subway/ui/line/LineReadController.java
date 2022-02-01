@@ -27,6 +27,7 @@ public class LineReadController {
     @GetMapping("{id}")
     public ResponseEntity<LineReadResponse> getLine(@PathVariable Long id) {
         LineReadResponse line = lineReadService.findSpecificLine(id);
+        System.out.println("line = " + line);
         return ResponseEntity.ok().body(line);
     }
 }

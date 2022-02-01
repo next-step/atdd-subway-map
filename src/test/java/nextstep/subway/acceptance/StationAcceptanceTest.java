@@ -1,50 +1,40 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.acceptance.requests.StationRequest.PATH_PREFIX;
+import static nextstep.subway.acceptance.requests.StationRequest.stationCreateRequest;
+import static nextstep.subway.acceptance.type.GeneralNameType.LOCATION;
+import static nextstep.subway.acceptance.type.StationNameType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String PATH_PREFIX = "/stations";
-    private static final String NAME = "name";
-    private static final String LOCATION = "Location";
-    private static final String 강남역 = "강남역";
-    private static final String 역삼역 = "역삼역";
-
-    /** When 지하철역 생성을 요청 하면 Then 지하철역 생성이 성공한다. */
     @DisplayName("지하철역 생성")
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = stationCreateRequest(강남역);
+        ExtractableResponse<Response> response = stationCreateRequest(강남역.stationName());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header(LOCATION)).isNotBlank();
+        assertThat(response.header(LOCATION.getType())).isNotBlank();
     }
 
-    /**
-     * Given 지하철역 생성을 요청 하고 Given 새로운 지하철역 생성을 요청 하고 When 지하철역 목록 조회를 요청 하면 Then 두 지하철역이 포함된 지하철역
-     * 목록을 응답받는다
-     */
     @DisplayName("지하철역 목록 조회")
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = stationCreateRequest(강남역);
+        ExtractableResponse<Response> createResponse1 = stationCreateRequest(강남역.stationName());
 
-        ExtractableResponse<Response> createResponse2 = stationCreateRequest(역삼역);
+        ExtractableResponse<Response> createResponse2 = stationCreateRequest(역삼역.stationName());
 
         // when
         ExtractableResponse<Response> response =
@@ -58,58 +48,38 @@ class StationAcceptanceTest extends AcceptanceTest {
                         .all()
                         .extract();
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(강남역, 역삼역);
+        assertThat(stationNames).contains(강남역.stationName(), 역삼역.stationName());
     }
 
-    /** Given 지하철역 생성을 요청 하고 When 생성한 지하철역 삭제를 요청 하면 Then 생성한 지하철역 삭제가 성공한다. */
     @DisplayName("지하철역 삭제")
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = stationCreateRequest(강남역);
+        ExtractableResponse<Response> createResponse = stationCreateRequest(강남역.stationName());
 
         // when
-        String uri = createResponse.header(LOCATION);
+        String uri = createResponse.header(LOCATION.getType());
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all().when().delete(uri).then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-    /** Given 지하철역 생성을 요청 하고 When 같은 이름으로 지하철역 생성을 요청 하면 Then 지하철역 생성이 실패한다. */
+
     @DisplayName("중복된 이름으로 역을 생성할 수 없다.")
     @Test
     void duplicateNameCreationTest() {
         // given
-        ExtractableResponse<Response> creationResponse = stationCreateRequest(강남역);
+        ExtractableResponse<Response> creationResponse = stationCreateRequest(강남역.stationName());
 
         // when
-        ExtractableResponse<Response> duplicateCreationResponse = stationCreateRequest(강남역);
+        ExtractableResponse<Response> duplicateCreationResponse =
+                stationCreateRequest(강남역.stationName());
 
         // then
-        // TODO question: Bad request vs conflict 어떤 status가 맞을지 애매하네요.
-        // 전 일단 bad_request로...
-        assertThat(duplicateCreationResponse.statusCode())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    static ExtractableResponse<Response> stationCreateRequest(String name) {
-
-        Map<String, String> params = new HashMap<>();
-        params.put(NAME, name);
-
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(PATH_PREFIX)
-                .then()
-                .log()
-                .all()
-                .extract();
+        assertThat(duplicateCreationResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
