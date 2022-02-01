@@ -6,15 +6,12 @@ import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class LineSteps {
-    public static final String DEFAULT_NAME = "1호선";
-    public static final String DEFAULT_COLOR = "bg-blue-600";
 
-    public static ExtractableResponse<Response> 지하철노선_생성() {
-        return 지하철노선_생성(DEFAULT_NAME, DEFAULT_COLOR);
+    public static Long 지하철노선_생성_및_아이디추출(LineRequest lineRequest) {
+        return 지하철노선_생성(lineRequest).jsonPath().getLong("id");
     }
 
     public static ExtractableResponse<Response> 지하철노선_생성(LineRequest lineRequest) {
@@ -26,36 +23,23 @@ public class LineSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철노선_생성(String name, String color) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract();
-    }
-
-    public static ExtractableResponse<Response> 지하철노선_삭제(int id) {
+    public static ExtractableResponse<Response> 지하철노선_삭제(long id) {
         return RestAssured
                 .given().log().all()
                 .when().delete("/lines/" + id)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철노선_수정(int id, Map<String, String> params2) {
+    public static ExtractableResponse<Response> 지하철노선_수정(long id, Map<String, String> params) {
         return RestAssured
                 .given().log().all()
-                .body(params2)
+                .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/" + id)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 지하철노선_조회(int id) {
+    public static ExtractableResponse<Response> 지하철노선_조회(long id) {
         return RestAssured
                 .given().log().all()
                 .when().get("/lines/" + id)

@@ -3,6 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,17 +20,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
+    public static final String 신분당선 = "신분당선";
+    public static final String COLOR = "bg-red-600";
+    public static final String 강남역 = "강남역";
+    public static final String 광교역 = "광교역";
+    public static final int DISTANCE = 10;
     private LineRequest lineRequest;
 
-    private LineRequest 지하철노선_생성_파라미터() {
-        String name = "신분당선";
-        String color = "bg-red-600";
-        long upStationId = 지하철역_생성_및_아이디추출("강남역");
-        long downStationId = 지하철역_생성_및_아이디추출("광교역");
-        int distance = 10;
+    private LineRequest 지하철노선_생성_요청_파라미터() {
+        return 지하철노선_생성_요청_파라미터(신분당선, COLOR, 강남역, 광교역, DISTANCE);
+    }
+
+    private LineRequest 지하철노선_생성_요청_파라미터(String name, String color, String upStation, String downStation, int distance) {
+        long upStationId = 지하철역_생성_및_아이디추출(upStation);
+        long downStationId = 지하철역_생성_및_아이디추출(downStation);
         return new LineRequest(name, color, upStationId, downStationId, distance);
     }
 
+    @BeforeEach
+    public void init(){
+        lineRequest = 지하철노선_생성_요청_파라미터();
+    }
+    
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -37,13 +50,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        lineRequest = 지하철노선_생성_파라미터();
         ExtractableResponse<Response> createResponse = 지하철노선_생성(lineRequest);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
-
 
 
     /**
@@ -56,14 +67,17 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        String 신분당선 = "신분당선";
-        String 빨간색 = "bg-red-600";
-
         String 경춘선 = "경춘선";
         String 초록색 = "bg-green-600";
+        String 상봉역 = "상봉역";
+        String 춘천역 = "춘천역";
+        int distance = 10;
 
-        지하철노선_생성(신분당선, 빨간색);
-        지하철노선_생성(경춘선, 초록색);
+        지하철노선_생성(lineRequest);
+
+        // given
+        LineRequest lineRequest_second = 지하철노선_생성_요청_파라미터(경춘선, 초록색, 상봉역, 춘천역, distance);
+        지하철노선_생성(lineRequest_second);
 
         // when
         Map<String, String> params = new HashMap<>();
@@ -73,8 +87,9 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = readResponse.jsonPath().getList("name");
         List<String> lineColors = readResponse.jsonPath().getList("color");
+
         assertThat(lineNames).contains(신분당선, 경춘선);
-        assertThat(lineColors).contains(빨간색, 초록색);
+        assertThat(lineColors).contains(COLOR, 초록색);
     }
 
     /**
@@ -86,22 +101,21 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        String _2호선 = "2호선";
-        String 초록색 = "bg-green-600";
-
-        ExtractableResponse<Response> createLineResponse = 지하철노선_생성(_2호선, 초록색);
-
-        int stationId = createLineResponse.jsonPath().getInt("id");
+        // when
+        long lineId = 지하철노선_생성_및_아이디추출(lineRequest);
 
         // when
-        ExtractableResponse<Response> readResponse = 지하철노선_조회(stationId);
+        ExtractableResponse<Response> readResponse = 지하철노선_조회(lineId);
 
         // then
         assertThat(readResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         String name = readResponse.jsonPath().getString("name");
         String color = readResponse.jsonPath().getString("color");
-        assertThat(name).isEqualTo(_2호선);
-        assertThat(color).isEqualTo(초록색);
+        List<StationResponse> stations = readResponse.jsonPath().getList("stations", StationResponse.class);
+
+        assertThat(name).isEqualTo(신분당선);
+        assertThat(color).isEqualTo(COLOR);
+        assertThat(stations).hasSize(2);
 
     }
 
@@ -114,8 +128,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성();
-        int stationId = createResponse.jsonPath().getInt("id");
+        long lineId = 지하철노선_생성_및_아이디추출(lineRequest);
 
         // when
         String _1호정_수정 = "1호선-수정";
@@ -124,7 +137,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         params.put("name", _1호정_수정);
         params.put("color", 파란색_수정);
 
-        ExtractableResponse<Response> modifyResponse = 지하철노선_수정(stationId, params);
+        ExtractableResponse<Response> modifyResponse = 지하철노선_수정(lineId, params);
 
         // then
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -143,11 +156,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철노선_생성();
-        int stationId = createResponse.jsonPath().getInt("id");
+        long lineId = 지하철노선_생성_및_아이디추출(lineRequest);
 
         // when
-        ExtractableResponse<Response> deleteResponse = 지하철노선_삭제(stationId);
+        ExtractableResponse<Response> deleteResponse = 지하철노선_삭제(lineId);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -162,10 +174,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLineWithDuplicatedException() {
         // given
-        지하철노선_생성("1호선", "blue");
+        지하철노선_생성(lineRequest);
 
         // when
-        ExtractableResponse<Response> createResponse = 지하철노선_생성("1호선", "red");
+        ExtractableResponse<Response> createResponse = 지하철노선_생성(lineRequest);
 
         // then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
