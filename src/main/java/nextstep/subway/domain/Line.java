@@ -52,4 +52,15 @@ public class Line extends BaseEntity {
         Section section = new Section(this, upStation, downStation, distance);
         sections.add(section);
     }
+
+    public List<Station> getStation() {
+        List<Station> stations = new ArrayList<>();
+
+        if(!sections.isEmpty()){
+            stations.add(sections.get(0).getUpStation());
+            sections.forEach(section -> stations.add(section.getDownStation()));
+        }
+
+        return stations;
+    }
 }
