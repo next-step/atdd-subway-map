@@ -78,4 +78,11 @@ public class LineService {
         Section section = sectionRepository.save(new Section(line, upStation, downStation, sectionRequest.getDistance()));
         return SectionResponse.of(section);
     }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findById(lineId);
+        Station station = stationService.findById(stationId);
+        sectionRepository.deleteByLineAndDownStation(line, station);
+
+    }
 }
