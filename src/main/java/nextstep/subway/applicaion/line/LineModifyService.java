@@ -6,6 +6,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.exception.DuplicateCreationException;
+import nextstep.subway.exception.IllegalAddSectionException;
 import nextstep.subway.exception.IllegalDeletionException;
 import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,12 @@ public class LineModifyService {
     public void addSection(Long id, Section section) {
         Line line = lineRepository.findById(id).orElseThrow(NotFoundException::new);
         // TODO 이게 맞는건지 모르겠습니다. 차라리 생성자 주입으로 해서 넣는게 맞는건지...
+        if (!line.isAddableSection(section)) {
+            throw new IllegalAddSectionException();
+        }
+        ;
         section.updateLine(line);
+
         line.addSection(section);
     }
 

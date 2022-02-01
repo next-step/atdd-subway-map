@@ -55,4 +55,12 @@ public class Line extends BaseEntity {
     public void addSection(Section section) {
         sections.add(section);
     }
+
+    public boolean isAddableSection(Section section) {
+        if (sections.isEmpty()) {
+            return true;
+        }
+
+        return sections.get(sections.size() - 1).getDownStation().equals(section.getUpStation());
+    }
 }

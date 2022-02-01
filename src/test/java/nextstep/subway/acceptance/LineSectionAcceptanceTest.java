@@ -46,35 +46,63 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
         assertThat(newSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("노선에 구간 추가 실패(상행, 하행 동일)")
+    @DisplayName("노선 구간에 하행 종점이 아닌 구간 추가 실패")
     @Test
-    void addNewStationSectionFailedTest() {
+    void addUnavailableSectionTest() {
         // given
         Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
         Long downStationId =
-          stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
+                stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
         Long newDownStationId =
-          stationCreateRequest(선릉역.stationName()).jsonPath().getLong(ID.getType());
+                stationCreateRequest(선릉역.stationName()).jsonPath().getLong(ID.getType());
 
         Long lineId =
-          lineCreateRequest(
-            NEW_BUN_DANG_LINE.lineName(),
-            NEW_BUN_DANG_LINE.lineColor(),
-            upStationId,
-            downStationId,
-            FIRST_DISTANCE)
-            .jsonPath()
-            .getLong(ID.getType());
+                lineCreateRequest(
+                                NEW_BUN_DANG_LINE.lineName(),
+                                NEW_BUN_DANG_LINE.lineColor(),
+                                upStationId,
+                                downStationId,
+                                FIRST_DISTANCE)
+                        .jsonPath()
+                        .getLong(ID.getType());
 
         // when
         ExtractableResponse<Response> newSectionResponse =
-          sectionAddRequest(lineId, downStationId, downStationId, 3);
+                sectionAddRequest(lineId, upStationId, newDownStationId, 3);
 
         // then
         assertThat(newSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("노선 구간 제거")
+    @DisplayName("노선에 상 하행 역 동일 구간 추가 실패")
+    @Test
+    void addNewStationSectionFailedTest() {
+        // given
+        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
+        Long downStationId =
+                stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
+        Long newDownStationId =
+                stationCreateRequest(선릉역.stationName()).jsonPath().getLong(ID.getType());
+
+        Long lineId =
+                lineCreateRequest(
+                                NEW_BUN_DANG_LINE.lineName(),
+                                NEW_BUN_DANG_LINE.lineColor(),
+                                upStationId,
+                                downStationId,
+                                FIRST_DISTANCE)
+                        .jsonPath()
+                        .getLong(ID.getType());
+
+        // when
+        ExtractableResponse<Response> newSectionResponse =
+                sectionAddRequest(lineId, downStationId, downStationId, 3);
+
+        // then
+        assertThat(newSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("노선에 하행 종점 구간 삭제")
     @Test
     void deleteStationSectionTest() {
         // given
@@ -104,7 +132,7 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("노선 구간 제거 실패")
+    @DisplayName("노선에 하행 종점이 아닌 구간 삭제 실패")
     @Test
     void deleteStationSectionFailedTest() {
         // given

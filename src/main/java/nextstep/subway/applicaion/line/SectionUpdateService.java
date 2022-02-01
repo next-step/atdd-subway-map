@@ -24,7 +24,7 @@ public class SectionUpdateService {
         Objects.nonNull(sectionRequest.getDownStationId());
         Objects.nonNull(sectionRequest.getDistance());
 
-        if(sectionRequest.getUpStationId() == sectionRequest.getDownStationId()){
+        if (sectionRequest.getUpStationId() == sectionRequest.getDownStationId()) {
             throw new DuplicateSectionStationException();
         }
 
