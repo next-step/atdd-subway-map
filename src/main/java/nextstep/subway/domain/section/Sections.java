@@ -27,21 +27,15 @@ public class Sections {
     }
 
     public boolean hasAnyMatchedDownStation(Station upStation) {
-        return sectionList.stream().anyMatch(section -> section.hasDownStation(upStation));
+        return sectionList.get(sectionList.size() - 1).hasDownStation(upStation);
     }
 
     public boolean hasStation(Station downStation) {
         return sectionList.stream().anyMatch(section -> section.hasStation(downStation));
     }
 
-    public boolean isEmpty() {
-        return sectionList.isEmpty();
-    }
-
     public List<Section> getSectionList() {
-        return sectionList.stream()
-                .sorted((o1, o2) -> (int) (o1.getId() - o2.getId()))
-                .collect(Collectors.toList());
+        return new ArrayList<>(sectionList);
     }
 
     public Section delete(Station station) {

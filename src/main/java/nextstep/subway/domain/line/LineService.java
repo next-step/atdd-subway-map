@@ -104,7 +104,7 @@ public class LineService {
         Station upStation = findStationById(upStationId);
         Station downStation = findStationById(downStationId);
 
-        line.validateSection(upStation, downStation, distance);
+        SectionValidator.proper(line, upStation, downStation, distance);
 
         return Section.of(upStation, downStation, distance);
     }

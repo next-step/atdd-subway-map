@@ -26,7 +26,7 @@ public class SectionValidator {
     }
 
     private static void validateUpStation(Line line, Station upStation) {
-        if (line.isEmptySections() || line.hasAnyMatchedDownStation(upStation)) {
+        if (line.hasAnyMatchedDownStation(upStation)) {
             return;
         }
         throw new BusinessException(NOT_VALID_UP_STATION);

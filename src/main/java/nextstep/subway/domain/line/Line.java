@@ -31,6 +31,7 @@ public class Line extends BaseEntity {
         this.sections = new Sections();
     }
 
+    /* Getter */
     public Long getId() {
         return id;
     }
@@ -47,6 +48,17 @@ public class Line extends BaseEntity {
         return sections.getAllStations();
     }
 
+    /* toString */
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                '}';
+    }
+
+    /* 노선 변경하기 - 검증 완료 */
     public void modify(String name, String color) {
         modifyName(name);
         modifyColor(color);
@@ -64,26 +76,22 @@ public class Line extends BaseEntity {
         }
     }
 
+    /* 노선에 역이 존재하는지 확인 */
     public boolean hasStation(Station downStation) {
         return sections.hasStation(downStation);
     }
 
+    /* 하행역이랑 같은지 확인 */
     public boolean hasAnyMatchedDownStation(Station station) {
         return sections.hasAnyMatchedDownStation(station);
     }
 
-    public boolean isEmptySections() {
-        return sections.isEmpty();
-    }
-
-    public Sections getSections() {
-        return this.sections;
-    }
-
+    /* 구간 목록 조회 */
     public List<Section> getSectionList() {
-        return this.sections.getSectionList();
+        return sections.getSectionList();
     }
 
+    /* 구간 삭제 */
     public void deleteSection(Station station) {
         if (sections.hasOneSection()) {
             throw new BusinessException(ErrorCode.REMAINED_SECTION_ONLY_ONE);
@@ -91,12 +99,9 @@ public class Line extends BaseEntity {
         sections.delete(station);
     }
 
+    /* 구간 추가 */
     public void addSection(Section section) {
         sections.add(section);
         section.setLine(this);
-    }
-
-    public void validateSection(Station upStation, Station downStation, int distance) {
-        SectionValidator.proper(this, upStation, downStation, distance);
     }
 }
