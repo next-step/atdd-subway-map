@@ -88,7 +88,6 @@ public class LineService {
     public void deleteSection(Long id) {
         Section section = sectionRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        Line line = section.getLine();
         sectionRepository.delete(section);
     }
 }
