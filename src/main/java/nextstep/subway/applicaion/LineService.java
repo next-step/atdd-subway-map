@@ -18,12 +18,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
-    private SectionRepository sectionRepository;
     private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
         this.stationRepository = stationRepository;
     }
 
@@ -35,7 +33,7 @@ public class LineService {
             throw new IllegalArgumentException(String.format("이미 존재하는 노선입니다. %s", request));
         }
 
-        Line line = lineRepository.save(this.fromLine(request));
+        Line line = lineRepository.save(this.toLine(request));
 
         return this.createLineResponse(line);
     }
@@ -72,21 +70,7 @@ public class LineService {
         final List<StationResponse> responseStation = new ArrayList<>();
         final List<Section> sections = line.getSections();
         if (!sections.isEmpty()) {
-            final Section section = sections.get(0);
-
-            final Station upStation = section.getUpStation();
-            final StationResponse upStationResponse = new StationResponse(upStation.getId(),
-                    upStation.getName(),
-                    upStation.getCreatedDate(),
-                    upStation.getModifiedDate());
-
-            final Station downStation = section.getDownStation();
-
-            final StationResponse downStationResponse = new StationResponse(downStation.getId(),
-                    downStation.getName(),
-                    downStation.getCreatedDate(),
-                    downStation.getModifiedDate());
-            responseStation.addAll(Arrays.asList(upStationResponse, downStationResponse));
+            responseStation.addAll(createStationResponse(sections));
         }
 
         return new LineResponse(line.getId(),
@@ -97,18 +81,33 @@ public class LineService {
                 line.getModifiedDate());
     }
 
-    private Line fromLine(LineRequest lineRequest) {
+    private List<StationResponse> createStationResponse(List<Section> sections) {
+        final Section section = sections.get(0);
+
+        final Station upStation = section.getUpStation();
+        final StationResponse upStationResponse = new StationResponse(upStation.getId(),
+                upStation.getName(),
+                upStation.getCreatedDate(),
+                upStation.getModifiedDate());
+
+        final Station downStation = section.getDownStation();
+
+        final StationResponse downStationResponse = new StationResponse(downStation.getId(),
+                downStation.getName(),
+                downStation.getCreatedDate(),
+                downStation.getModifiedDate());
+        return Arrays.asList(upStationResponse, downStationResponse);
+    }
+
+    private Line toLine(LineRequest lineRequest) {
         final Long downStationId = lineRequest.getDownStationId();
         final Station downStation = stationRepository.getById(downStationId);
+
         final Long upStationId = lineRequest.getUpStationId();
         final Station upStation = stationRepository.getById(upStationId);
+
         final Integer distance = lineRequest.getDistance();
-
         final Section section = new Section(upStation, downStation, distance);
-
-        List<Section> sections = new ArrayList<>();
-        sections.add(section);
-
 
         return new Line.Builder()
                 .name(lineRequest.getName())
