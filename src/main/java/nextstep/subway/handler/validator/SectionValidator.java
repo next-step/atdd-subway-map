@@ -9,7 +9,7 @@ import static nextstep.subway.handler.error.custom.ErrorCode.*;
 
 public class SectionValidator {
 
-    public static void proper(int distance) {
+    public static void properDistance(int distance) {
         validateDistance(distance);
     }
 

@@ -24,8 +24,7 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest.getName(), lineRequest.getColor(),
-                lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+        LineResponse line = lineService.saveLine(lineRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -59,7 +58,7 @@ public class LineController {
                                                          @RequestBody SectionRequest request) {
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/"))
                 .body(lineService
-                        .createSection(lineId, request.getUpStationId(), request.getDownStationId(), request.getDistance()));
+                        .insertSection(lineId, request.getUpStationId(), request.getDownStationId(), request.getDistance()));
     }
 
     @GetMapping("/{lineId}/sections")

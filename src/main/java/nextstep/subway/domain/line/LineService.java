@@ -1,6 +1,7 @@
 package nextstep.subway.domain.line;
 
 import nextstep.subway.domain.line.dto.LineDetailResponse;
+import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.line.dto.LineResponse;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.SectionRepository;
@@ -32,19 +33,33 @@ public class LineService {
         this.sectionRepository = sectionRepository;
     }
 
-    public LineResponse saveLine(String lineName, String lineColor, Long upStationId, Long downStationId, int distance) {
-        if (lineRepository.existsByName(lineName)) {
-            throw new BusinessException(FOUND_DUPLICATED_NAME);
-        }
-
-        Line savedLine = new Line(lineName, lineColor);
-        pushSection(savedLine, extractFirstSection(upStationId, downStationId, distance));
+    /* 노선 생성 */
+    public LineResponse saveLine(LineRequest request) {
+        Line savedLine = Line.of(request.getName(), request.getColor());
+        pushSection(savedLine, createFirstSection(request.getUpStationId(), request.getDownStationId(),
+                request.getDistance()));
 
         lineRepository.save(savedLine);
 
         return LineResponse.from(savedLine);
     }
 
+    private Section createFirstSection(Long upStationId, Long downStationId, int distance) {
+        Station upStation = findStationById(upStationId);
+        Station downStation = findStationById(downStationId);
+
+        validateSectionFirst(upStation, downStation, distance);
+        return Section.of(upStation, downStation, distance);
+    }
+
+    private void validateSectionFirst(Station upStation, Station downStation, int distance) {
+        if (sectionRepository.existsByUpStationAndDownStation(upStation, downStation)) {
+            throw new BusinessException(SECTION_ALREADY_EXISTS);
+        }
+        SectionValidator.properDistance(distance);
+    }
+
+    /* 노선 목록 조회 */
     @Transactional(readOnly = true)
     public List<LineDetailResponse> getLineList() {
         return lineRepository.findAll().stream()
@@ -52,31 +67,49 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    /* 단일 노선 조회 */
     @Transactional(readOnly = true)
     public LineDetailResponse getLine(Long id) {
         return LineDetailResponse.from(findLineById(id));
     }
 
+    /* 단일 노선 정보 수정 */
     public void patchLine(Long id, String lineName, String lineColor) {
         Line line = findLineById(id);
         line.modify(lineName, lineColor);
     }
 
+    /* 단일 노선 삭제 */
     public void deleteLine(Long id) {
-        if (!lineRepository.existsById(id)) {
-            throw new BusinessException(LINE_NOT_FOUND_BY_ID);
-        }
         lineRepository.deleteById(id);
     }
 
-    public SectionResponse createSection(Long lineId, Long upStationId, Long downStationId, int distance) {
+    /* 노선에 구간 추가 */
+    public SectionResponse insertSection(Long lineId, Long upStationId, Long downStationId, int distance) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
-        Section createdSection = extractSection(line, upStationId, downStationId, distance);
+        Section createdSection = createSection(line, upStationId, downStationId, distance);
         pushSection(line, createdSection);
 
         return SectionResponse.from(createdSection);
     }
 
+    private Section createSection(Line line, Long upStationId, Long downStationId, int distance) {
+        Station upStation = findStationById(upStationId);
+        Station downStation = findStationById(downStationId);
+
+        validateSection(line, upStation, downStation, distance);
+
+        return Section.of(upStation, downStation, distance);
+    }
+
+    private void validateSection(Line line, Station upStation, Station downStation, int distance) {
+        if (sectionRepository.existsByUpStationAndDownStation(upStation, downStation)) {
+            throw new BusinessException(SECTION_ALREADY_EXISTS);
+        }
+        SectionValidator.proper(line, upStation, downStation, distance);
+    }
+
+    /* 노선의 구간 목록 조회 */
     @Transactional(readOnly = true)
     public List<SectionDetailResponse> getSections(Long id) {
         Line selectedLine = findLineById(id);
@@ -87,6 +120,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    /* 노선의 단일 구간 삭제 */
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
         line.deleteSection(findStationById(stationId));
@@ -100,32 +134,8 @@ public class LineService {
         return lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
     }
 
-    private Section extractSection(Line line, Long upStationId, Long downStationId, int distance) {
-        Station upStation = findStationById(upStationId);
-        Station downStation = findStationById(downStationId);
-
-        SectionValidator.proper(line, upStation, downStation, distance);
-
-        return Section.of(upStation, downStation, distance);
-    }
-
-    private Section extractFirstSection(Long upStationId, Long downStationId, int distance) {
-        Station upStation = findStationById(upStationId);
-        Station downStation = findStationById(downStationId);
-
-        validateFirstSection(upStation, downStation, distance);
-        return Section.of(upStation, downStation, distance);
-    }
-
-    private Station findStationById(Long upStationId) {
-        return stationRepository.findById(upStationId)
+    private Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId)
                 .orElseThrow(() -> new BusinessException(STATION_NOT_FOUND_BY_ID));
-    }
-
-    private void validateFirstSection(Station upStation, Station downStation, int distance) {
-        if (sectionRepository.existsByUpStationAndDownStation(upStation, downStation)) {
-            throw new BusinessException(SECTION_ALREADY_EXISTS);
-        }
-        SectionValidator.proper(distance);
     }
 }

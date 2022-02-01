@@ -1,6 +1,7 @@
 package nextstep.subway.domain.section;
 
 import nextstep.subway.domain.station.Station;
+import nextstep.subway.handler.error.custom.BusinessException;
 import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.CascadeType;
@@ -27,6 +28,9 @@ public class Sections {
     }
 
     public boolean hasAnyMatchedDownStation(Station upStation) {
+        if(sectionList.isEmpty()) {
+            return true;
+        }
         return sectionList.get(sectionList.size() - 1).hasDownStation(upStation);
     }
 

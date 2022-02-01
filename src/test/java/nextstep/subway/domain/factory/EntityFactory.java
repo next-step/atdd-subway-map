@@ -7,7 +7,7 @@ import nextstep.subway.domain.station.Station;
 public class EntityFactory {
 
     public static Line createLine(String name, String color) {
-        return new Line(name, color);
+        return Line.of(name, color);
     }
 
     public static Station createStation(String name) {

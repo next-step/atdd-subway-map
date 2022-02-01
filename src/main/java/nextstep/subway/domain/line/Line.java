@@ -6,7 +6,6 @@ import nextstep.subway.domain.section.Sections;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.handler.error.custom.BusinessException;
 import nextstep.subway.handler.error.custom.ErrorCode;
-import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,19 +15,27 @@ public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
     private String name;
+
+    @Column(unique = true)
     private String color;
 
     @Embedded
     private Sections sections;
 
-    public Line() {
+    private Line() {
     }
 
-    public Line(String name, String color) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
         this.sections = new Sections();
+    }
+
+    public static Line of(String name, String color) {
+        return new Line(name, color);
     }
 
     /* Getter */
@@ -58,7 +65,7 @@ public class Line extends BaseEntity {
                 '}';
     }
 
-    /* 노선 변경하기 - 검증 완료 */
+    /* 노선 변경하기 */
     public void modify(String name, String color) {
         modifyName(name);
         modifyColor(color);
