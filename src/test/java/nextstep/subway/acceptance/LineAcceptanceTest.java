@@ -189,6 +189,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         ExtractableResponse<Response> response = 지하철_구간_생성_요청(1L, 2L, 3L, 20);
         // then
+        assertThat(response.jsonPath().getString("sections").contains("강남")).isTrue();
+        assertThat(response.jsonPath().getString("sections").contains("역삼")).isTrue();
+        assertThat(response.jsonPath().getString("sections").contains("건대")).isTrue();
+        assertThat(response.jsonPath().getString("sections").contains("양재")).isFalse();
+
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
