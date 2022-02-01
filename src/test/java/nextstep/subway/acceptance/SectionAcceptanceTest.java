@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.utils.StationUtils.*;
 import static nextstep.subway.utils.LineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,14 +45,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                         .toString());
     }
 
-    private Long 지하철_역_데이터_생성(String name) {
-        return Long.valueOf(
-                지하철_역_생성_요청(StationUtils.지하철_역_데이터_생성(name))
-                        .jsonPath()
-                        .get("id")
-                        .toString()
-        );
-    }
 
     /**
      * given 하행역으로 상행 종점이면서, 새로운 역으로 하행 종점인 구간 데이터 생성
@@ -63,38 +54,17 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 역 구간 생성")
     @Test
     void createSection() {
-        final Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 노선에_속한_상행역);
-        params.put("downStationId", 노선에_속한_하행역);
-        params.put("distance", 거리);
+        // given
+        final Map<String, Object> firstSectionParam = 지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역);
+        지하철_구간_생성_요청(firstSectionParam);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/" + 지하철_노선 + "/sections")
-                .then().log().all()
-                .extract();
-
-
-        final Map<String, Object> params2 = new HashMap<>();
-        params2.put("upStationId", 노선에_속한_하행역);
-        params2.put("downStationId", 노선에_속하지_않은_새로운역);
-        params2.put("distance", 거리);
-
-        // when
-        final ExtractableResponse<Response> response2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/" + 지하철_노선 + "/sections")
-                .then().log().all()
-                .extract();
+        final Map<String, Object> secondSectionParam = 지하철_구간_데이터_생성(노선에_속한_하행역, 노선에_속하지_않은_새로운역);
+        final ExtractableResponse<Response> secondResponse = 지하철_구간_생성_요청(secondSectionParam);
 
         // then
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response2.header("Location")).isNotBlank();
+        assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(secondResponse.header("Location")).isNotBlank();
     }
 
     /**
@@ -106,36 +76,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void sectionCreationExceptionWithInvalidDownStation() {
         // given
-        final Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 노선에_속한_상행역);
-        params.put("downStationId", 노선에_속한_하행역);
-        params.put("distance", 거리);
-
-
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/" + 지하철_노선 + "/sections")
-                .then().log().all()
-                .extract();
+        final Map<String, Object> firstSectionParam = 지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역);
+        지하철_구간_생성_요청(firstSectionParam);
 
         // when
-        final Map<String, Object> params2 = new HashMap<>();
-        params2.put("upStationId", 노선에_속한_하행역);
-        params2.put("downStationId", 노선에_속한_상행역);
-        params2.put("distance", 거리);
-
-        final ExtractableResponse<Response> response2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/" + 지하철_노선 + "/sections")
-                .then().log().all()
-                .extract();
+        final Map<String, Object> secondSectionParam = 지하철_구간_데이터_생성(노선에_속한_하행역, 노선에_속한_상행역);
+        final ExtractableResponse<Response> secondResponse = 지하철_구간_생성_요청(secondSectionParam);
 
         // then
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -147,36 +96,42 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void sectionCreationExceptionWithInvalidUpStation() {
         // given
+        final Map<String, Object> firstSectionParam = 지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역);
+        지하철_구간_생성_요청(firstSectionParam);
+
+        // when
+        final Map<String, Object> secondSectionParam = 지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속하지_않은_새로운역);
+        final ExtractableResponse<Response> secondResponse = 지하철_구간_생성_요청(secondSectionParam);
+
+        // then
+        assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+
+    private Long 지하철_역_데이터_생성(String name) {
+        return Long.valueOf(
+                StationUtils.지하철_역_생성_요청(StationUtils.지하철_역_데이터_생성(name))
+                        .jsonPath()
+                        .get("id")
+                        .toString()
+        );
+    }
+
+    private Map<String, Object> 지하철_구간_데이터_생성(Long 노선에_속한_상행역, Long 노선에_속한_하행역) {
         final Map<String, Object> params = new HashMap<>();
         params.put("upStationId", 노선에_속한_상행역);
         params.put("downStationId", 노선에_속한_하행역);
         params.put("distance", 거리);
+        return params;
+    }
 
-
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+    private ExtractableResponse<Response> 지하철_구간_생성_요청(Map<String, Object> params) {
+        return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/" + 지하철_노선 + "/sections")
                 .then().log().all()
                 .extract();
-
-        // given
-        final Map<String, Object> params2 = new HashMap<>();
-        params2.put("upStationId", 노선에_속한_상행역);
-        params2.put("downStationId", 노선에_속하지_않은_새로운역);
-        params2.put("distance", 거리);
-
-        // when
-        final ExtractableResponse<Response> response2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/" + 지하철_노선 + "/sections")
-                .then().log().all()
-                .extract();
-
-        // then
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }
