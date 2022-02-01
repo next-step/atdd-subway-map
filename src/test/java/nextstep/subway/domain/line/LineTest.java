@@ -144,10 +144,11 @@ class LineTest {
         Station 역삼역 = createStation("역삼역");
 
         Line 이호선 = createCompleteLine("2호선", "green", 강남역, 선릉역, 10);
-        이호선.addSection(createSection(선릉역, 역삼역, 10));
+        Section newSection = createSection(선릉역, 역삼역, 10);
+        이호선.addSection(newSection);
 
         // when
-        이호선.deleteSection(역삼역);
+        이호선.deleteSection(newSection);
 
         // then
         assertThat(이호선.getSectionList().size()).isEqualTo(1);
@@ -163,11 +164,13 @@ class LineTest {
         // given
         Station 강남역 = createStation("강남역");
         Station 선릉역 = createStation("선릉역");
+        Line 이호선 = createLine("2호선", "green");
 
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 선릉역, 10);
+        Section section = createSection(강남역, 선릉역, 10);
+        이호선.addSection(section);
 
         // when / then
-        assertThatThrownBy(() -> 이호선.deleteSection(선릉역))
+        assertThatThrownBy(() -> 이호선.deleteSection(section))
                 .isInstanceOf(BusinessException.class);
     }
 }

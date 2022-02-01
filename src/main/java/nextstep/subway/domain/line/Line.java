@@ -99,11 +99,11 @@ public class Line extends BaseEntity {
     }
 
     /* 구간 삭제 */
-    public void deleteSection(Station station) {
+    public void deleteSection(Section section) {
         if (sections.hasOneSection()) {
             throw new BusinessException(ErrorCode.REMAINED_SECTION_ONLY_ONE);
         }
-        sections.delete(station);
+        sections.delete(section);
     }
 
     /* 구간 추가 */

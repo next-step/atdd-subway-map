@@ -123,7 +123,13 @@ public class LineService {
     /* 노선의 단일 구간 삭제 */
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
-        line.deleteSection(findStationById(stationId));
+        Station downStation = stationRepository.findById(stationId)
+                .orElseThrow(() -> new BusinessException(STATION_NOT_FOUND_BY_ID));
+
+        line.getSectionList().stream()
+                .filter(section -> section.hasDownStation(downStation))
+                .findFirst()
+                .ifPresent(section -> line.deleteSection(section));
     }
 
     private void pushSection(Line line, Section createdSection) {

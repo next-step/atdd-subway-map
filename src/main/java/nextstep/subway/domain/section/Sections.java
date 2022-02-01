@@ -42,11 +42,8 @@ public class Sections {
         return new ArrayList<>(sectionList);
     }
 
-    public Section delete(Station station) {
-        Section section = sectionList.get(sectionList.size() - 1);
-        SectionValidator.properDelete(section, station);
+    public Section delete(Section section) {
         sectionList.remove(section);
-
         return section;
     }
 
