@@ -22,7 +22,7 @@ public class SectionController {
     public ResponseEntity<SectionResponse> createSection(@RequestBody SectionRequest sectionRequest, @PathVariable long lineId) {
         try {
             SectionResponse section = sectionService.saveSection(sectionRequest, lineId);
-            return ResponseEntity.created(URI.create("/lines/" + lineId +"/sections/" + section.getId())).build();
+            return ResponseEntity.created(URI.create("/lines/" + lineId +"/sections?stationId=" + section.getDownStationId())).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -30,7 +30,11 @@ public class SectionController {
 
     @DeleteMapping("/lines/{lineId}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable long lineId, @RequestParam long stationId) {
-//        sectionService.deleteSection(lineId, stationId);
+        try {
+            sectionService.deleteSection(lineId, stationId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         return ResponseEntity.noContent().build();
     }
 }

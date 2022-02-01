@@ -25,7 +25,8 @@ public class SectionService {
     public SectionResponse saveSection(SectionRequest sectionRequest, long lineId) {
         final long downStationId = sectionRequest.getDownStationId();
         final long upStationId = sectionRequest.getUpStationId();
-        checkExistingStation(downStationId, upStationId);
+        checkExistingStation(downStationId);
+        checkExistingStation(upStationId);
 
         final Station downStation = stationRepository.getById(downStationId);
         final Station upStation = stationRepository.getById(upStationId);
@@ -33,19 +34,13 @@ public class SectionService {
         validateStationInSection(downStation, upStation, foundLine);
 
         final Section section = sectionRepository.save(
-                toSection(
-                        sectionRequest, downStation, upStation, foundLine));
+                toSection(sectionRequest, downStation, upStation, foundLine));
 
         return createSectionResponse(section);
     }
 
-    private Section toSection(SectionRequest sectionRequest, Station downStation, Station upStation, Line foundLine) {
-        return new Section(
-                foundLine,
-                downStation,
-                upStation,
-                sectionRequest.getDistance()
-                );
+    private Section toSection(SectionRequest sectionRequest, Station upStation, Station downStation, Line foundLine) {
+        return new Section(foundLine, upStation, downStation, sectionRequest.getDistance());
     }
 
     private SectionResponse createSectionResponse(Section section) {
@@ -68,37 +63,41 @@ public class SectionService {
     }
 
     private void checkDownStation(Station downStation, List<Section> sections) {
-        if (downStation.equals(sections.get(0).getUpStation())
-        || downStation.equals(sections.get(0).getDownStation())) {
+        final Section lastSection = sections.get(sections.size() - 1);
+        if (lastSection.getDownStation().equals(downStation) ||
+        lastSection.getUpStation().equals(downStation)) {
             throw new IllegalArgumentException("등록할 하행종점역은 노선에 등록되지 않은 역만 가능합니다.");
         }
     }
 
     private void checkUpStation(Station upStation, List<Section> sections) {
-        if (upStation.equals(sections.get(0).getDownStation())) {
+        final Section lastSection = sections.get(sections.size() - 1);
+        if (upStation.equals(lastSection.getDownStation())) {
             throw new IllegalArgumentException("등록할 상행종점역은 노선의 하행종점역이어야 합니다.");
         }
     }
 
-    private void checkExistingStation(long downStationId, long upStationId) {
-        if (!stationRepository.existsById(downStationId)) {
-            throw new NotFoundException(downStationId);
-        }
-
-        if (!stationRepository.existsById(upStationId)) {
-            throw  new NotFoundException(upStationId);
+    private void checkExistingStation(long stationId) {
+        if (!stationRepository.existsById(stationId)) {
+            throw new NotFoundException(stationId);
         }
     }
 
-//    public void deleteSection(long lineId, long stationId) {
-//        final Line foundLine = lineRepository.getById(lineId);
-//
-//
-//        if (!foundLine.getSections().get(0).getDownStation().equals()) {
-//            throw new IllegalArgumentException("노선에 등록된 역(하행종점역)만 제거 가능합니다.");
-//        }
-//
-////        foundLine.getStations(); // todo 길이 체크
-////        // todo distance 체크
-//    }
+    public void deleteSection(long lineId, long stationId) {
+        checkExistingStation(stationId);
+
+        final Line foundLine = lineRepository.getById(lineId);
+        final List<Section> sections = foundLine.getSections();
+        if (sections.size() <= 1) {
+            throw new IllegalArgumentException("지하철 구간이 1개인 경우 구간을 제거할 수 없습니다.");
+        }
+
+        final Station foundStation = stationRepository.getById(stationId);
+        final Section lastSection = sections.get(sections.size() - 1);
+        if (!lastSection.getDownStation().equals(foundStation)) {
+            throw new IllegalArgumentException("노선에 등록된 역(하행종점역)만 제거 가능합니다.");
+        }
+
+        sectionRepository.delete(lastSection);
+    }
 }

@@ -107,6 +107,63 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(secondResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
+    @DisplayName("지하철 구간 제거")
+    @Test
+    void deleteSection() {
+        // given
+        // 구간 생성
+        지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역));
+        final ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_하행역, 노선에_속하지_않은_새로운역));
+//        final ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(param);
+
+        // when
+        final String uri = createResponse.header("Location");
+        final ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 구간이 1개인 경우 지하철 구간 삭제 실패")
+    @Test
+    void invalidDeleteSection() {
+        // given
+        final Map<String, Object> param = 지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역);
+        지하철_구간_생성_요청(param);
+
+        // when
+        final ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when()
+                .delete("/lines/" + 지하철_노선 + "/sections?stationId=" + 노선에_속한_하행역)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    @DisplayName("하행 종점역이 아닌 경우 지하철 구간 삭제 실패")
+    @Test
+    void invalidDeleteSection2() {
+        // given
+        지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역));
+        지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_하행역, 노선에_속하지_않은_새로운역));
+
+        // when
+        final ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when()
+                .delete("/lines/" + 지하철_노선 + "/sections?stationId=" + 노선에_속하지_않은_새로운역)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
 
     private Long 지하철_역_데이터_생성(String name) {
         return Long.valueOf(
@@ -117,10 +174,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private Map<String, Object> 지하철_구간_데이터_생성(Long 노선에_속한_상행역, Long 노선에_속한_하행역) {
+    private Map<String, Object> 지하철_구간_데이터_생성(Long upStationId, Long downStationId) {
         final Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 노선에_속한_상행역);
-        params.put("downStationId", 노선에_속한_하행역);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
         params.put("distance", 거리);
         return params;
     }
