@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedLineException;
+import nextstep.subway.exception.IllegalDeleteSectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class LineService {
 
         Section section = new Section(upStation, downStation, lineRequest.getDistance());
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), section);
+
         section.setLine(line);
         lineRepository.save(line);
 
@@ -72,22 +74,43 @@ public class LineService {
         lineRepository.delete(line);
     }
 
-    public LineResponse addSections(Long id, SectionRequest sectionRequest) {
+    public LineResponse addSection(Long id, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
+
         Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+
         line.addSection(section);
-        lineRepository.save(line);
+//
+//        System.out.println("-------------------------------------------------");
+//        line.getSections().getSections().stream().forEach(s -> {
+//            System.out.println(s.getUpStation() + " " + s.getDownStation());
+//        });
+//        System.out.println("-------------------------------------------------");
+//
+//        line = lineRepository.save(line);
+//
+//        System.out.println("==================================================");
+//        line.getSections().getSections().stream().forEach(s -> {
+//            System.out.println(s.getUpStation() + " " + s.getDownStation());
+//        });
+//        System.out.println("==================================================");
+
         return LineResponse.of(line);
     }
 
     public void deleteSection(Long id) {
         Section section = sectionRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
+        Line line = lineRepository.findById(section.getLine().getId())
+                .orElseThrow(EntityNotFoundException::new);
+        if (line.getSections().getSections().size() <= 1) {
+            throw new IllegalDeleteSectionException();
+        }
         sectionRepository.delete(section);
     }
 }
