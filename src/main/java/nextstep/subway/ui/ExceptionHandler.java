@@ -2,6 +2,7 @@ package nextstep.subway.ui;
 
 import nextstep.subway.exception.ContainStationException;
 import nextstep.subway.exception.DuplicatedLineException;
+import nextstep.subway.exception.IllegalDeleteSectionException;
 import nextstep.subway.exception.NotEqualDownStationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,11 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(ContainStationException.class)
     public ResponseEntity<HttpStatus> checkContainStation() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(IllegalDeleteSectionException.class)
+    public ResponseEntity<HttpStatus> checkIllegalDeleteSection() {
         return ResponseEntity.badRequest().build();
     }
 }
