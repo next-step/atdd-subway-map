@@ -50,17 +50,12 @@ public class LineController {
 
     @PostMapping("/{id}/sections")
     public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        return ResponseEntity.ok().body(lineService.addSections(id, sectionRequest));
+        return ResponseEntity.ok().body(lineService.addSection(id, sectionRequest));
     }
 
     @DeleteMapping("/sections/{id}")
     public ResponseEntity<HttpStatus> deleteSection(@PathVariable Long id) {
         lineService.deleteSection(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(DuplicatedLineException.class)
-    public ResponseEntity<HttpStatus> duplicatedCheck() {
-        return ResponseEntity.badRequest().build();
     }
 }
