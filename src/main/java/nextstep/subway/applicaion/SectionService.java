@@ -25,23 +25,30 @@ public class SectionService {
     public SectionResponse saveSection(SectionRequest sectionRequest, long lineId) {
         final long downStationId = sectionRequest.getDownStationId();
         final long upStationId = sectionRequest.getUpStationId();
-
         checkExistingStation(downStationId, upStationId);
 
         final Station downStation = stationRepository.getById(downStationId);
         final Station upStation = stationRepository.getById(upStationId);
-
         final Line foundLine = lineRepository.getById(lineId);
         validateStationInSection(downStation, upStation, foundLine);
 
         final Section section = sectionRepository.save(
-                new Section(
-                        foundLine,
-                        downStation,
-                        upStation,
-                        sectionRequest.getDistance()
-                        ));
+                toSection(
+                        sectionRequest, downStation, upStation, foundLine));
 
+        return createSectionResponse(section);
+    }
+
+    private Section toSection(SectionRequest sectionRequest, Station downStation, Station upStation, Line foundLine) {
+        return new Section(
+                foundLine,
+                downStation,
+                upStation,
+                sectionRequest.getDistance()
+                );
+    }
+
+    private SectionResponse createSectionResponse(Section section) {
         return new SectionResponse(section.getId(),
                 section.getLine().getId(),
                 section.getDownStation().getId(),
