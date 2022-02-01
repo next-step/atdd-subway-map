@@ -1,13 +1,16 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.StationService;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import org.springframework.http.HttpStatus;
+import nextstep.subway.applicaion.dto.request.StationRequest;
+import nextstep.subway.applicaion.dto.response.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
@@ -22,14 +25,8 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse response = null;
-        try {
-            response = stationService.saveStation(stationRequest);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.ok().body(new StationResponse(e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/stations/" + response.getId())).build();
+        StationResponse response = stationService.saveStation(stationRequest);
+        return ResponseEntity.created(URI.create("/stations/" + response.getId())).body(response);
     }
 
     @GetMapping(value = "/stations", produces = MediaType.APPLICATION_JSON_VALUE)

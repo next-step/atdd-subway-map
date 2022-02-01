@@ -1,23 +1,23 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.utils.LineSteps;
+import nextstep.subway.applicaion.StationService;
 import nextstep.subway.utils.StationSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
 class StationAcceptanceTest extends AcceptanceTest {
+
+    String 가양역 = "가양역";
+    String 화곡역 = "화곡역";
+
     /**
      * When 지하철역 생성을 요청 하면
      * Then 지하철역 생성이 성공한다.
@@ -25,10 +25,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("강남역");
+        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
 
         // then
-        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.FOUND.value());
+        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(지하철역_생성_응답.header("Location")).isNotBlank();
     }
 
@@ -41,15 +41,15 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_목록_조회() {
         /// given
-        StationSteps.지하철역_생성_요청("강남역");
-        StationSteps.지하철역_생성_요청("역삼역");
+        StationSteps.지하철역_생성_요청(가양역);
+        StationSteps.지하철역_생성_요청(화곡역);
 
         // when
         ExtractableResponse<Response> 지하철역_목록_조회_응답 = StationSteps.지하철역_목록_조회_요청();
 
         assertThat(지하철역_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = 지하철역_목록_조회_응답.jsonPath().getList("name");
-        assertThat(stationNames).contains("강남역", "역삼역");
+        assertThat(stationNames).contains(가양역, 화곡역);
     }
 
     /**
@@ -60,14 +60,30 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_삭제() {
         // given
-        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청("강남역");
+        ExtractableResponse<Response> 지하철역_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
 
         // when
-        String stationId = getStationId(지하철역_생성_응답.header("Location"));
+        Long stationId = StationSteps.getStationId(지하철역_생성_응답);
         ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
 
         // then
         assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * When 지하철 노선의 정보 삭제을 요청 하면
+     * Then 지하철 노선이 삭제되지 않는다.
+     */
+    @Test
+    void 존재하지_않는_지하철역_삭제() {
+        // when
+        Long stationId = 2L;
+        ExtractableResponse<Response> 지하철역_삭제_응답 = StationSteps.지하철역_삭제_요청(stationId);
+
+        // then
+        assertThat(지하철역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(지하철역_삭제_응답.jsonPath().getString("message"))
+                .isEqualTo(String.format(StationService.STATION_NOT_FOUND_REQUEST_EXCEPTION_MESSAGE, stationId));
     }
 
     /**
@@ -78,19 +94,14 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 중복_이름으로_지하철역_생성() {
         // given
-        StationSteps.지하철역_생성_요청("가양역");
+        StationSteps.지하철역_생성_요청(가양역);
 
         // when
-        ExtractableResponse<Response> 지하철역_중복_생성_응답 = StationSteps.지하철역_생성_요청("가양역");
+        ExtractableResponse<Response> 지하철역_중복_생성_응답 = StationSteps.지하철역_생성_요청(가양역);
 
         // then
-        assertThat(지하철역_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(지하철역_중복_생성_응답.jsonPath().getString("errorMessage")).isEqualTo("이미 등록된 역입니다. 역 이름 = " + "가양역");
-    }
-
-    private String getStationId(String locations) {
-        String[] split = locations.split("/");
-
-        return split[split.length - 1];
+        assertThat(지하철역_중복_생성_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(지하철역_중복_생성_응답.jsonPath().getString("message"))
+                .isEqualTo(String.format(StationService.STATION_DUPLICATE_REGISTRATION_EXCEPTION_MESSAGE, 가양역));
     }
 }
