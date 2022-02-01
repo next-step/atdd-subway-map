@@ -186,20 +186,8 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         지하철_노선_생성_요청("2호선", "green", 1L, 2L, 10);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", "20");
-
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .pathParam("id", 1L)
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_구간_생성_요청(1L, 2L, 3L, 20);
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -230,6 +218,42 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    @DisplayName("기존 하행역과 다른 상행역 구간 생성 요청")
+    @Test
+    void 기존_하행역과_다른_상행역_구간_생성_요청() {
+        // given
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
+        지하철_역_생성_요청("양재");
+        지하철_역_생성_요청("앵재시민의역");
+        지하철_노선_생성_요청("신분당선", "green", 1L, 2L, 10);
+
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(1L,3L, 4L,
+                20);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("노선에 포함된 하행역 구간 생성 요청")
+    @Test
+    void 포함된_하행역_구간_생성_요청() {
+        // given
+        지하철_역_생성_요청("미금");
+        지하철_역_생성_요청("정자");
+        지하철_역_생성_요청("양재");
+        지하철_역_생성_요청("앵재시민의역");
+        지하철_노선_생성_요청("신분당선", "green", 1L, 2L, 10);
+        지하철_구간_생성_요청(1L,2L, 3L, 30);
+
+        // when
+        ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(1L,3L, 1L,
+                20);
+
+        // then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
     public ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId,
                                                       Long downStationId, int distance) {
 
@@ -247,6 +271,23 @@ class LineAcceptanceTest extends AcceptanceTest {
                 .when()
                 .post("/lines")
                 .then().log().all().extract();
+    }
+
+    public ExtractableResponse<Response> 지하철_구간_생성_요청(Long lineId, Long upStationId,
+                                                      Long downStationId, int distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId", downStationId.toString());
+        params.put("distance", Integer.toString(distance));
+
+        return RestAssured.given().log().all()
+                .pathParam("id", lineId)
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
     }
 }
 
