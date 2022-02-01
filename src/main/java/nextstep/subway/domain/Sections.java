@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -18,15 +19,8 @@ public class Sections {
 
 	public void add(Section section) {
 		if(!sections.isEmpty()) {
-			Section lastSection = sections.get(sections.size() - 1);
-
-			if(section.getUpStation() != lastSection.getDownStation()) {
-				throw new IllegalEntityException(ExceptionMessage.NOT_ADD_SECTION.getMessage());
-			}
-
-			if(isValidContainDownStation(section)) {
-				throw new IllegalEntityException(ExceptionMessage.NOT_ADD_SECTION.getMessage());
-			}
+			validLastDownStation(section);
+			validContainDownStation(section);
 		}
 
 		sections.add(section);
@@ -44,6 +38,14 @@ public class Sections {
 		}
 	}
 
+	private void validLastDownStation(Section section) {
+		Section lastSection = sections.get(sections.size() - 1);
+
+		if(section.getUpStation() != lastSection.getDownStation()) {
+			throw new IllegalEntityException(ExceptionMessage.NOT_ADD_SECTION.getMessage());
+		}
+	}
+
 	private void validDownStation(Station station) {
 		Section lastSection = sections.get(sections.size() - 1);
 
@@ -52,12 +54,20 @@ public class Sections {
 		}
 	}
 
-	private boolean isValidContainDownStation(Section section) {
-		return sections.stream()
-			.anyMatch(row -> row.isContainStation(section.getDownStation()));
+	private void validContainDownStation(Section section) {
+		if(sections.stream()
+			.anyMatch(row -> row.isContainStation(section.getDownStation()))) {
+			throw new IllegalEntityException(ExceptionMessage.NOT_ADD_SECTION.getMessage());
+		}
 	}
 
-	public List<Section> getSections() {
-		return Collections.unmodifiableList(sections);
+	public List<Station> getStations() {
+		List<Station> stations = sections.stream()
+			.map(Section::getUpStation)
+			.collect(Collectors.toList());
+
+		stations.add(sections.get(sections.size() - 1).getDownStation());
+
+		return Collections.unmodifiableList(stations);
 	}
 }
