@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import nextstep.subway.exception.DuplicateStoreException;
+import nextstep.subway.exception.IllegalEntityException;
 import nextstep.subway.exception.NotFoundException;
 
 @RestControllerAdvice
@@ -19,5 +20,10 @@ public class ExceptionHandlingController {
 	@ExceptionHandler(NotFoundException.class)
 	public ResponseEntity<Void> notFoundExceptionHandler() {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@ExceptionHandler(IllegalEntityException.class)
+	public ResponseEntity<Void> notAddEntity() {
+		return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 	}
 }
