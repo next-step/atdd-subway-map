@@ -63,10 +63,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 역 구간 생성")
     @Test
     void createSection() {
-        // given
         final Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 노선에_속한_하행역);
-        params.put("downStationId", 노선에_속하지_않은_새로운역);
+        params.put("upStationId", 노선에_속한_상행역);
+        params.put("downStationId", 노선에_속한_하행역);
         params.put("distance", 거리);
 
         // when
@@ -78,9 +77,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
+
+        final Map<String, Object> params2 = new HashMap<>();
+        params2.put("upStationId", 노선에_속한_하행역);
+        params2.put("downStationId", 노선에_속하지_않은_새로운역);
+        params2.put("distance", 거리);
+
+        // when
+        final ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 지하철_노선 + "/sections")
+                .then().log().all()
+                .extract();
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response2.header("Location")).isNotBlank();
     }
 
     /**
@@ -88,16 +102,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * when 구간 데이터 생성 요청
      * then 구간 데이터 생성 에러 (새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.)
      */
-    @DisplayName("잘못된 하행역으로 구간 생성 시 에러")
+    @DisplayName("잘못된 하행역으로 구간 추가 시 에러")
     @Test
     void sectionCreationExceptionWithInvalidDownStation() {
         // given
         final Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 노선에_속한_하행역);
-        params.put("downStationId", 노선에_속한_상행역);
+        params.put("upStationId", 노선에_속한_상행역);
+        params.put("downStationId", 노선에_속한_하행역);
         params.put("distance", 거리);
 
-        // when
+
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -106,8 +120,22 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        // when
+        final Map<String, Object> params2 = new HashMap<>();
+        params2.put("upStationId", 노선에_속한_하행역);
+        params2.put("downStationId", 노선에_속한_상행역);
+        params2.put("distance", 거리);
+
+        final ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 지하철_노선 + "/sections")
+                .then().log().all()
+                .extract();
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -115,16 +143,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * when 구간 데이터 생성 요청
      * then 구간 데이터 생성 에러 (새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.)
      */
-    @DisplayName("잘못된 상행역으로 구간 생성 시 에러")
+    @DisplayName("잘못된 상행역으로 구간 추가 시 에러")
     @Test
     void sectionCreationExceptionWithInvalidUpStation() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("upStationId", 노선에_속한_상행역);
-        params.put("downStationId", 노선에_속하지_않은_새로운역);
+        params.put("downStationId", 노선에_속한_하행역);
         params.put("distance", 거리);
 
-        // when
+
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -133,7 +161,22 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        // given
+        final Map<String, Object> params2 = new HashMap<>();
+        params2.put("upStationId", 노선에_속한_상행역);
+        params2.put("downStationId", 노선에_속하지_않은_새로운역);
+        params2.put("distance", 거리);
+
+        // when
+        final ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/" + 지하철_노선 + "/sections")
+                .then().log().all()
+                .extract();
+
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 }

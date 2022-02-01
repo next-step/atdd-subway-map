@@ -48,7 +48,8 @@ public class Section extends BaseEntity {
         this.distance = distance;
     }
 
-    public long getId() {
+
+    public Long getId() {
         return id;
     }
 
@@ -66,49 +67,5 @@ public class Section extends BaseEntity {
 
     public Integer getDistance() {
         return distance;
-    }
-
-    public static class Builder {
-        private Long id;
-        private Line line;
-        private Station upStation;
-        private Station downStation;
-        private Integer distance;
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder line(Line line) {
-            this.line = line;
-            return this;
-        }
-
-        public Builder upStation(Station upStation) {
-            this.upStation = upStation;
-            return this;
-        }
-
-        public Builder downStation(Station downStation) {
-            this.downStation = downStation;
-            return this;
-        }
-
-        public Builder distance(Integer distance) {
-            this.distance = distance;
-            return this;
-        }
-
-        public Section build() {
-            if (id == null
-            || line == null
-            || upStation == null
-            || downStation == null
-            || distance == null) {
-                throw new IllegalArgumentException("Cannot create Section");
-            }
-            return new Section(id, line, upStation, downStation, distance);
-        }
     }
 }

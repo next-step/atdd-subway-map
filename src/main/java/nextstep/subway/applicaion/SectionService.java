@@ -6,6 +6,8 @@ import nextstep.subway.applicaion.exception.NotFoundException;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SectionService {
     private final SectionRepository sectionRepository;
@@ -26,40 +28,47 @@ public class SectionService {
 
         checkExistingStation(downStationId, upStationId);
 
+        final Station downStation = stationRepository.getById(downStationId);
+        final Station upStation = stationRepository.getById(upStationId);
+
         final Line foundLine = lineRepository.getById(lineId);
-        validateStationInSection(downStationId, upStationId, foundLine);
+        validateStationInSection(downStation, upStation, foundLine);
 
         final Section section = sectionRepository.save(
                 new Section(
-                        lineId,
-                        downStationId,
-                        upStationId,
-                        sectionRequest.getDistance()));
+                        foundLine,
+                        downStation,
+                        upStation,
+                        sectionRequest.getDistance()
+                        ));
 
         return new SectionResponse(section.getId(),
-                section.getLineId(),
-                section.getDownStationId(),
-                section.getUpStationId(),
+                section.getLine().getId(),
+                section.getDownStation().getId(),
+                section.getUpStation().getId(),
                 section.getDistance(),
                 section.getCreatedDate(),
                 section.getModifiedDate()
         );
     }
 
-    private void validateStationInSection(long downStationId, long upStationId, Line foundLine) {
-        checkUpStation(upStationId, foundLine);
-        checkDownStation(downStationId, foundLine);
+    private void validateStationInSection(Station downStation, Station upStation, Line foundLine) {
+        final List<Section> sections = foundLine.getSections();
+        if (!sections.isEmpty()) {
+            checkUpStation(upStation, sections);
+            checkDownStation(downStation, sections);
+        }
     }
 
-    private void checkDownStation(long downStationId, Line foundLine) {
-        if (foundLine.getUpStationId().equals(downStationId)
-                || foundLine.getDownStationId().equals(downStationId)) {
+    private void checkDownStation(Station downStation, List<Section> sections) {
+        if (downStation.equals(sections.get(0).getUpStation())
+        || downStation.equals(sections.get(0).getDownStation())) {
             throw new IllegalArgumentException("등록할 하행종점역은 노선에 등록되지 않은 역만 가능합니다.");
         }
     }
 
-    private void checkUpStation(long upStationId, Line foundLine) {
-        if (!foundLine.getDownStationId().equals(upStationId)) {
+    private void checkUpStation(Station upStation, List<Section> sections) {
+        if (upStation.equals(sections.get(0).getDownStation())) {
             throw new IllegalArgumentException("등록할 상행종점역은 노선의 하행종점역이어야 합니다.");
         }
     }
@@ -73,4 +82,16 @@ public class SectionService {
             throw  new NotFoundException(upStationId);
         }
     }
+
+//    public void deleteSection(long lineId, long stationId) {
+//        final Line foundLine = lineRepository.getById(lineId);
+//
+//
+//        if (!foundLine.getSections().get(0).getDownStation().equals()) {
+//            throw new IllegalArgumentException("노선에 등록된 역(하행종점역)만 제거 가능합니다.");
+//        }
+//
+////        foundLine.getStations(); // todo 길이 체크
+////        // todo distance 체크
+//    }
 }
