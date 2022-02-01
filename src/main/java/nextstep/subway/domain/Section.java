@@ -1,9 +1,6 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Section extends BaseEntity {
@@ -11,9 +8,17 @@ public class Section extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long lineId;
-    private Long downStationId;
-    private Long upStationId;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "line_id")
+    private Line line;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     private Integer distance;
 
@@ -22,30 +27,88 @@ public class Section extends BaseEntity {
 
     }
 
-    public Section(Long lineId, Long downStationId, Long upStationId, Integer distance) {
-        this.lineId = lineId;
-        this.downStationId = downStationId;
-        this.upStationId = upStationId;
+    public Section(Station upStation, Station downStation, Integer distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Long getId() {
+    public Section(Line line, Station upStation, Station downStation, Integer distance) {
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    private Section(Long id, Line line, Station upStation, Station downStation, Integer distance) {
+        this.id = id;
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public static class Builder {
+        private Long id;
+        private Line line;
+        private Station upStation;
+        private Station downStation;
+        private Integer distance;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder line(Line line) {
+            this.line = line;
+            return this;
+        }
+
+        public Builder upStation(Station upStation) {
+            this.upStation = upStation;
+            return this;
+        }
+
+        public Builder downStation(Station downStation) {
+            this.downStation = downStation;
+            return this;
+        }
+
+        public Builder distance(Integer distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Section build() {
+            if (id == null
+            || line == null
+            || upStation == null
+            || downStation == null
+            || distance == null) {
+                throw new IllegalArgumentException("Cannot create Section");
+            }
+            return new Section(id, line, upStation, downStation, distance);
+        }
     }
 }

@@ -2,13 +2,15 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.applicaion.exception.NotFoundException;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,9 +18,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+    private SectionRepository sectionRepository;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
+        this.stationRepository = stationRepository;
     }
 
 
@@ -63,26 +69,51 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse
-                .Builder()
-                .id(line.getId())
-                .name(line.getName())
-                .color(line.getColor())
-                .upStationId(line.getUpStationId())
-                .downStationId(line.getDownStationId())
-                .distance(line.getDistance())
-                .createdDate(line.getCreatedDate())
-                .modifiedDate(line.getModifiedDate())
-                .build();
+        final List<StationResponse> responseStation = new ArrayList<>();
+        final List<Section> sections = line.getSections();
+        if (!sections.isEmpty()) {
+            final Section section = sections.get(0);
+
+            final Station upStation = section.getUpStation();
+            final StationResponse upStationResponse = new StationResponse(upStation.getId(),
+                    upStation.getName(),
+                    upStation.getCreatedDate(),
+                    upStation.getModifiedDate());
+
+            final Station downStation = section.getDownStation();
+
+            final StationResponse downStationResponse = new StationResponse(downStation.getId(),
+                    downStation.getName(),
+                    downStation.getCreatedDate(),
+                    downStation.getModifiedDate());
+            responseStation.addAll(Arrays.asList(upStationResponse, downStationResponse));
+        }
+
+        return new LineResponse(line.getId(),
+                line.getName(),
+                line.getColor(),
+                responseStation,
+                line.getCreatedDate(),
+                line.getModifiedDate());
     }
 
     private Line fromLine(LineRequest lineRequest) {
-        return new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance()
-        );
+        final Long downStationId = lineRequest.getDownStationId();
+        final Station downStation = stationRepository.getById(downStationId);
+        final Long upStationId = lineRequest.getUpStationId();
+        final Station upStation = stationRepository.getById(upStationId);
+        final Integer distance = lineRequest.getDistance();
+
+        final Section section = new Section(upStation, downStation, distance);
+
+        List<Section> sections = new ArrayList<>();
+        sections.add(section);
+
+
+        return new Line.Builder()
+                .name(lineRequest.getName())
+                .color(lineRequest.getColor())
+                .sections(Arrays.asList(section))
+                .build();
     }
 }
