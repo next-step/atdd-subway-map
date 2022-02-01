@@ -2,7 +2,8 @@ package nextstep.subway.exception;
 
 public enum Messages {
     NOT_FOUND("Not Found"),
-    DUPLICATE_CREATION("Duplication Creation");
+    DUPLICATE_CREATION("Duplication Creation"),
+    ILLEGAL_DELETION("Deletion Forbidden");
 
     private final String message;
 

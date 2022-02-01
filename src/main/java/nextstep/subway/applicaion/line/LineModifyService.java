@@ -6,6 +6,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.exception.DuplicateCreationException;
+import nextstep.subway.exception.IllegalDeletionException;
 import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,12 +51,12 @@ public class LineModifyService {
         List<Section> sections = line.getSections();
 
         if (sections.size() <= 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalDeletionException();
         }
 
         Section lastSection = sections.get(sections.size() - 1);
         if (lastSection.getDownStation().getId() != stationId) {
-            throw new IllegalArgumentException();
+            throw new IllegalDeletionException();
         }
 
         sections.remove(lastSection);
