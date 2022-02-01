@@ -17,4 +17,16 @@ public class SectionResponse {
     public SectionResponse(Section section) {
         this(section.getUpStation(), section.getDownStation(), section.getDistance());
     }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
 }
