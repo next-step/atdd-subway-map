@@ -1,7 +1,6 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineAndSectionResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
@@ -28,12 +27,12 @@ public class LineController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineAndSectionResponse>> showLines() {
+    public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineAndSectionResponse> showLine(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findLine(id));
     }
 
@@ -55,14 +54,14 @@ public class LineController {
     }
 
     @PostMapping(value = "/{id}/sections")
-    public ResponseEntity<LineAndSectionResponse> saveSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        LineAndSectionResponse lineAndSectionResponse = lineService.saveSection(id, sectionRequest);
+    public ResponseEntity<LineResponse> saveSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineResponse lineResponse = lineService.saveSection(id, sectionRequest);
 
-        return ResponseEntity.created(URI.create("/lines/" + lineAndSectionResponse.getLineId())).body(lineAndSectionResponse);
+        return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
     @GetMapping(value = "/{id}/sections")
-    public ResponseEntity<LineAndSectionResponse> showSection(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> showSection(@PathVariable Long id) {
 
         return ResponseEntity.ok().body(lineService.findLineInAllSections(id));
     }

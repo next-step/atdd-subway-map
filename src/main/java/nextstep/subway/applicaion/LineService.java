@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineAndSectionResponse;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
@@ -53,20 +52,20 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineAndSectionResponse> findAllLines() {
+    public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(LineAndSectionResponse::of)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public LineAndSectionResponse findLine(Long id) {
+    public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
 
-        return LineAndSectionResponse.of(line);
+        return LineResponse.of(line);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
@@ -80,7 +79,7 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
-    public LineAndSectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
+    public LineResponse saveSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
 
@@ -100,15 +99,15 @@ public class LineService {
 
         line.addSection(upStation, downStation, sectionRequest.getDistance());
 
-        return LineAndSectionResponse.of(line);
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)
-    public LineAndSectionResponse findLineInAllSections(Long lineId) {
+    public LineResponse findLineInAllSections(Long lineId) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_LINE));
 
-        return LineAndSectionResponse.of(line);
+        return LineResponse.of(line);
     }
 
     public void deleteSection(Long lineId, Long stationId) {
