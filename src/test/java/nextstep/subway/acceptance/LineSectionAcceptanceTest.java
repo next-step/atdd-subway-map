@@ -18,6 +18,23 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
 
     private static final int FIRST_DISTANCE = 2;
 
+    @DisplayName("지하철 노선 생성")
+    @Test
+    void createLine() {
+        // given
+        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
+        Long downStationId =
+          stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
+
+        // when
+        ExtractableResponse<Response> response =
+          lineCreateRequest(NEW_BUN_DANG_LINE.lineName(), NEW_BUN_DANG_LINE.lineColor(), upStationId, downStationId, FIRST_DISTANCE);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header(LOCATION.getType())).isNotBlank();
+    }
+
     @DisplayName("노선에 구간 추가")
     @Test
     void addNewStationSectionTest() {
