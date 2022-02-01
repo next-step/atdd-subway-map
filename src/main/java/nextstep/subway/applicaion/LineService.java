@@ -51,8 +51,8 @@ public class LineService {
     }
 
     public LineResponse modifyLine(Long id, LineRequest lineRequest) {
-        findById(id);
-        Line line = lineRequest.toEntity(id);
+        Line line = findById(id);
+        line.modify(lineRequest);
         Line modifiedLine = lineRepository.save(line);
         return LineResponse.of(modifiedLine);
     }
