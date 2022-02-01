@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.station.StationReadService;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
+import nextstep.subway.exception.DuplicateSectionStationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +23,10 @@ public class SectionUpdateService {
         Objects.nonNull(sectionRequest.getUpStationId());
         Objects.nonNull(sectionRequest.getDownStationId());
         Objects.nonNull(sectionRequest.getDistance());
+
+        if(sectionRequest.getUpStationId() == sectionRequest.getDownStationId()){
+            throw new DuplicateSectionStationException();
+        }
 
         Station upStation = stationReadService.findSpecificStation(sectionRequest.getUpStationId());
         Station downStation =

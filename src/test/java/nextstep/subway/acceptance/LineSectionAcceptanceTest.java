@@ -46,6 +46,34 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
         assertThat(newSectionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    @DisplayName("노선에 구간 추가 실패(상행, 하행 동일)")
+    @Test
+    void addNewStationSectionFailedTest() {
+        // given
+        Long upStationId = stationCreateRequest(강남역.stationName()).jsonPath().getLong(ID.getType());
+        Long downStationId =
+          stationCreateRequest(역삼역.stationName()).jsonPath().getLong(ID.getType());
+        Long newDownStationId =
+          stationCreateRequest(선릉역.stationName()).jsonPath().getLong(ID.getType());
+
+        Long lineId =
+          lineCreateRequest(
+            NEW_BUN_DANG_LINE.lineName(),
+            NEW_BUN_DANG_LINE.lineColor(),
+            upStationId,
+            downStationId,
+            FIRST_DISTANCE)
+            .jsonPath()
+            .getLong(ID.getType());
+
+        // when
+        ExtractableResponse<Response> newSectionResponse =
+          sectionAddRequest(lineId, downStationId, downStationId, 3);
+
+        // then
+        assertThat(newSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("노선 구간 제거")
     @Test
     void deleteStationSectionTest() {
@@ -96,11 +124,11 @@ class LineSectionAcceptanceTest extends AcceptanceTest {
                         .jsonPath()
                         .getLong(ID.getType());
 
-        sectionAddRequest(lineId, downStationId, downStationId, 3);
+        sectionAddRequest(lineId, downStationId, newDownStationId, 3);
 
         // when
         ExtractableResponse<Response> deleteSectionResponse =
-                sectionDeleteRequest(lineId, newDownStationId);
+                sectionDeleteRequest(lineId, downStationId);
 
         // then
         assertThat(deleteSectionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
