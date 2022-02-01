@@ -46,8 +46,8 @@ public class Line extends BaseEntity {
         return color;
     }
 
-    public List<Section> getSectionAll() {
-        return sections.getSections();
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 
     public void update(String name, String color) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,11 +13,26 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
-    private final String 신분당선 = LineSteps.Line.신분당선.getName();
-    private final String 이호선 = LineSteps.Line.이호선.getName();
+    LineRequest 이호선;
+    LineRequest 신분당선;
+    private StationResponse 강남역;
+    private StationResponse 역삼역;
+    private StationResponse 교대역;
+
+    @BeforeEach
+    void 초기생성() {
+        // given
+        교대역 = StationSteps.지하철역_생성_요청(StationSteps.Station.교대역.getName()).as(StationResponse.class);
+        역삼역 = StationSteps.지하철역_생성_요청(StationSteps.Station.역삼역.getName()).as(StationResponse.class);
+        강남역 = StationSteps.지하철역_생성_요청(StationSteps.Station.강남역.getName()).as(StationResponse.class);
+        이호선 = LineSteps.노선_데이터(LineSteps.Line.이호선.getName());
+        신분당선 = LineSteps.노선_데이터(LineSteps.Line.신분당선.getName());
+    }
 
     /**`
      * When 지하철 노선 생성을 요청 하면
@@ -26,7 +42,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(LineRequest.of(이호선.getName(), 이호선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -42,10 +58,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void duplicateLineName() {
         // given
-        LineSteps.지하철_노선_생성_요청(신분당선);
+        LineSteps.지하철_노선_생성_요청(LineRequest.of(이호선.getName(), 이호선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
 
         // when
-        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> response = LineSteps.지하철_노선_생성_요청(LineRequest.of(이호선.getName(), 이호선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
@@ -61,8 +77,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        LineSteps.지하철_노선_생성_요청(신분당선);
-        LineSteps.지하철_노선_생성_요청(이호선);
+        LineSteps.지하철_노선_생성_요청(LineRequest.of(신분당선.getName(), 신분당선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
+        LineSteps.지하철_노선_생성_요청(LineRequest.of(이호선.getName(), 이호선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
 
         // when
         ExtractableResponse<Response> response = LineSteps.지하철_노선_목록_조회();
@@ -70,7 +86,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> lineNames = response.jsonPath().getList("name");
-        assertThat(lineNames).containsExactly(신분당선, 이호선);
+        assertThat(lineNames).containsExactly(신분당선.getName(), 이호선.getName());
     }
 
     /**
@@ -82,7 +98,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(LineRequest.of(신분당선.getName(), 신분당선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
         String uri = createResponse.header("Location");
 
         // when
@@ -106,12 +122,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        LineRequest updateRequest = LineSteps.노선_데이터(이호선);
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(LineRequest.of(신분당선.getName(), 신분당선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
         String uri = createResponse.header("Location");
 
         // when
-        LineSteps.지하철_노선_수정(uri, updateRequest);
+        LineSteps.지하철_노선_수정(uri, 이호선);
         ExtractableResponse<Response> response = LineSteps.지하철_노선_조회(uri);
 
         // then
@@ -132,7 +147,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(신분당선);
+        ExtractableResponse<Response> createResponse = LineSteps.지하철_노선_생성_요청(LineRequest.of(신분당선.getName(), 신분당선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
         String uri = createResponse.header("Location");
 
         // when
