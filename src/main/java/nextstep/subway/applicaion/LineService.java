@@ -75,8 +75,13 @@ public class LineService {
         Line line = findById(id);
         Station upStation = stationService.findById(sectionRequest.getUpStationId());
         Station downStation = stationService.findById(sectionRequest.getDownStationId());
-        Section section = sectionRepository.save(new Section(line, upStation, downStation, sectionRequest.getDistance()));
+        Section section = line.addSection(upStation, downStation, sectionRequest.getDistance());
         return SectionResponse.of(section);
+    }
+
+    private boolean isLastDownStation(Station downStation, long upStationId) {
+        Station upStation = stationService.findById(upStationId);
+        return upStation.getId() == downStation.getId();
     }
 
     public void deleteSection(Long lineId, Long stationId) {
