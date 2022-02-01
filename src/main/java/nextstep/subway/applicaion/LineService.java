@@ -39,8 +39,9 @@ public class LineService {
             request.getDistance());
         line.addSection(section);
 
-        Line result = lineRepository.save(line);
-        return LineResponse.of(result);
+        lineRepository.save(line);
+
+        return LineResponse.of(line);
     }
 
     @Transactional(readOnly = true)

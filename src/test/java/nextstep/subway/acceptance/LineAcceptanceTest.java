@@ -19,9 +19,9 @@ import nextstep.subway.applicaion.dto.StationResponse;
 class LineAcceptanceTest extends AcceptanceTest {
     LineRequest 이호선;
     LineRequest 신분당선;
-    private StationResponse 강남역;
-    private StationResponse 역삼역;
     private StationResponse 교대역;
+    private StationResponse 역삼역;
+    private StationResponse 강남역;
 
     @BeforeEach
     void 초기생성() {
@@ -76,7 +76,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        LineSteps.지하철_노선_생성_요청(LineRequest.of(신분당선.getName(), 신분당선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
+        LineSteps.지하철_노선_생성_요청(LineRequest.of(신분당선.getName(), 신분당선.getColor(), 역삼역.getId(), 강남역.getId(), 10));
         LineSteps.지하철_노선_생성_요청(LineRequest.of(이호선.getName(), 이호선.getColor(), 교대역.getId(), 역삼역.getId(), 10));
 
         // when

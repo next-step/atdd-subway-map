@@ -31,7 +31,6 @@ public class Section extends BaseEntity{
 	private int distance;
 
 	public Section() {
-
 	}
 
 	public Section(Line line, Station upStation, Station downStation, int distance) {
