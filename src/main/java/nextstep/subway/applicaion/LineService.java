@@ -3,9 +3,8 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
+import nextstep.subway.applicaion.dto.SectionResponse;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.LogicError;
 import nextstep.subway.exception.LogicException;
 import org.springframework.stereotype.Service;
@@ -19,15 +18,17 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
     private StationService stationService;
+    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
 
-        if(isExistLineName(lineRequest.getName())){
+        if (isExistLineName(lineRequest.getName())) {
             throw new LogicException(LogicError.DUPLICATED_NAME_LINE);
         }
 
@@ -70,7 +71,11 @@ public class LineService {
         return lineRepository.existsByName(name);
     }
 
-    public LineResponse saveSection(SectionRequest sectionRequest) {
-        return null;
+    public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
+        Line line = findById(id);
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        Section section = sectionRepository.save(new Section(line, upStation, downStation, sectionRequest.getDistance()));
+        return SectionResponse.of(section);
     }
 }
