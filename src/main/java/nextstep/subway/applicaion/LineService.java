@@ -28,7 +28,7 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest lineRequest) {
 
-        if (isExistLineName(lineRequest.getName())) {
+        if (existLineName(lineRequest.getName())) {
             throw new LogicException(LogicError.DUPLICATED_NAME_LINE);
         }
 
@@ -53,7 +53,7 @@ public class LineService {
 
     public LineResponse modifyLine(Long id, LineRequest lineRequest) {
         Line line = findById(id);
-        line.modify(lineRequest);
+        line.modify(lineRequest.getName(), lineRequest.getColor());
         Line modifiedLine = lineRepository.save(line);
         return LineResponse.of(modifiedLine);
     }
@@ -67,7 +67,7 @@ public class LineService {
                 .orElseThrow(() -> new LogicException(LogicError.NOT_EXIST_LINE));
     }
 
-    private boolean isExistLineName(String name) {
+    private boolean existLineName(String name) {
         return lineRepository.existsByName(name);
     }
 

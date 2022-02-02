@@ -22,7 +22,7 @@ public class Section {
 
     private int distance;
 
-    public Section() {
+    protected Section() {
 
     }
 

@@ -1,12 +1,12 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.exception.LogicError;
 import nextstep.subway.exception.LogicException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -64,13 +64,13 @@ public class Line extends BaseEntity {
         boolean exist = this.sections.stream()
                 .anyMatch(section -> section.getId() == downStation.getId());
 
-        if(exist){
+        if (exist) {
             throw new LogicException(LogicError.EXIST_STATION_IN_LINE);
         }
     }
 
     private void checkLastDownStation(Station upStation) {
-        if(upStation.getId() != this.getLastStation().getId()){
+        if (!upStation.equals(getLastStation())) {
             throw new LogicException(LogicError.NOT_LAST_DOWN_STATION);
         }
     }
@@ -83,20 +83,34 @@ public class Line extends BaseEntity {
         List<Station> stations = new ArrayList<>();
 
         if (!sections.isEmpty()) {
-            stations.add(sections.get(0).getUpStation());
-            sections.forEach(section -> stations.add(section.getDownStation()));
+            Station upStation = findFirstStation();
+            List<Station> downStations = findDownStations();
+            stations.add(upStation);
+            stations.addAll(downStations);
         }
 
         return stations;
     }
 
-    public Station getLastStation() {
-        int size = sections.size();
-        return sections.get(size - 1).getDownStation();
+    private List<Station> findDownStations() {
+        return sections.stream()
+                .map(section -> section.getDownStation())
+                .collect(Collectors.toList());
     }
 
-    public void modify(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
+    private Station findFirstStation() {
+        return sections.get(0)
+                .getUpStation();
+    }
+
+    public Station getLastStation() {
+        int size = sections.size();
+        return sections.get(size - 1)
+                .getDownStation();
+    }
+
+    public void modify(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 }
