@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sections {
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL,orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
     public void addSection(Section section) {
