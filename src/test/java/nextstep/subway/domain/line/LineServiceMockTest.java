@@ -1,11 +1,13 @@
 package nextstep.subway.domain.line;
 
+import nextstep.subway.domain.factory.EntityFactory;
 import nextstep.subway.domain.line.dto.LineDetailResponse;
 import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.section.dto.SectionDetailResponse;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,29 +57,30 @@ class LineServiceMockTest {
         int 강남_역삼_거리 = 10;
 
         LineRequest lineRequest = createLineRequest("2호선", "green", 강남역Id, 역삼역Id, 강남_역삼_거리);
-        Line lineResult = createLine(lineRequest.getName(), lineRequest.getColor(), 강남역, 역삼역);
 
         // stubbing
         when(stationRepository.findById(강남역Id)).thenReturn(Optional.of(강남역));
         when(stationRepository.findById(역삼역Id)).thenReturn(Optional.of(역삼역));
-        when(lineRepository.save(any())).thenReturn(lineResult);
+        when(lineRepository.save(any())).thenReturn(Line.of("2호선", "green", 강남역, 역삼역));
 
         // when
         lineService.saveLine(lineRequest);
 
         // then
-        assertThat(lineResult.getName()).isEqualTo(lineRequest.getName());
-        assertThat(lineResult.getColor()).isEqualTo(lineRequest.getColor());
+        assertThat("2호선").isEqualTo(lineRequest.getName());
+        assertThat("green").isEqualTo(lineRequest.getColor());
     }
 
     @DisplayName("노선 목록을 조회한다.")
     @Test
     void getLineList() {
         // given
-        Line line = createLine("2호선", "green", 강남역, 역삼역);
+        Line line = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // stubbing
-        when(lineRepository.findAll()).thenReturn(Arrays.asList(line));
+        List<Line> tmp = new ArrayList<>();
+        tmp.add(line);
+        when(lineRepository.findAll()).thenReturn(tmp);
 
         // when
         List<LineDetailResponse> lineList = lineService.getLineList();
@@ -90,7 +93,7 @@ class LineServiceMockTest {
     @Test
     void getLine() {
         // given
-        Line line = createLine("2호선", "green", 강남역, 역삼역);
+        Line line = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // stubbing
         when(lineRepository.findById(any())).thenReturn(Optional.of(line));
@@ -106,7 +109,7 @@ class LineServiceMockTest {
     @Test
     void patchLine() {
         // given
-        Line line = createLine("2호선", "green", 강남역, 역삼역);
+        Line line = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // stubbing
         when(lineRepository.findById(any())).thenReturn(Optional.of(line));
@@ -129,18 +132,24 @@ class LineServiceMockTest {
     @DisplayName("노선에 구간을 추가한다.")
     @Test
     void insertSection() {
-        Long 강남역Id = 1L;
         Long 역삼역Id = 2L;
         int 강남_역삼_거리 = 10;
-        Line line = createLine("2호선", "green", 강남역, 역삼역);
+        Line line = createLine("2호선", "green", 강남역, 역삼역, 강남_역삼_거리);
+
+        Long 선릉역Id = 3L;
+        Station 선릉역 = createStation("선릉역");
+        int 역삼_선릉_거리 = 8;
 
         // stubbing
         when(lineRepository.findById(any())).thenReturn(Optional.of(line));
-        when(stationRepository.findById(강남역Id)).thenReturn(Optional.of(강남역));
         when(stationRepository.findById(역삼역Id)).thenReturn(Optional.of(역삼역));
+        when(stationRepository.findById(선릉역Id)).thenReturn(Optional.of(선릉역));
 
         // when
-        lineService.insertSection(1L, createSectionRequest(강남역Id, 역삼역Id, 강남_역삼_거리));
+        lineService.insertSection(1L, createSectionRequest(역삼역Id, 선릉역Id, 역삼_선릉_거리));
+
+        // then
+        assertThat(line.getStationList()).containsExactly(Arrays.array(강남역, 역삼역, 선릉역));
     }
 
     @DisplayName("노선의 구간 목록을 조회한다.")
@@ -150,7 +159,7 @@ class LineServiceMockTest {
         Station 선릉역 = createStation("선릉역");
         int 강남_역삼_거리 = 10;
         int 역삼_선릉_거리 = 8;
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 강남_역삼_거리);
+        Line 이호선 = EntityFactory.createLine("2호선", "green", 강남역, 역삼역, 강남_역삼_거리);
         이호선.addSection(createSection(역삼역, 선릉역, 역삼_선릉_거리));
 
         // stubbing

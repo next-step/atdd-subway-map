@@ -1,6 +1,6 @@
 package nextstep.subway.domain.line;
 
-import nextstep.subway.domain.factory.DtoFactory;
+import nextstep.subway.domain.factory.EntityFactory;
 import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.line.dto.LineResponse;
 import nextstep.subway.domain.station.Station;
@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static nextstep.subway.domain.factory.DtoFactory.*;
+import static nextstep.subway.domain.factory.DtoFactory.createLineRequest;
 import static nextstep.subway.domain.factory.DtoFactory.createSectionRequest;
-import static nextstep.subway.domain.factory.EntityFactory.*;
+import static nextstep.subway.domain.factory.EntityFactory.createStation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -63,7 +63,7 @@ public class LineServiceTest {
         int 강남_역삼_거리 = 10;
         int 역삼_선릉_거리 = 8;
 
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 강남_역삼_거리);
+        Line 이호선 = EntityFactory.createLine("2호선", "green", 강남역, 역삼역, 강남_역삼_거리);
         lineRepository.save(이호선);
 
         // when

@@ -27,6 +27,28 @@ class LineTest {
     }
 
     /**
+     * 노선이 생성되고 여러 구간이 존재할때
+     * 노선의 역 목록을 조회하면
+     * 최상행선부터 최하행선까지 순서대로 조회가 가능합니다.
+     */
+    @Test
+    @DisplayName("노선의 역 순서대로 조회")
+    void getStationList() {
+        // given
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
+        Station 선릉역 = createStation("선릉역");
+        Station 교대역 = createStation("교대역");
+        Station 삼성역 = createStation("삼성역");
+
+        이호선.addSection(createSection(역삼역, 선릉역, 4));
+        이호선.addSection(createSection(선릉역, 교대역, 5));
+        이호선.addSection(createSection(교대역, 삼성역, 7));
+
+        // when/then
+        assertThat(이호선.getStationList()).containsExactly(Arrays.array(강남역, 역삼역, 선릉역, 교대역, 삼성역));
+    }
+
+    /**
      * 노선이 생성되었을때,
      * 노선의 정보 변경이 가능합니다.
      */
@@ -34,7 +56,7 @@ class LineTest {
     @DisplayName("노선의 정보를 변경한다.")
     void modify() {
         // given
-        Line line = createLine("2호선", "green", 강남역, 역삼역);
+        Line line = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // when
         line.modify("3호선", "orange");
@@ -51,7 +73,7 @@ class LineTest {
     @DisplayName("노선 정보 수정시 null 혹은 기존 값이 입력되면 변경을 하지 않는다.")
     void validationOfModify() {
         // given
-        Line line = createLine("2호선", "green", 강남역, 역삼역);
+        Line line = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // when
         line.modify("3호선", null);
@@ -61,20 +83,21 @@ class LineTest {
     }
 
     /**
-     * 노선과 역이 최소 2개가 생성되면,
+     * 노선과 역이 생성되었을때, 새로운 역과 구간 추가시
      * 구간을 추가할 수 있습니다.
      */
     @Test
     @DisplayName("노선에 구간을 등록한다.")
     void addSection() {
         // given
-        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역);
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
+        Station 선릉역 = createStation("선릉역");
 
         // when
-        이호선.addSection(createSection(강남역, 역삼역, 10));
+        이호선.addSection(createSection(역삼역, 선릉역, 8));
 
         // then
-        assertThat(이호선.getStationList()).containsExactly(강남역, 역삼역);
+        assertThat(이호선.getStationList()).containsExactly(Arrays.array(강남역, 역삼역, 선릉역));
     }
 
     /**
@@ -87,7 +110,7 @@ class LineTest {
     @DisplayName("구간 사이에 새로운 구간을 추가한다. - 상행선이 같은 경우")
     void addSection2() {
         // given
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
         Station 선릉역 = createStation("선릉역");
         Section section = createSection(강남역, 선릉역, 8);
 
@@ -102,7 +125,7 @@ class LineTest {
     @DisplayName("구간 사이에 새로운 구간을 추가한다. - 하행선이 같은 경우")
     void addSection3() {
         // given
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
         Station 선릉역 = createStation("선릉역");
         Section section = createSection(선릉역, 역삼역, 8);
 
@@ -121,7 +144,7 @@ class LineTest {
     @DisplayName("입력된 역이 노선에 존재하는지 확인한다.")
     void hasStation() {
         // given
-        Line completeLine = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
+        Line completeLine = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // when/then
         assertThat(completeLine.hasStation(강남역)).isTrue();
@@ -136,13 +159,9 @@ class LineTest {
     void getSectionList() {
         // given
         Station 선릉역 = createStation("선릉역");
-
-        Section 강남_역삼_구간 = createSection(강남역, 역삼역, 10);
         Section 역삼_선릉_구간 = createSection(역삼역, 선릉역, 8);
 
-        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역);
-
-        이호선.addSection(강남_역삼_구간);
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
         이호선.addSection(역삼_선릉_구간);
 
         // when
@@ -162,7 +181,7 @@ class LineTest {
         // given
         Station 선릉역 = createStation("선릉역");
 
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
         Section newSection = createSection(역삼역, 선릉역, 10);
         이호선.addSection(newSection);
 
@@ -181,12 +200,10 @@ class LineTest {
     @DisplayName("노선에 구간이 하나만 있으면 구간 삭제가 불가능합니다.")
     void validationOfDeleteSection() {
         // given
-        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역);
-
-        Section section = createSection(강남역, 역삼역, 10);
-        이호선.addSection(section);
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
 
         // when / then
+        Section section = 이호선.getSectionList().get(0);
         assertThatThrownBy(() -> 이호선.deleteSection(section))
                 .isInstanceOf(BusinessException.class);
     }

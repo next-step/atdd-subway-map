@@ -67,6 +67,10 @@ public class Section extends BaseEntity {
         return (this.upStation.equals(downStation) || this.downStation.equals(downStation));
     }
 
+    public boolean hasUpStation(Station target) {
+        return upStation.equals(target);
+    }
+
     public void push(List<Station> stations) {
         if (!stations.contains(upStation)) {
             stations.add(upStation);

@@ -18,10 +18,22 @@ public class Sections {
         this.sectionList = new ArrayList<>();
     }
 
-    public List<Station> getAllStations() {
+    public List<Station> getAllStations(Station upStation) {
+        List<Section> tmpSectionList = new ArrayList<>(sectionList);
         List<Station> stations = new ArrayList<>();
-        sectionList.forEach(section -> section.push(stations));
 
+        while (!tmpSectionList.isEmpty()) {
+            for (Section tmpSection : tmpSectionList) {
+                if (tmpSection.isUpStation(upStation)) {
+                    stations.add(upStation);
+                    upStation = tmpSection.getDownStation();
+                    tmpSectionList.remove(tmpSection);
+                    break;
+                }
+            }
+        }
+
+        stations.add(upStation);
         return stations;
     }
 
@@ -50,10 +62,10 @@ public class Sections {
                         && !oriSection.isDownStation(section.getDownStation()))
                 .findFirst()
                 .ifPresent(oriSection -> {
-                    push(line, section);
-                    sectionList.remove(oriSection);
                     push(line, Section.of(section.getDownStation(), oriSection.getDownStation(),
                             oriSection.getDistance() - section.getDistance()));
+                    sectionList.remove(oriSection);
+
                 });
 
         // 기존 하행과 새로운 구간의 하행이 같으면서 상행은 서로 다른경우
@@ -68,12 +80,11 @@ public class Sections {
                     push(line, Section.of(oriSection.getUpStation(), section.getUpStation(),
                             oriSection.getDistance() - section.getDistance()));
                     sectionList.remove(oriSection);
-                    push(line, section);
+
                 });
 
-        if (size == sectionList.size()) {
-            push(line, section);
-        }
+        push(line, section);
+
     }
 
     private void push(Line line, Section section) {

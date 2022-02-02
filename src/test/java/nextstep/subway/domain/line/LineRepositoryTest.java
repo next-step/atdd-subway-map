@@ -20,10 +20,10 @@ class LineRepositoryTest {
         // given
         Station 강남역 = createStation("강남역");
         Station 역삼역 = createStation("역삼역");
-        Line 이호선 = lineRepository.save(createLine("2호선", "green", 강남역, 역삼역));
+        Line 이호선 = lineRepository.save(createLine("2호선", "green", 강남역, 역삼역, 10));
 
         // when / then
-        assertThatThrownBy(() -> lineRepository.save(createLine("2호선", "orange", 강남역, 역삼역)))
+        assertThatThrownBy(() -> lineRepository.save(createLine("2호선", "orange", 강남역, 역삼역, 10)))
                 .isInstanceOf(RuntimeException.class);
     }
 }
