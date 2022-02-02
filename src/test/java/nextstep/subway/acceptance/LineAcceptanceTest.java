@@ -154,7 +154,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 중복된 노선 생성을 요청하면
      * Then 500 error 가 터진다.
      */
-    @DisplayName("중복이름으로 지하철 노선 생성")
+    @DisplayName("중복이름으로 지하철 노선 생성 시 실패")
     @Test
     void createDuplicatedLine() {
         // given
@@ -226,7 +226,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("기존 하행역과 다른 상행역 구간 생성 요청")
+    /**
+     * Given 지하철 역 생성과 노선 생성을 요창허고
+     * When 생성한 지하철 노선의 하행역과 다른 상행역 구간 생성을 요청하면
+     * Then 지하철 구간 생성 요청이 실패한다.
+     */
+    @DisplayName("기존 노선의 하행역과 다른 상행역 구간 생성 요청 시 실패")
     @Test
     void 기존_하행역과_다른_상행역_구간_생성_요청() {
         // given
@@ -244,7 +249,12 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("노선에 포함된 하행역 구간 생성 요청")
+    /**
+     * Given 지하철 역, 노선, 구간 생성을 요청하고
+     * When 노선에 이미 존재하는 역을, 하행역으로 포함하는 구간 생성 요창허면
+     * Then 지하철 구간 생성 요청이 실패한다.
+     */
+    @DisplayName("노선에 포함된 하행역을 가진 구간 생성 요청 시 실패")
     @Test
     void 포함된_하행역_구간_생성_요청() {
         // given
@@ -263,9 +273,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철 구간 삭제")
+    /**
+     * Given 지하철 역과 노선 생성을 요청하고
+     * When 한 개 이하의 구간을 가지는 노선에 구간 삭제를 요창허면
+     * Then 지하철 구간 삭제 요청이 실패한다.
+     */
+    @DisplayName("한 개 이하의 구간을 가진 노선에 구간 삭제 요청 시 실패")
     @Test
-    void 한개보다_이하_지하철_구간_삭제() {
+    void 한개_이하_지하철_구간_삭제() {
         //given
         지하철_역_생성_요청("미금");
         지하철_역_생성_요청("정자");
