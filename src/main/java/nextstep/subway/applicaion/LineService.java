@@ -23,8 +23,8 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Station upStation = findUpStationById(request.getUpStationId());
-        Station downStation = findDownStationById(request.getDownStationId());
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
 
         Line line = new Line(request.getName(), request.getColor());
         if (Objects.nonNull(upStation) && Objects.nonNull(downStation)) {
@@ -32,26 +32,6 @@ public class LineService {
         }
 
         return new LineResponse(lineRepository.save(line));
-    }
-
-    private Station findUpStationById(Long upStationId) {
-        Station upStation = null;
-        if (Objects.nonNull(upStationId)) {
-            upStation = stationRepository.findById(upStationId)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "노선의 구간 초기화 중 상행선역을 찾을 수 없습니다. upStationId:" + upStationId));
-        }
-        return upStation;
-    }
-
-    private Station findDownStationById(Long downStationId) {
-        Station downStation = null;
-        if (Objects.nonNull(downStationId)) {
-            downStation = stationRepository.findById(downStationId)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "노선의 구간 초기화 중 하행선역을 찾을 수 없습니다. downStationId:" + downStationId));
-        }
-        return downStation;
     }
 
     @Transactional(readOnly = true)
@@ -64,13 +44,11 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineIncludingStationsResponse findById(Long id) {
-        return new LineIncludingStationsResponse(lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("지하철 역을 찾을 수 없습니다. id = " + id)));
+        return new LineIncludingStationsResponse(findLineById(id));
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("지하철 역을 찾을 수 없습니다. id = " + id));
+        Line line = findLineById(id);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
@@ -79,25 +57,34 @@ public class LineService {
     }
 
     public SectionResponse saveSection(SectionRequest request, Long lineId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("구간 저장 중 관련 노선을 찾을 수 없습니다. lineId:" + lineId));
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "구간 저장 중 상행선역을 찾을 수 없습니다. upStationId:" + request.getUpStationId()));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "구간 저장 중 하행선역을 찾을 수 없습니다. downStationId:" + request.getDownStationId()));
+        Line line = findLineById(lineId);
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
 
         Section addedSection = line.addSection(upStation, downStation, request.getDistance());
         return new SectionResponse(sectionRepository.save(addedSection));
     }
 
     public void deleteSection(Long lineId, Long stationId) {
-        Line line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 노선을 찾을 수 없습니다. lineId:" + lineId));
-        Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 역을 찾을 수 없습니다. stationId:" + stationId));
+        Line line = findLineById(lineId);
+        Station station = findStationById(stationId);
 
         line.removeSection(station);
+    }
+
+    private Line findLineById(Long lineId) {
+        if (Objects.isNull(lineId)) {
+            throw new NullPointerException("Null 을 입력받아 역을 찾을 수 없습니다");
+        }
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 노선을 찾을 수 없습니다. lineId:" + lineId));
+    }
+
+    private Station findStationById(Long stationId) {
+        if (Objects.isNull(stationId)) {
+            throw new NullPointerException("Null 을 입력받아 역을 찾을 수 없습니다");
+        }
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 역을 찾을 수 없습니다. stationId:" + stationId));
     }
 }
