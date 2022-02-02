@@ -1,12 +1,6 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.ContainStationException;
-import nextstep.subway.exception.NotEqualDownStationException;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -24,7 +18,7 @@ public class Line extends BaseEntity {
     public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.sections.addSection(section);
+        this.sections.init(section);
     }
 
     public Line(String name, String color) {
@@ -54,31 +48,8 @@ public class Line extends BaseEntity {
     }
 
     public void addSection(Section section) {
-        checkNotEqualDownStation(section);
-        checkContainSection(section);
         sections.addSection(section);
     }
 
-    private void checkNotEqualDownStation(Section section) {
-        Section lastSection = sections.getSections().get(sections.getSections().size() - 1);
-        if (lastSection.getDownStation() != section.getUpStation()) {
-            throw new NotEqualDownStationException();
-        }
-    }
 
-    private void checkContainSection(Section section) {
-        if (getStations().contains(section.getDownStation())) {
-            throw new ContainStationException();
-        }
-    }
-
-    public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-        sections.getSections().stream()
-                .forEach(section -> {
-                    stations.add(section.getDownStation());
-                    stations.add(section.getUpStation());
-                });
-        return stations.stream().distinct().collect(Collectors.toList());
-    }
 }
