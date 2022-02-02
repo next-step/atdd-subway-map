@@ -79,15 +79,11 @@ public class LineService {
         return SectionResponse.of(section);
     }
 
-    private boolean isLastDownStation(Station downStation, long upStationId) {
-        Station upStation = stationService.findById(upStationId);
-        return upStation.getId() == downStation.getId();
-    }
-
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findById(lineId);
         Station station = stationService.findById(stationId);
+        line.checkLastDownStation(station);
+        line.checkLeftOneSection();
         sectionRepository.deleteByLineAndDownStation(line, station);
-
     }
 }

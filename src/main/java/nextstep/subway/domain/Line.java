@@ -69,14 +69,10 @@ public class Line extends BaseEntity {
         }
     }
 
-    private void checkLastDownStation(Station upStation) {
+    public void checkLastDownStation(Station upStation) {
         if (!upStation.equals(getLastStation())) {
             throw new LogicException(LogicError.NOT_LAST_DOWN_STATION);
         }
-    }
-
-    public List<Section> getSections() {
-        return sections;
     }
 
     public List<Station> getStation() {
@@ -112,5 +108,11 @@ public class Line extends BaseEntity {
     public void modify(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void checkLeftOneSection() {
+        if (sections.size() <= 1) {
+            throw new LogicException(LogicError.LEFT_ONE_SECTION);
+        }
     }
 }
