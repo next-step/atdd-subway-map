@@ -18,13 +18,18 @@ public class Line extends BaseEntity {
     private String name;
     private String color;
 
-    private Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
         this.sections.addSection(section);
+    }
+
+    public Line(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
