@@ -1,30 +1,49 @@
 package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Sections;
+import nextstep.subway.domain.Station;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<SectionResponse> sections;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
+    private final List<StationResponse> stations;
 
-    private LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    private LineResponse(Long id, String name, String color, List<SectionResponse> sections,
+                         List<StationResponse> stations, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.sections = sections;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+        this.stations = stations;
     }
 
-    public static LineResponse of(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
-        return new LineResponse(id, name, color, createdDate, modifiedDate);
-    }
     public static LineResponse of(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getCreatedDate(), line.getModifiedDate());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), sectionsResponseMapper(line.getSections()),
+                stationResponseMapper(line), line.getCreatedDate(), line.getModifiedDate());
     }
+
+    private static List<SectionResponse> sectionsResponseMapper(Sections sections) {
+        return sections.getSections().stream()
+                .map(section -> new SectionResponse(section))
+                .collect(Collectors.toList());
+    }
+
+    private static List<StationResponse> stationResponseMapper(Line line) {
+        List<Station> stations = line.getSections().getStations();
+        return stations.stream().map(station -> new StationResponse(station)).collect(Collectors.toList());
+    }
+
     public Long getId() {
         return id;
     }
@@ -39,6 +58,14 @@ public class LineResponse {
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
+    }
+
+    public List<SectionResponse> getSections() {
+        return sections;
     }
 
     public LocalDateTime getModifiedDate() {
