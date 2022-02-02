@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.exception.ContainStationException;
+import nextstep.subway.exception.IllegalDeleteSectionException;
 import nextstep.subway.exception.NotEqualDownStationException;
 
 import javax.persistence.CascadeType;
@@ -36,7 +37,7 @@ public class Sections {
 
     private void checkNotEqualDownStation(Section section) {
         Section lastSection = lastSection();
-        if (lastSection.getDownStation() != section.getUpStation()) {
+        if (!lastSection.getDownStation().equals(section.getUpStation())) {
             throw new NotEqualDownStationException();
         }
     }
@@ -57,4 +58,10 @@ public class Sections {
         return stations.stream().distinct().collect(Collectors.toList());
     }
 
+    public void delete(Section section) {
+        if (sections.size() <= 1) {
+            throw new IllegalDeleteSectionException();
+        }
+        sections.remove(section);
+    }
 }

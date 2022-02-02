@@ -5,7 +5,6 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.DuplicatedLineException;
-import nextstep.subway.exception.IllegalDeleteSectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,9 +88,6 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Line line = lineRepository.findById(section.getLine().getId())
                 .orElseThrow(EntityNotFoundException::new);
-        if (line.getSections().getSections().size() <= 1) {
-            throw new IllegalDeleteSectionException();
-        }
-        line.getSections().getSections().remove(section);
+        line.deleteSection(section);
     }
 }
