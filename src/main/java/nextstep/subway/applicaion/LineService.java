@@ -1,8 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineIncludingStationsResponse;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,5 +76,28 @@ public class LineService {
 
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    public SectionResponse saveSection(SectionRequest request, Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("구간 저장 중 관련 노선을 찾을 수 없습니다. lineId:" + lineId));
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "구간 저장 중 상행선역을 찾을 수 없습니다. upStationId:" + request.getUpStationId()));
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "구간 저장 중 하행선역을 찾을 수 없습니다. downStationId:" + request.getDownStationId()));
+
+        Section addedSection = line.addSection(upStation, downStation, request.getDistance());
+        return new SectionResponse(sectionRepository.save(addedSection));
+    }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 노선을 찾을 수 없습니다. lineId:" + lineId));
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("구간 삭제 중 관련 역을 찾을 수 없습니다. stationId:" + stationId));
+
+        line.removeSection(station);
     }
 }
