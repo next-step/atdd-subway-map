@@ -84,8 +84,8 @@ public class Line extends BaseEntity {
     }
 
     /* 노선에 역이 존재하는지 확인 */
-    public boolean hasStation(Station downStation) {
-        return sections.hasStation(downStation);
+    public boolean hasStation(Station station) {
+        return sections.hasStation(station);
     }
 
     /* 하행역이랑 같은지 확인 */

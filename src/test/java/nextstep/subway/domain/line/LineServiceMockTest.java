@@ -1,5 +1,6 @@
 package nextstep.subway.domain.line;
 
+import nextstep.subway.domain.factory.DtoFactory;
 import nextstep.subway.domain.line.dto.LineDetailResponse;
 import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.section.SectionRepository;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static nextstep.subway.domain.factory.DtoFactory.createLineRequest;
+import static nextstep.subway.domain.factory.DtoFactory.createSectionRequest;
 import static nextstep.subway.domain.factory.EntityFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -138,7 +140,7 @@ class LineServiceMockTest {
         when(stationRepository.findById(역삼역Id)).thenReturn(Optional.of(역삼역));
 
         // when
-        lineService.insertSection(1L, 강남역Id, 역삼역Id, 강남_역삼_거리);
+        lineService.insertSection(1L, createSectionRequest(강남역Id, 역삼역Id, 강남_역삼_거리));
     }
 
     @DisplayName("노선의 구간 목록을 조회한다.")

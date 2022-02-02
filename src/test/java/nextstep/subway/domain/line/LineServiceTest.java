@@ -1,6 +1,6 @@
 package nextstep.subway.domain.line;
 
-import nextstep.subway.domain.factory.EntityFactory;
+import nextstep.subway.domain.factory.DtoFactory;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import static nextstep.subway.domain.factory.DtoFactory.createSectionRequest;
 import static nextstep.subway.domain.factory.EntityFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,7 @@ public class LineServiceTest {
         lineRepository.save(이호선);
 
         // when
-        lineService.insertSection(이호선.getId(), 역삼역.getId(), 선릉역.getId(), 역삼_선릉_거리);
+        lineService.insertSection(이호선.getId(), createSectionRequest(역삼역.getId(), 선릉역.getId(), 역삼_선릉_거리));
 
         // then
         assertThat(이호선.getSectionList().get(1).getUpStationId()).isEqualTo(역삼역.getId());

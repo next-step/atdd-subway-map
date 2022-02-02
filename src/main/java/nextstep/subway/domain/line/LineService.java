@@ -6,6 +6,7 @@ import nextstep.subway.domain.line.dto.LineResponse;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.section.dto.SectionDetailResponse;
+import nextstep.subway.domain.section.dto.SectionRequest;
 import nextstep.subway.domain.section.dto.SectionResponse;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
@@ -56,7 +57,7 @@ public class LineService {
         if (sectionRepository.existsByUpStationAndDownStation(upStation, downStation)) {
             throw new BusinessException(SECTION_ALREADY_EXISTS);
         }
-        SectionValidator.properDistance(distance);
+        SectionValidator.validDistance(distance);
     }
 
     /* 노선 목록 조회 */
@@ -85,9 +86,10 @@ public class LineService {
     }
 
     /* 노선에 구간 추가 */
-    public SectionResponse insertSection(Long lineId, Long upStationId, Long downStationId, int distance) {
+    public SectionResponse insertSection(Long lineId, SectionRequest request) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(LINE_NOT_FOUND_BY_ID));
-        Section createdSection = createSection(line, upStationId, downStationId, distance);
+        Section createdSection =
+                createSection(line, request.getUpStationId(), request.getDownStationId(), request.getDistance());
         pushSection(line, createdSection);
 
         return SectionResponse.from(createdSection);
@@ -97,16 +99,10 @@ public class LineService {
         Station upStation = findStationById(upStationId);
         Station downStation = findStationById(downStationId);
 
-        validateSection(line, upStation, downStation, distance);
+        SectionValidator.existsOnlyOneStation(line, upStation, downStation);
+        SectionValidator.validDistance(distance);
 
         return Section.of(upStation, downStation, distance);
-    }
-
-    private void validateSection(Line line, Station upStation, Station downStation, int distance) {
-        if (sectionRepository.existsByUpStationAndDownStation(upStation, downStation)) {
-            throw new BusinessException(SECTION_ALREADY_EXISTS);
-        }
-        SectionValidator.proper(line, upStation, downStation, distance);
     }
 
     /* 노선의 구간 목록 조회 */

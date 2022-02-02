@@ -1,15 +1,12 @@
 package nextstep.subway.domain.section;
 
 import nextstep.subway.domain.station.Station;
-import nextstep.subway.handler.error.custom.BusinessException;
-import nextstep.subway.handler.validator.SectionValidator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
