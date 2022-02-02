@@ -1,6 +1,9 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class LineResponse {
     private Long id;
@@ -8,17 +11,23 @@ public class LineResponse {
     private String color;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private List<StationResponse> stations;
 
-    public LineResponse(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    @Builder
+    public LineResponse(
+            Long id,
+            String name,
+            String color,
+            LocalDateTime createdDate,
+            LocalDateTime modifiedDate,
+            List<StationResponse> stations
+    ) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
-    }
-
-    public static LineResponse of(Long id, String name, String color, LocalDateTime createdDate, LocalDateTime modifiedDate) {
-        return new LineResponse(id, name, color, createdDate, modifiedDate);
+        this.stations = stations;
     }
 
     public Long getId() {
@@ -39,5 +48,9 @@ public class LineResponse {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }

@@ -2,74 +2,97 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
+import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     public LineResponse saveLine(LineRequest request) {
-        checkDuplication(request);
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return LineResponse.of(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
+        checkDuplicatedName(request);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+        Line line = lineRepository.save(
+                Line.builder()
+                        .name(request.getName())
+                        .color(request.getColor())
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .distance(request.getDistance())
+                        .build()
         );
+        return createLineResponse(line);
     }
 
-    private void checkDuplication(LineRequest request) {
-        if (lineRepository.findByName(request.getName()).isPresent()) {
-            throw new IllegalArgumentException("[duplication]:name");
+    private void checkDuplicatedName(LineRequest request) {
+        if (lineRepository.existsByName(request.getName())) {
+            throw new DuplicatedException();
         }
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-                .map( line ->
-                        LineResponse.of(
-                                line.getId(),
-                                line.getName(),
-                                line.getColor(),
-                                line.getCreatedDate(),
-                                line.getModifiedDate()
-                        )
-                ).collect(Collectors.toList());
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
     }
 
     public LineResponse getLine(Long id) {
         Line line = lineRepository.getById(id);
-        return LineResponse.of(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+        return createLineResponse(line);
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        List<StationResponse> stationResponses = stationService.createStationResponses(line.getAllStations());
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .stations(stationResponses)
+                .build();
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.getById(id);
-        line.setName(lineRequest.getName());
-        line.setColor(lineRequest.getColor());
+        line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
     public void deleteLine(Long id) {
         Line line = lineRepository.getById(id);
         lineRepository.deleteById(line.getId());
+    }
+
+    public void saveSection(Long id, SectionRequest request) {
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        line.addSection(upStation, downStation, request.getDistance());
+    }
+
+    public void deleteSection(Long id, Long stationId) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        line.removeSection(stationId);
     }
 }

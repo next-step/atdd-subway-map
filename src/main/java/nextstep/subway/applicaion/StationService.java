@@ -4,9 +4,11 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.DuplicatedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +28,8 @@ public class StationService {
     }
 
     private void checkDuplication(StationRequest stationRequest) {
-        if (stationRepository.findByName(stationRequest.getName()).isPresent()) {
-            throw new IllegalArgumentException("[duplication]:name");
+        if (stationRepository.existsByName(stationRequest.getName())) {
+            throw new DuplicatedException();
         }
     }
 
@@ -45,11 +47,22 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
+        return StationResponse.builder()
+                .id(station.getId())
+                .name(station.getName())
+                .createdDate(station.getCreatedDate())
+                .modifiedDate(station.getModifiedDate())
+                .build();
+    }
+
+    public List<StationResponse> createStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(this::createStationResponse)
+                .collect(Collectors.toList());
+    }
+
+    public Station findById(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
