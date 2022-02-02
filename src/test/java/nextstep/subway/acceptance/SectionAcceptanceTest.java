@@ -8,8 +8,11 @@ import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static nextstep.subway.utils.LineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,13 +28,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
 
     private static final Integer 거리 = 1;
+    private static final String 상행역 = "상행역";
+    private static final String 하행역 = "하행역";
+    private static final String 새로운역 = "새로운역";
 
 
     @BeforeEach
     public void setup() {
-        노선에_속한_상행역 = 지하철_역_데이터_생성("상행역");
-        노선에_속한_하행역 = 지하철_역_데이터_생성("하행역");
-        노선에_속하지_않은_새로운역 = 지하철_역_데이터_생성("새로운역");
+        노선에_속한_상행역 = 지하철_역_데이터_생성(상행역);
+        노선에_속한_하행역 = 지하철_역_데이터_생성(하행역);
+        노선에_속하지_않은_새로운역 = 지하철_역_데이터_생성(새로운역);
 
         지하철_노선 = Long.valueOf(
                 지하철_노선_생성요청(
@@ -156,12 +162,32 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
                 .when()
-                .delete("/lines/" + 지하철_노선 + "/sections?stationId=" + 노선에_속하지_않은_새로운역)
+                .delete("/lines/" + 지하철_노선 + "/sections?stationId=" + 노선에_속한_하행역)
                 .then().log().all()
                 .extract();
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    }
+
+    @DisplayName("등록된 구간으로 역 목록 조회 기능")
+    @Test
+    void name() {
+        // given
+        지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역));
+        지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_하행역, 노선에_속하지_않은_새로운역));
+
+        // when
+        final ExtractableResponse<Response> getResponse = 지하철_노선_목록요청("/lines/" + 지하철_노선);
+
+        // then
+        final List<String> resultList = getResponse.jsonPath()
+                .getList("stations.name")
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        assertThat(resultList).isEqualTo(Arrays.asList(상행역, 하행역, 새로운역));
     }
 
 

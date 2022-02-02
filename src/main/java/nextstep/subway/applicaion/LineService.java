@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,7 +71,7 @@ public class LineService {
         final List<StationResponse> responseStation = new ArrayList<>();
         final List<Section> sections = line.getSections();
         if (!sections.isEmpty()) {
-            responseStation.addAll(createStationResponse(sections));
+            responseStation.addAll(createStationResponses(sections));
         }
 
         return new LineResponse(line.getId(),
@@ -81,22 +82,25 @@ public class LineService {
                 line.getModifiedDate());
     }
 
-    private List<StationResponse> createStationResponse(List<Section> sections) {
-        final Section section = sections.get(0);
+    private List<StationResponse> createStationResponses(List<Section> sections) {
+        List<StationResponse> responseList = new ArrayList<>();
+        final StationResponse firstStation = createStationResponse(sections.get(0).getUpStation());
+        responseList.add(firstStation);
 
-        final Station upStation = section.getUpStation();
-        final StationResponse upStationResponse = new StationResponse(upStation.getId(),
+        for (Section section : sections) {
+            final Station downStation = section.getDownStation();
+            final StationResponse downStationResponse = createStationResponse(downStation);
+            responseList.add(downStationResponse);
+        }
+
+        return responseList;
+    }
+
+    private StationResponse createStationResponse(Station upStation) {
+        return new StationResponse(upStation.getId(),
                 upStation.getName(),
                 upStation.getCreatedDate(),
                 upStation.getModifiedDate());
-
-        final Station downStation = section.getDownStation();
-
-        final StationResponse downStationResponse = new StationResponse(downStation.getId(),
-                downStation.getName(),
-                downStation.getCreatedDate(),
-                downStation.getModifiedDate());
-        return Arrays.asList(upStationResponse, downStationResponse);
     }
 
     private Line toLine(LineRequest lineRequest) {

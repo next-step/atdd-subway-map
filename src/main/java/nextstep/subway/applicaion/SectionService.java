@@ -34,7 +34,7 @@ public class SectionService {
         validateStationInSection(downStation, upStation, foundLine);
 
         final Section section = sectionRepository.save(
-                toSection(sectionRequest, downStation, upStation, foundLine));
+                toSection(sectionRequest, upStation, downStation, foundLine));
 
         return createSectionResponse(section);
     }
@@ -65,14 +65,14 @@ public class SectionService {
     private void checkDownStation(Station downStation, List<Section> sections) {
         final Section lastSection = sections.get(sections.size() - 1);
         if (lastSection.getDownStation().equals(downStation) ||
-        lastSection.getUpStation().equals(downStation)) {
+                lastSection.getUpStation().equals(downStation)) {
             throw new IllegalArgumentException("등록할 하행종점역은 노선에 등록되지 않은 역만 가능합니다.");
         }
     }
 
     private void checkUpStation(Station upStation, List<Section> sections) {
         final Section lastSection = sections.get(sections.size() - 1);
-        if (upStation.equals(lastSection.getDownStation())) {
+        if (!upStation.equals(lastSection.getDownStation())) {
             throw new IllegalArgumentException("등록할 상행종점역은 노선의 하행종점역이어야 합니다.");
         }
     }
