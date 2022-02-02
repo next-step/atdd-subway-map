@@ -31,10 +31,12 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public void addSection(Section section) {
+    public Section addSection(Station upStation, Station downStation, int distance) {
+        Section section = new Section(upStation, downStation, distance);
         checkPossibleAddingSection(section);
         section.updateLine(this);
         sections.add(section);
+        return section;
     }
 
     private void checkPossibleAddingSection(Section section) {

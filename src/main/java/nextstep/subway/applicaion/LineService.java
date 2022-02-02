@@ -30,8 +30,7 @@ public class LineService {
 
         Line line = new Line(request.getName(), request.getColor());
         if (Objects.nonNull(upStation) && Objects.nonNull(downStation)) {
-            Section section = new Section(upStation, downStation, request.getDistance());
-            line.addSection(section);
+            line.addSection(upStation, downStation, request.getDistance());
         }
 
         return new LineResponse(lineRepository.save(line));

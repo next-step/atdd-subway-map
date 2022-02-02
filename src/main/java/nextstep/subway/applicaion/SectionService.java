@@ -32,9 +32,8 @@ public class SectionService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "구간 저장 중 하행선역을 찾을 수 없습니다. downStationId:" + request.getDownStationId()));
 
-        Section section = new Section(upStation, downStation, request.getDistance());
-        line.addSection(section);
-        return new SectionResponse(sectionRepository.save(section));
+        Section addedSection = line.addSection(upStation, downStation, request.getDistance());
+        return new SectionResponse(sectionRepository.save(addedSection));
     }
 
     public void deleteSection(Long lineId, Long stationId) {
