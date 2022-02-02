@@ -36,7 +36,10 @@ public class LineService {
 
     /* 노선 생성 */
     public LineResponse saveLine(LineRequest request) {
-        Line savedLine = Line.of(request.getName(), request.getColor());
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
+
+        Line savedLine = Line.of(request.getName(), request.getColor(), upStation, downStation);
         pushSection(savedLine, createFirstSection(request.getUpStationId(), request.getDownStationId(),
                 request.getDistance()));
 

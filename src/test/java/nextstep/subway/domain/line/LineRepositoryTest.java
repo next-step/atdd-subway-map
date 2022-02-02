@@ -1,5 +1,6 @@
 package nextstep.subway.domain.line;
 
+import nextstep.subway.domain.station.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ class LineRepositoryTest {
     @Test
     void saveAlreadyExistName() {
         // given
-        Line 이호선 = lineRepository.save(createLine("2호선", "green"));
+        Station 강남역 = createStation("강남역");
+        Station 역삼역 = createStation("역삼역");
+        Line 이호선 = lineRepository.save(createLine("2호선", "green", 강남역, 역삼역));
 
         // when / then
-        assertThatThrownBy(() -> lineRepository.save(createLine("2호선", "orange")))
+        assertThatThrownBy(() -> lineRepository.save(createLine("2호선", "orange", 강남역, 역삼역)))
                 .isInstanceOf(RuntimeException.class);
     }
 }

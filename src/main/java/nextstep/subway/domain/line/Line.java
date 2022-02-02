@@ -25,17 +25,25 @@ public class Line extends BaseEntity {
     @Embedded
     private Sections sections;
 
-    private Line() {
+    @OneToOne
+    private Station upStation;
+
+    @OneToOne
+    private Station downStation;
+
+    public Line() {
     }
 
-    private Line(String name, String color) {
+    private Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.sections = new Sections();
     }
 
-    public static Line of(String name, String color) {
-        return new Line(name, color);
+    public static Line of(String name, String color, Station upStation, Station downStation) {
+        return new Line(name, color, upStation, downStation);
     }
 
     /* Getter */
@@ -56,7 +64,6 @@ public class Line extends BaseEntity {
     }
 
     /* toString */
-
     @Override
     public String toString() {
         return "Line{" +
@@ -88,11 +95,6 @@ public class Line extends BaseEntity {
         return sections.hasStation(station);
     }
 
-    /* 하행역이랑 같은지 확인 */
-    public boolean hasAnyMatchedDownStation(Station station) {
-        return sections.hasAnyMatchedDownStation(station);
-    }
-
     /* 구간 목록 조회 */
     public List<Section> getSectionList() {
         return sections.getSectionList();
@@ -108,7 +110,27 @@ public class Line extends BaseEntity {
 
     /* 구간 추가 */
     public void addSection(Section section) {
+        // 기존하행 == 새로운상행 : 하행 최신화
+        if (isDownStationUpdatable(section)) {
+            this.downStation = section.getDownStation();
+        }
+        // 기존상행 == 새로운하행 : 상행 최신화
+        if (isUpStationUpdatable(section.getDownStation())) {
+            this.upStation = section.getUpStation();
+        }
         sections.add(section);
         section.setLine(this);
+    }
+
+    private boolean isUpStationUpdatable(Station downStation) {
+        return this.upStation.equals(downStation);
+    }
+
+    private boolean isDownStationUpdatable(Section section) {
+        return this.downStation.equals(section.getUpStation());
+    }
+
+    public boolean isDownStation(Station station) {
+        return this.downStation.equals(station);
     }
 }

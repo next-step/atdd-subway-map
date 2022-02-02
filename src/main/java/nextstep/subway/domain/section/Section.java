@@ -71,7 +71,9 @@ public class Section extends BaseEntity {
         if (!stations.contains(upStation)) {
             stations.add(upStation);
         }
-        stations.add(downStation);
+        if (!stations.contains(downStation)) {
+            stations.add(downStation);
+        }
     }
 
     public List<StationResponse> getStationsResponse() {

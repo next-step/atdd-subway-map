@@ -24,13 +24,6 @@ public class Sections {
         return stations;
     }
 
-    public boolean hasAnyMatchedDownStation(Station upStation) {
-        if(sectionList.isEmpty()) {
-            return true;
-        }
-        return sectionList.get(sectionList.size() - 1).hasDownStation(upStation);
-    }
-
     public boolean hasStation(Station downStation) {
         return sectionList.stream().anyMatch(section -> section.hasStation(downStation));
     }

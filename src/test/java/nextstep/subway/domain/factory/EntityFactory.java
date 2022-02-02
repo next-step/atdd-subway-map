@@ -6,8 +6,8 @@ import nextstep.subway.domain.station.Station;
 
 public class EntityFactory {
 
-    public static Line createLine(String name, String color) {
-        return Line.of(name, color);
+    public static Line createLine(String name, String color, Station upStation, Station downStation) {
+        return Line.of(name, color, upStation, downStation);
     }
 
     public static Station createStation(String name) {
@@ -19,7 +19,7 @@ public class EntityFactory {
     }
 
     public static Line createCompleteLine(String name, String color, Station upStation, Station downStation, int distance) {
-        Line line = createLine(name, color);
+        Line line = createLine(name, color, upStation, downStation);
         line.addSection(createSection(upStation, downStation, distance));
 
         return line;

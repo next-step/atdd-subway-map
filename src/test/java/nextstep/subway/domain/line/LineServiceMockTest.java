@@ -1,6 +1,5 @@
 package nextstep.subway.domain.line;
 
-import nextstep.subway.domain.factory.DtoFactory;
 import nextstep.subway.domain.line.dto.LineDetailResponse;
 import nextstep.subway.domain.line.dto.LineRequest;
 import nextstep.subway.domain.section.SectionRepository;
@@ -37,27 +36,30 @@ class LineServiceMockTest {
 
     private LineService lineService;
 
+    private Station 강남역;
+    private Station 역삼역;
+
     @BeforeEach
     void init() {
         lineService = new LineService(lineRepository, stationRepository, sectionRepository);
+        강남역 = createStation("강남역");
+        역삼역 = createStation("역삼역");
     }
 
     @DisplayName("노선 생성을 처리한다.")
     @Test
     void saveLine() {
         // given
-        Station 강남역 = createStation("강남역");
         Long 강남역Id = 1L;
-        Station 선릉역 = createStation("선릉역");
-        Long 선릉역Id = 2L;
-        int 강남_선릉_거리 = 10;
+        Long 역삼역Id = 2L;
+        int 강남_역삼_거리 = 10;
 
-        LineRequest lineRequest = createLineRequest("2호선", "green", 강남역Id, 선릉역Id, 강남_선릉_거리);
-        Line lineResult = createLine(lineRequest.getName(), lineRequest.getColor());
+        LineRequest lineRequest = createLineRequest("2호선", "green", 강남역Id, 역삼역Id, 강남_역삼_거리);
+        Line lineResult = createLine(lineRequest.getName(), lineRequest.getColor(), 강남역, 역삼역);
 
         // stubbing
         when(stationRepository.findById(강남역Id)).thenReturn(Optional.of(강남역));
-        when(stationRepository.findById(선릉역Id)).thenReturn(Optional.of(선릉역));
+        when(stationRepository.findById(역삼역Id)).thenReturn(Optional.of(역삼역));
         when(lineRepository.save(any())).thenReturn(lineResult);
 
         // when
@@ -72,7 +74,7 @@ class LineServiceMockTest {
     @Test
     void getLineList() {
         // given
-        Line line = createLine("2호선", "green");
+        Line line = createLine("2호선", "green", 강남역, 역삼역);
 
         // stubbing
         when(lineRepository.findAll()).thenReturn(Arrays.asList(line));
@@ -88,7 +90,7 @@ class LineServiceMockTest {
     @Test
     void getLine() {
         // given
-        Line line = createLine("2호선", "green");
+        Line line = createLine("2호선", "green", 강남역, 역삼역);
 
         // stubbing
         when(lineRepository.findById(any())).thenReturn(Optional.of(line));
@@ -104,7 +106,7 @@ class LineServiceMockTest {
     @Test
     void patchLine() {
         // given
-        Line line = createLine("2호선", "green");
+        Line line = createLine("2호선", "green", 강남역, 역삼역);
 
         // stubbing
         when(lineRepository.findById(any())).thenReturn(Optional.of(line));
@@ -128,11 +130,9 @@ class LineServiceMockTest {
     @Test
     void insertSection() {
         Long 강남역Id = 1L;
-        Station 강남역 = createStation("강남역");
         Long 역삼역Id = 2L;
-        Station 역삼역 = createStation("역삼역");
         int 강남_역삼_거리 = 10;
-        Line line = createLine("2호선", "green");
+        Line line = createLine("2호선", "green", 강남역, 역삼역);
 
         // stubbing
         when(lineRepository.findById(any())).thenReturn(Optional.of(line));
@@ -147,8 +147,6 @@ class LineServiceMockTest {
     @Test
     void getSections() {
         // given
-        Station 강남역 = createStation("강남역");
-        Station 역삼역 = createStation("역삼역");
         Station 선릉역 = createStation("선릉역");
         int 강남_역삼_거리 = 10;
         int 역삼_선릉_거리 = 8;
