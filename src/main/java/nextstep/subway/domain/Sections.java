@@ -14,6 +14,9 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
+    protected Sections() {
+    }
+
     public void init(Section section) {
         sections.add(section);
     }
@@ -22,17 +25,6 @@ public class Sections {
         checkContainSection(section);
         checkNotEqualDownStation(section);
         sections.add(section);
-    }
-
-    public List<Section> getSections() {
-        return sections;
-    }
-
-    private Section lastSection() {
-        if (sections.size() - 1 < 0) {
-            throw new IllegalArgumentException("sections 의 size 가 0 이하 입니다.");
-        }
-        return sections.get(sections.size() - 1);
     }
 
     private void checkNotEqualDownStation(Section section) {
@@ -46,6 +38,17 @@ public class Sections {
         if (getStations().contains(section.getDownStation())) {
             throw new ContainStationException();
         }
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    private Section lastSection() {
+        if (sections.size() - 1 < 0) {
+            throw new IllegalArgumentException("sections 의 size 가 0 이하 입니다.");
+        }
+        return sections.get(sections.size() - 1);
     }
 
     public List<Station> getStations() {
