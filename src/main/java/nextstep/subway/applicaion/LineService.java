@@ -32,10 +32,8 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(lineRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
-
         Section section = new Section(upStation, downStation, lineRequest.getDistance());
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), section);
-
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(),section);
         section.setLine(line);
         lineRepository.save(line);
 
@@ -64,7 +62,6 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         line.update(lineRequest.getName(), lineRequest.getColor());
-        lineRepository.save(line);
         return LineResponse.of(line);
     }
 
@@ -81,25 +78,9 @@ public class LineService {
                 .orElseThrow(EntityNotFoundException::new);
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
-
         Section section = new Section(upStation, downStation, sectionRequest.getDistance());
-
         line.addSection(section);
-//
-//        System.out.println("-------------------------------------------------");
-//        line.getSections().getSections().stream().forEach(s -> {
-//            System.out.println(s.getUpStation() + " " + s.getDownStation());
-//        });
-//        System.out.println("-------------------------------------------------");
-//
-//        line = lineRepository.save(line);
-//
-//        System.out.println("==================================================");
-//        line.getSections().getSections().stream().forEach(s -> {
-//            System.out.println(s.getUpStation() + " " + s.getDownStation());
-//        });
-//        System.out.println("==================================================");
-
+        section.setLine(line);
         return LineResponse.of(line);
     }
 
@@ -111,6 +92,6 @@ public class LineService {
         if (line.getSections().getSections().size() <= 1) {
             throw new IllegalDeleteSectionException();
         }
-        sectionRepository.delete(section);
+        line.getSections().getSections().remove(section);
     }
 }
