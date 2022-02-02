@@ -33,7 +33,7 @@ public class LineService {
         Station downStation = stationRepository.findById(lineRequest.getDownStationId())
                 .orElseThrow(EntityNotFoundException::new);
         Section section = new Section(upStation, downStation, lineRequest.getDistance());
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(),section);
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), section);
         section.setLine(line);
         lineRepository.save(line);
 

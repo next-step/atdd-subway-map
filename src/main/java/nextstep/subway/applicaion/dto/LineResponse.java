@@ -40,7 +40,7 @@ public class LineResponse {
     }
 
     private static List<StationResponse> stationResponseMapper(Line line) {
-        List<Station> stations = line.getStations();
+        List<Station> stations = line.getSections().getStations();
         return stations.stream().map(station -> new StationResponse(station)).collect(Collectors.toList());
     }
 
