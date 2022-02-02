@@ -3,6 +3,7 @@ package nextstep.subway.domain.line;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.handler.error.custom.BusinessException;
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,14 +84,33 @@ class LineTest {
      * (기존구간_상행 - 새로운구간_하행) & (새로운구간_하행 - 기존구간_하행)
      */
     @Test
-    @DisplayName("구간 사이에 새로운 구간을 추가한다.")
+    @DisplayName("구간 사이에 새로운 구간을 추가한다. - 상행선이 같은 경우")
     void addSection2() {
         // given
-        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역);
+        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
         Station 선릉역 = createStation("선릉역");
+        Section section = createSection(강남역, 선릉역, 8);
 
         // when
+        이호선.addSection(section);
+
         // then
+        assertThat(이호선.getStationList()).containsExactly(Arrays.array(강남역, 선릉역, 역삼역));
+    }
+
+    @Test
+    @DisplayName("구간 사이에 새로운 구간을 추가한다. - 하행선이 같은 경우")
+    void addSection3() {
+        // given
+        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
+        Station 선릉역 = createStation("선릉역");
+        Section section = createSection(선릉역, 역삼역, 8);
+
+        // when
+        이호선.addSection(section);
+
+        // then
+        assertThat(이호선.getStationList()).containsExactly(Arrays.array(강남역, 선릉역, 역삼역));
     }
 
     /**
@@ -105,23 +125,6 @@ class LineTest {
 
         // when/then
         assertThat(completeLine.hasStation(강남역)).isTrue();
-    }
-
-    /**
-     * 노선과 구간이 생성되었을때,
-     * 입력된 역이 구간의 최 하행역과 같은지 확인합니다.
-     */
-    @Test
-    @DisplayName("입력된 역이 노선의 최하행역과 같은지 확인한다.")
-    void hasAnyMatchedDownStation() {
-        // given
-        Station 선릉역 = createStation("선릉역");
-        Line 이호선 = createCompleteLine("2호선", "green", 강남역, 역삼역, 10);
-        이호선.addSection(createSection(역삼역, 선릉역, 10));
-
-        // when/then
-        assertThat(이호선.isDownStation(역삼역)).isFalse();
-        assertThat(이호선.isDownStation(선릉역)).isTrue();
     }
 
     /**

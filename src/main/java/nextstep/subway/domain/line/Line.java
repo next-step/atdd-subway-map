@@ -115,19 +115,18 @@ public class Line extends BaseEntity {
             this.downStation = section.getDownStation();
         }
         // 기존상행 == 새로운하행 : 상행 최신화
-        if (isUpStationUpdatable(section.getDownStation())) {
+        if (isUpStationUpdatable(section)) {
             this.upStation = section.getUpStation();
         }
-        sections.add(section);
-        section.setLine(this);
+        sections.add(this, section);
     }
 
-    private boolean isUpStationUpdatable(Station downStation) {
-        return this.upStation.equals(downStation);
+    private boolean isUpStationUpdatable(Section section) {
+        return section.isDownStation(this.upStation);
     }
 
     private boolean isDownStationUpdatable(Section section) {
-        return this.downStation.equals(section.getUpStation());
+        return section.isUpStation(this.downStation);
     }
 
     public boolean isDownStation(Station station) {

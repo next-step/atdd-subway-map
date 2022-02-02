@@ -91,4 +91,12 @@ public class Section extends BaseEntity {
     public Station getUpStation() {
         return upStation;
     }
+
+    public boolean isUpStation(Station station) {
+        return this.upStation.equals(station);
+    }
+
+    public boolean isDownStation(Station station) {
+        return this.downStation.equals(station);
+    }
 }

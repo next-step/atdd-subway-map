@@ -94,7 +94,6 @@ public class LineService {
         Section createdSection =
                 createSection(line, request.getUpStationId(), request.getDownStationId(), request.getDistance());
         pushSection(line, createdSection);
-
         return SectionResponse.from(createdSection);
     }
 
@@ -122,11 +121,15 @@ public class LineService {
     /* 노선의 단일 구간 삭제 */
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineById(lineId);
-        Station downStation = stationRepository.findById(stationId)
+        Station targetStation = stationRepository.findById(stationId)
                 .orElseThrow(() -> new BusinessException(STATION_NOT_FOUND_BY_ID));
 
+        if (!line.isDownStation(targetStation)) {
+            throw new BusinessException(STATION_IS_NOT_DOWN);
+        }
+
         line.getSectionList().stream()
-                .filter(section -> section.hasDownStation(downStation))
+                .filter(section -> section.hasDownStation(targetStation))
                 .findFirst()
                 .ifPresent(section -> line.deleteSection(section));
     }

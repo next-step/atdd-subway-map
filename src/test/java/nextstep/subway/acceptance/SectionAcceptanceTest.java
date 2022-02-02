@@ -100,39 +100,49 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Scenario: 구간 등록시 존재하는 역을 하행역으로 등록하면 예외가 발생한다.
-     * when    : 강남역을 하행역으로 등록하여 구간을 생성하면
-     * then    : 400 에러가 반환된다.
+     * Scenario : 존재하는 구간 사이에 구간을 새로 등록이 가능하다.
+     * background: 역2개와 노선이 생성된다.
+     * given    : 역 1개를 추가로 생성하고
+     * when     : 기존 노선의 상행선과 새로운 역을 하행선으로 갖는 구간을 새롭게 등록했을때
+     * then     : 구간이 2개로 쪼개져서 생성된다.
+     * (기존_상행-새로운_역) - (새로운_역-기존_하행)
      */
-    @DisplayName("구간 등록시 존재하는 역을 하행역으로 등록할 수 없다.")
+    @DisplayName("기존 구간의 역을 상행선으로, 새로운 역을 하행선으로 갖는 구간을 추가할 수 있다.")
     @Test
-    void 존재하는_역_하행으로_등록() {
+    void 구간_사이에_새로운_구간_추가_상행역이_같은_경우() {
+        // given
+        Long 역삼역Id = extractId(역_생성("역삼역"));
+        int 강남_역삼_거리 = 6;
+
         // when
-        ExtractableResponse<Response> postResponse = 구간_생성_요청(양재역Id, 강남역Id, 강남_양재_거리, 신분당선Id);
+        ExtractableResponse<Response> postResponse = 구간_생성_요청(강남역Id, 역삼역Id, 강남_역삼_거리, 신분당선Id);
 
         // then
-        응답_상태_검증(postResponse, HttpStatus.BAD_REQUEST);
+        응답_상태_검증(postResponse, HttpStatus.CREATED);
+        구간_개수_검증(신분당선Id, 2);
     }
 
     /**
-     * Scenario: 구간 등록시 상행역이 기존 구간의 하행역이 아니면 예외가 발생한다.
-     * given   : 새로운 역을 생성하고
-     * when    : 새로운 역을 상행역으로 등록하여 구간을 생성하면
-     * then    : 400 에러가 반환된다.
+     * Scenario : 존재하는 구간 사이에 구간을 새로 등록이 가능하다.
+     * background: 역2개와 노선이 생성된다.
+     * given    : 역 1개를 추가로 생성하고
+     * when     : 기존 노선의 하행선과 새로운 역을 상행역으로 갖는 구간을 새롭게 등록했을때
+     * then     : 구간이 2개로 쪼개져서 생성된다.
+     * (기존_상행-새로운_역) - (새로운_역-기존_하행)
      */
-    @DisplayName("구간 등록시 상행역이 기존 구간의 하행역이 아니면 등록할 수 없다.")
+    @DisplayName("기존 구간의 역을 상행선으로, 새로운 역을 하행선으로 갖는 구간을 추가할 수 있다.")
     @Test
-    void 기존의_하행역이_아닌역을_상행역으로_등록() {
+    void 구간_사이에_새로운_구간_추가_하행역이_같은_경우() {
         // given
-        Long 역삼역 = extractId(역_생성("역삼역"));
-        Long 선릉역 = extractId(역_생성("선릉역"));
-        int 역삼_선릉_거리 = 3;
+        Long 역삼역Id = extractId(역_생성("역삼역"));
+        int 역삼_양재_거리 = 6;
 
         // when
-        ExtractableResponse<Response> postResponse = 구간_생성_요청(역삼역, 선릉역, 역삼_선릉_거리, 신분당선Id);
+        ExtractableResponse<Response> postResponse = 구간_생성_요청(역삼역Id, 양재역Id, 역삼_양재_거리, 신분당선Id);
 
         // then
-        응답_상태_검증(postResponse, HttpStatus.BAD_REQUEST);
+        응답_상태_검증(postResponse, HttpStatus.CREATED);
+        구간_개수_검증(신분당선Id, 2);
     }
 
     /**

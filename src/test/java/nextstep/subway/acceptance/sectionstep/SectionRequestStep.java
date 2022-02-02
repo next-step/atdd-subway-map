@@ -17,13 +17,13 @@ public class SectionRequestStep {
         assertThat(postResponse.statusCode()).isEqualTo(status.value());
     }
 
-    public static void 구간_개수_검증(Long 구간Id, int size) {
+    public static void 구간_개수_검증(Long 노선Id, int size) {
         ExtractableResponse<Response> getResponse = RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
 
                 .when()
-                .get("/lines/" + 구간Id + "/sections")
+                .get("/lines/" + 노선Id + "/sections")
 
                 .then().log().all()
                 .extract();
