@@ -18,7 +18,7 @@ public class LineIncludingStationsResponse {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations = line.getStations().stream()
+        this.stations = line.getAllStations().stream()
                 .map(StationResponse::new)
                 .collect(Collectors.toList());
         this.createdDate = line.getCreatedDate();
