@@ -1,15 +1,9 @@
 package nextstep.subway.applicaion.exception;
 
-import org.springframework.http.HttpStatus;
-
 public class DuplicateException extends RuntimeException {
-    private final HttpStatus code = HttpStatus.CONFLICT;
+    final static String message = "중복된 이름으로 생성할 수 없습니다. - [%s]";
 
-    public DuplicateException(String message) {
-        super(message);
-    }
-
-    public HttpStatus getCode() {
-        return code;
+    public DuplicateException(String name) {
+        super(String.format(message, name));
     }
 }

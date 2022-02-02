@@ -32,7 +32,7 @@ public class StationService {
         boolean existsStation = stationRepository.existsStationByName(stationRequest.getName());
 
         if (existsStation) {
-            throw new DuplicateException("중복된 지하철 역은 생성할 수 없습니다.");
+            throw new DuplicateException(stationRequest.getName());
         }
     }
 

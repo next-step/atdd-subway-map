@@ -12,6 +12,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<ErrorResponse> duplicateException(DuplicateException e) {
 
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.valueOf(e.getCode().value()));
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({NotExistLineException.class, NotExistStationException.class})
+    public ResponseEntity<ErrorResponse> notExistException(Exception e) {
+
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ErrorResponse> illegalException(Exception e) {
+
+        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
