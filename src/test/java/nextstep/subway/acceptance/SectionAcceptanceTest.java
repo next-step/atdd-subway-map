@@ -92,7 +92,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 구간 제거")
     @Test
-    void getStations() {
+    void deleteSection() {
         // given
         SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10);
         지하철구간_생성(line.getId(), sectionRequest);
@@ -102,6 +102,39 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 구간 생성을 요청 하면
+     * When 하행 종점역이 아닌, 지하철 구간 제거를 요청 하면
+     * Then 지하철 구간 제거가 성공한다.
+     */
+    @DisplayName("지하철 구간 제거 실패 - 하행 종점역이 아님")
+    @Test
+    void deleteSectionNotLastStationException() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest(downStationId, upStationId, 10);
+        지하철구간_생성(line.getId(), sectionRequest);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철구간_삭제(line.getId(), 2L);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * When 지하철 구간 제거를 요청 하면
+     * Then 지하철 구간 제거가 실패한다.
+     */
+    @DisplayName("지하철 구간 제거 실패 - Section 1개 이하")
+    @Test
+    void deleteSectionOneLeftSectionException() {
+        // when
+        ExtractableResponse<Response> deleteResponse = 지하철구간_삭제(line.getId(), 2L);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 }
