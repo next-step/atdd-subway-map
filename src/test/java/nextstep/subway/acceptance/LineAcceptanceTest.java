@@ -67,7 +67,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String 이호선 = "2호선";
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", 이호선);
-        params1.put("color", "bg-green-600");
+        params2.put("color", "bg-green-600");
         ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
                 .body(params2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
