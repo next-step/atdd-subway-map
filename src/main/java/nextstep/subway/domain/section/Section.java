@@ -5,7 +5,6 @@ import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.dto.StationResponse;
 import nextstep.subway.handler.error.custom.BusinessException;
-import nextstep.subway.handler.error.custom.ErrorCode;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -40,7 +39,7 @@ public class Section extends BaseEntity {
     }
 
     public static Section of(Station upStation, Station downStation, int distance) {
-        if (distance <= 0 ) {
+        if (distance <= 0) {
             throw new BusinessException(INVALID_NEW_DISTANCE);
         }
         return new Section(upStation, downStation, distance);

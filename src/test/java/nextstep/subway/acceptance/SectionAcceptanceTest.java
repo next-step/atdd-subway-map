@@ -166,6 +166,26 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Scenario: 새로운 구간을 기존 구간 사이에 등록시 거리가 기존 구간보다 크거나 같으면 에러를 반환한다.
+     * given    : 새로운 역을 생성하고
+     * when     : 구간을 기존 거리보다 길게 등록하면
+     * then     : 400 에러가 반환된다.
+     */
+    @DisplayName("기존 구간 사이로 구간 등록시 새로운 구간 거리는 기존 구간보다 작아야한다.")
+    @Test
+    void 거리를_비정상으로_입력2() {
+        // given
+        Long 선릉역Id = extractId(역_생성("선릉역"));
+        int 강남_선릉_거리 = 20;
+
+        // when
+        ExtractableResponse<Response> postResponse = 구간_생성_요청(강남역Id, 선릉역Id, 강남_선릉_거리, 신분당선Id);
+
+        // then
+        응답_상태_검증(postResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Scenario: 구간 삭제시 입력한 역이 최하행역이 아니면 예외를 발생한다
      * given   : 새로운 역을 생성하고 구간을 생성한다.
      * when    : 최하행역이 아닌 다른 역에 대해 구간 삭제를 요청하면
@@ -199,5 +219,40 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         응답_상태_검증(deleteResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Scenario : 추가될 구간의 두 역이 모두 노선에 이미 등록된 상태라면 에러를 반환한다.
+     * when     : 노선의 두 역으로 다시 구간을 추가하면
+     * then     : 409 에러가 반환된다.
+     */
+    @DisplayName("추가되는 구간의 두 역이 모두 노선에 등록된 상태라면 구간 추가가 불가하다.")
+    @Test
+    void 구간의_두_역_이미_노선에_존재할때_추가_불가() {
+        // when
+        ExtractableResponse<Response> postResponse = 구간_생성_요청(양재역Id, 강남역Id, 10, 신분당선Id);
+
+        // then
+        응답_상태_검증(postResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Scenario : 추가될 구간의 두 역이 모두 노선에 없는 상태라면 에러를 반환한다.
+     * given    : 새로운 역을 2개 추가하고
+     * when     : 새로운 역으로 구성된 구간을 추가하면
+     * then     : 404 에러가 반환된다.
+     */
+    @DisplayName("추가되는 구간의 두 역이 노선에 존재하지 않으면 구간 추가가 불가하다.")
+    @Test
+    void 구간의_두_역_노선에_존재하지_않으면_추가_불가() {
+        // given
+        Long 선릉역Id = extractId(역_생성("선릉역"));
+        Long 역삼역Id = extractId(역_생성("역삼역"));
+
+        // when
+        ExtractableResponse<Response> postResponse = 구간_생성_요청(선릉역Id, 역삼역Id, 10, 신분당선Id);
+
+        // then
+        응답_상태_검증(postResponse, HttpStatus.NOT_FOUND);
     }
 }

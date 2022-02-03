@@ -26,6 +26,10 @@ public class LineValidateStep {
         응답_상태코드_검증(response, status);
     }
 
+    public static void 노선_역_목록_검증(ExtractableResponse<Response> response, String[] stationsNames) {
+        assertThat(response.body().jsonPath().getList("stations.name")).containsExactly(stationsNames);
+    }
+
     private static void 응답_상태코드_검증(ExtractableResponse<Response> response, HttpStatus status) {
         assertThat(response.statusCode()).isEqualTo(status.value());
     }

@@ -13,6 +13,7 @@ public class SectionValidator {
             throw new BusinessException(DISTANCE_CAN_NOT_SMALL_THAN_ONE);
         }
     }
+
     public static void existsOnlyOneStation(Line line, Station upStation, Station downStation) {
         // 두 역이 모두 구간에 포함된 경우
         if (existsStation(line, upStation) && existsStation(line, downStation)) {
@@ -29,6 +30,6 @@ public class SectionValidator {
     }
 
     private static boolean notExistsStation(Line line, Station station) {
-        return line.hasStation(station);
+        return !line.hasStation(station);
     }
 }
