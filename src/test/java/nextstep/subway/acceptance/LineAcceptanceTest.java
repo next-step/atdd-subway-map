@@ -147,8 +147,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         String 구분당선 = "구분당선";
         Map<String, String> params2 = new HashMap<>();
-        params1.put("name", 구분당선);
-        params1.put("color", "bg-blue-600");
+        params2.put("name", 구분당선);
+        params2.put("color", "bg-blue-600");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -159,6 +159,15 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> updatedLine = RestAssured.given().log().all()
+                .when()
+                .get("/lines/1")
+                .then().log().all()
+                .extract();
+
+        String updateName = updatedLine.jsonPath().get("name");
+        assertThat(updateName).isEqualTo(구분당선);
     }
 
     /**
