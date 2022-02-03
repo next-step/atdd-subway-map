@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,5 +43,10 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return this.createLineResponse(line);
     }
 }
