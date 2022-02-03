@@ -11,8 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static nextstep.subway.domain.factory.EntityFactory.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("노선 단위 테스트")
 class LineTest {
@@ -134,6 +133,49 @@ class LineTest {
 
         // then
         assertThat(이호선.getStationList()).containsExactly(Arrays.array(강남역, 선릉역, 역삼역));
+    }
+
+    /**
+     * 노선에 구간이 존재할때, 새로운 구간을 생성하면
+     * 새로운 구간의 하행선이 노선의 최상행과 같다면
+     * 구간을 추가하고 최상행역을 갱신시켜준다.
+     */
+    @Test
+    @DisplayName("구간 사이에 새로운 구간을 추가한다. - 하행역이 노선의 최상행역과 같은 경우")
+    void addSection4() {
+        // given
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
+        Station 선릉역 = createStation("선릉역");
+        Section section = createSection(선릉역, 강남역, 8);
+
+        // when
+        이호선.addSection(section);
+
+        // then
+        assertThat(이호선.getStationList()).containsExactly(Arrays.array(선릉역, 강남역, 역삼역));
+    }
+
+    /**
+     * 노선에 구간이 존재할때, 새로운 구간을 생성하면
+     * 새로운 구간의 거리가 기존 구간의 거리보다 크거나 같으면
+     * 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("구간 사이에 새로운 구간을 추가한다. - 기존구간의 거리보다 크거나 같은경우")
+    void addSection5() {
+        // given
+        Line 이호선 = createLine("2호선", "green", 강남역, 역삼역, 10);
+        Station 선릉역 = createStation("선릉역");
+        Section biggerDistanceSection = createSection(강남역, 선릉역, 11);
+        Section sameDistanceSection = createSection(강남역, 선릉역, 10);
+
+        // when / then
+        assertThatExceptionOfType(BusinessException.class)
+                .isThrownBy(() -> 이호선.addSection(biggerDistanceSection))
+                .withMessageStartingWith("[ERROR]");
+        assertThatExceptionOfType(BusinessException.class)
+                .isThrownBy(() -> 이호선.addSection(sameDistanceSection))
+                .withMessageStartingWith("[ERROR]");
     }
 
     /**

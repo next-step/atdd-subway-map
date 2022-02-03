@@ -51,8 +51,6 @@ public class Sections {
     }
 
     public void add(Line line, Section section) {
-        int size = sectionList.size();
-
         // 기존 상행과 새로운 구간의 상행이 같으면서 하행은 서로 다른경우
         // 새로운 구간이 추가되고
         // 기존 구간이 삭제되며

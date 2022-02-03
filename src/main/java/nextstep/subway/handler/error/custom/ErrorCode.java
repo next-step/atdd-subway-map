@@ -5,6 +5,7 @@ public enum ErrorCode {
     REMAINED_SECTION_ONLY_ONE(400, "[ERROR] 구간이 하나 존재하여 삭제가 불가능합니다. "),
     STATIONS_ALL_EXIST(400, "[ERROR] 입력된 구간의 모든 역이 이미 노선에 존재합니다."),
     STATION_IS_NOT_DOWN(400, "[ERROR] 입력된 역은 노선의 최하행역이 아닙니다."),
+    INVALID_NEW_DISTANCE(400, "[ERROR] 입력된 구간의 거리는 기존 거리보다 작아야합니다."),
 
 
     LINE_NOT_FOUND_BY_ID(404, "[ERROR] 해당하는 id의 노선이 존재하지 않습니다."),
