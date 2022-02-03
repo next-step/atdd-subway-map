@@ -2,8 +2,9 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.LogicError;
 import nextstep.subway.exception.LogicException;
 import org.springframework.stereotype.Service;
@@ -16,18 +17,26 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private LineRepository lineRepository;
+    private StationService stationService;
+    private SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService, SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
 
-        if(isExistLineName(lineRequest.getName())){
+        if (existLineName(lineRequest.getName())) {
             throw new LogicException(LogicError.DUPLICATED_NAME_LINE);
         }
 
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
+        Station upStation = stationService.findById(lineRequest.getUpStationId());
+        Station downStation = stationService.findById(lineRequest.getDownStationId());
+        line.addSection(upStation, downStation, lineRequest.getDistance());
+
         return LineResponse.of(line);
     }
 
@@ -43,8 +52,8 @@ public class LineService {
     }
 
     public LineResponse modifyLine(Long id, LineRequest lineRequest) {
-        findById(id);
-        Line line = lineRequest.toEntity(id);
+        Line line = findById(id);
+        line.modify(lineRequest.getName(), lineRequest.getColor());
         Line modifiedLine = lineRepository.save(line);
         return LineResponse.of(modifiedLine);
     }
@@ -58,7 +67,23 @@ public class LineService {
                 .orElseThrow(() -> new LogicException(LogicError.NOT_EXIST_LINE));
     }
 
-    private boolean isExistLineName(String name) {
-        return lineRepository.findByName(name).isPresent();
+    private boolean existLineName(String name) {
+        return lineRepository.existsByName(name);
+    }
+
+    public SectionResponse saveSection(Long id, SectionRequest sectionRequest) {
+        Line line = findById(id);
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        Section section = line.addSection(upStation, downStation, sectionRequest.getDistance());
+        return SectionResponse.of(section);
+    }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findById(lineId);
+        Station station = stationService.findById(stationId);
+        line.checkLastDownStation(station);
+        line.checkLeftOneSection();
+        sectionRepository.deleteByLineAndDownStation(line, station);
     }
 }

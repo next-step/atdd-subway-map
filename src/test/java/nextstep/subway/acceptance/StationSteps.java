@@ -15,6 +15,10 @@ public class StationSteps {
         return 지하철역_생성(DEFAULT_NAME);
     }
 
+    public static Long 지하철역_생성_및_아이디추출(String name) {
+        return 지하철역_생성(name).jsonPath().getLong("id");
+    }
+    
     public static ExtractableResponse<Response> 지하철역_생성(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);

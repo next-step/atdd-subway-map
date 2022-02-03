@@ -43,7 +43,11 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public Station findById(Long id){
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new LogicException(LogicError.NOT_EXIST_STATION));
+    }
     private boolean isExistStationName(String name) {
-        return stationRepository.findByName(name).isPresent();
+        return stationRepository.existsByName(name);
     }
 }
