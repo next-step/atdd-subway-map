@@ -7,6 +7,10 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class LineService {
@@ -18,6 +22,20 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        return createLineResponse(line);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAllLines() {
+        List<Line> lines = lineRepository.findAll();
+
+        return lines.stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+
+    }
+
+    private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
@@ -25,5 +43,19 @@ public class LineService {
                 line.getCreatedDate(),
                 line.getModifiedDate()
         );
+    }
+
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return this.createLineResponse(line);
+    }
+
+    public void updateLineById(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        line.update(request);
+    }
+
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 }
