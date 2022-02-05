@@ -13,19 +13,29 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StationService {
-    private StationRepository stationRepository;
+    private static final String STATION_NAME_IS_ALREADY_REGISTERED = "이미 등록된 역 이름입니다.";
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
+    public StationResponse save(StationRequest stationRequest) {
+        validate(stationRequest);
+
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
+    private void validate(StationRequest stationRequest) {
+        stationRepository.findByName(stationRequest.getName())
+                .ifPresent(station -> {
+                    throw new IllegalArgumentException(STATION_NAME_IS_ALREADY_REGISTERED);
+                });
+    }
+
     @Transactional(readOnly = true)
-    public List<StationResponse> findAllStations() {
+    public List<StationResponse> findAll() {
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream()
@@ -33,7 +43,7 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteBy(Long id) {
         stationRepository.deleteById(id);
     }
 
