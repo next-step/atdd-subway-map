@@ -51,13 +51,13 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
         final Line foundLine = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(id));
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", id)));
         return createLineResponse(foundLine);
     }
 
     public LineResponse editLineById(long id, @RequestBody LineRequest lineRequest) {
         Line foundLine = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(id));
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", id)));
         foundLine.updateLine(lineRequest.getName(), lineRequest.getColor());
         final Line savedLine = lineRepository.save(foundLine);
         return createLineResponse(savedLine);

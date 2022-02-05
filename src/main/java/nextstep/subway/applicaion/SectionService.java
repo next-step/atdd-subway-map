@@ -79,7 +79,7 @@ public class SectionService {
 
     private void checkExistingStation(long stationId) {
         if (!stationRepository.existsById(stationId)) {
-            throw new NotFoundException(stationId);
+            throw new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", stationId));
         }
     }
 
