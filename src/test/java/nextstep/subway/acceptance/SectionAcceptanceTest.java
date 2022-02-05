@@ -90,4 +90,109 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Scenario: 구간 삭제하기
+     *
+     * Given 지하철 노선 생성을 요청하고
+     * When 하행 종점역으로 마지막 구간 삭제 요청을 한다.
+     * Then 노선에 구간 삭제가 실패한다.
+     */
+    @DisplayName("지하철 구간 삭제하기")
+    @Test
+    void deleteSection() {
+        // given
+        ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", "2");
+        params.put("downStationId", "5");
+        params.put("distance", "10");
+
+        // when
+        String uri = createLineResponse.header("Location") + "/sections";
+        ExtractableResponse<Response> addresponse = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post(uri)
+            .then().log().all()
+            .extract();
+
+        uri = uri +"?stationId=" + 5;
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete(uri)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+
+    /**
+     * Scenario: 노선에 구간이 1개인 경우 삭제할 수 없다.
+     *
+     * Given 지하철 노선 생성을 요청하고
+     * When 하행 종점역으로 마지막 구간 삭제 요청을 한다.
+     * Then 노선에 구간 삭제가 실패한다.
+     */
+    @DisplayName("지하철 구간 삭제 실패 - 노선에 구간이 1개인 경우")
+    @Test
+    void deleteSectionFail() {
+        // given
+        ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
+        // when
+        String uri = createLineResponse.header("Location") + "/sections";
+        uri = uri +"?stationId=" + 2;
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete(uri)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+
+    /**
+     * Scenario: 마지막 구간이 아닌 경우 삭제할 수 없다.
+     *
+     * Given 지하철 노선 생성을 요청하고
+     * When 하행 종점역이 아닌 역으로 마지막 구간 삭제 요청을 한다.
+     * Then 노선에 마지막 구간이 삭제된다.
+     */
+    @DisplayName("지하철 구간 삭제 실패 - 마지막 구간 하행역이 아닌 경우")
+    @Test
+    void deleteSectionNotLastStation() {
+        // given
+        ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", "2");
+        params.put("downStationId", "5");
+        params.put("distance", "10");
+
+        // when
+        String uri = createLineResponse.header("Location") + "/sections";
+        ExtractableResponse<Response> addresponse = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post(uri)
+            .then().log().all()
+            .extract();
+
+        uri = uri +"?stationId=" + 2;
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete(uri)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
