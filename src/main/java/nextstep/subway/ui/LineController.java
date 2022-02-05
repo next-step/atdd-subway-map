@@ -3,6 +3,8 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.domain.Line;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +23,12 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.save(lineRequest);
+        LineResponse line;
+        try {
+            line = lineService.save(lineRequest);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 

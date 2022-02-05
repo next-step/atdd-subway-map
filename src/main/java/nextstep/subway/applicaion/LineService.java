@@ -15,14 +15,24 @@ import java.util.stream.Collectors;
 @Transactional
 public class LineService {
     private final LineRepository lineRepository;
+    private static final String LINE_NAME_ALREADY_EXIST = "이미 등록된 노선명입니다.";
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
     public LineResponse save(LineRequest request) {
+        validate(request);
+
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
+    }
+
+    private void validate(LineRequest request) {
+        lineRepository.findByName(request.getName())
+                        .ifPresent(line -> {
+                            throw new IllegalArgumentException(LINE_NAME_ALREADY_EXIST);
+                        });
     }
 
     @Transactional(readOnly = true)
