@@ -43,6 +43,41 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철 노선 생성을 요청하고
+     * When 같은 이름으로 지하철 노선 생성을 요청하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선명 중복 방지")
+    @Test
+    void duplicateNameIsNotAllowed() {
+        //given
+        Map<String, String> 신분당선 = new HashMap<>();
+        신분당선.put("color", "bg-red-600");
+        신분당선.put("name", "신분당선");
+
+        ExtractableResponse<Response> 지하철_노선_생성_요청 = RestAssured.given().log().all()
+                .body(신분당선)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        //when
+
+        ExtractableResponse<Response> 중복된_노선명으로_노선_생성_요청 = RestAssured.given().log().all()
+                .body(신분당선)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(중복된_노선명으로_노선_생성_요청.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
