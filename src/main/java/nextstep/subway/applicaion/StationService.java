@@ -21,17 +21,16 @@ public class StationService {
     }
 
     public StationResponse save(StationRequest stationRequest) {
-        validate(stationRequest);
+        validate(stationRequest.getName());
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
-    private void validate(StationRequest stationRequest) {
-        stationRepository.findByName(stationRequest.getName())
-                .ifPresent(station -> {
-                    throw new IllegalArgumentException(STATION_NAME_IS_ALREADY_REGISTERED);
-                });
+    private void validate(String stationName) {
+        if (stationRepository.existsByName(stationName)) {
+            throw new IllegalArgumentException(STATION_NAME_IS_ALREADY_REGISTERED);
+        }
     }
 
     @Transactional(readOnly = true)

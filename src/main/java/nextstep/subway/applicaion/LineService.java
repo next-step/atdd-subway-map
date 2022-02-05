@@ -22,17 +22,16 @@ public class LineService {
     }
 
     public LineResponse save(LineRequest request) {
-        validate(request);
+        validate(request.getName());
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
     }
 
-    private void validate(LineRequest request) {
-        lineRepository.findByName(request.getName())
-                        .ifPresent(line -> {
-                            throw new IllegalArgumentException(LINE_NAME_IS_ALREADY_REGISTERED);
-                        });
+    private void validate(String lineName) {
+        if (lineRepository.existsByName(lineName)) {
+            throw new IllegalArgumentException(LINE_NAME_IS_ALREADY_REGISTERED);
+        }
     }
 
     @Transactional(readOnly = true)
