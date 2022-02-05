@@ -1,19 +1,17 @@
 package nextstep.subway.acceptance;
 
 import static nextstep.subway.acceptance.LineSteps.createLineRequest;
+import static nextstep.subway.acceptance.SectionSteps.addSectionRequest;
+import static nextstep.subway.acceptance.SectionSteps.deleteSectionRequest;
 import static nextstep.subway.acceptance.StationSteps.createStationRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 @DisplayName("지하철 구간 관리 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
@@ -40,20 +38,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void addSection() {
         // given
         ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "5");
-        params.put("distance", "10");
 
         // when
-        String uri = createLineResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post(uri)
-            .then().log().all()
-            .extract();
+        String uri = createLineResponse.header("Location");
+        ExtractableResponse<Response> response = addSectionRequest(uri, 2L, 5L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -71,20 +59,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void addSectionWithExistStationInLine() {
         // given
         ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "4");
-        params.put("distance", "10");
 
         // when
-        String uri = createLineResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post(uri)
-            .then().log().all()
-            .extract();
+        String uri = createLineResponse.header("Location");
+        ExtractableResponse<Response> response = addSectionRequest(uri, 2L, 4L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -93,7 +71,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Scenario: 구간 삭제하기
      *
-     * Given 지하철 노선 생성을 요청하고
+     * Given 지하철 노선 생성을 요청하고,
+     *       노선에 구간을 추가한다.
      * When 하행 종점역으로 마지막 구간 삭제 요청을 한다.
      * Then 노선에 구간 삭제가 실패한다.
      */
@@ -102,28 +81,11 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSection() {
         // given
         ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "5");
-        params.put("distance", "10");
+        String uri = createLineResponse.header("Location");
+        addSectionRequest(uri, 2L, 5L, 10);
 
         // when
-        String uri = createLineResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> addresponse = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post(uri)
-            .then().log().all()
-            .extract();
-
-        uri = uri +"?stationId=" + 5;
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .delete(uri)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = deleteSectionRequest(uri, 5L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -142,15 +104,10 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSectionFail() {
         // given
         ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
+        String uri = createLineResponse.header("Location");
+
         // when
-        String uri = createLineResponse.header("Location") + "/sections";
-        uri = uri +"?stationId=" + 2;
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .delete(uri)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = deleteSectionRequest(uri, 2L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -169,28 +126,11 @@ class SectionAcceptanceTest extends AcceptanceTest {
     void deleteSectionNotLastStation() {
         // given
         ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "5");
-        params.put("distance", "10");
+        String uri = createLineResponse.header("Location");
+        addSectionRequest(uri, 2L, 5L, 10);
 
         // when
-        String uri = createLineResponse.header("Location") + "/sections";
-        ExtractableResponse<Response> addresponse = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post(uri)
-            .then().log().all()
-            .extract();
-
-        uri = uri +"?stationId=" + 2;
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .delete(uri)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = deleteSectionRequest(uri, 2L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
