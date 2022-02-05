@@ -20,12 +20,7 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station;
-        try {
-            station = stationService.save(stationRequest);
-        } catch(IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        StationResponse station = stationService.save(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
