@@ -5,17 +5,28 @@ import static nextstep.subway.acceptance.LineSteps.deleteLineRequest;
 import static nextstep.subway.acceptance.LineSteps.getLineRequest;
 import static nextstep.subway.acceptance.LineSteps.getLinesRequest;
 import static nextstep.subway.acceptance.LineSteps.updateLineRequest;
+import static nextstep.subway.acceptance.StationSteps.createStationRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    @BeforeEach
+    void setup() {
+        createStationRequest("강남역");
+        createStationRequest("양재역");
+        createStationRequest("양재시민의숲역");
+        createStationRequest("청계산입구역");
+        createStationRequest("판교역");
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
