@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
+    private static final String LINE_NAME_IS_ALREADY_REGISTERED = "이미 등록된 노선명입니다.";
     private final LineRepository lineRepository;
-    private static final String LINE_NAME_ALREADY_EXIST = "이미 등록된 노선명입니다.";
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
@@ -31,7 +31,7 @@ public class LineService {
     private void validate(LineRequest request) {
         lineRepository.findByName(request.getName())
                         .ifPresent(line -> {
-                            throw new IllegalArgumentException(LINE_NAME_ALREADY_EXIST);
+                            throw new IllegalArgumentException(LINE_NAME_IS_ALREADY_REGISTERED);
                         });
     }
 
