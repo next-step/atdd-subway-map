@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +10,8 @@ import java.util.List;
 
 import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.StationFixture.*;
+import static nextstep.subway.utils.HttpRequestResponse.delete;
+import static nextstep.subway.utils.HttpRequestResponse.get;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
@@ -62,11 +63,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         역_생성(역삼역_이름);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = get("/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -86,11 +83,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성결과 = 역_생성(강남역_이름);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri(생성결과))
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = delete(uri(생성결과));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

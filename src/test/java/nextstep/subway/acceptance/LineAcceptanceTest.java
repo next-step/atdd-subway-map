@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,13 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.LineFixture.*;
+import static nextstep.subway.utils.HttpRequestResponse.delete;
+import static nextstep.subway.utils.HttpRequestResponse.put;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선")
@@ -121,13 +121,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         void updateLine() {
             // when
             Map<String, String> 구분당선 = 노선(구분당선_이름, 구분당선_색상);
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .body(구분당선)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when()
-                    .put(생성된_노선_uri)
-                    .then().log().all()
-                    .extract();
+            ExtractableResponse<Response> response = put(구분당선, 생성된_노선_uri);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -146,11 +140,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         @Test
         void deleteLine() {
            // when
-            ExtractableResponse<Response> response = RestAssured.given().log().all()
-                    .when()
-                    .delete(생성된_노선_uri)
-                    .then().log().all()
-                    .extract();
+            ExtractableResponse<Response> response = delete(생성된_노선_uri);
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
