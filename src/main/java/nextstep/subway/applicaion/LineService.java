@@ -14,19 +14,19 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class LineService {
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse save(LineRequest request) {
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
         return createLineResponse(line);
     }
 
     @Transactional(readOnly = true)
-    public List<LineResponse> findAllLines() {
+    public List<LineResponse> findAll() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
@@ -45,17 +45,17 @@ public class LineService {
         );
     }
 
-    public LineResponse findLineById(Long id) {
+    public LineResponse findBy(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
         return this.createLineResponse(line);
     }
 
-    public void updateLineById(Long id, LineRequest request) {
+    public void updateBy(Long id, LineRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        line.update(request);
+        line.update(request.getName(), request.getColor());
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteBy(Long id) {
         lineRepository.deleteById(id);
     }
 }
