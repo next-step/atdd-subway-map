@@ -5,10 +5,12 @@ import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.exception.NotFoundException;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class SectionService {
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
