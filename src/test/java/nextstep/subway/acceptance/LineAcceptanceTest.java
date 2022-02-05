@@ -119,7 +119,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         @Test
         void updateLine() {
             // when
-            Map<String, String> 구분당선 = 역_생성(구분당선_이름, 구분당선_색상);
+            Map<String, String> 구분당선 = 노선(구분당선_이름, 구분당선_색상);
             ExtractableResponse<Response> response = RestAssured.given().log().all()
                     .body(구분당선)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)

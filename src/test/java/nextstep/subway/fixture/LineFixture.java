@@ -24,7 +24,7 @@ public class LineFixture {
     }
 
     public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
-        Map<String, String> 노선 = 역_생성(name, color);
+        Map<String, String> 노선 = 노선(name, color);
 
         return RestAssured.given().log().all()
                 .body(노선)
@@ -35,11 +35,11 @@ public class LineFixture {
                 .extract();
     }
 
-    public static Map<String, String> 역_생성(String name, String color) {
-        Map<String, String> 역 = new HashMap<>();
-        역.put("name", name);
-        역.put("color", color);
-        return 역;
+    public static Map<String, String> 노선(String name, String color) {
+        Map<String, String> 노선 = new HashMap<>();
+        노선.put("name", name);
+        노선.put("color", color);
+        return 노선;
     }
 
     public static String uri(ExtractableResponse<Response> response) {
