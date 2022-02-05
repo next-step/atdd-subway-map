@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.LineFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 

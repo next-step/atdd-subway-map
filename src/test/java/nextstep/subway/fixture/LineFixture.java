@@ -41,8 +41,4 @@ public class LineFixture {
         노선.put("color", color);
         return 노선;
     }
-
-    public static String uri(ExtractableResponse<Response> response) {
-        return response.header("Location");
-    }
 }
