@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LineAcceptanceTestFixture {
+public class LineFixture {
     public static final String 신분당선_이름 = "신분당선";
     public static final String 신분당선_색상 = "bg-red-600";
 
