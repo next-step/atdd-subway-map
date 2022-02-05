@@ -40,14 +40,6 @@ public class Section extends BaseEntity{
         this.distance = distance;
     }
 
-    private Section(Long id, Line line, Station upStation, Station downStation, Integer distance) {
-        this.id = id;
-        this.line = line;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-    }
-
 
     public Long getId() {
         return id;

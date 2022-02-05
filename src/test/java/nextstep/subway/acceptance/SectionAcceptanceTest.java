@@ -120,7 +120,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         // 구간 생성
         지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_상행역, 노선에_속한_하행역));
         final ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(지하철_구간_데이터_생성(노선에_속한_하행역, 노선에_속하지_않은_새로운역));
-//        final ExtractableResponse<Response> createResponse = 지하철_구간_생성_요청(param);
 
         // when
         final String uri = createResponse.header("Location");

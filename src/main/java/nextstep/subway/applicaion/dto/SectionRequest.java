@@ -8,12 +8,6 @@ public class SectionRequest {
     public SectionRequest() {
     }
 
-    public SectionRequest(Long downStationId, Long upStationId, Integer distance) {
-        this.downStationId = downStationId;
-        this.upStationId = upStationId;
-        this.distance = distance;
-    }
-
     public Long getDownStationId() {
         return downStationId;
     }
