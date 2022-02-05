@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/lines")
 public class LineController {
-    private LineService lineService;
+    private final LineService lineService;
 
     public LineController(LineService lineService) {
         this.lineService = lineService;
@@ -21,30 +21,35 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line;
+        try {
+            line = lineService.save(lineRequest);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LineResponse>> showLines() {
-        return ResponseEntity.ok().body(lineService.findAllLines());
+        return ResponseEntity.ok().body(lineService.findAll());
     }
 
     @GetMapping (value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+        return ResponseEntity.ok().body(lineService.findBy(id));
     }
 
     @PutMapping (value = "/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id,
                                            @RequestBody LineRequest lineRequest) {
-        lineService.updateLineById(id, lineRequest);
+        lineService.updateBy(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping (value = "/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
-        lineService.deleteLineById(id);
+        lineService.deleteBy(id);
         return ResponseEntity.noContent().build();
     }
 }
