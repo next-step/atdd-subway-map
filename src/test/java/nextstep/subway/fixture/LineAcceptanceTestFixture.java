@@ -1,4 +1,4 @@
-package nextstep.subway.testfixture;
+package nextstep.subway.fixture;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;

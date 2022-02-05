@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.testfixture.LineAcceptanceTestFixture.*;
+import static nextstep.subway.fixture.LineAcceptanceTestFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선")
