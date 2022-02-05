@@ -9,7 +9,6 @@ import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.exception.DuplicateException;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,7 @@ public class LineService {
     private final LineRepository lineRepository;
     private final StationService stationService;
 
-    public LineService(LineRepository lineRepository,
-        SectionRepository sectionRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
     }
@@ -70,6 +68,11 @@ public class LineService {
             sectionRequest.getDistance());
 
         line.addSection(section);
+    }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        line.removeSection(stationId);
     }
 
     private Section createSection(Line line, Long upStationId, Long downStationId, int distance) {
