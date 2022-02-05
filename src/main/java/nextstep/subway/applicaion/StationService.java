@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import javax.persistence.EntityNotFoundException;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
@@ -48,5 +49,9 @@ public class StationService {
                 station.getCreatedDate(),
                 station.getModifiedDate()
         );
+    }
+
+    public Station findStation(Long id) {
+        return stationRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 }
