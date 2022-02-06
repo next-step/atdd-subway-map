@@ -34,7 +34,9 @@ public class SectionService {
         final Station upStation = stationRepository.getById(upStationId);
         final Line foundLine = lineRepository.getById(lineId);
         foundLine.validateStationInSection(downStation, upStation);
+        // todo line.addSection시 validate
 
+        // todo line.addSection으로 수정
         final Section section = sectionRepository.save(
                 toSection(sectionRequest, upStation, downStation, foundLine));
 

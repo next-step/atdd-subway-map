@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -77,10 +78,11 @@ public class Line extends BaseEntity {
     }
 
     private void checkDownStation(Station downStation) {
-        final Section lastSection = getLastSection();
-        if (lastSection.getDownStation().equals(downStation) ||
-                lastSection.getUpStation().equals(downStation)) {
-//        if (this.sections.) // todo section 목록에서 station 목록 전체 가져오기
+        final List<Station> stations = this.sections.stream()
+                .flatMap(section -> section.getAllStation().stream())
+                .distinct()
+                .collect(Collectors.toList());
+        if (stations.contains(downStation)) {
             throw new IllegalArgumentException("등록할 하행종점역은 노선에 등록되지 않은 역만 가능합니다.");
         }
     }

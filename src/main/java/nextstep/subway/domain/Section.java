@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 public class Section extends BaseEntity{
@@ -53,5 +55,9 @@ public class Section extends BaseEntity{
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public List<Station> getAllStation() {
+        return Arrays.asList(this.upStation, this.downStation);
     }
 }
