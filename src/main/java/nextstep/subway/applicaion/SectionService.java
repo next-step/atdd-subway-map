@@ -33,18 +33,15 @@ public class SectionService {
         final Station downStation = stationRepository.getById(downStationId);
         final Station upStation = stationRepository.getById(upStationId);
         final Line foundLine = lineRepository.getById(lineId);
-        foundLine.validateStationInSection(downStation, upStation);
-        // todo line.addSection시 validate
 
-        // todo line.addSection으로 수정
-        final Section section = sectionRepository.save(
-                toSection(sectionRequest, upStation, downStation, foundLine));
+        final Integer distance = sectionRequest.getDistance();
+        foundLine.addSection(upStation, downStation, distance);
 
-        return createSectionResponse(section);
+        return createSectionResponse(toSection(foundLine, upStation, downStation, distance));
     }
 
-    private Section toSection(SectionRequest sectionRequest, Station upStation, Station downStation, Line foundLine) {
-        return new Section(foundLine, upStation, downStation, sectionRequest.getDistance());
+    private Section toSection(Line foundLine, Station upStation, Station downStation, Integer distance) {
+        return new Section(foundLine, upStation, downStation, distance);
     }
 
     private SectionResponse createSectionResponse(Section section) {
