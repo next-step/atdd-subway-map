@@ -22,10 +22,4 @@ class LineTest {
         // then
         assertThat(line.getSections().get(0).getLine()).isEqualTo(line);
     }
-
-    @DisplayName("지하철 노선 section 제거시")
-    @Test
-    public void deleteSection() {
-
-    }
 }
