@@ -53,6 +53,11 @@ public class Line extends BaseEntity {
         this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
+    public void deleteLastSection() {
+        final int lastIndex = this.sections.size() - 1;
+        this.sections.remove(lastIndex);
+    }
+
 
     public static class Builder {
         private Long id;

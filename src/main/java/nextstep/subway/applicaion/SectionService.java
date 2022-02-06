@@ -100,6 +100,6 @@ public class SectionService {
             throw new IllegalArgumentException("노선에 등록된 역(하행종점역)만 제거 가능합니다.");
         }
 
-        sectionRepository.delete(lastSection);
+        foundLine.deleteLastSection();
     }
 }
