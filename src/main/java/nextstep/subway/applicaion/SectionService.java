@@ -27,14 +27,15 @@ public class SectionService {
     public SectionResponse saveSection(SectionRequest sectionRequest, long lineId) {
         final long downStationId = sectionRequest.getDownStationId();
         final long upStationId = sectionRequest.getUpStationId();
-        checkExistingStation(downStationId);
-        checkExistingStation(upStationId);
-
-        final Station downStation = stationRepository.getById(downStationId);
-        final Station upStation = stationRepository.getById(upStationId);
-        final Line foundLine = lineRepository.getById(lineId);
-
         final Integer distance = sectionRequest.getDistance();
+
+        final Station downStation = stationRepository.findById(downStationId)
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", downStationId)));
+        final Station upStation = stationRepository.findById(upStationId)
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", upStationId)));
+        final Line foundLine = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", lineId)));
+
         foundLine.addSection(upStation, downStation, distance);
 
         return createSectionResponse(toSection(foundLine, upStation, downStation, distance));
