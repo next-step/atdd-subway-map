@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,12 +109,13 @@ public class LineService {
         final Station upStation = stationRepository.getById(upStationId);
 
         final Integer distance = lineRequest.getDistance();
-        final Section section = new Section(upStation, downStation, distance);
 
-        return new Line.Builder()
+        final Line line = new Line.Builder()
                 .name(lineRequest.getName())
                 .color(lineRequest.getColor())
-                .sections(Arrays.asList(section))
                 .build();
+
+        line.addSection(upStation, downStation, distance);
+        return line;
     }
 }
