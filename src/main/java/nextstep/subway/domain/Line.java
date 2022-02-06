@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.exception.NotFoundException;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,9 +57,6 @@ public class Line extends BaseEntity {
         this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
-    public void deleteLastSection() {
-        this.sections.remove(getLastSection());
-    }
 
     public Section getLastSection() {
         final int lastIndex = this.sections.size() - 1;
@@ -86,6 +85,19 @@ public class Line extends BaseEntity {
         if (stations.contains(downStation)) {
             throw new IllegalArgumentException("등록할 하행종점역은 노선에 등록되지 않은 역만 가능합니다.");
         }
+    }
+
+    public void deleteLastSection(Station station) {
+        if (this.sections.size() <= 1) {
+            throw new IllegalArgumentException("지하철 구간이 1개인 경우 구간을 제거할 수 없습니다.");
+        }
+
+        final Section lastSection = getLastSection();
+        if (!lastSection.getDownStation().equals(station)) {
+            throw new IllegalArgumentException("노선에 등록된 역(하행종점역)만 제거 가능합니다.");
+        }
+
+        this.sections.remove(lastSection);
     }
 
 

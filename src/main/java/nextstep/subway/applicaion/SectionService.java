@@ -12,14 +12,11 @@ import java.util.List;
 @Service
 @Transactional
 public class SectionService {
-    private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
 
-    public SectionService(SectionRepository sectionRepository,
-                          StationRepository stationRepository,
+    public SectionService(StationRepository stationRepository,
                           LineRepository lineRepository) {
-        this.sectionRepository = sectionRepository;
         this.stationRepository = stationRepository;
         this.lineRepository = lineRepository;
     }
@@ -56,28 +53,13 @@ public class SectionService {
         );
     }
 
-
-    private void checkExistingStation(long stationId) {
-        if (!stationRepository.existsById(stationId)) {
-            throw new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", stationId));
-        }
-    }
-
     public void deleteSection(long lineId, long stationId) {
-        checkExistingStation(stationId);
+        final Line foundLine = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", lineId)));
 
-        final Line foundLine = lineRepository.getById(lineId);
-        final List<Section> sections = foundLine.getSections();
-        if (sections.size() <= 1) {
-            throw new IllegalArgumentException("지하철 구간이 1개인 경우 구간을 제거할 수 없습니다.");
-        }
+        final Station foundStation = stationRepository.findById(stationId)
+                .orElseThrow(() -> new NotFoundException(String.format("해당하는 대상을 찾을 수 없습니다. id : %s", stationId)));
 
-        final Station foundStation = stationRepository.getById(stationId);
-        final Section lastSection = sections.get(sections.size() - 1);
-        if (!lastSection.getDownStation().equals(foundStation)) {
-            throw new IllegalArgumentException("노선에 등록된 역(하행종점역)만 제거 가능합니다.");
-        }
-
-        foundLine.deleteLastSection();
+        foundLine.deleteLastSection(foundStation);
     }
 }

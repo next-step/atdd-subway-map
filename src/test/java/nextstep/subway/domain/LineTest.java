@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LineTest {
     @DisplayName("지하철 노선 section 추가시 Line 매핑")
     @Test
-    void createLine() {
+    void createSection() {
         // given
         final Line line = new Line();
         final Station 상행역 = new Station("상행역");
@@ -21,5 +21,11 @@ class LineTest {
 
         // then
         assertThat(line.getSections().get(0).getLine()).isEqualTo(line);
+    }
+
+    @DisplayName("지하철 노선 section 제거시")
+    @Test
+    public void deleteSection() {
+
     }
 }
