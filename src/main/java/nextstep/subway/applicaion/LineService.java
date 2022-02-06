@@ -65,6 +65,7 @@ public class LineService {
         lineRepository.deleteById(id);
     }
 
+
     private LineResponse createLineResponse(Line line) {
         final List<StationResponse> responseStation = new ArrayList<>();
         final List<Section> sections = line.getSections();
@@ -94,11 +95,12 @@ public class LineService {
         return responseList;
     }
 
-    private StationResponse createStationResponse(Station upStation) {
-        return new StationResponse(upStation.getId(),
-                upStation.getName(),
-                upStation.getCreatedDate(),
-                upStation.getModifiedDate());
+    private StationResponse createStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName(),
+                station.getCreatedDate(),
+                station.getModifiedDate());
     }
 
     private Line toLine(LineRequest lineRequest) {

@@ -33,7 +33,7 @@ public class SectionService {
         final Station downStation = stationRepository.getById(downStationId);
         final Station upStation = stationRepository.getById(upStationId);
         final Line foundLine = lineRepository.getById(lineId);
-        validateStationInSection(downStation, upStation, foundLine);
+        foundLine.validateStationInSection(downStation, upStation);
 
         final Section section = sectionRepository.save(
                 toSection(sectionRequest, upStation, downStation, foundLine));
@@ -56,28 +56,6 @@ public class SectionService {
         );
     }
 
-    private void validateStationInSection(Station downStation, Station upStation, Line foundLine) {
-        final List<Section> sections = foundLine.getSections();
-        if (!sections.isEmpty()) {
-            checkUpStation(upStation, sections);
-            checkDownStation(downStation, sections);
-        }
-    }
-
-    private void checkDownStation(Station downStation, List<Section> sections) {
-        final Section lastSection = sections.get(sections.size() - 1);
-        if (lastSection.getDownStation().equals(downStation) ||
-                lastSection.getUpStation().equals(downStation)) {
-            throw new IllegalArgumentException("등록할 하행종점역은 노선에 등록되지 않은 역만 가능합니다.");
-        }
-    }
-
-    private void checkUpStation(Station upStation, List<Section> sections) {
-        final Section lastSection = sections.get(sections.size() - 1);
-        if (!upStation.equals(lastSection.getDownStation())) {
-            throw new IllegalArgumentException("등록할 상행종점역은 노선의 하행종점역이어야 합니다.");
-        }
-    }
 
     private void checkExistingStation(long stationId) {
         if (!stationRepository.existsById(stationId)) {
