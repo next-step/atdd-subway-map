@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.LineFixture.*;
-import static nextstep.subway.utils.HttpRequestResponse.delete;
-import static nextstep.subway.utils.HttpRequestResponse.put;
+import static nextstep.subway.fixture.StationFixture.*;
+import static nextstep.subway.utils.HttpRequestResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선")
@@ -146,4 +147,41 @@ class LineAcceptanceTest extends AcceptanceTest {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         }
     }
+
+    /**
+     * Given 지하철 노선 생성을 요청하고
+     * Given 지하철역을 2개 생성하고
+     * When 지하철 구간 생성을 요청하면
+     * Then 지하철 구간 생성이 성공한다.
+     */
+    @DisplayName("지하철 구간 생성")
+    @Test
+    void createSection() {
+        // given
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상);
+        String 생성된_노선_uri = uri(생성_요청_응답);
+
+        역_생성(강남역_이름);
+        역_생성(역삼역_이름);
+
+        String 상행역_ID = "1";
+        String 하행역_ID = "2";
+        int 상행역과_하행역_사이_거리 = 10;
+
+        // when
+        Map<String, String> section = new HashMap<>();
+        section.put("upStationId", 상행역_ID);
+        section.put("downStationId", 하행역_ID);
+        section.put("distance", Integer.toString(상행역과_하행역_사이_거리));
+
+        ExtractableResponse<Response> 생성결과 = post(section, 생성된_노선_uri+"/sections");
+
+        // then
+        assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(uri(생성결과)).isNotBlank();
+    }
+
+    // TODO: 존재하지 않는 역
+    // TODO: 존재하지 않는 노선
+    // TODO: 구간 등록시, 노선의 하행역 업데이트
 }
