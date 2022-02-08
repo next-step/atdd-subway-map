@@ -1,5 +1,6 @@
 package nextstep.subway.application;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.application.dto.LineRequest;
 import nextstep.subway.application.dto.LineResponse;
 import nextstep.subway.application.dto.SectionRequest;
@@ -14,18 +15,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-
+@RequiredArgsConstructor
 public class LineService {
     private static final String LINE_NAME_IS_ALREADY_REGISTERED = "이미 등록된 노선명입니다.";
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
-
-    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
-        this.lineRepository = lineRepository;
-        this.sectionRepository = sectionRepository;
-        this.stationRepository = stationRepository;
-    }
 
     public LineResponse save(LineRequest request) {
         validate(request.getName());
@@ -88,6 +83,7 @@ public class LineService {
         return createSectionResponse(section);
     }
 
+    // TODO: response로 메서드 이동
     private SectionResponse createSectionResponse(Section section) {
         return new SectionResponse(
                 section.getId(),

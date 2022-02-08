@@ -1,11 +1,13 @@
 package nextstep.subway.domain;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class Section extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,26 +31,6 @@ public class Section extends BaseEntity{
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Line getLine() {
-        return line;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public int getDistance() {
-        return distance;
     }
 
     public Long getUpStationId() {

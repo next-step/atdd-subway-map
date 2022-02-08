@@ -1,5 +1,6 @@
 package nextstep.subway.application;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.application.dto.StationRequest;
 import nextstep.subway.application.dto.StationResponse;
 import nextstep.subway.domain.Station;
@@ -12,13 +13,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class StationService {
     private static final String STATION_NAME_IS_ALREADY_REGISTERED = "이미 등록된 역 이름입니다.";
     private final StationRepository stationRepository;
-
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
 
     public StationResponse save(StationRequest stationRequest) {
         validate(stationRequest.getName());

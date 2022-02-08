@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.application.StationService;
 import nextstep.subway.application.dto.StationRequest;
 import nextstep.subway.application.dto.StationResponse;
@@ -11,12 +12,9 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class StationController {
     private final StationService stationService;
-
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
-    }
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {

@@ -1,45 +1,17 @@
 package nextstep.subway.application.dto;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
+@Getter
 public class SectionResponse {
-    private Long id;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
-
-    public SectionResponse(Long id, Long upStationId, Long downStationId, int distance, LocalDateTime createdDate, LocalDateTime modifiedDate) {
-        this.id = id;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-        this.createdDate = createdDate;
-        this.modifiedDate = modifiedDate;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public LocalDateTime getModifiedDate() {
-        return modifiedDate;
-    }
+    private final Long id;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final int distance;
+    private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 }
