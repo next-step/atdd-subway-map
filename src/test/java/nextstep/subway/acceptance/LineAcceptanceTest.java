@@ -2,9 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -21,58 +19,70 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    @Nested
-    @DisplayName("한개 생성")
-    class createLineTest {
+    /**
+     * When 지하철 노선 생성을 요청 하면
+     * Then 지하철 노선 생성이 성공한다.
+     */
+    @DisplayName("지하철 노선 생성 성공")
+    @Test
+    void success() {
+        // given
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+        
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
 
-        ExtractableResponse<Response> 생성결과;
+        // when
+        ExtractableResponse<Response> 노선생성_결과 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        
 
-        @BeforeEach
-        void setUp() {
-            생성결과 = 지하철_노선_생성(신분당선_이름, 신분당선_색상);
-        }
-
-        /**
-         * When 지하철 노선 생성을 요청 하면
-         * Then 지하철 노선 생성이 성공한다.
-         */
-        @DisplayName("성공")
-        @Test
-        void success() {
-            // then
-            assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-            assertThat(uri(생성결과)).isNotBlank();
-        }
-
-        /**
-         * Given 지하철 노선 생성을 요청하고
-         * When 같은 이름으로 지하철 노선 생성을 요청하면
-         * Then 지하철 노선 생성이 실패한다.
-         */
-        @DisplayName("노선명이 중복이면, 노선 생성 실패")
-        @Test
-        void duplicateNameIsNotAllowed() {
-            //when
-            ExtractableResponse<Response> 중복생성_결과_response = 지하철_노선_생성(신분당선_이름, 신분당선_색상);
-
-            // then
-            assertThat(중복생성_결과_response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        }
+        // then
+        assertThat(노선생성_결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(uri(노선생성_결과)).isNotBlank();
+        assertThat(노선생성_결과.jsonPath().getList("stations")).isNotEmpty(); // TODO : station 리턴을 여기서 검증해야할지 생각해보기
     }
 
-
     /**
+     * Given 지하철 노선 생성을 요청하고
+     * When 같은 이름으로 지하철 노선 생성을 요청하면
+     * Then 지하철 노선 생성이 실패한다.
+     */
+    @DisplayName("지하철 노선명이 중복이면, 노선 생성 실패")
+    @Test
+    void duplicateNameIsNotAllowed() {
+        // given
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+        지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+
+        //when
+        ExtractableResponse<Response> 중복생성_결과_response = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+
+        // then
+        assertThat(중복생성_결과_response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+     /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
      * Then 두 노선이 포함된 지하철 노선 목록을 응답받는다
      */
-    @DisplayName("목록 조회")
+    @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
         /// given
-        지하철_노선_생성(신분당선_이름, 신분당선_색상);
-        지하철_노선_생성(구분당선_이름, 구분당선_색상);
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+        지하철_노선_생성(구분당선_이름, 구분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회("/lines");
@@ -83,74 +93,61 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(lineNames).contains(신분당선_이름, 구분당선_이름);
     }
 
-    @Nested
-    @DisplayName("한개")
-    class ChangeLineStatusTest {
+    /**
+     * Given 지하철 노선 생성을 요청 하면
+     * When 지하철 노선의 정보 수정을 요청 하면
+     * Then 지하철 노선의 정보 수정은 성공한다.
+     */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void updateLine() {
+        // when
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
 
-        String 생성된_노선_uri;
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        String 생성된_노선_uri = uri(생성_요청_응답);
 
-        @BeforeEach
-        void setup() {
-            ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상);
-            생성된_노선_uri = uri(생성_요청_응답);
-        }
+        Map<String, String> 구분당선 = 노선(구분당선_이름, 구분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        ExtractableResponse<Response> response = put(구분당선, 생성된_노선_uri);
 
-        /**
-         * Given 지하철 노선 생성을 요청 하고
-         * When 생성한 지하철 노선 조회를 요청 하면
-         * Then 생성한 지하철 노선을 응답받는다
-         */
-        @DisplayName("조회")
-        @Test
-        void getLine() {
-            // when
-            ExtractableResponse<Response> 조회요청_응답 = 지하철_노선_조회(생성된_노선_uri);
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-            // then
-            assertThat(조회요청_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
-            String lineName = 조회요청_응답.jsonPath().get("name");
-            assertThat(lineName).isEqualTo(신분당선_이름);
-        }
-
-        /**
-         * Given 지하철 노선 생성을 요청 하고
-         * When 지하철 노선의 정보 수정을 요청 하면
-         * Then 지하철 노선의 정보 수정은 성공한다.
-         */
-        @DisplayName("수정")
-        @Test
-        void updateLine() {
-            // when
-            Map<String, String> 구분당선 = 노선(구분당선_이름, 구분당선_색상);
-            ExtractableResponse<Response> response = put(구분당선, 생성된_노선_uri);
-
-            // then
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-            ExtractableResponse<Response> updatedLine = 지하철_노선_조회(생성된_노선_uri);
-            String updateName = updatedLine.jsonPath().get("name");
-            assertThat(updateName).isEqualTo(구분당선_이름);
-        }
-
-        /**
-         * Given 지하철 노선 생성을 요청 하고
-         * When 생성한 지하철 노선 삭제를 요청 하면
-         * Then 생성한 지하철 노선 삭제가 성공한다.
-         */
-        @DisplayName("삭제")
-        @Test
-        void deleteLine() {
-           // when
-            ExtractableResponse<Response> response = delete(생성된_노선_uri);
-
-            // then
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        }
+        ExtractableResponse<Response> updatedLine = 지하철_노선_조회(생성된_노선_uri);
+        String updateName = updatedLine.jsonPath().get("name");
+        assertThat(updateName).isEqualTo(구분당선_이름);
     }
 
     /**
-     * Given 지하철 노선 생성을 요청하고
+     * Given 지하철 노선 생성을 요청 하고
+     * When 생성한 지하철 노선 삭제를 요청 하면
+     * Then 생성한 지하철 노선 삭제가 성공한다.
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        String 생성된_노선_uri = uri(생성_요청_응답);
+
+        // when
+        ExtractableResponse<Response> response = delete(생성된_노선_uri);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
      * Given 지하철역을 2개 생성하고
+     * Given 지하철 노선 생성을 요청하고
      * When 지하철 구간 생성을 요청하면
      * Then 지하철 구간 생성이 성공한다.
      */
@@ -158,7 +155,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createSection() {
         // given
-        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상);
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
         String 생성된_노선_uri = uri(생성_요청_응답);
 
         역_생성(강남역_이름);
@@ -180,8 +183,4 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(uri(생성결과)).isNotBlank();
     }
-
-    // TODO: 존재하지 않는 역
-    // TODO: 존재하지 않는 노선
-    // TODO: 구간 등록시, 노선의 하행역 업데이트
 }

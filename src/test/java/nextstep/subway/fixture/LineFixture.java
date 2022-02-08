@@ -20,15 +20,18 @@ public class LineFixture {
         return get(uri);
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color) {
-        Map<String, String> line = 노선(name, color);
+    public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, String> line = 노선(name, color, upStationId, downStationId, distance);
         return post(line, "/lines");
     }
 
-    public static Map<String, String> 노선(String name, String color) {
+    public static Map<String, String> 노선(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, String> line = new HashMap<>();
         line.put("name", name);
         line.put("color", color);
+        line.put("upStationId", Long.toString(upStationId));
+        line.put("downStationId", Long.toString(downStationId));
+        line.put("distance", Integer.toString(distance));
         return line;
     }
 }

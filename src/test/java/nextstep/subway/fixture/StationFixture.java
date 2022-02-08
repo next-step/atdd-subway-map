@@ -15,8 +15,6 @@ public class StationFixture {
 
     public static ExtractableResponse<Response> 역_생성(String name) {
         Map<String, String> station = station(name);
-
-        // when
         return post(station, "/stations");
     }
 
@@ -24,5 +22,9 @@ public class StationFixture {
         Map<String, String> station = new HashMap<>();
         station.put("name", name);
         return station;
+    }
+
+    public static Long stationId(ExtractableResponse<Response> response) {
+        return (long) (int) response.body().jsonPath().get("id");
     }
 }

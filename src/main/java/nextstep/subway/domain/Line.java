@@ -2,7 +2,10 @@ package nextstep.subway.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 public class Line extends BaseEntity {
@@ -43,5 +46,14 @@ public class Line extends BaseEntity {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public List<Station> getStations() {
+        Stream<Station> upStations = sections.stream().map(Section::getUpStation);
+        Stream<Station> downStations = sections.stream().map(Section::getDownStation);
+        return Stream.concat(upStations, downStations)
+                .distinct()
+                .sorted(Comparator.comparing(Station::getId))
+                .collect(Collectors.toList());
     }
 }

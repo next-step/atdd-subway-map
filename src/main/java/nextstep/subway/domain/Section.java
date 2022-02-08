@@ -1,8 +1,11 @@
 package nextstep.subway.domain;
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor
 public class Section extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

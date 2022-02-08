@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+
 public class LineService {
     private static final String LINE_NAME_IS_ALREADY_REGISTERED = "이미 등록된 노선명입니다.";
     private final LineRepository lineRepository;
@@ -30,7 +31,12 @@ public class LineService {
         validate(request.getName());
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        return createLineResponse(line);
+
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(NoSuchElementException::new);
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(NoSuchElementException::new);
+        sectionRepository.save(new Section(line, upStation, downStation));
+
+        return createLineResponse(line, List.of(upStation, downStation));
     }
 
     private void validate(String lineName) {
@@ -44,24 +50,25 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(this::createLineResponse)
+                .map(line -> createLineResponse(line, line.getStations()))
                 .collect(Collectors.toList());
 
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getCreatedDate(),
-                line.getModifiedDate()
-        );
+    private LineResponse createLineResponse(Line line, List<Station> stations) {
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(stations)
+                .createdDate(line.getCreatedDate())
+                .modifiedDate(line.getModifiedDate())
+                .build();
     }
 
     public LineResponse findBy(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        return this.createLineResponse(line);
+        return this.createLineResponse(line, line.getStations());
     }
 
     public void updateBy(Long id, LineRequest request) {
