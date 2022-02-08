@@ -18,9 +18,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LineService {
     private static final String LINE_NAME_IS_ALREADY_REGISTERED = "이미 등록된 노선명입니다.";
+    public static final String GIVEN_LINE_ID_IS_NOT_REGISTERED = "등록되지 않은 노선 ID입니다.";
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
+    private final StationService stationService;
 
     public LineResponse save(LineRequest request) {
         validate(request.getName());
@@ -62,13 +64,16 @@ public class LineService {
     }
 
     public LineResponse findBy(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        Line line = line(id);
         return this.createLineResponse(line, line.getStations());
     }
 
+    private Line line(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
+    }
+
     public void updateBy(Long id, LineRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        line.update(request.getName(), request.getColor());
+        line(id).update(request.getName(), request.getColor());
     }
 
     public void deleteBy(Long id) {
@@ -76,9 +81,9 @@ public class LineService {
     }
 
     public SectionResponse addSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = lineRepository.findById(lineId).orElseThrow(NoSuchElementException::new);
-        Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(NoSuchElementException::new);
-        Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(NoSuchElementException::new);
+        Line line = line(lineId);
+        Station upStation = stationService.findBy(sectionRequest.getUpStationId());
+        Station downStation = stationService.findBy(sectionRequest.getDownStationId());
         Section section = sectionRepository.save(new Section(line, upStation, downStation));
         return createSectionResponse(section);
     }
