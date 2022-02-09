@@ -13,6 +13,8 @@ public class Section extends BaseEntity{
     private static final String GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE = "이미 등록된 노선명입니다.";
     @Transient
     private static final String UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE = "새로운 구간의 상행역은 노선의 하행 종점역이어야만 합니다.";
+    @Transient
+    private static final String ONLY_LAST_STATION_OF_LINE_CAN_BE_DELETED = "지하철 노선의 마지막 역만 삭제신청할 수 있습니다.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,5 +67,11 @@ public class Section extends BaseEntity{
 
     public Long getDownStationId() {
         return this.downStation.getId();
+    }
+
+    public static void validateDeleteSectionRequest(Line line, Station station) {
+        if (!line.isDownStation(station)) {
+            throw new IllegalArgumentException(ONLY_LAST_STATION_OF_LINE_CAN_BE_DELETED);
+        }
     }
 }

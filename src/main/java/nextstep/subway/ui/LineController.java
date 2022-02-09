@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
 
@@ -59,8 +60,8 @@ public class LineController {
 
 
     @DeleteMapping (value = "/{id}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId) {
-        sectionService.deleteBy(lineId);
+    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId, HttpServletRequest request) {
+        sectionService.deleteBy(lineId, Long.valueOf(request.getParameter("stationId")));
         return ResponseEntity.noContent().build();
     }
 }

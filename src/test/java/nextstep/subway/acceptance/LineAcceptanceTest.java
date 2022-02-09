@@ -273,10 +273,45 @@ class LineAcceptanceTest extends AcceptanceTest {
         post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
         // when
-        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections");
+        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=3");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청하고
+     * Given 두번째 지하철 구간 생성을 요청하고
+     * When 첫번째 구간 제거 요청하면
+     * Then 구간 삭제 실패한다.
+     */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void onlyLastSectionIsRemovable() {
+        // given
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        String 생성된_노선_uri = uri(생성_요청_응답);
+
+        ExtractableResponse<Response> 새구간_하행역_생성결괴 = 역_생성(대림역_이름);
+
+        Long 하행역_ID = stationId(새구간_하행역_생성결괴);
+        int 상행역과_하행역_사이_거리 = 10;
+
+        // given
+        Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
+        post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+
+        // when
+        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=1");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -312,7 +347,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(((ArrayList)response.jsonPath().getList("stations").get(0)).size()).isEqualTo(3);
+        assertThat(((ArrayList<?>)response.jsonPath().getList("stations").get(0)).size()).isEqualTo(3);
     }
 
 }
