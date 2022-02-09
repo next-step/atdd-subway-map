@@ -19,12 +19,12 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    @Transactional
+
     public StationResponse saveStation(StationRequest stationRequest) {
         final String name = stationRequest.getName();
 
-        if (stationRepository.findByName(name).isPresent()) {
-            throw new RuntimeException(String.format("이미 존재하는 역입니다. %s : %s", name));
+        if (stationRepository.existsByName(name)) {
+            throw new IllegalArgumentException(String.format("이미 존재하는 역입니다. : %s", name));
         }
 
         Station station = stationRepository.save(new Station(name));
@@ -40,7 +40,7 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStationById(long id) {
         stationRepository.deleteById(id);
     }
 

@@ -3,6 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,12 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
-        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        try {
+            LineResponse line = lineService.saveLine(lineRequest);
+            return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,17 +36,22 @@ public class LineController {
     }
 
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        return ResponseEntity.ok().body(lineService.findLineById(id));
+    public ResponseEntity<LineResponse> getLine(@PathVariable long id) {
+        final LineResponse foundLine = lineService.findLineById(id);
+        return ResponseEntity.ok().body(foundLine);
     }
 
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LineResponse> editLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        return ResponseEntity.ok().body(lineService.editLineById(id, lineRequest));
+    public ResponseEntity<LineResponse> editLine(@PathVariable long id, @RequestBody LineRequest lineRequest) {
+        try {
+            return ResponseEntity.ok().body(lineService.editLineById(id, lineRequest));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }

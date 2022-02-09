@@ -14,29 +14,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class StationUtils {
-    public static List<Map<String, String>> Station_데이터_생성(List<String> names) {
-        List<Map<String, String>> results = new ArrayList<>();
+    public static List<Map<String, Object>> 지하철_역_데이터_생성(List<String> names) {
+        List<Map<String, Object>> results = new ArrayList<>();
         for (String name : names) {
-            results.add(Station_데이터_생성(name));
+            results.add(지하철_역_데이터_생성(name));
         }
         return results;
     }
 
-    public static Map<String, String> Station_데이터_생성(String name) {
-        Map<String, String> params = new HashMap<>();
+    public static Map<String, Object> 지하철_역_데이터_생성(String name) {
+        Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         return params;
     }
 
-    public static List<ExtractableResponse<Response>> Station_생성_요청(List<Map<String, String>> params) {
+    public static List<ExtractableResponse<Response>> 지하철_역_생성_요청(List<Map<String, Object>> params) {
         List<ExtractableResponse<Response>> responseList = new ArrayList<>();
-        for (Map<String, String> param : params) {
-            responseList.add(Station_생성_요청(param));
+        for (Map<String, Object> param : params) {
+            responseList.add(지하철_역_생성_요청(param));
         }
         return responseList;
     }
 
-    public static ExtractableResponse<Response> Station_생성_요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철_역_생성_요청(Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -46,7 +46,7 @@ public class StationUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> Station_목록_요청() {
+    public static ExtractableResponse<Response> 지하철_역_목록_요청() {
         return RestAssured.given().log().all()
                 .when()
                 .get("/stations")
@@ -54,7 +54,7 @@ public class StationUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> Station_삭제_요청(String uri) {
+    public static ExtractableResponse<Response> 지하철_역_삭제_요청(String uri) {
         return RestAssured.given().log().all()
                 .when()
                 .delete(uri)
@@ -67,7 +67,7 @@ public class StationUtils {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    public static void 생성요청_Station_name_list와_생성된_Station_name_list가_동일함(List<ExtractableResponse<Response>> requestList, ExtractableResponse<Response> responseList) {
+    public static void 생성요청한_지하철역들과_생성된_지하철역_목록이_동일함(List<ExtractableResponse<Response>> requestList, ExtractableResponse<Response> responseList) {
         final List<String> requestNames = requestList.stream()
                 .map(r -> r.body())
                 .map(r -> r.jsonPath().get("name"))
@@ -85,7 +85,7 @@ public class StationUtils {
     }
 
     public static void 중복이름으로_지하철_역_생성_실패함(ExtractableResponse<Response> duplicateResponse) {
-        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(duplicateResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     public static void 삭제요청한_지하철_역이_존재하지_않음(ExtractableResponse<Response> response) {
