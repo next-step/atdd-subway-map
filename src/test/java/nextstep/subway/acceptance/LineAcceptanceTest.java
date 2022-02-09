@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.fixture.SectionFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.LineFixture.*;
+import static nextstep.subway.fixture.SectionFixture.*;
 import static nextstep.subway.fixture.StationFixture.*;
 import static nextstep.subway.utils.HttpRequestResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -164,20 +166,17 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
         String 생성된_노선_uri = uri(생성_요청_응답);
 
-        역_생성(강남역_이름);
-        역_생성(역삼역_이름);
+        ExtractableResponse<Response> 새구간_상행역_생성결과 = 역_생성(구로역_이름);
+        ExtractableResponse<Response> 새구간_하행역_생성결괴 = 역_생성(대림역_이름);
 
-        String 상행역_ID = "1";
-        String 하행역_ID = "2";
+        Long 상행역_ID = stationId(새구간_상행역_생성결과);
+        Long 하행역_ID = stationId(새구간_하행역_생성결괴);
         int 상행역과_하행역_사이_거리 = 10;
 
         // when
-        Map<String, String> section = new HashMap<>();
-        section.put("upStationId", 상행역_ID);
-        section.put("downStationId", 하행역_ID);
-        section.put("distance", Integer.toString(상행역과_하행역_사이_거리));
+        Map<String, String> 구간_생성요청_dto = 구간(상행역_ID, 하행역_ID, 상행역과_하행역_사이_거리);
 
-        ExtractableResponse<Response> 생성결과 = post(section, 생성된_노선_uri+"/sections");
+        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
         // then
         assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());

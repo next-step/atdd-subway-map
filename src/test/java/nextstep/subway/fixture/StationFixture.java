@@ -12,6 +12,8 @@ public class StationFixture {
 
     public static final String 강남역_이름 = "강남역";
     public static final String 역삼역_이름 = "역삼역";
+    public static final String 구로역_이름 = "구로역";
+    public static final String 대림역_이름 = "대림역";
 
     public static ExtractableResponse<Response> 역_생성(String name) {
         Map<String, String> station = station(name);
