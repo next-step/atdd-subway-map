@@ -74,7 +74,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * Given 지하철 노선 생성을 요청하고,
      *       노선에 구간을 추가한다.
      * When 하행 종점역으로 마지막 구간 삭제 요청을 한다.
-     * Then 노선에 구간 삭제가 실패한다.
+     * Then 노선에 마지막 구간이 삭제된다.
      */
     @DisplayName("지하철 구간 삭제하기")
     @Test
@@ -119,7 +119,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
      *
      * Given 지하철 노선 생성을 요청하고
      * When 하행 종점역이 아닌 역으로 마지막 구간 삭제 요청을 한다.
-     * Then 노선에 마지막 구간이 삭제된다.
+     * Then 노선에 구간 삭제가 실패한다.
      */
     @DisplayName("지하철 구간 삭제 실패 - 마지막 구간 하행역이 아닌 경우")
     @Test
