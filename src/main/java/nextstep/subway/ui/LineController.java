@@ -27,8 +27,6 @@ public class LineController {
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -49,8 +47,6 @@ public class LineController {
             return ResponseEntity.ok().body(lineService.editLineById(id, lineRequest));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
