@@ -1,12 +1,7 @@
 package nextstep.subway.fixture;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import static nextstep.subway.utils.HttpRequestResponse.post;
 
 public class SectionFixture {
 

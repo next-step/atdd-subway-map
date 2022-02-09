@@ -4,17 +4,17 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.fixture.CommonFixture.uri;
+import static nextstep.subway.utils.httpresponse.Header.*;
 import static nextstep.subway.fixture.LineFixture.*;
 import static nextstep.subway.fixture.SectionFixture.구간;
 import static nextstep.subway.fixture.StationFixture.*;
-import static nextstep.subway.utils.HttpRequestResponse.*;
+import static nextstep.subway.utils.httpresponse.Response.*;
+import static nextstep.subway.utils.httpresponse.StatusCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선")
@@ -39,9 +39,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         
 
         // then
-        assertThat(노선생성_결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        created(노선생성_결과);
         assertThat(uri(노선생성_결과)).isNotBlank();
-        assertThat(노선생성_결과.jsonPath().getList("stations")).isNotEmpty(); // TODO : station 리턴을 여기서 검증해야할지 생각해보기
     }
 
     /**
@@ -64,7 +63,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 중복생성_결과_response = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
 
         // then
-        assertThat(중복생성_결과_response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        badRequest(중복생성_결과_response);
     }
 
      /**
@@ -89,7 +88,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회("/lines");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ok(response);
         List<String> lineNames = response.jsonPath().getList("name");
         assertThat(lineNames).contains(신분당선_이름, 구분당선_이름);
     }
@@ -115,7 +114,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = put(구분당선, 생성된_노선_uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ok(response);
 
         ExtractableResponse<Response> updatedLine = 지하철_노선_조회(생성된_노선_uri);
         String updateName = updatedLine.jsonPath().get("name");
@@ -143,7 +142,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = delete(생성된_노선_uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        noContent(response);
     }
 
     /**
@@ -176,7 +175,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
         // then
-        assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        created(생성결과);
         assertThat(uri(생성결과)).isNotBlank();
     }
 
@@ -211,7 +210,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
         // then
-        assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        badRequest(생성결과);
     }
 
     /**
@@ -241,7 +240,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
         // then
-        assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        badRequest(생성결과);
     }
 
     /**
@@ -276,7 +275,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=3");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        noContent(response);
     }
 
     /**
@@ -311,7 +310,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=1");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        badRequest(response);
     }
 
     /**
@@ -336,7 +335,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=2");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        badRequest(response);
     }
 
     /**
@@ -371,7 +370,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회("/lines");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ok(response);
         assertThat(((ArrayList<?>)response.jsonPath().getList("stations").get(0)).size()).isEqualTo(3);
     }
 

@@ -6,8 +6,8 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.utils.HttpRequestResponse.get;
-import static nextstep.subway.utils.HttpRequestResponse.post;
+import static nextstep.subway.utils.httpresponse.Response.get;
+import static nextstep.subway.utils.httpresponse.Response.post;
 
 public class LineFixture {
     public static final String 신분당선_이름 = "신분당선";

@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.utils.HttpRequestResponse.post;
+import static nextstep.subway.utils.httpresponse.Response.post;
 
 public class StationFixture {
 
