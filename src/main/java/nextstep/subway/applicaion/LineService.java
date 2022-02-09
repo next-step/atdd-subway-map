@@ -68,10 +68,8 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
         final List<StationResponse> responseStation = new ArrayList<>();
-        final List<Section> sections = line.getSections();
-        if (!sections.isEmpty()) {
-            responseStation.addAll(createStationResponses(sections));
-        }
+        final Sections sections = line.getSections();
+        responseStation.addAll(createStationResponses(sections));
 
         return new LineResponse(line.getId(),
                 line.getName(),
@@ -81,12 +79,12 @@ public class LineService {
                 line.getModifiedDate());
     }
 
-    private List<StationResponse> createStationResponses(List<Section> sections) {
+    private List<StationResponse> createStationResponses(Sections sections) {
         List<StationResponse> responseList = new ArrayList<>();
-        final StationResponse firstStation = createStationResponse(sections.get(0).getUpStation());
+        final StationResponse firstStation = createStationResponse(sections.getFirstStation());
         responseList.add(firstStation);
 
-        for (Section section : sections) {
+        for (Section section : sections.sections()) {
             final Station downStation = section.getDownStation();
             final StationResponse downStationResponse = createStationResponse(downStation);
             responseList.add(downStationResponse);

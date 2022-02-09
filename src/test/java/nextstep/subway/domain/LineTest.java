@@ -20,6 +20,9 @@ class LineTest {
         line.addSection(상행역, 하행역, distance);
 
         // then
-        assertThat(line.getSections().get(0).getLine()).isEqualTo(line);
+        assertThat(line.getSections()
+                .sections()
+                .get(0)
+                .getLine()).isEqualTo(line);
     }
 }
