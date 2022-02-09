@@ -34,12 +34,21 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public List<Station> getStations() {
+    public List<Station> stations() {
         Stream<Station> upStations = sections.stream().map(Section::getUpStation);
         Stream<Station> downStations = sections.stream().map(Section::getDownStation);
         return Stream.concat(upStations, downStations)
                 .distinct()
                 .sorted(Comparator.comparing(Station::getId))
                 .collect(Collectors.toList());
+    }
+
+    public boolean isDownStation(Station station) {
+        return downStation().equals(station);
+    }
+
+    private Station downStation() {
+        List<Station> stations = stations();
+        return stations.get(stations.size() - 1);
     }
 }
