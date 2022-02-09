@@ -5,17 +5,28 @@ import static nextstep.subway.acceptance.LineSteps.deleteLineRequest;
 import static nextstep.subway.acceptance.LineSteps.getLineRequest;
 import static nextstep.subway.acceptance.LineSteps.getLinesRequest;
 import static nextstep.subway.acceptance.LineSteps.updateLineRequest;
+import static nextstep.subway.acceptance.StationSteps.createStationRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철 노선 관리 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+    @BeforeEach
+    void setup() {
+        createStationRequest("강남역");
+        createStationRequest("양재역");
+        createStationRequest("양재시민의숲역");
+        createStationRequest("청계산입구역");
+        createStationRequest("판교역");
+    }
+
     /**
      * When 지하철 노선 생성을 요청 하면
      * Then 지하철 노선 생성이 성공한다.
@@ -24,7 +35,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createLineRequest("신분당선", "bg-red-600");
+        ExtractableResponse<Response> response = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -43,11 +54,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name1 = "신분당선";
         String color1 = "bg-red-600";
-        createLineRequest(name1, color1);
+        createLineRequest(name1, color1, 4L, 2L, 10);
 
         String name2 = "2호선";
         String color2 = "bg-green-600";
-        createLineRequest(name2, color2);
+        createLineRequest(name2, color2, 2L, 5L, 20);
 
         // when
         ExtractableResponse<Response> response = getLinesRequest();
@@ -68,7 +79,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name = "신분당선";
         String color = "bg-red-600";
-        ExtractableResponse<Response> createResponse = createLineRequest(name, color);
+        ExtractableResponse<Response> createResponse = createLineRequest(name, color, 4L, 2L, 10);
 
         // when
         String uri = createResponse.header("Location");
@@ -91,13 +102,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name = "신분당선";
         String color = "bg-red-600";
-        ExtractableResponse<Response> createResponse = createLineRequest(name, color);
+        ExtractableResponse<Response> createResponse = createLineRequest(name, color, 4L, 2L, 10);
 
         // when
         String newName = "구분당선";
         String newColor = "bg-blue-600";
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = updateLineRequest(uri, newName, newColor);
+        ExtractableResponse<Response> response = updateLineRequest(uri, newName, newColor, 4L, 10L, 20);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -114,7 +125,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name = "신분당선";
         String color = "bg-red-600";
-        ExtractableResponse<Response> createResponse = createLineRequest(name, color);
+        ExtractableResponse<Response> createResponse = createLineRequest(name, color, 4L, 2L, 10);
 
         // when
         String uri = createResponse.header("Location");
@@ -135,10 +146,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         String name = "신분당선";
         String color = "bg-red-600";
-        createLineRequest(name, color);
+        createLineRequest(name, color, 4L, 2L, 10);
 
         // when
-        ExtractableResponse<Response> response = createLineRequest(name, color);
+        ExtractableResponse<Response> response = createLineRequest(name, color, 4L, 2L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());

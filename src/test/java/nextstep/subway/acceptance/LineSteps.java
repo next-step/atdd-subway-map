@@ -10,8 +10,8 @@ import org.springframework.http.MediaType;
 
 public class LineSteps {
 
-    public static ExtractableResponse<Response> createLineRequest(String name, String color) {
-        Map<String, String> params = makeLineParams(name, color);
+    public static ExtractableResponse<Response> createLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, String> params = makeLineParams(name, color, upStationId, downStationId, distance);
 
         return RestAssured.given().log().all()
             .body(params)
@@ -38,8 +38,8 @@ public class LineSteps {
             .extract();
     }
 
-    public static ExtractableResponse<Response> updateLineRequest(String uri, String name, String color) {
-        Map<String, String> params = makeLineParams(name, color);
+    public static ExtractableResponse<Response> updateLineRequest(String uri, String name, String color, Long upStationId, Long downStationId, int distance) {
+        Map<String, String> params = makeLineParams(name, color, upStationId, downStationId, distance);
 
         return RestAssured.given().log().all()
             .contentType(ContentType.JSON)
@@ -58,10 +58,13 @@ public class LineSteps {
             .extract();
     }
 
-    private static Map<String, String> makeLineParams(String name, String color) {
+    private static Map<String, String> makeLineParams(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
+        params.put("upStationId", upStationId.toString());
+        params.put("downStationId",downStationId.toString());
+        params.put("distance", String.valueOf(distance));
 
         return params;
     }

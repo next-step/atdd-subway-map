@@ -17,4 +17,11 @@ public class ExceptionAdvice {
             duplicateException.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidRequestException.class)
+    public ErrorResponse handleInvalidRequestException(HttpServletRequest request, InvalidRequestException invalidRequestException) {
+        return ErrorResponse.of(request.getRequestURI(), HttpStatus.BAD_REQUEST,
+            invalidRequestException.getMessage());
+    }
+
 }
