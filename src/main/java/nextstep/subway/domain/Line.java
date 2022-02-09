@@ -64,4 +64,8 @@ public class Line extends BaseEntity {
         int lastSectionIdx = sections.size() - 1;
         sections.remove(lastSectionIdx);
     }
+
+    public boolean hasOnlyOneSection() {
+        return sections.size() == 1;
+    }
 }

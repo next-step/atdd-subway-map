@@ -285,7 +285,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 첫번째 구간 제거 요청하면
      * Then 구간 삭제 실패한다.
      */
-    @DisplayName("지하철 구간 삭제")
+    @DisplayName("마지막 구간 이외의 구간은 삭제 할 수 없다.")
     @Test
     void onlyLastSectionIsRemovable() {
         // given
@@ -309,6 +309,31 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=1");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청하고
+     * When 구간을 제거 요청하면
+     * Then 구간 삭제 실패한다.
+     */
+    @DisplayName("마지막 구간 이외의 구간은 삭제 할 수 없다.")
+    @Test
+    void sectionIsRemovableWhenLineHasMoreThan2Section() {
+        // given
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        String 생성된_노선_uri = uri(생성_요청_응답);
+
+        // when
+        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=2");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
