@@ -9,6 +9,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 public class Section extends BaseEntity{
+    @Transient
+    private static final String GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE = "이미 등록된 노선명입니다.";
+    @Transient
+    private static final String UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE = "새로운 구간의 상행역은 노선의 하행 종점역이어야만 합니다.";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,9 +33,30 @@ public class Section extends BaseEntity{
     private int distance;
 
     public Section(Line line, Station upStation, Station downStation) {
+        validate(line, upStation, downStation);
+
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
+    }
+
+    private void validate(Line line, Station upStation, Station downStation) {
+        if(line.hasAnyStation()) {
+            validateUpStation(line, upStation);
+            validateDownStation(line, downStation);
+        }
+    }
+
+    private void validateUpStation(Line line, Station upStation) {
+        if (!line.isDownStation(upStation))  {
+            throw new IllegalArgumentException(UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE);
+        }
+    }
+
+    private void validateDownStation(Line line, Station downStation) {
+        if (line.has(downStation))  {
+            throw new IllegalArgumentException(GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE);
+        }
     }
 
     public Long getUpStationId() {

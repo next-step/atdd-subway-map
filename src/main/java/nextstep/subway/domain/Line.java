@@ -51,4 +51,12 @@ public class Line extends BaseEntity {
         List<Station> stations = stations();
         return stations.get(stations.size() - 1);
     }
+
+    public boolean has(Station station) {
+        return stations().contains(station);
+    }
+
+    public boolean hasAnyStation() {
+        return !sections.isEmpty();
+    }
 }

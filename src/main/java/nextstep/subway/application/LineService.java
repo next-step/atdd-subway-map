@@ -11,15 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class LineService {
     private static final String LINE_NAME_IS_ALREADY_REGISTERED = "이미 등록된 노선명입니다.";
-    public static final String GIVEN_LINE_ID_IS_NOT_REGISTERED = "등록되지 않은 노선 ID입니다.";
-    public static final String UPSTATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE = "새로운 구간의 상행역은 노선의 하행 종점역이어야만 합니다.";
+    private static final String GIVEN_LINE_ID_IS_NOT_REGISTERED = "등록되지 않은 노선 ID입니다.";
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
     private final StationService stationService;
@@ -69,17 +67,9 @@ public class LineService {
     public SectionResponse addSection(Long lineId, SectionRequest sectionRequest) {
         Line line = line(lineId);
         Station upStation = stationService.findBy(sectionRequest.getUpStationId());
-
-        validate(line, upStation);
-
         Station downStation = stationService.findBy(sectionRequest.getDownStationId());
         Section section = sectionRepository.save(new Section(line, upStation, downStation));
         return SectionResponse.of(section);
     }
 
-    private void validate(Line line, Station station) {
-        if (!line.isDownStation(station))  {
-            throw new IllegalArgumentException(UPSTATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE);
-        }
-    }
 }

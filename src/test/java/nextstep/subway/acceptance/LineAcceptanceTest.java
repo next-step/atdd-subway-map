@@ -2,18 +2,16 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.fixture.SectionFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.LineFixture.*;
-import static nextstep.subway.fixture.SectionFixture.*;
+import static nextstep.subway.fixture.SectionFixture.구간;
 import static nextstep.subway.fixture.StationFixture.*;
 import static nextstep.subway.utils.HttpRequestResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -166,15 +164,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
         String 생성된_노선_uri = uri(생성_요청_응답);
 
-        ExtractableResponse<Response> 새구간_상행역_생성결과 = 역_생성(구로역_이름);
         ExtractableResponse<Response> 새구간_하행역_생성결괴 = 역_생성(대림역_이름);
 
-        Long 상행역_ID = stationId(새구간_상행역_생성결과);
         Long 하행역_ID = stationId(새구간_하행역_생성결괴);
         int 상행역과_하행역_사이_거리 = 10;
 
         // when
-        Map<String, String> 구간_생성요청_dto = 구간(상행역_ID, 하행역_ID, 상행역과_하행역_사이_거리);
+        Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
 
         ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
@@ -185,13 +181,14 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철 노선 생성을 요청하고
+     * Given 새 역을 생성하고
      * When 노선의 역 중, 하행 종점역 외의 역을 새 구간의 상행역으로 지정하고
      * When 구간 생성요청시
      * Then 구간 생성이 실패한다.
      */
     @DisplayName("히헹 종점역 이외의 역을 구간의 상행역으로 지정시, 구간 생성 실패")
     @Test
-    void lastDownStationIsNewUpStation() {
+    void newUpStation() {
         // given
         ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
         ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
@@ -209,6 +206,36 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // when
         Map<String, String> 구간_생성요청_dto = 구간(상행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
+
+        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+
+        // then
+        assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청하고
+     * When 노선에 이미 등록된 역을 새 구간의 하행역으로 지정하고
+     * When 구간 생성요청시
+     * Then 구간 생성이 실패한다.
+     */
+    @DisplayName("노선에 이미 등록된 역을 새 구간의 하행역으로 지정시, 구간 생성 실패")
+    @Test
+    void newDownStation() {
+        // given
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+
+        String 생성된_노선_uri = uri(생성_요청_응답);
+        int 상행역과_하행역_사이_거리 = 10;
+
+        // when
+        Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행종점_ID, 상행역과_하행역_사이_거리);
 
         ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
 
