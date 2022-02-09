@@ -51,7 +51,7 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    private Line line(Long id) {
+    public Line line(Long id) {
         return lineRepository.findById(id)
                             .orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
     }
@@ -72,4 +72,6 @@ public class LineService {
         return SectionResponse.of(section);
     }
 
+    public void deleteSectionBy(Long lineId, Long sectionId) {
+    }
 }

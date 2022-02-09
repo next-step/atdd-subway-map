@@ -47,7 +47,7 @@ public class Line extends BaseEntity {
         return downStation().equals(station);
     }
 
-    private Station downStation() {
+    public Station downStation() {
         List<Station> stations = stations();
         return stations.get(stations.size() - 1);
     }
@@ -58,5 +58,10 @@ public class Line extends BaseEntity {
 
     public boolean hasAnyStation() {
         return !sections.isEmpty();
+    }
+
+    public void removeLastSection() {
+        int lastSectionIdx = sections.size() - 1;
+        sections.remove(lastSectionIdx);
     }
 }

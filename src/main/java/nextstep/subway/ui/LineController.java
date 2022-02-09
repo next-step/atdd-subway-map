@@ -2,6 +2,7 @@ package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.application.LineService;
+import nextstep.subway.application.SectionService;
 import nextstep.subway.application.dto.LineRequest;
 import nextstep.subway.application.dto.LineResponse;
 import nextstep.subway.application.dto.SectionRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LineController {
     private final LineService lineService;
+    private final SectionService sectionService;
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
@@ -53,5 +55,12 @@ public class LineController {
                                               @RequestBody SectionRequest sectionRequest) {
         SectionResponse section = lineService.addSection(lineId, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/"+ section.getId())).body(section);
+    }
+
+
+    @DeleteMapping (value = "/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId) {
+        sectionService.deleteBy(lineId);
+        return ResponseEntity.noContent().build();
     }
 }
