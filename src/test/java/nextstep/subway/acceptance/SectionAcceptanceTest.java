@@ -69,6 +69,27 @@ class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Scenario: 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+     *
+     * Given 지하철 노선 생성을 요청하고
+     * When 새로운 구간의 상행역을 해당 노선의 하행 종점역이 아닌 다른 역으로 요청하면
+     * Then 노선에 구간 추가가 실패한다.
+     */
+    @DisplayName("지하철 구간 추가 실패 - 새로운 구간의 상행역을 해당 노선의 하행 종점역이 아닌 다른 역으로 요청할 경우")
+    @Test
+    void addSectionWithDoesNotLastStation() {
+        // given
+        ExtractableResponse<Response> createLineResponse = createLineRequest("신분당선", "bg-red-600", 4L, 2L, 10);
+
+        // when
+        String uri = createLineResponse.header("Location");
+        ExtractableResponse<Response> response = addSectionRequest(uri, 3L, 4L, 10);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
      * Scenario: 구간 삭제하기
      *
      * Given 지하철 노선 생성을 요청하고,
