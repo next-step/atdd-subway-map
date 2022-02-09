@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -276,6 +277,42 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    /**
+     * Given 지하철 노선 생성을 요청 하고
+     * Given 지하철 구간 생성을 요청하고
+     * When 지하철 노선을 조회하면
+     * Then 지하철 역이 구간 순서대로 조회된다.
+     */
+    @DisplayName("지하철 역 목록 조회")
+    @Test
+    void getStations() {
+        // given
+        ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
+        ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
+
+        Long 상행종점_ID = stationId(상행종점_생성결과);
+        Long 하행종점_ID = stationId(하행종점_생성결과);
+
+        ExtractableResponse<Response> 생성_요청_응답 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
+        String 생성된_노선_uri = uri(생성_요청_응답);
+
+        ExtractableResponse<Response> 새구간_하행역_생성결괴 = 역_생성(대림역_이름);
+
+        Long 하행역_ID = stationId(새구간_하행역_생성결괴);
+        int 상행역과_하행역_사이_거리 = 10;
+
+        // given
+        Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
+        post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회("/lines");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(((ArrayList)response.jsonPath().getList("stations").get(0)).size()).isEqualTo(3);
     }
 
 }
