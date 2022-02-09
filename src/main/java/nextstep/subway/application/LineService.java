@@ -21,7 +21,6 @@ public class LineService {
     public static final String GIVEN_LINE_ID_IS_NOT_REGISTERED = "등록되지 않은 노선 ID입니다.";
     private final LineRepository lineRepository;
     private final SectionRepository sectionRepository;
-    private final StationRepository stationRepository;
     private final StationService stationService;
 
     public LineResponse save(LineRequest request) {
@@ -29,11 +28,11 @@ public class LineService {
 
         Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
-        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(NoSuchElementException::new);
-        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(NoSuchElementException::new);
+        Station upStation = stationService.findBy(request.getUpStationId());
+        Station downStation = stationService.findBy(request.getDownStationId());
         sectionRepository.save(new Section(line, upStation, downStation));
 
-        return createLineResponse(line, List.of(upStation, downStation));
+        return LineResponse.of(line, List.of(upStation, downStation));
     }
 
     private void validate(String lineName) {
@@ -45,31 +44,17 @@ public class LineService {
     @Transactional(readOnly = true)
     public List<LineResponse> findAll() {
         List<Line> lines = lineRepository.findAll();
-
-        return lines.stream()
-                .map(line -> createLineResponse(line, line.getStations()))
-                .collect(Collectors.toList());
-
-    }
-
-    private LineResponse createLineResponse(Line line, List<Station> stations) {
-        return LineResponse.builder()
-                .id(line.getId())
-                .name(line.getName())
-                .color(line.getColor())
-                .stations(stations)
-                .createdDate(line.getCreatedDate())
-                .modifiedDate(line.getModifiedDate())
-                .build();
+        return LineResponse.lineResponses(lines);
     }
 
     public LineResponse findBy(Long id) {
         Line line = line(id);
-        return this.createLineResponse(line, line.getStations());
+        return LineResponse.of(line);
     }
 
     private Line line(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
+        return lineRepository.findById(id)
+                            .orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
     }
 
     public void updateBy(Long id, LineRequest request) {
@@ -85,17 +70,6 @@ public class LineService {
         Station upStation = stationService.findBy(sectionRequest.getUpStationId());
         Station downStation = stationService.findBy(sectionRequest.getDownStationId());
         Section section = sectionRepository.save(new Section(line, upStation, downStation));
-        return createSectionResponse(section);
-    }
-
-    // TODO: response로 메서드 이동
-    private SectionResponse createSectionResponse(Section section) {
-        return new SectionResponse(
-                section.getId(),
-                section.getUpStationId(),
-                section.getDownStationId(),
-                section.getDistance(),
-                section.getCreatedDate(),
-                section.getModifiedDate());
+        return SectionResponse.of(section);
     }
 }

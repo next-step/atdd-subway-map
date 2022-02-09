@@ -26,7 +26,7 @@ public class StationService {
         validate(stationRequest.getName());
 
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.of(station);
     }
 
     private void validate(String stationName) {
@@ -38,23 +38,11 @@ public class StationService {
     @Transactional(readOnly = true)
     public List<StationResponse> findAll() {
         List<Station> stations = stationRepository.findAll();
-
-        return stations.stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+        return StationResponse.stationResponses(stations);
     }
 
     public void deleteBy(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName(),
-                station.getCreatedDate(),
-                station.getModifiedDate()
-        );
     }
 
     public Station findBy(Long id) {
