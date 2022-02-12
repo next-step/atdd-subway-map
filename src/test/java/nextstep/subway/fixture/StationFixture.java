@@ -27,6 +27,6 @@ public class StationFixture {
     }
 
     public static Long stationId(ExtractableResponse<Response> response) {
-        return (long) (int) response.body().jsonPath().get("id");
+        return response.body().jsonPath().getLong("id");
     }
 }
