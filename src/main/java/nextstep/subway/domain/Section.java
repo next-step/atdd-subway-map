@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Section extends BaseEntity{
+public class Section extends BaseEntity {
     @Transient
     private static final String GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE = "이미 등록된 노선명입니다.";
 
@@ -47,21 +47,31 @@ public class Section extends BaseEntity{
         this.downStation = downStation;
     }
 
+    public static void validateDeleteSectionRequest(Line line, Station station) {
+        if (line.hasOnlyOneSection()) {
+            throw new IllegalArgumentException(SECTION_CANNOT_BE_DELETED_WHEN_LINE_HAS_ONLY_ONE_SECTION);
+        }
+
+        if (!line.isDownStation(station)) {
+            throw new IllegalArgumentException(ONLY_LAST_STATION_OF_LINE_CAN_BE_DELETED);
+        }
+    }
+
     private void validate(Line line, Station upStation, Station downStation) {
-        if(line.hasAnyStation()) {
+        if (line.hasAnyStation()) {
             validateUpStation(line, upStation);
             validateDownStation(line, downStation);
         }
     }
 
     private void validateUpStation(Line line, Station upStation) {
-        if (!line.isDownStation(upStation))  {
+        if (!line.isDownStation(upStation)) {
             throw new IllegalArgumentException(UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE);
         }
     }
 
     private void validateDownStation(Line line, Station downStation) {
-        if (line.has(downStation))  {
+        if (line.has(downStation)) {
             throw new IllegalArgumentException(GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE);
         }
     }
@@ -72,15 +82,5 @@ public class Section extends BaseEntity{
 
     public Long getDownStationId() {
         return this.downStation.getId();
-    }
-
-    public static void validateDeleteSectionRequest(Line line, Station station) {
-        if (line.hasOnlyOneSection()) {
-            throw new IllegalArgumentException(SECTION_CANNOT_BE_DELETED_WHEN_LINE_HAS_ONLY_ONE_SECTION);
-        }
-
-        if (!line.isDownStation(station)) {
-            throw new IllegalArgumentException(ONLY_LAST_STATION_OF_LINE_CAN_BE_DELETED);
-        }
     }
 }

@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.utils.httpresponse.Header.*;
 import static nextstep.subway.fixture.LineFixture.*;
 import static nextstep.subway.fixture.SectionFixture.구간;
 import static nextstep.subway.fixture.StationFixture.*;
+import static nextstep.subway.utils.httpresponse.Header.uri;
 import static nextstep.subway.utils.httpresponse.Response.*;
 import static nextstep.subway.utils.httpresponse.StatusCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,13 +30,13 @@ class LineAcceptanceTest extends AcceptanceTest {
         // given
         ExtractableResponse<Response> 상행종점_생성결과 = 역_생성(역삼역_이름);
         ExtractableResponse<Response> 하행종점_생성결과 = 역_생성(강남역_이름);
-        
+
         Long 상행종점_ID = stationId(상행종점_생성결과);
         Long 하행종점_ID = stationId(하행종점_생성결과);
 
         // when
         ExtractableResponse<Response> 노선생성_결과 = 지하철_노선_생성(신분당선_이름, 신분당선_색상, 상행종점_ID, 하행종점_ID, 10);
-        
+
 
         // then
         created(노선생성_결과);
@@ -66,7 +66,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         badRequest(중복생성_결과_response);
     }
 
-     /**
+    /**
      * Given 지하철 노선 생성을 요청 하고
      * Given 새로운 지하철 노선 생성을 요청 하고
      * When 지하철 노선 목록 조회를 요청 하면
@@ -172,7 +172,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
 
-        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri + "/sections");
 
         // then
         created(생성결과);
@@ -207,7 +207,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         Map<String, String> 구간_생성요청_dto = 구간(상행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
 
-        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri + "/sections");
 
         // then
         badRequest(생성결과);
@@ -237,7 +237,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행종점_ID, 상행역과_하행역_사이_거리);
 
-        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+        ExtractableResponse<Response> 생성결과 = post(구간_생성요청_dto, 생성된_노선_uri + "/sections");
 
         // then
         badRequest(생성결과);
@@ -269,10 +269,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // given
         Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
-        post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+        post(구간_생성요청_dto, 생성된_노선_uri + "/sections");
 
         // when
-        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=3");
+        ExtractableResponse<Response> response = delete(생성된_노선_uri + "/sections?stationId=3");
 
         // then
         noContent(response);
@@ -304,10 +304,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // given
         Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
-        post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+        post(구간_생성요청_dto, 생성된_노선_uri + "/sections");
 
         // when
-        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=1");
+        ExtractableResponse<Response> response = delete(생성된_노선_uri + "/sections?stationId=1");
 
         // then
         badRequest(response);
@@ -332,7 +332,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         String 생성된_노선_uri = uri(생성_요청_응답);
 
         // when
-        ExtractableResponse<Response> response = delete(생성된_노선_uri+"/sections?stationId=2");
+        ExtractableResponse<Response> response = delete(생성된_노선_uri + "/sections?stationId=2");
 
         // then
         badRequest(response);
@@ -364,14 +364,14 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         // given
         Map<String, String> 구간_생성요청_dto = 구간(하행종점_ID, 하행역_ID, 상행역과_하행역_사이_거리);
-        post(구간_생성요청_dto, 생성된_노선_uri+"/sections");
+        post(구간_생성요청_dto, 생성된_노선_uri + "/sections");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_조회("/lines");
 
         // then
         ok(response);
-        assertThat(((ArrayList<?>)response.jsonPath().getList("stations").get(0)).size()).isEqualTo(3);
+        assertThat(((ArrayList<?>) response.jsonPath().getList("stations").get(0)).size()).isEqualTo(3);
     }
 
 }

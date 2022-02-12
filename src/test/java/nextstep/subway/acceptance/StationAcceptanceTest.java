@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static nextstep.subway.utils.httpresponse.Header.*;
 import static nextstep.subway.fixture.StationFixture.*;
+import static nextstep.subway.utils.httpresponse.Header.uri;
 import static nextstep.subway.utils.httpresponse.Response.delete;
 import static nextstep.subway.utils.httpresponse.Response.get;
 import static nextstep.subway.utils.httpresponse.StatusCode.*;

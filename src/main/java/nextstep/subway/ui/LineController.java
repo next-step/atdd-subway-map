@@ -33,33 +33,33 @@ public class LineController {
         return ResponseEntity.ok().body(lineService.findAll());
     }
 
-    @GetMapping (value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> showLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findBy(id));
     }
 
-    @PutMapping (value = "/{id}")
+    @PutMapping(value = "/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id,
                                            @RequestBody LineRequest lineRequest) {
         lineService.updateBy(id, lineRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping (value = "/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteBy(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping (value = "/{lineId}/sections")
+    @PostMapping(value = "/{lineId}/sections")
     public ResponseEntity<SectionResponse> addSection(@PathVariable Long lineId,
-                                              @RequestBody SectionRequest sectionRequest) {
+                                                      @RequestBody SectionRequest sectionRequest) {
         SectionResponse section = lineService.addSection(lineId, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/"+ section.getId())).body(section);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId())).body(section);
     }
 
 
-    @DeleteMapping (value = "/{id}/sections")
+    @DeleteMapping(value = "/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId, HttpServletRequest request) {
         sectionService.deleteBy(lineId, Long.valueOf(request.getParameter("stationId")));
         return ResponseEntity.noContent().build();

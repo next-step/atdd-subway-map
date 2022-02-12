@@ -5,7 +5,8 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import static nextstep.subway.domain.Section.*;
+
+import static nextstep.subway.domain.Section.validateDeleteSectionRequest;
 
 @Service
 @Transactional

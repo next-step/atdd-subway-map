@@ -53,7 +53,7 @@ public class LineService {
 
     public Line line(Long id) {
         return lineRepository.findById(id)
-                            .orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
+                .orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
     }
 
     public void updateBy(Long id, LineRequest request) {
