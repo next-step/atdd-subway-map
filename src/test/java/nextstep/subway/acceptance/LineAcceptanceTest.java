@@ -318,7 +318,7 @@ class LineAcceptanceTest extends AcceptanceTest {
      * When 구간을 제거 요청하면
      * Then 구간 삭제 실패한다.
      */
-    @DisplayName("마지막 구간 이외의 구간은 삭제 할 수 없다.")
+    @DisplayName("구간이 하나만 있을 때 삭제 불가")
     @Test
     void sectionIsRemovableWhenLineHasMoreThan2Section() {
         // given

@@ -16,7 +16,7 @@ public class SectionService {
     private final StationService stationService;
 
     public void deleteBy(Long lineId, Long stationId) {
-        Line line = lineService.line(lineId);
+        Line line = lineService.findLineBy(lineId);
         Station station = stationService.findBy(stationId);
 
         validateDeleteSectionRequest(line, station);

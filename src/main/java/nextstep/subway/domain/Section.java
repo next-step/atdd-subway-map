@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +10,8 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
+@Builder
+@AllArgsConstructor
 public class Section extends BaseEntity {
     @Transient
     private static final String GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE = "이미 등록된 노선명입니다.";
@@ -41,7 +45,6 @@ public class Section extends BaseEntity {
 
     public Section(Line line, Station upStation, Station downStation) {
         validate(line, upStation, downStation);
-
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;

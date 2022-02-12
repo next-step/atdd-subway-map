@@ -37,7 +37,7 @@ public class LineResponse {
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .stations(line.stations())
+                .stations(line.getStations())
                 .createdDate(line.getCreatedDate())
                 .modifiedDate(line.getModifiedDate())
                 .build();

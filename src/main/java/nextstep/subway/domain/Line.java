@@ -34,7 +34,7 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public List<Station> stations() {
+    public List<Station> getStations() {
         Stream<Station> upStations = sections.stream().map(Section::getUpStation);
         Stream<Station> downStations = sections.stream().map(Section::getDownStation);
         return Stream.concat(upStations, downStations)
@@ -44,16 +44,16 @@ public class Line extends BaseEntity {
     }
 
     public boolean isDownStation(Station station) {
-        return downStation().equals(station);
+        return getDownStation().equals(station);
     }
 
-    public Station downStation() {
-        List<Station> stations = stations();
+    public Station getDownStation() {
+        List<Station> stations = getStations();
         return stations.get(stations.size() - 1);
     }
 
     public boolean has(Station station) {
-        return stations().contains(station);
+        return getStations().contains(station);
     }
 
     public boolean hasAnyStation() {
@@ -67,5 +67,9 @@ public class Line extends BaseEntity {
 
     public boolean hasOnlyOneSection() {
         return sections.size() == 1;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
     }
 }

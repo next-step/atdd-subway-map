@@ -25,13 +25,18 @@ public class LineService {
     public LineResponse save(LineRequest request) {
         validate(request.getName());
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
+        Line line = new Line(request.getName(), request.getColor());
+        lineRepository.save(line);
 
-        Station upStation = stationService.findBy(request.getUpStationId());
-        Station downStation = stationService.findBy(request.getDownStationId());
-        sectionRepository.save(new Section(line, upStation, downStation));
+        Section section = Section.builder().
+                upStation(stationService.findBy(request.getUpStationId()))
+                .downStation(stationService.findBy(request.getDownStationId()))
+                .line(line)
+                .build();
 
-        return LineResponse.of(line, List.of(upStation, downStation));
+        line.addSection(section);
+
+        return LineResponse.of(line, line.getStations());
     }
 
     private void validate(String lineName) {
@@ -46,18 +51,18 @@ public class LineService {
         return LineResponse.lineResponses(lines);
     }
 
-    public LineResponse findBy(Long id) {
-        Line line = line(id);
+    public LineResponse findLineResponseBy(Long id) {
+        Line line = findLineBy(id);
         return LineResponse.of(line);
     }
 
-    public Line line(Long id) {
+    public Line findLineBy(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(GIVEN_LINE_ID_IS_NOT_REGISTERED));
     }
 
     public void updateBy(Long id, LineRequest request) {
-        line(id).update(request.getName(), request.getColor());
+        findLineBy(id).update(request.getName(), request.getColor());
     }
 
     public void deleteBy(Long id) {
@@ -65,7 +70,7 @@ public class LineService {
     }
 
     public SectionResponse addSection(Long lineId, SectionRequest sectionRequest) {
-        Line line = line(lineId);
+        Line line = findLineBy(lineId);
         Station upStation = stationService.findBy(sectionRequest.getUpStationId());
         Station downStation = stationService.findBy(sectionRequest.getDownStationId());
         Section section = sectionRepository.save(new Section(line, upStation, downStation));
