@@ -5,18 +5,19 @@ import nextstep.subway.application.dto.StationRequest;
 import nextstep.subway.application.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static nextstep.subway.exception.StationException.GIVEN_STATION_ID_IS_NOT_REGISTERED;
+import static nextstep.subway.exception.StationException.STATION_NAME_IS_ALREADY_REGISTERED;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class StationService {
-    public static final String GIVEN_STATION_ID_IS_NOT_REGISTERED = "등록되지 않은 역ID입니다.";
-    private static final String STATION_NAME_IS_ALREADY_REGISTERED = "이미 등록된 역 이름입니다.";
     private final StationRepository stationRepository;
 
     public StationResponse save(StationRequest stationRequest) {
@@ -28,7 +29,7 @@ public class StationService {
 
     private void validate(String stationName) {
         if (stationRepository.existsByName(stationName)) {
-            throw new IllegalArgumentException(STATION_NAME_IS_ALREADY_REGISTERED);
+            throw new BadRequestException(STATION_NAME_IS_ALREADY_REGISTERED);
         }
     }
 
@@ -44,6 +45,6 @@ public class StationService {
 
     public Station findBy(Long id) {
         return stationRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(GIVEN_STATION_ID_IS_NOT_REGISTERED));
+                .orElseThrow(() -> new BadRequestException(GIVEN_STATION_ID_IS_NOT_REGISTERED));
     }
 }

@@ -4,8 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.*;
+
+import static nextstep.subway.exception.SectionException.GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE;
+import static nextstep.subway.exception.SectionException.UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE;
 
 @Entity
 @NoArgsConstructor
@@ -13,18 +17,6 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 public class Section extends BaseEntity {
-    @Transient
-    private static final String GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE = "이미 등록된 노선명입니다.";
-
-    @Transient
-    private static final String UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE = "새로운 구간의 상행역은 노선의 하행 종점역이어야만 합니다.";
-
-    @Transient
-    private static final String ONLY_LAST_STATION_OF_LINE_CAN_BE_DELETED = "지하철 노선의 마지막 역만 삭제신청할 수 있습니다.";
-
-    @Transient
-    private static final String SECTION_CANNOT_BE_DELETED_WHEN_LINE_HAS_ONLY_ONE_SECTION = "노선에 구간이 하나만 존재하는 경우, 구간은 삭제할 수 없습니다.";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,16 +42,6 @@ public class Section extends BaseEntity {
         this.downStation = downStation;
     }
 
-    public static void validateDeleteSectionRequest(Line line, Station station) {
-        if (line.hasOnlyOneSection()) {
-            throw new IllegalArgumentException(SECTION_CANNOT_BE_DELETED_WHEN_LINE_HAS_ONLY_ONE_SECTION);
-        }
-
-        if (!line.isDownStation(station)) {
-            throw new IllegalArgumentException(ONLY_LAST_STATION_OF_LINE_CAN_BE_DELETED);
-        }
-    }
-
     private void validate(Line line, Station upStation, Station downStation) {
         if (line.hasAnyStation()) {
             validateUpStation(line, upStation);
@@ -69,13 +51,13 @@ public class Section extends BaseEntity {
 
     private void validateUpStation(Line line, Station upStation) {
         if (!line.isDownStation(upStation)) {
-            throw new IllegalArgumentException(UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE);
+            throw new BadRequestException(UP_STATION_OF_NEW_SECTION_MUST_BE_DOWN_STATION_OF_LINE);
         }
     }
 
     private void validateDownStation(Line line, Station downStation) {
         if (line.has(downStation)) {
-            throw new IllegalArgumentException(GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE);
+            throw new BadRequestException(GIVEN_DOWN_STATION_IS_ALREADY_REGISTERED_IN_LINE);
         }
     }
 
