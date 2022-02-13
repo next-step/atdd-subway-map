@@ -6,7 +6,7 @@ plugins {
 
 group = 'nextstep'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = "1.8"
 
 repositories {
 	mavenCentral()
@@ -29,8 +29,12 @@ dependencies {
 	}
 
 	runtimeOnly 'com.h2database:h2'
+
+	annotationProcessor('org.projectlombok:lombok')
+	implementation 'org.projectlombok:lombok'
 }
 
 test {
 	useJUnitPlatform()
 }
+targetCompatibility = JavaVersion.VERSION_1_9

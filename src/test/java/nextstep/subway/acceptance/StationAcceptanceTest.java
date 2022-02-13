@@ -1,16 +1,17 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static nextstep.subway.fixture.CommonFixture.uri;
 import static nextstep.subway.fixture.StationFixture.*;
+import static nextstep.subway.utils.httpresponse.Header.uri;
+import static nextstep.subway.utils.httpresponse.Response.delete;
+import static nextstep.subway.utils.httpresponse.Response.get;
+import static nextstep.subway.utils.httpresponse.StatusCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관리 기능")
@@ -26,7 +27,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성결과 = 역_생성(강남역_이름);
 
         // then
-        assertThat(생성결과.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        created(생성결과);
         assertThat(uri(생성결과)).isNotBlank();
     }
 
@@ -45,7 +46,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 중복생성_response = 역_생성(강남역_이름);
 
         // then
-        assertThat(중복생성_response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        badRequest(중복생성_response);
     }
 
     /**
@@ -62,14 +63,10 @@ class StationAcceptanceTest extends AcceptanceTest {
         역_생성(역삼역_이름);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = get("/stations");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ok(response);
         List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(강남역_이름, 역삼역_이름);
     }
@@ -86,13 +83,9 @@ class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 생성결과 = 역_생성(강남역_이름);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri(생성결과))
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = delete(uri(생성결과));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        noContent(response);
     }
 }
