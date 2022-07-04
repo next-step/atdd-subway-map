@@ -43,11 +43,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findStations();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -64,10 +60,7 @@ public class StationAcceptanceTest {
         createStation("잠실역");
 
         // when
-        List<String> stationNames = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findStations();
 
         //then
         assertThat(stationNames).containsOnly("강남역", "잠실역");
@@ -85,6 +78,13 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
+    private List<String> findStations() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
+
 
     /**
      * Given 지하철역을 생성하고
@@ -92,5 +92,4 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
-
 }
