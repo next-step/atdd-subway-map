@@ -120,7 +120,7 @@ public class StationAcceptanceTest {
             map.put("name", stationName);
             params.add(map);
         }
-
+        //when
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .body(params)
@@ -134,6 +134,13 @@ public class StationAcceptanceTest {
                 .when().delete("/stations/1")
                 .then().log().all();
 
+        List<String> stationName =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
 
+        //then
+        assertThat(stationName).doesNotContain("신림역");
     }
 }
