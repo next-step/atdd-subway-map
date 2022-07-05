@@ -20,15 +20,15 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+    public List<StationResponse> saveStation(List<StationRequest> stations) {
+        List<Station> stationList = stationRepository.saveAll(stations.stream()
+                                                                      .map(station -> new Station(station.getName()))
+                                                                      .collect(Collectors.toList()));
+        return createStationResponse(stationList);
     }
 
     public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+        return createStationResponse(stationRepository.findAll());
     }
 
     @Transactional
@@ -36,10 +36,9 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    private List<StationResponse> createStationResponse(List<Station> stations) {
+        return stations.stream()
+                       .map(station -> new StationResponse(station.getId(), station.getName()))
+                       .collect(Collectors.toList());
     }
 }

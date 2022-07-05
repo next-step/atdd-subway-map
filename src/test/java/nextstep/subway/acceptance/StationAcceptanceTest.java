@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,34 @@ public class StationAcceptanceTest {
     @Test
     void getStation() {
 
+        //given
+        List<Map<String, String>> params = new ArrayList<>();
+        String[] stationNames = {"신림역", "봉천역"};
+
+        for (String stationName : stationNames) {
+            Map<String, String> map = new HashMap<>();
+            map.put("name", stationName);
+
+            params.add(map);
+        }
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        //when
+        List<Station> stations = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("$.", Station.class);
+
+        //then
+        assertThat(stations.size()).isEqualTo(2);
+        assertThat(stationNames).containsAnyOf("신림역", "봉천역");
     }
 
     /**
