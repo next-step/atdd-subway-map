@@ -19,16 +19,18 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
+    private static Station apply(StationRequest sr) {
+        return new Station(sr.getName());
+    }
+
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+    public List<StationResponse> saveStation(List<StationRequest> stationRequest) {
+        List<Station> stations = stationRepository.saveAll(stationRequest.stream().map(StationService::apply).collect(Collectors.toList()));
+        return createStationResponse(stations);
     }
 
     public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+        return createStationResponse(stationRepository.findAll());
     }
 
     @Transactional
@@ -36,10 +38,7 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+    private List<StationResponse> createStationResponse(List<Station> stations) {
+        return stations.stream().map(station -> new StationResponse(station.getId(), station.getName())).collect(Collectors.toList());
     }
 }
