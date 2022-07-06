@@ -100,7 +100,7 @@ public class StationAcceptanceTest {
 
         // then
         ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
-        List<String> stationNames = response.jsonPath().getList("name");
+        List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames).isEmpty();
     }
 
