@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,16 +83,39 @@ public class StationAcceptanceTest {
 
     }
 
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        StationResponse 잠실역 = 역을_만들다("잠실역").as(StationResponse.class);
 
-    private void 역을_만들다(String name) {
+        // when
+        역을_삭제한다(잠실역.getId());
+
+        // then
+        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
+        List<String> stationNames = response.jsonPath().getList("name");
+        assertThat(stationNames).isEmpty();
+    }
+
+
+    private ExtractableResponse<Response> 역을_만들다(String name) {
         StationRequest stationRequest = new StationRequest(name);
 
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(stationRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
     }
 
     private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
@@ -101,18 +125,19 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
+    private void 역을_삭제한다(Long id) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
-    @DisplayName("지하철역을 제거한다.")
-    @Test
-    void deleteStation() {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+
 }
