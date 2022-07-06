@@ -101,5 +101,27 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제합니다.")
+    @Test
+    void deleteStations() throws Exception {
+        // given
+        final Station savedStation = stationRepository.save(new Station("강남역"));
 
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/" + savedStation.getId())
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+        assertThat(stationNames.size()).isEqualTo(0);
+    }
 }
