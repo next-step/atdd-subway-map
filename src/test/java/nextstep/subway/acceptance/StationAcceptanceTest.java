@@ -37,16 +37,8 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        String station = "강남역";
+        ExtractableResponse<Response> response = createStationRequest(station);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -114,11 +106,11 @@ public class StationAcceptanceTest {
         assertThat(stationNames).hasSize(0);
     }
 
-    private void createStationRequest(String stationName) {
+    private ExtractableResponse<Response> createStationRequest(String stationName) {
         Map<String, String> station = new HashMap<>();
         station.put("name", stationName);
 
-        RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .body(station)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
