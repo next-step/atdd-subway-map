@@ -69,6 +69,22 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given
+        String station1 = "강남역";
+        String station2 = "신논현역";
+
+        createStationRequest(station1);
+        createStationRequest(station2);
+
+        // when
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames).containsAnyOf("강남역", "신논현역");
     }
 
     /**
@@ -82,4 +98,15 @@ public class StationAcceptanceTest {
     void deleteStation() {
     }
 
+    private void createStationRequest(String stationName) {
+        Map<String, String> station = new HashMap<>();
+        station.put("name", stationName);
+
+        RestAssured.given().log().all()
+                .body(station)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 }
