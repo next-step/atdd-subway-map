@@ -70,8 +70,7 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
     }
-
-
+    
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -82,5 +81,4 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
     }
-
 }
