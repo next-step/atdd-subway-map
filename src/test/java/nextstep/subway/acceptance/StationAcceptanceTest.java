@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
     @LocalServerPort
     int port;
 
@@ -106,36 +107,19 @@ public class StationAcceptanceTest {
 
     private ExtractableResponse<Response> 역을_만들다(String name) {
         StationRequest stationRequest = new StationRequest(name);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(stationRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = RestAssuredTemplate.postRequestWithRequestBody("/stations", stationRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
     }
 
     private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = RestAssuredTemplate.getRequest("/stations");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     private void 역을_삭제한다(Long id) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/{id}", id)
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = RestAssuredTemplate.deleteRequestWithParameter("/stations/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
