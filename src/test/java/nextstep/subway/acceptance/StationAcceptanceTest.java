@@ -1,8 +1,13 @@
 package nextstep.subway.acceptance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,12 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -66,6 +65,11 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 조회한다.")
+    @Test
+    void getStations() {
+
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -73,5 +77,9 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다")
+    @Test
+    void deleteStation() {
 
+    }
 }
