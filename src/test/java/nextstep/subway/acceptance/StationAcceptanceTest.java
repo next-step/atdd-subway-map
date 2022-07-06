@@ -3,9 +3,12 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
+    @Autowired
+    private StationRepository stationRepository;
+
     @LocalServerPort
     int port;
 
@@ -66,6 +73,27 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회합니다.")
+    @Test
+    void getStations() throws Exception {
+        // given
+        final Station gangnamStation = new Station("강남역");
+        final Station samsungStation = new Station("삼성역");
+        stationRepository.saveAll(List.of(gangnamStation, samsungStation));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        final List<String> stationNames = response.jsonPath().getList("name", String.class);
+        assertThat(stationNames.size()).isEqualTo(2);
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -73,5 +101,27 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제합니다.")
+    @Test
+    void deleteStations() throws Exception {
+        // given
+        final Station savedStation = stationRepository.save(new Station("강남역"));
 
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/" + savedStation.getId())
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+        assertThat(stationNames.size()).isEqualTo(0);
+    }
 }
