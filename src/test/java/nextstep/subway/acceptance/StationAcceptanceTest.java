@@ -96,6 +96,22 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given
+        String station = "강남역";
+        createStationRequest(station);
+
+        // when
+        RestAssured.given().log().all()
+                .when().delete("/stations/{id}", 1L)
+                .then().log().all();
+
+        // then
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+        assertThat(stationNames).hasSize(0);
     }
 
     private void createStationRequest(String stationName) {
