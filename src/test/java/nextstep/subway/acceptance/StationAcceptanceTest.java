@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.RestAssuredTemplate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -107,19 +108,19 @@ public class StationAcceptanceTest {
 
     private ExtractableResponse<Response> 역을_만들다(String name) {
         StationRequest stationRequest = new StationRequest(name);
-        ExtractableResponse<Response> response = RestAssuredTemplate.postRequestWithRequestBody("/stations", stationRequest);
+        ExtractableResponse<Response> response = postRequestWithRequestBody("/stations", stationRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
     }
 
     private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
-        ExtractableResponse<Response> response = RestAssuredTemplate.getRequest("/stations");
+        ExtractableResponse<Response> response = getRequest("/stations");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     private void 역을_삭제한다(Long id) {
-        ExtractableResponse<Response> response = RestAssuredTemplate.deleteRequestWithParameter("/stations/{id}", id);
+        ExtractableResponse<Response> response = deleteRequestWithParameter("/stations/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
