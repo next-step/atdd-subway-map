@@ -44,11 +44,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findAllStationsRequest();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -69,11 +65,7 @@ public class StationAcceptanceTest {
         createStationRequest(station2);
 
         // when
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findAllStationsRequest();
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "신논현역");
@@ -98,11 +90,7 @@ public class StationAcceptanceTest {
                 .then().log().all();
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findAllStationsRequest();
         assertThat(stationNames).hasSize(0);
     }
 
@@ -116,5 +104,12 @@ public class StationAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private List<String> findAllStationsRequest() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 }
