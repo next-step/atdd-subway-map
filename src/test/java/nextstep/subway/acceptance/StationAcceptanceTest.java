@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.StationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,11 +66,44 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given
+        역을_만들다("잠실역");
+        역을_만들다("한성백제역");
+
+        // when
+        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
+
+        // then
+        List<String> stationNames = response.jsonPath().getList("name");
+        assertThat(stationNames).containsExactly("잠실역", "한성백제역");
+
     }
+
+
+    private void 역을_만들다(String name) {
+        StationRequest stationRequest = new StationRequest(name);
+
+        RestAssured.given().log().all()
+                .body(stationRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        return response;
+    }
+
 
     /**
      * Given 지하철역을 생성하고
