@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,13 +67,24 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() throws Exception {
         //given
+        지하철역_생성("강남역");
+        지하철역_생성("교대역");
 
         //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
 
         //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList(".", StationResponse.class).size()).isEqualTo(2);
+
     }
 
     /**
@@ -81,13 +93,38 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() throws Exception {
         //given
+        StationResponse 방배역 = 지하철역_생성("방배역");
 
         //when
+        RestAssured.given().log().all()
+                .when().delete("stations/" + 방배역.getId())
+                .then().log().all();
 
         //then
+        List<String> stationNames = RestAssured.given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then()
+                .extract().jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).doesNotContain("방배역");
+
+    }
+
+    private StationResponse 지하철역_생성(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> response = RestAssured.given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().extract();
+        return response.body().as(StationResponse.class);
     }
 
 }
