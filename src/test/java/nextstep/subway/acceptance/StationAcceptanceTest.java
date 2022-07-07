@@ -50,13 +50,13 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(APPLICATION_JSON_VALUE)
                         .when().post("/stations")
                         .then().log().all()
                         .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(CREATED.value());
 
         // then
         List<String> stationNames =
@@ -64,7 +64,9 @@ public class StationAcceptanceTest {
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+
+        assertThat(stationNames.size()).isEqualTo(params.size());
+        assertThat(stationNames).containsAll(params.values());
     }
 
     /**
