@@ -126,23 +126,39 @@ public class StationAcceptanceTest {
     @Test
     void deleteStations() throws Exception {
         // given
-        final Station savedStation = stationRepository.save(new Station("강남역"));
+        final HashMap<String, String> param = new HashMap<>();
+        param.put("name", "강남역");
+
+        final ExtractableResponse<Response> createStationResponse = RestAssured
+                .given().log().all()
+                .body(param)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then()
+                .extract();
+
+        assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
+
+        // 저장된 지하철 역의 ID
+        final String savedStationId = createStationResponse.jsonPath().getString("id");
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/stations/" + savedStation.getId())
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/stations/" + savedStationId)
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
         assertThat(stationNames.size()).isEqualTo(0);
     }
 }
