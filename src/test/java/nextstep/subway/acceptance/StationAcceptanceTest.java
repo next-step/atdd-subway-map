@@ -68,6 +68,32 @@ public class StationAcceptanceTest {
     @Test
     @DisplayName("지하철역 목록을 조회한다.")
     void getStation() {
+        // given 2개의 지하철역 생성
+        Map<String, String> station = new HashMap<>();
+        station.put("name", "신림역");
+
+        RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(station)
+            .when().post("/stations")
+            .then().log().all();
+
+        Map<String, String> otherStation = new HashMap<>();
+        otherStation.put("name", "신도림역");
+
+        RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(otherStation)
+            .when().post("/stations")
+            .then().log().all();
+
+        // when
+        List<String> stationNames = RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all().extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(stationNames).hasSize(2);
     }
 
 
@@ -79,5 +105,32 @@ public class StationAcceptanceTest {
     @Test
     @DisplayName("지하철 역을 제거한다.")
     void deleteStation() {
+        // given 지하철역 생성
+        Map<String, String> station = new HashMap<>();
+        station.put("name", "신림역");
+
+        ExtractableResponse<Response> extractableResponse = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(station)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // when 지하철역 삭제
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when().delete("/stations/" + extractableResponse.jsonPath().getString("id"))
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then 지하철 목록 조회 시 생성한 역 없음
+        List<String> stationNames = RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all().extract().jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).doesNotContain("신림역");
     }
 }
