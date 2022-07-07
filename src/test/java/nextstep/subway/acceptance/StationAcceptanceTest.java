@@ -71,17 +71,20 @@ public class StationAcceptanceTest {
     @Test
     void getStation() {
         //given
-        List<Map<String, String>> params = new ArrayList<>();
-        String[] stationNames = {"신림역", "봉천역"};
-
-        for (String stationName : stationNames) {
-            Map<String, String> map = new HashMap<>();
-            map.put("name", stationName);
-            params.add(map);
-        }
+        Map<String, String> firstStation = new HashMap<>();
+        firstStation.put("name", "신림역");
 
         RestAssured.given().log().all()
-                .body(params)
+                .body(firstStation)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+        Map<String, String> twoStation = new HashMap<>();
+        twoStation.put("name", "봉천역");
+
+        RestAssured.given().log().all()
+                .body(twoStation)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all();
@@ -110,22 +113,14 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        List<Map<String, String>> params = new ArrayList<>();
-        String[] stationNames = {"신림역"};
+        Map<String, String> firstStation = new HashMap<>();
+        firstStation.put("name", "신림역");
 
-        for (String stationName : stationNames) {
-            Map<String, String> map = new HashMap<>();
-            map.put("name", stationName);
-            params.add(map);
-        }
-        //when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        RestAssured.given().log().all()
+                .body(firstStation)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
