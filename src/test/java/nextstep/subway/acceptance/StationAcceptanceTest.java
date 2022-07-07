@@ -68,9 +68,39 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
-    void getStations(){
+    void getStations() {
+        //given
+        createStation("마곡역");
+        createStation("디지털미디어시티역");
 
+        //when
+        ExtractableResponse<Response> response = getAllStations();
+
+        //then
+        List<String> names = response.jsonPath().getList("name");
+        assertThat(names).hasSize(2);
     }
+
+    public void createStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    public ExtractableResponse<Response> getAllStations(){
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
 
     /**
      * Given 지하철역을 생성하고
@@ -80,7 +110,7 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 제거한다.")
     @Test
-    void deleteStation(){
+    void deleteStation() {
 
     }
 
