@@ -74,31 +74,10 @@ public class StationAcceptanceTest {
         createStation("디지털미디어시티역");
 
         //when
-        ExtractableResponse<Response> response = getAllStations();
+        List<String> names = getAllStations();
 
         //then
-        List<String> names = response.jsonPath().getList("name");
-        assertThat(names).hasSize(2);
-    }
-
-    public void createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    public ExtractableResponse<Response> getAllStations(){
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        assertThat(names).containsAnyOf("마곡역","디지털미디어시티역");
     }
 
 
@@ -111,7 +90,37 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        //given
+        //createStation("마곡나루역");
+
+        //when
+
+
+        //then
+
 
     }
+
+    public void createStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    public List<String> getAllStations() {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
+
 
 }
