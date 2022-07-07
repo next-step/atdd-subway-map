@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +70,39 @@ class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given: 2개의 지하철 역을 생성한다.
+        final Map<String, Object> params1 = new HashMap<>();
+        params1.put("name", "선릉역");
 
+        RestAssured
+                .given().log().all()
+                .body(params1).contentType(ContentType.JSON)
+                .when()
+                .post("/stations")
+                .then().log().all();
+
+        final Map<String, Object> params2 = new HashMap<>();
+        params2.put("name", "역삼역");
+
+        RestAssured
+                .given().log().all()
+                .body(params2).contentType(ContentType.JSON)
+                .when()
+                .post("/stations")
+                .then().log().all();
+
+
+        // when: 지하철 역들을 조회한다.
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when()
+                .get("/stations")
+                .then()
+                .log().all().extract();
+
+        // then: 지하철 역이 2개인지 검증한다.
+        final List<String> names = response.body().jsonPath().getList("name", String.class);
+        assertThat(names.size()).isEqualTo(2);
     }
 
     /**
