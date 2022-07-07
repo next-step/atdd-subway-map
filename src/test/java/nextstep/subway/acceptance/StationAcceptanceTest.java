@@ -1,8 +1,10 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.config.JsonPathConfig;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -65,10 +68,40 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+
+        // given
+        Map<String, String> params = Map.of("name", "방배역");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+
+        Map<String, String> params2 = Map.of("name", "신논현역");
+
+        RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+
+        // when
+
+        ExtractableResponse<Response> responseWrapper = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        List<Map<String, Object>> response = responseWrapper.body().jsonPath().getList(".");
+        assertThat(response).hasSize(2);
+
     }
 
     /**
