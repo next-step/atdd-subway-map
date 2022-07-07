@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+    private static final String NAME = "name";
     @LocalServerPort
     int port;
 
@@ -36,7 +37,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation(Map.of("name", "강남역"));
+        ExtractableResponse<Response> response = createStation(Map.of(NAME, "강남역"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -44,7 +45,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = getAllStations()
                 .jsonPath()
-                .getList("name", String.class);
+                .getList(NAME, String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -56,11 +57,9 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
-
         // given
-        createStation(Map.of("name", "방배역"));
-        createStation(Map.of("name", "신논현역"));
-
+        createStation(Map.of(NAME, "방배역"));
+        createStation(Map.of(NAME, "신논현역"));
 
         // when
         List<Map<String, Object>> response = getAllStations()
@@ -69,7 +68,6 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(response).hasSize(2);
-
     }
 
     /**
@@ -80,16 +78,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-
         // given
-        long id = createStation(Map.of("name", "사당역"))
+        long id = createStation(Map.of(NAME, "사당역"))
                 .jsonPath()
                 .getLong("id");
 
         // when
-        RestAssured.given().log().all()
-                .when().delete("/stations/{id}", id)
-                .then().log().all();
+        deleteStation(id);
 
         // then
         List<Long> allStationIds = getAllStations()
@@ -98,7 +93,6 @@ public class StationAcceptanceTest {
 
 
         assertThat(allStationIds).isNotIn(id);
-
     }
 
 
@@ -116,6 +110,12 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private void deleteStation(long id) {
+        RestAssured.given().log().all()
+                .when().delete("/stations/{id}", id)
+                .then().log().all();
     }
 
 }
