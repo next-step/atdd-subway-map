@@ -79,22 +79,41 @@ public class StationAcceptanceTest {
     @Test
     void getStations() throws Exception {
         // given
-        final Station gangnamStation = new Station("강남역");
-        final Station samsungStation = new Station("삼성역");
-        stationRepository.saveAll(List.of(gangnamStation, samsungStation));
+        // 생성할 역 이름 리스트
+        final List<String> stations = new ArrayList<>();
+        stations.add("강남역");
+        stations.add("역삼역");
+
+        // 생성해야할 리스트의 길이만큼 반복문을 돌며 역을 생성합니다
+        for (final String station : stations) {
+            final HashMap<String, String> param = new HashMap<>();
+            param.put("name", station);
+
+            final ExtractableResponse<Response> createStationResponse = RestAssured
+                    .given().log().all()
+                    .body(param)
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .when().post("/stations")
+                    .then()
+                    .extract();
+
+            assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
+        }
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
 
         // then
         final List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).contains("강남역", "역삼역");
     }
 
     /**
