@@ -37,14 +37,12 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation("강남역");
+        지하철역_등록_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames = findStationNames();
-        assertThat(stationNames).containsAnyOf("강남역");
+        ExtractableResponse<Response> stationResponse = 지하철역_목록_조회_요청();
+        List<String> 지하철역_ID_목록 = stationResponse.jsonPath().getList("name", String.class);
+        assertThat(지하철역_ID_목록).containsAnyOf("강남역");
     }
 
     /**
@@ -56,14 +54,15 @@ public class StationAcceptanceTest {
     @DisplayName("모든 지하철 역을 조회한다.")
     void getStations() {
         // given
-        createStation("강남역");
-        createStation("잠실역");
+        지하철역_등록_요청("강남역");
+        지하철역_등록_요청("잠실역");
 
         // when
-        List<String> stationNames = findStationNames();
+        ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
 
         //then
-        assertThat(stationNames).containsOnly("강남역", "잠실역");
+        List<String> 지하철역_이름_목록 = response.jsonPath().getList("name", String.class);
+        assertThat(지하철역_이름_목록).containsOnly("강남역", "잠실역");
     }
 
     /**
@@ -75,50 +74,47 @@ public class StationAcceptanceTest {
     @DisplayName("지하철 역을 제거한다.")
     void deleteStation() {
         // given
-        Map creationResponseMap = createStation("강남역").jsonPath().get();
-        long createdStationId = Long.valueOf((Integer) creationResponseMap.get("id"));
+        ExtractableResponse<Response> response = 지하철역_등록_요청("강남역");
+        long 강남역_ID = response.jsonPath().getLong("id");
 
         // when
-        deleteStation(createdStationId);
+        지하철역_제거_요청(강남역_ID);
 
         // then
-        assertThat(findStationIds()).doesNotContain(createdStationId);
+        ExtractableResponse<Response> stationResponse = 지하철역_목록_조회_요청();
+        List<Long> 지하철역_ID_목록 = stationResponse.jsonPath().getList("id", Long.class);
+        assertThat(지하철역_ID_목록).doesNotContain(강남역_ID);
     }
 
-    private ExtractableResponse<Response> createStation(String stationName) {
+    private ExtractableResponse<Response> 지하철역_등록_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        return RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
     }
 
-    private List<String> findStationNames() {
-        return findStations().jsonPath()
-                .getList("name", String.class);
-    }
-
-    private List<Long> findStationIds() {
-        return findStations().jsonPath()
-                .getList("id", Long.class);
-    }
-
-    private ExtractableResponse<Response> findStations() {
-        return RestAssured.given().log().all()
+    private ExtractableResponse<Response> 지하철역_목록_조회_요청() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
     }
 
-    private ExtractableResponse<Response> deleteStation(long stationId) {
-        String url = String.format("/stations/%d", stationId);
-        return RestAssured.given().log().all()
-                .when().delete(url)
+    private ExtractableResponse<Response> 지하철역_제거_요청(long stationId) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/{id}", stationId)
                 .then().log().all()
                 .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        return response;
     }
 }
