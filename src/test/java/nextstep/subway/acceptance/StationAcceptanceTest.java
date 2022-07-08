@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -59,6 +60,25 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given
+        createStationWithName("신사역");
+        createStationWithName("강남역");
+
+        // when
+        var response = RestAssured
+                .given()
+                .when()
+                    .get("/stations")
+                .then()
+                    .extract();
+
+        // then
+        var stationNames = response.jsonPath().getList("name", String.class);
+
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(stationNames).containsExactlyInAnyOrder("신사역", "강남역")
+        );
     }
 
     /**
