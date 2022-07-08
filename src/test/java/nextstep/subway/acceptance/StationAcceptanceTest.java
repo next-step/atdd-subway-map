@@ -29,6 +29,29 @@ public class StationAcceptanceTest {
     }
 
     /**
+     * When 지하철역 생성을 요청하면
+     * Then 지하철역이 생성된다.
+     * @param stationName
+     */
+    ExtractableResponse<Response> createStation(String stationName) {
+
+        final String url = "/stations";
+        final Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(url)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
+    }
+
+
+    /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
@@ -60,12 +83,33 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
+
     /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void findStations() {
+
+        //given
+        final String 강남역 = "강남역";
+        final String 교대역 = "교대역";
+
+        createStation(강남역);
+        createStation(교대역);
+
+        //when
+        List<String> names = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(names).contains(강남역, 교대역);
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -73,5 +117,27 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거")
+    @Test
+    void removeStation() {
 
+        //given
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> station = createStation(강남역);
+        long id = station.body().jsonPath().getLong("id");
+
+        //when
+        RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract();
+
+        //then
+        List<String> names = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        assertThat(names).doesNotContain(강남역);
+    }
 }
