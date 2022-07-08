@@ -96,6 +96,18 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다")
     @Test
     void deleteStation() {
+        // given
+        ExtractableResponse<Response> response = 지하철역_생성("건대입구역");
+        long stationId = response.jsonPath().getLong("id");
 
+        // when
+        RestAssured
+                .given().log().all()
+                .when().delete("/stations/{stationId}", stationId)
+                .then().log().all();
+
+        // then
+        List<String> resultList = 지하철역_전체_조회().jsonPath().getList("name", String.class);
+        assertThat(resultList).doesNotContain("건대입구역");
     }
 }
