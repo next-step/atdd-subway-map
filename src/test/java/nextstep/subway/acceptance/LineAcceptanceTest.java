@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 import static nextstep.subway.acceptance.RestAssuredTemplate.*;
 import static nextstep.subway.acceptance.StationAcceptanceTest.역을_만들다;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +26,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        // when
+        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
+        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
+        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
+        // then
+        List<LineResponse> lineResponse = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
+        assertThat(lineResponse).containsOnlyOnce(newLine);
     }
 
     /**
@@ -96,6 +105,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> 노선을_조회한다(Long id) {
         ExtractableResponse<Response> response = getRequestWithParameter("/lines/{id}", id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
+
+    private ExtractableResponse<Response> 노선_목록을_조회한다() {
+        ExtractableResponse<Response> response = getRequest("/lines");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
