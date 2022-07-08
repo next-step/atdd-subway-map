@@ -5,8 +5,6 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -39,10 +37,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params1.put("upStationId", "1");
         params1.put("downStationId", "3");
         params1.put("distance", "5");
-        registry(params1);
+        지하철노선_생성요청(params1);
 
         // then
-        final ExtractableResponse<Response> response = getAllLines();
+        final ExtractableResponse<Response> response = 지하철노선_목록_조회요청();
         final List<String> lineNames = response.jsonPath().getList("name", String.class);
         assertThat(lineNames).contains("분당선");
 
@@ -67,7 +65,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params1.put("upStationId", "1");
         params1.put("downStationId", "3");
         params1.put("distance", "5");
-        registry(params1);
+        지하철노선_생성요청(params1);
 
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", "신분당선");
@@ -75,10 +73,10 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params2.put("upStationId", "1");
         params2.put("downStationId", "2");
         params2.put("distance", "10");
-        registry(params2);
+        지하철노선_생성요청(params2);
 
         // when
-        final ExtractableResponse<Response> response = getAllLines();
+        final ExtractableResponse<Response> response = 지하철노선_목록_조회요청();
 
         // then
         final List<String> lineNames = response.jsonPath().getList("name", String.class);
@@ -103,13 +101,13 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params1.put("upStationId", "1");
         params1.put("downStationId", "3");
         params1.put("distance", "5");
-        final ExtractableResponse<Response> registryResponse = registry(params1);
+        final ExtractableResponse<Response> registryResponse = 지하철노선_생성요청(params1);
 
         // when
         final Long id = registryResponse.jsonPath().getLong("id");
 
         //then
-        final ExtractableResponse<Response> getLineResponse = getLine(id);
+        final ExtractableResponse<Response> getLineResponse = 지하철노선_조회요청(id);
         final JsonPath jsonPath = getLineResponse.jsonPath();
 
         final String name = jsonPath.getString("name");
@@ -128,7 +126,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 노선을 수정한다.")
     @Order(4)
     @Test
-    void updateLine() {
+    void 지하철노선_수정요청() {
         // given
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", "분당선");
@@ -136,7 +134,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params1.put("upStationId", "1");
         params1.put("downStationId", "3");
         params1.put("distance", "5");
-        final ExtractableResponse<Response> registryResponse = registry(params1);
+        final ExtractableResponse<Response> registryResponse = 지하철노선_생성요청(params1);
 
         // when
         final Long id = registryResponse.jsonPath().getLong("id");
@@ -145,7 +143,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params1.put("name", "뉴분당선");
         params1.put("upStationId", "2");
         params1.put("downStationId", "4");
-        final ExtractableResponse<Response> updateLineResponse = updateLine(id, params1);
+        final ExtractableResponse<Response> updateLineResponse = 지하철노선_수정요청(id, params1);
         final JsonPath jsonPath = updateLineResponse.jsonPath();
 
         final String name = jsonPath.getString("name");
@@ -172,19 +170,19 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params1.put("upStationId", "1");
         params1.put("downStationId", "3");
         params1.put("distance", "5");
-        final ExtractableResponse<Response> registryResponse = registry(params1);
+        final ExtractableResponse<Response> registryResponse = 지하철노선_생성요청(params1);
 
         // when
         final long id = registryResponse.jsonPath().getLong("id");
-        deleteById(id);
+        지하철노선_삭제요청(id);
 
         // then
-        final ExtractableResponse<Response> getResponse = getLine(id);
+        final ExtractableResponse<Response> getResponse = 지하철노선_조회요청(id);
         assertThat(getResponse.response().getStatusCode())
                 .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    private ExtractableResponse<Response> registry(Map<String, String> params) {
+    private ExtractableResponse<Response> 지하철노선_생성요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -193,7 +191,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
                 .extract();
     }
 
-    private ExtractableResponse<Response> getAllLines() {
+    private ExtractableResponse<Response> 지하철노선_목록_조회요청() {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("lines")
@@ -201,7 +199,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
                 .extract();
     }
 
-    private ExtractableResponse<Response> getLine(Long id) {
+    private ExtractableResponse<Response> 지하철노선_조회요청(Long id) {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("lines/" + id)
@@ -209,7 +207,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
                 .extract();
     }
 
-    private ExtractableResponse<Response> updateLine(Long id, Map<String, String> params) {
+    private ExtractableResponse<Response> 지하철노선_수정요청(Long id, Map<String, String> params) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
@@ -218,7 +216,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
                 .extract();
     }
 
-    private ExtractableResponse<Response> deleteById(long id) {
+    private ExtractableResponse<Response> 지하철노선_삭제요청(long id) {
         return RestAssured.given().log().all()
                 .when().delete("lines/" + id)
                 .then().log().all()

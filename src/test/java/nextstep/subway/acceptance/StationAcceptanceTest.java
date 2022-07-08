@@ -3,11 +3,9 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -20,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest extends AcceptanceTest{
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -35,13 +33,13 @@ public class StationAcceptanceTest extends AcceptanceTest{
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = registry(params);
+        ExtractableResponse<Response> response = 지하철역_생성요청(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getAllStations()
+        List<String> stationNames = 지하철역_목록_조회요청()
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
@@ -59,14 +57,14 @@ public class StationAcceptanceTest extends AcceptanceTest{
         // given
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", "역삼역");
-        registry(params1);
+        지하철역_생성요청(params1);
 
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", "선릉역");
-        registry(params2);
+        지하철역_생성요청(params2);
 
         // when
-        final ExtractableResponse<Response> response = getAllStations();
+        final ExtractableResponse<Response> response = 지하철역_목록_조회요청();
 
         // then
         final List<String> names = response
@@ -87,21 +85,21 @@ public class StationAcceptanceTest extends AcceptanceTest{
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "삼성역");
-        final ExtractableResponse<Response> registryResponse = registry(params);
+        final ExtractableResponse<Response> 삼성역 = 지하철역_생성요청(params);
 
         // when
-        final long id = registryResponse.jsonPath().getLong("id");
-        deleteStation(id);
+        final long id = 삼성역.jsonPath().getLong("id");
+        지하철역_삭제_요청(id);
 
         // then
-        final ExtractableResponse<Response> getResponse = getAllStations();
+        final ExtractableResponse<Response> getResponse = 지하철역_목록_조회요청();
         final List<String> names = getResponse
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(names).doesNotContain("삼성역");
     }
 
-    private ExtractableResponse<Response> registry(Map<String, String> params) {
+    public ExtractableResponse<Response> 지하철역_생성요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +108,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
                 .extract();
     }
 
-    private ExtractableResponse<Response> getAllStations() {
+    private ExtractableResponse<Response> 지하철역_목록_조회요청() {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/stations")
@@ -118,7 +116,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
                 .extract();
     }
 
-    private ExtractableResponse<Response> deleteStation(long id) {
+    private ExtractableResponse<Response> 지하철역_삭제_요청(long id) {
         return RestAssured.given().log().all()
                 .when().delete("/stations/" + id)
                 .then().log().all()
