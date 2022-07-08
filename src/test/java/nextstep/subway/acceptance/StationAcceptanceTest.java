@@ -24,6 +24,8 @@ public class StationAcceptanceTest {
 	@LocalServerPort
 	int port;
 
+	private static final String STATION_NAME = "강남역";
+
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
@@ -38,14 +40,14 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		ExtractableResponse<Response> response = 지하철역_생성("강남역");
+		ExtractableResponse<Response> response = 지하철역_생성(STATION_NAME);
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
 		List<String> stationNames = 지하철역_목록_조회();
-		assertThat(stationNames).containsAnyOf("강남역");
+		assertThat(stationNames).containsAnyOf(STATION_NAME);
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class StationAcceptanceTest {
 	@Test
 	void getStations() {
 		// given
-		지하철역_생성("강남역");
+		지하철역_생성(STATION_NAME);
 		지하철역_생성("역삼역");
 
 		// when
@@ -76,16 +78,16 @@ public class StationAcceptanceTest {
 	@Test
 	void deleteStation() {
 		// given
-        String name = "강남역";
-		ExtractableResponse<Response> responseOfCreate = 지하철역_생성(name);
+		ExtractableResponse<Response> responseOfCreate = 지하철역_생성(STATION_NAME);
 		Long id = responseOfCreate.jsonPath().getLong("id");
 
 		// when
-		지하철역_삭제(id);
+		ExtractableResponse<Response> responseOfDelete = 지하철역_삭제(id);
+		assertThat(responseOfDelete.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		// then
 		List<String> stationNames = 지하철역_목록_조회();
-		assertThat(stationNames).doesNotContain(name);
+		assertThat(stationNames).doesNotContain(STATION_NAME);
 	}
 
 	private ExtractableResponse<Response> 지하철역_생성(String name) {
@@ -107,10 +109,11 @@ public class StationAcceptanceTest {
 			.extract().jsonPath().getList("name", String.class);
 	}
 
-	private void 지하철역_삭제(Long id) {
-		RestAssured.given().log().all()
+	private ExtractableResponse<Response> 지하철역_삭제(Long id) {
+		return RestAssured.given().log().all()
 			.when().delete("/stations/" + id)
-			.then().log().all();
+			.then().log().all()
+			.extract();
 	}
 
 }
