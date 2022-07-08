@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class LineTest {
 
     @Test
-    void 라인을_생성한다() {
+    void 노선을_생성한다() {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
@@ -32,7 +32,7 @@ class LineTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {" ", ""})
-    void 라인_생성_시_이름이_빈칸이거나_널이면_예외를_발생시킨다(String name) {
+    void 노선_생성_시_이름이_빈칸이거나_널이면_예외를_발생시킨다(String name) {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
@@ -44,7 +44,7 @@ class LineTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {" ", ""})
-    void 라인_생성_시_색상이_빈칸이거나_널이면_예외를_발생시킨다(String color) {
+    void 노선_생성_시_색상이_빈칸이거나_널이면_예외를_발생시킨다(String color) {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
@@ -75,7 +75,7 @@ class LineTest {
     }
 
     @Test
-    void 라인의_정보를_변경_시킨다() {
+    void 노선의_정보를_변경_시킨다() {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
@@ -92,7 +92,7 @@ class LineTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {" ", ""})
-    void 라인_이름_변경시_빈칸이거나_널이면_예외를_발생시킨다(String name) {
+    void 노선_이름_변경시_빈칸이거나_널이면_예외를_발생시킨다(String name) {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
@@ -105,7 +105,7 @@ class LineTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {" ", ""})
-    void 라인_색상_변경시_빈칸이거나_널이면_예외를_발생시킨다(String color) {
+    void 노선_색상_변경시_빈칸이거나_널이면_예외를_발생시킨다(String color) {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
