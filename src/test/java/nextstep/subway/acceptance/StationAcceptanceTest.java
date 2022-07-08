@@ -7,7 +7,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,11 +41,11 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        var stationNames = RestAssured
+                        .when()
+                            .get("/stations")
+                        .then()
+                            .extract().jsonPath().getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -65,7 +64,6 @@ public class StationAcceptanceTest {
 
         // when
         var response = RestAssured
-                .given()
                 .when()
                     .get("/stations")
                 .then()
