@@ -67,7 +67,7 @@ public class StationAcceptanceTest {
 
         List<String> resultList = response.jsonPath().getList("name", String.class);
         assertThat(resultList).contains("성수역", "건대입구역");
-        assertThat(resultList.size()).isEqualTo(2);
+        assertThat(resultList).hasSize(2);
     }
 
     /**
@@ -84,7 +84,8 @@ public class StationAcceptanceTest {
         long stationId = response.jsonPath().getLong("id");
 
         // when
-        지하철역_삭제(stationId);
+        ExtractableResponse<Response> deleteResponse = 지하철역_삭제(stationId);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
         List<String> resultList = 지하철역_전체_조회().jsonPath().getList("name", String.class);
@@ -108,10 +109,11 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private void 지하철역_삭제(long stationId) {
-        RestAssured
+    private ExtractableResponse<Response> 지하철역_삭제(long stationId) {
+        return RestAssured
                 .given().log().all()
                 .when().delete("/stations/{stationId}", stationId)
-                .then().log().all();
+                .then().log().all()
+                .extract();
     }
 }
