@@ -43,7 +43,7 @@ class StationAcceptanceTest {
         ExtractableResponse<Response> response = createStationRequest(name);
 
         // then: 지하철역이 정상적으로 생성되었고, 목록에 존재하는지 검증한다.
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertStatusCode(response, HttpStatus.CREATED);
         assertThat(getStationNamesRequest()).containsAnyOf(name);
     }
 
@@ -62,7 +62,6 @@ class StationAcceptanceTest {
         final String name2 = "역삼역";
         createStationRequest(name2);
 
-
         // when: 지하철 역들을 조회한다.
         ExtractableResponse<Response> response = getStationsRequest();
 
@@ -70,7 +69,7 @@ class StationAcceptanceTest {
         final List<String> names = response.jsonPath()
                 .getList("name", String.class);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertStatusCode(response, HttpStatus.OK);
         assertThat(names.size()).isEqualTo(2);
     }
 
@@ -92,7 +91,7 @@ class StationAcceptanceTest {
         final ExtractableResponse<Response> response = deleteStationRequest(id);
 
         // then: 지하철 역이 제거되었는지 검증한다.
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertStatusCode(response, HttpStatus.NO_CONTENT);
         assertThat(getStationNamesRequest()).doesNotContain(name);
     }
 
@@ -130,6 +129,11 @@ class StationAcceptanceTest {
         return getStationsRequest()
                 .jsonPath()
                 .getList("name", String.class);
+    }
+
+
+    private void assertStatusCode(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
 }
