@@ -6,7 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import nextstep.subway.dto.StationRequestDto;
+import nextstep.subway.applicaion.dto.StationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,10 +75,23 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        //Given
+        ExtractableResponse<Response> response = 지하철역_등록("강남역");
+
+        String url = response.header("Location");
+
+        //when
+        지하철역_삭제(url);
+
+        //then
+        List<String> stationNames = 지하철역_목록_조회();
+
+        assertThat(stationNames).hasSize(0);
+        assertThat(stationNames).doesNotContain("강남역");
     }
 
     private ExtractableResponse<Response> 지하철역_등록(String stationName) {
-        StationRequestDto station = new StationRequestDto(stationName);
+        StationRequest station = new StationRequest(stationName);
 
         return RestAssured
                 .given()
@@ -94,12 +107,25 @@ public class StationAcceptanceTest {
     }
 
     private List<String> 지하철역_목록_조회() {
-        return RestAssured.given().log().all()
+        return RestAssured
+                .given()
+                    .log().all()
                 .when()
-                .get("/stations")
+                    .get("/stations")
                 .then()
-                .statusCode(200)
-                .log().all()
-                .extract().jsonPath().getList("name", String.class);
+                    .statusCode(200)
+                    .log().all()
+                    .extract().jsonPath().getList("name", String.class);
+    }
+
+    private ExtractableResponse<Response> 지하철역_삭제(String url) {
+        return RestAssured
+                .given()
+                    .log().all()
+                .when()
+                    .delete(url)
+                .then()
+                    .log().all()
+                    .extract();
     }
 }
