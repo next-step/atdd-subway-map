@@ -3,12 +3,11 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
@@ -17,6 +16,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Sql(scripts = {"classpath:station-setup.sql"})
 @DisplayName("지하철 노선 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
@@ -33,11 +34,40 @@ public class LineAcceptanceTest {
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    @Sql("classpath:station-setup.sql")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("노선을 생성한다.")
     @Test
+    @Order(1)
     void createLine() {
         // when
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", "분당선");
+        params1.put("color", "bg-green-600");
+        params1.put("upStationId", "1");
+        params1.put("downStationId", "3");
+        params1.put("distance", "5");
+        registry(params1);
+
+        // then
+        final ExtractableResponse<Response> response = getAllLines();
+        final List<String> lineNames = response.jsonPath().getList("name", String.class);
+        assertThat(lineNames).contains("분당선");
+
+        final List<String> list = response.jsonPath().getList("stations.name", String.class);
+        assertThat(list).contains("[강남역, 선릉역]");
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @DisplayName("노선을 조회한다.")
+    @Order(2)
+    @Test
+    void findLine() {
+        // given
         Map<String, String> params1 = new HashMap<>();
         params1.put("name", "분당선");
         params1.put("color", "bg-green-600");
@@ -54,13 +84,13 @@ public class LineAcceptanceTest {
         params2.put("distance", "10");
         registry(params2);
 
-        // then
+        // when
         final ExtractableResponse<Response> response = getAllLines();
-        final List<String> lineNames = response.jsonPath().getList("name", String.class);
-        assertThat(lineNames).contains("분당선", "신분당선");
 
-        final List<String> list = response.jsonPath().getList("stations.name", String.class);
-        assertThat(list).contains("[강남역, 선릉역]", "[강남역, 역삼역]");
+        // then
+        final List<String> lineNames = response.jsonPath().getList("name", String.class);
+        assertThat(lineNames.size()).isEqualTo(2);
+        assertThat(lineNames).contains("분당선", "신분당선");
     }
 
     private ExtractableResponse<Response> registry(Map<String, String> params) {
