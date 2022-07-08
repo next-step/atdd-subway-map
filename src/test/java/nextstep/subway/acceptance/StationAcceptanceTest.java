@@ -27,30 +27,6 @@ public class StationAcceptanceTest {
         RestAssured.port = port;
     }
 
-    private ExtractableResponse<Response> 지하철역_전체_조회() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성(String stationName) {
-        return RestAssured.given().log().all()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private void 지하철역_삭제(long stationId) {
-        RestAssured
-                .given().log().all()
-                .when().delete("/stations/{stationId}", stationId)
-                .then().log().all();
-    }
-
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -113,5 +89,29 @@ public class StationAcceptanceTest {
         // then
         List<String> resultList = 지하철역_전체_조회().jsonPath().getList("name", String.class);
         assertThat(resultList).doesNotContain("건대입구역");
+    }
+
+    private ExtractableResponse<Response> 지하철역_전체_조회() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철역_생성(String stationName) {
+        return RestAssured.given().log().all()
+                .body(Map.of("name", stationName))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private void 지하철역_삭제(long stationId) {
+        RestAssured
+                .given().log().all()
+                .when().delete("/stations/{stationId}", stationId)
+                .then().log().all();
     }
 }
