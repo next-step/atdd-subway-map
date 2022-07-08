@@ -46,7 +46,7 @@ public class StationAcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		List<String> stationNames = 지하철역_목록_조회();
+		List<String> stationNames = 지하철역_목록_조회_파싱();
 		assertThat(stationNames).containsAnyOf(STATION_NAME);
 	}
 
@@ -63,9 +63,11 @@ public class StationAcceptanceTest {
 		지하철역_생성("역삼역");
 
 		// when
-		List<String> stationNames = 지하철역_목록_조회();
+		ExtractableResponse<Response> response = 지하철역_목록_조회();
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 		// then
+		List<String> stationNames = 지하철역_목록_조회_파싱();
 		assertThat(stationNames).hasSize(2);
 	}
 
@@ -86,11 +88,11 @@ public class StationAcceptanceTest {
 		assertThat(responseOfDelete.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		// then
-		List<String> stationNames = 지하철역_목록_조회();
+		List<String> stationNames = 지하철역_목록_조회_파싱();
 		assertThat(stationNames).doesNotContain(STATION_NAME);
 	}
 
-	private ExtractableResponse<Response> 지하철역_생성(String name) {
+	ExtractableResponse<Response> 지하철역_생성(String name) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", name);
 
@@ -102,11 +104,21 @@ public class StationAcceptanceTest {
 			.extract();
 	}
 
-	private List<String> 지하철역_목록_조회() {
+	Long 지하철역_생성_파싱(String name) {
+		return 지하철역_생성(name)
+			.jsonPath().getLong("id");
+	}
+
+	private ExtractableResponse<Response> 지하철역_목록_조회() {
 		return RestAssured.given().log().all()
 			.when().get("/stations")
 			.then().log().all()
-			.extract().jsonPath().getList("name", String.class);
+			.extract();
+	}
+
+	private List<String> 지하철역_목록_조회_파싱() {
+		return 지하철역_목록_조회()
+			.jsonPath().getList("name", String.class);
 	}
 
 	private ExtractableResponse<Response> 지하철역_삭제(Long id) {
