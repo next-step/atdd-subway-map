@@ -35,4 +35,9 @@ public class LineController {
         return ResponseEntity.ok(lineService.findLineById(id));
     }
 
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        return ResponseEntity.ok(lineService.updateById(id, lineRequest));
+    }
+
 }

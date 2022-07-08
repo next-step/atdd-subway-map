@@ -25,9 +25,7 @@ public class LineResponse {
         id = line.getId();
         name = line.getName();
         color = line.getColor();
-        final long upStationId = line.getUpStationId();
-        final long downStationId = line.getDownStationId();
-        stations = stationRepository.findAllById(Arrays.asList(upStationId, downStationId));
+        stations = stationRepository.findAllById(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
     }
 
     public Long getId() {

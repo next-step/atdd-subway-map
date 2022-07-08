@@ -14,16 +14,16 @@ public class Line {
     private String name;
     private String color;
 
-    private long upStationId;
+    private Long upStationId;
 
-    private long downStationId;
+    private Long downStationId;
 
-    private long distance;
+    private Long distance;
 
-    protected Line() {
+    public Line() {
     }
 
-    public Line(String name, String color, int upStationId, int downStationId, int distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -43,15 +43,34 @@ public class Line {
         return color;
     }
 
-    public long getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public long getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public long getDistance() {
+    public Long getDistance() {
         return distance;
+    }
+
+    public Line update(Line line) {
+        if (line.getName() != null) {
+            name = line.getName();
+        }
+        if (line.getColor() != null) {
+            color = line.getColor();
+        }
+        if (line.getUpStationId() != null) {
+            upStationId = line.getUpStationId();
+        }
+        if (line.getDownStationId() != null) {
+            downStationId = line.getDownStationId();
+        }
+        if (line.getDistance() != null) {
+            distance = line.getDistance();
+        }
+        return this;
     }
 }
