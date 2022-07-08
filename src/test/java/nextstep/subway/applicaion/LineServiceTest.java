@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -10,6 +11,7 @@ import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -121,6 +123,38 @@ class LineServiceTest {
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() -> lineService.findLine(any()));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", ""})
+    void 노선_이름_변경시_빈칸이거나_널이면_예외를_발생시킨다(String name) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        given(lineRepository.findById(1L))
+                .willReturn(Optional.of(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역)));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.updateLine(1L, new LineUpdateRequest(name, "bg-lime-400"))
+        );
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", ""})
+    void 노선_색상_변경시_빈칸이거나_널이면_예외를_발생시킨다(String color) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        given(lineRepository.findById(1L))
+                .willReturn(Optional.of(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역)));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.updateLine(1L, new LineUpdateRequest("2호선", color))
+        );
     }
 
 }
