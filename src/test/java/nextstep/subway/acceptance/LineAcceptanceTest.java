@@ -44,7 +44,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 목록을 조회한다.")
     @Test
     void getLines() {
+        // given
+        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
+        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
+        LineResponse newLine1 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
+        Long 까치산역 = 역을_만들다("까치산역").as(StationResponse.class).getId();
+        Long 신설동역 = 역을_만들다("신설동역").as(StationResponse.class).getId();
+        LineResponse newLine2 = 노선을_만들다("2호선", "bg-lime-400", 까치산역, 신설동역, 23L).as(LineResponse.class);
+
+        // when
+        List<LineResponse> lineResponse = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
+
+        // then
+        assertThat(lineResponse).containsExactly(newLine1, newLine2);
     }
 
     /**
