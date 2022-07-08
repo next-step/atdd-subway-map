@@ -81,6 +81,18 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        //given
+        String stationName = "삼성역";
+        ExtractableResponse<Response> response = registerStation(stationName);
+
+        //when
+        Integer id = response.jsonPath().get("id");
+        ExtractableResponse<Response> deleteResponse = deleteStation(id);
+        List<String> findStations = findStations().jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(findStations).doesNotContain(stationName);
     }
 
     private ExtractableResponse<Response> registerStation(String stationName) {
@@ -109,4 +121,16 @@ public class StationAcceptanceTest {
                     .log().all()
                 .extract();
     }
+
+    private ExtractableResponse<Response> deleteStation(Integer id) {
+        return RestAssured
+                .given()
+                    .log().all()
+                .when()
+                    .delete("/stations/" + id)
+                .then()
+                    .log().all()
+                .extract();
+    }
+
 }
