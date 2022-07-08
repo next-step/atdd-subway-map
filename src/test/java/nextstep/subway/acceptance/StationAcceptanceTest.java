@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -107,6 +108,48 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다")
     @Test
     void deleteStation() {
+        // given - 2개의 지하철역 생성
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "서대문");
 
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "광화문");
+
+        RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        // when - 지하철역을 삭제
+        RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/1")
+                .then().log().all()
+                .extract();
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        // then - 지하철역 1개를 응답받는다
+        List<String> names = response.jsonPath().getList("name", String.class);
+
+        assertAll(
+                () -> assertThat(names).hasSize(1),
+                () -> assertThat(names).doesNotContain("서대문")
+        );
     }
 }
