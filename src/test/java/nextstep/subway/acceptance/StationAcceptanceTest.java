@@ -42,13 +42,10 @@ public class StationAcceptanceTest {
     @Order(1)
     void createStation() {
         // when
-        ExtractableResponse<Response> response = makeStation(Map.of("name", "역삼역"));
+        makeStationAndVerify(Map.of("name", "역삼역"));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = getStationNamesAndVerify();
         assertThat(stationNames).containsAnyOf("역삼역");
     }
 
@@ -62,11 +59,11 @@ public class StationAcceptanceTest {
     @Order(2)
     void getStations() {
         // when
-        makeStation(Map.of("name", "선릉역"));
-        makeStation(Map.of("name", "삼성역"));
+        makeStationAndVerify(Map.of("name", "선릉역"));
+        makeStationAndVerify(Map.of("name", "삼성역"));
 
         // when
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = getStationNamesAndVerify();
 
         // then
         assertThat(stationNames).hasSize(2).contains("삼성역", "선릉역");
@@ -82,7 +79,7 @@ public class StationAcceptanceTest {
     @Order(3)
     void deleteStation() {
         // given
-        Long id = makeStation(Map.of("name", "강남역")).jsonPath().getLong("id");
+        Long id = makeStationAndVerify(Map.of("name", "강남역")).jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response =
@@ -94,23 +91,31 @@ public class StationAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = getStationNamesAndVerify();
         assertThat(stationNames).doesNotContain("강남역");
     }
 
-    ExtractableResponse<Response> makeStation(Map<String, String> params) {
-        return RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+    ExtractableResponse<Response> makeStationAndVerify(Map<String, String> params) {
+        var response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return response;
     }
 
-    List<String> getStationNames() {
-        return RestAssured.given().log().all()
+    List<String> getStationNamesAndVerify() {
+        var response = RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return response.jsonPath().getList("name", String.class);
     }
 }
