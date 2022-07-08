@@ -28,6 +28,16 @@ class LineTest {
         });
     }
 
+    @Test
+    void 상행종점역과_하행종점역이_같은_경우_예외를_발생시킨다() {
+        // given
+        final Station 모란역1 = new Station(1L, "모란역");
+        final Station 모란역2 = new Station(1L, "모란역");
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> new Line("8호선", "bg-pink-500", 17L, 모란역1, 모란역2));
+    }
+
     @ParameterizedTest
     @ValueSource(longs = {0L, -1L, -2L})
     void 거리가_1_미만인_경우_예외를_발생시킨다(long distance) {
