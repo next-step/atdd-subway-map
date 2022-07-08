@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -61,8 +62,13 @@ public class StationAcceptanceTest {
         String station1 = "강남역";
         String station2 = "신논현역";
 
-        createStationRequest(station1);
-        createStationRequest(station2);
+        ExtractableResponse<Response> createStationResponse1 = createStationRequest(station1);
+        ExtractableResponse<Response> createStationResponse2 = createStationRequest(station2);
+
+        assertAll(
+                () -> assertThat(createStationResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(createStationResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
 
         // when
         List<String> stationNames = findAllStationsRequest();
@@ -85,11 +91,14 @@ public class StationAcceptanceTest {
         createStationRequest(station);
 
         // when
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().delete("/stations/{id}", 1L)
-                .then().log().all();
+                .then().log().all()
+                .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
         List<String> stationNames = findAllStationsRequest();
         assertThat(stationNames).hasSize(0);
     }
