@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +29,30 @@ class LineTest {
         });
     }
 
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", ""})
+    void 라인_생성_시_이름이_빈칸이거나_널이면_예외를_발생시킨다(String name) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> new Line(name, "bg-pink-500", 17L, 모란역, 암사역));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", ""})
+    void 라인_생성_시_색상이_빈칸이거나_널이면_예외를_발생시킨다(String color) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> new Line("호선", color, 17L, 모란역, 암사역));
+    }
+
     @Test
     void 상행종점역과_하행종점역이_같은_경우_예외를_발생시킨다() {
         // given
@@ -47,8 +72,47 @@ class LineTest {
 
         // when
         assertThatIllegalArgumentException().isThrownBy(() -> new Line("8호선", "bg-pink-500", distance, 모란역, 암사역));
+    }
 
+    @Test
+    void 라인의_정보를_변경_시킨다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        Line line = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
 
+        // when
+        line.changeInfo("2호선", "bg-lime-400");
+
+        // then
+        assertThat(line.getName()).isEqualTo("2호선");
+        assertThat(line.getColor()).isEqualTo("bg-lime-400");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", ""})
+    void 라인_이름_변경시_빈칸이거나_널이면_예외를_발생시킨다(String name) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        Line line = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> line.changeInfo(name, "bg-pink-500"));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", ""})
+    void 라인_색상_변경시_빈칸이거나_널이면_예외를_발생시킨다(String color) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        Line line = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> line.changeInfo("2호선", color));
     }
 
 }

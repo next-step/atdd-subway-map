@@ -15,10 +15,27 @@ public class Line {
     @Embedded
     private Stations stations;
 
+    public void changeInfo(String name, String color) {
+        validation(name, color);
+        this.name = name;
+        this.color = color;
+    }
+
+    private void validation(String name, String color) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("노선의 이름을 작성해주세요");
+        }
+
+        if (color == null || color.isBlank()) {
+            throw new IllegalArgumentException("색상을 넣어 주세요");
+        }
+    }
+
     protected Line() {
     }
 
     public Line(String name, String color, long distance, Station upStation, Station downStation) {
+        validation(name, color);
         this.name = name;
         this.color = color;
         this.distance = new Distance(distance);
@@ -44,4 +61,6 @@ public class Line {
     public Stations getStations() {
         return stations;
     }
+
+
 }
