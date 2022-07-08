@@ -88,11 +88,12 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String 강남역 = "강남역";
-        createStationRequest(강남역);
+        ExtractableResponse<Response> 강남역_생성_응답 = createStationRequest(강남역);
+        Long 강남역_고유번호 = 강남역_생성_응답.jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/stations/{id}", 1L)
+                .when().delete("/stations/{id}", 강남역_고유번호)
                 .then().log().all()
                 .extract();
 
