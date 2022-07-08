@@ -3,12 +3,12 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +20,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest extends AcceptanceTest {
 
+    @AfterEach
+    void cleanUp() {
+        final ExtractableResponse<Response> 지하철역_목록_응답 = 지하철역_목록_조회요청();
+        final List<Long> ids = 지하철역_목록_응답.jsonPath().getList("id", Long.class);
+        ids.forEach(this::지하철역_삭제요청);
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -50,7 +56,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
@@ -78,7 +83,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
@@ -89,7 +93,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
         // when
         final long id = 삼성역.jsonPath().getLong("id");
-        지하철역_삭제_요청(id);
+        지하철역_삭제요청(id);
 
         // then
         final ExtractableResponse<Response> getResponse = 지하철역_목록_조회요청();
@@ -99,7 +103,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(names).doesNotContain("삼성역");
     }
 
-    public ExtractableResponse<Response> 지하철역_생성요청(Map<String, String> params) {
+    public static ExtractableResponse<Response> 지하철역_생성요청(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -116,7 +120,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철역_삭제_요청(long id) {
+    private ExtractableResponse<Response> 지하철역_삭제요청(long id) {
         return RestAssured.given().log().all()
                 .when().delete("/stations/" + id)
                 .then().log().all()
