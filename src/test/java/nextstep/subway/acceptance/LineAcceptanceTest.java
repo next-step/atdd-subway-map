@@ -21,16 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Sql(scripts = {"classpath:station-setup.sql"})
 @DisplayName("지하철 노선 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
+public class LineAcceptanceTest extends AcceptanceTest{
 
     /**
      * When 지하철 노선을 생성하면
