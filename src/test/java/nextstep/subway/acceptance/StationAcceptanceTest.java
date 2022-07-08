@@ -126,6 +126,7 @@ public class StationAcceptanceTest {
                     .delete(url)
                 .then()
                     .log().all()
+                    .statusCode(203)
                     .extract();
     }
 }
