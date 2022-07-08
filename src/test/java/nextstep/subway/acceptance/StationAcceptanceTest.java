@@ -77,6 +77,19 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given
+        ExtractableResponse<Response> saveResponse = saveStation(Map.of("name", "서울대입구역"));
+
+        // when
+        Integer id = saveResponse.body().jsonPath().get("id");
+        RestAssured
+                .given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all();
+
+        // then
+        List<String> names = findStations().jsonPath().getList("name", String.class);
+        assertThat(names.contains("서울대입구역")).isFalse();
     }
 
     /**
