@@ -69,7 +69,38 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        //given
+        createStationRequest(Map.of("name", "서현역"));
+        createStationRequest(Map.of("name", "이매역"));
+
+        //when
+        ExtractableResponse<Response> stationsResponse = getStationsRequest();
+
+        //then
+        List<String> stationNameList = stationsResponse.jsonPath().getList("name", String.class);
+
+        assertThat(stationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(stationNameList).containsAnyOf("서현역");
+        assertThat(stationNameList).containsAnyOf("이매역");
     }
+
+    private ExtractableResponse<Response> createStationRequest(Map<String, String> params){
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> getStationsRequest(){
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/stations")
+            .then().log().all()
+            .extract();
+    }
+
     
     /**
      * Given 지하철역을 생성하고
