@@ -10,7 +10,8 @@ public class Line {
 
     private String name;
     private String color;
-    private long distance;
+    @Embedded
+    private Distance distance;
     @Embedded
     private Stations stations;
 
@@ -20,7 +21,7 @@ public class Line {
     public Line(String name, String color, long distance, Station upStation, Station downStation) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
+        this.distance = new Distance(distance);
         this.stations = new Stations(upStation, downStation);
     }
 
@@ -34,6 +35,10 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    public Distance getDistance() {
+        return distance;
     }
 
     public Stations getStations() {

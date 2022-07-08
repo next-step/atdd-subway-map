@@ -9,6 +9,8 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -71,6 +73,20 @@ class LineServiceTest {
         // given
         final LineRequest lineRequest = new LineRequest("8호선", "bg-pink-500", 1L, 2L, 17L);
         given(stationRepository.findById(any())).willReturn(Optional.empty());
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> lineService.saveLine(lineRequest));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0L, -1L, -2L})
+    void 거리가_1_미만인_경우_예외를_발생시킨다(long distance) {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final LineRequest lineRequest = new LineRequest("8호선", "bg-pink-500", 1L, 2L, distance);
+        given(stationRepository.findById(any())).willReturn(Optional.of(모란역));
+        given(stationRepository.findById(any())).willReturn(Optional.of(암사역));
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() -> lineService.saveLine(lineRequest));
