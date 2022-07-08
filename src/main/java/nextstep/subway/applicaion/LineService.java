@@ -51,4 +51,9 @@ public class LineService {
         final Line update = line.update(lineRequest.toDomain());
         return createLineResponse(update);
     }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 }

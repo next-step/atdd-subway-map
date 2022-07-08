@@ -164,6 +164,35 @@ public class LineAcceptanceTest {
         assertThat(color).isEqualTo(params1.get("color"));
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Order(5)
+    @Test
+    void deleteLine() {
+        // given
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", "분당선");
+        params1.put("color", "bg-green-600");
+        params1.put("upStationId", "1");
+        params1.put("downStationId", "3");
+        params1.put("distance", "5");
+        final ExtractableResponse<Response> registryResponse = registry(params1);
+
+        // when
+        final long id = registryResponse.jsonPath().getLong("id");
+        deleteById(id);
+
+        // then
+        final ExtractableResponse<Response> getResponse = getLine(id);
+        assertThat(getResponse.response().getStatusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private ExtractableResponse<Response> registry(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
@@ -194,6 +223,13 @@ public class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
                 .when().put("lines/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteById(long id) {
+        return RestAssured.given().log().all()
+                .when().delete("lines/" + id)
                 .then().log().all()
                 .extract();
     }
