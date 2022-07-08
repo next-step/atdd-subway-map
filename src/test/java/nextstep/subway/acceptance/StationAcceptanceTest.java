@@ -97,7 +97,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> 역을_만들다(String name) {
+    public static ExtractableResponse<Response> 역을_만들다(String name) {
         StationRequest stationRequest = new StationRequest(name);
         ExtractableResponse<Response> response = postRequestWithRequestBody("/stations", stationRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());

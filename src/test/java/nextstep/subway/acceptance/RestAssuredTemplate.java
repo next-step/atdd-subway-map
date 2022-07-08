@@ -15,6 +15,14 @@ public class RestAssuredTemplate {
                 .extract();
     }
 
+    public static <T> ExtractableResponse<Response> getRequestWithParameter(String url, T parameter) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(url, parameter)
+                .then().log().all()
+                .extract();
+    }
+
     public static <T> ExtractableResponse<Response> postRequestWithRequestBody(String url, T body) {
         return RestAssured.given().log().all()
                 .body(body)

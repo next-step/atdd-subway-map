@@ -1,7 +1,18 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+
+import static nextstep.subway.acceptance.RestAssuredTemplate.*;
+import static nextstep.subway.acceptance.StationAcceptanceTest.역을_만들다;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -35,7 +46,23 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine() {
+        // given
+        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
+        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
+        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
+        // when
+        LineResponse lineResponse = 노선을_조회한다(newLine.getId()).as(LineResponse.class);
+
+        // then
+        assertAll(() -> {
+            assertThat(lineResponse.getName()).isEqualTo("8호선");
+            assertThat(lineResponse.getColor()).isEqualTo("bg-pink-500");
+            assertThat(lineResponse.getStationResponses()).containsExactly(
+                    new StationResponse(1L, "모란역"),
+                    new StationResponse(2L, "암사역")
+            );
+        });
     }
 
     /**
@@ -58,5 +85,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
 
+    }
+
+    public static ExtractableResponse<Response> 노선을_만들다(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
+        ExtractableResponse<Response> response = postRequestWithRequestBody("/lines", lineRequest);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
+    }
+
+    private ExtractableResponse<Response> 노선을_조회한다(Long id) {
+        ExtractableResponse<Response> response = getRequestWithParameter("/lines/{id}", id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
     }
 }
