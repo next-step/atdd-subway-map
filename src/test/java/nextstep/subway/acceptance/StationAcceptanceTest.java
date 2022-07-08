@@ -66,7 +66,6 @@ class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
@@ -110,11 +109,38 @@ class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given: 1개의 지하철 역을 생성한다.
+        final Map<String, Object> params = new HashMap<>();
+        final String name = "잠실역";
+        params.put("name", name);
 
+        final Long id = RestAssured
+                .given().log().all()
+                .body(params).contentType(ContentType.JSON)
+                .when()
+                .post("/stations")
+                .then().log().all().extract().jsonPath().getObject("id", Long.class);
+
+        // when: 1개의 지하철 역을 제거한다.
+        final int responseStatusCode = RestAssured
+                .given().log().all()
+                .when()
+                .delete("/stations/{id}", id)
+                .then().log().all().extract().response().statusCode();
+
+        // then: 지하철 역이 제거되었는지 검증한다.
+        assertThat(responseStatusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        final List<String> names = RestAssured
+                .given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all().extract().jsonPath().getList("name", String.class);
+
+        assertThat(names.contains(name)).isFalse();
     }
 
 }
