@@ -11,6 +11,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,36 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStation() {
+        //given
+        Map<String, String> firstStation = new HashMap<>();
+        firstStation.put("name", "신림역");
+
+        RestAssured.given().log().all()
+                .body(firstStation)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+        Map<String, String> twoStation = new HashMap<>();
+        twoStation.put("name", "봉천역");
+
+        RestAssured.given().log().all()
+                .body(twoStation)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+        //when
+        List<String> stations =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(stations.size()).isEqualTo(2);
+        assertThat(stations).containsExactly("신림역", "봉천역");
+
 
     }
 
@@ -81,6 +112,28 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-        
+        //given
+        Map<String, String> firstStation = new HashMap<>();
+        firstStation.put("name", "신림역");
+
+        RestAssured.given().log().all()
+                .body(firstStation)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/1")
+                .then().log().all();
+
+        List<String> stationName =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(stationName).doesNotContain("신림역");
     }
 }
