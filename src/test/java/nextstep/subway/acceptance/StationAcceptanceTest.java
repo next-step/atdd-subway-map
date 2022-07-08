@@ -88,8 +88,8 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> resultList = 지하철역_전체_조회().jsonPath().getList("name", String.class);
-        assertThat(resultList).doesNotContain("건대입구역");
+        List<String> allStationNames = 지하철역_전체_조회().jsonPath().getList("name", String.class);
+        assertThat(allStationNames).doesNotContain("건대입구역");
     }
 
     private ExtractableResponse<Response> 지하철역_전체_조회() {
