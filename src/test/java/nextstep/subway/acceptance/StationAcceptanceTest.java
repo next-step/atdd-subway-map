@@ -59,15 +59,15 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        String station1 = "강남역";
-        String station2 = "신논현역";
+        String 강남역 = "강남역";
+        String 신논현역 = "신논현역";
 
-        ExtractableResponse<Response> createStationResponse1 = createStationRequest(station1);
-        ExtractableResponse<Response> createStationResponse2 = createStationRequest(station2);
+        ExtractableResponse<Response> 강남역_생성_응답 = createStationRequest(강남역);
+        ExtractableResponse<Response> 신논현역_생성_응답 = createStationRequest(신논현역);
 
         assertAll(
-                () -> assertThat(createStationResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(createStationResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+                () -> assertThat(강남역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(신논현역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
         );
 
         // when
@@ -87,8 +87,8 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String station = "강남역";
-        createStationRequest(station);
+        String 강남역 = "강남역";
+        createStationRequest(강남역);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
