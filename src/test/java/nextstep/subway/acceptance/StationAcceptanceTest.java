@@ -44,8 +44,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = findStations()
-                .jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationNames(findStations());
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -65,7 +64,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = findStations();
 
         // then
-        List<String> names = response.jsonPath().getList("name", String.class);
+        List<String> names = getStationNames(response);
         assertThat(names).isEqualTo(List.of("낙성대역", "구로디지털단지역"));
     }
 
@@ -82,13 +81,15 @@ public class StationAcceptanceTest {
 
         // when
         Integer id = saveResponse.body().jsonPath().get("id");
-        RestAssured
+        ExtractableResponse<Response> deleteResponse = RestAssured
                 .given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all();
+                .when().delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> names = findStations().jsonPath().getList("name", String.class);
+        List<String> names = getStationNames(findStations());
         assertThat(names.contains("서울대입구역")).isFalse();
     }
 
@@ -117,6 +118,15 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    /**
+     * Response에서 지하철역 이름 목록 추출
+     * @param response
+     * @return
+     */
+    private List<String> getStationNames(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
     }
 
 }
