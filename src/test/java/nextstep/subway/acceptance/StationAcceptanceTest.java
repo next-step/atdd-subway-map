@@ -36,28 +36,15 @@ class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        // given: 지하철 역을 생성한다.
+        final String name = "강남역";
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        // when: 지하철 역을 생성한다.
+        ExtractableResponse<Response> response = createStationRequest(name);
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        // then: 지하철역이 정상적으로 생성되었고, 목록에 존재하는지 검증한다.
+        assertStatusCode(response, HttpStatus.CREATED);
+        assertThat(getStationNamesRequest()).containsAnyOf(name);
     }
 
     /**
@@ -65,11 +52,25 @@ class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given: 2개의 지하철 역을 생성한다.
+        final String name1 = "선릉역";
+        createStationRequest(name1);
 
+        final String name2 = "역삼역";
+        createStationRequest(name2);
+
+        // when: 지하철 역들을 조회한다.
+        ExtractableResponse<Response> response = getStationsRequest();
+
+        // then: 지하철 역이 2개인지 검증한다.
+        final List<String> names = response.jsonPath()
+                .getList("name", String.class);
+
+        assertStatusCode(response, HttpStatus.OK);
+        assertThat(names.size()).isEqualTo(2);
     }
 
     /**
@@ -77,11 +78,62 @@ class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given: 1개의 지하철 역을 생성한다.
+        final String name = "잠실역";
+        final Long id = createStationRequest(name)
+                .jsonPath()
+                .getObject("id", Long.class);
 
+        // when: 1개의 지하철 역을 제거한다.
+        final ExtractableResponse<Response> response = deleteStationRequest(id);
+
+        // then: 지하철 역이 제거되었는지 검증한다.
+        assertStatusCode(response, HttpStatus.NO_CONTENT);
+        assertThat(getStationNamesRequest()).doesNotContain(name);
+    }
+
+    private ExtractableResponse<Response> createStationRequest(final String name) {
+        return RestAssured.given().log().all()
+                .body(createStationParams(name))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private Map<String, Object> createStationParams(final String name) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        return params;
+    }
+
+    private ExtractableResponse<Response> getStationsRequest() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteStationRequest(final Long id) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .delete("/stations/{id}", id)
+                .then().log().all().extract();
+    }
+
+    private List<String> getStationNamesRequest() {
+        return getStationsRequest()
+                .jsonPath()
+                .getList("name", String.class);
+    }
+
+
+    private void assertStatusCode(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
 }
