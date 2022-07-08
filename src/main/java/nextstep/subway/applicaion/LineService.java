@@ -39,11 +39,15 @@ public class LineService {
         return stationRepository.findById(upStationId).orElseThrow(() -> new IllegalArgumentException("역이 없습니다."));
     }
 
-
     private void validationStations(Long upStationId, Long downStationId) {
         if (Objects.equals(upStationId, downStationId)) {
             throw new IllegalArgumentException("상행종점역과 하행종점역의 아이디는 같을 수 없습니다.");
         }
+    }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+        return LineResponse.of(line);
     }
 
 }

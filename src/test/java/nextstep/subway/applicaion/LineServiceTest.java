@@ -91,4 +91,36 @@ class LineServiceTest {
         // then
         assertThatIllegalArgumentException().isThrownBy(() -> lineService.saveLine(lineRequest));
     }
+
+    @Test
+    void 노선을_조회한다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        given(lineRepository.findById(1L))
+                .willReturn(Optional.of(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역)));
+
+        // when
+        LineResponse lineResponse = lineService.findLine(1L);
+
+        // then
+        assertAll(() -> {
+            assertThat(lineResponse.getName()).isEqualTo("8호선");
+            assertThat(lineResponse.getColor()).isEqualTo("bg-pink-500");
+            assertThat(lineResponse.getStationResponses()).containsExactly(
+                    new StationResponse(1L, "모란역"),
+                    new StationResponse(2L, "암사역")
+            );
+        });
+    }
+
+    @Test
+    void 노선이_존재하지_않으면_예외를_발생시킨다() {
+        // given
+        given(lineRepository.findById(any())).willReturn(Optional.empty());
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() -> lineService.findLine(any()));
+    }
+
 }
