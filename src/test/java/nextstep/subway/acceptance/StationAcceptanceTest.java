@@ -44,6 +44,13 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
+    private void 지하철역_삭제(long stationId) {
+        RestAssured
+                .given().log().all()
+                .when().delete("/stations/{stationId}", stationId)
+                .then().log().all();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -101,10 +108,7 @@ public class StationAcceptanceTest {
         long stationId = response.jsonPath().getLong("id");
 
         // when
-        RestAssured
-                .given().log().all()
-                .when().delete("/stations/{stationId}", stationId)
-                .then().log().all();
+        지하철역_삭제(stationId);
 
         // then
         List<String> resultList = 지하철역_전체_조회().jsonPath().getList("name", String.class);
