@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @Controller
 public class LineController {
@@ -29,5 +30,11 @@ public class LineController {
     public ResponseEntity<LineResponse> findLine(@PathVariable Long id) {
         LineResponse line = lineService.findLine(id);
         return ResponseEntity.ok(line);
+    }
+
+    @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<LineResponse>> findLines() {
+        List<LineResponse> lines = lineService.findLines();
+        return ResponseEntity.ok(lines);
     }
 }

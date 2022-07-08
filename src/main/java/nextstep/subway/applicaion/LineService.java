@@ -9,7 +9,9 @@ import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -48,6 +50,11 @@ public class LineService {
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
         return LineResponse.of(line);
+    }
+
+    public List<LineResponse> findLines() {
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
 
 }
