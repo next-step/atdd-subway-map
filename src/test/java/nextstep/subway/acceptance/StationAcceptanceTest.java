@@ -88,16 +88,21 @@ public class StationAcceptanceTest {
         assertThat(names).hasSize(2);
     }
 
-    private void addStation(String name){
+    // 지하철역 추가하는 공통 로직
+    private ExtractableResponse<Response> addStation(String name){
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return response;
     }
 
     /**
@@ -106,5 +111,26 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다")
+    @Test
+    void deleteStation() {
+        // given
+        ExtractableResponse<Response> addResponse = addStation("강남역");
+        long id = addResponse.jsonPath().getLong("id");
 
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        List<Long> stationIdList = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("id", Long.class);
+
+        assertThat(stationIdList).isNotIn(id);
+    }
 }
