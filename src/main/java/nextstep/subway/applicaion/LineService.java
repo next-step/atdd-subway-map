@@ -57,7 +57,9 @@ public class LineService {
         ).collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 
     @Transactional
