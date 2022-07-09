@@ -139,17 +139,20 @@ public class LineAcceptanceTest {
 
         // When
         long lineId = 신분당선.jsonPath().getLong("id");
-        ExtractableResponse<Response> 신분당선_조회_응답 =
-                RestAssured
-                        .given().log().all()
-                        .when().get("/lines/" + lineId)
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> 신분당선_조회_응답 = findLineByIdAPIResponse(lineId);
 
         List<String> stationNames = 신분당선_조회_응답.jsonPath().getList("stations.name", String.class);
 
         // Then
         assertThat(stationNames).containsAnyOf("첫번째역", "새로운지하철역");
+    }
+
+    private ExtractableResponse<Response> findLineByIdAPIResponse(long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -160,7 +163,45 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 수정")
     @Test
     void updateLine() {
+        // Given
+        String 첫번째역 = "첫번째역";
+        String 두번째역 = "새로운지하철역";
 
+        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
+        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+
+        assertAll(
+                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
+
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // When
+        long lineId = 신분당선.jsonPath().getLong("id");
+
+        Map<String, String> lineChangeRequest = new HashMap<>();
+        lineChangeRequest.put("name", "다른분당선");
+        lineChangeRequest.put("color", "bg-red-600");
+
+        ExtractableResponse<Response> 지하철노선_수정_응답 = RestAssured
+                .given().log().all()
+                .body(lineChangeRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+        assertThat(지하철노선_수정_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // Then
+        ExtractableResponse<Response> 지하철노선_특정_조회_응답 = findLineByIdAPIResponse(lineId);
+
+        assertAll(
+                () -> assertThat(지하철노선_특정_조회_응답.jsonPath().getString("name")).isEqualTo("다른분당선"),
+                () -> assertThat(지하철노선_특정_조회_응답.jsonPath().getString("color")).isEqualTo("bg-red-600")
+        );
     }
 
     /**
