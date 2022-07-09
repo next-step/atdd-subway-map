@@ -136,7 +136,7 @@ public class StationAcceptanceTest {
                 .body(param)
                 .contentType(APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then()
+                .then().log().all()
                 .extract();
 
         return response;
