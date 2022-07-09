@@ -72,10 +72,42 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given
+        List<String> stationNames = List.of("강남역");
+        List<Long> stationIds = createStationsAndGetIds(stationNames);
+
+        // when
+        deleteStationsAndValidate(stationIds);
+
+        // then
+        getStationsAndValidateAbsence(stationNames);
+    }
+
+    private List<Long> createStationsAndGetIds(List<String> stationNames) {
+        return createStationsAndValidate(stationNames).stream()
+                .map(response -> response.jsonPath()
+                        .getLong("id"))
+                .collect(Collectors.toList());
+    }
+
+    private void deleteStationsAndValidate(List<Long> stationIds) {
+        stationIds.stream()
+                .map(id -> RestAssured.given().log().all()
+                        .when().delete("/stations/{id}", id)
+                        .then().log().all()
+                        .extract())
+                .forEach(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()));
+    }
+
     private void getStationsAndValidateExistence(List<String> stationNames) {
         assertThat(fetchStationsAndGetNames()).hasSize(stationNames.size())
                 .containsExactly(stationNames.toArray(String[]::new));
     }
+
+    private void getStationsAndValidateAbsence(List<String> stationNames) {
+        assertThat(fetchStationsAndGetNames()).doesNotContain(stationNames.toArray(String[]::new));
+    }
+
     private List<String> fetchStationsAndGetNames() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/stations")
