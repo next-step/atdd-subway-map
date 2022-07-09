@@ -92,13 +92,10 @@ public class StationAcceptanceTest {
         StationResponse stationResponse = createStationByStationName("방배역");
 
         //when
-        RestAssured.given().log().all()
-                .when().delete("stations/" + stationResponse.getId())
-                .then().log().all();
+        deleteByStationId(stationResponse.getId());
 
         //then
         List<String> stationNames = findAllStationNames();
-
         assertThat(stationNames).doesNotContain("방배역");
 
     }
@@ -120,6 +117,12 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
+    }
+
+    private void deleteByStationId(Long stationId) {
+        RestAssured.given().log().all()
+                .when().delete("stations/" + stationId)
+                .then().log().all();
     }
 
 }
