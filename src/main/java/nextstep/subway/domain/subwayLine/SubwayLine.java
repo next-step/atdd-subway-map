@@ -73,4 +73,8 @@ public class SubwayLine {
     public Integer getDistance() {
         return distance;
     }
+
+    public List<Station> getStations() {
+        return stations;
+    }
 }
