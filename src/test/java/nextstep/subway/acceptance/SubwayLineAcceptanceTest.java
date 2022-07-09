@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -30,16 +32,23 @@ public class SubwayLineAcceptanceTest {
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * CreateParam 정보: ( name, color, upStationId, downStationId, distance )
      */
     // TODO: 지하철 노선 생성에 대한 인수 테스트 코드 작성
     @DisplayName("지하철 노선을 생성합니다.")
     @Test
     void createSubwayLine() throws Exception {
-        // given
-
         // when
+        final Map<String, Object> params = createParams(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of("신분당선", "bg-red-600", 1, 2, 10));
+        final ExtractableResponse<Response> response = createSubwayLineRequest(params);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+
+        // then
+        // TODO: 지하철 노선 목록 조회를 통해 생성된 노선을 검증
     }
 
     /**
@@ -106,12 +115,12 @@ public class SubwayLineAcceptanceTest {
         // then
     }
 
-    private Map<String, String> createParams(List<String> keys, List<String> values) {
+    private Map<String, Object> createParams(List<String> keys, List<Object> values) {
         if (keys.size() != values.size()) {
             throw new RuntimeException("생성하려는 key 와 value 의 length 가 같아야 합니다.");
         }
 
-        final Map<String, String> params = new HashMap<>();
+        final Map<String, Object> params = new HashMap<>();
         for (int i = 0; i < keys.size(); i++) {
             params.put(keys.get(i), values.get(i));
         }
@@ -119,7 +128,7 @@ public class SubwayLineAcceptanceTest {
         return params;
     }
 
-    private ExtractableResponse<Response> createSubwayLineRequest(Map<String, String> param) {
+    private ExtractableResponse<Response> createSubwayLineRequest(Map<String, Object> param) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
