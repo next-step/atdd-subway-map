@@ -69,7 +69,7 @@ public class SubwayLineAcceptanceTest {
                 List.of("신분당선", "bg-red-600", 1, 2, 10));
         final Map<String, Object> params2 = createParams(
                 List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("신분당선", "bg-red-600", 1, 2, 10));
+                List.of("분당선", "bg-green-600", 1, 3, 10));
         final List<Map<String, Object>> paramsList = List.of(params1, params2);
         final List<String> createdSubwayLineNames = createSubwayLineRequest(paramsList);
 
