@@ -13,12 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("지하철노선 관련 기능")
+@Sql("classpath:truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 
@@ -63,7 +65,7 @@ public class LineAcceptanceTest {
 		assertThat(responseOfLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		List<String> lineNames = 지하철노선_목록_조회_파싱_name(responseOfLine);
+		List<String> lineNames = 지하철노선_목록_조회_파싱_name(지하철노선_목록_조회());
 		assertThat(lineNames).contains(LINE_NAME);
 	}
 
