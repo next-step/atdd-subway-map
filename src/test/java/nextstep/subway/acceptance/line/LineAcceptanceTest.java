@@ -42,7 +42,13 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
         // when 지하철 노선을 생성하면
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 강남역 = 지하철역_생성("강남역");
+        ExtractableResponse<Response> 분당역 = 지하철역_생성("분당역");
+
+        Long 강남역_ID = Long.parseLong(강남역.jsonPath().getString("id"));
+        Long 분당역_ID = Long.parseLong(분당역.jsonPath().getString("id"));
+
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -65,7 +71,6 @@ public class LineAcceptanceTest {
         // given 2개의 지하철 노선을 생성하고
         ExtractableResponse<Response> 강남역 = 지하철역_생성("강남역");
         ExtractableResponse<Response> 분당역 = 지하철역_생성("분당역");
-        System.out.println(강남역.jsonPath().getString("id"));
 
         Long 강남역_ID = Long.parseLong(강남역.jsonPath().getString("id"));
         Long 분당역_ID = Long.parseLong(분당역.jsonPath().getString("id"));
