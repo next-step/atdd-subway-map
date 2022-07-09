@@ -100,9 +100,6 @@ public class StationAcceptanceTest {
         // given
         final Map<String, String> param = createParam("강남역");
         final ExtractableResponse<Response> createStationResponse = createStationRequest(param);
-
-
-        // 저장된 지하철 역의 ID
         final Long savedStationId = createStationResponse.jsonPath().getLong("id");
 
         // when
