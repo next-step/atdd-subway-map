@@ -65,13 +65,12 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
         // given
-        addStation("강남역");
-        addStation("구로디지털단지역");
+        지하철역_추가("강남역");
+        지하철역_추가("구로디지털단지역");
 
         // when
         ExtractableResponse<Response> response =
@@ -89,7 +88,7 @@ public class StationAcceptanceTest {
     }
 
     // 지하철역 추가하는 공통 로직
-    private ExtractableResponse<Response> addStation(String name){
+    private ExtractableResponse<Response> 지하철역_추가(String name){
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -110,12 +109,11 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 제거한다")
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> addResponse = addStation("강남역");
+        ExtractableResponse<Response> addResponse = 지하철역_추가("강남역");
         long id = addResponse.jsonPath().getLong("id");
 
         // when
