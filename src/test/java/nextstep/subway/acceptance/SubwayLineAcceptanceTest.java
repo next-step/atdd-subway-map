@@ -49,10 +49,15 @@ public class SubwayLineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        final List<Object> stations = response.jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(2);
 
         // then
-        // TODO: 지하철 노선 목록 조회를 통해 생성된 노선을 검증
         final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
+        final List<String> subwayLineNames = getSubwayLinesResponse.jsonPath().getList("name", String.class);
+
+        assertThat(subwayLineNames.size()).isEqualTo(1);
+        assertThat(subwayLineNames).contains(String.valueOf(params.get("name")));
     }
 
     /**
