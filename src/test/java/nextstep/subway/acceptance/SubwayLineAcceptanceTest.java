@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,14 @@ public class SubwayLineAcceptanceTest {
     @Test
     void getSubwayLines() throws Exception {
         // given
+        final Map<String, Object> params1 = createParams(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of("신분당선", "bg-red-600", 1, 2, 10));
+        final Map<String, Object> params2 = createParams(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of("신분당선", "bg-red-600", 1, 2, 10));
+        final List<Map<String, Object>> paramsList = List.of(params1, params2);
+        final List<String> createdSubwayLineNames = createSubwayLineRequest(paramsList);
 
         // when
 
@@ -139,6 +148,18 @@ public class SubwayLineAcceptanceTest {
                 .extract();
 
         return response;
+    }
+
+    private List<String> createSubwayLineRequest(List<Map<String, Object>> paramsList) {
+        final List<String> subwayLineNames = new ArrayList<>();
+        for (Map<String, Object> params : paramsList) {
+            final ExtractableResponse<Response> response = createSubwayLineRequest(params);
+
+            final String subwayLineName = response.jsonPath().getString("name");
+            subwayLineNames.add(subwayLineName);
+        }
+
+        return subwayLineNames;
     }
 
     private ExtractableResponse<Response> getSubwayLinesRequest() {
