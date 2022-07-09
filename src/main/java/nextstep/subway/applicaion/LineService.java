@@ -7,6 +7,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,12 +47,12 @@ public class LineService {
         return stationRepository.findAllById(Arrays.asList(upStationId, downStationId));
     }
 
-    private LineResponse createLineResponse(Line createLine, List<Station> findStations) {
+    private LineResponse createLineResponse(Line line, List<Station> stations) {
         return new LineResponse(
-                createLine.getId(),
-                createLine.getName(),
-                createLine.getColor(),
-                findStations.stream()
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                stations.stream()
                         .map(this::createStationResponse)
                         .collect(toList())
         );
@@ -62,5 +63,14 @@ public class LineService {
                 station.getId(),
                 station.getName()
         );
+    }
+
+    public LineResponse findLineById(Long id) {
+        Line findLine = lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException("존재하지 않는 노선입니다."));
+
+        List<Station> findStations = findUpAndDownStation(findLine.getUpStationId(), findLine.getDownStationId());
+
+        return createLineResponse(findLine, findStations);
     }
 }
