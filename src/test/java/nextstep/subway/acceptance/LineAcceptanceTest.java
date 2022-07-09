@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +12,10 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.StationAcceptanceTest.NAME;
+import static nextstep.subway.acceptance.StationAcceptanceTest.createStation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
@@ -26,8 +28,10 @@ public class LineAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        createStation(Map.of(NAME, "남태령역"));
+        createStation(Map.of(NAME, "사당역"));
+        createStation(Map.of(NAME, "방배역"));
     }
-
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -48,11 +52,10 @@ public class LineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        List<String> lineNames = getLines()
-                .jsonPath()
-                .getList("name", String.class);
+        JsonPath lineJsonPath = getLines().jsonPath();
 
-        assertThat(lineNames).containsAnyOf("4호선");
+        assertThat(lineJsonPath.getList("name", String.class)).containsAnyOf("4호선");
+        assertThat(lineJsonPath.getList("stations")).hasSize(3);
     }
 
     /**

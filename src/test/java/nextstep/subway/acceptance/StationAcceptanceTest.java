@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
-    private static final String NAME = "name";
+    public static final String NAME = "name";
     @LocalServerPort
     int port;
 
@@ -96,7 +96,7 @@ public class StationAcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> createStation(Map<String, String> params) {
+    public static ExtractableResponse<Response> createStation(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
