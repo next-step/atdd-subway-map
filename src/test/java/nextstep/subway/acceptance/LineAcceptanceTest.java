@@ -33,6 +33,9 @@ public class LineAcceptanceTest {
     void setup() {
         RestAssured.port = port;
         databaseCleanup.execute();
+
+        StationAcceptanceTest.지하철역_등록_요청("강남역");
+        StationAcceptanceTest.지하철역_등록_요청("역삼역");
     }
 
     /**

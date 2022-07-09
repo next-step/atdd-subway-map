@@ -93,7 +93,7 @@ public class StationAcceptanceTest {
         assertThat(지하철역_ID_목록).doesNotContain(강남역_ID);
     }
 
-    private ExtractableResponse<Response> 지하철역_등록_요청(String stationName) {
+    public static ExtractableResponse<Response> 지하철역_등록_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -107,7 +107,7 @@ public class StationAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 지하철역_목록_조회_요청() {
+    public static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
@@ -116,7 +116,7 @@ public class StationAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 지하철역_제거_요청(long stationId) {
+    public static ExtractableResponse<Response> 지하철역_제거_요청(long stationId) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().delete("/stations/{id}", stationId)
                 .then().log().all()
