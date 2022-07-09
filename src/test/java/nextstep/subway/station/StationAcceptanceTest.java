@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.AcceptanceTestBase.assertStatusCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -133,9 +134,5 @@ public class StationAcceptanceTest {
                 .getList("name", String.class);
     }
 
-
-    private void assertStatusCode(final ExtractableResponse<Response> response, final HttpStatus httpStatus) {
-        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
-    }
 
 }
