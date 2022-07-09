@@ -68,7 +68,30 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @Test
     void 지하철역_목록_조회() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "도농역");
 
+        RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        params.put("name", "구리역");
+        RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        List<String> names = RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+
+        assertThat(names).containsAnyOf("도농역", "구리역");
     }
 
     /**
