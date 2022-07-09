@@ -35,7 +35,6 @@ public class Line {
             throw new IllegalArgumentException("거리는 1 이상의 자연수 입니다.");
         }
 
-
         this.id = id;
         this.name = name;
         this.color = color;
@@ -69,5 +68,9 @@ public class Line {
 
     public Stations getStations() {
         return stations;
+    }
+
+    public Line edit(LineRequest lineRequest) {
+        return new Line(id, lineRequest.getName(), lineRequest.getColor(), distance, stations.getStations());
     }
 }

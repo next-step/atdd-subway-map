@@ -26,6 +26,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationRepository
             .findById(lineRequest.getUpStationId())
@@ -59,4 +60,11 @@ public class LineService {
     public void deleteLine(Long id) {
     }
 
+    @Transactional
+    public LineResponse editLine(Long id, LineRequest lineRequest) {
+        Line findLine = lineRepository.findById(id).orElseThrow(
+            () -> new DataNotFoundException("Line 데이터가 없습니다.")
+        );
+        return new LineResponse(findLine.edit(lineRequest));
+    }
 }
