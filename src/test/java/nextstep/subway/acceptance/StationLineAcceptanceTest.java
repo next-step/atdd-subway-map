@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional(readOnly = true)
 public class StationLineAcceptanceTest extends AcceptanceTest {
 
+    public static final List<String> CLEAN_UP_TABLES = List.of("station_line", "station");
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -143,10 +145,10 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      */
     private void cleanUp() {
         entityManager.flush();
-        entityManager.createNativeQuery("TRUNCATE TABLE station_line").executeUpdate();
-        entityManager.createNativeQuery("TRUNCATE TABLE station").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE station_line ALTER COLUMN id RESTART WITH 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE station ALTER COLUMN id RESTART WITH 1").executeUpdate();
+        CLEAN_UP_TABLES.forEach(table -> {
+            entityManager.createNativeQuery("TRUNCATE TABLE " + table).executeUpdate();
+            entityManager.createNativeQuery("ALTER TABLE " + table + " ALTER COLUMN id RESTART WITH 1").executeUpdate();
+        });
     }
 
     /**
