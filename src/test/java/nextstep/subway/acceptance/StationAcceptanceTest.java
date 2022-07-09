@@ -37,14 +37,14 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // given: 지하철 역을 생성한다.
-        final String name = "강남역";
+        final String stationName = "강남역";
 
         // when: 지하철 역을 생성한다.
-        ExtractableResponse<Response> response = createStationRequest(name);
+        ExtractableResponse<Response> response = createStationRequest(stationName);
 
         // then: 지하철역이 정상적으로 생성되었고, 목록에 존재하는지 검증한다.
         assertStatusCode(response, HttpStatus.CREATED);
-        assertThat(getStationNamesRequest()).containsAnyOf(name);
+        assertThat(getStationNamesRequest()).containsAnyOf(stationName);
     }
 
     /**
@@ -56,11 +56,11 @@ class StationAcceptanceTest {
     @Test
     void getStations() {
         // given: 2개의 지하철 역을 생성한다.
-        final String name1 = "선릉역";
-        createStationRequest(name1);
+        final String stationName1 = "선릉역";
+        createStationRequest(stationName1);
 
-        final String name2 = "역삼역";
-        createStationRequest(name2);
+        final String stationName2 = "역삼역";
+        createStationRequest(stationName2);
 
         // when: 지하철 역들을 조회한다.
         ExtractableResponse<Response> response = getStationsRequest();
@@ -70,7 +70,9 @@ class StationAcceptanceTest {
                 .getList("name", String.class);
 
         assertStatusCode(response, HttpStatus.OK);
-        assertThat(names.size()).isEqualTo(2);
+        assertThat(names).hasSize(2);
+        assertThat(names).contains(stationName1);
+        assertThat(names).contains(stationName2);
     }
 
     /**
@@ -82,8 +84,8 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given: 1개의 지하철 역을 생성한다.
-        final String name = "잠실역";
-        final Long id = createStationRequest(name)
+        final String stationName = "잠실역";
+        final Long id = createStationRequest(stationName)
                 .jsonPath()
                 .getObject("id", Long.class);
 
@@ -92,21 +94,21 @@ class StationAcceptanceTest {
 
         // then: 지하철 역이 제거되었는지 검증한다.
         assertStatusCode(response, HttpStatus.NO_CONTENT);
-        assertThat(getStationNamesRequest()).doesNotContain(name);
+        assertThat(getStationNamesRequest()).doesNotContain(stationName);
     }
 
-    private ExtractableResponse<Response> createStationRequest(final String name) {
+    private ExtractableResponse<Response> createStationRequest(final String stationName) {
         return RestAssured.given().log().all()
-                .body(createStationParams(name))
+                .body(createStationParams(stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    private Map<String, Object> createStationParams(final String name) {
+    private Map<String, Object> createStationParams(final String stationName) {
         final Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
+        params.put("name", stationName);
         return params;
     }
 
