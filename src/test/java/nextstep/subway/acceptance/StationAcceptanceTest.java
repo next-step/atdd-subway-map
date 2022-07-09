@@ -1,16 +1,14 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
-import java.util.Map;
 
+import static nextstep.subway.acceptance.StationRequestCollection.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -79,30 +77,5 @@ public class StationAcceptanceTest extends AcceptanceTest {
         // then
         List<String> allStationNames = 지하철역_전체_조회().jsonPath().getList("name", String.class);
         assertThat(allStationNames).doesNotContain("건대입구역");
-    }
-
-    private ExtractableResponse<Response> 지하철역_전체_조회() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성(String stationName) {
-        return RestAssured.given().log().all()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_삭제(long stationId) {
-        return RestAssured
-                .given().log().all()
-                .when().delete("/stations/{stationId}", stationId)
-                .then().log().all()
-                .extract();
     }
 }
