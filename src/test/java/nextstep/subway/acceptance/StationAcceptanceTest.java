@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
