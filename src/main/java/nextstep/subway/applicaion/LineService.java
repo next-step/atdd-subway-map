@@ -7,6 +7,9 @@ import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -25,5 +28,11 @@ public class LineService {
         lineRepository.save(line);
 
         return LineResponse.from(line);
+    }
+
+    public List<LineResponse> findAllLineResponse() {
+        return lineRepository.findAll().stream()
+                .map(LineResponse::from)
+                .collect(Collectors.toUnmodifiableList());
     }
 }
