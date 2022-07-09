@@ -21,7 +21,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
-@Sql({"classpath:/station-init.sql", "classpath:/subwayLineColor-init.sql"})
+@Sql({"classpath:/reset-all-table.sql", "classpath:/station-init.sql", "classpath:/subwayLineColor-init.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SubwayLineAcceptanceTest {
 
