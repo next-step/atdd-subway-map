@@ -31,13 +31,6 @@ public class LineService {
         return createLineResponse(savedLine);
     }
 
-    @Transactional
-    public void modifyLine(final Long id, final LineRequest lineRequest) {
-        lineRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 노선이 존재하지 않습니다."));
-
-        lineRepository.save(lineRequest.toLine(id));
-    }
 
     private LineResponse createLineResponse(final Line savedLine) {
         return LineResponse.builder()
@@ -53,4 +46,24 @@ public class LineService {
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void modifyLine(final Long id, final LineRequest lineRequest) {
+        final Line line = findLine(id);
+
+        lineRepository.save(lineRequest.toLine(line.getId()));
+    }
+
+    @Transactional
+    public void deleteLine(final Long id) {
+        final Line line = findLine(id);
+
+        lineRepository.deleteById(line.getId());
+    }
+
+    private Line findLine(final Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 노선이 존재하지 않습니다."));
+    }
+
 }
