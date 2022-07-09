@@ -1,5 +1,6 @@
 package nextstep.subway.domain.subwayLine;
 
+import nextstep.subway.domain.m2m.StationToSubwayLine;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
 
@@ -38,7 +39,7 @@ public class SubwayLine {
     private Station downStation;
 
     @OneToMany(mappedBy = "subwayLine", fetch = LAZY)
-    private List<Station> stations = new ArrayList<>();
+    private List<StationToSubwayLine> stations = new ArrayList<>();
 
     public SubwayLine() {
     }
@@ -53,8 +54,8 @@ public class SubwayLine {
 
     @PrePersist
     void prePersist() {
-        this.upStation.updateSubwayLine(this);
-        this.downStation.updateSubwayLine(this);
+//        this.upStation.updateSubwayLine(this);
+//        this.downStation.updateSubwayLine(this);
     }
 
     public Long getId() {
@@ -81,11 +82,11 @@ public class SubwayLine {
         return distance;
     }
 
-    public List<Station> getStations() {
+    public List<StationToSubwayLine> getStations() {
         return stations;
     }
 
-    public void updateStations(List<Station> stations) {
-        this.stations.addAll(stations);
+    public void updateStations(List<StationToSubwayLine> stationToSubwayLines) {
+        this.stations.addAll(stationToSubwayLines);
     }
 }

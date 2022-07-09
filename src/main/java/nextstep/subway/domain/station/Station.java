@@ -1,8 +1,12 @@
 package nextstep.subway.domain.station;
 
+import nextstep.subway.domain.m2m.StationToSubwayLine;
 import nextstep.subway.domain.subwayLine.SubwayLine;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.LAZY;
@@ -18,9 +22,8 @@ public class Station {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "subway_line_id")
-    private SubwayLine subwayLine;
+    @OneToMany(mappedBy = "station", fetch = LAZY)
+    private List<StationToSubwayLine> subwayLines = new ArrayList<>();
 
     public Station() {
     }
@@ -37,7 +40,7 @@ public class Station {
         return name;
     }
 
-    public void updateSubwayLine(SubwayLine subwayLine) {
-        this.subwayLine = subwayLine;
+    public void updateSubwayLine(StationToSubwayLine stationToSubwayLine) {
+        this.subwayLines.add(stationToSubwayLine);
     }
 }
