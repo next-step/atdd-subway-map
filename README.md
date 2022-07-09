@@ -25,9 +25,15 @@
 
 ![DirtiesContext](./docs/step1/DirtiesContext.png)
 
-결론부터 말하자면, 성공하였다.
+결론부터 말하자면, 성공하였다.  
 하지만, 테스트 마다 context를 초기화하여 SpringBoot가 다시 시직되는 불 필요함이 있다.
 
+2. 두번쨰
 
+```@BeforeEach 나 @AfterEach 에서 초기화```
 
+![deleteAll](./docs/step1/deleteAll.png)
+
+이것도 또한 방법중 하나가 될것이다.  
+@DirtiesContext보다는 비용이 떨어지겠지만 데이터가 많아지면 테스트 성능이 떨어질 것이다.
 

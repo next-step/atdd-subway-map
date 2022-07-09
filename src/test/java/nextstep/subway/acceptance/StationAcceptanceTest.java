@@ -3,7 +3,9 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -21,8 +23,10 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
+
+    @Autowired
+    private StationRepository stationRepository;
 
     @LocalServerPort
     int port;
@@ -30,6 +34,8 @@ public class StationAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+
+        stationRepository.deleteAll();
     }
 
     /**
