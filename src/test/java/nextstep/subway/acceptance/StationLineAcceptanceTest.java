@@ -22,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StationLineAcceptanceTest {
 
     public static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS = Map.of(
-            Integer.class, (response, path) -> response.jsonPath().getInt(path),
-            String.class, (response, path) -> response.jsonPath().getString(path)
+            Integer.class, (response, path) -> response.body().jsonPath().getInt(path),
+            String.class, (response, path) -> response.body().jsonPath().getString(path)
     );
 
     @LocalServerPort
@@ -32,6 +32,9 @@ public class StationLineAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        saveStation(Map.of("name", "강남역"));
+        saveStation(Map.of("name", "양재역"));
+        saveStation(Map.of("name", "역삼역"));
     }
 
     /**
@@ -44,21 +47,21 @@ public class StationLineAcceptanceTest {
         Map<String, Object> params = Map.of(
                 "name", "신분당선",
                 "color", "bg-red-600",
-                "stations", List.of(
-                        Map.of("name", "강남역"),
-                        Map.of("name", "양재역")
-                )
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
         );
 
         // when
         ExtractableResponse<Response> saveResponse = saveStationLine(params);
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(saveResponse.header("Location")).isNotEmpty();
 
         // then
         ExtractableResponse<Response> response = findStationLines();
-        assertThat(getInfoAtStationLine(response, "name", String.class)).isEqualTo("신분당선");
-        assertThat(getInfoAtStationLine(response, "color", String.class)).isEqualTo("bg-red-600");
-        assertThat(getStringListAtStationLine(response, "$.stations.name")).isEqualTo(List.of("강남역","양재역"));
+        assertThat(getInfoAtStationLine(response, "[0].name", String.class)).isEqualTo("신분당선");
+        assertThat(getInfoAtStationLine(response, "[0].color", String.class)).isEqualTo("bg-red-600");
+        assertThat(getStringListAtStationLine(response, "[0].stations.name")).isEqualTo(List.of("강남역","양재역"));
     }
 
     /**
@@ -73,20 +76,18 @@ public class StationLineAcceptanceTest {
         Map<String, Object> params = Map.of(
                 "name", "신분당선",
                 "color", "bg-red-600",
-                "stations", List.of(
-                        Map.of("name", "강남역"),
-                        Map.of("name", "양재역")
-                )
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
         );
         saveStationLine(params);
 
         Map<String, Object> params2 = Map.of(
                 "name", "2호선",
                 "color", "bg-green-600",
-                "stations", List.of(
-                        Map.of("name", "구로디지털단지역"),
-                        Map.of("name", "대림역")
-                )
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 8
         );
         saveStationLine(params2);
 
@@ -94,9 +95,8 @@ public class StationLineAcceptanceTest {
         ExtractableResponse<Response> response = findStationLines();
 
         // then
-        assertThat(getStringListAtStationLine(response, "$.name")).isEqualTo(List.of("신분당선", "2호선"));
-
-
+        assertThat(getStringListAtStationLine(response, "name")).isEqualTo(List.of("신분당선", "2호선"));
+        assertThat(getStringListAtStationLine(response, "color")).isEqualTo(List.of("bg-red-600", "bg-green-600"));
     }
 
     /**
@@ -111,15 +111,14 @@ public class StationLineAcceptanceTest {
         Map<String, Object> params = Map.of(
                 "name", "신분당선",
                 "color", "bg-red-600",
-                "stations", List.of(
-                        Map.of("name", "강남역"),
-                        Map.of("name", "양재역")
-                )
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
         );
         ExtractableResponse<Response> saveResponse = saveStationLine(params);
 
         // when
-        int id = getInfoAtStationLine(saveResponse, "id", Integer.class);
+        Integer id = getInfoAtStationLine(saveResponse, "id", Integer.class);
         ExtractableResponse<Response> response = findStationLineById(id);
 
         // then
@@ -138,39 +137,32 @@ public class StationLineAcceptanceTest {
         Map<String, Object> params = Map.of(
                 "name", "신분당선",
                 "color", "bg-red-600",
-                "stations", List.of(
-                        Map.of("name", "강남역"),
-                        Map.of("name", "양재역")
-                )
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
         );
         ExtractableResponse<Response> saveResponse = saveStationLine(params);
 
         // when
-        int id = getInfoAtStationLine(saveResponse, "id", Integer.class);
+        Integer id = getInfoAtStationLine(saveResponse, "id", Integer.class);
         Map<String, Object> modifyParams = Map.of(
-                "id", id,
                 "name", "2호선",
-                "color", "bg-green-600",
-                "stations", List.of(
-                        Map.of("name", "강남역"),
-                        Map.of("name", "역삼역")
-                )
+                "color", "bg-green-600"
         );
 
         ExtractableResponse<Response> modifyResponse = RestAssured
                 .given().log().all()
-                .params(modifyParams)
+                .body(modifyParams)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/stations")
+                .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
-        assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
         ExtractableResponse<Response> response = findStationLineById(id);
         assertThat(getInfoAtStationLine(response, "name", String.class)).isEqualTo("2호선");
         assertThat(getInfoAtStationLine(response, "color", String.class)).isEqualTo("bg-green-600");
-        assertThat(getStringListAtStationLine(response, "$.stations.name")).isEqualTo(List.of("강남역", "역삼역"));
     }
 
     /**
@@ -185,10 +177,9 @@ public class StationLineAcceptanceTest {
         Map<String, Object> params = Map.of(
                 "name", "신분당선",
                 "color", "bg-red-600",
-                "stations", List.of(
-                        Map.of("name", "강남역"),
-                        Map.of("name", "양재역")
-                )
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
         );
         ExtractableResponse<Response> saveResponse = saveStationLine(params);
 
@@ -196,7 +187,7 @@ public class StationLineAcceptanceTest {
         Integer id = getInfoAtStationLine(saveResponse, "id", Integer.class);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/stations/{id}", id)
+                .when().delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
 
@@ -207,9 +198,9 @@ public class StationLineAcceptanceTest {
     private ExtractableResponse<Response> saveStationLine(Map<String, Object> params) {
         return RestAssured
                 .given().log().all()
-                .params(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/station/lines")
+                .body(params)
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
     }
@@ -217,7 +208,7 @@ public class StationLineAcceptanceTest {
     private ExtractableResponse<Response> findStationLines() {
         return RestAssured
                 .given().log().all()
-                .when().get("/station/lines")
+                .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
@@ -225,7 +216,17 @@ public class StationLineAcceptanceTest {
     private ExtractableResponse<Response> findStationLineById(int id) {
         return RestAssured
                 .given().log().all()
-                .when().get("/station/lines/{id}", id)
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> saveStation(Map<String, String> params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
                 .then().log().all()
                 .extract();
     }
