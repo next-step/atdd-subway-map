@@ -124,7 +124,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
+        // given
+        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
+        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
+        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
+        // when && then
+        노선을_삭제한다(newLine.getId());
     }
 
     public static ExtractableResponse<Response> 노선을_만들다(String name, String color, Long upStationId, Long downStationId, Long distance) {
@@ -150,5 +156,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineUpdateRequest lineUpdateRequest = new LineUpdateRequest(name, color);
         ExtractableResponse<Response> response = putRequestWithParameterAndRequestBody("/lines/{id}", id, lineUpdateRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void 노선을_삭제한다(Long id) {
+        ExtractableResponse<Response> response = deleteRequestWithParameter("/lines/{id}", id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
