@@ -3,12 +3,11 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.caller.StationApiCaller;
-import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Map;
@@ -16,21 +15,18 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("init.sql")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
-    @Autowired
-    StationRepository stationRepository;
-
     StationApiCaller stationApiCaller = new StationApiCaller();
 
     @BeforeEach
     public void setUp() {
         stationApiCaller.setPort(port);
-        stationRepository.deleteAll();
     }
 
     /**

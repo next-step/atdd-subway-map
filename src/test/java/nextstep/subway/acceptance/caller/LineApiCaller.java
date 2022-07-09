@@ -29,14 +29,14 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public ExtractableResponse<Response> getLine(long id) {
+    public ExtractableResponse<Response> getLineById(long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
 
-    public ExtractableResponse<Response> modifyLine(long id, Map<String, Object> params) {
+    public ExtractableResponse<Response> modifyLineById(long id, Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -45,7 +45,7 @@ public class LineApiCaller {
                 .extract();
     }
 
-    public ExtractableResponse<Response> deleteLine(long id) {
+    public ExtractableResponse<Response> deleteLineById(long id) {
         return RestAssured.given().log().all()
                 .when().delete("/lines/{id}", id)
                 .then().log().all()

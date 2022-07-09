@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext
+@Sql("init.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LineAcceptanceTest {
 
@@ -32,13 +32,15 @@ class LineAcceptanceTest {
 
     static final String FIRST_LINE_NAME = "신분당선";
     static final String SECOND_LINE_NAME = "분당선";
+    static final String FIRST_LINE_COLOR = "bg-red-600";
+    static final String SECOND_LINE_COLOR = "bg-green-600";
 
     @BeforeEach
     public void setUp() {
         stationApiCaller.setPort(port);
         lineApiCaller.setPort(port);
 
-        setStations();
+        지하철_역_생성();
     }
 
     /**
@@ -48,7 +50,7 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선_등록_테스트() {
         // when
-        지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10);
+        지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10);
 
         // then
         List<String> subwayLineNames = 지하철_노선_목록_조회();
@@ -63,14 +65,16 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
-        지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10);
-        지하철_노선_생성(SECOND_LINE_NAME, "bg-green-600", 1, 3, 9);
+        지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10);
+        지하철_노선_생성(SECOND_LINE_NAME, SECOND_LINE_COLOR, 1, 3, 9);
 
         // when
         List<String> subwayLineNames = 지하철_노선_목록_조회();
 
         // then
-        assertThat(subwayLineNames).hasSize(2).contains(FIRST_LINE_NAME, SECOND_LINE_NAME);
+        assertThat(subwayLineNames)
+                .hasSize(2)
+                .contains(FIRST_LINE_NAME, SECOND_LINE_NAME);
     }
 
     /**
@@ -81,13 +85,15 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선_조회_테스트() {
         // given
-        long id = 지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10).jsonPath().getLong("id");
+        long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
 
         // when
-        String lineName = 지하철_노선_조회(id);
+        Map<String, String> response = 지하철_노선_조회(id);
 
         // then
-        assertThat(lineName).isEqualTo(FIRST_LINE_NAME);
+        assertThat(response)
+                .containsEntry("name", FIRST_LINE_NAME)
+                .containsEntry("color", FIRST_LINE_COLOR);
     }
 
     /**
@@ -95,9 +101,8 @@ class LineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
-    @DisplayName("지하철 노선을 수정한다.")
     @Test
-    void modifySubwayLine() {
+    void 지하철_노선_수정_테스트() {
         // given
         long id = 지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10).jsonPath().getLong("id");
         String newLineName = "다른분당선";
@@ -107,8 +112,10 @@ class LineAcceptanceTest {
         지하철_노선_수정(id, newLineName, newLineColor);
 
         // then
-        String lineName = 지하철_노선_조회(id);
-        assertThat(lineName).isEqualTo(newLineName);
+        Map<String, String> response = 지하철_노선_조회(id);
+        assertThat(response)
+                .containsEntry("name", newLineName)
+                .containsEntry("color", newLineColor);
     }
 
     /**
@@ -116,9 +123,8 @@ class LineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    @DisplayName("지하철 노선을 삭제한다.")
     @Test
-    void createStation() {
+    void 지하철_노선_삭제_테스트() {
         // given
         long id = 지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10).jsonPath().getLong("id");
 
@@ -126,14 +132,14 @@ class LineAcceptanceTest {
         지하철_노선_삭제(id);
 
         // then
-        String lineName = 지하철_노선_조회(id);
-        assertThat(lineName).isNull();
+        List<String> lineNames = 지하철_노선_목록_조회();
+        assertThat(lineNames).doesNotContain(FIRST_LINE_NAME);
     }
 
-    void setStations() {
-        stationApiCaller.createStation(Map.of("name", "지하쳘역"));
-        stationApiCaller.createStation(Map.of("name", "새로운지하쳘역"));
-        stationApiCaller.createStation(Map.of("name", "또다른지하쳘역"));
+    void 지하철_역_생성() {
+        stationApiCaller.createStation(Map.of("name", "지하철역"));
+        stationApiCaller.createStation(Map.of("name", "새로운지하철역"));
+        stationApiCaller.createStation(Map.of("name", "또다른지하철역"));
     }
 
     ExtractableResponse<Response> 지하철_노선_생성(String name, String color, int upStationId, int downStationId, int distance) {
@@ -160,12 +166,13 @@ class LineAcceptanceTest {
         return response.jsonPath().getList("name", String.class);
     }
 
-    String 지하철_노선_조회(long id) {
-        ExtractableResponse<Response> response = lineApiCaller.getLine(id);
+    Map<String, String> 지하철_노선_조회(long id) {
+        ExtractableResponse<Response> response = lineApiCaller.getLineById(id);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        return response.jsonPath().getString("name");
+        return Map.of("name", response.jsonPath().getString("name"),
+                "color", response.jsonPath().getString("color"));
     }
 
     void 지하철_노선_수정(long id, String name, String color) {
@@ -173,13 +180,13 @@ class LineAcceptanceTest {
         params.put("name", name);
         params.put("color", color);
 
-        ExtractableResponse<Response> response = lineApiCaller.modifyLine(id, params);
+        ExtractableResponse<Response> response = lineApiCaller.modifyLineById(id, params);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     void 지하철_노선_삭제(long id) {
-        ExtractableResponse<Response> response = lineApiCaller.deleteLine(id);
+        ExtractableResponse<Response> response = lineApiCaller.deleteLineById(id);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
