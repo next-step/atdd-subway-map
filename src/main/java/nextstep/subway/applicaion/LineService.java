@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class LineService {
 
     private final LineRepository lineRepository;
@@ -43,6 +42,7 @@ public class LineService {
         return new LineResponse(createdLine);
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findOneLine(Long id) {
         return new LineResponse(
             lineRepository.findById(id).orElseThrow(
@@ -51,6 +51,7 @@ public class LineService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream().map(
             line -> new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations().getStations())
