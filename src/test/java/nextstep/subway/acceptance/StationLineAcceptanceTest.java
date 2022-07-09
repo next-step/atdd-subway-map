@@ -3,11 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,31 +18,25 @@ import java.util.function.BiFunction;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional(readOnly = true)
-public class StationLineAcceptanceTest {
-
-    public static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS = Map.of(
-            Integer.class, (response, path) -> response.body().jsonPath().getInt(path),
-            String.class, (response, path) -> response.body().jsonPath().getString(path)
-    );
+public class StationLineAcceptanceTest extends AcceptanceTest {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @LocalServerPort
-    private int port;
+    private CallApi callApi;
 
-    @Transactional
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
+    public StationLineAcceptanceTest() {
+        this.callApi = new CallApi();
+    }
 
+    @Override
+    protected void settings() {
         cleanUp();
 
-        saveStation(Map.of("name", "강남역"));
-        saveStation(Map.of("name", "양재역"));
-        saveStation(Map.of("name", "역삼역"));
+        callApi.saveStation(Param.강남역);
+        callApi.saveStation(Param.양재역);
+        callApi.saveStation(Param.역삼역);
     }
 
     /**
@@ -55,24 +46,16 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createStationLine() {
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
-
         // when
-        ExtractableResponse<Response> saveResponse = saveStationLine(params);
+        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(saveResponse.header("Location")).isNotEmpty();
 
         // then
-        ExtractableResponse<Response> response = findStationLines();
-        assertThat(getInfoAtStationLine(response, "[0].name", String.class)).isEqualTo("신분당선");
-        assertThat(getInfoAtStationLine(response, "[0].color", String.class)).isEqualTo("bg-red-600");
-        assertThat(getStringListAtStationLine(response, "[0].stations.name")).isEqualTo(List.of("강남역","양재역"));
+        ExtractableResponse<Response> response = callApi.findStationLines();
+        assertThat(Actual.get(response, "[0].name", String.class)).isEqualTo("신분당선");
+        assertThat(Actual.get(response, "[0].color", String.class)).isEqualTo("bg-red-600");
+        assertThat(Actual.getList(response, "[0].stations.name", String.class)).isEqualTo(List.of("강남역","양재역"));
     }
 
     /**
@@ -84,30 +67,15 @@ public class StationLineAcceptanceTest {
     @Test
     void getStationLines() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
-        saveStationLine(params);
-
-        Map<String, Object> params2 = Map.of(
-                "name", "2호선",
-                "color", "bg-green-600",
-                "upStationId", 1,
-                "downStationId", 3,
-                "distance", 8
-        );
-        saveStationLine(params2);
+        callApi.saveStationLine(Param.신분당선);
+        callApi.saveStationLine(Param.이호선);
 
         // when
-        ExtractableResponse<Response> response = findStationLines();
+        ExtractableResponse<Response> response = callApi.findStationLines();
 
         // then
-        assertThat(getStringListAtStationLine(response, "name")).isEqualTo(List.of("신분당선", "2호선"));
-        assertThat(getStringListAtStationLine(response, "color")).isEqualTo(List.of("bg-red-600", "bg-green-600"));
+        assertThat(Actual.getList(response, "name", String.class)).isEqualTo(List.of("신분당선", "2호선"));
+        assertThat(Actual.getList(response, "color", String.class)).isEqualTo(List.of("bg-red-600", "bg-green-600"));
     }
 
     /**
@@ -119,18 +87,11 @@ public class StationLineAcceptanceTest {
     @Test
     void getStationLine() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
-        ExtractableResponse<Response> saveResponse = saveStationLine(params);
+        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
 
         // when
-        Integer id = getInfoAtStationLine(saveResponse, "id", Integer.class);
-        ExtractableResponse<Response> response = findStationLineById(id);
+        Long id = Actual.get(saveResponse, "id", Long.class);
+        ExtractableResponse<Response> response = callApi.findStationLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -145,35 +106,17 @@ public class StationLineAcceptanceTest {
     @Test
     void modifyStationLine() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
-        ExtractableResponse<Response> saveResponse = saveStationLine(params);
+        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
 
         // when
-        Integer id = getInfoAtStationLine(saveResponse, "id", Integer.class);
-        Map<String, Object> modifyParams = Map.of(
-                "name", "2호선",
-                "color", "bg-green-600"
-        );
-
-        ExtractableResponse<Response> modifyResponse = RestAssured
-                .given().log().all()
-                .body(modifyParams)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", id)
-                .then().log().all()
-                .extract();
+        Long id = Actual.get(saveResponse, "id", Long.class);
+        ExtractableResponse<Response> modifyResponse = callApi.modifyStationLineById(id, Param.이호선으로_수정);
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> response = findStationLineById(id);
-        assertThat(getInfoAtStationLine(response, "name", String.class)).isEqualTo("2호선");
-        assertThat(getInfoAtStationLine(response, "color", String.class)).isEqualTo("bg-green-600");
+        ExtractableResponse<Response> response = callApi.findStationLineById(id);
+        assertThat(Actual.get(response, "name", String.class)).isEqualTo("2호선");
+        assertThat(Actual.get(response, "color", String.class)).isEqualTo("bg-green-600");
     }
 
     /**
@@ -185,76 +128,180 @@ public class StationLineAcceptanceTest {
     @Test
     void deleteStationLine() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
-        ExtractableResponse<Response> saveResponse = saveStationLine(params);
+        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
 
         // when
-        Integer id = getInfoAtStationLine(saveResponse, "id", Integer.class);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{id}", id)
-                .then().log().all()
-                .extract();
+        Long id = Actual.get(saveResponse, "id", Long.class);
+        ExtractableResponse<Response> response = callApi.deleteStationLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> saveStationLine(Map<String, Object> params) {
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> findStationLines() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> findStationLineById(int id) {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> saveStation(Map<String, String> params) {
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private <T> T getInfoAtStationLine(ExtractableResponse<Response> response, String path, Class<T> type) {
-        return (T) EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS.get(type).apply(response, path);
-    }
-
-    private List<String> getStringListAtStationLine(ExtractableResponse<Response> response, String path) {
-        return response.jsonPath().getList(path, String.class);
-    }
-
+    /**
+     *  테이블 데이터 초기화
+     */
     private void cleanUp() {
         entityManager.flush();
         entityManager.createNativeQuery("TRUNCATE TABLE station_line").executeUpdate();
         entityManager.createNativeQuery("TRUNCATE TABLE station").executeUpdate();
         entityManager.createNativeQuery("ALTER TABLE station_line ALTER COLUMN id RESTART WITH 1").executeUpdate();
         entityManager.createNativeQuery("ALTER TABLE station ALTER COLUMN id RESTART WITH 1").executeUpdate();
+    }
+
+    /**
+     * 검증 비교 대상 값 관련 클래스
+     */
+    private static class Actual {
+        private static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS = Map.of(
+                Long.class, (response, path) -> response.body().jsonPath().getLong(path),
+                String.class, (response, path) -> response.body().jsonPath().getString(path)
+        );
+
+        /**
+         * type에 해당하는 값을 반환
+         * @param response
+         * @param path
+         * @param type
+         * @param <T>
+         * @return
+         */
+        private static  <T> T get(ExtractableResponse<Response> response, String path, Class<T> type) {
+            return (T) EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS.get(type).apply(response, path);
+        }
+
+        /**
+         * type에 해당하는 리스트 반환
+         * @param response
+         * @param path
+         * @param type
+         * @param <T>
+         * @return
+         */
+        private static  <T> List<T> getList(ExtractableResponse<Response> response, String path, Class<T> type) {
+            return response.jsonPath().getList(path, type);
+        }
+    }
+
+    /**
+     * 파라미터 관련 클래스
+     */
+    private static class Param {
+        public static final Map<String, Object> 신분당선 = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        public static final Map<String, Object> 이호선 = Map.of(
+                "name", "2호선",
+                "color", "bg-green-600",
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 8
+        );
+
+        public static final Map<String, String> 이호선으로_수정 = Map.of(
+                "name", "2호선",
+                "color", "bg-green-600"
+        );
+
+        public static final Map<String, String> 강남역 = Map.of("name", "강남역");
+
+        public static final Map<String, String> 양재역 = Map.of("name", "양재역");
+
+        public static final Map<String, String> 역삼역 = Map.of("name", "역삼역");
+    }
+
+    /**
+     * 지하철 노선 관련 API 호출 관련 클래스
+     */
+    private static class CallApi {
+
+        /**
+         * 지하철 노선 저장
+         * @param params
+         * @return
+         */
+        public ExtractableResponse<Response> saveStationLine(Map<String, Object> params) {
+            return RestAssured
+                    .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(params)
+                    .when().post("/lines")
+                    .then().log().all()
+                    .extract();
+        }
+
+        /**
+         * 지하철 노선 수정
+         * @param id
+         * @param params
+         * @return
+         */
+        public ExtractableResponse<Response> modifyStationLineById(Long id, Map<String, String> params) {
+            return RestAssured
+                    .given().log().all()
+                    .body(params)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .when().put("/lines/{id}", id)
+                    .then().log().all()
+                    .extract();
+        }
+
+        /**
+         * 지하철 노선 삭제
+         * @param id
+         * @return
+         */
+        public ExtractableResponse<Response> deleteStationLineById(Long id) {
+            return RestAssured
+                    .given().log().all()
+                    .when().delete("/lines/{id}", id)
+                    .then().log().all()
+                    .extract();
+        }
+
+        /**
+         * 지하철 노선 목록 조회
+         * @return
+         */
+        public ExtractableResponse<Response> findStationLines() {
+            return RestAssured
+                    .given().log().all()
+                    .when().get("/lines")
+                    .then().log().all()
+                    .extract();
+        }
+
+        /**
+         * 지하철 노선 조회
+         * @param id
+         * @return
+         */
+        public ExtractableResponse<Response> findStationLineById(Long id) {
+            return RestAssured
+                    .given().log().all()
+                    .when().get("/lines/{id}", id)
+                    .then().log().all()
+                    .extract();
+        }
+
+        /**
+         * 지하철 저장
+         * @param params
+         * @return
+         */
+        public ExtractableResponse<Response> saveStation(Map<String, String> params) {
+            return RestAssured
+                    .given().log().all()
+                    .body(params)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .when().post("/stations")
+                    .then().log().all()
+                    .extract();
+        }
     }
 }
