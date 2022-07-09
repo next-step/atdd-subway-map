@@ -22,7 +22,7 @@ public class SubwayLineResponse {
         color = subwayLine.getColor().getCode();
         stations = subwayLine.getStations()
                 .stream()
-                .map(StationResponse::new)
+                .map(stationToSubwayLine -> new StationResponse(stationToSubwayLine.getStation()))
                 .collect(Collectors.toList());
     }
 
