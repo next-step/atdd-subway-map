@@ -46,7 +46,7 @@ public class StationAcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		List<String> stationNames = 지하철역_목록_조회_파싱();
+		List<String> stationNames = 지하철역_목록_조회_파싱_name(지하철역_목록_조회());
 		assertThat(stationNames).containsAnyOf(STATION_NAME);
 	}
 
@@ -67,7 +67,7 @@ public class StationAcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
 		// then
-		List<String> stationNames = 지하철역_목록_조회_파싱();
+		List<String> stationNames = 지하철역_목록_조회_파싱_name(response);
 		assertThat(stationNames).hasSize(2);
 	}
 
@@ -88,7 +88,7 @@ public class StationAcceptanceTest {
 		assertThat(responseOfDelete.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		// then
-		List<String> stationNames = 지하철역_목록_조회_파싱();
+		List<String> stationNames = 지하철역_목록_조회_파싱_name(지하철역_목록_조회());
 		assertThat(stationNames).doesNotContain(STATION_NAME);
 	}
 
@@ -104,8 +104,8 @@ public class StationAcceptanceTest {
 			.extract();
 	}
 
-	Long 지하철역_생성_파싱(String name) {
-		return 지하철역_생성(name)
+	Long 지하철역_생성_파싱_id(ExtractableResponse<Response> response) {
+		return response
 			.jsonPath().getLong("id");
 	}
 
@@ -116,8 +116,8 @@ public class StationAcceptanceTest {
 			.extract();
 	}
 
-	private List<String> 지하철역_목록_조회_파싱() {
-		return 지하철역_목록_조회()
+	private List<String> 지하철역_목록_조회_파싱_name(ExtractableResponse<Response> response) {
+		return response
 			.jsonPath().getList("name", String.class);
 	}
 

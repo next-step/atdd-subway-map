@@ -45,6 +45,24 @@ public class LineService {
 			.collect(Collectors.toList());
 	}
 
+	public LineResponse findLine(Long id) {
+		Line line = lineRepository.findById(id).orElseThrow(()-> new SubwayException("no subway"));
+		return createLineResponse(line);
+	}
+
+	@Transactional
+	public void updateLine(Long id, String name, String color) {
+		Line line = lineRepository.findById(id).orElseThrow(()-> new SubwayException("no subway"));
+		line.setName(name);
+		line.setColor(color);
+		lineRepository.save(line);
+	}
+
+	@Transactional
+	public void deleteLine(Long id) {
+		lineRepository.deleteById(id);
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		Optional<Station> upStation = stationRepository.findById(line.getUpStationId());
 		Optional<Station> downStation = stationRepository.findById(line.getDownStationId());
