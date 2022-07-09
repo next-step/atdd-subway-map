@@ -23,14 +23,15 @@ public class Section {
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
     private List<Station> stations;
 
-    private int distance;
+    @Embedded
+    private Distance distance;
 
     protected Section() {
     }
 
     private Section(List<Station> stations, int distance) {
         this.stations = stations;
-        this.distance = distance;
+        this.distance = new Distance(distance);
     }
 
     public static Section create(Station upStation, Station downStation, int distance) {
