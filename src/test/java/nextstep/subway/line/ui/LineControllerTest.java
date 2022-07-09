@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,7 +33,7 @@ class LineControllerTest {
     @Test
     void 노선생성() throws Exception {
         final LineRequest lineRequest = lineRequest();
-//
+
         doReturn(new LineResponse())
                 .when(lineService)
                 .createLine(any(LineRequest.class));
@@ -45,6 +47,21 @@ class LineControllerTest {
 
         // then
         result.andExpect(status().isCreated());
+    }
+
+    @Test
+    void 노선목록조회() throws Exception {
+        doReturn(List.of(new LineResponse()))
+                .when(lineService)
+                .findAllLines();
+
+        // when
+        final ResultActions result = target.perform(
+                MockMvcRequestBuilders.get("/lines")
+        );
+
+        // then
+        result.andExpect(status().isOk());
     }
 
     private LineRequest lineRequest() {
