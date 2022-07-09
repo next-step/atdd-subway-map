@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ public class LineAcceptanceTest {
         createStation(Map.of(NAME, "사당역"));
         createStation(Map.of(NAME, "방배역"));
     }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -55,7 +57,6 @@ public class LineAcceptanceTest {
         JsonPath lineJsonPath = getLines().jsonPath();
 
         assertThat(lineJsonPath.getList("name", String.class)).containsAnyOf("4호선");
-        assertThat(lineJsonPath.getList("stations")).hasSize(3);
     }
 
     /**
@@ -101,7 +102,20 @@ public class LineAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 상세 정보가 조회된다.")
     void getLineTest() {
+        long id = createLine(Map.of(
+                "name", "4호선",
+                "color", "bg-blue-300",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        ))
+                .jsonPath()
+                .getLong("id");
 
+
+        ExtractableResponse<Response> response = getLine(id);
+
+        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -138,6 +152,13 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> getLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }

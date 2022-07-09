@@ -20,6 +20,8 @@ public class LineCreateDto {
         return Line.builder()
                 .name(this.name)
                 .color(this.color)
+                .distance(this.distance)
                 .build();
     }
+
 }

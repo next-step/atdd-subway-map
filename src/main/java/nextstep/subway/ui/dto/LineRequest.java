@@ -1,17 +1,19 @@
 package nextstep.subway.ui.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreateDto;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class LineRequest {
-    private final String name;
-    private final String color;
-    private final Long upStationId;
-    private final Long downStationId;
-    private final int distance;
+    private String name;
+    private String color;
+    private Long upStationId;
+    private Long downStationId;
+    private int distance;
 
     public LineCreateDto toDto() {
         return LineCreateDto.builder()

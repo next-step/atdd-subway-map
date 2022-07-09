@@ -6,10 +6,7 @@ import nextstep.subway.applicaion.dto.LineDto;
 import nextstep.subway.ui.dto.LineRequest;
 import nextstep.subway.ui.dto.LineResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -23,7 +20,9 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineDto lineDto = lineService.createLine(lineRequest.toDto());
+        Long lineId = lineService.createLine(lineRequest.toDto());
+
+        LineDto lineDto = lineService.getLine(lineId);
         LineResponse response = LineResponse.of(lineDto);
 
         return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
@@ -36,5 +35,13 @@ public class LineController {
         return ResponseEntity.ok(lineDtos.stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toUnmodifiableList()));
+    }
+
+    @GetMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
+        LineDto lineDto = lineService.getLine(id);
+        LineResponse response = LineResponse.of(lineDto);
+
+        return ResponseEntity.ok().body(response);
     }
 }

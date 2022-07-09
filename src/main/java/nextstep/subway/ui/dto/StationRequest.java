@@ -1,13 +1,15 @@
 package nextstep.subway.ui.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.StationCreateDto;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class StationRequest {
-    private final String name;
+    private String name;
 
     public StationCreateDto toDto() {
         return new StationCreateDto(this.name);

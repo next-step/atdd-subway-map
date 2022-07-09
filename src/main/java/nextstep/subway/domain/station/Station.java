@@ -1,9 +1,10 @@
 package nextstep.subway.domain.station;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.domain.LineStation;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Station {
@@ -11,6 +12,9 @@ public class Station {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @OneToMany(mappedBy = "station")
+    private List<LineStation> lineStations = new ArrayList<>();
 
     public Station() {
     }

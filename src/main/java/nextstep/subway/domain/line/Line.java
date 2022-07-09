@@ -1,11 +1,11 @@
 package nextstep.subway.domain.line;
 
 import lombok.*;
+import nextstep.subway.domain.LineStation;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,5 +20,10 @@ public class Line {
 
     private String name;
     private String color;
+    private Integer distance;
+
+    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<LineStation> lineStations = new ArrayList<>();
+
 
 }
