@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -41,5 +42,10 @@ public class StationService {
                 station.getId(),
                 station.getName()
         );
+    }
+    @Transactional
+    public Station findStationById(Long id){
+        Optional<Station> station = stationRepository.findById(id);
+        return station.orElse(null);
     }
 }
