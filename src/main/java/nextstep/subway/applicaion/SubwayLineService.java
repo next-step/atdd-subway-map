@@ -11,7 +11,9 @@ import nextstep.subway.domain.subwayLineColor.SubwayLineColorRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,6 +49,15 @@ public class SubwayLineService {
         ));
 
         return new SubwayLineResponse(savedSubwayLine);
+    }
+
+    public List<SubwayLineResponse> findAllSubwayLines() {
+        final List<SubwayLineResponse> findSubwayLines = subwayLineRepository.findAll()
+                .stream()
+                .map(SubwayLineResponse::new)
+                .collect(Collectors.toList());
+
+        return findSubwayLines;
     }
 
     private Station getStationByIdIfExists(Long stationId) {
