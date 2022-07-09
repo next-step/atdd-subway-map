@@ -104,11 +104,12 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        ExtractableResponse<Response> response = RestAssured.given()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then().extract();
+                .then().log().all()
+                .extract();
         return response.body().as(StationResponse.class);
     }
 
