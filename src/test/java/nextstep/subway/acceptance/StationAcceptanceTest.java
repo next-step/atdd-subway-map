@@ -3,6 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,6 +71,38 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", "강남역");
+
+        ExtractableResponse<Response> response1 =
+                RestAssured.given().log().all()
+                        .body(params1)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "양재역");
+
+        ExtractableResponse<Response> response2 =
+                RestAssured.given().log().all()
+                        .body(params2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        // when
+        List<Station> stations = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().get();
+
+        // then
+        assertThat(stations.size()).isEqualTo(2);
     }
 
 
