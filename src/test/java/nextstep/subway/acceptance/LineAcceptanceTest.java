@@ -51,13 +51,7 @@ public class LineAcceptanceTest {
         );
 
         // When
-        String lineName = "신분당선";
-        String lineColor = "bg-red-600";
-        Long upStationId = 1L;
-        Long downStationId = 2L;
-        int distance = 10;
-
-        ExtractableResponse<Response> 첫번째노선_생성_응답 = createLineRequest(lineName, lineColor, upStationId, downStationId, distance);
+        ExtractableResponse<Response> 첫번째노선_생성_응답 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
 
         // Then
         List<String> stationNames = 첫번째노선_생성_응답.jsonPath().getList("stations.name", String.class);
@@ -76,7 +70,49 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록 조회")
     @Test
     void getLines() {
+        // Given
+        String 첫번째역 = "지하철역";
+        String 두번째역 = "새로운지하철역";
+        String 세번째역 = "또다른지하철역";
 
+        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
+        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+        ExtractableResponse<Response> 세번째역_생성_응답 = createStationRequest(세번째역);
+
+        assertAll(
+                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(세번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
+
+        // When
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 분당선 = createLineRequest("분당선", "bg-green-600", 1L, 3L, 20);
+
+        assertAll(
+                () -> assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
+
+        // Then
+        ExtractableResponse<Response> 노선_전체조회_응답 = findAllLinesRequest();
+        List<String> 신분당선_역이름 = 노선_전체조회_응답.jsonPath().get("stations[0].name");
+        List<String> 분당선_역이름 = 노선_전체조회_응답.jsonPath().get("stations[1].name");
+
+        assertAll(
+                () -> assertThat(신분당선_역이름).hasSize(2),
+                () -> assertThat(신분당선_역이름).containsAnyOf("지하철역", "새로운지하철역"),
+                () -> assertThat(분당선_역이름).hasSize(2),
+                () -> assertThat(분당선_역이름).containsAnyOf("지하철역", "또다른지하철역")
+        );
+    }
+
+    private ExtractableResponse<Response> findAllLinesRequest() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
     }
 
     /**
