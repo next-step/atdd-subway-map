@@ -30,6 +30,20 @@ class LineRequestTest {
         assertThat(line.getDistance()).isEqualTo(lineRequest.getDistance());
     }
 
+    @Test
+    void Line으로변환_Id() {
+        final long id = 1L;
+        final LineRequest lineRequest = lineRequest();
+        final Line line = lineRequest.toLine(id);
+
+        assertThat(line.getId()).isEqualTo(id);
+        assertThat(line.getName()).isEqualTo(lineRequest.getName());
+        assertThat(line.getColor()).isEqualTo(lineRequest.getColor());
+        assertThat(line.getUpStationId()).isEqualTo(lineRequest.getUpStationId());
+        assertThat(line.getDownStationId()).isEqualTo(lineRequest.getDownStationId());
+        assertThat(line.getDistance()).isEqualTo(lineRequest.getDistance());
+    }
+
     private LineRequest lineRequest() {
         return LineRequest.builder()
                 .name("lineName")

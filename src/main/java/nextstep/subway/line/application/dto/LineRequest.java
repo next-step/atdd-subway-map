@@ -55,6 +55,16 @@ public class LineRequest {
                 .distance(distance).build();
     }
 
+    public Line toLine(final Long id) {
+        return Line.builder()
+                .id(id)
+                .name(name)
+                .color(color)
+                .upStationId(upStationId)
+                .downStationId(downStationId)
+                .distance(distance).build();
+    }
+
     public static class LineRequestBuilder {
         private String name;
         private String color;

@@ -12,11 +12,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -32,7 +31,7 @@ class LineServiceTest {
     private LineRepository lineRepository;
 
     @Test
-    void 노선을생성한다() {
+    void 노선생성() {
         final LineRequest lineRequest = lineRequest();
         final Line line = savedLine();
         doReturn(line)
@@ -49,7 +48,7 @@ class LineServiceTest {
     }
 
     @Test
-    void 노선목록을조회한다() {
+    void 노선목록조회() {
         final Line line = savedLine();
 
         doReturn(List.of(line))
@@ -63,6 +62,27 @@ class LineServiceTest {
 
         assertThat(result).hasSize(1);
     }
+
+    @Test
+    void 노선수정_노선이없으면에러반환() {
+        final Line line = savedLine();
+        final NoSuchElementException result = assertThrows(NoSuchElementException.class, () -> target.modifyLine(line.getId(), lineRequest()));
+
+        assertThat(result).hasMessageContaining("해당 노선이 존재하지 않습니다.");
+    }
+
+    @Test
+    void 노선수정() {
+        final Line line = savedLine();
+
+        doReturn(Optional.of(line))
+                .when(lineRepository)
+                .findById(line.getId());
+
+        target.modifyLine(line.getId(), lineRequest());
+        verify(lineRepository, times(1)).save(any(Line.class));
+    }
+
 
     private LineRequest lineRequest() {
         return LineRequest.builder()

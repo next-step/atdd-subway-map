@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,14 @@ public class LineService {
     public LineResponse createLine(final LineRequest lineRequest) {
         final Line savedLine = lineRepository.save(lineRequest.toLine());
         return createLineResponse(savedLine);
+    }
+
+    @Transactional
+    public void modifyLine(final Long id, final LineRequest lineRequest) {
+        lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 노선이 존재하지 않습니다."));
+
+        lineRepository.save(lineRequest.toLine(id));
     }
 
     private LineResponse createLineResponse(final Line savedLine) {
