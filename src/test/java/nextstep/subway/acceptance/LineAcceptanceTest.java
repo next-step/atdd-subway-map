@@ -33,23 +33,16 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철노선을 생성한다.")
-    void createLine() {
+    void createLineTest() {
         // when
-        Map<String, Object> params = Map.of(
+
+        ExtractableResponse<Response> response = createLine(Map.of(
                 "name", "4호선",
                 "color", "bg-blue-300",
                 "upStationId", 1,
                 "downStationId", 2,
                 "distance", 10
-        );
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
+        ));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -62,7 +55,30 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철노선의 목록이 조회된다.")
-    void getLines() {
+    void getLinesTest() {
+        // when
+        createLine(Map.of(
+                "name", "4호선",
+                "color", "bg-blue-300",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        ));
+
+        createLine(Map.of(
+                "name", "2호선",
+                "color", "bg-green-300",
+                "upStationId", 2,
+                "downStationId", 3,
+                "distance", 10
+        ));
+
+        // when
+        ExtractableResponse<Response> response = getLines();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList(".")).hasSize(2);
+        assertThat(response.jsonPath().getList("name", String.class)).contains("4호선", "2호선");
 
     }
 
@@ -74,7 +90,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철노선의 상세 정보가 조회된다.")
-    void getLine() {
+    void getLineTest() {
 
     }
 
@@ -85,7 +101,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철노선의 정보가 수정된다.")
-    void updateLine() {
+    void updateLineTest() {
 
     }
 
@@ -96,6 +112,23 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철노선의 정보가 삭제된다.")
-    void deleteLine() {
+    void deleteLineTest() {
+    }
+
+    private ExtractableResponse<Response> createLine(Map<String, Object> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+
+    private ExtractableResponse<Response> getLines() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
     }
 }
