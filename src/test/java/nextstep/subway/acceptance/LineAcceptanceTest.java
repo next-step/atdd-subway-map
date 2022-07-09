@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -8,10 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-
+import static nextstep.subway.acceptance.LineRequestCollection.*;
 import static nextstep.subway.acceptance.StationRequestCollection.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -101,6 +98,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
      * Then 해당 지하철 노선 정보는 수정된다
      */
     @Test
+    @DisplayName("단일 지하철 노선 편집")
     public void editLine() {
         // given
         long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
@@ -118,6 +116,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
      * Then 해당 지하철 노선 정보는 삭제된다
      */
     @Test
+    @DisplayName("단일 지하철 노선 삭제")
     public void deleteLine() {
         // given
         long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
@@ -129,60 +128,4 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(deleteStatusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private int 지하철_단일_노선_삭제(long lineId) {
-        return RestAssured
-                .given().log().all()
-                .when().delete("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract()
-                .statusCode();
-    }
-
-    private int 지하철_노선_수정(long lineId, String name, String color) {
-        HashMap<String, String> requestParam = new HashMap<>();
-        requestParam.put("name", name);
-        requestParam.put("color", color);
-
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParam)
-                .when().put("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract()
-                .statusCode();
-    }
-
-    private ExtractableResponse<Response> 지하철_단일_노선_조회(long lineId) {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_생성(String lineName, String color, Long upStationId, Long downStationId, Integer distance) {
-        HashMap<String, String> requestParam = new HashMap<>();
-        requestParam.put("name", lineName);
-        requestParam.put("color", color);
-        requestParam.put("upStationId", upStationId.toString());
-        requestParam.put("downStationId", downStationId.toString());
-        requestParam.put("distance", distance.toString());
-
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParam)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
 }
