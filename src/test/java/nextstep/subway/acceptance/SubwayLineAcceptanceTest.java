@@ -59,7 +59,6 @@ public class SubwayLineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-    // TODO: 지하철 노선 목록 조회에 대한 인수 테스트 코드 작성
     @DisplayName("지하철 노선 목록을 조회합니다.")
     @Test
     void getSubwayLines() throws Exception {
