@@ -32,6 +32,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @Test
+    @DisplayName("지하철 노선을 생성")
     public void createLine() {
         // when
         ExtractableResponse<Response> response = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
@@ -53,7 +54,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
     @Test
-    public void searchLine() {
+    @DisplayName("전체 지하철 노선 목록 조회")
+    public void searchLines() {
         // given
         ExtractableResponse<Response> response1 = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
         ExtractableResponse<Response> response2 = 지하철_노선_생성("1호선", "bg-blue-600", upStationId, downStationId, 7);
@@ -67,6 +69,38 @@ public class LineAcceptanceTest extends AcceptanceTest {
         JsonPath responseBody = response.jsonPath();
         assertThat(responseBody.getList("name")).contains("1호선", "2호선");
         assertThat(responseBody.getList("name")).hasSize(2);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @Test
+    @DisplayName("단일 지하철 노선 조회")
+    public void searchLine() {
+        // given
+        long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = 지하철_단일_노선_조회(lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        JsonPath responseBody = response.jsonPath();
+        assertThat(responseBody.getLong("id")).isNotNull();
+        assertThat(responseBody.getString("name")).isEqualTo("2호선");
+        assertThat(responseBody.getString("color")).isEqualTo("bg-green-600");
+        assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역");
+    }
+
+    private ExtractableResponse<Response> 지하철_단일_노선_조회(long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> 지하철_노선_목록_조회() {
