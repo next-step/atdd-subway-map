@@ -41,11 +41,9 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationsRequest()
+                .jsonPath()
+                .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -62,12 +60,7 @@ public class StationAcceptanceTest {
         createStation("언주역");
 
         // when - 지하철역 목록 조회
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = getStationsRequest();
 
         // then - 지하철역 2개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
@@ -94,16 +87,10 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = getStationsRequest();
 
         // then - 지하철역 1개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
-
         assertAll(
                 () -> assertThat(names).hasSize(1),
                 () -> assertThat(names).doesNotContain("서대문")
@@ -124,5 +111,12 @@ public class StationAcceptanceTest {
         params.put("name", name);
 
         return params;
+    }
+
+    private ExtractableResponse<Response> getStationsRequest() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
     }
 }
