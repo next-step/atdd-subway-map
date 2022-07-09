@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +36,14 @@ public class LineService {
         return lineRepository.findAll().stream()
                 .map(line -> LineResponse.of(line, stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse findById(Long lineId) {
+        Line findLine = lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
+        List<Station> stations = stationRepository.findAllById(List.of(findLine.getUpStationId(), findLine.getDownStationId()));
+        return LineResponse.of(findLine, stations);
     }
 }
 
