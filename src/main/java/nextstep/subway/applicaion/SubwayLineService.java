@@ -44,6 +44,7 @@ public class SubwayLineService {
                 upStation,
                 downStation
         ));
+        savedSubwayLine.updateStations(List.of(upStation, downStation));
 
         return new SubwayLineResponse(savedSubwayLine);
     }

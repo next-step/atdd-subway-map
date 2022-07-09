@@ -36,4 +36,8 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public void updateSubwayLine(SubwayLine subwayLine) {
+        this.subwayLine = subwayLine;
+    }
 }
