@@ -75,7 +75,7 @@ public class LineService {
     }
 
     @Transactional
-    public void changeLine(Long lineId, LineChangeRequest lineChangeRequest) {
+    public void changeLineById(Long lineId, LineChangeRequest lineChangeRequest) {
         Line findLine = findPureLine(lineId);
         findLine.change(lineChangeRequest.getName(), lineChangeRequest.getColor());
     }
@@ -83,5 +83,10 @@ public class LineService {
     private Line findPureLine(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException("존재하지 않는 노선입니다."));
+    }
+
+    @Transactional
+    public void deleteLineById(Long lineId) {
+        lineRepository.deleteById(lineId);
     }
 }
