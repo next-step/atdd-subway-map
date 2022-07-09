@@ -4,6 +4,7 @@ import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
 import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.CascadeType.PERSIST;
@@ -37,7 +38,7 @@ public class SubwayLine {
     private Station downStation;
 
     @OneToMany(mappedBy = "subwayLine", fetch = LAZY)
-    private List<Station> stations;
+    private List<Station> stations = new ArrayList<>();
 
     public SubwayLine() {
     }
