@@ -84,6 +84,19 @@ class LineControllerTest {
         result.andExpect(status().isOk());
     }
 
+    @Test
+    void 노선삭제() throws Exception {
+        final Long id = 1L;
+
+        // when
+        final ResultActions result = target.perform(
+                MockMvcRequestBuilders.delete("/lines/{id}", id)
+        );
+
+        // then
+        result.andExpect(status().isOk());
+    }
+
     private LineRequest lineRequest() {
         return LineRequest.builder()
                 .name("lineName")
