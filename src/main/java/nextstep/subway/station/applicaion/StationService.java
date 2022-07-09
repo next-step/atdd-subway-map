@@ -36,10 +36,18 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public List<StationResponse> findStations(final List<Long> idList) {
+        return stationRepository.findAllById(idList)
+                .stream()
+                .map(this::createStationResponse)
+                .collect(Collectors.toList());
+    }
+
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()
         );
     }
+
 }
