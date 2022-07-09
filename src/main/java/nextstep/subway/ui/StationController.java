@@ -1,14 +1,16 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.StationService;
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.StationDto;
+import nextstep.subway.ui.dto.StationRequest;
+import nextstep.subway.ui.dto.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class StationController {
@@ -20,13 +22,19 @@ public class StationController {
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+        StationDto stationDto = stationService.saveStation(stationRequest.toDto());
+        StationResponse station = StationResponse.of(stationDto);
+
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
     @GetMapping(value = "/stations", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStations());
+        List<StationDto> allStationDtos = stationService.findAllStations();
+
+        return ResponseEntity.ok().body(allStationDtos.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toUnmodifiableList()));
     }
 
     @DeleteMapping("/stations/{id}")
