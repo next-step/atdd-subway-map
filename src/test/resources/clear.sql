@@ -1,4 +1,5 @@
 EXECUTE IMMEDIATE 'TRUNCATE TABLE station'
+EXECUTE IMMEDIATE 'TRUNCATE TABLE line'
 
 
 -- 아래는 시도했던 내용들 기록용으로 남겨두겠습니다! --
