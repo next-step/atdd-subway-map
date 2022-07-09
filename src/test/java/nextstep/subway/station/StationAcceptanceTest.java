@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @AcceptanceTest
-class StationAcceptanceTest {
+public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
@@ -97,7 +97,7 @@ class StationAcceptanceTest {
         assertThat(getStationNamesRequest()).doesNotContain(stationName);
     }
 
-    private ExtractableResponse<Response> createStationRequest(final String stationName) {
+    public static ExtractableResponse<Response> createStationRequest(final String stationName) {
         return RestAssured.given().log().all()
                 .body(createStationParams(stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -106,7 +106,7 @@ class StationAcceptanceTest {
                 .extract();
     }
 
-    private Map<String, Object> createStationParams(final String stationName) {
+    private static Map<String, Object> createStationParams(final String stationName) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", stationName);
         return params;
