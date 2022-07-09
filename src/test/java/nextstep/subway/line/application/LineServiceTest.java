@@ -83,6 +83,26 @@ class LineServiceTest {
         verify(lineRepository, times(1)).save(any(Line.class));
     }
 
+    @Test
+    void 노선삭제_노선이없으면에러반환() {
+        final Line line = savedLine();
+        final NoSuchElementException result = assertThrows(NoSuchElementException.class, () -> target.deleteLine(line.getId()));
+
+        assertThat(result).hasMessageContaining("해당 노선이 존재하지 않습니다.");
+    }
+
+    @Test
+    void 노선삭제() {
+        final Line line = savedLine();
+
+        doReturn(Optional.of(line))
+                .when(lineRepository)
+                .findById(line.getId());
+
+        target.deleteLine(line.getId());
+
+        verify(lineRepository, times(1)).deleteById(line.getId());
+    }
 
     private LineRequest lineRequest() {
         return LineRequest.builder()
