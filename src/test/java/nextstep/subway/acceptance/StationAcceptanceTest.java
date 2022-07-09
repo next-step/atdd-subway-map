@@ -37,8 +37,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = getRequestBody("강남역");
 
         ExtractableResponse<Response> response =
             RestAssured.given().log().all()
@@ -69,11 +68,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        Map<String, String> requestBody1 = new HashMap<>();
-        requestBody1.put("name", "가양역");
-
-        Map<String, String> requestBody2 = new HashMap<>();
-        requestBody2.put("name", "증미역");
+        Map<String, String> requestBody1 = getRequestBody("가양역");
+        Map<String, String> requestBody2 = getRequestBody("증미역");
 
         //when
         RestAssured.given().log().all()
@@ -91,7 +87,8 @@ public class StationAcceptanceTest {
             .extract();
 
         //then
-        List<String> stationNames = RestAssured.given().log().all()
+        List<String> stationNames =
+            RestAssured.given().log().all()
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
@@ -111,9 +108,9 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("name", "등촌역");
-        ExtractableResponse<Response> extract = RestAssured.given().log().all()
+        Map<String, String> requestBody = getRequestBody("등촌역");
+        ExtractableResponse<Response> createdStation =
+            RestAssured.given().log().all()
             .body(requestBody)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
@@ -121,18 +118,25 @@ public class StationAcceptanceTest {
             .extract();
 
         //when
-        int deleteId = extract.jsonPath().getInt("id");
+        int deleteId = createdStation.jsonPath().getInt("id");
         RestAssured.given().log().all()
             .when().delete("/stations/{id}", deleteId)
             .then().log().all()
             .extract();
 
         //then
-        List<String> stations = RestAssured.given().log().all()
+        List<String> stations =
+            RestAssured.given().log().all()
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
 
         assertThat(stations).doesNotContain("등촌역");
+    }
+
+    private Map<String, String> getRequestBody(String station) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("name", station);
+        return requestBody;
     }
 }
