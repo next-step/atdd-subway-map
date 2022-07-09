@@ -24,7 +24,7 @@ public class SubwayLineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     // TODO: 지하철 노선 생성에 대한 인수 테스트 코드 작성
-    @DisplayName("지하철 노선을 생성합니다.j")
+    @DisplayName("지하철 노선을 생성합니다.")
     @Test
     void createSubwayLine() throws Exception {
         // given
