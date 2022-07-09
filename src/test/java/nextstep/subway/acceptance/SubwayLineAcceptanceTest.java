@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -102,6 +104,19 @@ public class SubwayLineAcceptanceTest {
         // when
 
         // then
+    }
+
+    private Map<String, String> createParams(List<String> keys, List<String> values) {
+        if (keys.size() != values.size()) {
+            throw new RuntimeException("생성하려는 key 와 value 의 length 가 같아야 합니다.");
+        }
+
+        final Map<String, String> params = new HashMap<>();
+        for (int i = 0; i < keys.size(); i++) {
+            params.put(keys.get(i), values.get(i));
+        }
+
+        return params;
     }
 
     private ExtractableResponse<Response> createSubwayLineRequest(Map<String, String> param) {
