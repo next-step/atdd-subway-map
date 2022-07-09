@@ -95,6 +95,39 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @Test
+    public void editLine() {
+        // given
+        long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        int editStatusCode = 지하철_노선_수정(lineId, "다른 2호선", "연두색");
+
+        // then
+        assertThat(editStatusCode).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private int 지하철_노선_수정(long lineId, String name, String color) {
+        HashMap<String, String> requestParam = new HashMap<>();
+        requestParam.put("name", name);
+        requestParam.put("color", color);
+
+
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(requestParam)
+                .when().put("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract()
+                .statusCode();
+    }
+
     private ExtractableResponse<Response> 지하철_단일_노선_조회(long lineId) {
         return RestAssured
                 .given().log().all()
