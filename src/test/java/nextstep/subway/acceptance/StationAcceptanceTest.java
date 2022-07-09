@@ -11,9 +11,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,6 +54,14 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given
+        List<String> stationNames = List.of("강남역", "역삼역");
+
+        // when
+        createStationsAndValidate(stationNames);
+
+        // then
+        getStationsAndValidateExistence(stationNames);
     }
 
     /**
