@@ -11,6 +11,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,10 +24,8 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql("/truncate.sql")
 public class StationAcceptanceTest {
-
-    @Autowired
-    private StationRepository stationRepository;
 
     @LocalServerPort
     int port;
@@ -34,8 +33,6 @@ public class StationAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-
-        stationRepository.deleteAll();
     }
 
     /**
