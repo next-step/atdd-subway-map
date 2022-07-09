@@ -9,15 +9,18 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
     @LocalServerPort
     int port;
 
@@ -34,28 +37,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when - 생성
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        List<String> stations = List.of("강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        // when - 지하철역 생성
+        getIdOfcreateAndValidate(stations);
 
-        // then - 생성됨을 확인
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then - 목록조회
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        // then - 목록 조회 후, 역을 찾을 수 있다.
+        stationNameExists(stations, getStationNameOfselectStationsAndValidate(stations));
     }
 
     /**
@@ -67,34 +55,14 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
-        // when - 생성
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "선릉역");
-        RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        // when - 지하철역 생성
+        List<String> stations = List.of("선릉역", "역삼역");
+        getIdOfcreateAndValidate(stations);
 
-        params.put("name", "역삼역");
-        RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
-        List<String> stationList = RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract()
-                .jsonPath().getList("name", String.class);
-
-        assertThat(stationList).hasSize(2);
-        assertThat(stationList.get(0)).isEqualTo("선릉역");
-        assertThat(stationList.get(1)).isEqualTo("역삼역");
+        // then - 2개의 지하철역 응답 받기
+        List<String> stationNames = getStationNameOfselectStationsAndValidate(stations);
+        assertThat(stationNames).hasSize(2);
+        stationNameExists(stations, stationNames);
     }
 
     /**
@@ -106,25 +74,60 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-        // when - 생성
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        List<String> stations = List.of("강남역");
 
-        Long id = RestAssured.given().log().all()
-                        .body(params)
+        // when - 지하철역 생성 및 삭제
+        deleteStationAndValidate(getIdOfcreateAndValidate(stations));
+
+        // then - 지하철 목록을 찾을 수 없는지 확인
+        List<String> stationNames = getStationNameOfselectStationsAndValidate(stations);
+        assertThat(stationNames).doesNotContain(stations.toArray(String[]::new));
+    }
+
+    private void deleteStationAndValidate(List<Long> ids) {
+        ids.stream()
+                .map(id -> RestAssured
+                        .given().log().all()
+                        .when().delete("/stations/{id}", id)
+                        .then().log().all()
+                        .extract())
+                .forEach(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()));
+    }
+
+    private  List<Long> getIdOfcreateAndValidate(List<String> stations) {
+        return createAndValidate(stations).stream()
+                .map(response -> response.jsonPath().getLong("id"))
+                .collect(Collectors.toList());
+    }
+
+    private List<ExtractableResponse<Response>> createAndValidate(List<String> stations) {
+        return stations.stream()
+                .map(name -> RestAssured
+                        .given().log().all()
+                        .body(Collections.singletonMap("name", name))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
                         .then().log().all()
-                        .extract().jsonPath().getLong("id");
+                        .extract()
+                )
+                .peek(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()))
+                .collect(Collectors.toList());
+    }
 
-        // when - 삭제
+    private void stationNameExists(List<String> stations, List<String> stationNames) {
+        assertThat(stations).containsExactly(stationNames.toArray(String[]::new));
+    }
+
+    private List<String> getStationNameOfselectStationsAndValidate(List<String> stations) {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete(String.format("/stations/%s", id))
+                .when().get("/stations")
                 .then().log().all()
                 .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        return response.jsonPath().getList("name", String.class);
     }
+
 
 }
