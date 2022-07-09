@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,17 +34,34 @@ class LineServiceTest {
     @Test
     void 노선을생성한다() {
         final LineRequest lineRequest = lineRequest();
-        doReturn(savedLine())
+        final Line line = savedLine();
+        doReturn(line)
                 .when(lineRepository)
                 .save(any(Line.class));
         doReturn(Collections.emptyList())
                 .when(stationService)
-                .findStations(Arrays.asList(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
+                .findStations(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
 
         final LineResponse response = target.createLine(lineRequest);
 
         assertThat(response).isNotNull();
         verify(lineRepository, times(1)).save(any(Line.class));
+    }
+
+    @Test
+    void 노선목록을조회한다() {
+        final Line line = savedLine();
+
+        doReturn(List.of(line))
+                .when(lineRepository)
+                .findAll();
+        doReturn(Collections.emptyList())
+                .when(stationService)
+                .findStations(Arrays.asList(line.getUpStationId(), line.getDownStationId()));
+
+        final List<LineResponse> result = target.findAllLines();
+
+        assertThat(result).hasSize(1);
     }
 
     private LineRequest lineRequest() {
