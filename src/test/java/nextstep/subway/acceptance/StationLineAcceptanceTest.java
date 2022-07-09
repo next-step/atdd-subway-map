@@ -10,8 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -20,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql("classpath:init.sql")
+@Transactional(readOnly = true)
 public class StationLineAcceptanceTest {
 
     public static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS = Map.of(
@@ -28,12 +30,19 @@ public class StationLineAcceptanceTest {
             String.class, (response, path) -> response.body().jsonPath().getString(path)
     );
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @LocalServerPort
     private int port;
 
+    @Transactional
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+
+        cleanUp();
+
         saveStation(Map.of("name", "강남역"));
         saveStation(Map.of("name", "양재역"));
         saveStation(Map.of("name", "역삼역"));
@@ -239,5 +248,13 @@ public class StationLineAcceptanceTest {
 
     private List<String> getStringListAtStationLine(ExtractableResponse<Response> response, String path) {
         return response.jsonPath().getList(path, String.class);
+    }
+
+    private void cleanUp() {
+        entityManager.flush();
+        entityManager.createNativeQuery("TRUNCATE TABLE station_line").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE station").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE station_line ALTER COLUMN id RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE station ALTER COLUMN id RESTART WITH 1").executeUpdate();
     }
 }
