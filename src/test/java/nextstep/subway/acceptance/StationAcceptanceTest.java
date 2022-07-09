@@ -93,7 +93,18 @@ public class StationAcceptanceTest {
 	@DisplayName("지하철역을 제거한다.")
 	@Test
 	void deleteStation() {
-		
+		//Given
+		long stationId = 지하철역_생성(SAMSUNG_STATION);
+
+		//when
+		RestAssured.given().log().all()
+			.when().delete("/stations/" + stationId)
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
+
+		//then
+		List<String> stations = 지하철역_조회();
+		assertThat(stations).isEmpty();
 	}
 
 	private long 지하철역_생성(String stationName) {
