@@ -39,4 +39,8 @@ public class Section {
         }
         return new Section(List.of(upStation, downStation), distance);
     }
+
+    public List<Station> stations() {
+        return stations;
+    }
 }
