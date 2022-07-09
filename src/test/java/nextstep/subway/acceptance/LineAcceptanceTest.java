@@ -212,7 +212,35 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteLine() {
+        // Given
+        String 첫번째역 = "첫번째역";
+        String 두번째역 = "새로운지하철역";
 
+        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
+        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+
+        assertAll(
+                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
+
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // When
+        long lineId = 신분당선.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        List<Long> lineIds = findAllLinesRequest().jsonPath().getList("id", Long.class);
+        assertThat(lineIds).hasSize(0);
     }
 
     private ExtractableResponse<Response> createStationRequest(String stationName) {
