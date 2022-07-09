@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.AcceptanceTestBase.assertStatusCode;
+import static nextstep.subway.acceptance.AcceptanceTestBase.*;
 import static nextstep.subway.station.StationAcceptanceTest.createStationRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +38,7 @@ class LineAcceptanceTest {
     }
 
     private Long createStation(final String stationName) {
-        return createStationRequest(stationName).jsonPath().getObject("id", Long.class);
+        return getIdFromResponse(createStationRequest(stationName));
     }
 
     /**
@@ -84,9 +84,9 @@ class LineAcceptanceTest {
         // then
         assertStatusCode(response, HttpStatus.OK);
 
-        final List<String> names = getLineNames(response);
-        assertThat(names).hasSize(2);
-        assertThat(names).contains(lineName1, lineName2);
+        final List<String> lineNames = getNamesFromResponse(response);
+        assertThat(lineNames).hasSize(2);
+        assertThat(lineNames).contains(lineName1, lineName2);
     }
 
     /**
@@ -100,7 +100,7 @@ class LineAcceptanceTest {
     void modifyLines() {
         // given
         final String beforeLineName = "신분당선";
-        final Long id = createLineRequest(beforeLineName).jsonPath().getObject("id", Long.class);
+        final Long id = getIdFromResponse(createLineRequest(beforeLineName));
 
         final String afterLineName = "신신분당선";
 
@@ -110,9 +110,9 @@ class LineAcceptanceTest {
         // then
         assertStatusCode(modifyResponse, HttpStatus.OK);
 
-        final List<String> names = getLineNames(getLinesRequest());
-        assertThat(names).contains(afterLineName);
-        assertThat(names).doesNotContain(beforeLineName);
+        final List<String> lineNames = getNamesFromResponse(getLinesRequest());
+        assertThat(lineNames).contains(afterLineName);
+        assertThat(lineNames).doesNotContain(beforeLineName);
     }
 
     /**
@@ -126,7 +126,7 @@ class LineAcceptanceTest {
     void deleteLine() {
         // given
         final String lineName = "신분당선";
-        final Long id = createLineRequest(lineName).jsonPath().getObject("id", Long.class);
+        final Long id = getIdFromResponse(createLineRequest(lineName));
 
         // when
         final ExtractableResponse<Response> response = deleteLineRequest(id);
@@ -134,8 +134,8 @@ class LineAcceptanceTest {
         // then
         assertStatusCode(response, HttpStatus.OK);
 
-        final List<String> names = getLineNames(getLinesRequest());
-        assertThat(names).doesNotContain(lineName);
+        final List<String> lineNames = getNamesFromResponse(getLinesRequest());
+        assertThat(lineNames).doesNotContain(lineName);
     }
 
     private ExtractableResponse<Response> modifyLineRequest(final Long id, final String lineName) {
@@ -170,10 +170,6 @@ class LineAcceptanceTest {
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
-    }
-
-    private List<String> getLineNames(final ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> deleteLineRequest(final Long id) {

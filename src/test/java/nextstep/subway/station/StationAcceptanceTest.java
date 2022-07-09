@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.AcceptanceTestBase.assertStatusCode;
+import static nextstep.subway.acceptance.AcceptanceTestBase.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -45,7 +45,7 @@ public class StationAcceptanceTest {
 
         // then: 지하철역이 정상적으로 생성되었고, 목록에 존재하는지 검증한다.
         assertStatusCode(response, HttpStatus.CREATED);
-        assertThat(getStationNamesRequest()).containsAnyOf(stationName);
+        assertThat(getNamesFromResponse(getStationsRequest())).containsAnyOf(stationName);
     }
 
     /**
@@ -86,16 +86,14 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given: 1개의 지하철 역을 생성한다.
         final String stationName = "잠실역";
-        final Long id = createStationRequest(stationName)
-                .jsonPath()
-                .getObject("id", Long.class);
+        final Long id = getIdFromResponse(createStationRequest(stationName));
 
         // when: 1개의 지하철 역을 제거한다.
         final ExtractableResponse<Response> response = deleteStationRequest(id);
 
         // then: 지하철 역이 제거되었는지 검증한다.
         assertStatusCode(response, HttpStatus.NO_CONTENT);
-        assertThat(getStationNamesRequest()).doesNotContain(stationName);
+        assertThat(getNamesFromResponse(getStationsRequest())).doesNotContain(stationName);
     }
 
     public static ExtractableResponse<Response> createStationRequest(final String stationName) {
@@ -127,12 +125,5 @@ public class StationAcceptanceTest {
                 .delete("/stations/{id}", id)
                 .then().log().all().extract();
     }
-
-    private List<String> getStationNamesRequest() {
-        return getStationsRequest()
-                .jsonPath()
-                .getList("name", String.class);
-    }
-
 
 }
