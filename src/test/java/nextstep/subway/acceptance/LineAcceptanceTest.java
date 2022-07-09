@@ -117,7 +117,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         requestParam.put("name", name);
         requestParam.put("color", color);
 
-
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -36,4 +36,9 @@ public class LineController {
         LineResponse line = lineService.findById(lineId);
         return ResponseEntity.ok().body(line);
     }
+
+    @PutMapping("/{lineId}")
+    public void editLine(@PathVariable Long lineId, @RequestBody LineRequest request) {
+        lineService.editLine(lineId, request);
+    }
 }

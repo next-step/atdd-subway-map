@@ -45,5 +45,11 @@ public class LineService {
         List<Station> stations = stationRepository.findAllById(List.of(findLine.getUpStationId(), findLine.getDownStationId()));
         return LineResponse.of(findLine, stations);
     }
+
+    public void editLine(Long lineId, LineRequest request) {
+        Line findLine = lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
+        findLine.edit(request.toDomain());
+    }
 }
 

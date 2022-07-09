@@ -55,6 +55,24 @@ public class Line {
         return distance;
     }
 
+    public void edit(Line line) {
+        if (line.getName() != null) {
+            name = line.getName();
+        }
+        if (line.getColor() != null) {
+            color = line.getColor();
+        }
+        if (line.getUpStationId() != null) {
+            upStationId = line.getUpStationId();
+        }
+        if (line.getDownStationId() != null) {
+            downStationId = line.getDownStationId();
+        }
+        if (line.getDistance() != null) {
+            distance = line.getDistance();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
