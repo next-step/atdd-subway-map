@@ -33,7 +33,26 @@ public class LineAcceptanceTest {
     @Test
     @DisplayName("지하철 노선을 생성한다.")
     void createLineTest() {
+        //when
+        Map<String, Object> map = new HashMap<>();
+        map.put("name","신분당선");
+        map.put("color","bg-red-600");
+        map.put("upStationId",1);
+        map.put("downStationId",2);
+        map.put("distance",10);
 
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .body(map)
+            .when().post("/lines")
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        assertThat(response.jsonPath().getString("$..book")).hasSize(2);
     }
 
     /**
