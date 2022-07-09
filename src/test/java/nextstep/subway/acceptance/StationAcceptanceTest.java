@@ -3,9 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -36,7 +34,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when
+        // when - 생성
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
@@ -48,10 +46,10 @@ public class StationAcceptanceTest {
                         .then().log().all()
                         .extract();
 
-        // then
+        // then - 생성됨을 확인
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        // then
+        // then - 목록조회
         List<String> stationNames =
                 RestAssured.given().log().all()
                         .when().get("/stations")
@@ -69,6 +67,34 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // when - 생성
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "선릉역");
+        RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        params.put("name", "역삼역");
+        RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+
+        List<String> stationList = RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract()
+                .jsonPath().getList("name", String.class);
+
+        assertThat(stationList).hasSize(2);
+        assertThat(stationList.get(0)).isEqualTo("선릉역");
+        assertThat(stationList.get(1)).isEqualTo("역삼역");
     }
 
     /**
