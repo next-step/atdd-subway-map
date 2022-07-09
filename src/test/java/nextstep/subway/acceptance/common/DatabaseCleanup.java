@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.common;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
