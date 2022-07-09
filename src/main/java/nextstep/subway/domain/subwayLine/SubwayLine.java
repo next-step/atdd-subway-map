@@ -25,7 +25,7 @@ public class SubwayLine {
     private Integer distance;
 
     @ManyToOne(fetch = LAZY, cascade = PERSIST)
-    @JoinColumn(name = "color")
+    @JoinColumn(name = "color_id")
     private SubwayLineColor color;
 
     @ManyToOne(fetch = LAZY, cascade = PERSIST)
