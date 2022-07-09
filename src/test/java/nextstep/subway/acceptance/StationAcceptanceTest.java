@@ -60,17 +60,17 @@ public class StationAcceptanceTest {
     void getStations() {
         // Given
         List<String> stationNames = List.of("강남역", "서울대입구역");
-        List<Integer> createdStationIds = stationNames.stream()
-                .map(name -> (Integer) createStationWithName(name).jsonPath()
-                        .get("id"))
+        List<Long> createdStationIds = stationNames.stream()
+                .map(name -> createStationWithName(name).jsonPath()
+                        .getLong("id"))
                 .collect(Collectors.toList());
 
         // When
         ExtractableResponse<Response> getAllStationsResponse = getAllStations();
 
         // Then
-        List<Integer> getAllStationsIds = getAllStationsResponse.jsonPath()
-                .getList("id", Integer.class);
+        List<Long> getAllStationsIds = getAllStationsResponse.jsonPath()
+                .getList("id", Long.class);
         assertThat(getAllStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(getAllStationsIds.size()).isEqualTo(createdStationIds.size());
     }
@@ -114,20 +114,20 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // Given
         String stationName = "강남역";
-        Integer createdStationId = createStationWithName(stationName).jsonPath()
+        Long createdStationId = createStationWithName(stationName).jsonPath()
                 .get("id");
 
         // When
         ExtractableResponse<Response> deleteResponse = deleteStationWithId(createdStationId);
 
         // Then
-        List<Integer> ids = getStationWithId(createdStationId).jsonPath()
-                .getList("id", Integer.class);
+        List<Long> ids = getStationWithId(createdStationId).jsonPath()
+                .getList("id", Long.class);
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(ids).doesNotContain(createdStationId);
     }
 
-    private ExtractableResponse<Response> deleteStationWithId(Integer createdStationId) {
+    private ExtractableResponse<Response> deleteStationWithId(Long createdStationId) {
         return RestAssured.given()
                 .log()
                 .all()
@@ -139,7 +139,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> getStationWithId(Integer id) {
+    private ExtractableResponse<Response> getStationWithId(Long id) {
         return RestAssured.given()
                 .log()
                 .all()
