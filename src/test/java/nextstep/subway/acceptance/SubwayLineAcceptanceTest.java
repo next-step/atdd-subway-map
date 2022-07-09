@@ -52,6 +52,7 @@ public class SubwayLineAcceptanceTest {
 
         // then
         // TODO: 지하철 노선 목록 조회를 통해 생성된 노선을 검증
+        final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
     }
 
     /**
