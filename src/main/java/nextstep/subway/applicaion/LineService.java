@@ -7,10 +7,13 @@ import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class LineService {
 
     private LineRepository lineRepository;
@@ -26,4 +29,12 @@ public class LineService {
         List<Station> stations = stationRepository.findAllById(List.of(savedLine.getUpStationId(), savedLine.getDownStationId()));
         return LineResponse.of(savedLine, stations);
     }
+
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAll() {
+        return lineRepository.findAll().stream()
+                .map(line -> LineResponse.of(line, stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))))
+                .collect(Collectors.toList());
+    }
 }
+
