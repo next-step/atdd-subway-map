@@ -3,6 +3,7 @@ package nextstep.subway.acceptance.line;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.station.StationRestAssuredTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static nextstep.subway.acceptance.line.LineStationAssuredTemplate.*;
+import static nextstep.subway.acceptance.station.StationRestAssuredTemplate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -61,10 +63,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void findLines() {
         // given 2개의 지하철 노선을 생성하고
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 강남역 = 지하철역_생성("강남역");
+        ExtractableResponse<Response> 분당역 = 지하철역_생성("분당역");
+        System.out.println(강남역.jsonPath().getString("id"));
+
+        Long 강남역_ID = Long.parseLong(강남역.jsonPath().getString("id"));
+        Long 분당역_ID = Long.parseLong(분당역.jsonPath().getString("id"));
+
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 강남역_ID, 분당역_ID, 10);
         assertThat(분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when 지하철 노선 목록을 조회하면

@@ -4,13 +4,10 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.station.Station;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Embedded;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
-@Repository
+@Entity
 public class Line {
 
     @Id
@@ -70,7 +67,7 @@ public class Line {
         return distance;
     }
 
-    public List<Station> getStations() {
-        return stations.getStations();
+    public Stations getStations() {
+        return stations;
     }
 }
