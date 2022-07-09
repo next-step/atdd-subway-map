@@ -1,10 +1,10 @@
 package nextstep.subway.applicaion.dto;
 
-public class StationLineModifyRequest {
+public class SubwayLineModifyRequest {
     private String name;
     private String color;
 
-    public StationLineModifyRequest(String name, String color) {
+    public SubwayLineModifyRequest(String name, String color) {
         this.name = name;
         this.color = color;
     }

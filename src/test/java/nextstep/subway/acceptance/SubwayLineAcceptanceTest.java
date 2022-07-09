@@ -19,16 +19,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @Transactional(readOnly = true)
-public class StationLineAcceptanceTest extends AcceptanceTest {
+public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
-    public static final List<String> CLEAN_UP_TABLES = List.of("station_line", "station");
+    public static final List<String> CLEAN_UP_TABLES = List.of("subway_line", "station");
 
     @PersistenceContext
     private EntityManager entityManager;
 
     private CallApi callApi;
 
-    public StationLineAcceptanceTest() {
+    public SubwayLineAcceptanceTest() {
         this.callApi = new CallApi();
     }
 
@@ -47,14 +47,14 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 생성")
     @Test
-    void createStationLine() {
+    void createSubwayLine() {
         // when
-        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(saveResponse.header("Location")).isNotEmpty();
 
         // then
-        ExtractableResponse<Response> response = callApi.findStationLines();
+        ExtractableResponse<Response> response = callApi.findSubwayLines();
         assertThat(Actual.get(response, "[0].name", String.class)).isEqualTo("신분당선");
         assertThat(Actual.get(response, "[0].color", String.class)).isEqualTo("bg-red-600");
         assertThat(Actual.getList(response, "[0].stations.name", String.class)).isEqualTo(List.of("강남역","양재역"));
@@ -67,13 +67,13 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
-    void getStationLines() {
+    void getSubwayLines() {
         // given
-        callApi.saveStationLine(Param.신분당선);
-        callApi.saveStationLine(Param.이호선);
+        callApi.saveSubwayLine(Param.신분당선);
+        callApi.saveSubwayLine(Param.이호선);
 
         // when
-        ExtractableResponse<Response> response = callApi.findStationLines();
+        ExtractableResponse<Response> response = callApi.findSubwayLines();
 
         // then
         assertThat(Actual.getList(response, "name", String.class)).isEqualTo(List.of("신분당선", "2호선"));
@@ -87,13 +87,13 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 조회")
     @Test
-    void getStationLine() {
+    void getSubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = Actual.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> response = callApi.findStationLineById(id);
+        ExtractableResponse<Response> response = callApi.findSubwayLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -106,17 +106,17 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 수정")
     @Test
-    void modifyStationLine() {
+    void modifySubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = Actual.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> modifyResponse = callApi.modifyStationLineById(id, Param.이호선으로_수정);
+        ExtractableResponse<Response> modifyResponse = callApi.modifySubwayLineById(id, Param.이호선으로_수정);
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> response = callApi.findStationLineById(id);
+        ExtractableResponse<Response> response = callApi.findSubwayLineById(id);
         assertThat(Actual.get(response, "name", String.class)).isEqualTo("2호선");
         assertThat(Actual.get(response, "color", String.class)).isEqualTo("bg-green-600");
     }
@@ -128,13 +128,13 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선 삭제")
     @Test
-    void deleteStationLine() {
+    void deleteSubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = callApi.saveStationLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = Actual.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> response = callApi.deleteStationLineById(id);
+        ExtractableResponse<Response> response = callApi.deleteSubwayLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -155,7 +155,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
      * 검증 비교 대상 값 관련 클래스
      */
     private static class Actual {
-        private static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS = Map.of(
+        private static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_SUBWAY_LINE_FUNCTIONS = Map.of(
                 Long.class, (response, path) -> response.body().jsonPath().getLong(path),
                 String.class, (response, path) -> response.body().jsonPath().getString(path)
         );
@@ -169,7 +169,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
          * @return
          */
         private static  <T> T get(ExtractableResponse<Response> response, String path, Class<T> type) {
-            return (T) EXTRACT_INFO_AT_STATION_LINE_FUNCTIONS.get(type).apply(response, path);
+            return (T) EXTRACT_INFO_AT_SUBWAY_LINE_FUNCTIONS.get(type).apply(response, path);
         }
 
         /**
@@ -227,7 +227,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
          * @param params
          * @return
          */
-        public ExtractableResponse<Response> saveStationLine(Map<String, Object> params) {
+        public ExtractableResponse<Response> saveSubwayLine(Map<String, Object> params) {
             return RestAssured
                     .given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -243,7 +243,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
          * @param params
          * @return
          */
-        public ExtractableResponse<Response> modifyStationLineById(Long id, Map<String, String> params) {
+        public ExtractableResponse<Response> modifySubwayLineById(Long id, Map<String, String> params) {
             return RestAssured
                     .given().log().all()
                     .body(params)
@@ -258,7 +258,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
          * @param id
          * @return
          */
-        public ExtractableResponse<Response> deleteStationLineById(Long id) {
+        public ExtractableResponse<Response> deleteSubwayLineById(Long id) {
             return RestAssured
                     .given().log().all()
                     .when().delete("/lines/{id}", id)
@@ -270,7 +270,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
          * 지하철 노선 목록 조회
          * @return
          */
-        public ExtractableResponse<Response> findStationLines() {
+        public ExtractableResponse<Response> findSubwayLines() {
             return RestAssured
                     .given().log().all()
                     .when().get("/lines")
@@ -283,7 +283,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
          * @param id
          * @return
          */
-        public ExtractableResponse<Response> findStationLineById(Long id) {
+        public ExtractableResponse<Response> findSubwayLineById(Long id) {
             return RestAssured
                     .given().log().all()
                     .when().get("/lines/{id}", id)

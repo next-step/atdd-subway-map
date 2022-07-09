@@ -1,24 +1,24 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.domain.StationLine;
+import nextstep.subway.domain.SubwayLine;
 
 import java.util.List;
 
-public class StationLineResponse {
+public class SubwayLineResponse {
     private Long id;
     private String name;
     private String color;
     private List<StationResponse> stations;
 
-    public StationLineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public SubwayLineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.stations = stations;
     }
 
-    public StationLineResponse(StationLine stationLine, StationResponse upStation, StationResponse downStation) {
-        this(stationLine.getId(), stationLine.getName(), stationLine.getColor(), List.of(upStation, downStation));
+    public SubwayLineResponse(SubwayLine subwayLine, StationResponse upStation, StationResponse downStation) {
+        this(subwayLine.getId(), subwayLine.getName(), subwayLine.getColor(), List.of(upStation, downStation));
     }
 
     public long getId() {
