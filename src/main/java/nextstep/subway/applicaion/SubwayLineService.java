@@ -2,6 +2,8 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.subwayLine.CreateSubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayLine.SubwayLineResponse;
+import nextstep.subway.domain.m2m.StationToSubwayLine;
+import nextstep.subway.domain.m2m.StationToSubwayLineRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.domain.subwayLine.SubwayLine;
@@ -11,6 +13,7 @@ import nextstep.subway.domain.subwayLineColor.SubwayLineColorRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,14 +25,17 @@ public class SubwayLineService {
     private StationRepository stationRepository;
     private SubwayLineRepository subwayLineRepository;
     private SubwayLineColorRepository subwayLineColorRepository;
+    private StationToSubwayLineRepository stationToSubwayLineRepository;
 
     public SubwayLineService(
             StationRepository stationRepository,
             SubwayLineRepository subwayLineRepository,
-            SubwayLineColorRepository subwayLineColorRepository) {
+            SubwayLineColorRepository subwayLineColorRepository,
+            StationToSubwayLineRepository stationToSubwayLineRepository) {
         this.stationRepository = stationRepository;
         this.subwayLineRepository = subwayLineRepository;
         this.subwayLineColorRepository = subwayLineColorRepository;
+        this.stationToSubwayLineRepository = stationToSubwayLineRepository;
     }
 
     @Transactional
@@ -44,7 +50,7 @@ public class SubwayLineService {
                 upStation,
                 downStation
         ));
-        savedSubwayLine.updateStations(List.of(upStation, downStation));
+        linkingStationAndSubwayLine(savedSubwayLine, List.of(upStation, downStation));
 
         return new SubwayLineResponse(savedSubwayLine);
     }
@@ -74,5 +80,16 @@ public class SubwayLineService {
         }
 
         return findSubwayLineColor.get();
+    }
+
+    private void linkingStationAndSubwayLine(SubwayLine subwayLine, List<Station> stations) {
+        final List<StationToSubwayLine> stationToSubwayLines = new ArrayList<>();
+        for (Station station : stations) {
+            final StationToSubwayLine savedStationToSubwayLine = stationToSubwayLineRepository.save(new StationToSubwayLine(subwayLine, station));
+            stationToSubwayLines.add(savedStationToSubwayLine);
+
+            station.updateSubwayLine(savedStationToSubwayLine);
+        }
+        subwayLine.updateStations(stationToSubwayLines);
     }
 }
