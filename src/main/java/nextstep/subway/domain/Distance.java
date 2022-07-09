@@ -1,11 +1,12 @@
 package nextstep.subway.domain;
 
+import lombok.EqualsAndHashCode;
 import nextstep.subway.domain.exception.OutOfBoundDistanceException;
 
 import javax.persistence.Embeddable;
-import java.util.Objects;
 
 @Embeddable
+@EqualsAndHashCode
 public class Distance {
 
     public static final int MIN_VALUE = 1;
@@ -25,18 +26,5 @@ public class Distance {
 
     public int value() {
         return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Distance distance = (Distance) o;
-        return value == distance.value;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }

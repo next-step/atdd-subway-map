@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Embeddable
+@EqualsAndHashCode
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)

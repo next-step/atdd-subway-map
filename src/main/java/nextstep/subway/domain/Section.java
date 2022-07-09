@@ -1,11 +1,13 @@
 package nextstep.subway.domain;
 
+import lombok.EqualsAndHashCode;
 import nextstep.subway.domain.exception.InvalidUpDownStationException;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@EqualsAndHashCode
 public class Section {
 
     @Id
