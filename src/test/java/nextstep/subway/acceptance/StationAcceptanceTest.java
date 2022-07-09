@@ -73,17 +73,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() throws Exception {
         // given
-
-        // 생성해야할 리스트의 길이만큼 반복문을 돌며 역을 생성합니다
-        for (final String station : stations) {
-            final HashMap<String, String> param = new HashMap<>();
-            param.put("name", station);
-
-            final ExtractableResponse<Response> createStationResponse = createStationRequest(param);
-
-            assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
-        }
         final List<Map<String, String>> params = createParam(List.of("강남역", "역삼역"));
+        final List<String> createdStationNames = createStationRequest(params);
 
         // when
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
@@ -94,7 +85,7 @@ public class StationAcceptanceTest {
         // then
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).contains("강남역", "역삼역");
+        assertThat(stationNames).containsAll(createdStationNames);
     }
 
     /**
@@ -127,7 +118,6 @@ public class StationAcceptanceTest {
         assertThat(stationNames.size()).isEqualTo(0);
     }
 
-    private ExtractableResponse<Response> createStationRequest(Map<String, String> body) {
     private Map<String, String> createParam(String stationName) {
         final Map<String, String> param = new HashMap<>();
         param.put("name", stationName);
@@ -144,15 +134,33 @@ public class StationAcceptanceTest {
 
         return params;
     }
+
+    private ExtractableResponse<Response> createStationRequest(Map<String, String> param) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .body(body)
+                .body(param)
                 .contentType(APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then()
                 .extract();
 
         return response;
+    }
+
+    private List<String> createStationRequest(List<Map<String, String>> params) {
+        final ArrayList<String> stationNames = new ArrayList<>();
+        for (Map<String, String> param : params) {
+            final ExtractableResponse<Response> response = RestAssured
+                    .given().log().all()
+                    .body(param)
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .when().post("/stations")
+                    .then().log().all()
+                    .extract();
+            stationNames.add(response.jsonPath().getString("name"));
+        }
+
+        return stationNames;
     }
 
     private ExtractableResponse<Response> getStationsRequest() {
