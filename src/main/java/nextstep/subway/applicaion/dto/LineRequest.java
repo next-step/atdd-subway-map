@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
-
-import java.util.List;
 
 public class LineRequest {
 
@@ -24,8 +21,8 @@ public class LineRequest {
         this.distance = distance;
     }
 
-    public Line toLine(List<Station> stations) {
-        return new Line(name, color, upStationId, downStationId, distance, stations);
+    public Line toLine() {
+        return new Line(name, color, upStationId, downStationId, distance);
     }
 
     public String getName() {

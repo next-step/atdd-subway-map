@@ -12,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,21 +27,33 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        List<Station> findStations = stationRepository.findAllById(Arrays.asList(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
-        Line createLine = lineRepository.save(lineRequest.toLine(findStations));
+        List<Station> findStations = findUpAndDownStation(lineRequest.getUpStationId(), lineRequest.getDownStationId());
+        Line createLine = lineRepository.save(lineRequest.toLine());
 
-        return createLineResponse(createLine);
+        return createLineResponse(createLine, findStations);
     }
 
-    private LineResponse createLineResponse(Line createLine) {
+    public List<LineResponse> findAllLines() {
+        List<Line> findLines = lineRepository.findAll();
+        return findLines.stream()
+                .map(line -> createLineResponse(line, findUpAndDownStation(line.getUpStationId(), line.getDownStationId())))
+                .collect(toList());
+    }
+
+    private List<Station> findUpAndDownStation(Long upStationId, Long downStationId) {
+        return stationRepository.findAllById(Arrays.asList(upStationId, downStationId));
+    }
+
+    private LineResponse createLineResponse(Line createLine, List<Station> findStations) {
         return new LineResponse(
                 createLine.getId(),
                 createLine.getName(),
                 createLine.getColor(),
-                createLine.getStations().stream()
+                findStations.stream()
                         .map(this::createStationResponse)
-                        .collect(Collectors.toList())
+                        .collect(toList())
         );
     }
 

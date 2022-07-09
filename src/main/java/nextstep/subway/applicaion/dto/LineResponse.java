@@ -2,8 +2,6 @@ package nextstep.subway.applicaion.dto;
 
 import java.util.List;
 
-import static java.util.Collections.*;
-
 public class LineResponse {
 
     private Long id;
@@ -31,7 +29,7 @@ public class LineResponse {
     }
 
     public List<StationResponse> getStations() {
-        return unmodifiableList(stations);
+        return stations;
     }
 
 }

@@ -1,18 +1,14 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Line {
 
     @Id
+    @Column(name = "line_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToMany
-    private List<Station> stations = new ArrayList<>();
 
     private String name;
     private String color;
@@ -23,21 +19,16 @@ public class Line {
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance, List<Station> stations) {
+    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.stations.addAll(stations);
     }
 
     public Long getId() {
         return id;
-    }
-
-    public List<Station> getStations() {
-        return stations;
     }
 
     public String getName() {
@@ -48,4 +39,11 @@ public class Line {
         return color;
     }
 
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
 }
