@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "line")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Section {
 
@@ -38,6 +38,10 @@ public class Section {
             throw new InvalidUpDownStationException();
         }
         return new Section(List.of(upStation, downStation), distance);
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
     }
 
     public List<Station> stations() {

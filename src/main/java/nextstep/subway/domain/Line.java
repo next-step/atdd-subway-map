@@ -30,7 +30,9 @@ public class Line {
     }
 
     public static Line create(String name, String color, Section section) {
-        return new Line(name, color, new Sections(section));
+        Line line = new Line(name, color, Sections.create(section));
+        section.setLine(line);
+        return line;
     }
 
     public Long id() {
@@ -46,6 +48,6 @@ public class Line {
     }
 
     public List<Station> stations() {
-        return sections.toList();
+        return sections.stations();
     }
 }

@@ -16,10 +16,6 @@ public class Station {
     private Long id;
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_id")
-    private Section section;
-
     public Station(String name) {
         this(null, name);
     }
