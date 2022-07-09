@@ -37,26 +37,26 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String,String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+            RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+            RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -69,10 +69,10 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        Map<String,String> requestBody1 = new HashMap<>();
+        Map<String, String> requestBody1 = new HashMap<>();
         requestBody1.put("name", "가양역");
 
-        Map<String,String> requestBody2 = new HashMap<>();
+        Map<String, String> requestBody2 = new HashMap<>();
         requestBody2.put("name", "증미역");
 
         //when
@@ -98,7 +98,7 @@ public class StationAcceptanceTest {
 
         assertThat(stationNames)
             .hasSize(2)
-            .containsAnyOf("가양역","증미역");
+            .containsAnyOf("가양역", "증미역");
 
     }
 
@@ -111,7 +111,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        Map<String,String> requestBody = new HashMap<>();
+        Map<String, String> requestBody = new HashMap<>();
         requestBody.put("name", "등촌역");
         ExtractableResponse<Response> extract = RestAssured.given().log().all()
             .body(requestBody)
@@ -123,7 +123,7 @@ public class StationAcceptanceTest {
         //when
         int deleteId = extract.jsonPath().getInt("id");
         RestAssured.given().log().all()
-            .when().delete("/stations/{id}",deleteId)
+            .when().delete("/stations/{id}", deleteId)
             .then().log().all()
             .extract();
 
