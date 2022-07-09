@@ -54,8 +54,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("전체 지하철 노선 목록 조회")
     public void searchLines() {
         // given
-        ExtractableResponse<Response> response1 = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
-        ExtractableResponse<Response> response2 = 지하철_노선_생성("1호선", "bg-blue-600", upStationId, downStationId, 7);
+        지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
+        지하철_노선_생성("1호선", "bg-blue-600", upStationId, downStationId, 7);
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();

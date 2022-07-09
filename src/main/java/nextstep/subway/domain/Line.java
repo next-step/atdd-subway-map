@@ -56,10 +56,10 @@ public class Line {
     }
 
     public void edit(Line line) {
-        if (line.getName() != null) {
+        if (line.getName() != null && !line.getName().isBlank()) {
             name = line.getName();
         }
-        if (line.getColor() != null) {
+        if (line.getColor() != null && !line.getColor().isBlank()) {
             color = line.getColor();
         }
         if (line.getUpStationId() != null) {
