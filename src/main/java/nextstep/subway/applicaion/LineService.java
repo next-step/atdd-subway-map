@@ -58,6 +58,7 @@ public class LineService {
         return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
 
+    @Transactional
     public void updateLine(Long id, LineUpdateRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
         line.changeInfo(request.getName(), request.getColor());
