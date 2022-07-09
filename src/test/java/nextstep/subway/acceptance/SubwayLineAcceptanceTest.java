@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.util.Map;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SubwayLineAcceptanceTest {
@@ -100,8 +104,16 @@ public class SubwayLineAcceptanceTest {
         // then
     }
 
-    private ExtractableResponse<Response> createSubwayLineRequest() {
-        return null;
+    private ExtractableResponse<Response> createSubwayLineRequest(Map<String, String> param) {
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(param)
+                .when().post("/subway-line")
+                .then().log().all()
+                .extract();
+
+        return response;
     }
 
     private ExtractableResponse<Response> getSubwayLinesRequest() {
