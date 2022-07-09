@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import nextstep.subway.applicaion.dto.LineChangeRequest;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
@@ -66,11 +67,21 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Line findLine = lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException("존재하지 않는 노선입니다."));
+        Line findLine = findPureLine(id);
 
         List<Station> findStations = findUpAndDownStation(findLine.getUpStationId(), findLine.getDownStationId());
 
         return createLineResponse(findLine, findStations);
+    }
+
+    @Transactional
+    public void changeLine(Long lineId, LineChangeRequest lineChangeRequest) {
+        Line findLine = findPureLine(lineId);
+        findLine.change(lineChangeRequest.getName(), lineChangeRequest.getColor());
+    }
+
+    private Line findPureLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException("존재하지 않는 노선입니다."));
     }
 }
