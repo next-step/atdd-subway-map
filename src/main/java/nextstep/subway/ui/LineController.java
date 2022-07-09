@@ -36,7 +36,7 @@ public class LineController {
         try {
             return ResponseEntity.ok().body(lineService.findLineById(id));
         } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
     }
 
@@ -46,7 +46,7 @@ public class LineController {
             lineService.modifyLineById(id, lineRequest);
             return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
     }
 
