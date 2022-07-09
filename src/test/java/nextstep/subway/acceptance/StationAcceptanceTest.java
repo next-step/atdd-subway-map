@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,8 +70,52 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // Given
+        List<String> stationNames = List.of("강남역", "서울대입구역");
+        List<Integer> createdStationIds = stationNames.stream()
+                .map(name -> (Integer) createStationWithName(name).jsonPath()
+                        .get("id"))
+                .collect(Collectors.toList());
 
+        // When
+        ExtractableResponse<Response> getAllStationsResponse = getAllStations();
+
+        // Then
+        List<Integer> getAllStationsIds = getAllStationsResponse.jsonPath()
+                .getList("id", Integer.class);
+        assertThat(getAllStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(getAllStationsIds.size()).isEqualTo(createdStationIds.size());
     }
+
+    private ExtractableResponse<Response> getAllStations() {
+        return RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .get("/stations")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> createStationWithName(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
 
     /**
      * Given 지하철역을 생성하고
