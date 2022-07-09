@@ -102,6 +102,23 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @Test
     void 지하철역_제거() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "회기역");
 
+        ExtractableResponse<Response> saveResponse = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        long id = saveResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+            .when().delete("/stations/" + id)
+            .then().log().all()
+            .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
