@@ -101,7 +101,7 @@ public class StationAcceptanceTest {
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
 
-        assertThat(name).isEmpty();
+        assertThat(name).isNotIn("잠실역");
     }
 
     private ExtractableResponse<Response> createSubwayStation(final String station) {
