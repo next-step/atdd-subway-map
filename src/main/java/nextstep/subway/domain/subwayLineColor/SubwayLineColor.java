@@ -16,8 +16,8 @@ public class SubwayLineColor {
     @Column(name = "subway_line_color_id")
     private Long id;
 
-    @Column(name = "color")
-    private String color;
+    @Column(name = "code")
+    private String code;
 
     @OneToMany(mappedBy = "color", fetch = LAZY)
     private List<SubwayLine> subwayLines;
