@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("classpath:truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
 	@LocalServerPort
@@ -26,9 +28,14 @@ public class StationAcceptanceTest {
 
 	private static final String STATION_NAME = "강남역";
 
+	private ExtractableResponse<Response> responseOfCreate;
+
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
+
+		// given
+		responseOfCreate = 지하철역_생성(STATION_NAME);
 	}
 
 	/**
@@ -39,11 +46,8 @@ public class StationAcceptanceTest {
 	@DisplayName("지하철역을 생성한다.")
 	@Test
 	void createStation() {
-		// when
-		ExtractableResponse<Response> response = 지하철역_생성(STATION_NAME);
-
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(responseOfCreate.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
 		List<String> stationNames = 지하철역_목록_조회_파싱_name(지하철역_목록_조회());
@@ -59,8 +63,7 @@ public class StationAcceptanceTest {
 	@Test
 	void getStations() {
 		// given
-		지하철역_생성(STATION_NAME);
-		지하철역_생성("역삼역");
+		지하철역_생성("양재역");
 
 		// when
 		ExtractableResponse<Response> response = 지하철역_목록_조회();
@@ -80,7 +83,6 @@ public class StationAcceptanceTest {
 	@Test
 	void deleteStation() {
 		// given
-		ExtractableResponse<Response> responseOfCreate = 지하철역_생성(STATION_NAME);
 		Long id = responseOfCreate.jsonPath().getLong("id");
 
 		// when

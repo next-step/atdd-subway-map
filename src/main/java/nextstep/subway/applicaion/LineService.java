@@ -7,35 +7,34 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.repository.LineRepository;
 import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.repository.StationRepository;
 import nextstep.subway.exception.SubwayException;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LineService {
 	private final LineRepository lineRepository;
 	private final StationRepository stationRepository;
-
-	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
-		this.lineRepository = lineRepository;
-		this.stationRepository = stationRepository;
-	}
+	private final StationService stationService;
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
-		Line line = lineRepository.save(Line.builder()
+		Line line = Line.builder()
 			.name(lineRequest.getName())
 			.color(lineRequest.getColor())
 			.upStationId(lineRequest.getUpStationId())
 			.downStationId(lineRequest.getDownStationId())
 			.distance(lineRequest.getDistance())
-			.build()
-		);
+			.build();
+		lineRepository.save(line);
 		return createLineResponse(line);
 	}
 
@@ -53,8 +52,7 @@ public class LineService {
 	@Transactional
 	public void updateLine(Long id, String name, String color) {
 		Line line = lineRepository.findById(id).orElseThrow(()-> new SubwayException("no subway"));
-		line.setName(name);
-		line.setColor(color);
+		line.update(name, color);
 		lineRepository.save(line);
 	}
 
@@ -66,13 +64,15 @@ public class LineService {
 	private LineResponse createLineResponse(Line line) {
 		Optional<Station> upStation = stationRepository.findById(line.getUpStationId());
 		Optional<Station> downStation = stationRepository.findById(line.getDownStationId());
+		StationResponse upStationResponse = stationService.createStationResponse(upStation.orElseThrow(() -> new SubwayException("no station")));
+		StationResponse downStationResponse = stationService.createStationResponse(downStation.orElseThrow(() -> new SubwayException("no station")));
 
 		return LineResponse.builder()
 			.id(line.getId())
 			.name(line.getName())
 			.color(line.getColor())
-			.upStation(upStation.orElseThrow(() -> new SubwayException("no station")))
-			.downStation(downStation.orElseThrow(() -> new SubwayException("no station")))
+			.upStation(upStationResponse)
+			.downStation(downStationResponse)
 			.build();
 	}
 }
