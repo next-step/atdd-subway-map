@@ -1,6 +1,8 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,5 +98,25 @@ public class SubwayLineAcceptanceTest {
         // when
 
         // then
+    }
+
+    private ExtractableResponse<Response> createSubwayLineRequest() {
+        return null;
+    }
+
+    private ExtractableResponse<Response> getSubwayLinesRequest() {
+        return null;
+    }
+
+    private ExtractableResponse<Response> getSubwayLineRequest() {
+        return null;
+    }
+
+    private ExtractableResponse<Response> updateSubwayLineRequest() {
+        return null;
+    }
+
+    private ExtractableResponse<Response> deleteSubwayLineRequest() {
+        return null;
     }
 }
