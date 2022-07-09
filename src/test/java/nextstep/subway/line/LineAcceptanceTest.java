@@ -1,9 +1,9 @@
 package nextstep.subway.line;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
 import nextstep.subway.acceptance.AcceptanceTest;
 import nextstep.subway.station.StationAcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,12 +55,13 @@ class LineAcceptanceTest {
         final ExtractableResponse<Response> createLineResponse = RestAssured
                 .given().log().all()
                 .body(params)
+                .contentType(ContentType.JSON)
                 .when().post("/lines")
                 .then().log().all().extract();
 
         assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        final List<Long> idList = createLineResponse.jsonPath().getList("id", Long.class);
+        final List<Long> idList = createLineResponse.jsonPath().getList("stations.id", Long.class);
         assertThat(idList).contains(upStationId, downStationId);
     }
 
