@@ -69,6 +69,35 @@ public class StationAcceptanceTest {
     @Test
     @DisplayName("지하철역을 조회한다.")
     void getStations() {
+        //given
+        final Map<String, String> body = Map.of("name", "잠실역");
+        final Map<String, String> body2 = Map.of("name", "대림역");
+
+        RestAssured.given().log().all()
+            .body(body)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all();
+
+        final ExtractableResponse<Response> saveExtractResponse = RestAssured.given().log().all()
+            .body(body2)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        assertThat(saveExtractResponse
+            .statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        final List<String> stationNames = RestAssured.given()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(stationNames).hasSize(2);
+        assertThat(stationNames).containsAnyOf("잠실역", "대림역");
 
     }
 
@@ -81,6 +110,29 @@ public class StationAcceptanceTest {
     @Test
     @DisplayName("지하철역을 제거한다.")
     void deleteStation() {
+        //given
+        final Map<String, String> body = Map.of("name", "잠실역");
 
+        RestAssured.given().log().all()
+            .body(body)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all();
+
+        //when
+        final ExtractableResponse<Response> deleteExtract = RestAssured.given().log().all()
+            .when().delete("/stations/1")
+            .then().log().all()
+            .extract();
+
+        assertThat(deleteExtract.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        final List<String> name = RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+
+        assertThat(name).isEmpty();
     }
 }
