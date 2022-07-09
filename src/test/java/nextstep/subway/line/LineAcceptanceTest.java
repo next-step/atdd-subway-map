@@ -115,6 +115,29 @@ class LineAcceptanceTest {
         assertThat(names).doesNotContain(beforeLineName);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        final String lineName = "신분당선";
+        final Long id = createLineRequest(lineName).jsonPath().getObject("id", Long.class);
+
+        // when
+        final ExtractableResponse<Response> response = deleteLineRequest(id);
+
+        // then
+        assertStatusCode(response, HttpStatus.OK);
+
+        final List<String> names = getLineNames(getLinesRequest());
+        assertThat(names).doesNotContain(lineName);
+    }
+
     private ExtractableResponse<Response> modifyLineRequest(final Long id, final String lineName) {
         return RestAssured
                 .given().log().all().body(createLineParams(lineName)).contentType(ContentType.JSON)
@@ -153,4 +176,11 @@ class LineAcceptanceTest {
         return response.jsonPath().getList("name", String.class);
     }
 
+    private ExtractableResponse<Response> deleteLineRequest(final Long id) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
 }
