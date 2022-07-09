@@ -6,6 +6,7 @@ import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.exception.DataNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,15 +27,27 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
+        Station upStation = stationRepository
+            .findById(lineRequest.getUpStationId())
+            .orElseThrow(
+                () -> new DataNotFoundException("Station 데이터가 없습니다.")
+            );
+        Station downStation = stationRepository
+            .findById(lineRequest.getDownStationId())
+            .orElseThrow(
+                () -> new DataNotFoundException("Station 데이터가 없습니다.")
+            );
         Line createLine = new Line(lineRequest, Arrays.asList(upStation, downStation));
         Line createdLine = lineRepository.save(createLine);
         return new LineResponse(createdLine);
     }
 
     public LineResponse findOneLine(Long id) {
-        return null;
+        return new LineResponse(
+            lineRepository.findById(id).orElseThrow(
+                () -> new DataNotFoundException("Line 데이터가 없습니다.")
+            )
+        );
     }
 
     public List<LineResponse> findAllLines() {
