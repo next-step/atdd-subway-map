@@ -64,6 +64,26 @@ class LineControllerTest {
         result.andExpect(status().isOk());
     }
 
+    @Test
+    void 노선수정() throws Exception {
+        final Long id = 1L;
+        final LineRequest lineRequest = lineRequest();
+
+        doReturn(new LineResponse())
+                .when(lineService)
+                .createLine(any(LineRequest.class));
+
+        // when
+        final ResultActions result = target.perform(
+                MockMvcRequestBuilders.put("/lines/{id}", id)
+                        .content(objectMapper.writeValueAsString(lineRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isOk());
+    }
+
     private LineRequest lineRequest() {
         return LineRequest.builder()
                 .name("lineName")
