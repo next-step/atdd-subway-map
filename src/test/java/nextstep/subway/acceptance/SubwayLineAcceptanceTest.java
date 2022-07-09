@@ -133,7 +133,7 @@ public class SubwayLineAcceptanceTest {
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
                 .body(param)
-                .when().post("/subway-line")
+                .when().post("/subway-lines")
                 .then().log().all()
                 .extract();
 
