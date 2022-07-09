@@ -75,9 +75,8 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다")
     @Test
     void deleteStation() {
-        // given - 2개의 지하철역 생성
+        // given - 지하철역 생성
         createStation("서대문");
-        createStation("광화문");
 
         // when - 지하철역을 삭제
         RestAssured
@@ -91,10 +90,7 @@ public class StationAcceptanceTest {
 
         // then - 지하철역 1개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
-        assertAll(
-                () -> assertThat(names).hasSize(1),
-                () -> assertThat(names).doesNotContain("서대문")
-        );
+        assertThat(names).doesNotContain("서대문");
     }
 
     private ExtractableResponse<Response> createStation(String name) {
