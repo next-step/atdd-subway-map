@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import nextstep.subway.domain.exception.InvalidUpDownStationException;
 
 import javax.persistence.*;
@@ -8,6 +10,7 @@ import java.util.List;
 
 @Entity
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Section {
 
     @Id
@@ -24,9 +27,6 @@ public class Section {
 
     @Embedded
     private Distance distance;
-
-    protected Section() {
-    }
 
     private Section(List<Station> stations, int distance) {
         this.stations = new Stations(stations);

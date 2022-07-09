@@ -1,12 +1,15 @@
 package nextstep.subway.domain;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
 
     @Id
@@ -19,9 +22,6 @@ public class Line {
 
     private String name;
     private String color;
-
-    protected Line() {
-    }
 
     private Line(String name, String color, Sections sections) {
         this.name = name;
