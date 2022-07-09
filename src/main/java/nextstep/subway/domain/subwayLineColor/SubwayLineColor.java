@@ -21,4 +21,15 @@ public class SubwayLineColor {
 
     @OneToMany(mappedBy = "color", fetch = LAZY)
     private List<SubwayLine> subwayLines;
+
+    public SubwayLineColor() {
+    }
+
+    public SubwayLineColor(String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }
