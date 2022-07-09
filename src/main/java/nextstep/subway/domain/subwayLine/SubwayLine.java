@@ -38,4 +38,39 @@ public class SubwayLine {
 
     @OneToMany(mappedBy = "subwayLine", fetch = LAZY)
     private List<Station> stations;
+
+    public SubwayLine() {
+    }
+
+    public SubwayLine(String name, Integer distance, SubwayLineColor color, Station upStation, Station downStation) {
+        this.name = name;
+        this.distance = distance;
+        this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public SubwayLineColor getColor() {
+        return color;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }
