@@ -1,15 +1,14 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.caller.StationApiCaller;
 import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -26,9 +25,11 @@ public class StationAcceptanceTest {
     @Autowired
     StationRepository stationRepository;
 
+    StationApiCaller stationApiCaller = new StationApiCaller();
+
     @BeforeEach
     public void setUp() {
-        RestAssured.port = port;
+        stationApiCaller.setPort(port);
         stationRepository.deleteAll();
     }
 
@@ -79,29 +80,18 @@ public class StationAcceptanceTest {
     @Order(3)
     void deleteStation() {
         // given
-        Long id = makeStationAndVerify(Map.of("name", "강남역")).jsonPath().getLong("id");
+        long id = makeStationAndVerify(Map.of("name", "강남역")).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().delete("/stations/{id}", id)
-                        .then().log().all()
-                        .extract();
+        deleteStationAndVerify(id);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
         List<String> stationNames = getStationNamesAndVerify();
         assertThat(stationNames).doesNotContain("강남역");
     }
 
     ExtractableResponse<Response> makeStationAndVerify(Map<String, String> params) {
-        var response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = stationApiCaller.createStation(params);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -109,13 +99,16 @@ public class StationAcceptanceTest {
     }
 
     List<String> getStationNamesAndVerify() {
-        var response = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = stationApiCaller.getStations();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return response.jsonPath().getList("name", String.class);
+    }
+
+    void deleteStationAndVerify(long id) {
+        ExtractableResponse<Response> response = stationApiCaller.deleteStation(id);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
