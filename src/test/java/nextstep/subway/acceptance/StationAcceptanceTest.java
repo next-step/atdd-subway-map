@@ -120,7 +120,7 @@ public class StationAcceptanceTest {
         assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
 
         // 저장된 지하철 역의 ID
-        final String savedStationId = createStationResponse.jsonPath().getString("id");
+        final Long savedStationId = createStationResponse.jsonPath().getLong("id");
 
         // when
         final ExtractableResponse<Response> deleteStationResponse = deleteStationRequest(savedStationId);
