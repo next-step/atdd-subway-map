@@ -1,9 +1,11 @@
 package nextstep.subway.applicaion.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.ui.dto.LineRequest;
+import nextstep.subway.domain.line.Line;
 
+@Getter
 @Builder
 @RequiredArgsConstructor
 public class LineCreateDto {
@@ -14,13 +16,10 @@ public class LineCreateDto {
     private final Long downStationId;
     private final int distance;
 
-    public static LineCreateDto of(LineRequest lineRequest) {
-        return LineCreateDto.builder()
-                .name(lineRequest.getName())
-                .color(lineRequest.getColor())
-                .upStationId(lineRequest.getUpStationId())
-                .downStationId(lineRequest.getDownStationId())
-                .distance(lineRequest.getDistance())
+    public Line toDomain() {
+        return Line.builder()
+                .name(this.name)
+                .color(this.color)
                 .build();
     }
 }
