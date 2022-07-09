@@ -13,8 +13,8 @@ import java.util.List;
 @RestController
 public class StationLineController {
 
-    public static final String STATION_LINE_URI = "/station/lines";
-    public static final String STATION_LINE_BY_ID_URI = "/station/lines/{id}";
+    public static final String STATION_LINE_URI = "/lines";
+    public static final String STATION_LINE_BY_ID_URI = "/lines/{id}";
 
     private final StationLineService stationLineService;
 
@@ -28,24 +28,24 @@ public class StationLineController {
     }
 
     @GetMapping(STATION_LINE_BY_ID_URI)
-    public ResponseEntity<StationLineResponse> getStationLine(@PathVariable long id) {
+    public ResponseEntity<StationLineResponse> getStationLine(@PathVariable Long id) {
         return ResponseEntity.ok(stationLineService.getStationLineById(id));
     }
 
     @PostMapping(STATION_LINE_URI)
-    public ResponseEntity<Void> saveStationLine(@RequestBody StationLineSaveRequest stationLineSaveRequest) {
+    public ResponseEntity<StationLineResponse> saveStationLine(@RequestBody StationLineSaveRequest stationLineSaveRequest) {
         StationLineResponse response = stationLineService.saveStationLine(stationLineSaveRequest);
-        return ResponseEntity.created(URI.create(STATION_LINE_URI + response.getId())).build();
+        return ResponseEntity.created(URI.create(STATION_LINE_URI + response.getId())).body(response);
     }
 
-    @PutMapping(STATION_LINE_URI)
-    public ResponseEntity<Void> modifyStationLine(@RequestBody StationLineModifyRequest stationLineModifyRequest) {
-        stationLineService.modifyStationLine(stationLineModifyRequest);
-        return ResponseEntity.noContent().build();
+    @PutMapping(STATION_LINE_BY_ID_URI)
+    public ResponseEntity<Void> modifyStationLine(@PathVariable Long id, @RequestBody StationLineModifyRequest stationLineModifyRequest) {
+        stationLineService.modifyStationLine(id, stationLineModifyRequest);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(STATION_LINE_BY_ID_URI)
-    public ResponseEntity<Void> deleteStationLine(@PathVariable long id) {
+    public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
         stationLineService.deleteStationLine(id);
         return ResponseEntity.noContent().build();
     }
