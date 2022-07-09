@@ -44,7 +44,7 @@ public class StationAcceptanceTest {
         assertThat(createdStation.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getStationNames();
+        List<String> stationNames = getStations().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -66,8 +66,10 @@ public class StationAcceptanceTest {
         createStation(requestBody2);
 
         //then
-        List<String> stationNames = getStationNames();
+        ExtractableResponse<Response> stations = getStations();
+        List<String> stationNames = stations.jsonPath().getList("name", String.class);
 
+        assertThat(stations.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(stationNames)
             .hasSize(2)
             .containsAnyOf("가양역", "증미역");
@@ -88,12 +90,16 @@ public class StationAcceptanceTest {
 
         //when
         int deleteId = createdStation.jsonPath().getInt("id");
-        deleteStation(deleteId);
+        ExtractableResponse<Response> response = deleteStation(deleteId);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        List<String> stations = getStationNames();
+        ExtractableResponse<Response> stations = getStations();
+        List<String> stationNames = getStations().jsonPath().getList("name", String.class);
 
-        assertThat(stations).doesNotContain("등촌역");
+        assertThat(stations.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(stationNames).doesNotContain("등촌역");
     }
 
 
@@ -112,15 +118,15 @@ public class StationAcceptanceTest {
             .extract();
     }
 
-    private List<String> getStationNames() {
+    private ExtractableResponse<Response> getStations() {
         return RestAssured.given().log().all()
             .when().get("/stations")
             .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+            .extract();
     }
 
-    private void deleteStation(int deleteId) {
-        RestAssured.given().log().all()
+    private ExtractableResponse<Response> deleteStation(int deleteId) {
+        return RestAssured.given().log().all()
             .when().delete("/stations/{id}", deleteId)
             .then().log().all()
             .extract();
