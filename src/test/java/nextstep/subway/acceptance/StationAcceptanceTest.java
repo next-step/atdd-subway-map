@@ -49,10 +49,8 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        final ExtractableResponse<Response> response = createStationRequest(params);
+        final Map<String, String> param = createParam("강남역");
+        final ExtractableResponse<Response> response = createStationRequest(param);
 
         // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
@@ -61,8 +59,8 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames.size()).isEqualTo(params.size());
-        assertThat(stationNames).containsAll(params.values());
+        assertThat(stationNames.size()).isEqualTo(param.size());
+        assertThat(stationNames).containsAll(param.values());
     }
 
     /**
@@ -75,10 +73,6 @@ public class StationAcceptanceTest {
     @Test
     void getStations() throws Exception {
         // given
-        // 생성할 역 이름 리스트
-        final List<String> stations = new ArrayList<>();
-        stations.add("강남역");
-        stations.add("역삼역");
 
         // 생성해야할 리스트의 길이만큼 반복문을 돌며 역을 생성합니다
         for (final String station : stations) {
@@ -89,6 +83,7 @@ public class StationAcceptanceTest {
 
             assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
         }
+        final List<Map<String, String>> params = createParam(List.of("강남역", "역삼역"));
 
         // when
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
@@ -112,9 +107,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStations() throws Exception {
         // given
-        final HashMap<String, String> param = new HashMap<>();
-        param.put("name", "강남역");
-
+        final Map<String, String> param = createParam("강남역");
         final ExtractableResponse<Response> createStationResponse = createStationRequest(param);
 
         assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
@@ -136,6 +129,22 @@ public class StationAcceptanceTest {
     }
 
     private ExtractableResponse<Response> createStationRequest(Map<String, String> body) {
+    private Map<String, String> createParam(String stationName) {
+        final Map<String, String> param = new HashMap<>();
+        param.put("name", stationName);
+
+        return param;
+    }
+
+    private List<Map<String, String>> createParam(List<String> stationNames) {
+        final List<Map<String, String>> params = new ArrayList<>();
+        for (final String stationName : stationNames) {
+            final Map<String, String> param = createParam(stationName);
+            params.add(param);
+        }
+
+        return params;
+    }
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .body(body)
