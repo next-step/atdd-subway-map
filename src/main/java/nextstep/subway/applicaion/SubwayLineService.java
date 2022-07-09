@@ -22,17 +22,14 @@ public class SubwayLineService {
     private StationRepository stationRepository;
     private SubwayLineRepository subwayLineRepository;
     private SubwayLineColorRepository subwayLineColorRepository;
-    private StationService stationService;
 
     public SubwayLineService(
             StationRepository stationRepository,
             SubwayLineRepository subwayLineRepository,
-            SubwayLineColorRepository subwayLineColorRepository,
-            StationService stationService) {
+            SubwayLineColorRepository subwayLineColorRepository) {
         this.stationRepository = stationRepository;
         this.subwayLineRepository = subwayLineRepository;
         this.subwayLineColorRepository = subwayLineColorRepository;
-        this.stationService = stationService;
     }
 
     @Transactional
