@@ -3,6 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,5 +41,11 @@ public class LineController {
     @PutMapping("/{lineId}")
     public void editLine(@PathVariable Long lineId, @RequestBody LineRequest request) {
         lineService.editLine(lineId, request);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{lineId}")
+    public void deleteLine(@PathVariable Long lineId) {
+        lineService.deleteById(lineId);
     }
 }

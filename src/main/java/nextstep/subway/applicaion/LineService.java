@@ -51,5 +51,9 @@ public class LineService {
                 .orElseThrow(NoSuchElementException::new);
         findLine.edit(request.toDomain());
     }
+
+    public void deleteById(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
 }
 
