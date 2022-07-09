@@ -65,6 +65,7 @@ public class LineService {
         Line findLine = lineRepository.findById(id).orElseThrow(
             () -> new DataNotFoundException("Line 데이터가 없습니다.")
         );
-        return new LineResponse(findLine.edit(lineRequest));
+        findLine.edit(lineRequest);
+        return new LineResponse(findLine);
     }
 }

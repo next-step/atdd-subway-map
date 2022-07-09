@@ -70,7 +70,8 @@ public class Line {
         return stations;
     }
 
-    public Line edit(LineRequest lineRequest) {
-        return new Line(id, lineRequest.getName(), lineRequest.getColor(), distance, stations.getStations());
+    public void edit(LineRequest lineRequest) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
     }
 }
