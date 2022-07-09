@@ -15,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -40,27 +38,14 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "강남역");
-
-		ExtractableResponse<Response> response =
-			RestAssured.given().log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/stations")
-				.then().log().all()
-				.extract();
+		Long stationId = 지하철역_생성(GANGNAM_STATION);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(stationId).isNotNull();
 
 		// then
-		List<String> stationNames =
-			RestAssured.given().log().all()
-				.when().get("/stations")
-				.then().log().all()
-				.extract().jsonPath().getList("name", String.class);
-		assertThat(stationNames).containsAnyOf("강남역");
+		List<String> stations = 지하철역_조회();
+		assertThat(stations).containsAnyOf(GANGNAM_STATION);
 	}
 
 	/**
@@ -107,7 +92,7 @@ public class StationAcceptanceTest {
 		assertThat(stations).isEmpty();
 	}
 
-	private long 지하철역_생성(String stationName) {
+	private Long 지하철역_생성(String stationName) {
 
 		Map<String, String> searchParameter = new HashMap<>();
 		searchParameter.put("name", stationName);
