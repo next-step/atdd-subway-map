@@ -37,3 +37,11 @@
 이것도 또한 방법중 하나가 될것이다.  
 @DirtiesContext보다는 비용이 떨어지겠지만 데이터가 많아지면 테스트 성능이 떨어질 것이다.
 
+3. 세번쨰
+
+```@sql 사용```
+
+![truncate](./docs/step1/truncate.png)
+
+@SQL을 이용하여 truncate sql을 사용하여 해결할 수 있다.
+delete 보다 truncate 가 트랜잭션 로그 공간도 차지 하지 않고, 락도 걸리지 않아 이중에서 제일 좋은 방법이라고 생각하였습니다.
