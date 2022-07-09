@@ -1,10 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -14,8 +11,8 @@ public class Line {
     @Column(name = "line_id")
     private Long id;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private Set<Section> sections = new LinkedHashSet<>();
+    @Embedded
+    private Sections sections;
 
     private String name;
     private String color;
@@ -23,14 +20,14 @@ public class Line {
     protected Line() {
     }
 
-    private Line(String name, String color, Section section) {
+    private Line(String name, String color, Sections sections) {
         this.name = name;
         this.color = color;
-        this.sections.add(section);
+        this.sections = sections;
     }
 
     public static Line create(String name, String color, Section section) {
-        return new Line(name, color, section);
+        return new Line(name, color, new Sections(section));
     }
 
     public Long id() {
@@ -46,10 +43,6 @@ public class Line {
     }
 
     public List<Station> stations() {
-        return sections.stream()
-                .map(Section::stations)
-                .flatMap(List::stream)
-                .distinct()
-                .collect(Collectors.toList());
+        return sections.toList();
     }
 }
