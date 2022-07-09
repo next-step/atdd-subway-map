@@ -10,6 +10,14 @@ public class LineRequest {
     private final Long downStationId;
     private final Long distance;
 
+    public LineRequest() {
+        this.name = null;
+        this.color = null;
+        this.upStationId = null;
+        this.downStationId = null;
+        this.distance = null;
+    }
+
     public LineRequest(final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
         this.name = name;
         this.color = color;
