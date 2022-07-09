@@ -123,7 +123,33 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 조회")
     @Test
     void getLineById() {
+        // Given
+        String 첫번째역 = "첫번째역";
+        String 두번째역 = "새로운지하철역";
 
+        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
+        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+
+        assertAll(
+                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
+
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+
+        // When
+        long lineId = 신분당선.jsonPath().getLong("id");
+        ExtractableResponse<Response> 신분당선_조회_응답 =
+                RestAssured
+                        .given().log().all()
+                        .when().get("/lines/" + lineId)
+                        .then().log().all()
+                        .extract();
+
+        List<String> stationNames = 신분당선_조회_응답.jsonPath().getList("stations.name", String.class);
+
+        // Then
+        assertThat(stationNames).containsAnyOf("첫번째역", "새로운지하철역");
     }
 
     /**
