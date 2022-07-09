@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext
 public class LineAcceptanceTest {
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
@@ -74,10 +76,18 @@ public class LineAcceptanceTest {
         Long 강남역_ID = Long.parseLong(강남역.jsonPath().getString("id"));
         Long 분당역_ID = Long.parseLong(분당역.jsonPath().getString("id"));
 
+
         ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 강남역_ID, 분당역_ID, 10);
+
+        ExtractableResponse<Response> 수서역 = 지하철역_생성("수서역");
+        ExtractableResponse<Response> 가천대역 = 지하철역_생성("가천대역");
+
+        Long 수서역_ID = Long.parseLong(수서역.jsonPath().getString("id"));
+        Long 가천대역_ID = Long.parseLong(가천대역.jsonPath().getString("id"));
+
+        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 수서역_ID, 가천대역_ID, 10);
         assertThat(분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when 지하철 노선 목록을 조회하면
