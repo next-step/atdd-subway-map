@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -73,8 +74,16 @@ public class SubwayLineAcceptanceTest {
         final List<String> createdSubwayLineNames = createSubwayLineRequest(paramsList);
 
         // when
+        final ExtractableResponse<Response> response = getSubwayLinesRequest();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+
+        // then
+        final List<String> subwayLineNames = response.jsonPath().getList("name", String.class);
+
+        assertThat(subwayLineNames.size()).isEqualTo(paramsList.size());
+        assertThat(subwayLineNames).containsAll(createdSubwayLineNames);
     }
 
     /**
@@ -138,11 +147,11 @@ public class SubwayLineAcceptanceTest {
         return params;
     }
 
-    private ExtractableResponse<Response> createSubwayLineRequest(Map<String, Object> param) {
+    private ExtractableResponse<Response> createSubwayLineRequest(Map<String, Object> params) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
-                .body(param)
+                .body(params)
                 .when().post("/subway-lines")
                 .then().log().all()
                 .extract();
@@ -163,7 +172,14 @@ public class SubwayLineAcceptanceTest {
     }
 
     private ExtractableResponse<Response> getSubwayLinesRequest() {
-        return null;
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/subway-lines")
+                .then().log().all()
+                .extract();
+
+        return response;
     }
 
     private ExtractableResponse<Response> getSubwayLineRequest() {
