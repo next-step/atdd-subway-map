@@ -5,12 +5,10 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -18,13 +16,12 @@ import java.util.function.BiFunction;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@Transactional(readOnly = true)
 public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
     public static final List<String> CLEAN_UP_TABLES = List.of("subway_line", "station");
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private CleanUpUtils cleanUpUtils;
 
     private CallApi callApi;
 
@@ -34,7 +31,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
     @Override
     protected void settings() {
-        cleanUp();
+        cleanUpUtils.execute(CLEAN_UP_TABLES);
 
         callApi.saveStation(Param.강남역);
         callApi.saveStation(Param.양재역);
@@ -138,17 +135,6 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    /**
-     *  테이블 데이터 초기화
-     */
-    private void cleanUp() {
-        entityManager.flush();
-        CLEAN_UP_TABLES.forEach(table -> {
-            entityManager.createNativeQuery("TRUNCATE TABLE " + table).executeUpdate();
-            entityManager.createNativeQuery("ALTER TABLE " + table + " ALTER COLUMN id RESTART WITH 1").executeUpdate();
-        });
     }
 
     /**
