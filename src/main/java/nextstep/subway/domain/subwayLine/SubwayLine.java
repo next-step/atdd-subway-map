@@ -1,7 +1,7 @@
 package nextstep.subway.domain.subwayLine;
 
-import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
 import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -51,6 +51,12 @@ public class SubwayLine {
         this.downStation = downStation;
     }
 
+    @PrePersist
+    void prePersist() {
+        this.upStation.updateSubwayLine(this);
+        this.downStation.updateSubwayLine(this);
+    }
+
     public Long getId() {
         return id;
     }
@@ -77,5 +83,9 @@ public class SubwayLine {
 
     public List<Station> getStations() {
         return stations;
+    }
+
+    public void updateStations(List<Station> stations) {
+        this.stations.addAll(stations);
     }
 }
