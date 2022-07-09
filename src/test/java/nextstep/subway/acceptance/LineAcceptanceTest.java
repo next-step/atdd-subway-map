@@ -112,6 +112,32 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(editStatusCode).isEqualTo(HttpStatus.OK.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @Test
+    public void deleteLine() {
+        // given
+        long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        int deleteStatusCode = 지하철_단일_노선_삭제(lineId);
+
+        // then
+        assertThat(deleteStatusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private int 지하철_단일_노선_삭제(long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract()
+                .statusCode();
+    }
+
     private int 지하철_노선_수정(long lineId, String name, String color) {
         HashMap<String, String> requestParam = new HashMap<>();
         requestParam.put("name", name);
