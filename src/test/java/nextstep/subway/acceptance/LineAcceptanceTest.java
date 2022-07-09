@@ -1,11 +1,22 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import io.restassured.specification.ResponseSpecification;
+import org.apache.http.entity.ContentType;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,6 +37,25 @@ public class LineAcceptanceTest {
     @Test
     @DisplayName("지하철노선을 생성한다.")
     void createLine() {
+        // when
+        Map<String, Object> params = Map.of(
+                "name", "4호선",
+                "color", "bg-blue-300",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/lines")
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
