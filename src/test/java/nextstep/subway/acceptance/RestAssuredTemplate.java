@@ -39,4 +39,13 @@ public class RestAssuredTemplate {
                 .then().log().all()
                 .extract();
     }
+
+    public static <T> ExtractableResponse<Response> putRequestWithParameterAndRequestBody(String url, T parameter, T body) {
+        return RestAssured.given().log().all()
+                .body(body)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(url, parameter)
+                .then().log().all()
+                .extract();
+    }
 }

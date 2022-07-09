@@ -4,6 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,7 +96,24 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
+        // given
+        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
+        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
+        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
+        // when
+        노선_목록을_수정한다(newLine.getId(), "2호선", "bg-lime-300");
+
+        // when
+        LineResponse lineResponse = 노선을_조회한다(newLine.getId()).as(LineResponse.class);
+        assertAll(() -> {
+            assertThat(lineResponse.getName()).isEqualTo("2호선");
+            assertThat(lineResponse.getColor()).isEqualTo("bg-lime-300");
+            assertThat(lineResponse.getStationResponses()).containsExactly(
+                    new StationResponse(1L, "모란역"),
+                    new StationResponse(2L, "암사역")
+            );
+        });
     }
 
     /**
@@ -126,5 +144,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = getRequest("/lines");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
+    }
+
+    private void 노선_목록을_수정한다(Long id, String name, String color) {
+        LineUpdateRequest lineUpdateRequest = new LineUpdateRequest(name, color);
+        ExtractableResponse<Response> response = putRequestWithParameterAndRequestBody("/lines/{id}", id, lineUpdateRequest);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
