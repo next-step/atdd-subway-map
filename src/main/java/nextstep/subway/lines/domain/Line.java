@@ -26,8 +26,7 @@ public class Line {
     @OneToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
-//    @Embedded
-    @Column(name = "distance")
+    @Embedded
     private Distance distance;
 
     protected Line() {
