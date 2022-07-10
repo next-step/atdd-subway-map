@@ -1,7 +1,7 @@
 package nextstep.subway.acceptance;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -9,7 +9,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Component
-@ActiveProfiles("test")
+@Profile("test")
 public class CleanUpUtils {
 
     @PersistenceContext
