@@ -31,6 +31,6 @@ public class Sections {
                 .map(Section::stations)
                 .flatMap(List::stream)
                 .distinct()
-                .collect(Collectors.toList());
+                .collect(Collectors.toUnmodifiableList());
     }
 }
