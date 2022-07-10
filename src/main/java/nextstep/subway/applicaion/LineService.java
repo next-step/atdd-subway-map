@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.exception.ExceptionMessages;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,8 @@ public class LineService {
     }
 
     public LineResponse getLine(long lineId) {
-        Line line = lineRepository.findById(lineId).orElseThrow(()->new RuntimeException("노선이 존재하지 않습니다."));
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(()->new RuntimeException(ExceptionMessages.NO_LINE_EXCEPTION_MESSAGE));
         return LineResponse.convertedByEntity(line);
     }
 
