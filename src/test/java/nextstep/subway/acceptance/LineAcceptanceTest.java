@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import static nextstep.subway.acceptance.LineRequestCollection.*;
 import static nextstep.subway.acceptance.StationRequestCollection.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -39,10 +40,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
 
         JsonPath responseBody = response.jsonPath();
-        assertThat(responseBody.getLong("id")).isNotNull();
-        assertThat(responseBody.getString("name")).isEqualTo("2호선");
-        assertThat(responseBody.getString("color")).isEqualTo("bg-green-600");
-        assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역");
+        assertAll(
+                () -> assertThat(responseBody.getLong("id")).isNotNull(),
+                () -> assertThat(responseBody.getString("name")).isEqualTo("2호선"),
+                () -> assertThat(responseBody.getString("color")).isEqualTo("bg-green-600"),
+                () -> assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역")
+        );
     }
 
     /**
@@ -64,8 +67,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         JsonPath responseBody = response.jsonPath();
-        assertThat(responseBody.getList("name")).contains("1호선", "2호선");
-        assertThat(responseBody.getList("name")).hasSize(2);
+        assertThat(responseBody.getList("name")).containsExactly("1호선", "2호선");
     }
 
     /**
@@ -86,10 +88,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         JsonPath responseBody = response.jsonPath();
-        assertThat(responseBody.getLong("id")).isNotNull();
-        assertThat(responseBody.getString("name")).isEqualTo("2호선");
-        assertThat(responseBody.getString("color")).isEqualTo("bg-green-600");
-        assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역");
+
+        assertAll(
+                () -> assertThat(responseBody.getLong("id")).isNotNull(),
+                () -> assertThat(responseBody.getString("name")).isEqualTo("2호선"),
+                () -> assertThat(responseBody.getString("color")).isEqualTo("bg-green-600"),
+                () -> assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역")
+        );
     }
 
     /**
