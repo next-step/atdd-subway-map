@@ -54,4 +54,9 @@ public class LineService {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
     }
+
+    @Transactional
+    public void delete(Long id) {
+        lineRepository.findById(id).ifPresent(lineRepository::delete);
+    }
 }
