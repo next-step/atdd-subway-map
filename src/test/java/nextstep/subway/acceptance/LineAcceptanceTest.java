@@ -33,13 +33,14 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 생성한다.")
-    @Sql(value = "classpath:sql/station/truncate.sql")
+    @Sql(value = "classpath:sql/truncate.sql")
     void createLineTest() {
         //when
         Map<String, Object> requestBody = setRequestBody("신분당선", "bg-red-600",1,2,10);
 
         ExtractableResponse<Response> response = createLine(requestBody);
 
+        //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
@@ -53,7 +54,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선목록을 조회한다.")
-    @Sql(value = "classpath:sql/station/truncate.sql")
+    @Sql(value = "classpath:sql/truncate.sql")
     void getLinesTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
@@ -76,7 +77,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 조회한다.")
-    @Sql(value = "classpath:sql/station/truncate.sql")
+    @Sql(value = "classpath:sql/truncate.sql")
     void getLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
@@ -99,7 +100,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 수정한다.")
-    @Sql(value = "classpath:sql/station/truncate.sql")
+    @Sql(value = "classpath:sql/truncate.sql")
     void updateLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
@@ -125,6 +126,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 삭제한다.")
+    @Sql(value = "classpath:sql/truncate.sql")
     void deleteLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
