@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.useDefaultRepresentation;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -175,5 +174,29 @@ public class LineAcceptanceTest {
         LineResponse lineResponse = response.as(LineResponse.class);
         assertThat(lineResponse.getName()).isEqualTo(params.get("name"));
         assertThat(lineResponse.getColor()).isEqualTo(params.get("color"));
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void 지하철_노선_삭제() {
+        // given
+        final ExtractableResponse<Response> addResponse =
+                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
+        final long id = addResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().delete("/lines/" + id)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
