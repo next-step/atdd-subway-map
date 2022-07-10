@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
+import org.assertj.core.api.AbstractStringAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,12 +64,34 @@ class LineAcceptanceTest {
     }
 
     /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        final String 신분당선 = "신분당선";
+        final Long id = getIdFromResponse(createLineRequest(신분당선));
+
+        // when
+        final ExtractableResponse<Response> response = getLineRequest(id);
+
+        // then
+        assertStatusCode(response, HttpStatus.OK);
+
+        assertThat(getNameFromResponse(response)).contains(신분당선);
+    }
+
+    /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
 
-    @DisplayName("지하철 노선을 조회한다.")
+    @DisplayName("지하철 노선 목을 조회한다.")
     @Test
     void getLines() {
         // given
@@ -163,6 +186,14 @@ class LineAcceptanceTest {
         params.put("distance", 10);
         return params;
     }
+
+    private ExtractableResponse<Response> getLineRequest(final Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{idd}", id)
+                .then().log().all()
+                .extract();
+    }
+
 
     private ExtractableResponse<Response> getLinesRequest() {
         return RestAssured.given().log().all()

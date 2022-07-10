@@ -15,7 +15,11 @@ public class AcceptanceTestBase {
     }
 
     public static Long getIdFromResponse(final ExtractableResponse<Response> response) {
-        return response.jsonPath().getObject("id", Long.class);
+        return response.jsonPath().getLong("id");
+    }
+
+    public static String getNameFromResponse(final ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("name");
     }
 
     public static List<String> getNamesFromResponse(final ExtractableResponse<Response> response) {
