@@ -52,4 +52,10 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(),
                 stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId())));
     }
+
+    @Transactional
+    public void updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        line.updateLineContent(lineRequest.getName(), lineRequest.getColor());
+    }
 }
