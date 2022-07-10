@@ -39,10 +39,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        var _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // then
-        List<LineResponse> 노선_목록 = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
+        var 노선_목록 = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
         assertThat(노선_목록).containsOnlyOnce(_8호선);
     }
 
@@ -55,14 +55,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        var _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
-        Long 까치산역 = 역을_만들다("까치산역").as(StationResponse.class).getId();
-        Long 신설동역 = 역을_만들다("신설동역").as(StationResponse.class).getId();
-        LineResponse _2호선 = 노선을_만들다("2호선", "bg-lime-400", 까치산역, 신설동역, 23L).as(LineResponse.class);
+        var 까치산역 = 역을_만들다("까치산역").as(StationResponse.class).getId();
+        var 신설동역 = 역을_만들다("신설동역").as(StationResponse.class).getId();
+        var _2호선 = 노선을_만들다("2호선", "bg-lime-400", 까치산역, 신설동역, 23L).as(LineResponse.class);
 
         // when
-        List<LineResponse> 노선_목록 = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
+        var 노선_목록 = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
 
         // then
         assertThat(노선_목록).containsExactly(_8호선, _2호선);
@@ -77,10 +77,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        var _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when
-        LineResponse 조회한_8호선 = 노선을_조회한다(_8호선.getId()).as(LineResponse.class);
+        var 조회한_8호선 = 노선을_조회한다(_8호선.getId()).as(LineResponse.class);
 
         // then
         assertAll(() -> {
@@ -102,13 +102,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        var _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when
         노선_목록을_수정한다(_8호선.getId(), "2호선", "bg-lime-300");
 
         // when
-        LineResponse _2호선 = 노선을_조회한다(_8호선.getId()).as(LineResponse.class);
+        var _2호선 = 노선을_조회한다(_8호선.getId()).as(LineResponse.class);
         assertAll(() -> {
             assertThat(_2호선.getName()).isEqualTo("2호선");
             assertThat(_2호선.getColor()).isEqualTo("bg-lime-300");
@@ -128,39 +128,39 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        var _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when && then
         노선을_삭제한다(_8호선.getId());
     }
 
     public static ExtractableResponse<Response> 노선을_만들다(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
-        ExtractableResponse<Response> response = postRequestWithRequestBody("/lines", lineRequest);
+        var lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
+        var response = postRequestWithRequestBody("/lines", lineRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
     }
 
     private ExtractableResponse<Response> 노선을_조회한다(Long id) {
-        ExtractableResponse<Response> response = getRequestWithParameter("/lines/{id}", id);
+        var response = getRequestWithParameter("/lines/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     private ExtractableResponse<Response> 노선_목록을_조회한다() {
-        ExtractableResponse<Response> response = getRequest("/lines");
+        var response = getRequest("/lines");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     private void 노선_목록을_수정한다(Long id, String name, String color) {
-        LineUpdateRequest lineUpdateRequest = new LineUpdateRequest(name, color);
-        ExtractableResponse<Response> response = putRequestWithParameterAndRequestBody("/lines/{id}", id, lineUpdateRequest);
+        var lineUpdateRequest = new LineUpdateRequest(name, color);
+        var response = putRequestWithParameterAndRequestBody("/lines/{id}", id, lineUpdateRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     private void 노선을_삭제한다(Long id) {
-        ExtractableResponse<Response> response = deleteRequestWithParameter("/lines/{id}", id);
+        var response = deleteRequestWithParameter("/lines/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
