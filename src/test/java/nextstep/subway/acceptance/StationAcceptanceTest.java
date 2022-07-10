@@ -66,11 +66,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
         역을_만들다("한성백제역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
+        ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록을_조회한다();
 
         // then
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).containsExactly("잠실역", "한성백제역");
+        List<String> 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name");
+        assertThat(지하철역_이름_목록).containsExactly("잠실역", "한성백제역");
 
     }
 
@@ -89,9 +89,9 @@ public class StationAcceptanceTest extends AcceptanceTest {
         역을_삭제한다(잠실역.getId());
 
         // then
-        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).isEmpty();
+        ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록을_조회한다();
+        List<String> 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name", String.class);
+        assertThat(지하철역_이름_목록).isEmpty();
     }
 
 
