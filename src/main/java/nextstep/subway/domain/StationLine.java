@@ -6,25 +6,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Station {
+public class StationLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String color;
 
-    public Station() {
-    }
+    private int upStationId;
 
-    public Station(String name) {
-        this.name = name;
-    }
+    private int downStationId;
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+    private int distance;
 }
