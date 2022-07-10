@@ -4,14 +4,12 @@ import nextstep.subway.domain.station.Station;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 @Embeddable
 public class Stations {
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-//    @JoinColumn(name = "id")
     private List<Station> stations = new ArrayList<>();
 
     protected Stations() {/*no-op*/}

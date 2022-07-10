@@ -2,7 +2,6 @@ package nextstep.subway.domain.line;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.domain.station.Station;
-import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import java.util.List;
