@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion.dto;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class StationResponses {

@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -45,7 +46,8 @@ public class LineService {
         );
 
         Line createdLine = lineRepository.save(createLine);
-        return new LineResponse(createdLine.getId(), createdLine.getName(), createdLine.getColor(), createdLine.getStations().getStations());
+        return getLineResponse
+            (createdLine);
     }
 
     @Transactional(readOnly = true)
@@ -53,16 +55,13 @@ public class LineService {
         Line findLine = lineRepository.findById(id).orElseThrow(
             () -> new DataNotFoundException("Line 데이터가 없습니다.")
         );
-        return new LineResponse(
-            findLine.getId(), findLine.getName(), findLine.getColor(), findLine.getStations().getStations()
-        );
+        return getLineResponse(findLine);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream().map(
-            line -> new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations().getStations())
-        ).collect(Collectors.toList());
+        return lineRepository.findAll().stream().map(this::getLineResponse)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -76,8 +75,15 @@ public class LineService {
             () -> new DataNotFoundException("Line 데이터가 없습니다.")
         );
         findLine.edit(lineRequest);
-        return new LineResponse(
-            findLine.getId(), findLine.getName(), findLine.getColor(), findLine.getStations().getStations()
-        );
+        return getLineResponse(findLine);
     }
+
+    private LineResponse getLineResponse(Line createdLine) {
+        return new LineResponse(
+            createdLine.getId(), createdLine.getName(), createdLine.getColor(),
+            createdLine.getStations().getStations().stream()
+            .map(station -> new StationResponse(station.getId(), station.getName()))
+            .collect(Collectors.toList()));
+    }
+
 }
