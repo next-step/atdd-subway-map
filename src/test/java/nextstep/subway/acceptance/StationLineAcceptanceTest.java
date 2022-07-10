@@ -63,6 +63,30 @@ class StationLineAcceptanceTest {
 			.then().log().all().extract();
 	}
 
+	@DisplayName("지하철 노선 목록 조회 테스트")
+	@Test
+	void getAllLinesTest() throws Exception {
+
+		//given
+		long upStationId = 지하철_생성_요청(Map.of("name", "판교역")).jsonPath().getLong("id");
+		long downStationId = 지하철_생성_요청(Map.of("name", "정자역")).jsonPath().getLong("id");
+		Map<String, Object> param =
+			Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", upStationId, "downStationId", downStationId, "distance", 10);
+		지하철_노선_생성_요청(param);
+
+		upStationId = 지하철_생성_요청(Map.of("name", "서현역")).jsonPath().getLong("id");
+		downStationId = 지하철_생성_요청(Map.of("name", "이매역")).jsonPath().getLong("id");
+		param =
+			Map.of("name", "분당선", "color", "yellow", "upStationId", upStationId, "downStationId", downStationId, "distance", 10);
+		지하철_노선_생성_요청(param);
+
+		//when
+		ExtractableResponse<Response> getAllLineResponse = 지하철_노선_목록_조회();
+
+		//then
+		assertThat(getAllLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+	}
+
 	private ExtractableResponse<Response> 지하철_노선_목록_조회() {
 		return RestAssured.given().log().all()
 			.when()
