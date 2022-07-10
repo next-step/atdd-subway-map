@@ -157,4 +157,63 @@ public class StationAcceptanceTest {
         return response.jsonPath()
                 .getLong("id");
     }
+
+    /**
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     */
+    @DisplayName("지하철 노선을 생성한다.")
+    @Test
+    void createStationLine() {
+        // When
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        ExtractableResponse<Response> response = createStationLine(stationLineName, stationLineColor, upStationId, downStationId);
+        Long createdStationLineId = extractIdInResponse(response);
+
+        // Then
+        List<Long> ids = extractIdsInListTypeResponse(getAllStationLines());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(ids).containsAnyOf(createdStationLineId);
+    }
+
+    private ExtractableResponse<Response> createStationLine(String stationLineName, String stationLineColor, Long upStationId, Long downStationId
+    ) {
+        Map<Object, Object> params = new HashMap<>();
+        params.put("name", stationLineName);
+        params.put("color", stationLineColor);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stationLines")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getAllStationLines() {
+        return RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .get("/stationLines")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
 }
