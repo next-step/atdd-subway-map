@@ -66,10 +66,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
         역을_만들다("한성백제역");
 
         // when
-        ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록을_조회한다();
+        var 지하철역_목록 = 지하철역_목록을_조회한다();
 
         // then
-        List<String> 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name");
+        var 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name");
         assertThat(지하철역_이름_목록).containsExactly("잠실역", "한성백제역");
 
     }
@@ -83,33 +83,33 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        StationResponse 잠실역 = 역을_만들다("잠실역").as(StationResponse.class);
+        var 잠실역 = 역을_만들다("잠실역").as(StationResponse.class);
 
         // when
         역을_삭제한다(잠실역.getId());
 
         // then
-        ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록을_조회한다();
-        List<String> 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name", String.class);
+        var 지하철역_목록 = 지하철역_목록을_조회한다();
+        var 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name", String.class);
         assertThat(지하철역_이름_목록).isEmpty();
     }
 
 
     public static ExtractableResponse<Response> 역을_만들다(String name) {
-        StationRequest stationRequest = new StationRequest(name);
-        ExtractableResponse<Response> response = postRequestWithRequestBody("/stations", stationRequest);
+        var stationRequest = new StationRequest(name);
+        var response = postRequestWithRequestBody("/stations", stationRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
     }
 
     private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
-        ExtractableResponse<Response> response = getRequest("/stations");
+        var response = getRequest("/stations");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     private void 역을_삭제한다(Long id) {
-        ExtractableResponse<Response> response = deleteRequestWithParameter("/stations/{id}", id);
+        var response = deleteRequestWithParameter("/stations/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
