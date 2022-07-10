@@ -22,7 +22,7 @@ public class StationLineRequest {
         this.color = color;
     }
 
-    protected StationLineRequest() {
+    private StationLineRequest() {
     }
 
     public String getName() {

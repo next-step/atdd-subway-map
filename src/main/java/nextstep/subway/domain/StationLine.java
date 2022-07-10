@@ -40,10 +40,6 @@ public class StationLine {
         return color;
     }
 
-    public int getDistance() {
-        return distance;
-    }
-
     public Stations getStations() {
         return stations;
     }
