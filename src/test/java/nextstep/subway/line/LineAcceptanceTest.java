@@ -50,10 +50,10 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // given
-        final String lineName = "신분당선";
+        final String 신분당선 = "신분당선";
 
         // when
-        final ExtractableResponse<Response> createLineResponse = createLineRequest(lineName);
+        final ExtractableResponse<Response> createLineResponse = createLineRequest(신분당선);
 
         // then
         assertStatusCode(createLineResponse, HttpStatus.CREATED);
@@ -72,11 +72,11 @@ class LineAcceptanceTest {
     @Test
     void getLines() {
         // given
-        final String lineName1 = "신분당선";
-        createLineRequest(lineName1);
+        final String 신분당선 = "신분당선";
+        createLineRequest(신분당선);
 
-        final String lineName2 = "2호선";
-        createLineRequest(lineName2);
+        final String 신신분당선 = "신신분당선";
+        createLineRequest(신신분당선);
 
         // when
         final ExtractableResponse<Response> response = getLinesRequest();
@@ -85,8 +85,7 @@ class LineAcceptanceTest {
         assertStatusCode(response, HttpStatus.OK);
 
         final List<String> lineNames = getNamesFromResponse(response);
-        assertThat(lineNames).hasSize(2);
-        assertThat(lineNames).contains(lineName1, lineName2);
+        assertThat(lineNames).containsExactly(신분당선, 신신분당선);
     }
 
     /**
@@ -99,20 +98,20 @@ class LineAcceptanceTest {
     @Test
     void modifyLines() {
         // given
-        final String beforeLineName = "신분당선";
-        final Long id = getIdFromResponse(createLineRequest(beforeLineName));
+        final String 신분당선 = "신분당선";
+        final Long id = getIdFromResponse(createLineRequest(신분당선));
 
-        final String afterLineName = "신신분당선";
+        final String 신신분당선 = "신신분당선";
 
         // when
-        final ExtractableResponse<Response> modifyResponse = modifyLineRequest(id, afterLineName);
+        final ExtractableResponse<Response> modifyResponse = modifyLineRequest(id, 신신분당선);
 
         // then
         assertStatusCode(modifyResponse, HttpStatus.OK);
 
         final List<String> lineNames = getNamesFromResponse(getLinesRequest());
-        assertThat(lineNames).contains(afterLineName);
-        assertThat(lineNames).doesNotContain(beforeLineName);
+        assertThat(lineNames).contains(신신분당선);
+        assertThat(lineNames).doesNotContain(신분당선);
     }
 
     /**
@@ -125,8 +124,8 @@ class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        final String lineName = "신분당선";
-        final Long id = getIdFromResponse(createLineRequest(lineName));
+        final String 신분당선 = "신분당선";
+        final Long id = getIdFromResponse(createLineRequest(신분당선));
 
         // when
         final ExtractableResponse<Response> response = deleteLineRequest(id);
@@ -135,7 +134,7 @@ class LineAcceptanceTest {
         assertStatusCode(response, HttpStatus.OK);
 
         final List<String> lineNames = getNamesFromResponse(getLinesRequest());
-        assertThat(lineNames).doesNotContain(lineName);
+        assertThat(lineNames).doesNotContain(신분당선);
     }
 
     private ExtractableResponse<Response> modifyLineRequest(final Long id, final String lineName) {
