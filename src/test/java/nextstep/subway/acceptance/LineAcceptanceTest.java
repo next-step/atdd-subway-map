@@ -20,8 +20,9 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DirtiesContext
 @DisplayName("지하철 노선 관련 기능")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql("classpath:/stations.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
     @LocalServerPort
@@ -37,7 +38,6 @@ public class LineAcceptanceTest {
 
 
     @BeforeAll
-    @Sql("classpath:/stations.sql")
     static void init() {
         line1 = new HashMap<>();
         line1.put("name", "신분당선");
