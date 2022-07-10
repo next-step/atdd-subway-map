@@ -134,7 +134,23 @@ public class LineAcceptanceTest {
                 () -> assertThat(updatedLine.jsonPath().getString("name")).isEqualTo(FIRST_LINE),
                 () -> assertThat(updatedLine.jsonPath().getString("color")).isEqualTo(GREEN_COLOR)
         );
+    }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다")
+    @Test
+    void 지하철_노선_삭제() {
+        // given 지하철_노선_생성
+        ExtractableResponse<Response> createLine = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED_COLOR, Long.valueOf(지하철역_생성(GANGNAM_STATION).jsonPath().getString("id")),
+                Long.valueOf(지하철역_생성(YUKSAM_STATION).jsonPath().getString("id")), DISTANCE);
+        // When 지하철_노선_삭제
+        ExtractableResponse<Response> deleteLineResponse = 지하철_노선_삭제(createLine.jsonPath().get("id"));
+        // Then 해당 지하철 노선 정보를 찾을 수 없다
+        assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
@@ -169,6 +185,13 @@ public class LineAcceptanceTest {
                 .body(지하철_노선_수정_파라미터(name, color))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_삭제(int id) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
