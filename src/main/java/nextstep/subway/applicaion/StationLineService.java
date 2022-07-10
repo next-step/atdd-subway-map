@@ -37,6 +37,14 @@ public class StationLineService {
 		return stationLineResponseList;
 	}
 
+	public StationLineResponse findStationLines(Long stationId) {
+
+		StationLine stationLine = stationLineRepository.findById(stationId)
+			.orElseThrow(() -> new RuntimeException());
+
+		return createStationLineResponse(stationLine);
+	}
+
 	private StationLineResponse createStationLineResponse(StationLine stationLine) {
 
 		return new StationLineResponse(stationLine.getId(),
