@@ -7,6 +7,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
 
+    private Long 모란역;
+    private Long 암사역;
+
+    @BeforeEach
+    void init() {
+        모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
+        암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
+    }
+
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -29,8 +39,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
-        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
         LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // then
@@ -47,8 +55,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
-        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
         LineResponse newLine1 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         Long 까치산역 = 역을_만들다("까치산역").as(StationResponse.class).getId();
@@ -71,8 +77,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
-        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
         LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when
@@ -98,8 +102,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
-        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
         LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when
@@ -126,8 +128,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        Long 모란역 = 역을_만들다("모란역").as(StationResponse.class).getId();
-        Long 암사역 = 역을_만들다("암사역").as(StationResponse.class).getId();
         LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when && then
