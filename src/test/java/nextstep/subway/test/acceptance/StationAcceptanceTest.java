@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.test.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -6,10 +6,12 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import nextstep.subway.utils.acceptance.util.DatabaseCleanup;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +25,13 @@ public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        databaseCleanup.execute();
     }
 
     /**
@@ -66,7 +72,7 @@ public class StationAcceptanceTest {
         List<String> response = getStationList();
 
         //then
-        assertThat(response).hasSize(2);
+        assertThat(response).contains("구일역", "개봉역");
     }
     /**
      * Given 지하철역을 생성하고
