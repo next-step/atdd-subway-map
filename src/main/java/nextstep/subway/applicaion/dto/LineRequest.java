@@ -21,6 +21,10 @@ public class LineRequest {
         return new Line(this.name,this.color);
     }
 
+    public Line toEntity(long id) {
+        return new Line(id,this.name,this.color);
+    }
+
     public long getUpStationId() {
         return upStationId;
     }

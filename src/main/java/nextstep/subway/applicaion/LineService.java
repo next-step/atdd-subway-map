@@ -19,8 +19,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line createdLine = lineRepository.save(lineRequest.toEntity());
-        return LineResponse.convertedByEntity(createdLine);
+        Line savedLine = lineRepository.save(lineRequest.toEntity());
+        return LineResponse.convertedByEntity(savedLine);
     }
 
     public List<LineResponse> getLines() {
@@ -31,5 +31,12 @@ public class LineService {
     public LineResponse getLine(long lineId) {
         Line line = lineRepository.findById(lineId).orElseThrow(()->new RuntimeException("노선이 존재하지 않습니다."));
         return LineResponse.convertedByEntity(line);
+    }
+
+    @Transactional
+    public LineResponse updateLine(LineRequest lineRequest, long lineId) {
+        Line line = lineRequest.toEntity(lineId);
+        Line updatedLine = lineRepository.save(line);
+        return LineResponse.convertedByEntity(updatedLine);
     }
 }
