@@ -18,4 +18,4 @@
 - [x] LineService.findAllStationInLine 내부 메서드 레퍼런스로 변경
 - [x] LineAcceptanceTest에서 getLong()은 primitive type을 반환한다. 이에 알맞은 검증코드로 변경하기
 - [x] http status code 검증 부분도 assertAll() 내부로 이동
-- [ ] TestFixture 에 대하여 공부하고, 특정 역을 가진 노선을 명확하게 명시하는 메서드 만링기
+- [x] TestFixture 에 대하여 공부하고, 특정 역을 가진 노선을 명확하게 명시하는 메서드 만링기
