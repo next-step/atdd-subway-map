@@ -32,22 +32,29 @@ public class LineService {
             .orElseThrow(
                 () -> new DataNotFoundException("Station 데이터가 없습니다.")
             );
+
         Station downStation = stationRepository
             .findById(lineRequest.getDownStationId())
             .orElseThrow(
                 () -> new DataNotFoundException("Station 데이터가 없습니다.")
             );
-        Line createLine = lineRequest.toEntity(Arrays.asList(upStation, downStation));
+
+        Line createLine = new Line(
+            null, lineRequest.getName(), lineRequest.getColor(),
+            lineRequest.getDistance(), Arrays.asList(upStation, downStation)
+        );
+
         Line createdLine = lineRepository.save(createLine);
-        return new LineResponse(createdLine);
+        return new LineResponse(createdLine.getId(), createdLine.getName(), createdLine.getColor(), createdLine.getStations().getStations());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findOneLine(Long id) {
+        Line findLine = lineRepository.findById(id).orElseThrow(
+            () -> new DataNotFoundException("Line 데이터가 없습니다.")
+        );
         return new LineResponse(
-            lineRepository.findById(id).orElseThrow(
-                () -> new DataNotFoundException("Line 데이터가 없습니다.")
-            )
+            findLine.getId(), findLine.getName(), findLine.getColor(), findLine.getStations().getStations()
         );
     }
 
@@ -69,6 +76,8 @@ public class LineService {
             () -> new DataNotFoundException("Line 데이터가 없습니다.")
         );
         findLine.edit(lineRequest);
-        return new LineResponse(findLine);
+        return new LineResponse(
+            findLine.getId(), findLine.getName(), findLine.getColor(), findLine.getStations().getStations()
+        );
     }
 }
