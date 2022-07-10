@@ -1,12 +1,12 @@
 package nextstep.subway.applicaion;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
@@ -39,8 +39,11 @@ public class StationLineService {
 	}
 
 	public StationLineResponse findStationLine(Long stationId) {
-		return createStationLineResponse(stationLineRepository.findById(stationId)
-			.orElse(null));
+		Optional<StationLine> stationLine = stationLineRepository.findById(stationId);
+		if (stationLine.isEmpty()) {
+			return null;
+		}
+		return createStationLineResponse(stationLine.get());
 	}
 
 	@Transactional
@@ -58,9 +61,6 @@ public class StationLineService {
 	}
 
 	private StationLineResponse createStationLineResponse(StationLine stationLine) {
-		if (ObjectUtils.isEmpty(stationLine)) {
-			return new StationLineResponse();
-		}
 		return new StationLineResponse(stationLine.getId(),
 			stationLine.getName(),
 			stationLine.getColor(),

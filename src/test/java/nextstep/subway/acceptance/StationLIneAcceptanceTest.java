@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
 
 @DisplayName("지하철 노선 테스트")
 @Sql("/truncate.sql")
@@ -92,7 +93,7 @@ public class StationLIneAcceptanceTest {
 		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
 
 		//then
-		assertEquals(response.get("name"), SIN_BOONDANG_LINE);
+		assertEquals(SIN_BOONDANG_LINE, response.get("name"));
 	}
 
 	/**
@@ -142,8 +143,8 @@ public class StationLIneAcceptanceTest {
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		//then
-		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
-		assertThat(response.get("name")).isNull();
+		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.NO_CONTENT);
+		assertThat(response).isNull();
 
 	}
 
@@ -186,10 +187,15 @@ public class StationLIneAcceptanceTest {
 	}
 
 	private Map<String, Object> 지하철라인_조회_BY_ID(Long id, HttpStatus httpStatus) {
-		return RestAssured.given().log().all()
+
+		ExtractableResponse response = RestAssured.given().log().all()
 			.when().get("/lines/" + id)
 			.then().log().all()
 			.statusCode(httpStatus.value())
-			.extract().jsonPath().get();
+			.extract();
+		if (httpStatus == HttpStatus.NO_CONTENT) {
+			return null;
+		}
+		return response.jsonPath().get();
 	}
 }
