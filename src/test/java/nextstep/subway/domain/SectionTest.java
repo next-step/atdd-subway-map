@@ -12,7 +12,7 @@ class SectionTest {
     @Test
     @DisplayName("동일한 지하철역으로 구간을 생성 시 에러를 반환한다.")
     void invalidCreate() {
-        Station upStation = new Station(1L, "강남역");
+        Station upStation = StationTest.GANGNAM_STATION;
         Station downStation = upStation;
 
         assertThatThrownBy(() -> Section.create(upStation, downStation, 10))
@@ -22,8 +22,8 @@ class SectionTest {
     @Test
     @DisplayName("양수가 아닌 거리로 구간을 생성 시 에러를 반환한다.")
     void invalidCreate_distance() {
-        Station upStation = new Station(1L, "강남역");
-        Station downStation = new Station(2L, "역삼역");
+        Station upStation = StationTest.GANGNAM_STATION;
+        Station downStation = StationTest.YEOKSAM_STATION;
 
         assertThatThrownBy(() -> Section.create(upStation, downStation, 0))
                 .isInstanceOf(OutOfBoundDistanceException.class)
