@@ -107,11 +107,10 @@ class StationLineAcceptanceTest {
 	 * given 지하철 노선을 생성하고
 	 * when 생성한 지하철 노선 목록을 조회하면
 	 * then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-	 * @throws Exception
 	 */
 	@DisplayName("지하철 노선 조회 테스트")
 	@Test
-	void getLineTest() throws Exception {
+	void getLineTest() {
 
 		//given
 		long 신분당선_상행종점역_번호 = 지하철_생성_요청(Map.of("name", "판교역")).jsonPath().getLong("id");
@@ -131,6 +130,36 @@ class StationLineAcceptanceTest {
 		return RestAssured.given().log().all()
 			.when()
 			.get("/lines/{id}", lineId)
+			.then().log().all().extract();
+	}
+
+	/**
+	 * given 지하철 노선을 생성하고
+	 * when 생성한 지하철 노선을 삭제하면
+	 * then 해당 지하철 노선 정보는 삭제된다.
+	 */
+	@DisplayName("지하철 노선 삭제 테스트")
+	@Test
+	void deleteLintTest() {
+
+		//given
+		long 신분당선_상행종점역_번호 = 지하철_생성_요청(Map.of("name", "판교역")).jsonPath().getLong("id");
+		long 신분당선_하행종점역_번호 = 지하철_생성_요청(Map.of("name", "정자역")).jsonPath().getLong("id");
+		Map<String, Object> param =
+			Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", 신분당선_상행종점역_번호, "downStationId", 신분당선_하행종점역_번호, "distance", 10);
+		long 신분당선_노선_번호 = 지하철_노선_생성_요청(param).jsonPath().getLong("id");
+
+		//when
+		ExtractableResponse<Response> deleteLineResponse = 지하철_노선_삭제_요청(신분당선_노선_번호);
+
+		//then
+		assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
+	private ExtractableResponse<Response> 지하철_노선_삭제_요청(long lineId) {
+		return RestAssured.given().log().all()
+			.when()
+			.delete("/lines/{lineId}", lineId)
 			.then().log().all().extract();
 	}
 
