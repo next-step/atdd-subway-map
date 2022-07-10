@@ -107,6 +107,25 @@ public class StationLineAcceptanceTest {
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteStationLine(){
+        //given
+        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 1L, 2L, 10);
+        String url = response.header("Location");
+
+        //when
+        ExtractableResponse<Response> response2  = 지하철노선_삭제(url);
+
+        //then
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
 
     private ExtractableResponse<Response> 지하철역_노선_등록(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         //when
@@ -167,4 +186,14 @@ public class StationLineAcceptanceTest {
                     .extract();
     }
 
+    private ExtractableResponse<Response> 지하철노선_삭제(String url) {
+        return RestAssured
+                .given()
+                    .log().all()
+                .when()
+                    .delete(url)
+                .then()
+                    .log().all()
+                    .extract();
+    }
 }
