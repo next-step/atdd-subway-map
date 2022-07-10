@@ -151,7 +151,7 @@ public class StationLIneAcceptanceTest {
 		Map<Object, Object> requestParameter = new HashMap<>();
 		requestParameter.put("name", stationName);
 		requestParameter.put("color", stationColor);
-		requestParameter.put("upstationId", upstationId);
+		requestParameter.put("upStationId", upstationId);
 		requestParameter.put("downStationId", downStationId);
 		requestParameter.put("distance", distance);
 		return requestParameter;

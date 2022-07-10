@@ -1,19 +1,21 @@
 package nextstep.subway.applicaion.dto;
 
 public class StationResponse {
-    private Long id;
-    private String name;
 
-    public StationResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+	private Long id;
+	private String name;
+	private String color;
 
-    public Long getId() {
-        return id;
-    }
+	public StationResponse(Long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Long getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
 }
