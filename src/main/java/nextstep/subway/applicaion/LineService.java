@@ -2,12 +2,14 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.line.CreateLineRequest;
 import nextstep.subway.applicaion.dto.line.LineResponse;
+import nextstep.subway.applicaion.dto.line.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,8 +17,6 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class LineService {
-    public static final int STATION_IN_LINE_INIT_NUM = 2;
-
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
@@ -49,5 +49,12 @@ public class LineService {
             .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
         List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
         return LineResponse.of(line, stations);
+    }
+
+    public void updateLine(Long lineId, UpdateLineRequest request){
+        Line line = lineRepository.findById(lineId)
+                                  .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+        line.setName(StringUtils.hasText(request.getName()) ? request.getName() : line.getName());
+        line.setColor(StringUtils.hasText(request.getColor()) ? request.getColor() : line.getColor());
     }
 }

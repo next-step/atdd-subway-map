@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import org.springframework.util.StringUtils;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,6 +32,14 @@ public class Line {
     }
 
     protected Line() {
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setColor(final String color) {
+        this.color = color;
     }
 
     public Long getId() {
