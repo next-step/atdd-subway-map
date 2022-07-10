@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -157,10 +156,22 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSubwayLine() throws Exception {
         // given
+        final Map<String, Object> params = createParams(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of("신분당선", "bg-red-600", 1, 2, 10));
+        final ExtractableResponse<Response> createSubwayLineResponse = createSubwayLineRequest(params);
+        final long createdSubwayLineId = createSubwayLineResponse.jsonPath().getLong("id");
 
         // when
+        final ExtractableResponse<Response> response = deleteSubwayLineRequest(createdSubwayLineId);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
+
+        // then
+        final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
+        final List<Object> subwayLineIdList = getSubwayLinesResponse.jsonPath().getList("id");
+        assertThat(subwayLineIdList.size()).isEqualTo(0);
     }
 
     private Map<String, Object> createParams(List<String> keys, List<Object> values) {
@@ -233,7 +244,13 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> deleteSubwayLineRequest() {
-        return null;
+    private ExtractableResponse<Response> deleteSubwayLineRequest(Long subwayLineId) {
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/subway-lines/" + subwayLineId)
+                .then().log().all()
+                .extract();
+
+        return response;
     }
 }
