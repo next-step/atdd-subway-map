@@ -33,7 +33,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 생성")
     public void createLine() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
+        ExtractableResponse<Response> response = 지하철_노선_생성("2호선", "bg-green-600");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -57,8 +57,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("전체 지하철 노선 목록 조회")
     public void searchLines() {
         // given
-        지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
-        지하철_노선_생성("1호선", "bg-blue-600", upStationId, downStationId, 7);
+        지하철_노선_생성("1호선", "bg-blue-600");
+        지하철_노선_생성("2호선", "bg-green-600");
 
         // when
         ExtractableResponse<Response> response = 지하철_노선_목록_조회();
@@ -79,7 +79,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("단일 지하철 노선 조회")
     public void searchLine() {
         // given
-        long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        long lineId = 지하철_노선_생성("2호선", "bg-green-600").jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = 지하철_단일_노선_조회(lineId);
@@ -106,7 +106,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("단일 지하철 노선 편집")
     public void editLine() {
         // given
-        long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        long lineId = 지하철_노선_생성("2호선", "bg-green-600").jsonPath().getLong("id");
 
         // when
         int editStatusCode = 지하철_노선_수정(lineId, "다른 2호선", "연두색");
@@ -131,7 +131,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("단일 지하철 노선 삭제")
     public void deleteLine() {
         // given
-        long lineId = 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        long lineId = 지하철_노선_생성("2호선", "bg-green-600").jsonPath().getLong("id");
 
         // when
         int deleteStatusCode = 지하철_단일_노선_삭제(lineId);

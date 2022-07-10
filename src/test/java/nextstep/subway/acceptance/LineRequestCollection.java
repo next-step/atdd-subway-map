@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 
+import static nextstep.subway.acceptance.StationRequestCollection.지하철역_생성;
+
 public class LineRequestCollection {
 
     public static int 지하철_단일_노선_삭제(long lineId) {
@@ -64,5 +66,11 @@ public class LineRequestCollection {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철_노선_생성(String lineName, String color) {
+        Long upStationId = 지하철역_생성("강남역").jsonPath().getLong("id");
+        Long downStationId = 지하철역_생성("건대입구역").jsonPath().getLong("id");
+        return 지하철_노선_생성(lineName, color, upStationId, downStationId, 10);
     }
 }
