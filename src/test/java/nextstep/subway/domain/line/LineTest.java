@@ -2,6 +2,8 @@ package nextstep.subway.domain.line;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static nextstep.subway.domain.line.Fixture.역정보;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,11 +21,13 @@ class LineTest {
         );
     }
 
-    @Test
+
+    @ParameterizedTest
     @DisplayName("이름은 2글자 미만이면 IllegalArgumentException 예외를 발생한다.")
-    void test2() {
+    @NullAndEmptySource
+    void test2(String name) {
         // given
-        String 선 = "선";
+        String 선 = name;
 
         // when & then
         assertThatThrownBy(
@@ -39,7 +43,7 @@ class LineTest {
 
         // when & then
         assertThatThrownBy(
-            () -> new Line( "신분당선", 색, 10, 역정보)
+            () -> new Line("신분당선", 색, 10, 역정보)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -51,7 +55,7 @@ class LineTest {
 
         // when & then
         assertThatThrownBy(
-            () -> new Line( "신분당선", "bg-red-600", 거리, 역정보)
+            () -> new Line("신분당선", "bg-red-600", 거리, 역정보)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 }

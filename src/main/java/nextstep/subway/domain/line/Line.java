@@ -22,7 +22,7 @@ public class Line {
 
     public Line(Long id, String name, String color, int distance, List<Station> stations) {
 
-        if (name.isBlank() || name.length() < 2) {
+        if (name == null || name.isBlank() || name.length() < 2) {
             throw new IllegalArgumentException("이름이 공백이거나 2글자 이하일 수 없습니다.");
         }
 
