@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,13 +41,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStation(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -69,8 +64,22 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
-    }
+        // given
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("name", "강남역");
 
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("name", "양재역");
+
+        createStation(params1);
+        createStation(params2);
+
+        // when
+        List<Station> stations = getStationList();
+
+        // then
+        assertThat(stations.size()).isEqualTo(2);
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -81,5 +90,36 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+
+        Integer id = createStation(params).jsonPath().get("id");
+
+        // when
+        RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all();
+
+        // then
+        List<Station> stations = getStationList();
+        assertThat(stations.isEmpty()).isTrue();
+    }
+
+    private ExtractableResponse<Response> createStation(Map<String, String> station) {
+        return RestAssured.given().log().all()
+                .body(station)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private List<Station> getStationList() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().get();
     }
 }
