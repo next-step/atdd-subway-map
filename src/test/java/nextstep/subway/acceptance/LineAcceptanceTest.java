@@ -109,9 +109,10 @@ public class LineAcceptanceTest {
         long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_수정_요청(lineId, "다른분당선", "bg-red-610");
+        지하철노선_수정_요청(lineId, "다른분당선", "bg-red-610");
 
         // then
+        final ExtractableResponse<Response> response = 지하철노선_조회(lineId);
         assertAll(
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선"),
             () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-610")
