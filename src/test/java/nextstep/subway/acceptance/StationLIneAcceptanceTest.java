@@ -142,7 +142,10 @@ public class StationLIneAcceptanceTest {
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		//then
-		assertThat(getLine(stationId)).isEmpty();
+		RestAssured.given().log().all()
+			.when().get("/lines/" + stationId)
+			.then().log().all()
+			.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
 	}
 

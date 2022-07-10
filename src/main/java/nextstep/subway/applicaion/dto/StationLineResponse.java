@@ -9,6 +9,9 @@ public class StationLineResponse {
 	private String color;
 	private List<StationResponse> stations;
 
+	public StationLineResponse() {
+	}
+
 	public StationLineResponse(Long id, String name, String color, StationResponse upStationResponse,
 		StationResponse downStationResponse) {
 

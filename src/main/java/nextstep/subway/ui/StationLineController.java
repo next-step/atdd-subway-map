@@ -50,6 +50,7 @@ public class StationLineController {
 
 	@DeleteMapping("/lines/{id}")
 	public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
-		return null;
+		stationLineService.deleteStationLine(id);
+		return ResponseEntity.noContent().build();
 	}
 }

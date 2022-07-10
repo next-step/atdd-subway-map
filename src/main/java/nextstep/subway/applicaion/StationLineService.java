@@ -53,6 +53,13 @@ public class StationLineService {
 		stationLine.updateStationLineInformation(stationLineRequest.getName(), stationLineRequest.getColor());
 	}
 
+	@Transactional
+	public void deleteStationLine(Long stationId) {
+		StationLine stationLine = stationLineRepository.findById(stationId)
+			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
+		stationLineRepository.delete(stationLine);
+	}
+
 	private StationLineResponse createStationLineResponse(StationLine stationLine) {
 
 		return new StationLineResponse(stationLine.getId(),

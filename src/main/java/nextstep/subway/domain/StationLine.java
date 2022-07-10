@@ -21,7 +21,7 @@ public class StationLine {
 	private Long downStationId;
 	private Long distance;
 
-	public StationLine() {
+	protected StationLine() {
 	}
 
 	public StationLine(String stationName, String stationColor, Long upStationId, Long downStationId, Long distance) {
