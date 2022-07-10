@@ -5,5 +5,4 @@ public class LineRequest {
 	private String color;
 	private Long upStationId;
 	private Long downStation;
-	private Long distance;
 }
