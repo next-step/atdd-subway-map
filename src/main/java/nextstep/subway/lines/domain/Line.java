@@ -7,7 +7,9 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "lines")
+@Table(name = "line", uniqueConstraints = {
+        @UniqueConstraint(name = "line_name_unique", columnNames = {"name"})
+})
 public class Line {
 
     @Id
@@ -24,7 +26,7 @@ public class Line {
     @OneToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
-    @Embedded
+//    @Embedded
     @Column(name = "distance")
     private Distance distance;
 

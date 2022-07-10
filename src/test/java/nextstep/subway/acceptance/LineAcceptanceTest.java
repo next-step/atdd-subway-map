@@ -10,8 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
 
     @LocalServerPort
@@ -32,7 +34,7 @@ public class LineAcceptanceTest {
         stationAcceptanceTest = new StationAcceptanceTest();
     }
 
-    private ExtractableResponse<Response> createLine(String lineName, String upStationName, String downStationName, String color, int distance) {
+    public ExtractableResponse<Response> createLine(String lineName, String upStationName, String downStationName, String color, int distance) {
         Long upStationId = stationAcceptanceTest.createStation(upStationName)
                 .jsonPath()
                 .getLong("id");
@@ -59,6 +61,26 @@ public class LineAcceptanceTest {
         return createResponse;
     }
 
+    public ExtractableResponse<Response> gets() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
+
+    public ExtractableResponse<Response> get(long lineId) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
+
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
@@ -71,10 +93,7 @@ public class LineAcceptanceTest {
         createLine(신분당선, 시청역, 강남역, "bg-red-600", 10);
 
         //then(지하철 노선 목록과 앞서 생성한 지하철 노선을 비교하여 생성된 지하철이 존재하는지 확인한다.)
-        ExtractableResponse<Response> getsResponse = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> getsResponse = gets();
 
         //상태코드 200 확인
         assertThat(getsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -104,10 +123,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> lineResponseTwo = createLine(일호선, 구로역, 신도림역, "bg-red-200", 15);
 
         //when
-        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> getResponse = gets();
 
         //then
         //상태코드 200 확인
@@ -130,15 +146,9 @@ public class LineAcceptanceTest {
         long lineId = createLine(신분당선, 시청역, 강남역, color, 10).jsonPath().getLong("id");
 
         //when(생성한 지하철 노선을 조회한다.)
-        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> getResponse = get(lineId);
 
         //then
-        //상태코드 200 확인
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
         //지하철 노선 id 확인
         assertThat(getResponse.jsonPath().getLong("id")).isEqualTo(lineId);
 
@@ -178,10 +188,7 @@ public class LineAcceptanceTest {
         //상태코드 200 확인
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> getResponse = get(lineId);
 
         //수정된 지하철 노선명 확인
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo(일호선);

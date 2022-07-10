@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     @LocalServerPort
     int port;
@@ -33,7 +36,7 @@ public class StationAcceptanceTest {
      * Then 지하철역이 생성된다.
      * @param stationName
      */
-    ExtractableResponse<Response> createStation(String stationName) {
+    public ExtractableResponse<Response> createStation(String stationName) {
 
         final String url = "/stations";
         final Map<String, String> params = new HashMap<>();
@@ -50,6 +53,15 @@ public class StationAcceptanceTest {
         return response;
     }
 
+    public ExtractableResponse<Response> gets() {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -63,8 +75,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
@@ -75,11 +86,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = gets().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -101,10 +108,7 @@ public class StationAcceptanceTest {
         createStation(교대역);
 
         //when
-        List<String> names = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> names = gets().jsonPath().getList("name", String.class);
 
         //then
         assertThat(names).contains(강남역, 교대역);
@@ -131,10 +135,7 @@ public class StationAcceptanceTest {
                 .extract();
 
         //then
-        List<String> names = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> names = gets().jsonPath().getList("name", String.class);
 
         assertThat(names).doesNotContain(강남역);
     }
