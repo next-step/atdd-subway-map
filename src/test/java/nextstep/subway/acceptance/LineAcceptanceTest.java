@@ -77,6 +77,27 @@ public class LineAcceptanceTest {
         assertThat(노선_이름_목록).containsOnly("2호선", "신분당선");
     }
 
+
+    /**
+     * Given    지하철 노선을 생성하고
+     * When     생성한 지하철 노선을 조회하면
+     * Then     생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @Test
+    @DisplayName("지하철노선을 조회한다.")
+    void getLine() {
+        // given
+        ExtractableResponse<Response> savedResponse = 노선_생성_요청("신분당선", "bg-red-600", 1L, 3L, 20);
+        Long 신분당선_ID = savedResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = 노선_조회_요청(신분당선_ID);
+        String 조회한_노선_이름 = response.jsonPath().getString("name");
+
+        // then
+        assertThat(조회한_노선_이름).isEqualTo("신분당선");
+    }
+
     private ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -98,6 +119,15 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> 노선_목록_조회_요청() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
+
+    private ExtractableResponse<Response> 노선_조회_요청(Long id) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
