@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
+
 @Entity
 public class Line {
 	@Id
@@ -60,5 +62,14 @@ public class Line {
 
 	public int getDistance() {
 		return distance;
+	}
+
+	public void update(LineUpdateRequest lineUpdateRequest) {
+		if (lineUpdateRequest.getName() != null) {
+			this.name = lineUpdateRequest.getName();
+		}
+		if (lineUpdateRequest.getColor() != null) {
+			this.color = lineUpdateRequest.getColor();
+		}
 	}
 }
