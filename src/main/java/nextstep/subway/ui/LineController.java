@@ -1,9 +1,9 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.line.CreateLineRequest;
-import nextstep.subway.applicaion.dto.line.LineResponse;
-import nextstep.subway.applicaion.dto.line.UpdateLineRequest;
+import nextstep.subway.domain.line.LineService;
+import nextstep.subway.ui.dto.line.CreateLineRequest;
+import nextstep.subway.ui.dto.line.LineResponse;
+import nextstep.subway.ui.dto.line.UpdateLineRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

@@ -1,6 +1,6 @@
-package nextstep.subway.applicaion.dto.line;
+package nextstep.subway.ui.dto.line;
 
-import nextstep.subway.domain.Line;
+import nextstep.subway.domain.line.Line;
 
 public class CreateLineRequest {
     private String name;

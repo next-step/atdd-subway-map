@@ -1,8 +1,8 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.applicaion.StationService;
-import nextstep.subway.applicaion.dto.station.StationRequest;
-import nextstep.subway.applicaion.dto.station.StationResponse;
+import nextstep.subway.domain.station.StationService;
+import nextstep.subway.ui.dto.station.StationRequest;
+import nextstep.subway.ui.dto.station.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
