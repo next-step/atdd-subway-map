@@ -5,9 +5,8 @@ import nextstep.subway.domain.subwayLine.SubwayLine;
 
 import javax.persistence.*;
 
-import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
-import static javax.persistence.GenerationType.*;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 public class StationToSubwayLine {
@@ -17,11 +16,11 @@ public class StationToSubwayLine {
     @Column(name = "station_to_subway_line_id")
     private Long id;
 
-    @ManyToOne(fetch = LAZY, cascade = ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "station_id")
     private Station station;
 
-    @ManyToOne(fetch = LAZY, cascade = ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "subway_line_id")
     private SubwayLine subwayLine;
 

@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -26,15 +25,15 @@ public class SubwayLine {
     @Column(name = "distance")
     private Integer distance;
 
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "color_id")
     private SubwayLineColor color;
 
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "up_station_id")
     private Station upStation;
 
-    @ManyToOne(fetch = LAZY, cascade = PERSIST)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
