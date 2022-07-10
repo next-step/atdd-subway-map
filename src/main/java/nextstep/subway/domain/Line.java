@@ -17,8 +17,11 @@ public class Line {
     private Long downStationId;
     private int distance;
 
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId, int distance) {
-        this.id = id;
+    public Line() {
+
+    }
+
+    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

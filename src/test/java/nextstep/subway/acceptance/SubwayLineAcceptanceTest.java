@@ -54,14 +54,14 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        ExtractableResponse<Response> response = createdSubwayLine("신분당선", "bg-red-600", 1, 2, 10);
+        ExtractableResponse<Response> response = createdSubwayLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    private ExtractableResponse<Response> createdSubwayLine(String name, String color, int upStationId,
-                                                            int downStationId, int distance) {
+    private ExtractableResponse<Response> createdSubwayLine(String name, String color, Long upStationId,
+                                                            Long downStationId, int distance) {
         return RestAssured.given().log().all()
                 .body(createSubwayLineParams(name, color, upStationId, downStationId, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -70,7 +70,7 @@ public class SubwayLineAcceptanceTest {
                 .extract();
     }
 
-    private Map<String, String> createSubwayLineParams(String name, String color, int upStationId, int downStationId, int distance) {
+    private Map<String, String> createSubwayLineParams(String name, String color, Long upStationId, Long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
