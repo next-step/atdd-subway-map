@@ -1,6 +1,5 @@
 package nextstep.subway.domain.subwayLine;
 
-import nextstep.subway.applicaion.dto.subwayLine.UpdateSubwayLineRequest;
 import nextstep.subway.domain.m2m.StationToSubwayLine;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
@@ -61,12 +60,6 @@ public class SubwayLine {
         this.upStation = subwayLine.getUpStation();
         this.downStation = subwayLine.getDownStation();
         this.stations = subwayLine.getStations();
-    }
-
-    @PrePersist
-    void prePersist() {
-//        this.upStation.updateSubwayLine(this);
-//        this.downStation.updateSubwayLine(this);
     }
 
     public Long getId() {

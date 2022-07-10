@@ -1,7 +1,5 @@
 package nextstep.subway.applicaion.dto.subwayLine;
 
-import nextstep.subway.domain.subwayLine.SubwayLine;
-
 public class CreateSubwayLineRequest {
 
     private final String name;
