@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +31,18 @@ public class LineService {
         return createLineResponse(lineRepository.save(line));
     }
 
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
-    }
-
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findLine(Long id) {
+        return createLineResponse(lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("지하철 노선 데이터가 없습니다.")));
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
+    }
 
 }

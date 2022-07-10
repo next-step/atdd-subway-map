@@ -96,6 +96,24 @@ public class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void 지하철_노선_조회() {
+        // given 지하철 노선을 생성하고
+        Long upStationId = Long.valueOf(지하철역_생성(GANGNAM_STATION).jsonPath().getString("id"));
+        Long downStationId = Long.valueOf(지하철역_생성(YUKSAM_STATION).jsonPath().getString("id"));
+        ExtractableResponse<Response> createLine = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED_COLOR, upStationId, downStationId, DISTANCE);
+        // when 생성한 지하철 노선을 조회하면
+        String lineName = 지하철_노선_조회(createLine.jsonPath().get("id")).jsonPath().get("name");
+        // then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+        assertThat(lineName).isEqualTo(SHIN_BUNDANG_LINE);
+    }
+
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
         return stationAcceptanceTest.createStation(GANGNAM_STATION);
@@ -113,6 +131,13 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> 지하철_노선_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회(int id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
