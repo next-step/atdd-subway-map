@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
-    public static final List<String> CLEAN_UP_TABLES = List.of("subway_line", "station");
+    public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
 
     @Autowired
     private CleanUpUtils cleanUpUtils;
@@ -30,7 +30,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     }
 
     @Override
-    protected void settings() {
+    protected void preprocessing() {
         cleanUpUtils.execute(CLEAN_UP_TABLES);
 
         callApi.saveStation(Param.강남역);
@@ -141,7 +141,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
      * 검증 비교 대상 값 관련 클래스
      */
     private static class Actual {
-        private static final Map<Class, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_SUBWAY_LINE_FUNCTIONS = Map.of(
+        private static final Map<Class<?>, BiFunction<ExtractableResponse<Response>, String, ?>> EXTRACT_INFO_AT_SUBWAY_LINE_FUNCTIONS = Map.of(
                 Long.class, (response, path) -> response.body().jsonPath().getLong(path),
                 String.class, (response, path) -> response.body().jsonPath().getString(path)
         );
@@ -154,7 +154,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
          * @param <T>
          * @return
          */
-        private static  <T> T get(ExtractableResponse<Response> response, String path, Class<T> type) {
+        private static <T> T get(ExtractableResponse<Response> response, String path, Class<T> type) {
             return (T) EXTRACT_INFO_AT_SUBWAY_LINE_FUNCTIONS.get(type).apply(response, path);
         }
 
@@ -166,7 +166,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
          * @param <T>
          * @return
          */
-        private static  <T> List<T> getList(ExtractableResponse<Response> response, String path, Class<T> type) {
+        private static <T> List<T> getList(ExtractableResponse<Response> response, String path, Class<T> type) {
             return response.jsonPath().getList(path, type);
         }
     }

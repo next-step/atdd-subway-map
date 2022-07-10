@@ -17,9 +17,9 @@ public abstract class AcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        settings();
+        preprocessing();
     }
 
-    protected void settings() {
+    protected void preprocessing() {
     }
 }
