@@ -10,7 +10,7 @@ import java.util.List;
 @Embeddable
 public class Stations {
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Station> stations = new ArrayList<>();
+    private List<Station> stations;
 
     protected Stations() {/*no-op*/}
 
