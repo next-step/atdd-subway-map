@@ -8,6 +8,7 @@ import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.LineNotFoundException;
+import nextstep.subway.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,33 +31,20 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        List<Station> findStations = findUpAndDownStation(lineRequest.getUpStationId(), lineRequest.getDownStationId());
         Line createLine = lineRepository.save(lineRequest.toLine());
-
-        return createLineResponse(createLine, findStations);
+        return createLineResponse(createLine);
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> findLines = lineRepository.findAll();
         return findLines.stream()
-                .map(line -> createLineResponse(line, findUpAndDownStation(line.getUpStationId(), line.getDownStationId())))
+                .map(this::createLineResponse)
                 .collect(toList());
-    }
-
-    private List<Station> findUpAndDownStation(Long upStationId, Long downStationId) {
-        return stationRepository.findAllById(Arrays.asList(upStationId, downStationId));
-    }
-
-    private LineResponse createLineResponse(Line line, List<Station> stations) {
-        return new LineResponse(line, stations);
     }
 
     public LineResponse getLineById(Long id) {
         Line findLine = findLineById(id);
-
-        List<Station> findStations = findUpAndDownStation(findLine.getUpStationId(), findLine.getDownStationId());
-
-        return createLineResponse(findLine, findStations);
+        return createLineResponse(findLine);
     }
 
     @Transactional
@@ -65,13 +53,28 @@ public class LineService {
         findLine.change(lineChangeRequest.getName(), lineChangeRequest.getColor());
     }
 
-    private Line findLineById(Long id) {
-        return lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException("존재하지 않는 노선입니다."));
-    }
-
     @Transactional
     public void deleteLineById(Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        List<Station> findStations = findUpAndDownStation(line.getUpStationId(), line.getDownStationId());
+        return new LineResponse(line, findStations);
+    }
+
+    private List<Station> findUpAndDownStation(Long upStationId, Long downStationId) {
+        List<Station> findStations = stationRepository.findAllById(Arrays.asList(upStationId, downStationId));
+
+        if (findStations.isEmpty()) {
+            throw new StationNotFoundException("존재하지 않는 지하철역입니다.");
+        }
+
+        return findStations;
+    }
+
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException("존재하지 않는 노선입니다."));
     }
 }
