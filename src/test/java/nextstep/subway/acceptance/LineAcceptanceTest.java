@@ -99,13 +99,7 @@ public class LineAcceptanceTest {
         params1.put("upStationId", "1");
         params1.put("downStationId", "2");
         params1.put("distance", "10");
-
-        RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_추가(params1);
 
         Map<String, String> params2 = new HashMap<>();
         params2.put("name", "분당선");
@@ -113,13 +107,7 @@ public class LineAcceptanceTest {
         params2.put("upStationId", "1");
         params2.put("downStationId", "3");
         params2.put("distance", "5");
-
-        RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        지하철_노선_추가(params2);
 
         // when
         ExtractableResponse<Response> response =
@@ -134,5 +122,17 @@ public class LineAcceptanceTest {
         List<String> names = response.jsonPath().getList("name", String.class);
         assertThat(names).contains("신분당선", "분당선");
         assertThat(names).hasSize(2);
+
+        List<String> stationNames = response.jsonPath().getList("stations.name", String.class);
+        assertThat(stationNames).contains("[삼성역, 역삼역]", "[삼성역, 강남역]");
+    }
+
+    private void 지하철_노선_추가(Map<String, String> param) {
+        RestAssured.given().log().all()
+                .body(param)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
     }
 }
