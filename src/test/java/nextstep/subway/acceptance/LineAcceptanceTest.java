@@ -7,6 +7,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,7 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 조회한다.")
+    @Sql(value = "classpath:sql/station/truncate.sql")
     void getLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
@@ -98,8 +100,21 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 수정한다.")
+    @Sql(value = "classpath:sql/station/truncate.sql")
     void updateLineTest() {
+        //given
+        Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
+        ExtractableResponse<Response> line = createLine(requestBody1);
 
+        //when
+        Map<String, String> requestBody2 = setRequestBody("13호선", "bg-red-600");
+        int createdLineId = line.jsonPath().getInt("id");
+        ExtractableResponse<Response> subwayLines = updateLine(createdLineId, requestBody2);
+
+        //then
+        assertThat(subwayLines.jsonPath().getInt("id")).isEqualTo(createdLineId);
+        assertThat(subwayLines.jsonPath().getString("name")).isEqualTo("13호선");
+        assertThat(subwayLines.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
     /**
@@ -135,6 +150,13 @@ public class LineAcceptanceTest {
         return map;
     }
 
+    private Map<String, String> setRequestBody(String name, String color) {
+        Map<String, String> map = new HashMap<>();
+        map.put("name", name);
+        map.put("color", color);
+        return map;
+    }
+
     private ExtractableResponse<Response> getLines() {
         return RestAssured
             .given().log().all()
@@ -149,6 +171,16 @@ public class LineAcceptanceTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/lines/{id}",id)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> updateLine(long id, Map<String,String> requestBody) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(requestBody)
+            .when().put("/lines/{id}",id)
             .then().log().all()
             .extract();
     }
