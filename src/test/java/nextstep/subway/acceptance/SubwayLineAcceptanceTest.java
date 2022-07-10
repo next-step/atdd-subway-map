@@ -101,10 +101,19 @@ public class SubwayLineAcceptanceTest {
     @Test
     void getSubwayLine() throws Exception {
         // given
+        final Map<String, Object> params = createParams(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of("신분당선", "bg-red-600", 1, 2, 10));
+        final ExtractableResponse<Response> createSubwayLineResponse = createSubwayLineRequest(params);
+        final long createdSubwayLineId = createSubwayLineResponse.jsonPath().getLong("id");
 
         // when
+        final ExtractableResponse<Response> response = getSubwayLineRequest(createdSubwayLineId);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+        final long getSubwayLineId = response.jsonPath().getLong("id");
+        assertThat(getSubwayLineId).isEqualTo(createdSubwayLineId);
     }
 
     /**
@@ -166,7 +175,7 @@ public class SubwayLineAcceptanceTest {
 
     private List<String> createSubwayLineRequest(List<Map<String, Object>> paramsList) {
         final List<String> subwayLineNames = new ArrayList<>();
-        for (Map<String, Object> params : paramsList) {
+        for (final Map<String, Object> params : paramsList) {
             final ExtractableResponse<Response> response = createSubwayLineRequest(params);
 
             final String subwayLineName = response.jsonPath().getString("name");
@@ -187,8 +196,15 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> getSubwayLineRequest() {
-        return null;
+    private ExtractableResponse<Response> getSubwayLineRequest(Long subwayLineId) {
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/subway-lines/" + subwayLineId)
+                .then().log().all()
+                .extract();
+
+        return response;
     }
 
     private ExtractableResponse<Response> updateSubwayLineRequest() {
