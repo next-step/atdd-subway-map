@@ -79,15 +79,20 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
+        ExtractableResponse<Response> createResponse = 지하철역_생성_요청("기흥역");
+        long stationId = createResponse.response().jsonPath().getLong("id");
 
         // when
-
+        지하철역_삭제_요청(stationId);
 
         // then
+        ExtractableResponse<Response> getResponse = 지하철역_목록조회_요청();
+        List<String> stationNames = getResponse.jsonPath().getList("name", String.class);
+        assertThat(stationNames).doesNotContain("기흥역");
     }
 
-    private ExtractableResponse<Response> 지하철역_생성_요청(final String stationName) {
-        final Map<String, String> params = new HashMap<>();
+    private ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
+        Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
         return RestAssured.given().log().all()
@@ -101,6 +106,13 @@ public class StationAcceptanceTest {
     private ExtractableResponse<Response> 지하철역_목록조회_요청() {
         return RestAssured.given().log().all()
                           .when().get("/stations")
+                          .then().log().all()
+                          .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철역_삭제_요청(long stationId) {
+        return RestAssured.given().log().all()
+                          .when().delete("/stations/" + stationId)
                           .then().log().all()
                           .extract();
     }
