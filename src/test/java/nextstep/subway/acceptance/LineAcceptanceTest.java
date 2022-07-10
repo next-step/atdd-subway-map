@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,12 +36,35 @@ public class LineAcceptanceTest {
         stationAcceptanceTest = new StationAcceptanceTest();
     }
 
+    public ExtractableResponse<Response> createLine(String lineName, long upStationId, long downStationId, String color, int distance) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        //when(지하철 노선을 생성한다.)
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params).post("/lines")
+                .then().log().all()
+                .extract();
+
+        return createResponse;
+    }
+
     public ExtractableResponse<Response> createLine(String lineName, String upStationName, String downStationName, String color, int distance) {
-        Long upStationId = stationAcceptanceTest.createStation(upStationName)
+        ExtractableResponse<Response> upStationResponse = stationAcceptanceTest.createStation(upStationName);
+        assertThat(upStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Long upStationId = upStationResponse
                 .jsonPath()
                 .getLong("id");
 
-        Long downStationId = stationAcceptanceTest.createStation(downStationName)
+        ExtractableResponse<Response> downStationResponse = stationAcceptanceTest.createStation(downStationName);
+        assertThat(downStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        Long downStationId = downStationResponse
                 .jsonPath()
                 .getLong("id");
 
@@ -58,7 +82,6 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return createResponse;
     }
 
@@ -91,7 +114,8 @@ public class LineAcceptanceTest {
         final String 강남역 = "강남역";
         final String 신분당선 = "신분당선";
 
-        createLine(신분당선, 시청역, 강남역, "bg-red-600", 10);
+        ExtractableResponse<Response> createResponse = createLine(신분당선, 시청역, 강남역, "bg-red-600", 10);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then(지하철 노선 목록과 앞서 생성한 지하철 노선을 비교하여 생성된 지하철이 존재하는지 확인한다.)
         ExtractableResponse<Response> getsResponse = gets();
@@ -105,6 +129,39 @@ public class LineAcceptanceTest {
         //지하철 노선의 상행, 하행역 확인
         //TODO : json path element 이해가 가지 않음[공부 필요]
         assertThat(getsResponse.body().jsonPath().getList("stations[0].name", String.class)).containsExactly(시청역, 강남역);
+    }
+
+    @DisplayName("지하철 노선 생성 시 distance가 0보다 작거나 같을 때 예외")
+    @Test
+    void throwsIfCreateLineByDistanceZeroAndNegative() {
+
+        //given(지하철역을 생성한다)
+        final String 시청역 = "시청역";
+        final String 강남역 = "강남역";
+        final String 신분당선 = "신분당선";
+
+        //경계선 테스트를 위한 distance 0
+        ExtractableResponse<Response> createResponse = createLine(신분당선, 시청역, 강남역, "bg-red-600", 0);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("지하철 노선 생성 시 상행과 하행이 같을 때 예외")
+    @Test
+    void throwsIfCreateLineByStationEquals() {
+
+        //given
+        final String 시청역 = "시청역";
+        final String 신분당선 = "신분당선";
+
+        ExtractableResponse<Response> createStationResponse = stationAcceptanceTest.createStation(시청역);
+        assertThat(createStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long stationId = createStationResponse.jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> createResponse = createLine(신분당선, stationId, stationId, "bg-red-600", 10);
+
+        //then
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @DisplayName("지하철 노선 목록 조회")
@@ -122,6 +179,8 @@ public class LineAcceptanceTest {
 
         ExtractableResponse<Response> lineResponseOne = createLine(신분당선, 시청역, 강남역, "bg-red-600", 10);
         ExtractableResponse<Response> lineResponseTwo = createLine(일호선, 구로역, 신도림역, "bg-red-200", 15);
+        assertThat(lineResponseOne.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(lineResponseTwo.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
         ExtractableResponse<Response> getResponse = gets();
@@ -144,7 +203,9 @@ public class LineAcceptanceTest {
         final String 시청역 = "시청역";
         final String color = "bg-red-600";
 
-        long lineId = createLine(신분당선, 시청역, 강남역, color, 10).jsonPath().getLong("id");
+        ExtractableResponse<Response> createResponse = createLine(신분당선, 시청역, 강남역, color, 10);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long lineId = createResponse.jsonPath().getLong("id");
 
         //when(생성한 지하철 노선을 조회한다.)
         ExtractableResponse<Response> getResponse = get(lineId);
@@ -171,7 +232,9 @@ public class LineAcceptanceTest {
         final String color = "bg-red-600";
         final String updateColor = "bg-red-700";
 
-        long lineId = createLine(신분당선, 시청역, 강남역, color, 10).jsonPath().getLong("id");
+        ExtractableResponse<Response> createResponse = createLine(신분당선, 시청역, 강남역, color, 10);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long lineId = createResponse.jsonPath().getLong("id");
 
         //when(생성한 지하철 노선을 수정한다.)
         Map<String, Object> params = new HashMap<>();
@@ -209,7 +272,9 @@ public class LineAcceptanceTest {
         final String 시청역 = "시청역";
         final String color = "bg-red-600";
 
-        long lineId = createLine(신분당선, 시청역, 강남역, color, 10).jsonPath().getLong("id");
+        ExtractableResponse<Response> createResponse = createLine(신분당선, 시청역, 강남역, color, 10);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long lineId = createResponse.jsonPath().getLong("id");
 
         //when(생성한 지하철 노선을 삭제한다.)
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()

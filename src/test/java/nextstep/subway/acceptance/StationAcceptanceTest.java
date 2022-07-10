@@ -50,7 +50,6 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
     }
 
@@ -73,15 +72,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -89,6 +80,21 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = gets().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
+    }
+
+    @DisplayName("지하철역 생성 시 같은 이름을 가질 경우 예외")
+    @Test
+    void throwsIfEqualsStationName() {
+
+        //given
+        ExtractableResponse<Response> createResponseOne = createStation("강남역");
+        assertThat(createResponseOne.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        ExtractableResponse<Response> createResponseTwo = createStation("강남역");
+
+        //then
+        assertThat(createResponseTwo.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
 
@@ -105,8 +111,11 @@ public class StationAcceptanceTest {
         final String 강남역 = "강남역";
         final String 교대역 = "교대역";
 
-        createStation(강남역);
-        createStation(교대역);
+        ExtractableResponse<Response> createResponseOne = createStation(강남역);
+        assertThat(createResponseOne.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> createResponseTwo = createStation(교대역);
+        assertThat(createResponseTwo.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //when
         List<String> names = gets().jsonPath().getList("name", String.class);
@@ -126,8 +135,9 @@ public class StationAcceptanceTest {
 
         //given
         String 강남역 = "강남역";
-        ExtractableResponse<Response> station = createStation(강남역);
-        long id = station.body().jsonPath().getLong("id");
+        ExtractableResponse<Response> createResponse = createStation(강남역);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long id = createResponse.body().jsonPath().getLong("id");
 
         //when
         RestAssured.given().log().all()
