@@ -1,5 +1,7 @@
 package nextstep.subway.domain.line;
 
+import org.springframework.util.StringUtils;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,15 +31,12 @@ public class Line {
         this.distance = distance;
     }
 
+    public void update(String name, String color){
+        this.name = StringUtils.hasText(name) ? name : this.name;
+        this.color = StringUtils.hasText(color) ? name : this.color;
+    }
+
     protected Line() {
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setColor(final String color) {
-        this.color = color;
     }
 
     public Long getId() {

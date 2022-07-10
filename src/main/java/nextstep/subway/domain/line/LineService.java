@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class LineService {
+    public static final String LINE_NOT_FOUND = "노선이 존재하지 않습니다.";
+
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
@@ -44,16 +46,15 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long lineId) {
         Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+                                  .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
         List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
         return LineResponse.of(line, stations);
     }
 
     public void updateLine(Long lineId, UpdateLineRequest request) {
         Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
-        line.setName(StringUtils.hasText(request.getName()) ? request.getName() : line.getName());
-        line.setColor(StringUtils.hasText(request.getColor()) ? request.getColor() : line.getColor());
+                                  .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
+        line.update(request.getName(), request.getColor());
     }
 
     public void deleteLine(final Long lineId) {
