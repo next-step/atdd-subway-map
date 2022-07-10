@@ -1,0 +1,34 @@
+package nextstep.subway.applicaion;
+
+import org.springframework.stereotype.Service;
+
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
+
+@Service
+public class LineService {
+	private final LineRepository lineRepository;
+	private final StationRepository stationRepository;
+
+	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+		this.lineRepository = lineRepository;
+		this.stationRepository = stationRepository;
+	}
+
+	public LineResponse createLine(LineRequest lineRequest) {
+		Station upStation = getStation(lineRequest.getUpStationId());
+		Station downStation = getStation(lineRequest.getDownStationId());
+		Line line = lineRequest.toEntity(upStation, downStation);
+		lineRepository.save(line);
+		return LineResponse.from(line);
+	}
+
+	private Station getStation(Long stationId) {
+		return stationRepository.findById(stationId)
+			.orElseThrow(() -> new RuntimeException("역이 존재하지 않습니다."));
+	}
+}
