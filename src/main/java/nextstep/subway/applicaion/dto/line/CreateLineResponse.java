@@ -1,28 +1,28 @@
-package nextstep.subway.applicaion.dto.stationLine;
+package nextstep.subway.applicaion.dto.line;
 
 import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationLine;
+import nextstep.subway.domain.Line;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CreateStationLineResponse {
+public class CreateLineResponse {
     private final Long id;
     private final String name;
     private final String color;
     private final List<LineStation> stations;
 
-    public static CreateStationLineResponse of(StationLine stationLine, List<Station> createStations) {
+    public static CreateLineResponse of(Line line, List<Station> createStations) {
         List<LineStation> stations = createStations.stream()
                                                    .map((station) -> new LineStation(station.getId(), station.getName()))
                                                    .collect(Collectors.toList());
-        return new CreateStationLineResponse(stationLine.getId(), stationLine.getName(), stationLine.getColor(), stations);
+        return new CreateLineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
 
-    private CreateStationLineResponse(final Long id,
-                                      final String name,
-                                      final String color,
-                                      final List<LineStation> stations) {
+    private CreateLineResponse(final Long id,
+                               final String name,
+                               final String color,
+                               final List<LineStation> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
