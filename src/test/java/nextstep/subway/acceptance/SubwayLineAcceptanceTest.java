@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
@@ -85,6 +86,30 @@ public class SubwayLineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given - 지하철 노선을 생성한다
+        createdSubwayLine("신분당선", "bg-red-600", 4L, 5L, 10);
+
+        // when - 지하철 노선을 조회한다
+        ExtractableResponse<Response> response = getSubwayLine(1L);
+
+        // then - 지하철 노선의 정보를 응답받을 수 있다
+        JsonPath jsonPath = response.jsonPath();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(jsonPath.getString("name")).isEqualTo("신분당선"),
+                () -> assertThat(jsonPath.getString("color")).isEqualTo("bg-red-600"),
+                () -> assertThat(jsonPath.getList("stations.name")).contains("강남역", "양재역")
+        );
+    }
+
     private ExtractableResponse<Response> createdSubwayLine(String name, String color, Long upStationId,
                                                             Long downStationId, int distance) {
         return RestAssured.given().log().all()
@@ -110,6 +135,13 @@ public class SubwayLineAcceptanceTest {
     private ExtractableResponse<Response> getSubwayLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getSubwayLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
