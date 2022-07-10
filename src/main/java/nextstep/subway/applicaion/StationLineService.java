@@ -41,4 +41,10 @@ public class StationLineService {
                 .map(stationLineMapper::of)
                 .collect(Collectors.toList());
     }
+
+    public StationLineResponse getStationLine(Long lineId) {
+        StationLine stationLine = stationLineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
+        return stationLineMapper.of(stationLine);
+    }
 }
