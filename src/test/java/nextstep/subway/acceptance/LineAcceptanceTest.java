@@ -1,15 +1,12 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.exception.ExceptionMessages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -139,8 +136,8 @@ public class LineAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        assertThatThrownBy(()->getLine(createdLineId)).isInstanceOf(RuntimeException.class)
-            .hasMessage(ExceptionMessages.NO_LINE_EXCEPTION_MESSAGE);
+        ExtractableResponse<Response> subwayLines = getLines();
+        assertThat(subwayLines.jsonPath().getList("name",String.class)).doesNotContain("신분당선");
     }
 
     private ExtractableResponse<Response> createLine(Map<String, Object> map) {
