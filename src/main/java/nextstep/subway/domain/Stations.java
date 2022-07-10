@@ -3,31 +3,27 @@ package nextstep.subway.domain;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
+import javax.persistence.*;
 import java.util.List;
 
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 public class Stations {
 
-    private static final int INDEX_UP_STATION = 0;
-    private static final int INDEX_DOWN_STATION = 1;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station upStation;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Station> stations = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station downStation;
 
-    public Stations(List<Station> stations) {
-        this.stations.addAll(stations);
+    public Stations(Station upStation, Station downStation) {
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public List<Station> toList() {
-        return this.stations;
+        return List.of(upStation, downStation);
     }
 }

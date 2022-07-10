@@ -28,16 +28,16 @@ public class Section {
     @Embedded
     private Distance distance;
 
-    private Section(List<Station> stations, int distance) {
-        this.stations = new Stations(stations);
-        this.distance = new Distance(distance);
+    private Section(Stations stations, Distance distance) {
+        this.stations = stations;
+        this.distance = distance;
     }
 
     public static Section create(Station upStation, Station downStation, int distance) {
         if (upStation.equals(downStation)) {
             throw new InvalidUpDownStationException();
         }
-        return new Section(List.of(upStation, downStation), distance);
+        return new Section(new Stations(upStation, downStation), new Distance(distance));
     }
 
     public void setLine(Line line) {
