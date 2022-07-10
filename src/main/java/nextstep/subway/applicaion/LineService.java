@@ -41,6 +41,11 @@ public class LineService {
         return createLineResponse(lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("지하철 노선 데이터가 없습니다.")));
     }
 
+    @Transactional
+    public void updateLine(Long id, LineRequest lineRequest) {
+        lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("지하철 노선 데이터가 없습니다.")).update(lineRequest.getName(), lineRequest.getColor());
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getUpStation(), line.getDownStation(), line.getDistance());
     }

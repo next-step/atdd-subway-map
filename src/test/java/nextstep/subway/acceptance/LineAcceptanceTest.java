@@ -114,6 +114,28 @@ public class LineAcceptanceTest {
         assertThat(lineName).isEqualTo(SHIN_BUNDANG_LINE);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다")
+    @Test
+    void 지하철_노선_수정() {
+        // given 지하철 노선 생성
+        Long upStationId = Long.valueOf(지하철역_생성(GANGNAM_STATION).jsonPath().getString("id"));
+        Long downStationId = Long.valueOf(지하철역_생성(YUKSAM_STATION).jsonPath().getString("id"));
+        ExtractableResponse<Response> createLine = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED_COLOR, upStationId, downStationId, DISTANCE);
+        // When 지하철 노선 수정
+        지하철_노선_수정(Long.valueOf(createLine.jsonPath().getString("id")), FIRST_LINE, GREEN_COLOR);
+        ExtractableResponse<Response> updatedLine = 지하철_노선_조회(createLine.jsonPath().get("id"));
+        //    Then 해당 지하철 노선 정보는 수정된다
+        assertAll(
+                () -> assertThat(updatedLine.jsonPath().getString("name")).isEqualTo(FIRST_LINE),
+                () -> assertThat(updatedLine.jsonPath().getString("color")).isEqualTo(GREEN_COLOR)
+        );
+
+    }
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
         return stationAcceptanceTest.createStation(GANGNAM_STATION);
@@ -140,6 +162,22 @@ public class LineAcceptanceTest {
                 .when().get("/lines/" + id)
                 .then().log().all()
                 .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
+        return RestAssured.given().log().all()
+                .body(지하철_노선_수정_파라미터(name, color))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
+
+    private Map<String, String> 지하철_노선_수정_파라미터(String name, String color) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+        param.put("color", color);
+        return param;
     }
 
     private Map<String, String> 지하철_노선_생성_파라미터(String name, String color, String upStationId, String downStationId, String distance) {
