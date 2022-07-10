@@ -31,30 +31,58 @@ public class LineAcceptanceTest {
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("지하철노선 생성한다.")
     @Test
     void createStationLine() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("distance", "10");
+        // given
+        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
 
-        RestAssured.given().log().all()
+        // when
+        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10);
+
+        // then
+        List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
+        assertThat(lineNames).containsExactlyInAnyOrder("신분당선");
+    }
+
+    private ExtractableResponse<Response> 지하철노선_목록_조회() {
+        return RestAssured.given().log().all()
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().get("/lines")
+                          .then().log().all()
+                          .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철노선_생성_요청(final String lineName,
+                                                      final String lineColor,
+                                                      final long upStationId,
+                                                      final long downStationId,
+                                                      final int distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", lineColor);
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", String.valueOf(distance));
+
+        return RestAssured.given().log().all()
                    .body(params)
                    .contentType(MediaType.APPLICATION_JSON_VALUE)
                    .when().post("/lines")
                    .then().log().all()
                    .extract();
+    }
 
-        // then
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                            .when().get("/lines")
-                                                            .then().log().all()
-                                                            .extract();
-        List<String> lineNames = response.jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsExactlyInAnyOrder("신분당선");
+    private ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                          .body(params)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().post("/stations")
+                          .then().log().all()
+                          .extract();
     }
 }
