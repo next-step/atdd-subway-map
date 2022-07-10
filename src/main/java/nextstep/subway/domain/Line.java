@@ -20,17 +20,16 @@ public class Line {
     @Embedded
     private Sections sections;
 
-    private String name;
-    private String color;
+    @Embedded
+    private LineContent lineContent;
 
-    private Line(String name, String color, Sections sections) {
-        this.name = name;
-        this.color = color;
+    private Line(LineContent lineContent, Sections sections) {
+        this.lineContent = lineContent;
         this.sections = sections;
     }
 
     public static Line create(String name, String color, Section section) {
-        Line line = new Line(name, color, Sections.create());
+        Line line = new Line(LineContent.create(name, color), Sections.create());
         line.addSection(section);
         return line;
     }
@@ -44,12 +43,8 @@ public class Line {
         return id;
     }
 
-    public String name() {
-        return name;
-    }
-
-    public String color() {
-        return color;
+    public LineContent content() {
+        return lineContent;
     }
 
     public List<Station> stations() {
