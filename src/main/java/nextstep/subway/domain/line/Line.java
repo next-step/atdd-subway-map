@@ -33,7 +33,7 @@ public class Line {
 
     public void update(String name, String color){
         this.name = StringUtils.hasText(name) ? name : this.name;
-        this.color = StringUtils.hasText(color) ? name : this.color;
+        this.color = StringUtils.hasText(color) ? color : this.color;
     }
 
     protected Line() {
