@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static nextstep.subway.domain.line.Fixture.강남역;
-import static nextstep.subway.domain.line.Fixture.분당역;
+import static nextstep.subway.domain.Fixture.강남역;
+import static nextstep.subway.domain.Fixture.분당역;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class StationsTest {
     @Test

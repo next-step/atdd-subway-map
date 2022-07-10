@@ -1,6 +1,4 @@
-package nextstep.subway.domain.line;
-
-import nextstep.subway.domain.Station;
+package nextstep.subway.domain;
 
 import java.util.Arrays;
 import java.util.List;

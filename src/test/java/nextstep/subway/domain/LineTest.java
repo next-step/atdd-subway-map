@@ -1,12 +1,11 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.domain.Line;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import static nextstep.subway.domain.line.Fixture.역정보;
+import static nextstep.subway.domain.Fixture.역정보;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
