@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -35,29 +36,18 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
+    @Order(1)
     void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        final String GANG_NAM = "강남역";
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        // when
+        ExtractableResponse<Response> response = createStation(GANG_NAM);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(getStationNames()).containsAnyOf(GANG_NAM);
     }
 
     /**
@@ -68,7 +58,19 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역을 조회한다.")
     @Test
+    @Order(2)
     void getStations() {
+        final String SIN_DO_RIM = "신도림역";
+        final String GURO_DIGITAL_COMPLEX = "구로디지털단지역";
+
+        ExtractableResponse<Response> response1 = createStation(SIN_DO_RIM);
+        ExtractableResponse<Response> response2 = createStation(GURO_DIGITAL_COMPLEX);
+
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        assertThat(getStationNames().size()).isEqualTo(2);
+        assertThat(getStationNames()).contains(SIN_DO_RIM, GURO_DIGITAL_COMPLEX);
     }
 
     /**
@@ -79,7 +81,47 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 제거한다.")
     @Test
+    @Order(3)
     void deleteStation() {
+        final String BU_CHEON = "부천역";
+
+        ExtractableResponse<Response> createResponse = createStation(BU_CHEON);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        Integer bucheonId = createResponse.body().jsonPath().get("id");
+        ExtractableResponse<Response> deleteResponse = deleteStation(bucheonId);
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(getStationNames()).doesNotContain(BU_CHEON);
+    }
+
+    // 지하철역 이름 조회
+    public List<String> getStationNames() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
+
+    // 지하철역 생성
+    public ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    // 지하철역 삭제
+    public ExtractableResponse<Response> deleteStation(Integer id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/" + id)
+                .then().log().all().extract();
     }
 
 }
