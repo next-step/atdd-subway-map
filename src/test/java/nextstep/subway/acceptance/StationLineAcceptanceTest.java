@@ -163,4 +163,37 @@ class StationLineAcceptanceTest {
 			.then().log().all().extract();
 	}
 
+	/**
+	 * given 지하철 노선을 생성하고
+	 * when 생성한 지하철 노선을 수정하면
+	 * then 해당 지하철 노선 정보는 수정된다.
+	 */
+	@DisplayName("지하철 노선 수정 테스트")
+	@Test
+	void updateLineTest() {
+
+		//given
+		long 신분당선_상행종점역_번호 = 지하철_생성_요청(Map.of("name", "판교역")).jsonPath().getLong("id");
+		long 신분당선_하행종점역_번호 = 지하철_생성_요청(Map.of("name", "정자역")).jsonPath().getLong("id");
+		Map<String, Object> param =
+			Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", 신분당선_상행종점역_번호, "downStationId", 신분당선_하행종점역_번호, "distance", 10);
+		long 신분당선_노선_번호 = 지하철_노선_생성_요청(param).jsonPath().getLong("id");
+
+		param = Map.of("name", "신분당선_수정", "color", "bg_blue_200");
+
+		//when
+		ExtractableResponse<Response> updateLineResponse = 지하철_노선_수정_요청(신분당선_노선_번호, param);
+
+		//then
+		assertThat(updateLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+	}
+
+	private ExtractableResponse<Response> 지하철_노선_수정_요청(long lineId, Map<String, Object> param) {
+		return RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.body(param)
+			.when()
+			.put("/lines/{lineId}", lineId)
+			.then().log().all().extract();
+	}
 }
