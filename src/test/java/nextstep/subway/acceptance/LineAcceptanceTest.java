@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,7 +53,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철노선 목록 조회")
     @Test
-    void findLineAll() {
+    void findAllLine() {
         // given
         long upStationId1 = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
         long downStationId1 = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
