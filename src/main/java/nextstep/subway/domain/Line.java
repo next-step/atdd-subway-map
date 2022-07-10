@@ -14,6 +14,7 @@ public class Line {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	private String name;
 	private String color;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -26,8 +27,23 @@ public class Line {
 
 	private int distance;
 
+	public Line() {
+	}
+
+	public Line(String name, String color, Station upStation, Station downStation, int distance) {
+		this.name = name;
+		this.color = color;
+		this.upStation = upStation;
+		this.downStation = downStation;
+		this.distance = distance;
+	}
+
 	public Long getId() {
 		return id;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getColor() {
