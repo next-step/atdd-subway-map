@@ -14,6 +14,7 @@ class LineDtoTest {
     @DisplayName("DTO가 정상적으로 생성된다.")
     void createDtoTest() {
         Line line = LineFactory.getMockLine(1L, "4호선", "blue", 5);
+
         LineDto dto = LineDto.of(line);
 
         assertThat(dto.getId()).isEqualTo(line.getId());

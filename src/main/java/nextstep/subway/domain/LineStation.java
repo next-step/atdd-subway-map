@@ -8,9 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class LineStation {
 
     @Id
@@ -25,8 +23,15 @@ public class LineStation {
     @JoinColumn(name = "station_id")
     private Station station;
 
-    public LineStation(Line line, Station station) {
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    private LineStation next;
+
+    @Builder
+    protected LineStation(Line line, Station station, LineStation next) {
         this.line = line;
         this.station = station;
+        this.next = next;
     }
 }

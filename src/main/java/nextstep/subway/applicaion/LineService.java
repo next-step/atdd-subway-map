@@ -27,16 +27,28 @@ public class LineService {
 
     @Transactional
     public Long createLine(final LineCreateDto lineDto) {
-        Station upStation = stationRepository.findById(lineDto.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException("upStation is not found"));
-
         Station downStation = stationRepository.findById(lineDto.getDownStationId())
                 .orElseThrow(() -> new IllegalArgumentException("downStation is not found"));
 
+        Station upStation = stationRepository.findById(lineDto.getUpStationId())
+                .orElseThrow(() -> new IllegalArgumentException("upStation is not found"));
+
+
         Line line = lineRepository.save(lineDto.toDomain());
 
-        lineStationRepository.save(new LineStation(line, upStation));
-        lineStationRepository.save(new LineStation(line, downStation));
+        LineStation downLineStation = lineStationRepository.save(LineStation.builder()
+                .line(line)
+                .station(downStation)
+                .build()
+        );
+
+        lineStationRepository.save(LineStation.builder()
+                .line(line)
+                .station(upStation)
+                .next(downLineStation)
+                .build()
+        );
+
 
         return line.getId();
     }

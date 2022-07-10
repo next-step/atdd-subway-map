@@ -9,9 +9,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
 
     @Id
@@ -26,4 +24,12 @@ public class Line {
     private List<LineStation> lineStations = new ArrayList<>();
 
 
+    @Builder
+    protected Line(Long id, String name, String color, Integer distance, List<LineStation> lineStations) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.distance = distance;
+        this.lineStations = lineStations;
+    }
 }
