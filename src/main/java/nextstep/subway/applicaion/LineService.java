@@ -1,7 +1,7 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.line.CreateLineRequest;
-import nextstep.subway.applicaion.dto.line.CreateLineResponse;
+import nextstep.subway.applicaion.dto.line.LineResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -24,7 +24,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    public CreateLineResponse saveStationLine(CreateLineRequest request) {
+    public LineResponse saveStationLine(CreateLineRequest request) {
         Line line = request.toEntity();
 
         List<Station> stations = stationRepository.findAllById(List.of(request.getUpStationId(), request.getDownStationId()));
@@ -33,6 +33,6 @@ public class LineService {
         }
         stationLineRepository.save(line);
 
-        return CreateLineResponse.of(line, stations);
+        return LineResponse.of(line, stations);
     }
 }
