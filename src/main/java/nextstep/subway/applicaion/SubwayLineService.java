@@ -71,6 +71,7 @@ public class SubwayLineService {
         return new SubwayLineResponse(findSubwayLine);
     }
 
+    @Transactional
     public SubwayLineResponse updateSubwayLine(Long subwayLineId, UpdateSubwayLineRequest updateSubwayLineRequest) {
         final SubwayLine subwayLine = getSubwayLineByIdIfExists(subwayLineId);
         final SubwayLineColor subwayLineColor = getSubwayLineColorByCodeIfExists(updateSubwayLineRequest.getColor());
