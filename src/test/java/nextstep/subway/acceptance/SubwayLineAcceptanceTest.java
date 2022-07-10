@@ -120,7 +120,6 @@ public class SubwayLineAcceptanceTest {
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
-    // TODO: 지하철 노선 수정에 대한 인수 테스트 코드 작성
     @DisplayName("지하철 노선을 수정합니다.")
     @Test
     void updateSubwayLine() throws Exception {
