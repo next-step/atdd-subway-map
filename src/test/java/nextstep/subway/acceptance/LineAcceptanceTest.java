@@ -40,22 +40,29 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 생성")
     @Test
     void createLine() {
-        // Given
+        // When
         String 첫번째역 = "지하철역";
         String 두번째역 = "새로운지하철역";
 
         long firstStationId = createStationRequest(첫번째역);
         long secondStationId = createStationRequest(두번째역);
 
-        // When
         ExtractableResponse<Response> 첫번째노선_생성_응답 = createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
 
-        // Then
+        // Then ?? When ??
         List<String> stationNames = 첫번째노선_생성_응답.jsonPath().getList("stations.name", String.class);
-
         assertAll(
                 () -> assertThat(첫번째노선_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(stationNames).containsAnyOf("지하철역", "새로운지하철역")
+        );
+
+        // Then
+        ExtractableResponse<Response> 지하철_노선_목록_조회 = findAllLinesRequest();
+        List<String> 신분당선_역이름 = 지하철_노선_목록_조회.jsonPath().get("stations[0].name");
+
+        assertAll(
+                () -> assertThat(신분당선_역이름).hasSize(2),
+                () -> assertThat(신분당선_역이름).containsAnyOf("지하철역", "새로운지하철역")
         );
     }
 
