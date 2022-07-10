@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -198,7 +199,7 @@ public class StationAcceptanceTest {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/stationLines")
+                .post("/lines")
                 .then()
                 .log()
                 .all()
@@ -210,7 +211,7 @@ public class StationAcceptanceTest {
                 .log()
                 .all()
                 .when()
-                .get("/stationLines")
+                .get("/lines")
                 .then()
                 .log()
                 .all()
@@ -261,7 +262,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철 노선을 조회한다.")
     @Test
-    void getStationLine(){
+    void getStationLine() {
         // Given
         String stationLineName = "신분당선";
         String stationLineColor = "bg-red-600";
@@ -290,6 +291,61 @@ public class StationAcceptanceTest {
                 .param("id", id)
                 .when()
                 .get("/stationLines")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다.
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateStationLine() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        String updateName = "다른분당선";
+        String updateColor = "bg-red-600";
+
+        Map<Object, Object> params = new HashMap<>();
+        params.put("name", updateName);
+        params.put("color", updateColor);
+
+        ExtractableResponse response = updateStationLine(createdStationLineId, params);
+
+        // Then
+        JsonPath jsonPath = getStationLineWithId(createdStationLineId).jsonPath();
+        String updatedName = jsonPath
+                .getString("name");
+        String updatedColor = jsonPath.getString("color");
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(updatedName).isEqualTo(updateName);
+        assertThat(updatedColor).isEqualTo(updateColor);
+    }
+
+    private ExtractableResponse updateStationLine(Long lineId, Map<Object, Object> params) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{lineId}", lineId)
                 .then()
                 .log()
                 .all()
