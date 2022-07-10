@@ -116,7 +116,7 @@ public class SubwayLineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
@@ -125,10 +125,24 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() throws Exception {
         // given
+        final Map<String, Object> params = createParams(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of("신분당선", "bg-red-600", 1, 2, 10));
+        final ExtractableResponse<Response> createSubwayLineResponse = createSubwayLineRequest(params);
+        final long createdSubwayLineId = createSubwayLineResponse.jsonPath().getLong("id");
+
+        final Map<String, Object> updateParams = createParams(
+                List.of("name", "color"),
+                List.of("다른분당선", "bg-green-600")
+        );
 
         // when
+        final ExtractableResponse<Response> response = updateSubwayLineRequest(createdSubwayLineId, updateParams);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
+        assertThat(response.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
     }
 
     /**
@@ -198,7 +212,6 @@ public class SubwayLineAcceptanceTest {
     private ExtractableResponse<Response> getSubwayLineRequest(Long subwayLineId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .contentType(APPLICATION_JSON_VALUE)
                 .when().get("/subway-lines/" + subwayLineId)
                 .then().log().all()
                 .extract();
@@ -206,8 +219,16 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> updateSubwayLineRequest() {
-        return null;
+    private ExtractableResponse<Response> updateSubwayLineRequest(Long subwayLineId, Map<String, Object> params) {
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().put("/subway-lines/" + subwayLineId)
+                .then().log().all()
+                .extract();
+
+        return response;
     }
 
     private ExtractableResponse<Response> deleteSubwayLineRequest() {
