@@ -7,6 +7,7 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -19,7 +20,7 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Validated LineRequest lineRequest) {
         LineResponse line = lineService.save(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -35,7 +36,7 @@ public class LineController {
     }
 
     @PutMapping(value = "/lines/{id}")
-    public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody LineModifyRequest lineModifyRequest) {
+    public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody @Validated LineModifyRequest lineModifyRequest) {
         lineService.update(id, lineModifyRequest);
         return ResponseEntity.ok().build();
     }
