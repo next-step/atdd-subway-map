@@ -6,8 +6,11 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -16,7 +19,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("지하철 노선 인수테스트")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationLineAcceptanceTest {
+	@LocalServerPort
+	int port;
+
+	@BeforeEach
+	public void setUp() {
+		RestAssured.port = port;
+	}
 
 	/**
 	 * When 지하철 노선을 생성하면
@@ -35,11 +46,12 @@ class StationLineAcceptanceTest {
 
 		//when
 		ExtractableResponse<Response> createLineResponse = 지하철_노선_생성_요청(param);
-		ExtractableResponse<Response> getLineResponse = 지하철_노선_목록_조회();
 
 		//then
 		assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(getLineResponse.jsonPath().getList("$..id")).containsAll(List.of(upStationId, downStationId));
+		List<Long> stationsIdList = createLineResponse.jsonPath().getList("stations.id", Long.class);
+		assertThat(stationsIdList).contains(upStationId, downStationId);
+
 	}
 
 	private ExtractableResponse<Response> 지하철_노선_생성_요청(Map<String, Object> param) {
