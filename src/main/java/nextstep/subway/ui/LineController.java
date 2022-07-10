@@ -1,10 +1,8 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +12,9 @@ import java.util.List;
 @RestController
 public class LineController {
     private LineService lineService;
-    private StationService stationService;
 
-    public LineController(LineService lineService, StationService stationService) {
+    public LineController(LineService lineService) {
         this.lineService = lineService;
-        this.stationService = stationService;
     }
 
     @PostMapping("/lines")

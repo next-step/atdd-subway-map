@@ -48,7 +48,7 @@ public class LineService {
     public LineResponse findLineById(Long id){
         Optional<Line> line = lineRepository.findById(id);
         if(line.isPresent()){
-            this.createLineResponse(line.get());
+            return this.createLineResponse(line.get());
         }
         return null;
     }
