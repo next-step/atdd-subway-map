@@ -3,11 +3,10 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.testsupport.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -19,16 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-    @LocalServerPort
-    private int port;
+public class LineAcceptanceTest extends AcceptanceTest {
     private long upStationId;
     private long downStationId;
 
     @BeforeEach
     public void setUp() {
-        RestAssured.port = port;
         upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
         downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
     }
