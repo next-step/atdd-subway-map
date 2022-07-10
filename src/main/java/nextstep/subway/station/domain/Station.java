@@ -1,4 +1,4 @@
-package nextstep.subway.domain;
+package nextstep.subway.station.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,12 +7,14 @@ import javax.persistence.Id;
 
 @Entity
 public class Station {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {
