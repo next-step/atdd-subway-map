@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -21,6 +22,7 @@ public class LineService {
 		this.stationRepository = stationRepository;
 	}
 
+	@Transactional
 	public LineResponse createLine(LineRequest lineRequest) {
 		Station upStation = getStation(lineRequest.getUpStationId());
 		Station downStation = getStation(lineRequest.getDownStationId());
@@ -45,5 +47,10 @@ public class LineService {
 
 	private Line getLineById(Long lineId) {
 		return lineRepository.findById(lineId).orElseThrow(() -> new RuntimeException("노선이 존재하지 않습니다."));
+	}
+
+	@Transactional
+	public void deleteLine(Long lineId) {
+		lineRepository.delete(getLineById(lineId));
 	}
 }
