@@ -26,9 +26,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역을_생성한다() {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
@@ -58,9 +57,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역을 조회한다.")
     @Test
-    void getStations() {
+    void 지하철역을_조회한다() {
         // given
         역을_만들다("잠실역");
         역을_만들다("한성백제역");
@@ -79,9 +77,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역을 제거한다.")
     @Test
-    void deleteStation() {
+    void 지하철역을_제거한다() {
         // given
         var 잠실역 = 역을_만들다("잠실역").as(StationResponse.class);
 
