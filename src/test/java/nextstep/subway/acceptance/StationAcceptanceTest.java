@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static io.restassured.RestAssured.UNDEFINED_PORT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -8,9 +9,11 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import nextstep.subway.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -22,9 +25,17 @@ public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
+
     @BeforeEach
     public void setUp() {
-        RestAssured.port = port;
+        if (RestAssured.port == UNDEFINED_PORT) {
+            RestAssured.port = port;
+            databaseCleanUp.afterPropertiesSet();
+        }
+
+        databaseCleanUp.execute();
     }
 
     /**
