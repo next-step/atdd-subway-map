@@ -6,9 +6,11 @@ import nextstep.subway.applicaion.StationLineService;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +39,12 @@ public class StationLineController {
     public ResponseEntity<StationLineResponse> getStationLine(@PathVariable Long lineId) {
         StationLineResponse stationLines = stationLineService.getStationLine(lineId);
         return ResponseEntity.ok().body(stationLines);
+    }
+
+    @PutMapping("/lines/{lineId}")
+    public ResponseEntity<StationLineResponse> updateStationLine(@PathVariable Long lineId,
+                                                                 @RequestBody StationLineRequest request) {
+        stationLineService.updateStationLine(lineId, request);
+        return ResponseEntity.ok().build();
     }
 }

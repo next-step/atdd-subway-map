@@ -47,4 +47,10 @@ public class StationLineService {
                 .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
         return stationLineMapper.of(stationLine);
     }
+
+    public void updateStationLine(Long lineId, StationLineRequest request) {
+        StationLine stationLine = stationLineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
+        stationLine.changeNameAndColor(request.getName(),request.getColor());
+    }
 }

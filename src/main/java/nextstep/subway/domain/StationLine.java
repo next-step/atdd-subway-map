@@ -51,4 +51,9 @@ public class StationLine {
     public Long getId() {
         return id;
     }
+
+    public void changeNameAndColor(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }
