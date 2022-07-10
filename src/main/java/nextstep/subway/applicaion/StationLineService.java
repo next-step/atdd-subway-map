@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.domain.Station;
@@ -31,5 +33,12 @@ public class StationLineService {
         StationLine stationLine = stationLineMapper.of(request, upStation, downStation);
         StationLine savedStationLine = stationLineRepository.save(stationLine);
         return stationLineMapper.of(savedStationLine);
+    }
+
+    public List<StationLineResponse> getStationLines() {
+        List<StationLine> stationLines = stationLineRepository.findAll();
+        return stationLines.stream()
+                .map(stationLineMapper::of)
+                .collect(Collectors.toList());
     }
 }

@@ -1,10 +1,12 @@
 package nextstep.subway.ui;
 
 import java.net.URI;
+import java.util.List;
 import nextstep.subway.applicaion.StationLineService;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,5 +24,11 @@ public class StationLineController {
     public ResponseEntity<StationLineResponse> createStationLine(@RequestBody StationLineRequest request) {
         StationLineResponse stationLine = stationLineService.createStationLine(request);
         return ResponseEntity.created(URI.create("/stations/" + stationLine.getId())).body(stationLine);
+    }
+
+    @GetMapping("/lines")
+    public ResponseEntity<List<StationLineResponse>> getStationLines() {
+        List<StationLineResponse> stationLines = stationLineService.getStationLines();
+        return ResponseEntity.ok().body(stationLines);
     }
 }
