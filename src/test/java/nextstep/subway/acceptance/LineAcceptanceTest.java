@@ -8,6 +8,7 @@ import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
+import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -101,13 +102,7 @@ class LineAcceptanceTest {
         var createdLineId = creationResponse.body().jsonPath().getLong("id");
 
         // when
-        var lineQueryResponse = RestAssured
-                .given()
-                    .pathParam("lineId", createdLineId)
-                .when()
-                    .get("/lines/{lineId}")
-                .then()
-                    .extract();
+        var lineQueryResponse = getLine(createdLineId);
 
         // then
         var id = lineQueryResponse.jsonPath().getLong("id");
@@ -122,6 +117,42 @@ class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void canModifyLineInformationWhichCreated() {
+        // given
+        var creationResponse = createLine(sinbundangLineCreationRequest);
+        var createdLineId = creationResponse.jsonPath().getLong("id");
+
+        // when
+        var modificationRequest = new LineModificationRequest("구분당선", "bg-red-600");
+        var modificationResponse = RestAssured
+                .given()
+                    .pathParam("lineId", createdLineId)
+                    .body(modificationRequest, ObjectMapperType.JACKSON_2)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .put("/lines/{lineId}")
+                .then()
+                    .extract();
+
+        // then
+        var lineQueryResponse = getLine(createdLineId);
+        var modifiedName = lineQueryResponse.jsonPath().getString("name");
+        var modifiedColor = lineQueryResponse.jsonPath().getString("color");
+
+        assertAll(
+                () -> assertThat(modificationResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(modifiedName).isEqualTo(modificationRequest.getName()),
+                () -> assertThat(modifiedColor).isEqualTo(modificationRequest.getColor())
+        );
+    }
+
     private ExtractableResponse<Response> createLine(LineCreationRequest creationRequest) {
         return RestAssured
                 .given()
@@ -129,6 +160,16 @@ class LineAcceptanceTest {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/lines")
+                .then()
+                    .extract();
+    }
+
+    private ExtractableResponse<Response> getLine(Long lineId) {
+        return RestAssured
+                .given()
+                    .pathParam("lineId", lineId)
+                .when()
+                    .get("/lines/{lineId}")
                 .then()
                     .extract();
     }
