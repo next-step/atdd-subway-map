@@ -12,11 +12,20 @@ public class Station {
     private Long id;
     private String name;
 
-    public Station() {
+    protected Station() {/*no-op*/}
+
+    public Station(Long id, String name) {
+
+        if (name == null || name.isBlank() || name.length() < 2) {
+            throw new IllegalArgumentException();
+        }
+
+        this.id = id;
+        this.name = name;
     }
 
     public Station(String name) {
-        this.name = name;
+        this(null, name);
     }
 
     public Long getId() {
