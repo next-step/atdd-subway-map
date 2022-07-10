@@ -118,7 +118,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철노선 삭제")
     @Test
-    void deleteLine(){
+    void deleteLine() {
         // given
         long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
 
