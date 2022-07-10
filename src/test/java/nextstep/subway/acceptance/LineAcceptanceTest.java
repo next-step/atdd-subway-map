@@ -41,7 +41,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         JsonPath responseBody = response.jsonPath();
         assertAll(
-                () -> assertThat(responseBody.getLong("id")).isNotNull(),
+                () -> assertThat(responseBody.getLong("id")).isNotZero(),
                 () -> assertThat(responseBody.getString("name")).isEqualTo("2호선"),
                 () -> assertThat(responseBody.getString("color")).isEqualTo("bg-green-600"),
                 () -> assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역")
@@ -90,7 +90,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         JsonPath responseBody = response.jsonPath();
 
         assertAll(
-                () -> assertThat(responseBody.getLong("id")).isNotNull(),
+                () -> assertThat(responseBody.getLong("id")).isEqualTo(lineId),
                 () -> assertThat(responseBody.getString("name")).isEqualTo("2호선"),
                 () -> assertThat(responseBody.getString("color")).isEqualTo("bg-green-600"),
                 () -> assertThat(responseBody.getList("stations.name")).contains("강남역", "건대입구역")
