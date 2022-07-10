@@ -95,6 +95,42 @@ public class LineAcceptanceTest {
                  );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void updateLine() {
+        // given
+        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = 지하철노선_수정_요청(lineId, "다른분당선", "bg-red-610");
+
+        // then
+        assertAll(
+            () -> assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선"),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-610")
+                 );
+    }
+
+    private ExtractableResponse<Response> 지하철노선_수정_요청(final long lineId, final String lineName, final String lineColor) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", lineColor);
+
+        return RestAssured.given().log().all()
+                          .body(params)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().put("/lines/" + lineId)
+                          .then().log().all()
+                          .extract();
+    }
+
     private ExtractableResponse<Response> 지하철노선_조회(final long lineId) {
         return RestAssured.given().log().all()
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
