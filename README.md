@@ -4,9 +4,9 @@
 
 ## 2차 PR TODO List
 
-- [ ] LineResponse 내부의 List<Station> 수정
+- [x] LineResponse 내부의 List<Station> 수정
 - [ ] toDomain 메서드에 대하여 다시 생각해보기
-- [ ] LineService 내부의 findAll, findByIs 에서 중복부분 제거
+- [x] LineService 내부의 findAll, findByIs 에서 중복부분 제거
 - [ ] Line의 기본생성자 접근제어자 수정
 - [ ] 인수테스트 부분에서 assertAll로 변경, containsExactly 활용
 - [ ] editLine 테스트 에서 이름과 색상이 변경되었는지 검증하도록 변경

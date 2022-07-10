@@ -2,9 +2,9 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,14 +27,15 @@ public class LineService {
 
     public LineResponse createLine(LineRequest request) {
         Line savedLine = lineRepository.save(request.toDomain());
-        List<Station> stations = stationRepository.findAllById(List.of(savedLine.getUpStationId(), savedLine.getDownStationId()));
+        List<StationResponse> stations = findAllStationInLine(savedLine);
         return LineResponse.of(savedLine, stations);
     }
 
     @Transactional(readOnly = true)
     public List<LineResponse> findAll() {
-        return lineRepository.findAll().stream()
-                .map(line -> LineResponse.of(line, stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))))
+        return lineRepository.findAll()
+                .stream()
+                .map(line -> LineResponse.of(line, findAllStationInLine(line)))
                 .collect(Collectors.toList());
     }
 
@@ -42,8 +43,16 @@ public class LineService {
     public LineResponse findById(Long lineId) {
         Line findLine = lineRepository.findById(lineId)
                 .orElseThrow(NoSuchElementException::new);
-        List<Station> stations = stationRepository.findAllById(List.of(findLine.getUpStationId(), findLine.getDownStationId()));
+
+        List<StationResponse> stations = findAllStationInLine(findLine);
         return LineResponse.of(findLine, stations);
+    }
+
+    private List<StationResponse> findAllStationInLine(Line line) {
+        return stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))
+                .stream()
+                .map(station -> StationResponse.of(station))
+                .collect(Collectors.toList());
     }
 
     public void editLine(Long lineId, LineRequest request) {
