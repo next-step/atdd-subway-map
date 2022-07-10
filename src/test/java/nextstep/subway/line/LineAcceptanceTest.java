@@ -154,7 +154,7 @@ class LineAcceptanceTest {
         final ExtractableResponse<Response> response = deleteLineRequest(id);
 
         // then
-        assertStatusCode(response, HttpStatus.OK);
+        assertStatusCode(response, HttpStatus.NO_CONTENT);
 
         final List<String> lineNames = getNamesFromResponse(getLinesRequest());
         assertThat(lineNames).doesNotContain(신분당선);

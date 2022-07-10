@@ -110,7 +110,7 @@ class LineControllerTest {
         );
 
         // then
-        result.andExpect(status().isOk());
+        result.andExpect(status().isNoContent());
     }
 
     private LineRequest lineRequest() {
