@@ -3,6 +3,7 @@ package nextstep.subway.applicaion.dto;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LineResponse {
@@ -15,6 +16,7 @@ public class LineResponse {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
+        stations = new ArrayList<>();
 
     }
     public void setStation(Station station){
