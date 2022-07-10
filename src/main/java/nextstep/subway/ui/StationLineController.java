@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +32,8 @@ public class StationLineController {
 	}
 
 	@GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Void> showStationsLine() {
-		return null;
+	public ResponseEntity<List<StationLineResponse>> showAllStationsLines() {
+		return ResponseEntity.ok().body(stationLineService.findAllStationLines());
 	}
 
 	@GetMapping("/lines/{id}")
