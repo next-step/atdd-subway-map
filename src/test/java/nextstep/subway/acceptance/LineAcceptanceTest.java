@@ -113,6 +113,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(editStatusCode).isEqualTo(HttpStatus.OK.value());
+
+        JsonPath responseBody = 지하철_단일_노선_조회(lineId).jsonPath();
+        assertAll(
+                () -> assertThat(responseBody.getString("name")).isEqualTo("다른 2호선"),
+                () -> assertThat(responseBody.getString("color")).isEqualTo("연두색")
+        );
+
     }
 
     /**

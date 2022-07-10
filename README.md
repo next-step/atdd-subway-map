@@ -9,5 +9,5 @@
 - [x] LineService 내부의 findAll, findByIs 에서 중복부분 제거
 - [x] Line의 기본생성자 접근제어자 수정
 - [x] 인수테스트 부분에서 assertAll로 변경, containsExactly 활용
-- [ ] editLine 테스트 에서 이름과 색상이 변경되었는지 검증하도록 변경
+- [x] editLine 테스트 에서 이름과 색상이 변경되었는지 검증하도록 변경
 - [ ] 지하철 노선 생성 메서드에서 upStationId, downStationId, 10 에 대한 중복 제거하기
