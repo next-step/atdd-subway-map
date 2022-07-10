@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -35,6 +36,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
+    @Order(1)
     void createStation() {
         final String GANG_NAM = "강남역";
 
@@ -55,6 +57,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 조회한다.")
     @Test
+    @Order(2)
     void getStations() {
         final String SIN_DO_RIM = "신도림역";
         final String GURO_DIGITAL_COMPLEX = "구로디지털단지역";
@@ -76,6 +79,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 제거한다.")
     @Test
+    @Order(3)
     void deleteStation() {
         final String BU_CHEON = "부천역";
 
