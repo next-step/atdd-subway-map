@@ -140,8 +140,11 @@ public class SubwayLineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
-        assertThat(response.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
-        assertThat(response.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
+
+        // then
+        final ExtractableResponse<Response> getSubwayLineResponse = getSubwayLineRequest(createdSubwayLineId);
+        assertThat(getSubwayLineResponse.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
+        assertThat(getSubwayLineResponse.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
     }
 
     /**
