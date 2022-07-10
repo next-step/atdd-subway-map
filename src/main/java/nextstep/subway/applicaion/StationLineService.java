@@ -38,11 +38,8 @@ public class StationLineService {
 	}
 
 	public StationLineResponse findStationLine(Long stationId) {
-
-		StationLine stationLine = stationLineRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
-
-		return createStationLineResponse(stationLine);
+		return createStationLineResponse(stationLineRepository.findById(stationId)
+			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
 	}
 
 	@Transactional
@@ -54,9 +51,9 @@ public class StationLineService {
 
 	@Transactional
 	public void deleteStationLine(Long stationId) {
-		StationLine stationLine = stationLineRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
-		stationLineRepository.delete(stationLine);
+
+		stationLineRepository.delete(stationLineRepository.findById(stationId)
+			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
 	}
 
 	private StationLineResponse createStationLineResponse(StationLine stationLine) {
