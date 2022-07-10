@@ -11,3 +11,11 @@
 - [x] 인수테스트 부분에서 assertAll로 변경, containsExactly 활용
 - [x] editLine 테스트 에서 이름과 색상이 변경되었는지 검증하도록 변경
 - [x] 지하철 노선 생성 메서드에서 upStationId, downStationId, 10 에 대한 중복 제거하기
+
+추가 수정 사항
+
+- [ ] 통일성을 위해 @ResponseStatus 보다는 내용(body)없이 응답 코드만 반환하기
+- [ ] LineService.findAllStationInLine
+- [ ] LineAcceptanceTest에서 getLong()은 primitive type을 반환한다. 이에 알맞은 검증코드로 변경하기
+- [ ] http status code 검증 부분도 assertAll() 내부로 이동
+- [ ] TestFixture 에 대하여 공부하고, 특정 역을 가진 노선을 명확하게 명시하는 메서드 만들기
