@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -67,6 +68,39 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(lineNames).containsExactlyInAnyOrder("신분당선", "에버라인");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void findLine() {
+        // given
+        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        final ExtractableResponse<Response> response = 지하철노선_조회(lineId);
+
+        assertAll(
+            () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId),
+            () -> assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선"),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600"),
+            () -> assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(upStationId, downStationId),
+            () -> assertThat(response.jsonPath().getList("stations.name", String.class)).containsExactly("기흥역", "신갈역")
+                 );
+    }
+
+    private ExtractableResponse<Response> 지하철노선_조회(final long lineId) {
+        return RestAssured.given().log().all()
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().get("/lines/" + lineId)
+                          .then().log().all()
+                          .extract();
     }
 
     private ExtractableResponse<Response> 지하철노선_목록_조회() {
