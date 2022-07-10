@@ -41,4 +41,9 @@ public class LineService {
         Line updatedLine = lineRepository.save(line);
         return LineResponse.convertedByEntity(updatedLine);
     }
+
+    @Transactional
+    public void deleteLine(long lineId) {
+        lineRepository.deleteById(lineId);
+    }
 }
