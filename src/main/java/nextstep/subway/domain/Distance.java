@@ -8,7 +8,6 @@ public class Distance {
     private static final long MIN_DISTANCE = 1;
     private long distance;
 
-
     protected Distance() {
 
     }

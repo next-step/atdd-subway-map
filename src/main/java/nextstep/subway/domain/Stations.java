@@ -17,16 +17,16 @@ public class Stations {
 
     }
 
-    public List<Station> getStations() {
-        return List.of(upStation, downStation);
-    }
-
     public Stations(Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalArgumentException("상행종점역과 하행종점역의 아이디는 같을 수 없습니다.");
         }
         this.upStation = upStation;
         this.downStation = downStation;
+    }
+
+    public List<Station> getStations() {
+        return List.of(upStation, downStation);
     }
 
     @Override

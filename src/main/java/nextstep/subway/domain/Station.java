@@ -16,12 +16,12 @@ public class Station {
     protected Station() {
     }
 
-    public Station(Long id, String name) {
-        this.id = id;
+    public Station(String name) {
         this.name = name;
     }
 
-    public Station(String name) {
+    public Station(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 

@@ -22,6 +22,17 @@ public class LineResponse {
         this.stationResponses = stationResponses;
     }
 
+    public static LineResponse of(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getStations()
+                        .stream().map(StationResponse::of)
+                        .collect(Collectors.toList())
+        );
+    }
+
     public Long getId() {
         return id;
     }
@@ -36,17 +47,6 @@ public class LineResponse {
 
     public List<StationResponse> getStationResponses() {
         return stationResponses;
-    }
-
-    public static LineResponse of(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStations()
-                        .stream().map(StationResponse::of)
-                        .collect(Collectors.toList())
-        );
     }
 
     @Override
