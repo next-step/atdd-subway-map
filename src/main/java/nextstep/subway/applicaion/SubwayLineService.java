@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SubwayLineService {
 
-    private static final String NOT_FOUND_SUBWAY_LINE = "not found subway line by ";
-    private static final String NOT_FOUND_STATION = "not found station by ";
+    private static final String NOT_FOUND_SUBWAY_LINE = "not found subway line id by ";
+    private static final String NOT_FOUND_STATION = "not found station id by ";
 
     private final StationRepository stationRepository;
     private final SubwayLineRepository subwayLineRepository;
