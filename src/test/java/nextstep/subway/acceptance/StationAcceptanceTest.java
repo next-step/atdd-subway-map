@@ -44,7 +44,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = 지하철역_목록조회_요청().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsExactlyInAnyOrder("강남역");
     }
 
 
@@ -66,8 +66,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsAnyOf("기흥역");
-        assertThat(stationNames).containsAnyOf("신갈역");
+        assertThat(stationNames).containsExactlyInAnyOrder("기흥역", "신갈역");
     }
 
     /**

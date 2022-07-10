@@ -55,6 +55,6 @@ public class StationLineAcceptanceTest {
                                                             .then().log().all()
                                                             .extract();
         List<String> lineNames = response.jsonPath().getList("name", String.class);
-        assertThat(lineNames).contains("신분당선");
+        assertThat(lineNames).containsExactlyInAnyOrder("신분당선");
     }
 }
