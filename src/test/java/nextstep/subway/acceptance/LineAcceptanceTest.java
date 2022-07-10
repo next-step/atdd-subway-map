@@ -57,6 +57,36 @@ class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철노선 목록 조회")
+    @Test
+    void canFindSameNumberOfLinesWhenLinesWereCreated() {
+        // given
+        createLine(sinbundangLineCreationRequest);
+        createLine(bundangLineCreationRequest);
+
+        // when
+        var lineQueryResponse = RestAssured
+                .when()
+                    .get("/lines")
+                .then()
+                    .extract();
+        var lineNames = lineQueryResponse.jsonPath().getList("name");
+
+        // then
+        assertAll(
+                () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(lineNames).containsExactlyInAnyOrder(
+                        sinbundangLineCreationRequest.getName(),
+                        bundangLineCreationRequest.getName()
+                )
+        );
+    }
+
     private ExtractableResponse<Response> createLine(LineCreationRequest creationRequest) {
         return RestAssured
                 .given()
