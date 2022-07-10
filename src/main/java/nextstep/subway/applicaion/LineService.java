@@ -39,7 +39,9 @@ public class LineService {
     }
 
     private Station findStation(Long upStationId) {
-        return stationRepository.findById(upStationId).orElseThrow(() -> new IllegalArgumentException("역이 없습니다."));
+        return stationRepository.findById(upStationId).orElseThrow(() ->
+                new IllegalArgumentException("역이 없습니다.")
+        );
     }
 
     private void validationStations(Long upStationId, Long downStationId) {
@@ -49,7 +51,9 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+        Line line = lineRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("노선이 존재하지 않습니다")
+        );
         return LineResponse.of(line);
     }
 
@@ -60,7 +64,9 @@ public class LineService {
 
     @Transactional
     public void updateLine(Long id, LineUpdateRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+        Line line = lineRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("노선이 존재하지 않습니다")
+        );
         line.changeInfo(request.getName(), request.getColor());
     }
 
