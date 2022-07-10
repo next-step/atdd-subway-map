@@ -4,12 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
-import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.Map;
-import nextstep.subway.applicaion.dto.LineCreationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @DisplayName("노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -70,9 +68,10 @@ class LineAcceptanceTest {
         return RestAssured
                 .given()
                     .body(requestBody)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().log().all()
                     .post("/lines")
-                .then()
+                .then().log().all()
                     .extract();
     }
 }
