@@ -62,21 +62,21 @@ public class SubwayLineAcceptanceTest {
     }
 
     /**
-     * When 지하철 노선을 생성하고
-     * When 생성한 지하철 노선을 조회하면
-     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
      */
-    @DisplayName("지하철 노선을 조회한다.")
+    @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void getLines() {
-        // when - 지하철 노선을 생성한다
+    void getLineList() {
+        // given - 지하철 노선을 생성한다
         createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
         createdSubwayLine("신분당선", "bg-red-600", 4L, 5L, 10);
 
         // when - 지하철 노선을 조회한다
         ExtractableResponse<Response> response = getSubwayLines();
 
-        // then
+        // then - 지하철 2개의 노선을 조회할 수 있다
         List<String> names = response.jsonPath().getList("name", String.class);
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
