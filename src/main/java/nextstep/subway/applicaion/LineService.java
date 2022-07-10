@@ -49,21 +49,7 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line, List<Station> stations) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                stations.stream()
-                        .map(this::createStationResponse)
-                        .collect(toList())
-        );
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new LineResponse(line, stations);
     }
 
     public LineResponse findLineById(Long id) {
