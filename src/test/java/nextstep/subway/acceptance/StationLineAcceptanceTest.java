@@ -38,7 +38,7 @@ public class StationLineAcceptanceTest {
         지하철역_노선_등록("신분당선", "bg-red-600",1L,2L,10);
 
         //then
-        List<StationLineResponse> stationLineResponses = 지하철역_목록_조회();
+        List<StationLineResponse> stationLineResponses = 지하철역노선_목록_조회();
 
         assertThat(stationLineResponses).hasSize(1);
         assertThat(stationLineResponses.get(0).getName()).isEqualTo("신분당선");
@@ -58,7 +58,7 @@ public class StationLineAcceptanceTest {
         지하철역_노선_등록("분당선", "bg-green-600",1L,3L,10);
 
         //when
-        List<StationLineResponse> stationLineResponses = 지하철역_목록_조회();
+        List<StationLineResponse> stationLineResponses = 지하철역노선_목록_조회();
 
         //then
         assertThat(stationLineResponses).hasSize(2);
@@ -69,25 +69,23 @@ public class StationLineAcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철 노선을 생성하고
-     * When 지하철 노선 목록을 조회하면
-     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
-    @DisplayName("지하철 노선 목록 조회")
+    @DisplayName("지하철 노선 조회")
     @Test
     void getStationLine(){
         //given
-        지하철역_노선_등록("신분당선", "bg-red-600",1L,2L,10);
+        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 1L, 2L, 10);
+        String url = response.header("Location");
 
         //when
-        List<StationLineResponse> stationLineResponses = 지하철역_목록_조회();
+        StationLineResponse stationLineResponse = 지하철노선_조회(url);
 
         //then
-        assertThat(stationLineResponses).hasSize(2);
-        assertThat(stationLineResponses.get(0).getName()).isEqualTo("신분당선");
-        assertThat(stationLineResponses.get(0).getColor()).isEqualTo("bg-red-600");
-        assertThat(stationLineResponses.get(1).getName()).isEqualTo("분당선");
-        assertThat(stationLineResponses.get(1).getColor()).isEqualTo("bg-green-600");
+        assertThat(stationLineResponse.getName()).isEqualTo("신분당선");
+        assertThat(stationLineResponse.getColor()).isEqualTo("bg-red-600");
     }
 
     private ExtractableResponse<Response> 지하철역_노선_등록(String name, String color, Long upStationId, Long downStationId, Integer distance) {
@@ -101,10 +99,10 @@ public class StationLineAcceptanceTest {
                 .when()
                     .post("/lines")
                 .then()
+                    .statusCode(201)
                     .log().all()
                     .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
@@ -119,5 +117,18 @@ public class StationLineAcceptanceTest {
                     .log().all()
                     .extract()
                     .jsonPath().getList("$", StationLineResponse.class);
+    }
+
+    private StationLineResponse 지하철노선_조회(String url) {
+        return RestAssured
+                .given()
+                    .log().all()
+                .when()
+                    .get(url)
+                .then()
+                    .statusCode(200)
+                    .log().all()
+                    .extract()
+                    .jsonPath().getObject("$", StationLineResponse.class);
     }
 }
