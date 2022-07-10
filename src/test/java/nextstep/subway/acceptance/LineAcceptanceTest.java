@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
@@ -136,6 +137,36 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(modificationResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(modifiedName).isEqualTo(modificationRequest.getName()),
                 () -> assertThat(modifiedColor).isEqualTo(modificationRequest.getColor())
+        );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선 삭제")
+    @Test
+    void removeCreatedLine() {
+        // given
+        var creationResponse = createLine(bundangLineCreationRequest);
+        var createdLineId = creationResponse.jsonPath().getLong("id");
+
+        // when
+        var deleteResponse = RestAssured
+                .given()
+                    .pathParam("lineId", createdLineId)
+                .when()
+                    .delete("/lines/{lineId}")
+                .then()
+                    .extract();
+
+        // then
+        var lineQueryResponse = getLine(createdLineId);
+
+        assertAll(
+                () -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
         );
     }
 
