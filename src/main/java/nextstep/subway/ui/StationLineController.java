@@ -3,7 +3,6 @@ package nextstep.subway.ui;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +30,7 @@ public class StationLineController {
 		return ResponseEntity.created(URI.create("/lines/" + stationLineResponse.getId())).body(stationLineResponse);
 	}
 
-	@GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/lines")
 	public ResponseEntity<List<StationLineResponse>> showAllStationsLines() {
 		return ResponseEntity.ok().body(stationLineService.findAllStationLines());
 	}
