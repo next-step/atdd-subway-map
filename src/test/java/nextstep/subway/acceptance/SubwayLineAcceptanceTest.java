@@ -110,6 +110,30 @@ public class SubwayLineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given - 지하철 노선을 생성한다
+        createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
+
+        // when - 생성한 지하철 노선을 수정한다
+        updateSubwayLine(1L, "수정된9호선", "bg-yellow-600");
+
+        // then - 해당 지하철 노선 정보는 수정된다
+        ExtractableResponse<Response> response = getSubwayLine(1L);
+        JsonPath jsonPath = response.jsonPath();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(jsonPath.getString("name")).isEqualTo("수정된9호선"),
+                () -> assertThat(jsonPath.getString("color")).isEqualTo("bg-yellow-600")
+        );
+    }
+
     private ExtractableResponse<Response> createdSubwayLine(String name, String color, Long upStationId,
                                                             Long downStationId, int distance) {
         return RestAssured.given().log().all()
@@ -144,5 +168,22 @@ public class SubwayLineAcceptanceTest {
                 .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
+    }
+
+    private void updateSubwayLine(Long id, String updateName, String updateColor) {
+        RestAssured.given().log().all()
+                .body(updateSubwayLineParams(updateName, updateColor))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private Map<String, String> updateSubwayLineParams(String updateName, String updateColor) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", updateName);
+        params.put("color", updateColor);
+
+        return params;
     }
 }
