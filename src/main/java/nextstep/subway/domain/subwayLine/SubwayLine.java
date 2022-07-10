@@ -53,6 +53,16 @@ public class SubwayLine {
         this.downStation = downStation;
     }
 
+    public SubwayLine(SubwayLine subwayLine) {
+        this.id = subwayLine.getId();
+        this.name = subwayLine.getName();
+        this.distance = subwayLine.getDistance();
+        this.color = subwayLine.getColor();
+        this.upStation = subwayLine.getUpStation();
+        this.downStation = subwayLine.getDownStation();
+        this.stations = subwayLine.getStations();
+    }
+
     @PrePersist
     void prePersist() {
 //        this.upStation.updateSubwayLine(this);
@@ -91,7 +101,7 @@ public class SubwayLine {
         this.name = name;
         this.color = color;
 
-        return this;
+        return new SubwayLine(this);
     }
 
     public void updateStations(List<StationToSubwayLine> stationToSubwayLines) {
