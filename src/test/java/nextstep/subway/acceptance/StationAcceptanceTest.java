@@ -351,4 +351,45 @@ public class StationAcceptanceTest {
                 .all()
                 .extract();
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStationLines() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        ExtractableResponse<Response> deleteResponse = deleteStationLineWithId(createdStationLineId);
+
+        // Then
+        List<Long> ids = extractIdsInListTypeResponse(getAllStationLines());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(ids).doesNotContain(createdStationLineId);
+    }
+
+    private ExtractableResponse<Response> deleteStationLineWithId(Long createdStationLineId) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .delete("/lines/{id}", createdStationLineId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
 }
