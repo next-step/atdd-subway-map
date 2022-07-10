@@ -111,11 +111,12 @@ public class LineAcceptanceTest {
         Long 신분당선_ID = savedResponse.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = 노선_수정_요청(신분당선_ID, "2호선", "bg-green-600");
-        String 조회한_노선_이름 = response.jsonPath().getString("name");
-        String 조회한_노선_색상 = response.jsonPath().getString("color");
+        노선_수정_요청(신분당선_ID, "2호선", "bg-green-600");
 
         // then
+        ExtractableResponse<Response> response = 노선_조회_요청(신분당선_ID);
+        String 조회한_노선_이름 = response.jsonPath().getString("name");
+        String 조회한_노선_색상 = response.jsonPath().getString("color");
         assertThat(조회한_노선_이름).isEqualTo("2호선");
         assertThat(조회한_노선_색상).isEqualTo("bg-green-600");
     }

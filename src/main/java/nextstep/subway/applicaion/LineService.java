@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.dto.LineModifyRequest;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.*;
@@ -40,6 +41,17 @@ public class LineService {
     public LineResponse findLineResponse(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::from)
+                .orElseThrow(() -> new NotFoundLineException(id));
+    }
+
+    @Transactional
+    public void update(Long id, LineModifyRequest lineModifyRequest) {
+        Line line = findLine(id);
+        line.changeContent(lineModifyRequest.toLineContent());
+    }
+
+    private Line findLine(Long id) {
+        return lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundLineException(id));
     }
 }
