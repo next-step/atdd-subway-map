@@ -38,26 +38,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = 지하철_역_생성("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철_역_목록_조회()
+                .jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -74,14 +62,35 @@ public class StationAcceptanceTest {
         지하철_역_생성("삼성역");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_역_목록_조회();
 
         // then
-        assertThat(response.body().jsonPath().getList("name").size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
+    }
+
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        ExtractableResponse<Response> toDeleteStation = 지하철_역_생성("강남역");
+        Long id = toDeleteStation.jsonPath().getLong("id");
+        지하철_역_생성("삼성역");
+
+        // when
+        지하철_역_제거(id);
+
+        // then
+        ExtractableResponse<Response> response = 지하철_역_목록_조회();
+        assertThat(response.jsonPath().getList("id")
+                .stream()
+                .filter(stationId -> stationId == id)
+                .count())
+                .isEqualTo(0);
     }
 
     ExtractableResponse<Response> 지하철_역_생성(String stationName) {
@@ -96,36 +105,6 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    @DisplayName("지하철역을 제거한다.")
-    @Test
-    void deleteStation() {
-        // given
-        ExtractableResponse<Response> toDeleteStation = 지하철_역_생성("강남역");
-        Long id = toDeleteStation.body().jsonPath().getLong("id");
-
-        지하철_역_생성("삼성역");
-
-        // when
-        RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .delete("/stations/" + id)
-                .then().log().all();
-
-        // then
-        ExtractableResponse<Response> response = 지하철_역_목록_조회();
-        assertThat(response.body().jsonPath().getList("id")
-                .stream()
-                .filter(stationId -> stationId == id)
-                .count())
-                .isEqualTo(0);
-    }
-
     ExtractableResponse<Response> 지하철_역_목록_조회() {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -134,4 +113,10 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
+    void 지하철_역_제거(Long id) {
+        RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/" + id)
+                .then().log().all();
+    }
 }
