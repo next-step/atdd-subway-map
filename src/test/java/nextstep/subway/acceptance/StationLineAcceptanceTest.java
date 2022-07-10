@@ -68,16 +68,16 @@ class StationLineAcceptanceTest {
 	void getAllLinesTest() throws Exception {
 
 		//given
-		long upStationId = 지하철_생성_요청(Map.of("name", "판교역")).jsonPath().getLong("id");
-		long downStationId = 지하철_생성_요청(Map.of("name", "정자역")).jsonPath().getLong("id");
+		long 신분당선_상행종점역_번호 = 지하철_생성_요청(Map.of("name", "판교역")).jsonPath().getLong("id");
+		long 신분당선_하행종점역_번호 = 지하철_생성_요청(Map.of("name", "정자역")).jsonPath().getLong("id");
 		Map<String, Object> param =
-			Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", upStationId, "downStationId", downStationId, "distance", 10);
+			Map.of("name", "신분당선", "color", "bg-red-600", "upStationId", 신분당선_상행종점역_번호, "downStationId", 신분당선_하행종점역_번호, "distance", 10);
 		지하철_노선_생성_요청(param);
 
-		upStationId = 지하철_생성_요청(Map.of("name", "서현역")).jsonPath().getLong("id");
-		downStationId = 지하철_생성_요청(Map.of("name", "이매역")).jsonPath().getLong("id");
+		long 분당선_상행종점역_번호 = 지하철_생성_요청(Map.of("name", "서현역")).jsonPath().getLong("id");
+		long 분당선_하행종점역_번호 = 지하철_생성_요청(Map.of("name", "이매역")).jsonPath().getLong("id");
 		param =
-			Map.of("name", "분당선", "color", "yellow", "upStationId", upStationId, "downStationId", downStationId, "distance", 10);
+			Map.of("name", "분당선", "color", "yellow", "upStationId", 분당선_상행종점역_번호, "downStationId", 분당선_하행종점역_번호, "distance", 10);
 		지하철_노선_생성_요청(param);
 
 		//when
@@ -85,6 +85,9 @@ class StationLineAcceptanceTest {
 
 		//then
 		assertThat(getAllLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(getAllLineResponse.jsonPath().getList("[0].stations.id", Long.class)).contains(신분당선_상행종점역_번호, 신분당선_하행종점역_번호);
+		assertThat(getAllLineResponse.jsonPath().getList("[1].stations.id", Long.class)).contains(분당선_상행종점역_번호, 분당선_하행종점역_번호);
+
 	}
 
 	private ExtractableResponse<Response> 지하철_노선_목록_조회() {
@@ -93,5 +96,4 @@ class StationLineAcceptanceTest {
 			.get("/lines")
 			.then().log().all().extract();
 	}
-
 }
