@@ -97,6 +97,14 @@ public class SubwayLine {
         return new SubwayLine(this);
     }
 
+    public void performDelete(StationToSubwayLine upStationToSubwayLine, StationToSubwayLine downStationToSubwayLine) {
+        this.upStation.removeSubwayLine(upStationToSubwayLine);
+        this.downStation.removeSubwayLine(downStationToSubwayLine);
+        this.stations.removeAll(List.of(upStationToSubwayLine, downStationToSubwayLine));
+        this.upStation = null;
+        this.downStation = null;
+    }
+
     public void updateStations(List<StationToSubwayLine> stationToSubwayLines) {
         this.stations.addAll(stationToSubwayLines);
     }
