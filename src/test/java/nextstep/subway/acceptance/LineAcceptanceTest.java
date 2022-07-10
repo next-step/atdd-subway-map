@@ -100,14 +100,6 @@ public class LineAcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> findAllLinesRequest() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 조회하면
@@ -133,15 +125,6 @@ public class LineAcceptanceTest {
 
         // Then
         assertThat(stationNames).containsAnyOf("첫번째역", "새로운지하철역");
-    }
-
-    private ExtractableResponse<Response> findLineByIdAPIResponse(long lineId) {
-        return RestAssured
-                .given().log().all()
-                .pathParam("id", lineId)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
     }
 
     /**
@@ -223,7 +206,6 @@ public class LineAcceptanceTest {
         List<Long> lineIds = findAllLinesRequest().jsonPath().getList("id", Long.class);
         assertThat(lineIds).hasSize(0);
     }
-
     private long createStationRequest(String stationName) {
         Map<String, String> station = new HashMap<>();
         station.put("name", stationName);
@@ -257,4 +239,20 @@ public class LineAcceptanceTest {
         return createLineResponse;
     }
 
+    private ExtractableResponse<Response> findAllLinesRequest() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> findLineByIdAPIResponse(long lineId) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+    }
 }
