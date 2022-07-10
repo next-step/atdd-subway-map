@@ -80,6 +80,20 @@ public class SubwayLineService {
         return new SubwayLineResponse(updatedSubwayLine);
     }
 
+    @Transactional
+    public void performDeleteSubwayLine(Long subwayLineId) {
+        final SubwayLine subwayLine = getSubwayLineByIdIfExists(subwayLineId);
+        final StationToSubwayLine upStationToSubwayLine = getStationToSubwayLineIfExists(subwayLine, subwayLine.getUpStation());
+        final StationToSubwayLine downStationToSubwayLine = getStationToSubwayLineIfExists(subwayLine, subwayLine.getDownStation());
+        subwayLine.performDelete(upStationToSubwayLine, downStationToSubwayLine);
+        stationToSubwayLineRepository.deleteAll(List.of(upStationToSubwayLine, downStationToSubwayLine));
+    }
+
+    @Transactional
+    public void deleteSubwayLine(Long subwayLineId) {
+        subwayLineRepository.deleteById(subwayLineId);
+    }
+
     private Station getStationByIdIfExists(Long stationId) {
         final Optional<Station> findStation = stationRepository.findById(stationId);
         if (findStation.isEmpty()) {
@@ -105,6 +119,15 @@ public class SubwayLineService {
         }
 
         return findSubwayLineColor.get();
+    }
+
+    private StationToSubwayLine getStationToSubwayLineIfExists(SubwayLine subwayLine, Station station) {
+        final Optional<StationToSubwayLine> findStationToSubwayLine = stationToSubwayLineRepository.findByStationAndSubwayLine(station, subwayLine);
+        if (findStationToSubwayLine.isEmpty()) {
+            throw new RuntimeException("연결되어있지 않는 지하철역과 지하철 노선의 관계입니다");
+        }
+
+        return findStationToSubwayLine.get();
     }
 
     private void linkingStationAndSubwayLine(SubwayLine subwayLine, List<Station> stations) {
