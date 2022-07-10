@@ -3,37 +3,18 @@ package nextstep.subway.test.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import nextstep.subway.utils.acceptance.util.DatabaseCleanup;
 
-import java.util.HashMap;
+import static nextstep.subway.test.acceptance.StationRequest.*;
+
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
-    }
-
+public class StationAcceptanceTest extends AcceptanceTest{
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -43,13 +24,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // given
-        ExtractableResponse<Response> response = createStationUsingName("개봉역");
+        ExtractableResponse<Response> response = 지하철역_생성("개봉역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        List<String> stationNames = getStationList();
+        List<String> stationNames = 지하철목록조회();
 
         // then
         assertThat(stationNames).containsAnyOf("개봉역");
@@ -65,11 +46,11 @@ public class StationAcceptanceTest {
     @Test
     void findStationList() {
         // given
-        createStationUsingName("개봉역");
-        createStationUsingName("구일역");
+        지하철역_생성("개봉역");
+        지하철역_생성("구일역");
 
         // when
-        List<String> response = getStationList();
+        List<String> response = 지하철목록조회();
 
         //then
         assertThat(response).contains("구일역", "개봉역");
@@ -83,8 +64,8 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-        createStationUsingName("오류역");
-        long stationId = createStationUsingName("개봉역")
+        지하철역_생성("오류역");
+        long stationId = 지하철역_생성("개봉역")
                 .jsonPath().getLong("id");
         ExtractableResponse<Response> response =
                 RestAssured
@@ -95,31 +76,9 @@ public class StationAcceptanceTest {
                         .then().log().all()
                         .extract()
                 ;
-        List<String> stationNames = getStationList();
+        List<String> stationNames = 지하철목록조회();
 
         assertThat(stationNames).doesNotContain("개봉역");
     }
 
-    ExtractableResponse<Response> createStationUsingName(String stationName){
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
-
-        return RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract()
-                ;
-    }
-
-    List<String> getStationList(){
-        return RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
 }
