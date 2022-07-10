@@ -19,12 +19,16 @@ public class Line {
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    private Line(String name, String color, Long upStationId, Long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public static Line of(String name, String color, Long upStationId, Long downStationId, int distance) {
+        return new Line(name, color, upStationId, downStationId, distance);
     }
 
     public void change(String name, String color) {
