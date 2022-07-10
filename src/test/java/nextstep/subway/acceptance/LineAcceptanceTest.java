@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -46,6 +47,29 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsExactlyInAnyOrder("신분당선");
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철노선 목록 조회")
+    @Test
+    void findLineAll() {
+        // given
+        long upStationId1 = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        long downStationId1 = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId1, downStationId1, 10);
+        long upStationId2 = 지하철역_생성_요청("동백역").jsonPath().getLong("id");
+        long downStationId2 = 지하철역_생성_요청("강남대역").jsonPath().getLong("id");
+        지하철노선_생성_요청("에버라인", "bg-red-600", upStationId2, downStationId2, 10);
+
+        // when
+        List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(lineNames).containsExactlyInAnyOrder("신분당선", "에버라인");
+    }
+
     private ExtractableResponse<Response> 지하철노선_목록_조회() {
         return RestAssured.given().log().all()
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -67,11 +91,11 @@ public class LineAcceptanceTest {
         params.put("distance", String.valueOf(distance));
 
         return RestAssured.given().log().all()
-                   .body(params)
-                   .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().post("/lines")
-                   .then().log().all()
-                   .extract();
+                          .body(params)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().post("/lines")
+                          .then().log().all()
+                          .extract();
     }
 
     private ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
