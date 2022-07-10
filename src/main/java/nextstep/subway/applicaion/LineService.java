@@ -10,9 +10,11 @@ import nextstep.subway.domain.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +39,17 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
         return LineResponse.of(line, findAllStationUsingLine(line));
     }
-
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAllLine(){
+        return lineRepository.findAll()
+                .stream()
+                .map(line -> LineResponse.of(line, findAllStationUsingLine(line)))
+                .collect(Collectors.toList())
+                ;
+    }
 
     private List<StationResponse> findAllStationUsingLine(Line line){
         return stationRepository.findAllById(
@@ -49,6 +58,17 @@ public class LineService {
                 .map(station -> StationResponse.of(station))
                 .collect(Collectors.toList())
                 ;
+    }
+
+    public void modifyLine(Long lineId, LineRequest lineRequest){
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
+        line.modify(lineRequest.getName(), lineRequest.getColor());
+    }
+
+    @Transactional
+    public void deleteLineById(Long lineId) {
+        lineRepository.deleteById(lineId);
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.Map;
  * @project subway
  * @description
  */
-public class StationRequest {
+public class StationTestMethod {
     public static ExtractableResponse<Response> 지하철역_생성(String stationName){
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,12 +18,16 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String color;
 
+    @Column(nullable = false)
     private Long upStationId;
+    @Column(nullable = false)
     private Long downStationId;
+    @Column(nullable = false)
     private Integer distance;
 
     public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
@@ -33,7 +38,10 @@ public class Line {
         this.distance = distance;
     }
 
-    public Line() {
+    public Line() {}
 
+    public void modify(String name, String color){
+        this.name = name;
+        this.color = color;
     }
 }

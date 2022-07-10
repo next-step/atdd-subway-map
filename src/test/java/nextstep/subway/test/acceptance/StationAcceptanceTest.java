@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import static nextstep.subway.test.acceptance.StationRequest.*;
+import static nextstep.subway.test.acceptance.StationTestMethod.*;
 
 import java.util.List;
 
