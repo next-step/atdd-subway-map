@@ -115,7 +115,8 @@ public class StationAcceptanceTest {
                 .then()
                     .statusCode(200)
                     .log().all()
-                    .extract().jsonPath().getList("name", String.class);
+                    .extract()
+                    .jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> 지하철역_삭제(String url) {
@@ -126,7 +127,7 @@ public class StationAcceptanceTest {
                     .delete(url)
                 .then()
                     .log().all()
-                    .statusCode(203)
+                    .statusCode(204)
                     .extract();
     }
 }
