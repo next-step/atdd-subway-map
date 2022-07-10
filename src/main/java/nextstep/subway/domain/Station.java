@@ -7,23 +7,27 @@ import javax.persistence.Id;
 
 @Entity
 public class Station {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String name;
 
-    public Station() {
-    }
+	public Station() {
+	}
 
-    public Station(String name) {
-        this.name = name;
-    }
+	public Station(String name) {
+		this.name = name;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
+
+	public void updateStationName(String stationName) {
+		this.name = stationName;
+	}
 }

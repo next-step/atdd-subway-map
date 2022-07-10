@@ -13,16 +13,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
-	private static final String SAMSUNG_STATION = "삼성역";
-	private static final String GANGNAM_STATION = "강남역";
+	protected static final String SIN_BOONDANG_LINE = "신분당선";
+	protected static final String SAMSUNG_STATION = "삼성역";
 	@LocalServerPort
 	int port;
 
@@ -40,27 +40,14 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "강남역");
-
-		ExtractableResponse<Response> response =
-			RestAssured.given().log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/stations")
-				.then().log().all()
-				.extract();
+		Long stationId = 지하철역_생성(SIN_BOONDANG_LINE);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(stationId).isNotNull();
 
 		// then
-		List<String> stationNames =
-			RestAssured.given().log().all()
-				.when().get("/stations")
-				.then().log().all()
-				.extract().jsonPath().getList("name", String.class);
-		assertThat(stationNames).containsAnyOf("강남역");
+		List<String> stations = 지하철역_조회();
+		assertThat(stations).containsAnyOf(SIN_BOONDANG_LINE);
 	}
 
 	/**
@@ -73,7 +60,7 @@ public class StationAcceptanceTest {
 	void getStations() {
 		//Given
 		지하철역_생성(SAMSUNG_STATION);
-		지하철역_생성(GANGNAM_STATION);
+		지하철역_생성(SIN_BOONDANG_LINE);
 
 		//When
 		List<String> stations = 지하철역_조회();
@@ -81,7 +68,7 @@ public class StationAcceptanceTest {
 		//then
 		assertThat(stations).hasSize(2)
 			.containsAnyOf(SAMSUNG_STATION)
-			.containsAnyOf(GANGNAM_STATION);
+			.containsAnyOf(SIN_BOONDANG_LINE);
 
 	}
 
@@ -107,7 +94,7 @@ public class StationAcceptanceTest {
 		assertThat(stations).isEmpty();
 	}
 
-	private long 지하철역_생성(String stationName) {
+	private Long 지하철역_생성(String stationName) {
 
 		Map<String, String> searchParameter = new HashMap<>();
 		searchParameter.put("name", stationName);
