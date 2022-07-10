@@ -6,8 +6,6 @@ import io.restassured.response.Response;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
-import java.util.Map;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AcceptanceTest {
 
@@ -17,7 +15,7 @@ public class AcceptanceTest {
 			.then().log().all().extract();
 	}
 
-	ExtractableResponse<Response> post(String path, Map<String, String> params) {
+	ExtractableResponse<Response> post(String path, Object params) {
 		return RestAssured.given().log().all()
 			.body(params)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
