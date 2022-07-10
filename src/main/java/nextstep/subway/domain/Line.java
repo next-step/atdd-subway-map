@@ -20,7 +20,7 @@ public class Line {
     private Long downStationId;
     private Integer distance;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
