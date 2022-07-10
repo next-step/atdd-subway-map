@@ -134,6 +134,26 @@ public class SubwayLineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("재하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given - 지하철 노선을 생성한다
+        createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
+
+        // when - 지하철 노선을 삭제한다
+        deleteSubwayLine(1L);
+
+        // then - 지하철 노선 정보가 삭제된다
+        ExtractableResponse<Response> response = getSubwayLines();
+        List<String> names = response.jsonPath().getList("name", String.class);
+        assertThat(names).doesNotContain("9호선");
+    }
+
     private ExtractableResponse<Response> createdSubwayLine(String name, String color, Long upStationId,
                                                             Long downStationId, int distance) {
         return RestAssured.given().log().all()
@@ -185,5 +205,13 @@ public class SubwayLineAcceptanceTest {
         params.put("color", updateColor);
 
         return params;
+    }
+
+    private void deleteSubwayLine(long id) {
+        RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", id)
+                .then().log().all()
+                .extract();
     }
 }
