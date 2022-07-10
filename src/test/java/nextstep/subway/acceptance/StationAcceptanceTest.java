@@ -61,16 +61,14 @@ public class StationAcceptanceTest {
         // Given
         List<String> stationNames = List.of("강남역", "서울대입구역");
         List<Long> createdStationIds = stationNames.stream()
-                .map(name -> createStationWithName(name).jsonPath()
-                        .getLong("id"))
+                .map(name -> extractIdInResponse(createStationWithName(name)))
                 .collect(Collectors.toList());
 
         // When
         ExtractableResponse<Response> getAllStationsResponse = getAllStations();
 
         // Then
-        List<Long> getAllStationsIds = getAllStationsResponse.jsonPath()
-                .getList("id", Long.class);
+        List<Long> getAllStationsIds = extractIdsInListTypeResponse(getAllStationsResponse);
         assertThat(getAllStationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(getAllStationsIds.size()).isEqualTo(createdStationIds.size());
     }
@@ -114,15 +112,13 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // Given
         String stationName = "강남역";
-        Long createdStationId = createStationWithName(stationName).jsonPath()
-                .getLong("id");
+        Long createdStationId = extractIdInResponse(createStationWithName(stationName));
 
         // When
         ExtractableResponse<Response> deleteResponse = deleteStationWithId(createdStationId);
 
         // Then
-        List<Long> ids = getStationWithId(createdStationId).jsonPath()
-                .getList("id", Long.class);
+        List<Long> ids = extractIdsInListTypeResponse(getStationWithId(createdStationId));
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(ids).doesNotContain(createdStationId);
     }
@@ -150,5 +146,15 @@ public class StationAcceptanceTest {
                 .log()
                 .all()
                 .extract();
+    }
+
+    private List<Long> extractIdsInListTypeResponse(ExtractableResponse response) {
+        return response.jsonPath()
+                .getList("id", Long.class);
+    }
+
+    private Long extractIdInResponse(ExtractableResponse response) {
+        return response.jsonPath()
+                .getLong("id");
     }
 }
