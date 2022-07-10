@@ -17,7 +17,7 @@ public class Line {
     @Embedded
     private Stations stations;
 
-    public Line() {/*no-op*/}
+    protected Line() {/*no-op*/}
 
     public Line(Long id, String name, String color, int distance, List<Station> stations) {
 
