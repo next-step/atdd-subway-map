@@ -6,29 +6,19 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.acceptance_infra.AcceptanceTest;
 
 @DisplayName("지하철 노선 인수테스트")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StationLineAcceptanceTest {
-	@LocalServerPort
-	int port;
-
-	@BeforeEach
-	public void setUp() {
-		RestAssured.port = port;
-	}
-
+class StationLineAcceptanceTest extends AcceptanceTest {
+	
 	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회시 생성한 노선을 찾을수 있다.
