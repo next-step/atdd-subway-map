@@ -53,4 +53,8 @@ public class StationLineService {
                 .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
         stationLine.changeNameAndColor(request.getName(),request.getColor());
     }
+
+    public void deleteStationLine(Long lineId) {
+        stationRepository.deleteById(lineId);
+    }
 }
