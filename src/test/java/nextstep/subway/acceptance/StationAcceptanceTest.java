@@ -94,7 +94,7 @@ public class StationAcceptanceTest {
         createdStation("서대문");
 
         // when - 지하철역을 삭제
-        deleteSubwayStation(1);
+        deleteSubwayStation(1L);
 
         ExtractableResponse<Response> response = getSubwayStations();
 
@@ -110,7 +110,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private void deleteSubwayStation(int id) {
+    private void deleteSubwayStation(Long id) {
         RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
