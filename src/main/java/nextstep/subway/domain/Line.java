@@ -39,6 +39,13 @@ public class Line {
         section.setLine(this);
     }
 
+    public void changeContent(LineContent lineContent) {
+        if (this.lineContent.equals(lineContent)) {
+            return ;
+        }
+        this.lineContent = lineContent;
+    }
+
     public Long id() {
         return id;
     }
