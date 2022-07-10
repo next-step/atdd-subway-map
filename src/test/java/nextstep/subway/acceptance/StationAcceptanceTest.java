@@ -23,7 +23,6 @@ import io.restassured.RestAssured;
 public class StationAcceptanceTest {
 	private static final String SAMSUNG_STATION = "삼성역";
 	private static final String GANGNAM_STATION = "강남역";
-	private static final String LINE_COLOR_RED = "bg-red-600";
 	@LocalServerPort
 	int port;
 
