@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,8 +24,6 @@ import io.restassured.RestAssured;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationLIneAcceptanceTest {
 
-	private static final String SIN_BOONDANG_LINE = "신분당선";
-	private static final String SAMSUNG_STATION = "삼성역";
 	private static final String LINE_COLOR_RED = "bg-red-600";
 	private static final String LINE_COLOR_BLUE = "bg-blue-600";
 
@@ -43,9 +42,8 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_생성() {
 		//when
-		Map<Object, Object> createLineRequest =
+		Map<String, Object> createLineRequest =
 			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-
 		지하철라인_생성(createLineRequest);
 
 		//then
@@ -62,9 +60,9 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_목록_조회() {
 		//given
-		Map<Object, Object> createLineRequest1 =
+		Map<String, Object> createLineRequest1 =
 			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		Map<Object, Object> createLineRequest2 =
+		Map<String, Object> createLineRequest2 =
 			지하철노선_생성_파라미터생성(SAMSUNG_STATION, LINE_COLOR_RED, 2, 3, 8);
 
 		지하철라인_생성(createLineRequest1);
@@ -75,8 +73,7 @@ public class StationLIneAcceptanceTest {
 
 		//then
 		assertThat(names).hasSize(2)
-			.containsAnyOf(SIN_BOONDANG_LINE)
-			.containsAnyOf(SAMSUNG_STATION);
+			.containsExactly(SIN_BOONDANG_LINE, SAMSUNG_STATION);
 	}
 
 	/**
@@ -87,19 +84,15 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_조회() {
 		//given
-		Map<Object, Object> createLineRequest =
+		Map<String, Object> createLineRequest =
 			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		long stationId = 지하철라인_생성(createLineRequest);
 
 		//when
-		String stationName = RestAssured.given().log().all()
-			.when().get("/lines/" + stationId)
-			.then().log().all()
-			.statusCode(HttpStatus.OK.value())
-			.extract().jsonPath().getString("name");
+		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
 
 		//then
-		assertThat(stationName).isEqualTo(SIN_BOONDANG_LINE);
+		assertEquals(response.get("name"), SIN_BOONDANG_LINE);
 	}
 
 	/**
@@ -110,12 +103,12 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_수정() {
 		//given
-		Map<Object, Object> createdLineRequest =
+		Map<String, Object> createdLineRequest =
 			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		long stationId = 지하철라인_생성(createdLineRequest);
 
 		//when
-		Map<Object, Object> updatedLineRequest = generateUpdateRequestDTO(SAMSUNG_STATION, LINE_COLOR_BLUE);
+		Map<String, Object> updatedLineRequest = generateUpdateRequestDTO(SAMSUNG_STATION, LINE_COLOR_BLUE);
 		RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.body(updatedLineRequest)
@@ -124,7 +117,7 @@ public class StationLIneAcceptanceTest {
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		//then
-		Map<Object, Object> response = 지하철라인_조회_BY_ID(stationId);
+		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
 		assertEquals(SAMSUNG_STATION, response.get("name"));
 		assertEquals(LINE_COLOR_BLUE, response.get("color"));
 
@@ -138,7 +131,7 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_삭제() {
 		//given
-		Map<Object, Object> createdLineRequest =
+		Map<String, Object> createdLineRequest =
 			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		long stationId = 지하철라인_생성(createdLineRequest);
 
@@ -149,17 +142,15 @@ public class StationLIneAcceptanceTest {
 			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		//then
-		RestAssured.given().log().all()
-			.when().get("/lines/" + stationId)
-			.then().log().all()
-			.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
+		assertThat(response.get("name")).isNull();
 
 	}
 
-	private Map<Object, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upstationId,
+	private Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upstationId,
 		long downStationId,
 		long distance) {
-		Map<Object, Object> requestParameter = new HashMap<>();
+		Map<String, Object> requestParameter = new HashMap<>();
 		requestParameter.put("name", stationName);
 		requestParameter.put("color", stationColor);
 		requestParameter.put("upStationId", upstationId);
@@ -168,14 +159,14 @@ public class StationLIneAcceptanceTest {
 		return requestParameter;
 	}
 
-	private Map<Object, Object> generateUpdateRequestDTO(String stationName, String stationColor) {
-		Map<Object, Object> requestParameter = new HashMap<>();
+	private Map<String, Object> generateUpdateRequestDTO(String stationName, String stationColor) {
+		Map<String, Object> requestParameter = new HashMap<>();
 		requestParameter.put("name", stationName);
 		requestParameter.put("color", stationColor);
 		return requestParameter;
 	}
 
-	private Long 지하철라인_생성(Map<Object, Object> requestParameter) {
+	private Long 지하철라인_생성(Map<String, Object> requestParameter) {
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.body(requestParameter)
@@ -194,11 +185,11 @@ public class StationLIneAcceptanceTest {
 			.extract().jsonPath().getList("name", String.class);
 	}
 
-	private Map<Object, Object> 지하철라인_조회_BY_ID(Long id) {
+	private Map<String, Object> 지하철라인_조회_BY_ID(Long id, HttpStatus httpStatus) {
 		return RestAssured.given().log().all()
 			.when().get("/lines/" + id)
 			.then().log().all()
-			.statusCode(HttpStatus.OK.value())
+			.statusCode(httpStatus.value())
 			.extract().jsonPath().get();
 	}
 }

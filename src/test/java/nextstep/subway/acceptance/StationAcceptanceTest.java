@@ -21,8 +21,8 @@ import io.restassured.RestAssured;
 @Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
-	private static final String SAMSUNG_STATION = "삼성역";
-	private static final String GANGNAM_STATION = "강남역";
+	protected static final String SIN_BOONDANG_LINE = "신분당선";
+	protected static final String SAMSUNG_STATION = "삼성역";
 	@LocalServerPort
 	int port;
 
@@ -40,14 +40,14 @@ public class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		Long stationId = 지하철역_생성(GANGNAM_STATION);
+		Long stationId = 지하철역_생성(SIN_BOONDANG_LINE);
 
 		// then
 		assertThat(stationId).isNotNull();
 
 		// then
 		List<String> stations = 지하철역_조회();
-		assertThat(stations).containsAnyOf(GANGNAM_STATION);
+		assertThat(stations).containsAnyOf(SIN_BOONDANG_LINE);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class StationAcceptanceTest {
 	void getStations() {
 		//Given
 		지하철역_생성(SAMSUNG_STATION);
-		지하철역_생성(GANGNAM_STATION);
+		지하철역_생성(SIN_BOONDANG_LINE);
 
 		//When
 		List<String> stations = 지하철역_조회();
@@ -68,7 +68,7 @@ public class StationAcceptanceTest {
 		//then
 		assertThat(stations).hasSize(2)
 			.containsAnyOf(SAMSUNG_STATION)
-			.containsAnyOf(GANGNAM_STATION);
+			.containsAnyOf(SIN_BOONDANG_LINE);
 
 	}
 
