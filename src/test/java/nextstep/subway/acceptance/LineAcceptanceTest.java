@@ -17,8 +17,8 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.acceptance_infra.AcceptanceTest;
 
 @DisplayName("지하철 노선 인수테스트")
-class StationLineAcceptanceTest extends AcceptanceTest {
-	
+class LineAcceptanceTest extends AcceptanceTest {
+
 	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회시 생성한 노선을 찾을수 있다.
