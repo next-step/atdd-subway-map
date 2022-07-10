@@ -3,13 +3,11 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.common.AcceptanceTest;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -17,20 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.RestAssuredTemplate.*;
+import static nextstep.subway.acceptance.common.RestAssuredTemplate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -106,7 +95,7 @@ public class StationAcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> 역을_만들다(String name) {
+    public static ExtractableResponse<Response> 역을_만들다(String name) {
         StationRequest stationRequest = new StationRequest(name);
         ExtractableResponse<Response> response = postRequestWithRequestBody("/stations", stationRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
