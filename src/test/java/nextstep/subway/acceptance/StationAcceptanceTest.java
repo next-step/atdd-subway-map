@@ -37,26 +37,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = saveStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findAllStationNames();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -68,7 +55,14 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @Test
     void 지하철역_목록_조회() {
+        saveStation("도농역");
+        saveStation("구리역");
 
+        ExtractableResponse<Response> stations = findAllStations();
+        assertThat(stations.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        List<String> names = findAllStations().jsonPath().getList("name", String.class);
+        assertThat(names).containsAnyOf("도농역", "구리역");
     }
 
     /**
@@ -79,6 +73,36 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @Test
     void 지하철역_제거() {
+        long id = saveStation("회기역").jsonPath().getLong("id");
 
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+            .when().delete("/stations/" + id)
+            .then().log().all()
+            .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> saveStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+    }
+
+    private List<String> findAllStationNames() {
+        return findAllStations().jsonPath().getList("name", String.class);
+    }
+
+    private ExtractableResponse<Response> findAllStations() {
+        return RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all()
+            .extract();
     }
 }
