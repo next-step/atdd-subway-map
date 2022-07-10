@@ -96,7 +96,6 @@ public class SubwayLineAcceptanceTest {
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다
      */
-    // TODO: 지하철 노선 조회에 대한 인수 테스트 코드 작성
     @DisplayName("지하철 노선을 조회합니다.")
     @Test
     void getSubwayLine() throws Exception {
