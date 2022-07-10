@@ -1,12 +1,11 @@
-package nextstep.subway.domain.line;
-
-import nextstep.subway.domain.station.Station;
+package nextstep.subway.domain;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+
 @Embeddable
 public class Stations {
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)

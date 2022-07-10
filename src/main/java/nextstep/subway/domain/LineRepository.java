@@ -1,4 +1,4 @@
-package nextstep.subway.domain.line;
+package nextstep.subway.domain;
 
 import nextstep.subway.infra.JpaLineRepository;
 import org.springframework.stereotype.Repository;

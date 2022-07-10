@@ -1,7 +1,6 @@
-package nextstep.subway.domain.line;
+package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
 import java.util.List;
