@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,11 +53,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findAllStationNames();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -66,13 +63,20 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void getStations() throws Exception {
+    void getStations() {
         //given
+        createStationByStationName("강남역");
+        createStationByStationName("교대역");
 
         //when
+        List<String> stationNames = findAllStationNames();
 
         //then
+        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).contains("강남역", "교대역");
+
     }
 
     /**
@@ -81,13 +85,45 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
     @Test
-    void deleteStation() throws Exception {
+    void deleteStation() {
         //given
+        StationResponse stationResponse = createStationByStationName("방배역");
 
         //when
+        deleteByStationId(stationResponse.getId());
 
         //then
+        List<String> stationNames = findAllStationNames();
+        assertThat(stationNames).doesNotContain("방배역");
+
+    }
+
+    private StationResponse createStationByStationName(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        return response.body().as(StationResponse.class);
+    }
+
+    private List<String> findAllStationNames() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
+
+    private void deleteByStationId(Long stationId) {
+        RestAssured.given().log().all()
+                .when().delete("stations/" + stationId)
+                .then().log().all();
     }
 
 }
