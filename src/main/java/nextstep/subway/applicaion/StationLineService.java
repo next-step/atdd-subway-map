@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
@@ -26,7 +27,6 @@ public class StationLineService {
 	@Transactional
 	public StationLineResponse createStationLines(StationLineRequest stationLineRequest) {
 		StationLine stationLine = stationLineRepository.save(stationLineRequest.toStationLine());
-
 		return createStationLineResponse(stationLine);
 	}
 
@@ -39,7 +39,7 @@ public class StationLineService {
 
 	public StationLineResponse findStationLine(Long stationId) {
 		return createStationLineResponse(stationLineRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
+			.orElse(null));
 	}
 
 	@Transactional
@@ -57,11 +57,14 @@ public class StationLineService {
 	}
 
 	private StationLineResponse createStationLineResponse(StationLine stationLine) {
-
+		if (ObjectUtils.isEmpty(stationLine)) {
+			return new StationLineResponse();
+		}
 		return new StationLineResponse(stationLine.getId(),
 			stationLine.getStationName(),
 			stationLine.getColor(),
 			new StationResponse(stationLine.getUpStationId(), STATION_NAME),
 			new StationResponse(stationLine.getDownStationId(), NEW_STATION_NAME));
 	}
+
 }
