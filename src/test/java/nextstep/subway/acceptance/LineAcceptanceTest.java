@@ -9,32 +9,18 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @DisplayName("노선 관련 기능")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class LineAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
+class LineAcceptanceTest extends AcceptanceTest {
 
     private final LineCreationRequest sinbundangLineCreationRequest = new LineCreationRequest(
             "신분당선", "bg-red-600", 1L, 2L, 10L);
     private final LineCreationRequest bundangLineCreationRequest = new LineCreationRequest(
             "분당선", "bg-green-600", 1L, 3L, 20L);
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     /**
      * When 지하철 노선을 생성하면
