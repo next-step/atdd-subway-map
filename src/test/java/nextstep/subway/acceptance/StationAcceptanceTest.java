@@ -216,4 +216,41 @@ public class StationAcceptanceTest {
                 .all()
                 .extract();
     }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선을 목록을 조회한다.")
+    @Test
+    void getStationLines() {
+        // Given
+        String stationLineName1 = "신분당선";
+        String stationLineColor1 = "bg-red-600";
+        String stationLineName2 = "신분당선2";
+        String stationLineColor2 = "bg-red-6002";
+
+        String upStationName1 = "지하철역";
+        String downStationName1 = "새로운지하철역";
+        String upStationName2 = "지하철역2";
+        String downStationName2 = "새로운지하철역2";
+
+        Long upStationId1 = extractIdInResponse(createStationWithName(upStationName1));
+        Long downStationId1 = extractIdInResponse(createStationWithName(downStationName1));
+        Long upStationId2 = extractIdInResponse(createStationWithName(upStationName2));
+        Long downStationId2 = extractIdInResponse(createStationWithName(downStationName2));
+
+        Long createdStationLineId1 = extractIdInResponse(createStationLine(stationLineName1, stationLineColor1, upStationId1, downStationId1));
+        Long createdStationLineId2 = extractIdInResponse(createStationLine(stationLineName2, stationLineColor2, upStationId2, downStationId2));
+
+        // When
+        ExtractableResponse<Response> allStationLines = getAllStationLines();
+
+        // Then
+        List<Long> ids = extractIdsInListTypeResponse(allStationLines);
+        assertThat(allStationLines.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(ids).hasSize(2);
+        assertThat(ids).contains(createdStationLineId1, createdStationLineId2);
+    }
 }
