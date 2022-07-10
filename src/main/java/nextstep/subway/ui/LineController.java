@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 
 @RestController
 @RequestMapping("/lines")
@@ -45,6 +47,12 @@ public class LineController {
 	public ResponseEntity<Void> deleteLine(@PathVariable("lineId") Long lineId) {
 		lineService.deleteLine(lineId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@PutMapping("/{lineId}")
+	public ResponseEntity<Void> updateLine(@PathVariable("lineId") Long lineId, @RequestBody LineUpdateRequest lineUpdateRequest) {
+		lineService.updateLine(lineId, lineUpdateRequest);
+		return ResponseEntity.ok().build();
 	}
 
 }

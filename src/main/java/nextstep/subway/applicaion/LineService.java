@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -52,5 +53,10 @@ public class LineService {
 	@Transactional
 	public void deleteLine(Long lineId) {
 		lineRepository.delete(getLineById(lineId));
+	}
+
+	@Transactional
+	public void updateLine(Long lineId, LineUpdateRequest lineUpdateRequest) {
+		getLineById(lineId).update(lineUpdateRequest);
 	}
 }
