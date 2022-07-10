@@ -1,0 +1,35 @@
+package nextstep.subway.applicaion;
+
+import nextstep.subway.applicaion.dto.StationLineRequest;
+import nextstep.subway.applicaion.dto.StationLineResponse;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationLine;
+import nextstep.subway.domain.StationLineRepository;
+import nextstep.subway.domain.StationRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class StationLineService {
+
+    private final StationLineRepository stationLineRepository;
+    private final StationRepository stationRepository;
+    private final StationLineMapper stationLineMapper;
+
+    public StationLineService(StationLineRepository stationLineRepository,
+                              StationRepository stationRepository,
+                              StationLineMapper stationLineMapper) {
+        this.stationLineRepository = stationLineRepository;
+        this.stationRepository = stationRepository;
+        this.stationLineMapper = stationLineMapper;
+    }
+
+    public StationLineResponse createStationLine(StationLineRequest request) {
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
+        StationLine stationLine = stationLineMapper.of(request, upStation, downStation);
+        StationLine savedStationLine = stationLineRepository.save(stationLine);
+        return stationLineMapper.of(savedStationLine);
+    }
+}
