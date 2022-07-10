@@ -1,5 +1,6 @@
 package nextstep.subway.domain.subwayLine;
 
+import nextstep.subway.applicaion.dto.subwayLine.UpdateSubwayLineRequest;
 import nextstep.subway.domain.m2m.StationToSubwayLine;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
@@ -84,6 +85,13 @@ public class SubwayLine {
 
     public List<StationToSubwayLine> getStations() {
         return stations;
+    }
+
+    public SubwayLine update(String name, SubwayLineColor color) {
+        this.name = name;
+        this.color = color;
+
+        return this;
     }
 
     public void updateStations(List<StationToSubwayLine> stationToSubwayLines) {
