@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.*;
+import nextstep.subway.domain.exception.NotFoundLineException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,5 +35,11 @@ public class LineService {
         return lineRepository.findAll().stream()
                 .map(LineResponse::from)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public LineResponse findLineResponse(Long id) {
+        return lineRepository.findById(id)
+                .map(LineResponse::from)
+                .orElseThrow(() -> new NotFoundLineException(id));
     }
 }
