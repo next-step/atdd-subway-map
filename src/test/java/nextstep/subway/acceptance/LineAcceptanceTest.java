@@ -83,15 +83,15 @@ public class LineAcceptanceTest {
         long secondStationId = createStationRequest(두번째역);
         long thirdStationId = createStationRequest(세번째역);
 
-        // When
         createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
         createLineRequest("분당선", "bg-green-600", firstStationId, thirdStationId, 20);
 
-        // Then
+        // When
         ExtractableResponse<Response> 노선_전체조회_응답 = findAllLinesRequest();
         List<String> 신분당선_역이름 = 노선_전체조회_응답.jsonPath().get("stations[0].name");
         List<String> 분당선_역이름 = 노선_전체조회_응답.jsonPath().get("stations[1].name");
 
+        // Then
         assertAll(
                 () -> assertThat(신분당선_역이름).hasSize(2),
                 () -> assertThat(신분당선_역이름).containsAnyOf("지하철역", "새로운지하철역"),
