@@ -3,7 +3,6 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,10 +74,10 @@ public class StationAcceptanceTest {
         createStation(params2);
 
         // when
-        List<Station> stations = getStationList();
+        List<String> stationNames = getStationNameList();
 
         // then
-        assertThat(stations.size()).isEqualTo(2);
+        assertThat(stationNames).hasSize(2);
     }
 
     /**
@@ -102,8 +101,8 @@ public class StationAcceptanceTest {
                 .then().log().all();
 
         // then
-        List<Station> stations = getStationList();
-        assertThat(stations.isEmpty()).isTrue();
+        List<String> stationNames = getStationNameList();
+        assertThat(stationNames).isEmpty();
     }
 
     private ExtractableResponse<Response> createStation(Map<String, String> station) {
@@ -115,11 +114,11 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private List<Station> getStationList() {
+    private List<String> getStationNameList() {
         return RestAssured
                 .given().log().all()
                 .when().get("/stations")
                 .then().log().all()
-                .extract().jsonPath().get();
+                .extract().jsonPath().getList("name");
     }
 }
