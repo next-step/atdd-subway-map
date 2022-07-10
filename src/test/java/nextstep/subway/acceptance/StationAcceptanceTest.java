@@ -222,7 +222,7 @@ public class StationAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-    @DisplayName("지하철 노선을 목록을 조회한다.")
+    @DisplayName("지하철 노선의 목록을 조회한다.")
     @Test
     void getStationLines() {
         // Given
@@ -252,5 +252,47 @@ public class StationAcceptanceTest {
         assertThat(allStationLines.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(ids).hasSize(2);
         assertThat(ids).contains(createdStationLineId1, createdStationLineId2);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getStationLine(){
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        ExtractableResponse<Response> response = getStationLineWithId(createdStationLineId);
+
+        // Then
+        Long responseId = extractIdInResponse(response);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(responseId).isEqualTo(createdStationLineId);
+    }
+
+    private ExtractableResponse<Response> getStationLineWithId(Long id) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .param("id", id)
+                .when()
+                .get("/stationLines")
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 }
