@@ -1,16 +1,15 @@
 package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.line.Line;
-import nextstep.subway.domain.line.Stations;
 import nextstep.subway.domain.station.Station;
 
 import java.util.List;
 
 public class LineResponse {
-    private Long id;
-    private String name;
-    private String color;
-    private List<Station> stations;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<Station> stations;
 
     public LineResponse(Long id, String name, String color, List<Station> stations) {
         this.id = id;

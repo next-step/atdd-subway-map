@@ -45,10 +45,6 @@ public class Line {
         this(null, name, color, distance, stations);
     }
 
-    public Line(LineRequest lineRequest, List<Station> station) {
-        this(null, lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), station);
-    }
-
     public Long getId() {
         return id;
     }

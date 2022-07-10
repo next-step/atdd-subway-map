@@ -37,7 +37,7 @@ public class LineService {
             .orElseThrow(
                 () -> new DataNotFoundException("Station 데이터가 없습니다.")
             );
-        Line createLine = new Line(lineRequest, Arrays.asList(upStation, downStation));
+        Line createLine = lineRequest.toEntity(Arrays.asList(upStation, downStation));
         Line createdLine = lineRepository.save(createLine);
         return new LineResponse(createdLine);
     }
