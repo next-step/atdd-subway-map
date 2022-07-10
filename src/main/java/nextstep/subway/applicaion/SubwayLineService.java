@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SubwayLineService {
 
-    private StationRepository stationRepository;
-    private SubwayLineRepository subwayLineRepository;
-    private SubwayLineColorRepository subwayLineColorRepository;
-    private StationToSubwayLineRepository stationToSubwayLineRepository;
+    private final StationRepository stationRepository;
+    private final SubwayLineRepository subwayLineRepository;
+    private final SubwayLineColorRepository subwayLineColorRepository;
+    private final StationToSubwayLineRepository stationToSubwayLineRepository;
 
     public SubwayLineService(
             StationRepository stationRepository,

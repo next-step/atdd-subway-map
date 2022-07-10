@@ -21,7 +21,7 @@ public class Station {
     private String name;
 
     @OneToMany(mappedBy = "station", fetch = LAZY)
-    private List<StationToSubwayLine> subwayLines = new ArrayList<>();
+    private final List<StationToSubwayLine> subwayLines = new ArrayList<>();
 
     public Station() {
     }

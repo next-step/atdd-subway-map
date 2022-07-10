@@ -4,7 +4,6 @@ import nextstep.subway.applicaion.SubwayLineService;
 import nextstep.subway.applicaion.dto.subwayLine.CreateSubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayLine.SubwayLineResponse;
 import nextstep.subway.applicaion.dto.subwayLine.UpdateSubwayLineRequest;
-import nextstep.subway.domain.subwayLine.SubwayLine;
 import nextstep.subway.domain.subwayLine.SubwayLineRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

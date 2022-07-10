@@ -2,9 +2,9 @@ package nextstep.subway.applicaion.dto.subwayLine;
 
 public class UpdateSubwayLineRequest {
 
-    private String name;
+    private final String name;
 
-    private String color;
+    private final String color;
 
     public UpdateSubwayLineRequest(String name, String color) {
         this.name = name;

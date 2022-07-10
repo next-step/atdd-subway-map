@@ -3,7 +3,6 @@ package nextstep.subway.domain.subwayLineColor;
 import nextstep.subway.domain.subwayLine.SubwayLine;
 
 import javax.persistence.*;
-
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
