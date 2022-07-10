@@ -119,7 +119,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = deleteStationWithId(createdStationId);
 
         // Then
-        List<Long> ids = extractIdsInListTypeResponse(getStationWithId(createdStationId));
+        List<Long> ids = extractIdsInListTypeResponse(getAllStations());
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(ids).doesNotContain(createdStationId);
     }
@@ -130,19 +130,6 @@ public class StationAcceptanceTest {
                 .all()
                 .when()
                 .delete("/stations/{id}", createdStationId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> getStationWithId(Long id) {
-        return RestAssured.given()
-                .log()
-                .all()
-                .param("id", id)
-                .when()
-                .get("/stations")
                 .then()
                 .log()
                 .all()
