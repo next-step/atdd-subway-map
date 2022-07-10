@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관리 기능")
+@Sql({"classpath:subway.init.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 
@@ -42,16 +44,11 @@ public class LineAcceptanceTest {
         String 첫번째역 = "지하철역";
         String 두번째역 = "새로운지하철역";
 
-        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
-        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
-
-        assertAll(
-                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
+        long firstStationId = createStationRequest(첫번째역);
+        long secondStationId = createStationRequest(두번째역);
 
         // When
-        ExtractableResponse<Response> 첫번째노선_생성_응답 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 첫번째노선_생성_응답 = createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
 
         // Then
         List<String> stationNames = 첫번째노선_생성_응답.jsonPath().getList("stations.name", String.class);
@@ -75,24 +72,13 @@ public class LineAcceptanceTest {
         String 두번째역 = "새로운지하철역";
         String 세번째역 = "또다른지하철역";
 
-        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
-        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
-        ExtractableResponse<Response> 세번째역_생성_응답 = createStationRequest(세번째역);
-
-        assertAll(
-                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(세번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
+        long firstStationId = createStationRequest(첫번째역);
+        long secondStationId = createStationRequest(두번째역);
+        long thirdStationId = createStationRequest(세번째역);
 
         // When
-        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-        ExtractableResponse<Response> 분당선 = createLineRequest("분당선", "bg-green-600", 1L, 3L, 20);
-
-        assertAll(
-                () -> assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
+        createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
+        createLineRequest("분당선", "bg-green-600", firstStationId, thirdStationId, 20);
 
         // Then
         ExtractableResponse<Response> 노선_전체조회_응답 = findAllLinesRequest();
@@ -127,15 +113,10 @@ public class LineAcceptanceTest {
         String 첫번째역 = "첫번째역";
         String 두번째역 = "새로운지하철역";
 
-        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
-        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+        long firstStationId = createStationRequest(첫번째역);
+        long secondStationId = createStationRequest(두번째역);
 
-        assertAll(
-                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
-
-        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
 
         // When
         long lineId = 신분당선.jsonPath().getLong("id");
@@ -167,15 +148,10 @@ public class LineAcceptanceTest {
         String 첫번째역 = "첫번째역";
         String 두번째역 = "새로운지하철역";
 
-        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
-        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+        long firstStationId = createStationRequest(첫번째역);
+        long secondStationId = createStationRequest(두번째역);
 
-        assertAll(
-                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
-
-        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
         assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // When
@@ -216,15 +192,10 @@ public class LineAcceptanceTest {
         String 첫번째역 = "첫번째역";
         String 두번째역 = "새로운지하철역";
 
-        ExtractableResponse<Response> 첫번째역_생성_응답 = createStationRequest(첫번째역);
-        ExtractableResponse<Response> 두번째역_생성_응답 = createStationRequest(두번째역);
+        long firstStationId = createStationRequest(첫번째역);
+        long secondStationId = createStationRequest(두번째역);
 
-        assertAll(
-                () -> assertThat(첫번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(두번째역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
-
-        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        ExtractableResponse<Response> 신분당선 = createLineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
         assertThat(신분당선.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // When
@@ -243,29 +214,37 @@ public class LineAcceptanceTest {
         assertThat(lineIds).hasSize(0);
     }
 
-    private ExtractableResponse<Response> createStationRequest(String stationName) {
+    private long createStationRequest(String stationName) {
         Map<String, String> station = new HashMap<>();
         station.put("name", stationName);
 
-        return RestAssured
+        ExtractableResponse<Response> createStationResponse = RestAssured
                 .given().log().all()
                 .body(station)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+
+        assertThat(createStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return createStationResponse.jsonPath().getLong("id");
     }
 
     private ExtractableResponse<Response> createLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
         LineRequest line = new LineRequest(name, color, upStationId, downStationId, distance);
 
-        return RestAssured
+        ExtractableResponse<Response> createLineResponse = RestAssured
                 .given().log().all()
                 .body(line)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+
+        assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return createLineResponse;
     }
 
 }
