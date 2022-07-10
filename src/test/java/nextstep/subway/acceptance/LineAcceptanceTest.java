@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,6 +73,29 @@ public class LineAcceptanceTest {
                 () -> assertThat(지하철_노선_목록_조회().jsonPath().getList("name")).containsAnyOf(SHIN_BUNDANG_LINE)
         );
     }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 2개의 지하철 노선을 응답 받는다
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void 지하철_노선_목록_조회_테스트() {
+
+        // given 2개의 지하철역을 생성하고
+        지하철_노선_생성(SHIN_BUNDANG_LINE, RED_COLOR, Long.valueOf(지하철역_생성(GANGNAM_STATION).jsonPath().getString("id")), Long.valueOf(지하철역_생성(YUKSAM_STATION).jsonPath().getString("id")), DISTANCE);
+        지하철_노선_생성(BUNDANG_LINE, BLUE_COLOR, Long.valueOf(지하철역_생성(GANGNAM_STATION).jsonPath().getString("id")), Long.valueOf(지하철역_생성(YUKSAM_STATION).jsonPath().getString("id")), DISTANCE);
+
+        // when 지하철역 목록을 조회하면
+        List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
+        // then 2개의 지하철역을 응답 받는다
+        assertAll(
+                () -> assertThat(lineNames).containsAnyOf(SHIN_BUNDANG_LINE),
+                () -> assertThat(lineNames).containsAnyOf(BUNDANG_LINE)
+        );
+    }
+
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
         return stationAcceptanceTest.createStation(GANGNAM_STATION);
