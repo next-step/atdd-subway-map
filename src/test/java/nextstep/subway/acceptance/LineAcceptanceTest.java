@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DirtiesContext
+@Sql("/truncate.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
@@ -91,9 +91,11 @@ public class LineAcceptanceTest {
         List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
         // then 2개의 지하철역을 응답 받는다
         assertAll(
+                () -> assertThat(lineNames.size()).isEqualTo(2),
                 () -> assertThat(lineNames).containsAnyOf(SHIN_BUNDANG_LINE),
                 () -> assertThat(lineNames).containsAnyOf(BUNDANG_LINE)
         );
+
     }
 
     /**
