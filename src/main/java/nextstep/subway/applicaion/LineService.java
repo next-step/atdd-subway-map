@@ -38,4 +38,12 @@ public class LineService {
 		List<Line> lineList = lineRepository.findAll();
 		return LineResponse.fromList(lineList);
 	}
+
+	public LineResponse getLine(Long lineId) {
+		return LineResponse.from(getLineById(lineId));
+	}
+
+	private Line getLineById(Long lineId) {
+		return lineRepository.findById(lineId).orElseThrow(() -> new RuntimeException("노선이 존재하지 않습니다."));
+	}
 }
