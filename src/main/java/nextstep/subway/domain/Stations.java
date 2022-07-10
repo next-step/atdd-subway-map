@@ -17,7 +17,7 @@ public class Stations {
 
     }
 
-    public List<Station> getValues() {
+    public List<Station> getStations() {
         return List.of(upStation, downStation);
     }
 

@@ -43,7 +43,7 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getStations().getValues()
+                line.getStations()
                         .stream().map(StationResponse::of)
                         .collect(Collectors.toList())
         );

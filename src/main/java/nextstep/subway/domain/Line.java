@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -58,8 +59,8 @@ public class Line {
         return distance;
     }
 
-    public Stations getStations() {
-        return stations;
+    public List<Station> getStations() {
+        return stations.getStations();
     }
 
 
