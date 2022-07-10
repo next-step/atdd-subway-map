@@ -1,16 +1,17 @@
 package nextstep.subway.domain;
 
+import static javax.persistence.FetchType.LAZY;
+
 import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
 @Embeddable
 public class Stations {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     private Station upStations;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Station downStation;
 
     public Stations() {

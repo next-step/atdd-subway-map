@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
 public class StationLineRequest {
+
     private String name;
     private String color;
     private Long upStationId;
@@ -19,6 +20,9 @@ public class StationLineRequest {
     public StationLineRequest(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    protected StationLineRequest() {
     }
 
     public String getName() {
