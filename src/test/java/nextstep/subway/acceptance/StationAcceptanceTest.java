@@ -1,7 +1,6 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -29,7 +28,9 @@ public class StationAcceptanceTest {
     }
 
     /**
-     * When 지하철역을 생성하면 Then 지하철역이 생성된다 Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+     * When 지하철역을 생성하면
+     * Then 지하철역이 생성된다
+     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
@@ -41,7 +42,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getStationsRequest()
+        List<String> stationNames = getSubwayStations()
                 .jsonPath()
                 .getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
@@ -60,7 +61,7 @@ public class StationAcceptanceTest {
         createStation("언주역");
 
         // when - 지하철역 목록 조회
-        ExtractableResponse<Response> response = getStationsRequest();
+        ExtractableResponse<Response> response = getSubwayStations();
 
         // then - 지하철역 2개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
@@ -79,14 +80,9 @@ public class StationAcceptanceTest {
         createStation("서대문");
 
         // when - 지하철역을 삭제
-        RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/1")
-                .then().log().all()
-                .extract();
+        deleteSubwayStation(1);
 
-        ExtractableResponse<Response> response = getStationsRequest();
+        ExtractableResponse<Response> response = getSubwayStations();
 
         // then - 지하철역 1개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
@@ -109,9 +105,18 @@ public class StationAcceptanceTest {
         return params;
     }
 
-    private ExtractableResponse<Response> getStationsRequest() {
+    private ExtractableResponse<Response> getSubwayStations() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private void deleteSubwayStation(int id) {
+        RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/{id}", id)
                 .then().log().all()
                 .extract();
     }
