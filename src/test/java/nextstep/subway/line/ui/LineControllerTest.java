@@ -50,6 +50,22 @@ class LineControllerTest {
     }
 
     @Test
+    void 노선조회() throws Exception {
+        final Long id = 1L;
+        doReturn(new LineResponse())
+                .when(lineService)
+                .findLine(id);
+
+        // when
+        final ResultActions result = target.perform(
+                MockMvcRequestBuilders.get("/lines/{id}", id)
+        );
+
+        // then
+        result.andExpect(status().isOk());
+    }
+
+    @Test
     void 노선목록조회() throws Exception {
         doReturn(List.of(new LineResponse()))
                 .when(lineService)
