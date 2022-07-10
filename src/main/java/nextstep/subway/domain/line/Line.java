@@ -31,12 +31,12 @@ public class Line {
         this.distance = distance;
     }
 
+    protected Line() {
+    }
+
     public void update(String name, String color){
         this.name = StringUtils.hasText(name) ? name : this.name;
         this.color = StringUtils.hasText(color) ? color : this.color;
-    }
-
-    protected Line() {
     }
 
     public Long getId() {
