@@ -11,11 +11,48 @@ public class StationLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     private String color;
 
-    private int upStationId;
+    private Long upStationId;
 
-    private int downStationId;
+    private Long downStationId;
 
-    private int distance;
+    private Integer distance;
+
+    public StationLine(final String name, final String color, final Long upStationId, final Long downStationId, final Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
+
+    protected StationLine() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }
