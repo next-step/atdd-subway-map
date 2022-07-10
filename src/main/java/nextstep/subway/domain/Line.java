@@ -30,9 +30,14 @@ public class Line {
     }
 
     public static Line create(String name, String color, Section section) {
-        Line line = new Line(name, color, Sections.create(section));
-        section.setLine(line);
+        Line line = new Line(name, color, Sections.create());
+        line.addSection(section);
         return line;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
+        section.setLine(this);
     }
 
     public Long id() {
