@@ -41,4 +41,8 @@ public class Station {
     public void updateSubwayLine(StationToSubwayLine stationToSubwayLine) {
         this.subwayLines.add(stationToSubwayLine);
     }
+
+    public void removeSubwayLine(StationToSubwayLine stationToSubwayLine) {
+        this.subwayLines.remove(stationToSubwayLine);
+    }
 }
