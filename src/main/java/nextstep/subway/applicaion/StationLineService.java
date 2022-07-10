@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -31,7 +32,7 @@ public class StationLineService {
 	}
 
 	public List<StationLineResponse> findAllStationLines() {
-		return stationLineRepository.findAll()
+		return stationLineRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
 			.stream()
 			.map(this::createStationLineResponse)
 			.collect(Collectors.toList());
