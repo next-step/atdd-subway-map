@@ -1,21 +1,19 @@
 package nextstep.subway.domain.station;
 
 import nextstep.subway.domain.m2m.StationToSubwayLine;
-import nextstep.subway.domain.subwayLine.SubwayLine;
 
 import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.*;
 
 @Entity
 public class Station {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "station_id")
     private Long id;
 

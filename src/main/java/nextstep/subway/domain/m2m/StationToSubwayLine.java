@@ -6,13 +6,15 @@ import nextstep.subway.domain.subwayLine.SubwayLine;
 import javax.persistence.*;
 
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.*;
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.*;
 
 @Entity
 public class StationToSubwayLine {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "station_to_subway_line_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY, cascade = ALL)
