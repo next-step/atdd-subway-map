@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -76,7 +77,10 @@ public class StationAcceptanceTest {
 
         // then - 지하철역 2개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
-        assertThat(names).hasSize(2);
+        assertAll(
+                () -> assertThat(names).hasSize(2),
+                () -> assertThat(names).contains("신논현역", "언주역")
+        );
     }
 
     /**
