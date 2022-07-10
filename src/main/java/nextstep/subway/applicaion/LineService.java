@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
@@ -44,5 +45,11 @@ public class LineService {
                 line.getColor(),
                 stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))
         );
+    }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return new LineResponse(line.getId(), line.getName(), line.getColor(),
+                stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId())));
     }
 }
