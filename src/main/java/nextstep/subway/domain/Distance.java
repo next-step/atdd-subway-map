@@ -5,15 +5,16 @@ import java.util.Objects;
 
 @Embeddable
 public class Distance {
-
+    private static final long MIN_DISTANCE = 1;
     private long distance;
+
 
     protected Distance() {
 
     }
 
     public Distance(long distance) {
-        if (distance < 1) {
+        if (distance < MIN_DISTANCE) {
             throw new IllegalArgumentException("거리는 1 이상이어야 합니다.");
         }
         this.distance = distance;
