@@ -3,6 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.SubwayLineService;
 import nextstep.subway.applicaion.dto.subwayLine.CreateSubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayLine.SubwayLineResponse;
+import nextstep.subway.applicaion.dto.subwayLine.UpdateSubwayLineRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,14 @@ public class SubwayLineController {
     @GetMapping("/subway-lines/{subwayLineId}")
     public ResponseEntity<SubwayLineResponse> getSubwayLine(@PathVariable Long subwayLineId) {
         final SubwayLineResponse subwayLineResponse = subwayLineService.findOneSubwayLineById(subwayLineId);
+        return ResponseEntity.ok().body(subwayLineResponse);
+    }
+
+    @PutMapping("/subway-lines/{subwayLineId}")
+    public ResponseEntity<SubwayLineResponse> updateSubway(
+            @PathVariable Long subwayLineId,
+            @RequestBody UpdateSubwayLineRequest updateSubwayLineRequest) {
+        final SubwayLineResponse subwayLineResponse = subwayLineService.updateSubwayLine(subwayLineId, updateSubwayLineRequest);
         return ResponseEntity.ok().body(subwayLineResponse);
     }
 }
