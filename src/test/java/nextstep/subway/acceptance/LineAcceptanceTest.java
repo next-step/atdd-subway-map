@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
+import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Map;
+import nextstep.subway.applicaion.dto.LineCreationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,11 @@ class LineAcceptanceTest {
     @LocalServerPort
     private int port;
 
+    private final LineCreationRequest sinbundangLineCreationRequest = new LineCreationRequest(
+            "신분당선", "bg-red-600", 1L, 2L, 10L);
+    private final LineCreationRequest bundangLineCreationRequest = new LineCreationRequest(
+            "분당선", "bg-green-600", 1L, 3L, 20L);
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -36,12 +42,7 @@ class LineAcceptanceTest {
     @Test
     void canFindTheLineCreatedWhenLineWasCreated() {
         // when
-        var lineName = "신분당선";
-        var lineColor = "bg-red-600";
-        var upStationId = 1L;
-        var downStationId = 2L;
-        var distance = 10L;
-        var creationResponse = createLine(lineName, lineColor, upStationId, downStationId, distance);
+        var creationResponse = createLine(sinbundangLineCreationRequest);
 
         // then
         var lineNames = RestAssured
@@ -52,26 +53,18 @@ class LineAcceptanceTest {
 
         assertAll(
                 () -> assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(lineNames).containsExactlyInAnyOrder(lineName)
+                () -> assertThat(lineNames).containsExactlyInAnyOrder(sinbundangLineCreationRequest.getName())
         );
     }
 
-    private ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        var requestBody = Map.of(
-                "name", name,
-                "color", color,
-                "upStationId", upStationId,
-                "downStationId", downStationId,
-                "distance", distance
-        );
-
+    private ExtractableResponse<Response> createLine(LineCreationRequest creationRequest) {
         return RestAssured
                 .given()
-                    .body(requestBody)
+                    .body(creationRequest, ObjectMapperType.JACKSON_2)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().log().all()
+                .when()
                     .post("/lines")
-                .then().log().all()
+                .then()
                     .extract();
     }
 }
