@@ -27,4 +27,9 @@ public class LineService {
         List<Line> lines = lineRepository.findAll();
         return lines.stream().map(LineResponse::convertedByEntity).collect(Collectors.toList());
     }
+
+    public LineResponse getLine(long lineId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(()->new RuntimeException("노선이 존재하지 않습니다."));
+        return LineResponse.convertedByEntity(line);
+    }
 }
