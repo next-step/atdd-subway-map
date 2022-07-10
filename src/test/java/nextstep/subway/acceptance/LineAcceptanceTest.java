@@ -98,6 +98,28 @@ public class LineAcceptanceTest {
         assertThat(조회한_노선_이름).isEqualTo("신분당선");
     }
 
+    /**
+     * Given    지하철 노선을 생성하고
+     * When     생성한 지하철 노선을 수정하면
+     * Then     해당 지하철 노선 정보는 수정된다.
+     */
+    @Test
+    @DisplayName("지하철노선을 수정한다.")
+    void modifyLine() {
+        // given
+        ExtractableResponse<Response> savedResponse = 노선_생성_요청("신분당선", "bg-red-600", 1L, 3L, 20);
+        Long 신분당선_ID = savedResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = 노선_수정_요청(신분당선_ID, "2호선", "bg-green-600");
+        String 조회한_노선_이름 = response.jsonPath().getString("name");
+        String 조회한_노선_색상 = response.jsonPath().getString("color");
+
+        // then
+        assertThat(조회한_노선_이름).isEqualTo("2호선");
+        assertThat(조회한_노선_색상).isEqualTo("bg-green-600");
+    }
+
     private ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -128,6 +150,21 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> 노선_조회_요청(Long id) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
+
+    private ExtractableResponse<Response> 노선_수정_요청(Long id, String name, String color) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
