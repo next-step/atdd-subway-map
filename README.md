@@ -14,7 +14,7 @@
 
 추가 수정 사항
 
-- [ ] 통일성을 위해 @ResponseStatus 보다는 내용(body)없이 응답 코드만 반환하기
+- [x] 통일성을 위해 @ResponseStatus 보다는 내용(body)없이 응답 코드만 반환하기
 - [ ] LineService.findAllStationInLine
 - [ ] LineAcceptanceTest에서 getLong()은 primitive type을 반환한다. 이에 알맞은 검증코드로 변경하기
 - [ ] http status code 검증 부분도 assertAll() 내부로 이동
