@@ -18,12 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StationAcceptanceTest extends AcceptanceTest {
 
     public static final String CLEAN_UP_TABLE = "station";
+
     @Autowired
-    private CleanUpUtils cleanUpUtils;
+    private CleanUpSchema cleanUpSchema;
 
     @Override
     protected void preprocessing() {
-        cleanUpUtils.execute(CLEAN_UP_TABLE);
+        cleanUpSchema.execute(CLEAN_UP_TABLE);
     }
 
     /**

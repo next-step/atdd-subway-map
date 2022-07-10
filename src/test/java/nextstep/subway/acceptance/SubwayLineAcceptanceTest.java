@@ -1,13 +1,11 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -21,21 +19,21 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
 
     @Autowired
-    private CleanUpUtils cleanUpUtils;
+    private CleanUpSchema cleanUpSchema;
 
-    private CallApi callApi;
+    private SubwayLineCallApi subwayLineCallApi;
 
     public SubwayLineAcceptanceTest() {
-        this.callApi = new CallApi();
+        this.subwayLineCallApi = new SubwayLineCallApi();
     }
 
     @Override
     protected void preprocessing() {
-        cleanUpUtils.execute(CLEAN_UP_TABLES);
+        cleanUpSchema.execute(CLEAN_UP_TABLES);
 
-        callApi.saveStation(Param.강남역);
-        callApi.saveStation(Param.양재역);
-        callApi.saveStation(Param.역삼역);
+        subwayLineCallApi.saveStation(Param.강남역);
+        subwayLineCallApi.saveStation(Param.양재역);
+        subwayLineCallApi.saveStation(Param.역삼역);
     }
 
     /**
@@ -46,12 +44,14 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+
+        // then
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(saveResponse.header("Location")).isNotEmpty();
 
         // then
-        ExtractableResponse<Response> response = callApi.findSubwayLines();
+        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLines();
         assertThat(Actual.get(response, "[0].name", String.class)).isEqualTo("신분당선");
         assertThat(Actual.get(response, "[0].color", String.class)).isEqualTo("bg-red-600");
         assertThat(Actual.getList(response, "[0].stations.name", String.class)).isEqualTo(List.of("강남역","양재역"));
@@ -66,11 +66,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void getSubwayLines() {
         // given
-        callApi.saveSubwayLine(Param.신분당선);
-        callApi.saveSubwayLine(Param.이호선);
+        subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        subwayLineCallApi.saveSubwayLine(Param.이호선);
 
         // when
-        ExtractableResponse<Response> response = callApi.findSubwayLines();
+        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLines();
 
         // then
         assertThat(Actual.getList(response, "name", String.class)).isEqualTo(List.of("신분당선", "2호선"));
@@ -86,14 +86,17 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void getSubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = Actual.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> response = callApi.findSubwayLineById(id);
+        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(Actual.get(response, "name", String.class)).isEqualTo("신분당선");
+        assertThat(Actual.get(response, "color", String.class)).isEqualTo("bg-red-600");
+        assertThat(Actual.getList(response, "stations.name", String.class)).isEqualTo(List.of("강남역", "양재역"));
     }
 
     /**
@@ -105,15 +108,17 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifySubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = Actual.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> modifyResponse = callApi.modifySubwayLineById(id, Param.이호선으로_수정);
+        ExtractableResponse<Response> modifyResponse = subwayLineCallApi.modifySubwayLineById(id, Param.이호선으로_수정);
+
+        // then
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> response = callApi.findSubwayLineById(id);
+        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(id);
         assertThat(Actual.get(response, "name", String.class)).isEqualTo("2호선");
         assertThat(Actual.get(response, "color", String.class)).isEqualTo("bg-green-600");
     }
@@ -127,11 +132,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = callApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = Actual.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> response = callApi.deleteSubwayLineById(id);
+        ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwayLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -201,95 +206,5 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
         public static final Map<String, String> 양재역 = Map.of("name", "양재역");
 
         public static final Map<String, String> 역삼역 = Map.of("name", "역삼역");
-    }
-
-    /**
-     * 지하철 노선 관련 API 호출 관련 클래스
-     */
-    private static class CallApi {
-
-        /**
-         * 지하철 노선 저장
-         * @param params
-         * @return
-         */
-        public ExtractableResponse<Response> saveSubwayLine(Map<String, Object> params) {
-            return RestAssured
-                    .given().log().all()
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .body(params)
-                    .when().post("/lines")
-                    .then().log().all()
-                    .extract();
-        }
-
-        /**
-         * 지하철 노선 수정
-         * @param id
-         * @param params
-         * @return
-         */
-        public ExtractableResponse<Response> modifySubwayLineById(Long id, Map<String, String> params) {
-            return RestAssured
-                    .given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().put("/lines/{id}", id)
-                    .then().log().all()
-                    .extract();
-        }
-
-        /**
-         * 지하철 노선 삭제
-         * @param id
-         * @return
-         */
-        public ExtractableResponse<Response> deleteSubwayLineById(Long id) {
-            return RestAssured
-                    .given().log().all()
-                    .when().delete("/lines/{id}", id)
-                    .then().log().all()
-                    .extract();
-        }
-
-        /**
-         * 지하철 노선 목록 조회
-         * @return
-         */
-        public ExtractableResponse<Response> findSubwayLines() {
-            return RestAssured
-                    .given().log().all()
-                    .when().get("/lines")
-                    .then().log().all()
-                    .extract();
-        }
-
-        /**
-         * 지하철 노선 조회
-         * @param id
-         * @return
-         */
-        public ExtractableResponse<Response> findSubwayLineById(Long id) {
-            return RestAssured
-                    .given().log().all()
-                    .when().get("/lines/{id}", id)
-                    .then().log().all()
-                    .extract();
-        }
-
-        /**
-         * 지하철 저장
-         * @param params
-         * @return
-         */
-        public ExtractableResponse<Response> saveStation(Map<String, String> params) {
-            return RestAssured
-                    .given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post("/stations")
-                    .then().log().all()
-                    .extract();
-        }
     }
 }

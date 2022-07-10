@@ -9,7 +9,7 @@ import javax.persistence.PersistenceContext;
 
 @Component
 @Profile("test")
-public class CleanUpUtils {
+public class CleanUpSchema {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -22,5 +22,4 @@ public class CleanUpUtils {
             entityManager.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN id RESTART WITH 1").executeUpdate();
         }
     }
-
 }
