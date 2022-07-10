@@ -28,8 +28,7 @@ public class LineService {
 		Station upStation = getStation(lineRequest.getUpStationId());
 		Station downStation = getStation(lineRequest.getDownStationId());
 		Line line = lineRequest.toEntity(upStation, downStation);
-		lineRepository.save(line);
-		return LineResponse.from(line);
+		return LineResponse.from(lineRepository.save(line));
 	}
 
 	private Station getStation(Long stationId) {
