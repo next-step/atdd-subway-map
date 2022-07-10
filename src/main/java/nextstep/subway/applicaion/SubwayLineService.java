@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.subwayLine.CreateSubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayLine.SubwayLineResponse;
+import nextstep.subway.applicaion.dto.subwayLine.UpdateSubwayLineRequest;
 import nextstep.subway.domain.m2m.StationToSubwayLine;
 import nextstep.subway.domain.m2m.StationToSubwayLineRepository;
 import nextstep.subway.domain.station.Station;
@@ -68,6 +69,14 @@ public class SubwayLineService {
         final SubwayLine findSubwayLine = getSubwayLineByIdIfExists(subwayLineId);
 
         return new SubwayLineResponse(findSubwayLine);
+    }
+
+    public SubwayLineResponse updateSubwayLine(Long subwayLineId, UpdateSubwayLineRequest updateSubwayLineRequest) {
+        final SubwayLine subwayLine = getSubwayLineByIdIfExists(subwayLineId);
+        final SubwayLineColor subwayLineColor = getSubwayLineColorByCodeIfExists(updateSubwayLineRequest.getColor());
+        final SubwayLine updatedSubwayLine = subwayLine.update(updateSubwayLineRequest.getName(), subwayLineColor);
+
+        return new SubwayLineResponse(updatedSubwayLine);
     }
 
     private Station getStationByIdIfExists(Long stationId) {
