@@ -51,7 +51,7 @@ public class LineService {
     private List<StationResponse> findAllStationInLine(Line line) {
         return stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))
                 .stream()
-                .map(station -> StationResponse.of(station))
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
