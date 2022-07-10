@@ -6,14 +6,13 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,7 +83,8 @@ public class LineAcceptanceTest {
         assertThat(getsResponse.body().jsonPath().getList("name", String.class)).contains(신분당선);
 
         //지하철 노선의 상행, 하행역 확인
-        assertThat(getsResponse.body().jsonPath().getString("$[*].stations[*].name")).contains(강남역, 시청역);
+        //TODO : json path element 이해가 가지 않음[공부 필요]
+        assertThat(getsResponse.body().jsonPath().getList("stations[0].name", String.class)).containsExactly(시청역, 강남역);
     }
 
     @DisplayName("지하철 노선 목록 조회")
@@ -177,12 +177,17 @@ public class LineAcceptanceTest {
         
         //상태코드 200 확인
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        
+
+        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
         //수정된 지하철 노선명 확인
-        assertThat(updateResponse.jsonPath().getString("name")).isEqualTo(일호선);
-        
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo(일호선);
+
         //수정된 지하철 노선 색 확인
-        assertThat(updateResponse.jsonPath().getString("color")).isEqualTo(updateColor);
+        assertThat(getResponse.jsonPath().getString("color")).isEqualTo(updateColor);
 
     }
 
