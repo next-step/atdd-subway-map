@@ -66,9 +66,8 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteStation() {
         //Given
-        ExtractableResponse<Response> response = 지하철역_등록("강남역");
-
-        String url = response.header("Location");
+        String url = 지하철역_등록("강남역")
+                .header("Location");
 
         //when
         지하철역_삭제(url);
