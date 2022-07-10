@@ -121,6 +121,27 @@ public class LineAcceptanceTest {
         assertThat(조회한_노선_색상).isEqualTo("bg-green-600");
     }
 
+    /**
+     * Given    지하철 노선을 생성하고
+     * When     생성한 지하철 노선을 삭제하면
+     * Then     해당 지하철 노선 정보는 삭제된다.
+     */
+    @Test
+    @DisplayName("지하철노선을 삭제한다.")
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> savedResponse = 노선_생성_요청("신분당선", "bg-red-600", 1L, 3L, 20);
+        Long 신분당선_ID = savedResponse.jsonPath().getLong("id");
+
+        // when
+        노선_삭제_요청(신분당선_ID);
+
+        // then
+        ExtractableResponse<Response> response = 노선_목록_조회_요청();
+        List<String> 노선_이름_목록 = response.jsonPath().getList("name", String.class);
+        assertThat(노선_이름_목록).doesNotContain("신분당선");
+    }
+
     private ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -169,6 +190,16 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response;
+    }
+
+    private ExtractableResponse<Response> 노선_삭제_요청(Long id) {
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         return response;
     }
 }
