@@ -1,15 +1,14 @@
 package nextstep.subway.acceptance;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
+import static nextstep.subway.acceptance.SubwayStationCommon.createdStation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import nextstep.subway.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +47,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation("강남역");
+        ExtractableResponse<Response> response = createdStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -69,8 +68,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given - 2개의 지하철역 생성
-        createStation("신논현역");
-        createStation("언주역");
+        createdStation("신논현역");
+        createdStation("언주역");
 
         // when - 지하철역 목록 조회
         ExtractableResponse<Response> response = getSubwayStations();
@@ -92,7 +91,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given - 지하철역 생성
-        createStation("서대문");
+        createdStation("서대문");
 
         // when - 지하철역을 삭제
         deleteSubwayStation(1);
@@ -102,22 +101,6 @@ public class StationAcceptanceTest {
         // then - 지하철역 1개를 응답받는다
         List<String> names = response.jsonPath().getList("name", String.class);
         assertThat(names).doesNotContain("서대문");
-    }
-
-    private ExtractableResponse<Response> createStation(String name) {
-        return RestAssured.given().log().all()
-                .body(createStationParams(name))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private Map<String, String> createStationParams(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return params;
     }
 
     private ExtractableResponse<Response> getSubwayStations() {
