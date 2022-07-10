@@ -7,27 +7,20 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-    @LocalServerPort
-    int port;
-
+public class LineAcceptanceTest extends AcceptanceTest{
     @BeforeEach
     public void setUp() {
-        RestAssured.port = port;
+        super.setUp();
         지하철역_추가("삼성역");
         지하철역_추가("역삼역");
         지하철역_추가("강남역");
@@ -64,13 +57,17 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> readResponse = 지하철_노선_목록();
+        List<String> names = readResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf("신분당선");
+        assertThat(names).containsAnyOf("신분당선");
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_목록() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -86,11 +83,7 @@ public class LineAcceptanceTest {
         지하철_노선_추가("분당선","bg-green-600",1,3,5);
 
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/lines")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = 지하철_노선_목록();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
