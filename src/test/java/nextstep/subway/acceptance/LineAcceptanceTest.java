@@ -8,6 +8,7 @@ import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,6 +85,40 @@ class LineAcceptanceTest {
                         sinbundangLineCreationRequest.getName(),
                         bundangLineCreationRequest.getName()
                 )
+        );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철노선 조회")
+    @Test
+    void canGetResponseOfLineInformationByLineId() {
+        // given
+        var creationResponse = createLine(bundangLineCreationRequest);
+        var createdLineId = creationResponse.body().jsonPath().getLong("id");
+
+        // when
+        var lineQueryResponse = RestAssured
+                .given()
+                    .pathParam("lineId", createdLineId)
+                .when()
+                    .get("/lines/{lineId}")
+                .then()
+                    .extract();
+
+        // then
+        var id = lineQueryResponse.jsonPath().getLong("id");
+        var name = lineQueryResponse.jsonPath().getString("name");
+        var color = lineQueryResponse.jsonPath().getString("color");
+
+        assertAll(
+                () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(id).isEqualTo(createdLineId),
+                () -> assertThat(name).isEqualTo(bundangLineCreationRequest.getName()),
+                () -> assertThat(color).isEqualTo(bundangLineCreationRequest.getColor())
         );
     }
 
