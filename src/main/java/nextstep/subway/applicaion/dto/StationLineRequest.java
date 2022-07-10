@@ -17,6 +17,10 @@ public class StationLineRequest {
 		return name;
 	}
 
+	public String getColor() {
+		return color;
+	}
+
 	public Long getUpStationId() {
 		return upStationId;
 	}

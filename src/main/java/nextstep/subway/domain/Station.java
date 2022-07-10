@@ -26,4 +26,8 @@ public class Station {
 	public String getName() {
 		return name;
 	}
+
+	public void updateStationName(String stationName) {
+		this.name = stationName;
+	}
 }

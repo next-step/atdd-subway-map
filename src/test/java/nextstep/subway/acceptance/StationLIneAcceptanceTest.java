@@ -109,15 +109,16 @@ public class StationLIneAcceptanceTest {
 		//when
 		Map<Object, Object> updatedLineRequest = generateUpdateRequestDTO(SAMSUNG_STATION, LINE_COLOR_RED);
 		RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.body(updatedLineRequest)
 			.when().put("/lines/" + stationId)
 			.then().log().all()
-			.statusCode(HttpStatus.OK.value());
+			.statusCode(HttpStatus.NO_CONTENT.value());
 
 		//then
 		String name = getLine(stationId, "name");
-		String color = getLine(stationId, "color");
 		assertThat(name).isEqualTo(updatedLineRequest.get("name"));
+		String color = getLine(stationId, "color");
 		assertThat(color).isEqualTo(updatedLineRequest.get("color"));
 
 	}

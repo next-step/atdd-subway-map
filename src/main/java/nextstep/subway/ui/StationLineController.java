@@ -38,12 +38,14 @@ public class StationLineController {
 
 	@GetMapping("/lines/{id}")
 	public ResponseEntity<StationLineResponse> showStationLine(@PathVariable Long id) {
-		return ResponseEntity.ok().body(stationLineService.findStationLines(id));
+		return ResponseEntity.ok().body(stationLineService.findStationLine(id));
 	}
 
 	@PutMapping("/lines/{id}")
-	public ResponseEntity<Void> updateStationLine(@PathVariable Long id) {
-		return null;
+	public ResponseEntity<Void> updateStationLine(@PathVariable Long id,
+		@RequestBody StationLineRequest stationLineRequest) {
+		stationLineService.updateStationLine(id, stationLineRequest);
+		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/lines/{id}")

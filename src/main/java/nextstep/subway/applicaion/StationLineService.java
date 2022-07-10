@@ -16,6 +16,7 @@ import nextstep.subway.domain.StationLineRepository;
 public class StationLineService {
 	private static final String STATION_NAME = "지하철역";
 	private static final String NEW_STATION_NAME = "새로운지하철역";
+	private static final String ENTITY_NOT_FOUND_EXCEPTION_MESSAGE = "Entity Not Found ";
 	private StationLineRepository stationLineRepository;
 
 	public StationLineService(StationLineRepository stationLineRepository) {
@@ -37,12 +38,19 @@ public class StationLineService {
 		return stationLineResponseList;
 	}
 
-	public StationLineResponse findStationLines(Long stationId) {
+	public StationLineResponse findStationLine(Long stationId) {
 
 		StationLine stationLine = stationLineRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException());
+			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
 
 		return createStationLineResponse(stationLine);
+	}
+
+	@Transactional
+	public void updateStationLine(Long stationId, StationLineRequest stationLineRequest) {
+		StationLine stationLine = stationLineRepository.findById(stationId)
+			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
+		stationLine.updateStationLineInformation(stationLineRequest.getName(), stationLineRequest.getColor());
 	}
 
 	private StationLineResponse createStationLineResponse(StationLine stationLine) {

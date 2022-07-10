@@ -51,4 +51,9 @@ public class StationLine {
 	public Long getDownStationId() {
 		return downStationId;
 	}
+
+	public void updateStationLineInformation(String stationName, String stationColor) {
+		this.station.updateStationName(stationName);
+		this.color = stationColor;
+	}
 }

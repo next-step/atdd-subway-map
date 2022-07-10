@@ -26,6 +26,10 @@ public class StationLineResponse {
 		return name;
 	}
 
+	public String getColor() {
+		return color;
+	}
+
 	public List<StationResponse> getStations() {
 		return stations;
 	}
