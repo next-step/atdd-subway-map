@@ -46,16 +46,6 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
-    private ExtractableResponse<Response> createLine(Map<String, Object> map) {
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(map)
-            .when().post("/lines")
-            .then().log().all()
-            .extract();
-    }
-
     /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
@@ -79,27 +69,6 @@ public class LineAcceptanceTest {
         assertThat(subwayLines.jsonPath().getList("")).hasSize(2);
     }
 
-    private Map<String, Object> setRequestBody(String name, String color, long upStationId, long downStationId,
-        long distance) {
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", name);
-        map.put("color", color);
-        map.put("upStationId", upStationId);
-        map.put("downStationId", downStationId);
-        map.put("distance", distance);
-        return map;
-    }
-
-    private ExtractableResponse<Response> getLines() {
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 조회하면
@@ -108,7 +77,18 @@ public class LineAcceptanceTest {
     @Test
     @DisplayName("지하철 노선을 조회한다.")
     void getLineTest() {
+        //given
+        Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
+        ExtractableResponse<Response> line = createLine(requestBody1);
 
+        //when
+        int createdLineId = line.jsonPath().getInt("id");
+        ExtractableResponse<Response> subwayLines = getLine(createdLineId);
+
+        //then
+        assertThat(subwayLines.jsonPath().getInt("id")).isEqualTo(createdLineId);
+        assertThat(subwayLines.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(subwayLines.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
     /**
@@ -131,5 +111,45 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     void deleteLineTest() {
 
+    }
+
+    private ExtractableResponse<Response> createLine(Map<String, Object> map) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(map)
+            .when().post("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private Map<String, Object> setRequestBody(String name, String color, long upStationId, long downStationId,
+        long distance) {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("color", color);
+        map.put("upStationId", upStationId);
+        map.put("downStationId", downStationId);
+        map.put("distance", distance);
+        return map;
+    }
+
+    private ExtractableResponse<Response> getLines() {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> getLine(long id) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/lines/{id}",id)
+            .then().log().all()
+            .extract();
     }
 }
