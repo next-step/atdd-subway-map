@@ -1,6 +1,7 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,6 +9,7 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.exception.ExceptionMessages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -109,12 +111,14 @@ public class LineAcceptanceTest {
         //when
         Map<String, String> requestBody2 = setRequestBody("13호선", "bg-red-500");
         int createdLineId = line.jsonPath().getInt("id");
-        ExtractableResponse<Response> subwayLines = updateLine(createdLineId, requestBody2);
+        ExtractableResponse<Response> updateResponse = updateLine(createdLineId, requestBody2);
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        assertThat(subwayLines.jsonPath().getInt("id")).isEqualTo(createdLineId);
-        assertThat(subwayLines.jsonPath().getString("name")).isEqualTo("13호선");
-        assertThat(subwayLines.jsonPath().getString("color")).isEqualTo("bg-red-500");
+        ExtractableResponse<Response> subwayLine = getLine(createdLineId);
+        assertThat(subwayLine.jsonPath().getInt("id")).isEqualTo(createdLineId);
+        assertThat(subwayLine.jsonPath().getString("name")).isEqualTo("13호선");
+        assertThat(subwayLine.jsonPath().getString("color")).isEqualTo("bg-red-500");
     }
 
     /**
@@ -125,7 +129,18 @@ public class LineAcceptanceTest {
     @Test
     @DisplayName("지하철 노선을 삭제한다.")
     void deleteLineTest() {
+        //given
+        Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
+        ExtractableResponse<Response> line = createLine(requestBody1);
 
+        //when
+        int createdLineId = line.jsonPath().getInt("id");
+        ExtractableResponse<Response> deleteResponse = deleteLine(createdLineId);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        assertThatThrownBy(()->getLine(createdLineId)).isInstanceOf(RuntimeException.class)
+            .hasMessage(ExceptionMessages.NO_LINE_EXCEPTION_MESSAGE);
     }
 
     private ExtractableResponse<Response> createLine(Map<String, Object> map) {
@@ -181,6 +196,15 @@ public class LineAcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(requestBody)
             .when().put("/lines/{id}",id)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLine(long id) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/lines/{id}",id)
             .then().log().all()
             .extract();
     }
