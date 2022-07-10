@@ -33,15 +33,10 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 생성한다.")
-    @Sql(value = "classpath:sql/station/createStations.sql")
+    @Sql(value = "classpath:sql/station/truncate.sql")
     void createLineTest() {
         //when
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("name", "신분당선");
-        requestBody.put("color", "bg-red-600");
-        requestBody.put("upStationId", 1);
-        requestBody.put("downStationId", 2);
-        requestBody.put("distance", 10);
+        Map<String, Object> requestBody = setRequestBody("신분당선", "bg-red-600",1,2,10);
 
         ExtractableResponse<Response> response = createLine(requestBody);
 
@@ -68,22 +63,11 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선목록을 조회한다.")
-    @Sql(value = "classpath:sql/station/createStations.sql")
+    @Sql(value = "classpath:sql/station/truncate.sql")
     void getLinesTest() {
         //given
-        Map<String, Object> requestBody1 = new HashMap<>();
-        requestBody1.put("name", "신분당선");
-        requestBody1.put("color", "bg-red-600");
-        requestBody1.put("upStationId", 1);
-        requestBody1.put("downStationId", 2);
-        requestBody1.put("distance", 10);
-
-        Map<String, Object> requestBody2 = new HashMap<>();
-        requestBody2.put("name", "2호선");
-        requestBody2.put("color", "green");
-        requestBody2.put("upStationId", 1);
-        requestBody2.put("downStationId", 2);
-        requestBody2.put("distance", 10);
+        Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
+        Map<String, Object> requestBody2 = setRequestBody("2호선", "green",1,2,10);
 
         createLine(requestBody1);
         createLine(requestBody2);
@@ -93,6 +77,18 @@ public class LineAcceptanceTest {
 
         //then
         assertThat(subwayLines.jsonPath().getList("")).hasSize(2);
+    }
+
+    private Map<String, Object> setRequestBody(String name, String color, long upStationId, long downStationId,
+        long distance) {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("color", color);
+        map.put("upStationId", upStationId);
+        map.put("downStationId", downStationId);
+        map.put("distance", distance);
+        return map;
     }
 
     private ExtractableResponse<Response> getLines() {
