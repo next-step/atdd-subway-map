@@ -151,7 +151,6 @@ public class SubwayLineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    // TODO: 지하철 노선 삭제에 대한 인수 테스트 코드 작성
     @DisplayName("지하철 노선을 삭제합니다.")
     @Test
     void deleteSubwayLine() throws Exception {
