@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,6 +61,22 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
+    private ExtractableResponse<Response> createStation(Map params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private List<String> getStations(String variable) {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList(variable, String.class);
+    }
+
     /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
@@ -69,6 +86,21 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        createStation(params);
+        params.put("name", "역삼역");
+        createStation(params);
+
+        RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().statusCode(200)
+                .assertThat().body("size()", is(2));
+
+        List<String> stationNames = getStations("name");
+        assertThat(stationNames).hasSize(2);
+        assertThat(stationNames).containsExactly("강남역", "역삼역");
     }
 
     /**
