@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -41,6 +42,15 @@ public class LineService {
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException(String.format("존재하지 않는 노선입니다. id : %d", id)));
+        List<StationResponse> stations = stationService.findStationsById(List.of(line.getUpStationId(), line.getDownStationId()));
+        return LineResponse.of(line, stations);
+    }
+
+    public LineResponse updateLine(Long id, LineUpdateRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException(String.format("존재하지 않는 노선입니다. id : %d", id)));
+        line.update(request);
+
         List<StationResponse> stations = stationService.findStationsById(List.of(line.getUpStationId(), line.getDownStationId()));
         return LineResponse.of(line, stations);
     }

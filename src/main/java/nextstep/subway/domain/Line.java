@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -51,4 +53,8 @@ public class Line {
         return downStationId;
     }
 
+    public void update(LineUpdateRequest request) {
+        this.name = request.getName();
+        this.color = request.getColor();
+    }
 }
