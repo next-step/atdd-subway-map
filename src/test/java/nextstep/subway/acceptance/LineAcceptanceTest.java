@@ -22,11 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
     @LocalServerPort
-    int port;
+    private int port;
+    private long upStationId;
+    private long downStationId;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
     }
 
     /**
@@ -37,8 +41,8 @@ public class LineAcceptanceTest {
     @Test
     void createStationLine() {
         // given
-        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        지하철역_생성_요청("신갈역").jsonPath().getLong("id");
 
         // when
         지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10);
@@ -57,12 +61,8 @@ public class LineAcceptanceTest {
     @Test
     void findAllLine() {
         // given
-        long upStationId1 = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        long downStationId1 = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
-        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId1, downStationId1, 10);
-        long upStationId2 = 지하철역_생성_요청("동백역").jsonPath().getLong("id");
-        long downStationId2 = 지하철역_생성_요청("강남대역").jsonPath().getLong("id");
-        지하철노선_생성_요청("에버라인", "bg-red-600", upStationId2, downStationId2, 10);
+        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10);
+        지하철노선_생성_요청("에버라인", "bg-red-600", upStationId, downStationId, 10);
 
         // when
         List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
@@ -80,8 +80,6 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
         long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
 
         // when
@@ -105,8 +103,6 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
         long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
 
         // when
@@ -129,8 +125,6 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine(){
         // given
-        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
         long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
 
         // when
