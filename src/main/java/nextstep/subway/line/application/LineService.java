@@ -49,21 +49,25 @@ public class LineService {
 
     @Transactional
     public void modifyLine(final Long id, final LineRequest lineRequest) {
-        final Line line = findLine(id);
+        final Line line = findLineById(id);
 
         lineRepository.save(lineRequest.toLine(line.getId()));
     }
 
     @Transactional
     public void deleteLine(final Long id) {
-        final Line line = findLine(id);
+        final Line line = findLineById(id);
 
         lineRepository.deleteById(line.getId());
     }
 
-    private Line findLine(final Long id) {
+    public LineResponse findLine(final Long id) {
+        return createLineResponse(findLineById(id));
+    }
+
+
+    private Line findLineById(final Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 노선이 존재하지 않습니다."));
     }
-
 }

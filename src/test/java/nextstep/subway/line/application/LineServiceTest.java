@@ -48,6 +48,19 @@ class LineServiceTest {
     }
 
     @Test
+    void 노선조회() {
+        final Line line = savedLine();
+
+        doReturn(Optional.of(line))
+                .when(lineRepository)
+                .findById(line.getId());
+
+        final LineResponse result = target.findLine(line.getId());
+
+        assertThat(result).isNotNull();
+    }
+
+    @Test
     void 노선목록조회() {
         final Line line = savedLine();
 
