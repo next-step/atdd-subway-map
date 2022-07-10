@@ -1,21 +1,16 @@
 package nextstep.subway.domain;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class StationLine {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@ManyToOne(cascade = CascadeType.ALL)
-	private Station station;
-
+	private String name;
 	private String color;
 	private Long upStationId;
 	private Long downStationId;
@@ -25,7 +20,7 @@ public class StationLine {
 	}
 
 	public StationLine(String stationName, String stationColor, Long upStationId, Long downStationId, Long distance) {
-		this.station = new Station(stationName);
+		this.name = stationName;
 		this.color = stationColor;
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;
@@ -36,8 +31,8 @@ public class StationLine {
 		return id;
 	}
 
-	public String getStationName() {
-		return this.station.getName();
+	public String getName() {
+		return name;
 	}
 
 	public String getColor() {
@@ -53,7 +48,7 @@ public class StationLine {
 	}
 
 	public void updateStationLineInformation(String stationName, String stationColor) {
-		this.station.updateStationName(stationName);
+		this.name = stationName;
 		this.color = stationColor;
 	}
 }

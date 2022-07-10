@@ -62,7 +62,7 @@ public class StationLineService {
 			return new StationLineResponse();
 		}
 		return new StationLineResponse(stationLine.getId(),
-			stationLine.getStationName(),
+			stationLine.getName(),
 			stationLine.getColor(),
 			new StationResponse(stationLine.getUpStationId(), STATION_NAME),
 			new StationResponse(stationLine.getDownStationId(), NEW_STATION_NAME));
