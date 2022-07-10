@@ -37,4 +37,11 @@ public class LineService {
                         stationService.findStationsById(List.of(line.getUpStationId(), line.getDownStationId()))))
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException(String.format("존재하지 않는 노선입니다. id : %d", id)));
+        List<StationResponse> stations = stationService.findStationsById(List.of(line.getUpStationId(), line.getDownStationId()));
+        return LineResponse.of(line, stations);
+    }
 }

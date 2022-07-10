@@ -28,4 +28,9 @@ public class LineController {
     public ResponseEntity<List<LineResponse>> showStations() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
+
+    @GetMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> findStationById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.findLine(id));
+    }
 }

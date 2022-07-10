@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.useDefaultRepresentation;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -56,20 +58,8 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_생성() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
-        params.put("distance", "10");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
+        final ExtractableResponse<Response> response =
+                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -93,21 +83,8 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_목록_조회() {
         // given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "신분당선");
-        params1.put("color", "bg-red-600");
-        params1.put("upStationId", "1");
-        params1.put("downStationId", "2");
-        params1.put("distance", "10");
-        지하철_노선_추가(params1);
-
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "분당선");
-        params2.put("color", "bg-green-600");
-        params2.put("upStationId", "1");
-        params2.put("downStationId", "3");
-        params2.put("distance", "5");
-        지하철_노선_추가(params2);
+        지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
+        지하철_노선_추가("분당선","bg-green-600",1,3,5);
 
         // when
         ExtractableResponse<Response> response =
@@ -127,12 +104,45 @@ public class LineAcceptanceTest {
         assertThat(stationNames).contains("[삼성역, 역삼역]", "[삼성역, 강남역]");
     }
 
-    private void 지하철_노선_추가(Map<String, String> param) {
-        RestAssured.given().log().all()
-                .body(param)
+    private ExtractableResponse<Response> 지하철_노선_추가(String name, String color, long upStationId, long downStationId, long distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", String.valueOf(distance));
+
+        return RestAssured.given().log().all()
+                .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void 지하철_노선_조회() {
+        // given
+        final ExtractableResponse<Response> addResponse =
+                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
+        final long id = addResponse.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().get("/lines/" + id)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        LineResponse lineResponse = response.as(LineResponse.class);
+        assertThat(lineResponse.getName()).isEqualTo("신분당선");
+        assertThat(lineResponse.getColor()).isEqualTo("bg-red-600");
     }
 }
