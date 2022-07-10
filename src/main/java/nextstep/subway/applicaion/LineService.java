@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import nextstep.subway.applicaion.dto.LineRequest;
@@ -30,5 +32,10 @@ public class LineService {
 	private Station getStation(Long stationId) {
 		return stationRepository.findById(stationId)
 			.orElseThrow(() -> new RuntimeException("역이 존재하지 않습니다."));
+	}
+
+	public List<LineResponse> getAllLine() {
+		List<Line> lineList = lineRepository.findAll();
+		return LineResponse.fromList(lineList);
 	}
 }
