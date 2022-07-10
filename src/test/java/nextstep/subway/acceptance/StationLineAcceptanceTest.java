@@ -1,6 +1,6 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.StationAcceptanceTest.*;
+import static nextstep.subway.acceptance.StationAcceptanceTest.지하철역_등록;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -10,24 +10,14 @@ import java.util.List;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
-import org.junit.jupiter.api.BeforeEach;
+import nextstep.subway.common.BaseAcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @DisplayName("지하철역노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationLineAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
+public class StationLineAcceptanceTest extends BaseAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
