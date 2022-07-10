@@ -9,6 +9,7 @@ import nextstep.subway.domain.StationLine;
 import nextstep.subway.domain.StationLineRepository;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StationLineService {
@@ -25,6 +26,7 @@ public class StationLineService {
         this.stationLineMapper = stationLineMapper;
     }
 
+    @Transactional
     public StationLineResponse createStationLine(StationLineRequest request) {
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
@@ -35,6 +37,8 @@ public class StationLineService {
         return stationLineMapper.of(savedStationLine);
     }
 
+    @Transactional(readOnly = true)
+
     public List<StationLineResponse> getStationLines() {
         List<StationLine> stationLines = stationLineRepository.findAll();
         return stationLines.stream()
@@ -42,19 +46,22 @@ public class StationLineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public StationLineResponse getStationLine(Long lineId) {
         StationLine stationLine = stationLineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
         return stationLineMapper.of(stationLine);
     }
 
+    @Transactional
     public void updateStationLine(Long lineId, StationLineRequest request) {
         StationLine stationLine = stationLineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
         stationLine.changeNameAndColor(request.getName(), request.getColor());
     }
 
+    @Transactional
     public void deleteStationLine(Long lineId) {
-        stationRepository.deleteById(lineId);
+        stationLineRepository.deleteById(lineId);
     }
 }
