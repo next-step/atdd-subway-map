@@ -25,7 +25,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    public LineResponse saveStationLine(CreateLineRequest request) {
+    public LineResponse saveLine(CreateLineRequest request) {
         List<Station> stations = stationRepository.findAllById(List.of(request.getUpStationId(), request.getDownStationId()));
 
         Line line = request.toEntity();
@@ -41,5 +41,13 @@ public class LineService {
                                                                                                 line.getDownStationId()));
                                  return LineResponse.of(line, stations);
                              }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public LineResponse findLineById(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
+        return LineResponse.of(line, stations);
     }
 }
