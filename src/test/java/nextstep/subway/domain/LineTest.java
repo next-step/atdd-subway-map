@@ -26,7 +26,6 @@ class LineTest {
         assertAll(() -> {
             assertThat(line.getName()).isEqualTo("8호선");
             assertThat(line.getColor()).isEqualTo("bg-pink-500");
-            assertThat(line.getDistance()).isEqualTo(new Distance(17L));
             assertThat(line.getStations()).isEqualTo(List.of(모란역, 암사역));
         });
     }

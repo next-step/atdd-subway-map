@@ -55,10 +55,6 @@ public class Line {
         return color;
     }
 
-    public Distance getDistance() {
-        return distance;
-    }
-
     public List<Station> getStations() {
         return stations.getStations();
     }
