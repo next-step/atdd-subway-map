@@ -36,6 +36,7 @@ public class LineAcceptanceTest {
 
         StationAcceptanceTest.지하철역_등록_요청("강남역");
         StationAcceptanceTest.지하철역_등록_요청("역삼역");
+        StationAcceptanceTest.지하철역_등록_요청("판교역");
     }
 
     /**
@@ -46,14 +47,34 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 생성한다.")
     void createStationLine() {
         // given
-        노선_생성_요청("신분당선", "bg-red-600", 1L, 2L, 10);
+        노선_생성_요청("2호선", "bg-green-600", 1L, 2L, 10);
 
         // when
         ExtractableResponse<Response> response = 노선_목록_조회_요청();
         List<String> 노선_이름_목록 = response.jsonPath().getList("name", String.class);
 
         // then
-        assertThat(노선_이름_목록).contains("신분당선");
+        assertThat(노선_이름_목록).contains("2호선");
+    }
+
+    /**
+     * Given    2개의 지하철 노선을 생성하고
+     * When     지하철 노선 목록을 조회하면
+     * Then     지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @Test
+    @DisplayName("지하철노선 목록을 조회한다.")
+    void getLines() {
+        // given
+        노선_생성_요청("2호선", "bg-green-600", 1L, 2L, 10);
+        노선_생성_요청("신분당선", "bg-red-600", 1L, 3L, 20);
+
+        // when
+        ExtractableResponse<Response> response = 노선_목록_조회_요청();
+        List<String> 노선_이름_목록 = response.jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(노선_이름_목록).containsOnly("2호선", "신분당선");
     }
 
     private ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
