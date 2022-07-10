@@ -107,14 +107,14 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> line = createLine(requestBody1);
 
         //when
-        Map<String, String> requestBody2 = setRequestBody("13호선", "bg-red-600");
+        Map<String, String> requestBody2 = setRequestBody("13호선", "bg-red-500");
         int createdLineId = line.jsonPath().getInt("id");
         ExtractableResponse<Response> subwayLines = updateLine(createdLineId, requestBody2);
 
         //then
         assertThat(subwayLines.jsonPath().getInt("id")).isEqualTo(createdLineId);
         assertThat(subwayLines.jsonPath().getString("name")).isEqualTo("13호선");
-        assertThat(subwayLines.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        assertThat(subwayLines.jsonPath().getString("color")).isEqualTo("bg-red-500");
     }
 
     /**
