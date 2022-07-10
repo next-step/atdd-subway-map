@@ -88,6 +88,26 @@ public class StationLineAcceptanceTest {
         assertThat(stationLineResponse.getColor()).isEqualTo("bg-red-600");
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void updateStationLine(){
+        //given
+        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 1L, 2L, 10);
+        String url = response.header("Location");
+
+        //when
+        ExtractableResponse<Response> response2  = 지하철노선_수정(url,"다른분당선","bg-red-600");
+
+        //then
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+
     private ExtractableResponse<Response> 지하철역_노선_등록(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         //when
         StationLineRequest request = new StationLineRequest(name,color,upStationId,downStationId,distance);
@@ -131,4 +151,20 @@ public class StationLineAcceptanceTest {
                     .extract()
                     .jsonPath().getObject("$", StationLineResponse.class);
     }
+
+    private ExtractableResponse<Response> 지하철노선_수정(String url, String name, String color) {
+        StationLineRequest request = new StationLineRequest(name,color);
+
+        return RestAssured
+                .given()
+                    .log().all()
+                    .body(request)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .put(url)
+                .then()
+                    .log().all()
+                    .extract();
+    }
+
 }
