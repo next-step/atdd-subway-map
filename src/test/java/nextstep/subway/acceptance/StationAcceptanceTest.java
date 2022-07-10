@@ -115,7 +115,7 @@ public class StationAcceptanceTest {
         // Given
         String stationName = "강남역";
         Long createdStationId = createStationWithName(stationName).jsonPath()
-                .get("id");
+                .getLong("id");
 
         // When
         ExtractableResponse<Response> deleteResponse = deleteStationWithId(createdStationId);
