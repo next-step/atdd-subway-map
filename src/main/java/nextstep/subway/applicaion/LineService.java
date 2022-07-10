@@ -46,12 +46,12 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long lineId) {
         Line line = lineRepository.findById(lineId)
-            .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
+                                  .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
         List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
         return LineResponse.of(line, stations);
     }
 
-    public void updateLine(Long lineId, UpdateLineRequest request){
+    public void updateLine(Long lineId, UpdateLineRequest request) {
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다."));
         line.setName(StringUtils.hasText(request.getName()) ? request.getName() : line.getName());

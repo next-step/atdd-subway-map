@@ -1,7 +1,5 @@
 package nextstep.subway.domain;
 
-import org.springframework.util.StringUtils;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

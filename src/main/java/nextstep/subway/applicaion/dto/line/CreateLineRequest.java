@@ -9,7 +9,7 @@ public class CreateLineRequest {
     private Long downStationId;
     private Integer distance;
 
-    public Line toEntity(){
+    public Line toEntity() {
         return new Line(name, color, upStationId, downStationId, distance);
     }
 
