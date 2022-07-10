@@ -57,4 +57,8 @@ public class LineService {
         line.setName(StringUtils.hasText(request.getName()) ? request.getName() : line.getName());
         line.setColor(StringUtils.hasText(request.getColor()) ? request.getColor() : line.getColor());
     }
+
+    public void deleteLine(final Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
 }
