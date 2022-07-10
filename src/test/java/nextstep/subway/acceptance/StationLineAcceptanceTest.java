@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -8,6 +9,7 @@ import io.restassured.response.Response;
 import java.util.List;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,14 +37,15 @@ public class StationLineAcceptanceTest {
     @Test
     void createStationLine() {
         //when
-        지하철역_노선_등록("신분당선", "bg-red-600",1L,2L,10);
+        Long 강남역 = 지하철역_등록("강남역").as(StationResponse.class).getId();
+        Long 역삼역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
+        StationLineResponse 신분당선 = 지하철역_노선_등록("신분당선", "bg-red-600", 강남역, 역삼역, 10).as(StationLineResponse.class);
 
         //then
         List<StationLineResponse> stationLineResponses = 지하철역노선_목록_조회();
 
         assertThat(stationLineResponses).hasSize(1);
-        assertThat(stationLineResponses.get(0).getName()).isEqualTo("신분당선");
-        assertThat(stationLineResponses.get(0).getColor()).isEqualTo("bg-red-600");
+        assertThat(stationLineResponses).containsExactly(신분당선);
     }
 
     /**
@@ -54,18 +57,19 @@ public class StationLineAcceptanceTest {
     @Test
     void getStationLines(){
         //given
-        지하철역_노선_등록("신분당선", "bg-red-600",1L,2L,10);
-        지하철역_노선_등록("분당선", "bg-green-600",1L,3L,10);
+        Long 강남역 = 지하철역_등록("강남역").as(StationResponse.class).getId();
+        Long 역삼역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
+        Long 선릉역 = 지하철역_등록("선릉역").as(StationResponse.class).getId();
+
+        StationLineResponse 신분당선 = 지하철역_노선_등록("신분당선", "bg-red-600", 강남역, 역삼역, 10).as(StationLineResponse.class);
+        StationLineResponse 분당선 = 지하철역_노선_등록("분당선", "bg-green-600", 강남역, 선릉역, 10).as(StationLineResponse.class);
 
         //when
         List<StationLineResponse> stationLineResponses = 지하철역노선_목록_조회();
 
         //then
         assertThat(stationLineResponses).hasSize(2);
-        assertThat(stationLineResponses.get(0).getName()).isEqualTo("신분당선");
-        assertThat(stationLineResponses.get(0).getColor()).isEqualTo("bg-red-600");
-        assertThat(stationLineResponses.get(1).getName()).isEqualTo("분당선");
-        assertThat(stationLineResponses.get(1).getColor()).isEqualTo("bg-green-600");
+        assertThat(stationLineResponses).containsExactly(신분당선,분당선);
     }
 
     /**
@@ -77,7 +81,9 @@ public class StationLineAcceptanceTest {
     @Test
     void getStationLine(){
         //given
-        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 1L, 2L, 10);
+        Long 강남역 = 지하철역_등록("강남역").as(StationResponse.class).getId();
+        Long 역삼역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
+        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 강남역, 역삼역, 10);
         String url = response.header("Location");
 
         //when
@@ -86,6 +92,7 @@ public class StationLineAcceptanceTest {
         //then
         assertThat(stationLineResponse.getName()).isEqualTo("신분당선");
         assertThat(stationLineResponse.getColor()).isEqualTo("bg-red-600");
+        assertThat(stationLineResponse.getStations()).containsExactly(new StationResponse(강남역,"강남역"),new StationResponse(역삼역,"역삼역"));
     }
 
     /**
@@ -97,14 +104,15 @@ public class StationLineAcceptanceTest {
     @Test
     void updateStationLine(){
         //given
-        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 1L, 2L, 10);
-        String url = response.header("Location");
+        Long 강남역 = 지하철역_등록("강남역").as(StationResponse.class).getId();
+        Long 역삼역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
+        String url = 지하철역_노선_등록("신분당선", "bg-red-600", 강남역, 역삼역, 10).header("Location");
 
         //when
-        ExtractableResponse<Response> response2  = 지하철노선_수정(url,"다른분당선","bg-red-600");
+        ExtractableResponse<Response> response  = 지하철노선_수정(url,"다른분당선","bg-red-600");
 
         //then
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -116,14 +124,15 @@ public class StationLineAcceptanceTest {
     @Test
     void deleteStationLine(){
         //given
-        ExtractableResponse<Response> response = 지하철역_노선_등록("신분당선", "bg-red-600", 1L, 2L, 10);
-        String url = response.header("Location");
+        Long 강남역 = 지하철역_등록("강남역").as(StationResponse.class).getId();
+        Long 역삼역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
+        String url = 지하철역_노선_등록("신분당선", "bg-red-600", 강남역, 역삼역, 10).header("Location");
 
         //when
-        ExtractableResponse<Response> response2  = 지하철노선_삭제(url);
+        ExtractableResponse<Response> response  = 지하철노선_삭제(url);
 
         //then
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 

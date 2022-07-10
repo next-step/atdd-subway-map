@@ -90,7 +90,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain("강남역");
     }
 
-    private ExtractableResponse<Response> 지하철역_등록(String stationName) {
+    static ExtractableResponse<Response> 지하철역_등록(String stationName) {
         StationRequest station = new StationRequest(stationName);
 
         return RestAssured
@@ -106,7 +106,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private List<String> 지하철역_목록_조회() {
+    List<String> 지하철역_목록_조회() {
         return RestAssured
                 .given()
                     .log().all()
@@ -119,7 +119,7 @@ public class StationAcceptanceTest {
                     .jsonPath().getList("name", String.class);
     }
 
-    private ExtractableResponse<Response> 지하철역_삭제(String url) {
+    ExtractableResponse<Response> 지하철역_삭제(String url) {
         return RestAssured
                 .given()
                     .log().all()
