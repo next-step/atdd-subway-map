@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
+import nextstep.subway.domain.Line;
+
 public class LineResponse {
     private final Long id;
     private final String name;
@@ -21,6 +23,10 @@ public class LineResponse {
 
     public String getColor() {
         return color;
+    }
+
+    public static LineResponse convertedByEntity(Line line) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor());
     }
 
 }
