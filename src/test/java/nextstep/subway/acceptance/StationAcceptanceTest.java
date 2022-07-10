@@ -20,7 +20,7 @@ import io.restassured.response.Response;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
@@ -74,7 +74,7 @@ public class StationAcceptanceTest {
         assertThat(stationNameList).containsAnyOf("이매역");
     }
 
-    private ExtractableResponse<Response> 지하철_생성_요청(Map<String, String> params){
+    public static ExtractableResponse<Response> 지하철_생성_요청(Map<String, String> params){
         return RestAssured.given().log().all()
             .body(params)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
