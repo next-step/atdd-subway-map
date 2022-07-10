@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -117,6 +118,34 @@ public class LineAcceptanceTest {
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선"),
             () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-610")
                  );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선 삭제")
+    @Test
+    void deleteLine(){
+        // given
+        long upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        final ExtractableResponse<Response> response = 지하철노선_삭제_요청(lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> 지하철노선_삭제_요청(final long lineId) {
+        return RestAssured.given().log().all()
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().delete("/lines/" + lineId)
+                          .then().log().all()
+                          .extract();
     }
 
     private ExtractableResponse<Response> 지하철노선_수정_요청(final long lineId, final String lineName, final String lineColor) {
