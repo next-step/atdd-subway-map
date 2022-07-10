@@ -1,8 +1,23 @@
 package nextstep.subway.domain.station;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import nextstep.subway.infra.JpaStationRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public interface StationRepository extends JpaRepository<Station, Long> {
+public interface StationRepository extends JpaStationRepository {
+
+    @Override
+    List<Station> findAll();
+
+    @Override
+    Optional<Station> findById(Long aLong);
+
+    @Override
+    <S extends Station> S save(S entity);
+
+    @Override
+    void deleteById(Long aLong);
 }
