@@ -39,11 +39,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // then
-        List<LineResponse> lineResponse = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
-        assertThat(lineResponse).containsOnlyOnce(newLine);
+        List<LineResponse> 노선_목록 = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
+        assertThat(노선_목록).containsOnlyOnce(_8호선);
     }
 
     /**
@@ -55,17 +55,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLines() {
         // given
-        LineResponse newLine1 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         Long 까치산역 = 역을_만들다("까치산역").as(StationResponse.class).getId();
         Long 신설동역 = 역을_만들다("신설동역").as(StationResponse.class).getId();
-        LineResponse newLine2 = 노선을_만들다("2호선", "bg-lime-400", 까치산역, 신설동역, 23L).as(LineResponse.class);
+        LineResponse _2호선 = 노선을_만들다("2호선", "bg-lime-400", 까치산역, 신설동역, 23L).as(LineResponse.class);
 
         // when
-        List<LineResponse> lineResponse = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
+        List<LineResponse> 노선_목록 = 노선_목록을_조회한다().jsonPath().getList(".", LineResponse.class);
 
         // then
-        assertThat(lineResponse).containsExactly(newLine1, newLine2);
+        assertThat(노선_목록).containsExactly(_8호선, _2호선);
     }
 
     /**
@@ -77,16 +77,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
-        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when
-        LineResponse lineResponse = 노선을_조회한다(newLine.getId()).as(LineResponse.class);
+        LineResponse 조회한_8호선 = 노선을_조회한다(_8호선.getId()).as(LineResponse.class);
 
         // then
         assertAll(() -> {
-            assertThat(lineResponse.getName()).isEqualTo("8호선");
-            assertThat(lineResponse.getColor()).isEqualTo("bg-pink-500");
-            assertThat(lineResponse.getStationResponses()).containsExactly(
+            assertThat(조회한_8호선.getName()).isEqualTo("8호선");
+            assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
+            assertThat(조회한_8호선.getStationResponses()).containsExactly(
                     new StationResponse(1L, "모란역"),
                     new StationResponse(2L, "암사역")
             );
@@ -102,17 +102,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when
-        노선_목록을_수정한다(newLine.getId(), "2호선", "bg-lime-300");
+        노선_목록을_수정한다(_8호선.getId(), "2호선", "bg-lime-300");
 
         // when
-        LineResponse lineResponse = 노선을_조회한다(newLine.getId()).as(LineResponse.class);
+        LineResponse _2호선 = 노선을_조회한다(_8호선.getId()).as(LineResponse.class);
         assertAll(() -> {
-            assertThat(lineResponse.getName()).isEqualTo("2호선");
-            assertThat(lineResponse.getColor()).isEqualTo("bg-lime-300");
-            assertThat(lineResponse.getStationResponses()).containsExactly(
+            assertThat(_2호선.getName()).isEqualTo("2호선");
+            assertThat(_2호선.getColor()).isEqualTo("bg-lime-300");
+            assertThat(_2호선.getStationResponses()).containsExactly(
                     new StationResponse(1L, "모란역"),
                     new StationResponse(2L, "암사역")
             );
@@ -128,10 +128,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        LineResponse newLine = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
+        LineResponse _8호선 = 노선을_만들다("8호선", "bg-pink-500", 모란역, 암사역, 17L).as(LineResponse.class);
 
         // when && then
-        노선을_삭제한다(newLine.getId());
+        노선을_삭제한다(_8호선.getId());
     }
 
     public static ExtractableResponse<Response> 노선을_만들다(String name, String color, Long upStationId, Long downStationId, Long distance) {
