@@ -64,6 +64,12 @@ public class SubwayLineService {
         return findSubwayLines;
     }
 
+    public SubwayLineResponse findOneSubwayLineById(Long subwayLineId) {
+        final SubwayLine findSubwayLine = getSubwayLineByIdIfExists(subwayLineId);
+
+        return new SubwayLineResponse(findSubwayLine);
+    }
+
     private Station getStationByIdIfExists(Long stationId) {
         final Optional<Station> findStation = stationRepository.findById(stationId);
         if (findStation.isEmpty()) {
@@ -71,6 +77,15 @@ public class SubwayLineService {
         }
 
         return findStation.get();
+    }
+
+    private SubwayLine getSubwayLineByIdIfExists(Long subwayLineId) {
+        final Optional<SubwayLine> findSubwayLine = subwayLineRepository.findById(subwayLineId);
+        if (findSubwayLine.isEmpty()) {
+            throw new RuntimeException("존재하지 않는 지하철 노선입니다.");
+        }
+
+        return findSubwayLine.get();
     }
 
     private SubwayLineColor getSubwayLineColorByCodeIfExists(String stationLineColorCode) {
