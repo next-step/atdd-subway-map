@@ -138,7 +138,8 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> findLineByIdAPIResponse(long lineId) {
         return RestAssured
                 .given().log().all()
-                .when().get("/lines/" + lineId)
+                .pathParam("id", lineId)
+                .when().get("/lines/{id}")
                 .then().log().all()
                 .extract();
     }
@@ -170,10 +171,11 @@ public class LineAcceptanceTest {
 
         ExtractableResponse<Response> 지하철노선_수정_응답 = RestAssured
                 .given().log().all()
+                .pathParam("id", lineId)
                 .body(lineChangeRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .put("/lines/" + lineId)
+                .put("/lines/{id}")
                 .then().log().all()
                 .extract();
         assertThat(지하철노선_수정_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -210,7 +212,8 @@ public class LineAcceptanceTest {
 
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/" + lineId)
+                .pathParam("id", lineId)
+                .when().delete("/lines/{id}")
                 .then().log().all()
                 .extract();
 
