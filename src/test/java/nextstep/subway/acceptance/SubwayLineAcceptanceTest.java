@@ -95,7 +95,8 @@ public class SubwayLineAcceptanceTest {
                 .extract();
     }
 
-    private Map<String, String> createSubwayLineParams(String name, String color, Long upStationId, Long downStationId, int distance) {
+    private Map<String, String> createSubwayLineParams(String name, String color, Long upStationId, Long downStationId,
+                                                       int distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);

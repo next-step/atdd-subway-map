@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
@@ -28,5 +29,20 @@ public class LineService {
         List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
 
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+    }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
+    private LineResponse createLineResponse(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))
+        );
     }
 }
