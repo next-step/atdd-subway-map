@@ -1,0 +1,106 @@
+package nextstep.subway.acceptance;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+@DirtiesContext
+@DisplayName("지하철 노선 관련 기능")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class LineAcceptanceTest {
+
+    @LocalServerPort
+    int port;
+
+    private final StationAcceptanceTest stationAcceptanceTest;
+
+    static final String GANGNAM_STATION = "강남역";
+    static final String YUKSAM_STATION = "역삼역";
+    static final String NONHYUN_STATION = "논현역";
+
+    static final String SHIN_BUNDANG_LINE = "신분당선";
+    static final String FIRST_LINE = "1호선";
+    static final String BUNDANG_LINE = "분당선";
+
+    static final String RED_COLOR = "bg-red-600";
+    static final String GREEN_COLOR = "bg-green-600";
+    static final String BLUE_COLOR = "blue";
+
+    static final Long DISTANCE = 5L;
+
+    public LineAcceptanceTest() {
+        this.stationAcceptanceTest = new StationAcceptanceTest();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
+    }
+
+    /**
+     * When 지하철 노선을 생성하면
+     * Then 지하철 노선이 생성된다
+     * Then 지하철 노선 목록 조회시 생성한 역을 찾을 수 있다
+     */
+    @DisplayName("지하철 노선을 생성한다.")
+    @Test
+    void 지하철_노선_생성() {
+        // when 지하철 노선을 생성하면
+        Long upStationId = Long.valueOf(지하철역_생성(GANGNAM_STATION).jsonPath().getString("id"));
+        Long downStationId = Long.valueOf(지하철역_생성(YUKSAM_STATION).jsonPath().getString("id"));
+        ExtractableResponse<Response> response = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED_COLOR, upStationId, downStationId, DISTANCE);
+        assertAll(
+                // then 지하철 노선이 생성된다
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(SHIN_BUNDANG_LINE),
+                () -> assertThat(response.jsonPath().getString("color")).isEqualTo(RED_COLOR),
+                // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
+                () -> assertThat(지하철_노선_목록_조회().jsonPath().getList("name")).containsAnyOf(SHIN_BUNDANG_LINE)
+        );
+    }
+
+    private ExtractableResponse<Response> 지하철역_생성(String stationName) {
+        return stationAcceptanceTest.createStation(GANGNAM_STATION);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        return RestAssured.given().log().all()
+                .body(지하철_노선_생성_파라미터(name, color, String.valueOf(upStationId), String.valueOf(downStationId), String.valueOf(distance)))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private Map<String, String> 지하철_노선_생성_파라미터(String name, String color, String upStationId, String downStationId, String distance) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+        param.put("color", color);
+        param.put("upStationId", upStationId);
+        param.put("downStationId", downStationId);
+        param.put("distance", distance);
+        return param;
+    }
+
+}
