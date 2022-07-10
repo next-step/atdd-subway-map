@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -101,5 +102,27 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+        ExtractableResponse<Response> response = createStation(params);
+        String createdId = response.jsonPath().getString("id");
+
+        // then
+        List<String> stationNames = getStations("name");
+        assertThat(stationNames).hasSize(1);
+        assertThat(stationNames).containsExactly("강남역");
+        List<String> stationIds = getStations("id");
+        assertThat(stationIds).containsExactly("1");
+
+        // when
+        RestAssured
+                .given().log().all()
+                .when().delete("/stations/" + createdId)
+                .then().statusCode(204);
+
+        // then
+        stationNames = getStations("name");
+        assertThat(stationNames).hasSize(0);
     }
 }
