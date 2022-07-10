@@ -1,55 +1,18 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
-import java.util.Map;
 
+import static nextstep.subway.acceptance.StationRequestCollection.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
-
-    private ExtractableResponse<Response> 지하철역_전체_조회() {
-        return RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성(String stationName) {
-        return RestAssured.given().log().all()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private void 지하철역_삭제(long stationId) {
-        RestAssured
-                .given().log().all()
-                .when().delete("/stations/{stationId}", stationId)
-                .then().log().all();
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -91,7 +54,7 @@ public class StationAcceptanceTest {
 
         List<String> resultList = response.jsonPath().getList("name", String.class);
         assertThat(resultList).contains("성수역", "건대입구역");
-        assertThat(resultList.size()).isEqualTo(2);
+        assertThat(resultList).hasSize(2);
     }
 
     /**
@@ -108,10 +71,11 @@ public class StationAcceptanceTest {
         long stationId = response.jsonPath().getLong("id");
 
         // when
-        지하철역_삭제(stationId);
+        ExtractableResponse<Response> deleteResponse = 지하철역_삭제(stationId);
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> resultList = 지하철역_전체_조회().jsonPath().getList("name", String.class);
-        assertThat(resultList).doesNotContain("건대입구역");
+        List<String> allStationNames = 지하철역_전체_조회().jsonPath().getList("name", String.class);
+        assertThat(allStationNames).doesNotContain("건대입구역");
     }
 }
