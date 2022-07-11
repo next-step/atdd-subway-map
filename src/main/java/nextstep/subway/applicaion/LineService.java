@@ -52,4 +52,9 @@ public class LineService {
 
 		line.update(lineUpdateRequest);
 	}
+
+	@Transactional
+	public void deleteLineById(Long lineId) {
+		lineRepository.deleteById(lineId);
+	}
 }
