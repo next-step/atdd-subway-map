@@ -7,9 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Embeddable
 public class Sections {
@@ -45,16 +43,6 @@ public class Sections {
         lastSection.changeDownStation(downStation);
     }
 
-    public List<Long> getAllStationId() {
-        Set<Long> stationIds = new HashSet<>();
-        sections.forEach(section -> {
-                    stationIds.add(section.getUpStationId());
-                    stationIds.add(section.getDownStationId());
-                }
-        );
-        return new ArrayList<>(stationIds);
-    }
-
     public List<Station> getStations() {
         final List<Station> stations = new ArrayList<>();
         stations.add(sections.get(0).getUpStation());
@@ -63,5 +51,9 @@ public class Sections {
         }
 
         return stations;
+    }
+
+    public boolean isDownStation(Station station) {
+        return sections.get(sections.size() - 1).getDownStation().equals(station);
     }
 }

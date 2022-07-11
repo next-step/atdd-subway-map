@@ -61,12 +61,12 @@ public class Line {
         this.sections.add(section);
     }
 
-    public List<Long> getAllStationId() {
-        return sections.getAllStationId();
-    }
-
     public List<Station> getAllStation() {
         return sections.getStations();
+    }
+
+    public boolean isOwnDownStation(Station station) {
+        return sections.isDownStation(station);
     }
 
     @Override

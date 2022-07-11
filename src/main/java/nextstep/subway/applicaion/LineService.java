@@ -5,6 +5,8 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.*;
+import nextstep.subway.exception.ErrorCode;
+import nextstep.subway.exception.unchecked.SectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +76,11 @@ public class LineService {
         Line findLine = findLineById(lineId);
         Station upStation = stationRepository.findById(request.getUpStationId())
                 .orElseThrow(NoSuchElementException::new);
+
+        if (!findLine.isOwnDownStation(upStation)) {
+            throw new SectionException(ErrorCode.INVALID_UP_STATION_EXCEPTION);
+        }
+
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(NoSuchElementException::new);
 
