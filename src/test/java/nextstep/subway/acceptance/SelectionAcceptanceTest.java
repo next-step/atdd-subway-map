@@ -117,7 +117,7 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 		long lindId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		지하철_구간_생성(lindId, 2, 3, 1);
 		//when
-		지하철_구간_삭제();
+		지하철_구간_삭제(lindId, 3);
 	}
 
 	private void 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance) {
@@ -144,8 +144,12 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 
 	}
 
-	private void 지하철_구간_삭제() {
-
+	private void 지하철_구간_삭제(long lineId, long stationId) {
+		String deleteUrl = String.format("%s/%s/selection?stationId=%s", baseUrlPrefix, lineId, stationId);
+		RestAssured.given().log().all()
+			.when().delete(deleteUrl)
+			.then()
+			.statusCode(HttpStatus.NO_CONTENT.value());
 	}
 
 	private Map<String, Object> 지하철_구간_생성_파라미터생성(long upStationId, long downStationId, long distance) {

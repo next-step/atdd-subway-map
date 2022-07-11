@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import nextstep.subway.applicaion.SelectionService;
@@ -32,9 +33,10 @@ public class SelectionController {
 		return ResponseEntity.created(URI.create("/lines/" + lineId + "/selection")).body(selectionResponse);
 	}
 
-	@DeleteMapping(value = "{lineId}/selection/{stationId}")
-	public ResponseEntity<Void> deleteSelection(@PathVariable long lineId, @PathVariable long stationId) {
-		return null;
+	@DeleteMapping(value = "{lineId}/selection")
+	public ResponseEntity<Void> deleteSelection(@PathVariable long lineId, @RequestParam("stationId") long stationId) {
+		selectionService.deleteSelection(lineId, stationId);
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping(value = "{lineId}/selection")
@@ -43,8 +45,9 @@ public class SelectionController {
 		return null;
 	}
 
-	@GetMapping(value = "{lineId}/selection/{stationId}")
-	public ResponseEntity<SelectionResponse> getSelection(@PathVariable long lineId, @PathVariable long stationId) {
+	@GetMapping(value = "{lineId}/selection/{selectionId}")
+	public ResponseEntity<SelectionResponse> getSelection(@PathVariable long lineId,
+		@PathVariable long selectionId) {
 		return null;
 	}
 
