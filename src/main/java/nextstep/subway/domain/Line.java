@@ -13,6 +13,9 @@ public class Line {
 	@OneToMany
 	private List<Station> stations;
 
+	public Line() {
+	}
+
 	public Line(String name, String color, List<Station> stations) {
 		this.name = name;
 		this.color = color;

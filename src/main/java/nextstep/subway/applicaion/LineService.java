@@ -34,4 +34,8 @@ public class LineService {
 		Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations));
 		return LineResponse.of(line);
 	}
+
+	public List<LineResponse> findAllLines() {
+		return LineResponse.listOf(lineRepository.findAll());
+	}
 }

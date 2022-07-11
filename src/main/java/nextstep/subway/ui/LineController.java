@@ -28,23 +28,7 @@ public class LineController {
 
 	@GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LineResponse>> showLines() {
-		List<StationResponse> stations1 = new ArrayList<>();
-		List<StationResponse> stations2 = new ArrayList<>();
-		StationResponse station1 = new StationResponse(1L, "지하철역");
-		StationResponse station2 = new StationResponse(2L, "새로운지하철역");
-		StationResponse station3 = new StationResponse(3L, "또다른지하철역");
-		stations1.add(station1);
-		stations1.add(station2);
-		stations2.add(station1);
-		stations2.add(station3);
-
-		List<LineResponse> lines = new ArrayList<>();
-		LineResponse line1 = new LineResponse(1L, "신분당선", "bg-red-600", stations1);
-		LineResponse line2 = new LineResponse(2L, "분당선", "bg-green-600", stations2);
-		lines.add(line1);
-		lines.add(line2);
-
-		return ResponseEntity.ok().body(lines);
+		return ResponseEntity.ok().body(lineService.findAllLines());
 	}
 
 	@GetMapping("/lines/{lineId}")
