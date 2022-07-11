@@ -33,5 +33,35 @@ class SectionTest {
         assertThatIllegalArgumentException().isThrownBy(() -> new Section(distance, 모란역, 암사역));
     }
 
+    @Test
+    void 새로운_구간의_상행역은_해당_노선에_등록되어있는_하행_종점역이면_참을_반환한다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        Section currentSection = new Section(10L, 모란역, 암사역);
+
+        final Station 모란역1 = new Station(2L, "암사역");
+        final Station 송파역 = new Station(3L, "송파역");
+        Section newSection = new Section(10L, 모란역1, 송파역);
+
+        // then
+        assertThat(currentSection.isUpStation(newSection)).isTrue();
+    }
+
+    @Test
+    void 새로운_구간의_하행역은_해당_노선에_등록되어있는_역이면_참을_반환한다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        Section currentSection = new Section(10L, 모란역, 암사역);
+
+        final Station 송파역 = new Station(3L, "송파역");
+        final Station 모란역1 = new Station(1L, "모란역");
+        Section newSection = new Section(10L, 송파역, 모란역1);
+
+        // then
+        assertThat(currentSection.isDownStation(newSection)).isTrue();
+    }
+
 
 }

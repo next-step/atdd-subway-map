@@ -22,18 +22,48 @@ public class Sections {
         sections.add(section);
     }
 
+    public void addSection(Line line, Section section) {
+        validation(section);
+        sections.add(section);
+        section.setLine(line);
+    }
+
+    private void validation(Section section) {
+        isContains(section);
+        isUpStation(section);
+        isDownStation(section);
+    }
+
+    private void isContains(Section section) {
+        if (sections.contains(section)) {
+            throw new IllegalArgumentException("이미 등록 된 구간입니다");
+        }
+    }
+
+    private void isUpStation(Section section) {
+        boolean isUpStation = sections.stream().anyMatch(currentSection ->
+                currentSection.isUpStation(section)
+        );
+        if (!isUpStation) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+        }
+    }
+
+    private void isDownStation(Section section) {
+        boolean isDownStation = sections.stream().anyMatch(currentSection ->
+                currentSection.isDownStation(section)
+        );
+        if (isDownStation) {
+            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
+        }
+    }
+
     public List<Station> getStation() {
         return sections.stream()
                 .map(Section::getStations)
                 .flatMap(List::stream)
+                .distinct()
                 .collect(Collectors.toList());
     }
 
-    public void addSection(Line line, Section section) {
-        if (sections.contains(section)) {
-            throw new IllegalArgumentException("이미 등록 된 구간입니다");
-        }
-        sections.add(section);
-        section.setLine(line);
-    }
 }

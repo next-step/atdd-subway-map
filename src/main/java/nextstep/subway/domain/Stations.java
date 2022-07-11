@@ -29,6 +29,14 @@ public class Stations {
         return List.of(upStation, downStation);
     }
 
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

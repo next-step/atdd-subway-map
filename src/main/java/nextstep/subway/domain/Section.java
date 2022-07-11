@@ -13,18 +13,25 @@ public class Section {
     @ManyToOne
     private Line line;
 
-    @Embedded
-    private Distance distance;
+    @ManyToOne
+    public Station upStation;
+
+    @ManyToOne
+    public Station downStation;
 
     @Embedded
-    private Stations stations;
+    private Distance distance;
 
     protected Section() {
     }
 
     public Section(long distance, Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException("상행종점역과 하행종점역의 아이디는 같을 수 없습니다.");
+        }
         this.distance = new Distance(distance);
-        this.stations = new Stations(upStation, downStation);
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public void setLine(Line line) {
@@ -32,7 +39,15 @@ public class Section {
     }
 
     public List<Station> getStations() {
-        return stations.getStations();
+        return List.of(upStation, downStation);
+    }
+
+    public boolean isUpStation(Section section) {
+        return downStation.equals(section.upStation);
+    }
+
+    public boolean isDownStation(Section section) {
+        return getStations().contains(section.downStation);
     }
 
     @Override
@@ -40,11 +55,11 @@ public class Section {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Section section = (Section) o;
-        return Objects.equals(stations, section.stations);
+        return Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(stations);
+        return Objects.hash(upStation, downStation);
     }
 }
