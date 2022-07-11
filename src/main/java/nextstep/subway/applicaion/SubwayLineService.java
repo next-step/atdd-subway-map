@@ -44,6 +44,13 @@ public class SubwayLineService {
 		lineEntity.modify(request);
 	}
 
+	@Transactional
+	public void deleteSubwayLine(Long id) {
+		SubwayLine lineEntity = lineRepository.findById(id)
+				.orElseThrow(NoSuchElementException::new);
+		lineRepository.delete(lineEntity);
+	}
+
 	public List<SubwayLineResponse> findAll() {
 		return lineRepository.findAll().stream()
 				.map(line -> new SubwayLineResponse(

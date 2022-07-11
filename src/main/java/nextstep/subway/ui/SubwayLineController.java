@@ -40,4 +40,10 @@ public class SubwayLineController {
 		lineService.modifySubwayLine(id, request);
 		return ResponseEntity.ok().build();
 	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
+		lineService.deleteSubwayLine(id);
+		return ResponseEntity.noContent().build();
+	}
 }

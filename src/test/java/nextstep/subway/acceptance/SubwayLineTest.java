@@ -202,9 +202,24 @@ public class SubwayLineTest {
 	@Test
 	void deleteSubwayLine() {
 	    //given
+		ExtractableResponse<Response> createSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
+		long subwayLineId = createSubwayLine.jsonPath().getLong("id");
 
-	    //when
+		//when
+		ExtractableResponse<Response> response = deleteSubwayLine(subwayLineId);
 
-	    //then
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
+	private ExtractableResponse<Response> deleteSubwayLine(long subwayLineId) {
+		return RestAssured
+				.given()
+					.log().all()
+				.when()
+					.delete("/lines/{id}", subwayLineId)
+				.then()
+					.log().all()
+				.extract();
 	}
 }
