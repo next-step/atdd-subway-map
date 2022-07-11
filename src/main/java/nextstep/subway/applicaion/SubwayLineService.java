@@ -26,55 +26,39 @@ public class SubwayLineService {
 	@Transactional
 	public SubwayLineResponse createSubwayLine(SubwayLineRequest request) {
 		SubwayLine savedLine = lineRepository.save(request.toEntity());
-		List<Station> findStations = stationRepository.findAllById(
-				List.of(
-						request.getUpStationId(),
-						request.getDownStationId()
-				)
-		);
+		List<Station> upAndDownStation = getUpAndDownStation(request.getUpStationId(), request.getDownStationId());
+		return new SubwayLineResponse(savedLine, upAndDownStation);
+	}
 
-		return new SubwayLineResponse(savedLine, findStations);
+	private List<Station> getUpAndDownStation(Long upStationId, Long downStationId) {
+		return stationRepository.findAllById(List.of(upStationId, downStationId));
 	}
 
 	@Transactional
 	public void modifySubwayLine(Long id, SubwayLineModifyRequest request) {
-		SubwayLine lineEntity = lineRepository.findById(id)
-				.orElseThrow(NoSuchElementException::new);
-
+		SubwayLine lineEntity = findSubwayLineEntityById(id);
 		lineEntity.modify(request);
+	}
+
+	private SubwayLine findSubwayLineEntityById(Long id) {
+		return lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
 	}
 
 	@Transactional
 	public void deleteSubwayLine(Long id) {
-		SubwayLine lineEntity = lineRepository.findById(id)
-				.orElseThrow(NoSuchElementException::new);
+		SubwayLine lineEntity = findSubwayLineEntityById(id);
 		lineRepository.delete(lineEntity);
 	}
 
 	public List<SubwayLineResponse> findAll() {
 		return lineRepository.findAll().stream()
 				.map(line -> new SubwayLineResponse(
-						line,
-						stationRepository.findAllById(
-								List.of(
-										line.getUpStationId(),
-										line.getDownStationId()
-								)
-						)
-				))
+						line, getUpAndDownStation(line.getUpStationId(), line.getDownStationId())))
 				.collect(Collectors.toList());
 	}
 
 	public SubwayLineResponse findById(Long id) {
-		SubwayLine findLine = lineRepository.findById(id)
-				.orElseThrow(NoSuchElementException::new);
-
-		return new SubwayLineResponse(findLine,
-				stationRepository.findAllById(
-						List.of(
-								findLine.getUpStationId(),
-								findLine.getDownStationId()
-						)
-				));
+		SubwayLine findLine = findSubwayLineEntityById(id);
+		return new SubwayLineResponse(findLine, getUpAndDownStation(findLine.getUpStationId(), findLine.getDownStationId()));
 	}
 }
