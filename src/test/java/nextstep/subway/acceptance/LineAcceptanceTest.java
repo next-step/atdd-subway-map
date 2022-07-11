@@ -1,13 +1,18 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 
+import java.awt.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @DisplayName("노선도 관련 기능")
@@ -28,13 +33,39 @@ public class LineAcceptanceTest {
     @Test
     void createSubwayLine() {
         //given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "2");
-        params.put("distance", "10");
+        Map<String, String> stationParams = new HashMap<>();
+        stationParams.put("name", "강남역");
 
+        String upStationId = RestAssured.given().log().all()
+                .body(stationParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        stationParams.put("name", "양재역");
+
+        String downStationId = RestAssured.given().log().all()
+                .body(stationParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> lineParams = new HashMap<>();
+        lineParams.put("name", "신분당선");
+        lineParams.put("color", "bg-red-600");
+        lineParams.put("upStationId", upStationId);
+        lineParams.put("downStationId", downStationId);
+        lineParams.put("distance", "10");
+
+        ExtractableResponse<Response> extract = RestAssured
+                .given().log().all()
+                .body(lineParams).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        List<String> stationName = extract.jsonPath().getList("name", String.class);
 
     }
 
