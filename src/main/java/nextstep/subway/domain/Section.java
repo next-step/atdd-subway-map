@@ -34,10 +34,7 @@ public class Section {
     }
 
     public static Section create(Station upStation, Station downStation, int distance) {
-        if (upStation.equals(downStation)) {
-            throw new InvalidUpDownStationException();
-        }
-        return new Section(new Stations(upStation, downStation), new Distance(distance));
+        return new Section(Stations.create(upStation, downStation), new Distance(distance));
     }
 
     public void setLine(Line line) {
