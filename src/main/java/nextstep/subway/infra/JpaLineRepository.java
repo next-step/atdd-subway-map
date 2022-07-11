@@ -3,10 +3,12 @@ package nextstep.subway.infra;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface JpaLineRepository extends JpaRepository<Line, Long>, LineRepository {
     @Override
     List<Line> findAll();
