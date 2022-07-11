@@ -50,6 +50,14 @@ public class StationLineService {
         return StationLineResponse.of(stationLine, findByUpStationAndDownStation(stationLine));
     }
 
+    @Transactional
+    public void updateByStationLineId(Long id, StationLineRequest stationLineRequest) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선입니다."));
+
+        stationLine.update(stationLineRequest.getName(), stationLineRequest.getColor());
+    }
+
 
     private List<StationResponse> findByUpStationAndDownStation(StationLine stationLine) {
         return stationRepository.findAllById(List.of(

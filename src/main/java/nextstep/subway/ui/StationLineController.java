@@ -31,5 +31,11 @@ public class StationLineController {
         return ResponseEntity.ok(stationLineService.findByStationLineId(id));
     }
 
+    @PutMapping("/lines/{id}")
+    public ResponseEntity updateByStationLineId(@PathVariable Long id,
+                                                @RequestBody StationLineRequest stationLineRequest) {
+
+        return ResponseEntity.ok().build();
+    }
 
 }
