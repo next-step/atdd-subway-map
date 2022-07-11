@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.Line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,22 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createSubwayLine() {
-        ExtractableResponse<Response> response = createLine("1호선");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "구로역");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        params.put("name", "부천역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        ExtractableResponse<Response> response = createLine(new Line("1호선", "bg-blue-600", 1L, 2L, 10));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -49,9 +65,13 @@ public class LineAcceptanceTest {
 
 
     // 지하철노선 생성
-    private ExtractableResponse<Response> createLine(String LineName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", LineName);
+    private ExtractableResponse<Response> createLine(Line line) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", line.getName());
+        params.put("color", line.getColor());
+        params.put("upStationId", line.getUpStationId());
+        params.put("downStationId", line.getDownStationId());
+        params.put("distance", line.getDistance());
 
         return RestAssured.given().log().all()
                 .body(params)

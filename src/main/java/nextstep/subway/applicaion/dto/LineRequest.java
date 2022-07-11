@@ -4,10 +4,9 @@ public class LineRequest {
 
     private String name;
     private String color;
-    private long upStationId;
-    private long downStationId;
-    private int distance;
-
+    private Long upStationId;
+    private Long downStationId;
+    private Integer distance;
 
     public String getName() {
         return name;
