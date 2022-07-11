@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public enum DomainExceptionType {
 
-    LINE_NOT_FOUND("없는 노선 ID 입니다.", HttpStatus.NOT_FOUND)
     ;
 
     private final String message;

@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.exception.DomainException;
-import nextstep.subway.domain.exception.DomainExceptionType;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,7 @@ public class LineService {
 
     public LineResponse modify(Long lineId, LineModificationRequest request) {
         var line = lineRepository.findById(lineId)
-                .orElseThrow(() -> new DomainException(DomainExceptionType.LINE_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 노선 ID 입니다."));
 
         line.changeNameAndColor(request.getName(), request.getColor());
 
