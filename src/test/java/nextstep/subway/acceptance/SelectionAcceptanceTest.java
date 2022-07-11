@@ -45,11 +45,11 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void createSelection() {
 		//given
-		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		//when
-		지하철_구간_생성(1, 1, 1, 1);
+		지하철_구간_생성(lineId, 2, 3, 1);
 		//then
-		지하철_구간_목록_조회();
+		//지하철_구간_목록_조회();
 	}
 
 	/**
@@ -62,9 +62,9 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getSelections() {
 		//given
-		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		지하철_구간_생성(1, 1, 1, 1);
-		지하철_구간_생성(1, 1, 1, 1);
+		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		지하철_구간_생성(lineId, 2, 3, 1);
+		지하철_구간_생성(lineId, 3, 4, 1);
 		//when
 		지하철_구간_목록_조회();
 		//then
@@ -114,8 +114,8 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteSelection() {
 		//given
-		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		지하철_구간_생성(1, 1, 1, 1);
+		long lindId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		지하철_구간_생성(lindId, 2, 3, 1);
 		//when
 		지하철_구간_삭제();
 	}
