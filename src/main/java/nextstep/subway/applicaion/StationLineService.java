@@ -43,6 +43,14 @@ public class StationLineService {
                 .collect(Collectors.toList());
     }
 
+    public StationLineResponse findByStationLineId(Long id) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선입니다."));
+
+        return StationLineResponse.of(stationLine, findByUpStationAndDownStation(stationLine));
+    }
+
+
     private List<StationResponse> findByUpStationAndDownStation(StationLine stationLine) {
         return stationRepository.findAllById(List.of(
                 stationLine.getUpStationId(),
