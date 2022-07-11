@@ -42,7 +42,7 @@ public class StationLineController {
 		if (ObjectUtils.isEmpty(stationLineResponse)) {
 			return ResponseEntity.noContent().build();
 		}
-		return ResponseEntity.ok().body(stationLineService.findStationLine(id));
+		return ResponseEntity.ok().body(stationLineResponse);
 	}
 
 	@PutMapping("/lines/{id}")

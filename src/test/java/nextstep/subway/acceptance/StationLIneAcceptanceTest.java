@@ -11,17 +11,17 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 
 @DisplayName("지하철 노선 테스트")
-@Sql("/truncate.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationLIneAcceptanceTest {
 
@@ -31,9 +31,17 @@ public class StationLIneAcceptanceTest {
 	@LocalServerPort
 	int port;
 
+	@Autowired
+	List<JpaRepository> jpaRepositories;
+
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		RestAssured.port = port;
+	}
+
+	@BeforeEach
+	void initializeData() {
+		this.jpaRepositories.forEach(JpaRepository::deleteAllInBatch);
 	}
 
 	/**
@@ -43,13 +51,10 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_생성() {
 		//when
-		Map<String, Object> createLineRequest =
-			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		지하철라인_생성(createLineRequest);
+		지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//then
-		List<String> names = 지하철라인_전체_조회();
-		assertThat(names).containsAnyOf(SIN_BOONDANG_LINE);
+		assertThat(지하철라인_전체_조회()).containsAnyOf(SIN_BOONDANG_LINE);
 
 	}
 
@@ -61,13 +66,8 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_목록_조회() {
 		//given
-		Map<String, Object> createLineRequest1 =
-			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		Map<String, Object> createLineRequest2 =
-			지하철노선_생성_파라미터생성(SAMSUNG_STATION, LINE_COLOR_RED, 2, 3, 8);
-
-		지하철라인_생성(createLineRequest1);
-		지하철라인_생성(createLineRequest2);
+		지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		지하철라인_생성(SAMSUNG_STATION, LINE_COLOR_RED, 2, 3, 8);
 
 		//when
 		List<String> names = 지하철라인_전체_조회();
@@ -85,9 +85,7 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_조회() {
 		//given
-		Map<String, Object> createLineRequest =
-			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		long stationId = 지하철라인_생성(createLineRequest);
+		long stationId = 지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
 		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
@@ -104,18 +102,10 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_수정() {
 		//given
-		Map<String, Object> createdLineRequest =
-			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		long stationId = 지하철라인_생성(createdLineRequest);
+		long stationId = 지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
-		Map<String, Object> updatedLineRequest = generateUpdateRequestDTO(SAMSUNG_STATION, LINE_COLOR_BLUE);
-		RestAssured.given().log().all()
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.body(updatedLineRequest)
-			.when().put("/lines/" + stationId)
-			.then().log().all()
-			.statusCode(HttpStatus.NO_CONTENT.value());
+		지하철라인_수정(stationId, SAMSUNG_STATION, LINE_COLOR_BLUE);
 
 		//then
 		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
@@ -132,15 +122,10 @@ public class StationLIneAcceptanceTest {
 	@Test
 	void 지하철노선_삭제() {
 		//given
-		Map<String, Object> createdLineRequest =
-			지하철노선_생성_파라미터생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		long stationId = 지하철라인_생성(createdLineRequest);
+		long stationId = 지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
-		RestAssured.given().log().all()
-			.when().delete("/lines/" + stationId)
-			.then().log().all()
-			.statusCode(HttpStatus.NO_CONTENT.value());
+		지하철라인_삭제(stationId);
 
 		//then
 		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.NO_CONTENT);
@@ -148,34 +133,51 @@ public class StationLIneAcceptanceTest {
 
 	}
 
-	private Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upstationId,
+	private Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upStationId,
 		long downStationId,
 		long distance) {
 		Map<String, Object> requestParameter = new HashMap<>();
 		requestParameter.put("name", stationName);
 		requestParameter.put("color", stationColor);
-		requestParameter.put("upStationId", upstationId);
+		requestParameter.put("upStationId", upStationId);
 		requestParameter.put("downStationId", downStationId);
 		requestParameter.put("distance", distance);
 		return requestParameter;
 	}
 
-	private Map<String, Object> generateUpdateRequestDTO(String stationName, String stationColor) {
+	private Map<String, Object> 지하철라인_수정_파라미터생성(String stationName, String stationColor) {
 		Map<String, Object> requestParameter = new HashMap<>();
 		requestParameter.put("name", stationName);
 		requestParameter.put("color", stationColor);
 		return requestParameter;
 	}
 
-	private Long 지하철라인_생성(Map<String, Object> requestParameter) {
+	private Long 지하철라인_생성(String stationName, String stationColor, long upStationId, long downStationId,
+		long distance) {
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.body(requestParameter)
+			.body(지하철노선_생성_파라미터생성(stationName, stationColor, upStationId, downStationId, distance))
 			.when().post("/lines")
 			.then().log().all()
 			.statusCode(HttpStatus.CREATED.value())
 			.extract()
 			.jsonPath().getLong("id");
+	}
+
+	private void 지하철라인_수정(long stationId, String stationName, String stationColor) {
+		RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.body(지하철라인_수정_파라미터생성(stationName, stationColor))
+			.when().put("/lines/" + stationId)
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
+	}
+
+	private void 지하철라인_삭제(long stationId) {
+		RestAssured.given().log().all()
+			.when().delete("/lines/" + stationId)
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
 	}
 
 	private List<String> 지하철라인_전체_조회() {
