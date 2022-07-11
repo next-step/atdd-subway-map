@@ -36,19 +36,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response = 지하철역_생성요청(params);
+        ExtractableResponse<Response> response = 지하철역_생성요청("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철역_목록_조회요청()
-                .jsonPath()
-                .getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        지하철역_목록에_포함되어있다("강남역");
     }
 
     /**
@@ -60,22 +54,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void getStations() {
         // given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "역삼역");
-        지하철역_생성요청(params1);
-
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "선릉역");
-        지하철역_생성요청(params2);
+        지하철역_생성요청("역삼역");
+        지하철역_생성요청("선릉역");
 
         // when
-        final ExtractableResponse<Response> response = 지하철역_목록_조회요청();
+        final ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록_조회요청();
 
         // then
-        final List<String> names = response
-                .jsonPath()
-                .getList("name", String.class);
-        assertThat(names).contains("역삼역", "선릉역");
+        지하철역_목록에_포함되어있다("역삼역", "선릉역");
     }
 
     /**
@@ -87,23 +73,35 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "삼성역");
-        final ExtractableResponse<Response> 삼성역 = 지하철역_생성요청(params);
+        final ExtractableResponse<Response> 삼성역 = 지하철역_생성요청("삼성역");
 
         // when
         final long id = 삼성역.jsonPath().getLong("id");
         지하철역_삭제요청(id);
 
         // then
-        final ExtractableResponse<Response> getResponse = 지하철역_목록_조회요청();
-        final List<String> names = getResponse
-                .jsonPath()
-                .getList("name", String.class);
-        assertThat(names).doesNotContain("삼성역");
+        지하철역_목록에_포함되어있지_않다("삼성역");
     }
 
-    public static ExtractableResponse<Response> 지하철역_생성요청(Map<String, String> params) {
+    private void 지하철역_목록에_포함되어있다(String... name) {
+        final ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록_조회요청();
+        final List<String> names = 지하철역_목록
+                .jsonPath()
+                .getList("name", String.class);
+        assertThat(names).contains(name);
+    }
+    private void 지하철역_목록에_포함되어있지_않다(String... name) {
+        final ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록_조회요청();
+        final List<String> names = 지하철역_목록
+                .jsonPath()
+                .getList("name", String.class);
+        assertThat(names).doesNotContain(name);
+    }
+
+    public static ExtractableResponse<Response> 지하철역_생성요청(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

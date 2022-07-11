@@ -3,7 +3,6 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.apache.groovy.util.Maps;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,10 +23,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void stationSetUp() {
-        var 강남역 = StationAcceptanceTest.지하철역_생성요청(Maps.of("name", "강남역"));
-        var 역삼역 = StationAcceptanceTest.지하철역_생성요청(Maps.of("name", "역삼역"));
-        var 선릉역 = StationAcceptanceTest.지하철역_생성요청(Maps.of("name", "선릉역"));
-        var 삼성역 = StationAcceptanceTest.지하철역_생성요청(Maps.of("name", "삼성역"));
+        var 강남역 = StationAcceptanceTest.지하철역_생성요청("강남역");
+        var 역삼역 = StationAcceptanceTest.지하철역_생성요청("역삼역");
+        var 선릉역 = StationAcceptanceTest.지하철역_생성요청("선릉역");
+        var 삼성역 = StationAcceptanceTest.지하철역_생성요청("삼성역");
 
         upStationId = 강남역.jsonPath().getString("id");
         downStationId = 선릉역.jsonPath().getString("id");
