@@ -20,8 +20,9 @@ class LineTest {
     void changeLineContent() {
         Line line = Line.create("신분당선", "bg-red-600", section);
 
-        line.changeContent(LineContent.create("2호선", "bg-green-600"));
+        line.changeNameAndColor("2호선", "bg-green-600");
 
-        assertThat(line.content()).isEqualTo(LineContent.create("2호선", "bg-green-600"));
+        assertThat(line.name()).isEqualTo("2호선");
+        assertThat(line.color()).isEqualTo("bg-green-600");
     }
 }

@@ -16,20 +16,20 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "line_id")
     private Long id;
+    private String name;
+    private String color;
 
     @Embedded
     private Sections sections;
 
-    @Embedded
-    private LineContent lineContent;
-
-    private Line(LineContent lineContent, Sections sections) {
-        this.lineContent = lineContent;
+    private Line(String name, String color, Sections sections) {
+        this.name = name;
+        this.color = color;
         this.sections = sections;
     }
 
     public static Line create(String name, String color, Section section) {
-        Line line = new Line(LineContent.create(name, color), Sections.create());
+        Line line = new Line(name, color, Sections.create());
         line.addSection(section);
         return line;
     }
@@ -39,19 +39,26 @@ public class Line {
         section.setLine(this);
     }
 
-    public void changeContent(LineContent lineContent) {
-        if (this.lineContent.equals(lineContent)) {
-            return ;
+    public void changeNameAndColor(String name, String color) {
+        if (!this.name.equals(name)) {
+            this.name = name;
         }
-        this.lineContent = lineContent;
+
+        if (!this.color.equals(color)) {
+            this.color = color;
+        }
     }
 
     public Long id() {
         return id;
     }
 
-    public LineContent content() {
-        return lineContent;
+    public String name() {
+        return name;
+    }
+
+    public String color() {
+        return color;
     }
 
     public List<Station> stations() {
