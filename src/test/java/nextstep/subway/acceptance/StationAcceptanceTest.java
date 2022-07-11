@@ -266,9 +266,9 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = getStationLineWithId(createdStationLineId);
 
         // Then
-        Long responseId = extractIdInResponse(response);
+        Long responseStationLineId = extractIdInResponse(response);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(responseId).isEqualTo(createdStationLineId);
+        assertThat(responseStationLineId).isEqualTo(createdStationLineId);
     }
 
     private ExtractableResponse<Response> getStationLineWithId(Long id) {
@@ -306,7 +306,7 @@ public class StationAcceptanceTest {
 
         // When
         String updateName = "다른분당선";
-        String updateColor = "bg-red-600";
+        String updateColor = "bg-red-601";
 
         Map<Object, Object> params = new HashMap<>();
         params.put("name", updateName);
@@ -316,8 +316,7 @@ public class StationAcceptanceTest {
 
         // Then
         JsonPath jsonPath = getStationLineWithId(createdStationLineId).jsonPath();
-        String updatedName = jsonPath
-                .getString("name");
+        String updatedName = jsonPath.getString("name");
         String updatedColor = jsonPath.getString("color");
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
