@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql("classpath:/truncate.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
@@ -25,6 +27,10 @@ public class LineAcceptanceTest {
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
+
+		createStation(Map.of("name", "지하철역"));
+		createStation(Map.of("name", "새로운지하철역"));
+		createStation(Map.of("name", "또다른지하철역"));
 	}
 
 	/**
@@ -52,10 +58,11 @@ public class LineAcceptanceTest {
 	void showLines() {
 		// given
 		createLineFrom("신분당선", "bg-red-600", 1L, 2L);
-		createLineFrom("분당선", "bg-green-600", 1L, 2L);
+		createLineFrom("분당선", "bg-green-600", 1L, 3L);
 
 		// when
 		List<Long> id = responseOfShowLines().jsonPath().getList("id");
+
 		// then
 		assertThat(id).hasSize(2);
 	}
@@ -75,6 +82,7 @@ public class LineAcceptanceTest {
 
 		// when
 		String name = responseOfShowLine(id).jsonPath().get("name");
+
 		// then
 		assertThat(name).isEqualTo("신분당선");
 	}
@@ -103,6 +111,7 @@ public class LineAcceptanceTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when().put("/lines/{lineId}", id)
 				.then().log().all();
+
 		// then
 		String name = responseOfShowLine(id).jsonPath().get("name");
 		assertThat(name).isEqualTo("다른분당선");
@@ -164,6 +173,15 @@ public class LineAcceptanceTest {
 		return RestAssured
 				.given().log().all()
 				.when().get("/lines")
+				.then().log().all()
+				.extract();
+	}
+
+	private ExtractableResponse<Response> createStation(Map<String, String> station) {
+		return RestAssured.given().log().all()
+				.body(station)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when().post("/stations")
 				.then().log().all()
 				.extract();
 	}

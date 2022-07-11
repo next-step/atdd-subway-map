@@ -3,7 +3,10 @@ package nextstep.subway.domain;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
 public class Line {
@@ -12,16 +15,23 @@ public class Line {
 	private Long id;
 	private String name;
 	private String color;
-	@OneToMany
-	private List<Station> stations;
+
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "up_station_id")
+	private Station upStation;
+
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "down_station_id")
+	private Station downStation;
 
 	public Line() {
 	}
 
-	public Line(String name, String color, List<Station> stations) {
+	public Line(String name, String color, Station upStation, Station downStation) {
 		this.name = name;
 		this.color = color;
-		this.stations = stations;
+		this.upStation = upStation;
+		this.downStation = downStation;
 	}
 
 	public Long getId() {
@@ -36,7 +46,18 @@ public class Line {
 		return color;
 	}
 
+	public Station getUpStation() {
+		return upStation;
+	}
+
+	public Station getDownStation() {
+		return downStation;
+	}
+
 	public List<Station> getStations() {
+		List<Station> stations = new ArrayList<>();
+		stations.add(upStation);
+		stations.add(downStation);
 		return stations;
 	}
 

@@ -10,7 +10,6 @@ import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,13 +25,19 @@ public class LineService {
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
-		List<Station> stations = new ArrayList<>();
-		Station station1 = stationRepository.save(new Station("지하철역"));
-		Station station2 = stationRepository.save(new Station("새로운지하철역"));
-		stations.add(station1);
-		stations.add(station2);
+		Station upStation = stationRepository.findById(lineRequest.getUpStationId())
+				.orElseThrow(RuntimeException::new);
+		Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+				.orElseThrow(RuntimeException::new);
 
-		Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations));
+		Line line = lineRepository.save(
+				new Line(
+						lineRequest.getName(),
+						lineRequest.getColor(),
+						upStation,
+						downStation
+				)
+		);
 		return LineResponse.of(line);
 	}
 

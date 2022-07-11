@@ -13,4 +13,12 @@ public class LineRequest {
 	public String getColor() {
 		return color;
 	}
+
+	public Long getUpStationId() {
+		return upStationId;
+	}
+
+	public Long getDownStationId() {
+		return downStationId;
+	}
 }
