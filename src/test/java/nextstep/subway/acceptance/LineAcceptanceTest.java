@@ -34,11 +34,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         var creationResponse = createLine(sinbundangLineCreationRequest);
 
         // then
-        var lineNames = RestAssured
-                .when()
-                    .get("/lines")
-                .then()
-                    .extract().jsonPath().getList("name", String.class);
+        var lineNames = getAllLines().jsonPath().getList("name", String.class);
 
         assertAll(
                 () -> assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
@@ -59,11 +55,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         createLine(bundangLineCreationRequest);
 
         // when
-        var lineQueryResponse = RestAssured
-                .when()
-                    .get("/lines")
-                .then()
-                    .extract();
+        var lineQueryResponse = getAllLines();
         var lineNames = lineQueryResponse.jsonPath().getList("name");
 
         // then
@@ -187,6 +179,14 @@ class LineAcceptanceTest extends AcceptanceTest {
                     .pathParam("lineId", lineId)
                 .when()
                     .get("/lines/{lineId}")
+                .then()
+                    .extract();
+    }
+
+    private ExtractableResponse<Response> getAllLines() {
+        return RestAssured
+                .when()
+                    .get("/lines")
                 .then()
                     .extract();
     }
