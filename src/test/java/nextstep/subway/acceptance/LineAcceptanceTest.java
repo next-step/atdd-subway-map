@@ -18,6 +18,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = {"classpath:sql/truncate.sql","classpath:sql/createStations.sql"})
 public class LineAcceptanceTest {
     @LocalServerPort
     int port;
@@ -33,11 +34,9 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 생성한다.")
-    @Sql(value = "classpath:sql/truncate.sql")
     void createLineTest() {
         //when
         Map<String, Object> requestBody = setRequestBody("신분당선", "bg-red-600",1,2,10);
-
         ExtractableResponse<Response> response = createLine(requestBody);
 
         //then
@@ -45,6 +44,7 @@ public class LineAcceptanceTest {
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        assertThat(response.jsonPath().getList("stations.id",Integer.class)).containsExactlyInAnyOrder(1,2);
     }
 
     /**
@@ -54,11 +54,10 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선목록을 조회한다.")
-    @Sql(value = "classpath:sql/truncate.sql")
     void getLinesTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
-        Map<String, Object> requestBody2 = setRequestBody("2호선", "green",1,2,10);
+        Map<String, Object> requestBody2 = setRequestBody("2호선", "green",1,3,10);
 
         createLine(requestBody1);
         createLine(requestBody2);
@@ -68,6 +67,11 @@ public class LineAcceptanceTest {
 
         //then
         assertThat(subwayLines.jsonPath().getList("")).hasSize(2);
+        assertThat(subwayLines.jsonPath().getList("id",Integer.class)).containsExactlyInAnyOrder(1,2);
+        assertThat(subwayLines.jsonPath().getList("name",String.class)).containsExactlyInAnyOrder("신분당선","2호선");
+        assertThat(subwayLines.jsonPath().getList("color",String.class)).containsExactlyInAnyOrder("bg-red-600","green");
+        assertThat(subwayLines.jsonPath().getList("stations")).hasSize(2);
+
     }
 
     /**
@@ -77,7 +81,6 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 조회한다.")
-    @Sql(value = "classpath:sql/truncate.sql")
     void getLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
@@ -91,6 +94,7 @@ public class LineAcceptanceTest {
         assertThat(subwayLines.jsonPath().getInt("id")).isEqualTo(createdLineId);
         assertThat(subwayLines.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(subwayLines.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        assertThat(subwayLines.jsonPath().getList("stations.id",Integer.class)).containsExactlyInAnyOrder(1,2);
     }
 
     /**
@@ -100,7 +104,6 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 수정한다.")
-    @Sql(value = "classpath:sql/truncate.sql")
     void updateLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
@@ -126,7 +129,6 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선을 삭제한다.")
-    @Sql(value = "classpath:sql/truncate.sql")
     void deleteLineTest() {
         //given
         Map<String, Object> requestBody1 = setRequestBody("신분당선", "bg-red-600",1,2,10);
