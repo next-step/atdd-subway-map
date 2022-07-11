@@ -28,17 +28,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationRepository
-            .findById(lineRequest.getUpStationId())
-            .orElseThrow(
-                () -> new DataNotFoundException("Station 데이터가 없습니다.")
-            );
-
-        Station downStation = stationRepository
-            .findById(lineRequest.getDownStationId())
-            .orElseThrow(
-                () -> new DataNotFoundException("Station 데이터가 없습니다.")
-            );
+        Station upStation = getStation(lineRequest.getUpStationId());
+        Station downStation = getStation(lineRequest.getDownStationId());
 
         Line createLine = new Line(
             null, lineRequest.getName(), lineRequest.getColor(),
@@ -46,18 +37,14 @@ public class LineService {
         );
 
         Line createdLine = lineRepository.save(createLine);
-        return getLineResponse
-            (createdLine);
+        return getLineResponse(createdLine);
     }
 
     @Transactional(readOnly = true)
     public LineResponse findOneLine(Long id) {
-        Line findLine = lineRepository.findById(id).orElseThrow(
-            () -> new DataNotFoundException("Line 데이터가 없습니다.")
-        );
+        Line findLine = getLine(id);
         return getLineResponse(findLine);
     }
-
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream().map(this::getLineResponse)
@@ -71,9 +58,7 @@ public class LineService {
 
     @Transactional
     public LineResponse editLine(Long id, LineRequest lineRequest) {
-        Line findLine = lineRepository.findById(id).orElseThrow(
-            () -> new DataNotFoundException("Line 데이터가 없습니다.")
-        );
+        Line findLine = getLine(id);
         findLine.edit(lineRequest);
         return getLineResponse(findLine);
     }
@@ -85,5 +70,20 @@ public class LineService {
             .map(station -> new StationResponse(station.getId(), station.getName()))
             .collect(Collectors.toList()));
     }
+
+    private Station getStation(Long stationId) {
+        return stationRepository
+            .findById(stationId)
+            .orElseThrow(
+                () -> new DataNotFoundException("Station 데이터가 없습니다.")
+            );
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id).orElseThrow(
+            () -> new DataNotFoundException("Line 데이터가 없습니다.")
+        );
+    }
+
 
 }
