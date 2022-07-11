@@ -39,25 +39,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 정상적으로 구간이 노선에 추가된다.
      */
     @Test
+    @DisplayName("정상적으로 역을 생성하여 기존 노선 끝에 구간을 추가한다")
     public void addSection() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
         Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
 
         // when
-        HashMap<String, String> requestParam = new HashMap<>();
-        requestParam.put("upStationId", downStationId.toString());
-        requestParam.put("downStationId", stationId.toString());
-        requestParam.put("distance", "1");
-
-        int statusCode = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParam)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract()
-                .statusCode();
+        int statusCode = 지하철_구간_등록_요청(lineId, downStationId, stationId, 1);
 
         // then
         ExtractableResponse<Response> response = 지하철_단일_노선_조회(lineId);
@@ -66,5 +55,43 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(statusCode).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(stationList.get(2)).isEqualTo("성수역")
         );
+    }
+
+    /**
+     * Given 지하철 노선을 1개 생성
+     * Given 추가할 역 1개 생성
+     * When 기존 노선에 등록된 상행역을 상행역으로 하고
+     * When 새로 생성한 역을 하행역으로 하고
+     * When 구간 생성 요청을 하면
+     * Then 예외를 발생시킨다
+     */
+    @Test
+    @DisplayName("기존 노선의 하행이 신규 구간의 상행과 일치하지 않는경우 실패한다")
+    public void addSectionWithInvalidUpStation() {
+        // given
+        Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+
+        // when
+        int statusCode = 지하철_구간_등록_요청(lineId, upStationId, stationId, 3);
+
+        // then
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    public int 지하철_구간_등록_요청(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+        HashMap<String, String> requestParam = new HashMap<>();
+        requestParam.put("upStationId", upStationId.toString());
+        requestParam.put("downStationId", downStationId.toString());
+        requestParam.put("distance", distance.toString());
+
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(requestParam)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract()
+                .statusCode();
     }
 }
