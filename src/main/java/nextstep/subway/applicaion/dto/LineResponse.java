@@ -1,10 +1,11 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 
 import java.util.List;
 
+@NoArgsConstructor
 public class LineResponse {
     private Long id;
     private String name;

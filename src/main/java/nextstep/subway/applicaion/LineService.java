@@ -25,9 +25,19 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(),
-                lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
-        List<StationResponse> stations = stationService.findStationsById(List.of(line.getUpStationId(), line.getDownStationId()));
+        // upStationId나 downStationId의 존재 여부 확인
+        List<StationResponse> stations = stationService.findStationsById(
+                List.of(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
+
+        Line line = lineRepository.save(
+                Line.builder()
+                    .name(lineRequest.getName())
+                    .color(lineRequest.getColor())
+                    .distance(lineRequest.getDistance())
+                    .upStationId(lineRequest.getUpStationId())
+                    .downStationId(lineRequest.getDownStationId())
+                    .build()
+        );
         return LineResponse.of(line, stations);
     }
 

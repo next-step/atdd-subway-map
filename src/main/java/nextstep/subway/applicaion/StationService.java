@@ -6,6 +6,7 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,9 +33,10 @@ public class StationService {
     }
 
     public List<StationResponse> findStationsById(List<Long> idList) {
-        return stationRepository.findAllById(idList).stream()
-                .map(StationResponse::of)
-                .collect(Collectors.toList());
+        List<Station> stations = stationRepository.findAllById(idList);
+        Assert.isTrue(idList.size() == stations.size(),
+                String.format("존재하지 않는 역이 있습니다. idList : %s", idList));
+        return stations.stream().map(StationResponse::of).collect(Collectors.toList());
     }
 
     @Transactional

@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 
 import javax.persistence.Entity;
@@ -8,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
+@NoArgsConstructor
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +25,7 @@ public class Line {
 
     private long distance;
 
-    public Line() {
-    }
-
+    @Builder
     public Line(String name, String color, long upStationId, long downStationId, long distance ) {
         this.name = name;
         this.color = color;
