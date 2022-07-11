@@ -49,7 +49,7 @@ public class SubwayLineController {
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<SubwayLineResponse> saveSubwaySection(@PathVariable Long id, @RequestBody SubwaySectionRequest subwaySectionRequest) {
         SubwayLineResponse response = subwayLineService.saveSubwaySection(id, subwaySectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + response.getId())).build();
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 
     @DeleteMapping("/lines/{id}/sections")

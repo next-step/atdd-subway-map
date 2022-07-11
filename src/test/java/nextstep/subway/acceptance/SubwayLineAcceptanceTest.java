@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
-    public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
+    public static final String[] CLEAN_UP_TABLES = {"subway_line", "station", "section"};
 
     @Autowired
     private CleanUpSchema cleanUpSchema;
@@ -167,7 +167,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
         assertThat(saveSectionResponse.header("Location")).isNotNull();
 
         // then
-        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLines();
+        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(lineId);
         assertThat(Actual.getList(response, "stations.name", String.class)).isEqualTo(List.of("강남역","양재역","양재시민의숲역"));
     }
 
@@ -242,7 +242,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> findResponse = subwayLineCallApi.findSubwayLineById(lineId);
-        Long stationId = Actual.get(findResponse, "station[2].id", Long.class);
+        Long stationId = Actual.get(findResponse, "stations[2].id", Long.class);
         ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwaySectionById(lineId, stationId);
 
         // then
@@ -273,7 +273,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
         assertThat(saveSectionResponse.header("Location")).isNotNull();
 
         // when
-        Long stationId = Actual.get(saveSectionResponse, "stations[2].id", Long.class);
+        Long stationId = Actual.get(saveSectionResponse, "stations[0].id", Long.class);
         ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwaySectionById(lineId, stationId);
 
         //then

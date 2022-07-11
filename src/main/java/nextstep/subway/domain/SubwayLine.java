@@ -1,9 +1,7 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class SubwayLine {
@@ -12,19 +10,17 @@ public class SubwayLine {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Integer distance;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     public SubwayLine() {
     }
 
-    public SubwayLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public SubwayLine(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.addSection(section);
     }
 
     public Long getId() {
@@ -39,16 +35,25 @@ public class SubwayLine {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
     public void modify(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        if (this.sections == null) {
+            this.sections = new Sections();
+        }
+        this.sections.add(section);
+        section.setSubwayLine(this);
+    }
+
+    public Set<Long> getStationIds() {
+        return this.sections.getStationIds();
+    }
+
+    public void removeStation(Long stationId) {
+        Section section = this.sections.remove(stationId);
+        section.clearSubwayLine();
     }
 }

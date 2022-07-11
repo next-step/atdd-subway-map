@@ -1,15 +1,16 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.Section;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.domain.SubwayLineRepository;
-import nextstep.subway.exception.StationNotFoundException;
 import nextstep.subway.exception.SubwayLineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +25,7 @@ public class SubwayLineService {
     }
 
     public List<SubwayLineResponse> getSubwayLines() {
-        List<SubwayLine> all = subwayLineRepository.findAll();
-        return all.stream()
+        return subwayLineRepository.findAll().stream()
                 .map(this::createSubwayLineResponse)
                 .collect(Collectors.toList());
     }
@@ -54,24 +54,27 @@ public class SubwayLineService {
 
     @Transactional
     public SubwayLineResponse saveSubwaySection(Long lineId, SubwaySectionRequest subwaySectionRequest) {
-        return null;
+        SubwayLine subwayLine = findSubwayLineById(lineId);
+        Section newSection = subwaySectionRequest.toEntity();
+        subwayLine.addSection(newSection);
+        SubwayLineResponse subwayLineResponse = createSubwayLineResponse(subwayLine);
+        return subwayLineResponse;
     }
 
     @Transactional
     public void deleteSubwaySection(Long lineId, Long stationId) {
-
+        SubwayLine subwayLine = findSubwayLineById(lineId);
+        subwayLine.removeStation(stationId);
     }
 
     private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
-        StationResponse upStation = createStationResponse(subwayLine.getUpStationId());
-        StationResponse downStation = createStationResponse(subwayLine.getDownStationId());
-        return new SubwayLineResponse(subwayLine, upStation, downStation);
+        return new SubwayLineResponse(subwayLine, createStationResponseList(subwayLine.getStationIds()));
     }
 
-    private StationResponse createStationResponse(Long id) {
-        return stationRepository.findById(id)
+    private List<StationResponse> createStationResponseList(Set<Long> ids) {
+        return stationRepository.findAllById(ids).stream()
                 .map(StationResponse::new)
-                .orElseThrow(() -> new StationNotFoundException(id));
+                .collect(Collectors.toList());
     }
 
     private SubwayLine findSubwayLineById(Long id) {
