@@ -4,9 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.StationLineRepository;
+import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -28,6 +31,20 @@ public class StationAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+    }
+
+    @Autowired
+    private StationLineRepository stationLineRepository;
+
+    @Autowired
+    private StationRepository stationRepository;
+
+    @BeforeEach
+    public void clearRepository(){
+        stationRepository.deleteAll();
+        stationRepository.flush();
+        stationLineRepository.deleteAll();
+        stationLineRepository.flush();
     }
 
     /**
