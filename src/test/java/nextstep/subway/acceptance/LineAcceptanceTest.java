@@ -76,18 +76,51 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
-        ExtractableResponse<Response> response1 = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
-        ExtractableResponse<Response> response2 = createLine(new Line("7호선", "bg-brown-600", 1L, 3L, 10));
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        params.put("name", "광교역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        params.put("name", "부평구청역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        params.put("name", "도봉산역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+
+        ExtractableResponse<Response> createResponse1 = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
+        ExtractableResponse<Response> createResponse2 = createLine(new Line("7호선", "bg-brown-600", 3L, 4L, 10));
+
+        assertThat(createResponse1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         List<String> lineNames = RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+                .extract()
+                .jsonPath().getList("name", String.class);
+
+        assertThat(lineNames).contains("신분당선", "7호선");
 
     }
 
 
-        // 지하철노선 생성
+    // 지하철노선 생성
     private ExtractableResponse<Response> createLine(Line line) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", line.getName());
