@@ -27,7 +27,7 @@ public class SelectionService {
 		Line line = lineRepository.findById(lineId)
 			.orElseThrow(RuntimeException::new);
 		line.isRegistrable(selectionRequest.getUpStationId(), selectionRequest.getDownStationId());
-
+		line.updateDownStationId(selectionRequest.getDownStationId());
 		return createSelectionResponse(selectionRepository.save(selectionRequest.toSelection(lineId)));
 	}
 

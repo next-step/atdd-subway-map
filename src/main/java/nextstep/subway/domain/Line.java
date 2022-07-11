@@ -69,4 +69,8 @@ public class Line {
 		}
 		return true;
 	}
+
+	public void updateDownStationId(long downStationIdFromSelection) {
+		this.downStationId = downStationIdFromSelection;
+	}
 }
