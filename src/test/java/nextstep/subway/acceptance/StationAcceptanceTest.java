@@ -43,13 +43,18 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // given
-        List<String> stationNames = List.of("강남역");
+        String stationName = "강남역";
 
         // when
-        createStationsAndValidate(stationNames);
+        ExtractableResponse<Response> response = createStation(stationName);
 
         // then
-        getStationsAndValidateExistence(stationNames);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        ExtractableResponse<Response> stationsResponse = fetchStations();
+        assertThat(stationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        validateEquation(convertToNames(stationsResponse), List.of(stationName));
     }
 
     /**
@@ -57,17 +62,17 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역을 조회한다.")
+    @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() {
         // given
         List<String> stationNames = List.of("강남역", "역삼역");
 
         // when
-        createStationsAndValidate(stationNames);
+        createStations(stationNames);
 
         // then
-        getStationsAndValidateExistence(stationNames);
+        validateEquation(convertToNames(fetchStations()), stationNames);
     }
 
     /**
@@ -79,61 +84,59 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        List<String> stationNames = List.of("강남역");
-        List<Long> stationIds = createStationsAndGetIds(stationNames);
+        String stationName = "강남역";
+        Long stationId = convertToId(createStation(stationName));
 
         // when
-        deleteStationsAndValidate(stationIds);
+        ExtractableResponse<Response> response = deleteStation(stationId);
 
         // then
-        getStationsAndValidateAbsence(stationNames);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(convertToNames(fetchStations())).doesNotContain(stationName);
     }
 
-    private List<Long> createStationsAndGetIds(List<String> stationNames) {
-        return createStationsAndValidate(stationNames).stream()
-                .map(response -> response.jsonPath()
-                        .getLong("id"))
-                .collect(Collectors.toList());
+    private Long convertToId(ExtractableResponse<Response> creationResponse) {
+        return creationResponse.jsonPath()
+                        .getLong("id");
     }
 
-    private void deleteStationsAndValidate(List<Long> stationIds) {
-        stationIds.stream()
-                .map(id -> RestAssured.given().log().all()
-                        .when().delete("/stations/{id}", id)
+    private ExtractableResponse<Response> deleteStation(Long stationId) {
+         return RestAssured.given().log().all()
+                        .when().delete("/stations/{id}", stationId)
                         .then().log().all()
-                        .extract())
-                .forEach(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()));
+                        .extract();
     }
 
-    private void getStationsAndValidateExistence(List<String> stationNames) {
-        assertThat(fetchStationsAndGetNames()).hasSize(stationNames.size())
-                .containsExactly(stationNames.toArray(String[]::new));
+    private void validateEquation(List<String> stationNames, List<String> targetStationNames) {
+        assertThat(stationNames).hasSize(targetStationNames.size())
+                .containsExactly(targetStationNames.toArray(String[]::new));
     }
 
-    private void getStationsAndValidateAbsence(List<String> stationNames) {
-        assertThat(fetchStationsAndGetNames()).doesNotContain(stationNames.toArray(String[]::new));
-    }
-
-    private List<String> fetchStationsAndGetNames() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    private List<String> convertToNames(ExtractableResponse<Response> response) {
         return response.jsonPath()
                 .getList("name", String.class);
     }
 
-    private List<ExtractableResponse<Response>> createStationsAndValidate(List<String> stationNames) {
+    private ExtractableResponse<Response> fetchStations() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private List<ExtractableResponse<Response>> createStations(List<String> stationNames) {
         return stationNames.stream()
-                .map(name -> RestAssured.given().log().all()
-                        .body(Collections.singletonMap("name", name))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract())
-                .peek(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()))
+                .map(this::createStation)
                 .collect(Collectors.toList());
+    }
+
+    private ExtractableResponse<Response> createStation(String stationName) {
+        return RestAssured.given().log().all()
+                .body(Collections.singletonMap("name", stationName))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
     }
 
 }
