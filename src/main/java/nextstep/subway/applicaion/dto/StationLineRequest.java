@@ -1,12 +1,8 @@
 package nextstep.subway.applicaion.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class StationLineRequest {
     private String name;
@@ -14,4 +10,13 @@ public class StationLineRequest {
     private Long upStationId;
     private Long downStationId;
     private Integer distance;
+
+    @Builder
+    public StationLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 }

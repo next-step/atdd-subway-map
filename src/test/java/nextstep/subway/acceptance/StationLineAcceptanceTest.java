@@ -1,0 +1,85 @@
+package nextstep.subway.acceptance;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.StationLineRequest;
+import nextstep.subway.applicaion.dto.StationLineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.utils.DatabaseCleanup;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DisplayName("지하철노선 관련 기능")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class StationLineAcceptanceTest {
+
+    @Autowired
+    DatabaseCleanup databaseCleanup;
+
+    @LocalServerPort
+    int port;
+
+    @BeforeEach
+    public void steup() {
+        RestAssured.port = port;
+        databaseCleanup.execute();
+    }
+
+    /**
+     * when 지하철 노션을 생성하면
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
+     */
+    @DisplayName("지하철노선 생성")
+    @Test
+    void createStationLine() {
+        createStationLineAndValidate("2호선",
+                "bg-red-600",
+                createStationAndValidate("강남역"),
+                createStationAndValidate("역삼역"));
+    }
+
+    private void createStationLineAndValidate(String stationLineName, String color, Long upStationId, Long downStationId) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(StationLineRequest.builder()
+                        .name(stationLineName)
+                        .color(color)
+                        .upStationId(upStationId)
+                        .downStationId(downStationId)
+                        .distance(10)
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.jsonPath().getString("name")).isEqualTo(stationLineName);
+        assertThat(response.jsonPath().getString("color")).isEqualTo(color);
+    }
+
+    private Long createStationAndValidate(String name) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(Collections.singletonMap("name", name))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return response.jsonPath().getLong("id");
+    }
+
+}
