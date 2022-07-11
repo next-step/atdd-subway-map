@@ -89,26 +89,6 @@ public class StationAcceptanceTest {
         assertThat(getStationNames()).doesNotContain(BU_CHEON);
     }
 
-    /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     */
-    @DisplayName("지하철 노선을 생성한다.")
-    @Test
-    void createSubwayLine() {
-        ExtractableResponse<Response> response = createLine("1호선");
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        List<String> lineNames = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-
-        assertThat(lineNames.contains("1호선")).isEqualTo(true);
-
-    }
-
 
     // 지하철역 이름 조회
     private List<String> getStationNames() {
@@ -130,20 +110,6 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
     }
-
-    // 지하철노선 생성
-    private ExtractableResponse<Response> createLine(String LineName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", LineName);
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
 
     // 지하철역 삭제
     private ExtractableResponse<Response> deleteStation(Integer id) {
