@@ -37,10 +37,10 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
+    public LineResponse addSection(Long id, SectionRequest sectionRequest) {
         validationStations(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
 
-        Line line = findLind(lineId);
+        Line line = findLind(id);
         Station upStation = findStation(sectionRequest.getUpStationId());
         Station downStation = findStation(sectionRequest.getDownStationId());
         Section section = new Section(sectionRequest.getDistance(), upStation, downStation);
