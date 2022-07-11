@@ -8,6 +8,7 @@ import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ public class LineService {
 
     public LineDto getLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("line is not found"));
+                .orElseThrow(() -> new NotFoundException("line is not found"));
 
         return convertToLineDto(line);
     }
@@ -49,7 +50,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineUpdateDto lineUpdateDto) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("line is not found"));
+                .orElseThrow(() -> new NotFoundException("line is not found"));
 
         lineRepository.save(lineUpdateDto.toDomain(line));
     }
@@ -60,4 +61,11 @@ public class LineService {
         return LineDto.of(line, stations);
     }
 
+    @Transactional
+    public void deleteLine(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("line is not found"));
+
+        lineRepository.delete(line);
+    }
 }
