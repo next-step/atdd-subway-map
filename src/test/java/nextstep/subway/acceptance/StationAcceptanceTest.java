@@ -89,7 +89,6 @@ public class StationAcceptanceTest {
                 .assertThat().body("size()", is(2));
 
         List<String> stationNames = getStations("name");
-        assertThat(stationNames).hasSize(2);
         assertThat(stationNames).containsExactly("강남역", "역삼역");
     }
 
