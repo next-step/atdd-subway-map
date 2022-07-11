@@ -7,7 +7,6 @@ import nextstep.subway.ui.dto.line.LineResponse;
 import nextstep.subway.ui.dto.line.UpdateLineRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     public static final String LINE_NOT_FOUND = "노선이 존재하지 않습니다.";
+    public static final String STATION_NOT_FOUND = "지하철역이 존재하지 않습니다.";
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
@@ -26,28 +26,29 @@ public class LineService {
     }
 
     public LineResponse saveLine(CreateLineRequest request) {
-        List<Station> stations = stationRepository.findAllById(List.of(request.getUpStationId(), request.getDownStationId()));
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                                             .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                                             .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
 
-        Line line = request.toEntity();
+
+        Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
         lineRepository.save(line);
 
-        return LineResponse.of(line, stations);
+        return LineResponse.of(line, List.of(upStation, downStation));
     }
 
     public List<LineResponse> findAllLine() {
         return lineRepository.findAll().stream()
-                             .map(line -> {
-                                 List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(),
-                                                                                                line.getDownStationId()));
-                                 return LineResponse.of(line, stations);
-                             }).collect(Collectors.toList());
+                             .map(line -> LineResponse.of(line, List.of(line.getUpStation(), line.getDownStation())))
+                             .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long lineId) {
         Line line = lineRepository.findById(lineId)
                                   .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
-        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
+        List<Station> stations = List.of(line.getUpStation(), line.getDownStation());
         return LineResponse.of(line, stations);
     }
 

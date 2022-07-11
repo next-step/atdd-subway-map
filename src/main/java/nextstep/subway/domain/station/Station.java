@@ -20,6 +20,10 @@ public class Station {
         this.name = name;
     }
 
+    public Station(final Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }

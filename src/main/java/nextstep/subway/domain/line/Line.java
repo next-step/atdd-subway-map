@@ -1,11 +1,14 @@
 package nextstep.subway.domain.line;
 
+import nextstep.subway.domain.station.Station;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Line {
@@ -17,17 +20,25 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
+    @ManyToOne
+    @JoinColumn(name = "upStationId")
+    private Station upStation;
 
-    private Long downStationId;
+    @ManyToOne
+    @JoinColumn(name = "downStationId")
+    private Station downStation;
 
     private Integer distance;
 
-    public Line(final String name, final String color, final Long upStationId, final Long downStationId, final Integer distance) {
+    public Line(final String name,
+                final String color,
+                final Station upStation,
+                final Station downStation,
+                final Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -51,12 +62,12 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {
