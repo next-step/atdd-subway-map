@@ -9,4 +9,5 @@ public interface SelectionRepository extends JpaRepository<Selection, Long> {
 	List<Selection> findByLineIdOrderById(long lineId);
 
 	Optional<Selection> findByDownStationId(long stationId);
+
 }

@@ -25,7 +25,7 @@ public class SelectionService {
 	@Transactional
 	public SelectionResponse createSelection(long lineId, SelectionRequest selectionRequest) {
 		Line line = lineRepository.findById(lineId)
-			.orElseThrow(RuntimeException::new);
+			.orElseThrow(IllegalArgumentException::new);
 		line.isRegistrable(selectionRequest.getUpStationId(), selectionRequest.getDownStationId());
 		line.updateDownStationId(selectionRequest.getDownStationId());
 		return createSelectionResponse(selectionRepository.save(selectionRequest.toSelection(lineId)));
@@ -34,14 +34,14 @@ public class SelectionService {
 	@Transactional
 	public void deleteSelection(long lineId, long stationId) {
 		Line line = lineRepository.findById(lineId)
-			.orElseThrow(RuntimeException::new);
+			.orElseThrow(IllegalArgumentException::new);
 		line.isDeletable(stationId);
 
 		Selections selections = new Selections(selectionRepository.findByLineIdOrderById(lineId));
 		selections.isDeletable(stationId);
 
 		Selection selection = selectionRepository.findByDownStationId(stationId)
-			.orElseThrow(RuntimeException::new);
+			.orElseThrow(IllegalArgumentException::new);
 		selectionRepository.delete(selection);
 
 	}

@@ -49,14 +49,14 @@ public class LineService {
 	@Transactional
 	public void updateStationLine(Long stationId, StationLineRequest stationLineRequest) {
 		Line line = lineRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
+			.orElseThrow(() -> new IllegalArgumentException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
 		line.updateStationLineInformation(stationLineRequest.getName(), stationLineRequest.getColor());
 	}
 
 	@Transactional
 	public void deleteStationLine(Long stationId) {
 		lineRepository.delete(lineRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
+			.orElseThrow(() -> new IllegalArgumentException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
 	}
 
 	private StationLineResponse createStationLineResponse(Line line) {
