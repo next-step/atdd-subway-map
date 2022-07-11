@@ -73,8 +73,8 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> linesResponse = 지하철노선_목록을_조회한다();
 
         // then
-        List<String> stationNames = linesResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsOnlyOnce("신분당선", "1호선");
+        List<String> lineNames = linesResponse.jsonPath().getList("name", String.class);
+        assertThat(lineNames).containsOnlyOnce("신분당선", "1호선");
     }
 
     /**
