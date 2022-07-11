@@ -51,10 +51,8 @@ public class SubwayLineAcceptanceTest {
         final List<Object> stations = response.jsonPath().getList("stations");
         assertThat(stations.size()).isEqualTo(2);
 
-        // then
         final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
         final List<String> subwayLineNames = getSubwayLinesResponse.jsonPath().getList("name", String.class);
-
         assertThat(subwayLineNames).hasSize(1);
         assertThat(subwayLineNames).contains(String.valueOf(params.get("name")));
     }
@@ -83,9 +81,7 @@ public class SubwayLineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
 
-        // then
         final List<String> subwayLineNames = response.jsonPath().getList("name", String.class);
-
         assertThat(subwayLineNames).hasSize(paramsList.size());
         assertThat(subwayLineNames).containsAll(createdSubwayLineNames);
     }
@@ -140,7 +136,6 @@ public class SubwayLineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(OK.value());
 
-        // then
         final ExtractableResponse<Response> getSubwayLineResponse = getSubwayLineRequest(createdSubwayLineId);
         assertThat(getSubwayLineResponse.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
         assertThat(getSubwayLineResponse.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
@@ -167,7 +162,6 @@ public class SubwayLineAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
 
-        // then
         final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
         final List<Object> subwayLineIdList = getSubwayLinesResponse.jsonPath().getList("id");
         assertThat(subwayLineIdList).hasSize(0);
