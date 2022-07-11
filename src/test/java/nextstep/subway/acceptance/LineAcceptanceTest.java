@@ -51,20 +51,43 @@ public class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations");
 
-        ExtractableResponse<Response> response = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
+        ExtractableResponse<Response> createResponse = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        String lineName = getResponse.jsonPath().getString("[0].name");
+        String lineColor = getResponse.jsonPath().getString("[0].color");
+
+        assertThat(lineName).isEqualTo("신분당선");
+        assertThat(lineColor).isEqualTo("bg-red-600");
+
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void getLines() {
+        ExtractableResponse<Response> response1 = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
+        ExtractableResponse<Response> response2 = createLine(new Line("7호선", "bg-brown-600", 1L, 3L, 10));
 
         List<String> lineNames = RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
 
-        assertThat(lineNames.contains("신분당선")).isEqualTo(true);
     }
 
 
-    // 지하철노선 생성
+        // 지하철노선 생성
     private ExtractableResponse<Response> createLine(Line line) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", line.getName());
