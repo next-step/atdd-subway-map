@@ -19,25 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    private static final String LINE1_NAME = "1호선";
-    private static final String LINE1_COLOR = "red";
-    private static final Long LINE1_UP_STATION_ID = 1L;
-    private static final Long LINE1_DOWN_STATION_ID = 3L;
-    private static final Long LINE1_DISTANCE = 10L;
-
-    private static final String LINE2_NAME = "2호선";
-    private static final Long LINE2_UP_STATION_ID = 2L;
-    private static final String LINE2_COLOR = "blue";
-    private static final Long LINE2_DOWN_STATION_ID = 4L;
-    private static final Long LINE2_DISTANCE = 20L;
-
-    private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_COLOR = "color";
-    private static final String KEY_UP_STATION_ID = "upStationId";
-    private static final String KEY_DOWN_STATION_ID = "downStationId";
-    private static final String KEY_DISTANCE = "distance";
-
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {

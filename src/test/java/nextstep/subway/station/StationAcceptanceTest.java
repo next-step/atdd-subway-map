@@ -18,12 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends AcceptanceTest {
 
-    private static final String GANGNAM_STATION = "강남역";
-    private static final String SINDORIM_STATION = "신도림역";
-
-    private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {

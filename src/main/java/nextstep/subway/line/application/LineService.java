@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +38,7 @@ public class LineService {
     public LineResponse findLine(final Long id) {
         return lineRepository.findById(id)
                 .map(this::createLineResponse)
-                .orElse(null);
+                .orElseThrow(NoSuchElementException::new);
     }
 
     @Transactional
@@ -63,6 +64,6 @@ public class LineService {
 
     private Line findLineById(final Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(NoSuchElementException::new);
     }
 }
