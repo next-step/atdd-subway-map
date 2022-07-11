@@ -44,7 +44,7 @@ public class Line {
     public static Line makeLine(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
         validateName(name);
         validateColor(color);
-        isSameStation(upStation, downStation);
+        validateUpAndDownStation(upStation, downStation);
         return new Line(name, color, upStation, downStation, new Distance(distance));
     }
 
@@ -60,7 +60,7 @@ public class Line {
         }
     }
 
-    private static void isSameStation(Station upStation, Station downStation) {
+    private static void validateUpAndDownStation(Station upStation, Station downStation) {
         if(upStation.isSame(downStation)) {
             throw new IllegalArgumentException("상행과 하행이 같습니다.");
         }

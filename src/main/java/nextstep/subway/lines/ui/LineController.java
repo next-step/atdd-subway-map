@@ -25,7 +25,7 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/lines")
     public ResponseEntity<LineSaveResponse> saveLine(@RequestBody LineSaveRequest lineSaveRequest) {
         Line line = lineService.saveLine(lineSaveRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(LineSaveResponse.of(line));

@@ -20,13 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql({"/station.sql", "/line.sql"})
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    int port;
+public class LineAcceptanceTest extends AcceptanceTest {
 
     private StationAcceptanceTest stationAcceptanceTest;
 
@@ -115,20 +110,9 @@ public class LineAcceptanceTest {
         final String 신분당선 = "신분당선";
 
         ExtractableResponse<Response> createResponse = createLine(신분당선, 시청역, 강남역, "bg-red-600", 10);
+
+        //then
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        //then(지하철 노선 목록과 앞서 생성한 지하철 노선을 비교하여 생성된 지하철이 존재하는지 확인한다.)
-        ExtractableResponse<Response> getsResponse = gets();
-
-        //상태코드 200 확인
-        assertThat(getsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        //지하철 노선명 확인
-        assertThat(getsResponse.body().jsonPath().getList("name", String.class)).contains(신분당선);
-
-        //지하철 노선의 상행, 하행역 확인
-        //TODO : json path element 이해가 가지 않음[공부 필요]
-        assertThat(getsResponse.body().jsonPath().getList("stations[0].name", String.class)).containsExactly(시청역, 강남역);
     }
 
     @DisplayName("지하철 노선 생성 시 distance가 0보다 작거나 같을 때 예외")
