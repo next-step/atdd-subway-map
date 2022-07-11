@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,26 @@ public class StationAcceptanceTest {
     public void setUp() {
         RestAssured.port = port;
     }
+
+    private static Map<String, Object> station1;
+    private static Map<String, Object> station2;
+    private static Map<String, Object> station3;
+    static RestUtil restUtil;
+
+    @BeforeAll
+    static void init() {
+        restUtil = new RestUtil();
+
+        station1 = new HashMap<>();
+        station1.put("name", "마곡역");
+
+        station2 = new HashMap<>();
+        station2.put("name", "디지털미디어시티역");
+
+        station3 = new HashMap<>();
+        station3.put("name", "마곡나루역");
+    }
+
 
     /**
      * When 지하철역을 생성하면
@@ -70,14 +91,15 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        createStation("마곡역");
-        createStation("디지털미디어시티역");
+        restUtil.createEntityData(station1, "/stations");
+        restUtil.createEntityData(station2, "/stations");
+
 
         //when
         List<String> names = getAllStations();
 
         //then
-        assertThat(names).containsAnyOf("마곡역","디지털미디어시티역");
+        assertThat(names).containsAnyOf(station1.get("name").toString(), station2.get("name").toString());
     }
 
 
@@ -91,30 +113,16 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        createStation("마곡나루역");
+        Long id = restUtil.createEntityData(station3, "/stations");
 
         //when
-        deleteStations(1L);
+        deleteStations(id);
 
         //then
         List<String> names = getAllStations();
-        assertThat(names).doesNotContain("마곡나루역");
+        assertThat(names).doesNotContain(station3.get("name").toString());
 
 
-    }
-
-    public void createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     public List<String> getAllStations() {
@@ -125,7 +133,7 @@ public class StationAcceptanceTest {
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    public void deleteStations(Long id){
+    public void deleteStations(Long id) {
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)

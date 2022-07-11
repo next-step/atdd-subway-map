@@ -3,16 +3,14 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,24 +19,33 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@Sql("classpath:/stations.sql")
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("tableTruncator")
 public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseTruncator databaseTruncator;
+
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         RestAssured.port = port;
+        databaseTruncator.afterPropertiesSet();
     }
 
     private static Map<String, Object> line1;
     private static Map<String, Object> line2;
+    private static Map<String, Object> station1;
+    private static Map<String, Object> station2;
+    private static Map<String, Object> station3;
 
+    static RestUtil restUtil;
 
     @BeforeAll
     static void init() {
+        restUtil = new RestUtil();
         line1 = new HashMap<>();
         line1.put("name", "신분당선");
         line1.put("color", "bg-red-600");
@@ -53,6 +60,20 @@ public class LineAcceptanceTest {
         line2.put("downStationId", 3);
         line2.put("distance", 10);
 
+        station1 = new HashMap<>();
+        station1.put("name", "강남역");
+
+        station2 = new HashMap<>();
+        station2.put("name", "양재역");
+
+        station3 = new HashMap<>();
+        station3.put("name", "교대역");
+
+    }
+
+    @AfterEach
+    void clear(){
+        databaseTruncator.cleanTable();
     }
 
 
@@ -60,6 +81,10 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         //when
+        restUtil.createEntityData(station1, "/stations");
+        restUtil.createEntityData(station2, "/stations");
+
+
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
                         .body(line1)
@@ -78,8 +103,12 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         //given
-        createLine(line1);
-        createLine(line2);
+
+        restUtil.createEntityData(station1, "/stations");
+        restUtil.createEntityData(station2, "/stations");
+        restUtil.createEntityData(station3, "/stations");
+        restUtil.createEntityData(line1, "/lines");
+        restUtil.createEntityData(line2, "/lines");
 
         //when
         List<String> names = RestAssured.given().log().all()
@@ -96,7 +125,9 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         //given
-        Long id = createLine(line1);
+        restUtil.createEntityData(station1, "/stations");
+        restUtil.createEntityData(station2, "/stations");
+        Long id = restUtil.createEntityData(line1, "/lines");
 
         //when
         ExtractableResponse<Response> response =
@@ -115,7 +146,9 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Long id = createLine(line1);
+        restUtil.createEntityData(station1, "/stations");
+        restUtil.createEntityData(station2, "/stations");
+        Long id = restUtil.createEntityData(line1, "/lines");
 
         Map<String, String> updateParams = new HashMap<>();
 
@@ -140,7 +173,9 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        Long id = createLine(line1);
+        restUtil.createEntityData(station1, "/stations");
+        restUtil.createEntityData(station2, "/stations");
+        Long id = restUtil.createEntityData(line1, "/lines");
 
         //when
         ExtractableResponse<Response> response =
@@ -153,22 +188,5 @@ public class LineAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-
-    Long createLine(Map<String, Object> params) {
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        String location = response.header("Location");
-        String[] args = location.split("/");
-        return Long.parseLong(args[args.length-1]);
-    }
-
 
 }
