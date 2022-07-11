@@ -2,6 +2,7 @@ package nextstep.subway.ui;
 
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -19,24 +20,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class LineController {
 
     private final LineCreator lineCreator;
     private final LineModifier lineModifier;
     private final LineRemover lineRemover;
     private final LineQueryService lineQueryService;
-
-    public LineController(
-            LineCreator lineCreator,
-            LineModifier lineModifier,
-            LineRemover lineRemover,
-            LineQueryService lineQueryService
-    ) {
-        this.lineCreator = lineCreator;
-        this.lineModifier = lineModifier;
-        this.lineRemover = lineRemover;
-        this.lineQueryService = lineQueryService;
-    }
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getLines() {

@@ -1,5 +1,6 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.station;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.station.Station;
@@ -12,12 +13,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StationService {
-    private final StationRepository stationRepository;
 
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+    private final StationRepository stationRepository;
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
