@@ -5,6 +5,7 @@ import static nextstep.subway.acceptance.sample.LineSampleData.일호선_노선�
 import static nextstep.subway.acceptance.template.LineRequestTemplate.노선을_생성한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_목록을_조회한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_생성을_요청한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_조회한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,6 +85,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철역노선을 조회한다.")
     @Test
     void 지하철역노선_조회() {
+        // given
+        long lineId = 신분당선_노선을_생성한다().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> lineResponse = 지하철노선을_조회한다(lineId);
+
+        // then
+        assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        String lineName = lineResponse.jsonPath().getObject("name", String.class);
+        assertThat(lineName).containsAnyOf("신분당선");
     }
 
     /**

@@ -25,6 +25,14 @@ public class LineRequestTemplate {
                 .extract();
     }
 
+
+    public static ExtractableResponse<Response> 지하철노선을_조회한다(long lineId) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> 노선을_생성한다(String name, String color, Long downStationId,
                                                          Long upStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();

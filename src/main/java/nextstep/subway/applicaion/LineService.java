@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +39,15 @@ public class LineService {
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(),
                 upStation, downStation);
         return createLineResponse(lineRepository.save(line));
+    }
+
+    public LineResponse findLine(Long lineId) {
+        return createLineResponse(getLine(lineId));
+    }
+
+    private Line getLine(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 노선이 없습니다."));
     }
 
     private Station getStation(Long upStationId) {
