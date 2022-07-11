@@ -42,6 +42,13 @@ public class LineRequestTemplate {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철노선_삭제를_요청한다(long lineId) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+    }
+
     public static ExtractableResponse<Response> 지하철노선을_수정한다(long lineId, String name, String color) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);

@@ -52,6 +52,11 @@ public class LineService {
         lineRepository.save(line);
     }
 
+    @Transactional
+    public void deleteLineById(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
+
     private Line getLine(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 노선이 없습니다."));

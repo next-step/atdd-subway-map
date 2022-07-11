@@ -4,6 +4,7 @@ import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노�
 import static nextstep.subway.acceptance.sample.LineSampleData.일호선_노선을_생성한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.노선을_생성한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_목록을_조회한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_삭제를_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_생성을_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_수정한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_조회한다;
@@ -132,5 +133,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철역노선을 삭제한다.")
     @Test
     void 지하철역노선_삭제() {
+        // given
+        long lineId = 신분당선_노선을_생성한다().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> lineDeletedResponse = 지하철노선_삭제를_요청한다(lineId);
+
+        // then
+        assertThat(lineDeletedResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> linesResponse = 지하철노선_목록을_조회한다();
+        List<Long> lineIdsResponse = linesResponse.jsonPath().getList("id", Long.class);
+        assertThat(lineIdsResponse).doesNotContain(lineId);
     }
 }
