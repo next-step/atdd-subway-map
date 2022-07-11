@@ -1,31 +1,37 @@
 package nextstep.subway.acceptance;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
+import java.util.Map;
+import nextstep.subway.config.DataBaseCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.test.context.ActiveProfiles;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("acceptance")
 public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    DataBaseCleaner dataBaseCleaner;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        dataBaseCleaner.afterPropertiesSet();
+        dataBaseCleaner.tableClear();
     }
 
     /**
@@ -104,7 +110,7 @@ public class StationAcceptanceTest {
         assertThat(name).isNotIn("잠실역");
     }
 
-    private ExtractableResponse<Response> createSubwayStation(final String station) {
+    public ExtractableResponse<Response> createSubwayStation(final String station) {
         return RestAssured.given().log().all()
             .body(Map.of("name", station))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
