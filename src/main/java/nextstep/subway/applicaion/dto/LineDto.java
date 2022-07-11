@@ -3,8 +3,8 @@ package nextstep.subway.applicaion.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.domain.LineStation;
 import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.station.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,15 +22,14 @@ public class LineDto {
 
     private final List<StationDto> stations;
 
-    public static LineDto of(final Line line) {
+    public static LineDto of(final Line line, final List<Station> stations) {
         return LineDto.builder()
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
                 .distance(line.getDistance())
                 .stations(
-                        line.getLineStations().stream()
-                                .map(LineStation::getStation)
+                        stations.stream()
                                 .map(StationDto::of)
                                 .collect(Collectors.toUnmodifiableList()))
                 .build();

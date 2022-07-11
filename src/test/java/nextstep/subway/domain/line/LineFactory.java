@@ -9,6 +9,6 @@ import java.util.ArrayList;
 public final class LineFactory {
 
     public static Line getMockLine(final Long id, final String name, final String color, final Integer distance) {
-        return new Line(id, name, color, distance, new ArrayList<>());
+        return new Line(id, name, color, distance, 1L, 2L);
     }
 }

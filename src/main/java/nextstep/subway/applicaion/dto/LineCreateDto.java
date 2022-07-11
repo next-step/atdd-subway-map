@@ -21,6 +21,8 @@ public class LineCreateDto {
                 .name(this.name)
                 .color(this.color)
                 .distance(this.distance)
+                .upStationId(this.upStationId)
+                .downStationId(this.downStationId)
                 .build();
     }
 

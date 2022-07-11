@@ -1,11 +1,11 @@
 package nextstep.subway.domain.line;
 
-import lombok.*;
-import nextstep.subway.domain.LineStation;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,16 +20,20 @@ public class Line {
     private String color;
     private Integer distance;
 
-    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER)
-    private List<LineStation> lineStations = new ArrayList<>();
+    @Column(nullable = false)
+    private Long upStationId;
+
+    @Column(nullable = false)
+    private Long downStationId;
 
 
     @Builder(toBuilder = true)
-    protected Line(Long id, String name, String color, Integer distance, List<LineStation> lineStations) {
+    protected Line(Long id, String name, String color, Integer distance, Long upStationId, Long downStationId) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.lineStations = lineStations;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
     }
 }

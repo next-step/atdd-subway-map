@@ -5,6 +5,8 @@ import nextstep.subway.domain.line.LineFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LineDtoTest {
@@ -15,7 +17,7 @@ class LineDtoTest {
     void createDtoTest() {
         Line line = LineFactory.getMockLine(1L, "4호선", "blue", 5);
 
-        LineDto dto = LineDto.of(line);
+        LineDto dto = LineDto.of(line, Collections.emptyList());
 
         assertThat(dto.getId()).isEqualTo(line.getId());
         assertThat(dto.getName()).isEqualTo(line.getName());
