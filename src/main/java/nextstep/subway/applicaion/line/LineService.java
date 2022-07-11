@@ -34,8 +34,7 @@ public class LineService {
         var line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new DomainException(DomainExceptionType.LINE_NOT_FOUND));
 
-        line.setName(request.getName());
-        line.setColor(request.getColor());
+        line.changeNameAndColor(request.getName(), request.getColor());
 
         return LineResponse.fromLine(line);
     }
