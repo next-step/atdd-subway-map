@@ -58,9 +58,7 @@ class LineAcceptanceTest {
 
         // then
         assertStatusCode(createLineResponse, HttpStatus.CREATED);
-
-        final List<Long> stationIdList = createLineResponse.jsonPath().getList("stations.id", Long.class);
-        assertThat(stationIdList).contains(upStationId, downStationId);
+        assertThat(getNamesFromResponse(getLinesRequest())).contains(신분당선);
     }
 
     /**
