@@ -28,4 +28,12 @@ public class Sections {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
+
+    public void addSection(Line line, Section section) {
+        if (sections.contains(section)) {
+            throw new IllegalArgumentException("이미 등록 된 구간입니다");
+        }
+        sections.add(section);
+        section.setLine(line);
+    }
 }

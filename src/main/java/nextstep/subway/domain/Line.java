@@ -31,6 +31,10 @@ public class Line {
         this.color = color;
     }
 
+    public void addSection(Section section) {
+        sections.addSection(this,section);
+    }
+
     private void validation(String name, String color) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("노선의 이름을 작성해주세요");

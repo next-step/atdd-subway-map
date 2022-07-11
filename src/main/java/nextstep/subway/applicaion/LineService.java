@@ -3,10 +3,8 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +36,19 @@ public class LineService {
         return LineResponse.of(newLine);
     }
 
+    @Transactional
+    public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
+        validationStations(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+
+        Line line = findLind(lineId);
+        Station upStation = findStation(sectionRequest.getUpStationId());
+        Station downStation = findStation(sectionRequest.getDownStationId());
+        Section section = new Section(sectionRequest.getDistance(), upStation, downStation);
+        line.addSection(section);
+
+        return LineResponse.of(line);
+    }
+
     private Station findStation(Long upStationId) {
         return stationRepository.findById(upStationId).orElseThrow(() ->
                 new IllegalArgumentException("역이 없습니다.")
@@ -51,10 +62,14 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() ->
+        Line line = findLind(id);
+        return LineResponse.of(line);
+    }
+
+    private Line findLind(Long id) {
+        return lineRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("노선이 존재하지 않습니다")
         );
-        return LineResponse.of(line);
     }
 
     public List<LineResponse> findLines() {
@@ -64,9 +79,7 @@ public class LineService {
 
     @Transactional
     public void updateLine(Long id, LineUpdateRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("노선이 존재하지 않습니다")
-        );
+        Line line = findLind(id);
         line.changeInfo(request.getName(), request.getColor());
     }
 
