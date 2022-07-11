@@ -58,6 +58,13 @@ public class StationLineService {
         stationLine.update(stationLineRequest.getName(), stationLineRequest.getColor());
     }
 
+    public void deleteByStationLineId(Long id) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선입니다."));
+
+        stationLineRepository.deleteById(stationLine.getId());
+    }
+
 
     private List<StationResponse> findByUpStationAndDownStation(StationLine stationLine) {
         return stationRepository.findAllById(List.of(

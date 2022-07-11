@@ -32,10 +32,16 @@ public class StationLineController {
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity updateByStationLineId(@PathVariable Long id,
+    public ResponseEntity<Void> updateByStationLineId(@PathVariable Long id,
                                                 @RequestBody StationLineRequest stationLineRequest) {
         stationLineService.updateByStationLineId(id, stationLineRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteByStationLineId(@PathVariable Long id) {
+        stationLineService.deleteByStationLineId(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
