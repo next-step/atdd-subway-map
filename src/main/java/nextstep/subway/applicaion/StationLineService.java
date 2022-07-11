@@ -28,10 +28,8 @@ public class StationLineService {
 
     @Transactional
     public StationLineResponse createStationLine(StationLineRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
         StationLine stationLine = stationLineMapper.of(request, upStation, downStation);
         StationLine savedStationLine = stationLineRepository.save(stationLine);
         return stationLineMapper.of(savedStationLine);
@@ -62,5 +60,10 @@ public class StationLineService {
     @Transactional
     public void deleteStationLine(Long lineId) {
         stationLineRepository.deleteById(lineId);
+    }
+
+    private Station findStationById(Long request) {
+        return stationRepository.findById(request)
+                .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
     }
 }
