@@ -112,7 +112,7 @@ public class SubwayLineTest {
 		return RestAssured
 				.given()
 					.log().all()
-					.accept(MediaType.APPLICATION_JSON_VALUE)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 					.get("/lines")
 				.then()
@@ -146,7 +146,7 @@ public class SubwayLineTest {
 		return RestAssured
 				.given()
 					.log().all()
-					.accept(MediaType.APPLICATION_JSON_VALUE)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 					.get("/lines/{id}", responseId)
 				.then()
