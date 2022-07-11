@@ -40,6 +40,7 @@ public class LineService {
     public LineResponse findLineById(long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
+
         return LineResponse.of(line, findAllStationUsingLine(line));
     }
 
