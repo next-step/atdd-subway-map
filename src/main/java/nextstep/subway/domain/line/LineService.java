@@ -26,11 +26,8 @@ public class LineService {
     }
 
     public LineResponse saveLine(CreateLineRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                                             .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                                             .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
-
+        Station upStation = findStation(request.getUpStationId());
+        Station downStation = findStation(request.getDownStationId());
 
         Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
         lineRepository.save(line);
@@ -46,19 +43,27 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long lineId) {
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
+        Line line = findLine(lineId);
         List<Station> stations = List.of(line.getUpStation(), line.getDownStation());
         return LineResponse.of(line, stations);
     }
 
     public void updateLine(Long lineId, UpdateLineRequest request) {
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
+        Line line = findLine(lineId);
         line.update(request.getName(), request.getColor());
     }
 
     public void deleteLine(final Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    private Station findStation(long stationId) {
+        return stationRepository.findById(stationId)
+                                .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
+    }
+
+    private Line findLine(final Long lineId) {
+        return lineRepository.findById(lineId)
+                             .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
     }
 }
