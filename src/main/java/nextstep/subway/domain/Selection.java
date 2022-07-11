@@ -10,7 +10,6 @@ public class Selection {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
 	private long lineId;
 	private Long upStationId;
 	private Long downStationId;
@@ -28,5 +27,13 @@ public class Selection {
 
 	public Long getId() {
 		return id;
+	}
+
+	public Long getUpStationId() {
+		return upStationId;
+	}
+
+	public Long getDownStationId() {
+		return downStationId;
 	}
 }

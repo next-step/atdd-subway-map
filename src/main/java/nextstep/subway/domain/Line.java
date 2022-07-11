@@ -63,8 +63,10 @@ public class Line {
 		return true;
 	}
 
-	public boolean isDeletable(long selectionId) {
-
+	public boolean isDeletable(long stationId) {
+		if (this.downStationId != stationId) {
+			throw new RuntimeException();
+		}
 		return true;
 	}
 }
