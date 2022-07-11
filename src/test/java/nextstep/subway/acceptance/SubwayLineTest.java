@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.DatabaseCleanup;
 import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.station.StationRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +35,16 @@ public class SubwayLineTest {
 	@Autowired
 	private StationService stationService;
 
+	@Autowired
+	private DatabaseCleanup databaseCleanup;
+
 	@LocalServerPort
 	int port;
 
 	@BeforeEach
 	void setUp() {
 		RestAssured.port = port;
+		databaseCleanup.execute();
 		upStationId = stationService.saveStation(new StationRequest(UP_STATION_NAME)).getId();
 		downStationId = stationService.saveStation(new StationRequest(DOWN_STATION_NAME)).getId();
 	}
