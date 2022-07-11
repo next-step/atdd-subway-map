@@ -8,11 +8,14 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.StationAcceptanceTest.NAME;
@@ -26,9 +29,15 @@ public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private List<JpaRepository> jpaRepositories;
+
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        jpaRepositories.forEach(JpaRepository::deleteAllInBatch);
+
         createStation(Map.of(NAME, "남태령역"));
         createStation(Map.of(NAME, "사당역"));
         createStation(Map.of(NAME, "방배역"));

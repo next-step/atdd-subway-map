@@ -6,8 +6,10 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -23,9 +25,13 @@ public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private List<JpaRepository> jpaRepositories;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        jpaRepositories.forEach(JpaRepository::deleteAllInBatch);
     }
 
     /**
