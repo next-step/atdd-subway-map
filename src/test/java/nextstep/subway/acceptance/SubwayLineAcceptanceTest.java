@@ -218,7 +218,7 @@ public class SubwayLineAcceptanceTest {
     private ExtractableResponse<Response> getSubwayLineRequest(Long subwayLineId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/subway-lines/" + subwayLineId)
+                .when().get("/subway-lines/{subwayLineId}", subwayLineId)
                 .then().log().all()
                 .extract();
 
@@ -230,7 +230,7 @@ public class SubwayLineAcceptanceTest {
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().put("/subway-lines/" + subwayLineId)
+                .when().put("/subway-lines/{subwayLineId}", subwayLineId)
                 .then().log().all()
                 .extract();
 
@@ -240,7 +240,7 @@ public class SubwayLineAcceptanceTest {
     private ExtractableResponse<Response> deleteSubwayLineRequest(Long subwayLineId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/subway-lines/" + subwayLineId)
+                .when().delete("/subway-lines/{subwayLineId}", subwayLineId)
                 .then().log().all()
                 .extract();
 

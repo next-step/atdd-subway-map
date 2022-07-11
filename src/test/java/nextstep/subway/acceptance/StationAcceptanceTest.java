@@ -171,7 +171,7 @@ public class StationAcceptanceTest {
     private ExtractableResponse<Response> deleteStationRequest(Long stationId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/stations/" + stationId)
+                .when().delete("/stations/{stationId}", stationId)
                 .then().log().all()
                 .extract();
 
