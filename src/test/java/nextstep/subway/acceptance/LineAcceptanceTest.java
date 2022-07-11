@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -7,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
@@ -56,12 +59,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 2개의 지하철 노선을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
-    @DisplayName("지하철노선을 조회한다.")
+    @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     void getLines() {
         // given
@@ -82,5 +85,50 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(getList("name", "/lines")).containsExactly("2호선", "신분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선을 응답 받는다
+     */
+    // TODO: 지하철 노선 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철노선을 조회한다.")
+    @Test
+    void getLine() {
+        // given
+        createStations();
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "2호선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", "1");
+        params.put("downStationId", "3");
+        params.put("distance", "10");
+        createLines(params);
+
+        // then
+        assertThat(getLine("name", "1")).isEqualTo("2호선");
+
+        // given
+        params = new HashMap<>();
+        params.put("name", "신분당선");
+        params.put("color", "bg-green-300");
+        params.put("upStationId", "1");
+        params.put("downStationId", "4");
+        params.put("distance", "3");
+        createLines(params);
+
+        // then
+        assertAll(() -> {
+            assertThat(getLine("name", "1")).isEqualTo("2호선");
+            assertThat(getLine("name", "2")).isEqualTo("신분당선");
+        });
+    }
+
+    private String getLine(String variable, String id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .extract().jsonPath().get(variable);
     }
 }
