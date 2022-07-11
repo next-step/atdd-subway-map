@@ -12,18 +12,19 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/lines")
 @RequiredArgsConstructor
 public class SubwayLineController {
 
 	private final SubwayLineService lineService;
 
-	@PostMapping("/lines")
+	@PostMapping
 	public ResponseEntity<SubwayLineResponse> createSubwayLine(@RequestBody SubwayLineRequest request) {
 		SubwayLineResponse lineResponse = lineService.createSubwayLine(request);
 		return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
 	}
 
-	@GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<SubwayLineResponse>> findSubwayLines() {
 		return ResponseEntity.ok().body(lineService.findAll());
 	}
