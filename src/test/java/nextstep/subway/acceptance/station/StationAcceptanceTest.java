@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest extends AcceptanceTest {
 
     static final String GANGNAM_STATION = "강남역";
@@ -52,7 +51,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void findAllStations() {
