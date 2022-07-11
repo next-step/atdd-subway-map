@@ -25,4 +25,8 @@ public class Selection {
 		this.downStationId = downStationId;
 		this.distance = distance;
 	}
+
+	public Long getId() {
+		return id;
+	}
 }

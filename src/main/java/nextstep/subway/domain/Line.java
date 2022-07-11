@@ -51,4 +51,20 @@ public class Line {
 		this.name = stationName;
 		this.color = stationColor;
 	}
+
+	public boolean isRegistrable(long upStationIdFromSelection, long downStationIdFromSelection) {
+		if (upStationIdFromSelection != this.downStationId) {
+			throw new RuntimeException();
+		}
+
+		if (this.upStationId == downStationIdFromSelection || this.downStationId == downStationIdFromSelection) {
+			throw new RuntimeException();
+		}
+		return true;
+	}
+
+	public boolean isDeletable(long selectionId) {
+
+		return true;
+	}
 }
