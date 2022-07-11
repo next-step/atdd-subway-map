@@ -5,6 +5,7 @@ import static nextstep.subway.acceptance.sample.LineSampleData.일호선_노선�
 import static nextstep.subway.acceptance.template.LineRequestTemplate.노선을_생성한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_목록을_조회한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_생성을_요청한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_수정한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_조회한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
@@ -106,6 +107,21 @@ public class LineAcceptanceTest {
     @DisplayName("지하철역노선을 수정한다.")
     @Test
     void 지하철역노선_수정() {
+        // given
+        long lineId = 신분당선_노선을_생성한다().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> lineUpdatedResponse = 지하철노선을_수정한다(lineId, "신도림역", "bg-green-600");
+
+        // then
+        assertThat(lineUpdatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> lineResponse = 지하철노선을_조회한다(lineId);
+        String lineName = lineResponse.jsonPath().getObject("name", String.class);
+        assertThat(lineName).containsAnyOf("신도림역");
+
+        String lineColor = lineResponse.jsonPath().getObject("color", String.class);
+        assertThat(lineColor).containsAnyOf("bg-green-600");
     }
 
     /**

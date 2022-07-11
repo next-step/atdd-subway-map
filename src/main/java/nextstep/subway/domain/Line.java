@@ -1,6 +1,5 @@
 package nextstep.subway.domain;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,6 +34,11 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public void updateNameAndColor(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {

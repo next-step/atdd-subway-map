@@ -45,6 +45,13 @@ public class LineService {
         return createLineResponse(getLine(lineId));
     }
 
+    @Transactional
+    public void updateLine(Long lineId, LineRequest lineRequest) {
+        Line line = getLine(lineId);
+        line.updateNameAndColor(lineRequest.getName(), lineRequest.getColor());
+        lineRepository.save(line);
+    }
+
     private Line getLine(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 노선이 없습니다."));
