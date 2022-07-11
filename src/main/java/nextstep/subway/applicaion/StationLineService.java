@@ -36,5 +36,21 @@ public class StationLineService {
         return StationLineResponse.of(stationLine, stations);
     }
 
+    public List<StationLineResponse> findAllStationLine() {
+        return stationLineRepository.findAll()
+                .stream()
+                .map(stationLine -> StationLineResponse.of(stationLine, findByUpStationAndDownStation(stationLine)))
+                .collect(Collectors.toList());
+    }
+
+    private List<StationResponse> findByUpStationAndDownStation(StationLine stationLine) {
+        return stationRepository.findAllById(List.of(
+                stationLine.getUpStationId(),
+                stationLine.getDownStationId()))
+                .stream()
+                .map(station -> StationResponse.of(station))
+                .collect(Collectors.toList());
+    }
+
 
 }
