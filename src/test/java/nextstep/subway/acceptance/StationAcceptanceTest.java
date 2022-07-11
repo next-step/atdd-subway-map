@@ -20,6 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
+    private static final String gangnamStation = "강남역";
+    private static final String donongStation = "도농역";
+    private static final String gooriStation = "구리역";
+
     @LocalServerPort
     int port;
 
@@ -37,14 +42,14 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = saveStation("강남역");
+        ExtractableResponse<Response> response = saveStation(gangnamStation);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames = findAllStationNames();
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(gangnamStation);
     }
 
     /**
@@ -55,14 +60,14 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @Test
     void 지하철역_목록_조회() {
-        saveStation("도농역");
-        saveStation("구리역");
+        saveStation(donongStation);
+        saveStation(gooriStation);
 
         ExtractableResponse<Response> stations = findAllStations();
         assertThat(stations.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> names = findAllStations().jsonPath().getList("name", String.class);
-        assertThat(names).containsAnyOf("도농역", "구리역");
+        assertThat(names).containsAnyOf(donongStation, gooriStation);
     }
 
     /**
