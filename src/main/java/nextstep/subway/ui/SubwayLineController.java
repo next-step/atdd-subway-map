@@ -4,7 +4,6 @@ import nextstep.subway.applicaion.SubwayLineService;
 import nextstep.subway.applicaion.dto.subwayLine.CreateSubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayLine.SubwayLineResponse;
 import nextstep.subway.applicaion.dto.subwayLine.UpdateSubwayLineRequest;
-import nextstep.subway.domain.subwayLine.SubwayLineRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +13,10 @@ import java.util.List;
 @RestController
 public class SubwayLineController {
 
-    private final SubwayLineRepository subwayLineRepository;
-
     private final SubwayLineService subwayLineService;
 
-    public SubwayLineController(SubwayLineService subwayLineService, SubwayLineRepository subwayLineRepository) {
+    public SubwayLineController(SubwayLineService subwayLineService) {
         this.subwayLineService = subwayLineService;
-        this.subwayLineRepository = subwayLineRepository;
     }
 
     @PostMapping("/subway-lines")
