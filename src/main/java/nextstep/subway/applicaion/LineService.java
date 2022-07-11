@@ -2,10 +2,9 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,11 @@ public class LineService {
     }
 
     public LineResponse createLine(LineRequest request) {
-        Line savedLine = lineRepository.save(request.toDomain());
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(NoSuchElementException::new);
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(NoSuchElementException::new);
+        Line savedLine = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
         List<StationResponse> stations = findAllStationInLine(savedLine);
         return LineResponse.of(savedLine, stations);
     }
@@ -41,28 +44,40 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findById(Long lineId) {
-        Line findLine = lineRepository.findById(lineId)
-                .orElseThrow(NoSuchElementException::new);
-
+        Line findLine = findLineById(lineId);
         List<StationResponse> stations = findAllStationInLine(findLine);
         return LineResponse.of(findLine, stations);
     }
 
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
     private List<StationResponse> findAllStationInLine(Line line) {
-        return stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))
+        return line.getAllStation()
                 .stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
     public void editLine(Long lineId, LineRequest request) {
-        Line findLine = lineRepository.findById(lineId)
-                .orElseThrow(NoSuchElementException::new);
-        findLine.edit(request.toDomain());
+        Line findLine = findLineById(lineId);
+        findLine.edit(request.getName(), request.getColor(), request.getDistance());
     }
 
     public void deleteById(Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    public void addSection(Long lineId, SectionRequest request) {
+        Line findLine = findLineById(lineId);
+        Station upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(NoSuchElementException::new);
+        Station downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(NoSuchElementException::new);
+
+        findLine.addSection(new Section(findLine, upStation, downStation, request.getDistance()));
     }
 }
 
