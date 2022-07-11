@@ -26,8 +26,7 @@ public class StationTestMethod {
                 .when()
                 .post("/stations")
                 .then().log().all()
-                .extract()
-                ;
+                .extract();
     }
 
     public static List<String> 지하철목록조회(){

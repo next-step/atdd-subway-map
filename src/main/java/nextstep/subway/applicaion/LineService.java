@@ -42,33 +42,32 @@ public class LineService {
                 .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
         return LineResponse.of(line, findAllStationUsingLine(line));
     }
+
     @Transactional(readOnly = true)
     public List<LineResponse> findAllLine(){
         return lineRepository.findAll()
                 .stream()
                 .map(line -> LineResponse.of(line, findAllStationUsingLine(line)))
-                .collect(Collectors.toList())
-                ;
-    }
-
-    private List<StationResponse> findAllStationUsingLine(Line line){
-        return stationRepository.findAllById(
-                List.of(line.getUpStationId(), line.getDownStationId()))
-                .stream()
-                .map(station -> StationResponse.of(station))
-                .collect(Collectors.toList())
-                ;
+                .collect(Collectors.toList());
     }
 
     public void modifyLine(Long lineId, LineRequest lineRequest){
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
+
         line.modify(lineRequest.getName(), lineRequest.getColor());
     }
 
-    @Transactional
+
     public void deleteLineById(Long lineId) {
         lineRepository.deleteById(lineId);
     }
 
+    private List<StationResponse> findAllStationUsingLine(Line line){
+        return stationRepository.findAllById(
+                        List.of(line.getUpStationId(), line.getDownStationId()))
+                .stream()
+                .map(station -> StationResponse.of(station))
+                .collect(Collectors.toList());
+    }
 }

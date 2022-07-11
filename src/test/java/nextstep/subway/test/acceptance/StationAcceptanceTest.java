@@ -74,8 +74,7 @@ public class StationAcceptanceTest extends AcceptanceTest{
                         .when()
                         .delete("/stations/{id}")
                         .then().log().all()
-                        .extract()
-                ;
+                        .extract();
         List<String> stationNames = 지하철목록조회();
 
         assertThat(stationNames).doesNotContain("개봉역");

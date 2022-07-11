@@ -27,7 +27,7 @@ public class StationService {
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(station -> StationResponse.of(station))
+                .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
