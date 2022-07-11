@@ -13,7 +13,6 @@ public class SubwayLineResponse {
 	private String color;
 	private List<Station> stations;
 
-
 	public SubwayLineResponse(SubwayLine savedLine, List<Station> stations) {
 		this.id = savedLine.getId();
 		this.name = savedLine.getName();

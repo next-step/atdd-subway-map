@@ -140,7 +140,6 @@ public class SubwayLineTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME);
 		assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME);
-
 	}
 
 	private ExtractableResponse<Response> findSubwayLine(long responseId) {

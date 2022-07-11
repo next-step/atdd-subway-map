@@ -26,8 +26,10 @@ public class SubwayLineService {
 	public SubwayLineResponse createSubwayLine(SubwayLineRequest request) {
 		SubwayLine savedLine = lineRepository.save(request.toEntity());
 		List<Station> findStations = stationRepository.findAllById(
-				List.of(request.getUpStationId(),
-						request.getDownStationId())
+				List.of(
+						request.getUpStationId(),
+						request.getDownStationId()
+				)
 		);
 
 		return new SubwayLineResponse(savedLine, findStations);
@@ -37,8 +39,12 @@ public class SubwayLineService {
 		return lineRepository.findAll().stream()
 				.map(line -> new SubwayLineResponse(
 						line,
-						stationRepository.findAllById(List.of(line.getUpStationId(),
-								line.getDownStationId()))
+						stationRepository.findAllById(
+								List.of(
+										line.getUpStationId(),
+										line.getDownStationId()
+								)
+						)
 				))
 				.collect(Collectors.toList());
 	}
