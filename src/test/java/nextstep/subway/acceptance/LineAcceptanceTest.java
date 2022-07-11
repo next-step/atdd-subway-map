@@ -50,6 +50,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철역노선 목록을 조회한다.")
     @Test
     void 지하철역노선_목록_조회() {
+        // given
+        신분당선_노선을_생성한다();
+        일호선_노선을_생성한다();
+
+        // when
+        ExtractableResponse<Response> linesResponse = readAllLinesRequest();
+
+        // then
+        List<String> stationNames = linesResponse.jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).containsOnlyOnce("신분당선", "1호선");
     }
 
     /**
@@ -87,6 +98,13 @@ public class LineAcceptanceTest {
         long upStationId = 지하철역을_생성한다("신사역").jsonPath().getLong("id");
 
         return 노선을_생성한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10);
+    }
+
+    private ExtractableResponse<Response> 일호선_노선을_생성한다() {
+        long downStationId = 지하철역을_생성한다("인천역").jsonPath().getLong("id");
+        long upStationId = 지하철역을_생성한다("소요산역").jsonPath().getLong("id");
+
+        return 노선을_생성한다("1호선", "bg-blue-600", downStationId, upStationId, (long) 15);
     }
 
     private ExtractableResponse<Response> 노선을_생성한다(String name, String color,
