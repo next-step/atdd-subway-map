@@ -45,4 +45,11 @@ public class LineService {
                 .map(this::createLineResponse)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLineById(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("번호에 해당하는 노선이 없습니다."));
+
+        return createLineResponse(line);
+    }
 }
