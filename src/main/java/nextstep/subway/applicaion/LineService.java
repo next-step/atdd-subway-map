@@ -12,6 +12,8 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.BusinessException;
+import nextstep.subway.exception.ErrorCode;
 
 @Service
 public class LineService {
@@ -33,7 +35,7 @@ public class LineService {
 
 	private Station getStation(Long stationId) {
 		return stationRepository.findById(stationId)
-			.orElseThrow(() -> new RuntimeException("역이 존재하지 않습니다."));
+			.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 	}
 
 	public List<LineResponse> getAllLine() {
@@ -46,7 +48,7 @@ public class LineService {
 	}
 
 	private Line getLineById(Long lineId) {
-		return lineRepository.findById(lineId).orElseThrow(() -> new RuntimeException("노선이 존재하지 않습니다."));
+		return lineRepository.findById(lineId).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 	}
 
 	@Transactional
