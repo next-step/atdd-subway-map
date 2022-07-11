@@ -82,12 +82,6 @@ public class StationAcceptanceTest {
         params.put("name", "역삼역");
         createStation(params);
 
-        RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().statusCode(200)
-                .assertThat().body("size()", is(2));
-
         List<String> stationNames = getStations("name");
         assertThat(stationNames).containsExactly("강남역", "역삼역");
     }
