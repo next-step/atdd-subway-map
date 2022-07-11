@@ -35,7 +35,7 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = createStation(Map.of(NAME, "강남역"));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        checkResponseStatus(response, HttpStatus.CREATED);
 
         // then
         List<String> stationNames = getAllStations()
@@ -57,12 +57,11 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
         createStation(Map.of(NAME, "신논현역"));
 
         // when
-        List<Map<String, Object>> response = getAllStations()
-                .jsonPath()
-                .getList(".");
+        ExtractableResponse<Response> response = getAllStations();
+        checkResponseStatus(response, HttpStatus.OK);
 
         // then
-        assertThat(response).hasSize(2);
+        assertThat(response.jsonPath().getList(".")).hasSize(2);
     }
 
     /**
@@ -79,7 +78,8 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
                 .getLong("id");
 
         // when
-        deleteStation(id);
+        ExtractableResponse<Response> response = deleteStation(id);
+        checkResponseStatus(response, HttpStatus.NO_CONTENT);
 
         // then
         List<Long> allStationIds = getAllStations()
@@ -107,10 +107,11 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
                 .extract();
     }
 
-    private void deleteStation(long id) {
-        RestAssured.given().log().all()
+    private ExtractableResponse<Response> deleteStation(long id) {
+        return RestAssured.given().log().all()
                 .when().delete("/stations/{id}", id)
-                .then().log().all();
+                .then().log().all()
+                .extract();
     }
 
 }
