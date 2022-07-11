@@ -38,29 +38,29 @@ public class LineAcceptanceTest {
     void createSubwayLine() {
 
         Map<String, String> params = new HashMap<>();
-        params.put("name", "구로역");
+        params.put("name", "강남역");
 
         RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations");
 
-        params.put("name", "부천역");
+        params.put("name", "광교역");
         RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations");
 
-        ExtractableResponse<Response> response = createLine(new Line("1호선", "bg-blue-600", 1L, 2L, 10));
+        ExtractableResponse<Response> response = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-//        List<String> lineNames = RestAssured.given().log().all()
-//                .when().get("/lines")
-//                .then().log().all()
-//                .extract().jsonPath().getList("name", String.class);
-//
-//        assertThat(lineNames.contains("1호선")).isEqualTo(true);
+        List<String> lineNames = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        assertThat(lineNames.contains("신분당선")).isEqualTo(true);
     }
 
 
