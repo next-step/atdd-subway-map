@@ -163,10 +163,34 @@ public class SubwayLineTest {
 	@Test
 	void modifySubwayLine() {
 	    //given
+		ExtractableResponse<Response> createSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
+		long subwayLineId = createSubwayLine.jsonPath().getLong("id");
 
-	    //when
+		//when
+		ExtractableResponse<Response> modifiedSubwayLine = modifySubwayLine(subwayLineId, "상현역", "bg-white-600");
+		JsonPath findSubwayLineJson = findSubwayLine(subwayLineId).jsonPath();
 
-	    //then
+		//then
+		assertThat(modifiedSubwayLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역");
+		assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600");
+	}
+
+	private ExtractableResponse<Response> modifySubwayLine(Long subwayLineId, String name, String color) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("name", name);
+		params.put("color", color);
+
+		return RestAssured
+				.given()
+					.log().all()
+					.body(params)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+					.put("/lines/{id}", subwayLineId)
+				.then()
+					.log().all()
+				.extract();
 	}
 
 	/**

@@ -2,6 +2,7 @@ package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.SubwayLineService;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
 import org.springframework.http.MediaType;
@@ -32,5 +33,11 @@ public class SubwayLineController {
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SubwayLineResponse> findSubwayLine(@PathVariable Long id) {
 		return ResponseEntity.ok().body(lineService.findById(id));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Void> modifySubwayLine(@PathVariable Long id, @RequestBody SubwayLineModifyRequest request) {
+		lineService.modifySubwayLine(id, request);
+		return ResponseEntity.ok().build();
 	}
 }

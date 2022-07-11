@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
 import nextstep.subway.domain.Station;
@@ -33,6 +34,14 @@ public class SubwayLineService {
 		);
 
 		return new SubwayLineResponse(savedLine, findStations);
+	}
+
+	@Transactional
+	public void modifySubwayLine(Long id, SubwayLineModifyRequest request) {
+		SubwayLine lineEntity = lineRepository.findById(id)
+				.orElseThrow(NoSuchElementException::new);
+
+		lineEntity.modify(request);
 	}
 
 	public List<SubwayLineResponse> findAll() {

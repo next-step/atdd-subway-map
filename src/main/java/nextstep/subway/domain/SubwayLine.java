@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,4 +25,9 @@ public class SubwayLine {
 	private Long upStationId;
 	private Long downStationId;
 	private Integer distance;
+
+	public void modify(SubwayLineModifyRequest request) {
+		this.name = request.getName();
+		this.color = request.getColor();
+	}
 }
