@@ -74,6 +74,27 @@ public class StationAcceptanceTest {
         assertThat(getAllStationsIds.size()).isEqualTo(createdStationIds.size());
     }
 
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // Given
+        String stationName = "강남역";
+        Long createdStationId = extractIdInResponse(createStationWithName(stationName));
+
+        // When
+        ExtractableResponse<Response> deleteResponse = deleteStationWithId(createdStationId);
+
+        // Then
+        List<Long> ids = extractIdsInListTypeResponse(getAllStations());
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(ids).doesNotContain(createdStationId);
+    }
+
     private ExtractableResponse<Response> getAllStations() {
         return RestAssured.given()
                 .log()
@@ -101,27 +122,6 @@ public class StationAcceptanceTest {
                 .log()
                 .all()
                 .extract();
-    }
-
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    @DisplayName("지하철역을 제거한다.")
-    @Test
-    void deleteStation() {
-        // Given
-        String stationName = "강남역";
-        Long createdStationId = extractIdInResponse(createStationWithName(stationName));
-
-        // When
-        ExtractableResponse<Response> deleteResponse = deleteStationWithId(createdStationId);
-
-        // Then
-        List<Long> ids = extractIdsInListTypeResponse(getAllStations());
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(ids).doesNotContain(createdStationId);
     }
 
     private ExtractableResponse<Response> deleteStationWithId(Long createdStationId) {
@@ -170,39 +170,6 @@ public class StationAcceptanceTest {
         List<Long> ids = extractIdsInListTypeResponse(getAllStationLines());
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(ids).containsAnyOf(createdStationLineId);
-    }
-
-    private ExtractableResponse<Response> createStationLine(String stationLineName, String stationLineColor, Long upStationId, Long downStationId
-    ) {
-        Map<Object, Object> params = new HashMap<>();
-        params.put("name", stationLineName);
-        params.put("color", stationLineColor);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> getAllStationLines() {
-        return RestAssured.given()
-                .log()
-                .all()
-                .when()
-                .get("/lines")
-                .then()
-                .log()
-                .all()
-                .extract();
     }
 
     /**
@@ -271,18 +238,6 @@ public class StationAcceptanceTest {
         assertThat(responseStationLineId).isEqualTo(createdStationLineId);
     }
 
-    private ExtractableResponse<Response> getStationLineWithId(Long id) {
-        return RestAssured.given()
-                .log()
-                .all()
-                .when()
-                .get("/lines/{id}", id)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
@@ -323,26 +278,12 @@ public class StationAcceptanceTest {
         assertThat(updatedColor).isEqualTo(updateColor);
     }
 
-    private ExtractableResponse updateStationLine(Long lineId, Map<Object, Object> params) {
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .put("/lines/{lineId}", lineId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    @DisplayName("지하철역을 제거한다.")
+    @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteStationLines() {
         // Given
@@ -364,6 +305,65 @@ public class StationAcceptanceTest {
         List<Long> ids = extractIdsInListTypeResponse(getAllStationLines());
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(ids).doesNotContain(createdStationLineId);
+    }
+
+    private ExtractableResponse<Response> createStationLine(String stationLineName, String stationLineColor, Long upStationId, Long downStationId
+    ) {
+        Map<Object, Object> params = new HashMap<>();
+        params.put("name", stationLineName);
+        params.put("color", stationLineColor);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getAllStationLines() {
+        return RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .get("/lines")
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getStationLineWithId(Long id) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .get("/lines/{id}", id)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse updateStationLine(Long lineId, Map<Object, Object> params) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{lineId}", lineId)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     private ExtractableResponse<Response> deleteStationLineWithId(Long createdStationLineId) {

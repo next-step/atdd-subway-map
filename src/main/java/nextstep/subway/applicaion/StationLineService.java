@@ -30,6 +30,12 @@ public class StationLineService {
         return createStationLineResponse(stationLine);
     }
 
+    public StationLineResponse findStationLine(Long id) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow();
+        return createStationLineResponse(stationLine);
+    }
+
     public List<StationLineResponse> findAllStationLines() {
         return stationLineRepository.findAll().stream()
                 .map(this::createStationLineResponse)
@@ -39,6 +45,20 @@ public class StationLineService {
     @Transactional
     public void deleteStationLineById(Long id) {
         stationLineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateStationLine(Long id, StationLineRequest stationLineRequest) {
+        StationLine existedStationLine = stationLineRepository.findById(id)
+                .orElseThrow();
+        StationLine updateRequestStationLine = stationLineRequest.toUpdateEntity(existedStationLine);
+
+        if(existedStationLine.equals(updateRequestStationLine)){
+            // 변경점이 없습니다.
+            System.out.println("같다");
+        } else {
+            stationLineRepository.save(updateRequestStationLine);
+        }
     }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine) {
@@ -59,25 +79,5 @@ public class StationLineService {
         stations.add(upStation);
         stations.add(downStation);
         return stations;
-    }
-
-    public StationLineResponse findStationLine(Long id) {
-        StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow();
-        return createStationLineResponse(stationLine);
-    }
-
-    @Transactional
-    public void updateStationLine(Long id, StationLineRequest stationLineRequest) {
-        StationLine existedStationLine = stationLineRepository.findById(id)
-                .orElseThrow();
-        StationLine updateRequestStationLine = stationLineRequest.toUpdateEntity(existedStationLine);
-
-        if(existedStationLine.equals(updateRequestStationLine)){
-            // 변경점이 없습니다.
-            System.out.println("같다");
-        } else {
-            stationLineRepository.save(updateRequestStationLine);
-        }
     }
 }
