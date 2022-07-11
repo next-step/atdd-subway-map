@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.applicaion.dto.SubwayLineModifyRequest;
-import nextstep.subway.applicaion.dto.SubwayLineResponse;
-import nextstep.subway.applicaion.dto.SubwayLineSaveRequest;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.domain.SubwayLineRepository;
@@ -55,6 +52,16 @@ public class SubwayLineService {
         subwayLineRepository.deleteById(id);
     }
 
+    @Transactional
+    public SubwayLineResponse saveSubwaySection(Long lineId, SubwaySectionRequest subwaySectionRequest) {
+        return null;
+    }
+
+    @Transactional
+    public void deleteSubwaySection(Long lineId, Long stationId) {
+
+    }
+
     private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
         StationResponse upStation = createStationResponse(subwayLine.getUpStationId());
         StationResponse downStation = createStationResponse(subwayLine.getDownStationId());
@@ -71,4 +78,5 @@ public class SubwayLineService {
         return subwayLineRepository.findById(id)
                 .orElseThrow(() -> new SubwayLineNotFoundException(id));
     }
+
 }

@@ -120,9 +120,9 @@ public class SubwayLineCallApi {
     public ExtractableResponse<Response> deleteSubwaySectionById(Long lineId, Long stationId) {
         return RestAssured
                 .given().log().all()
-                .param("stationId", stationId)
+                .queryParam("stationId", stationId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{lineId}/sections", lineId)
+                .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
     }

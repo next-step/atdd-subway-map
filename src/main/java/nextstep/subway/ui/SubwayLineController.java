@@ -1,9 +1,8 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.SubwayLineService;
-import nextstep.subway.applicaion.dto.SubwayLineModifyRequest;
-import nextstep.subway.applicaion.dto.SubwayLineResponse;
-import nextstep.subway.applicaion.dto.SubwayLineSaveRequest;
+import nextstep.subway.applicaion.dto.*;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +43,18 @@ public class SubwayLineController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
         subwayLineService.deleteSubwayLine(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<SubwayLineResponse> saveSubwaySection(@PathVariable Long id, @RequestBody SubwaySectionRequest subwaySectionRequest) {
+        SubwayLineResponse response = subwayLineService.saveSubwaySection(id, subwaySectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).build();
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSubwaySection(@PathVariable("id") Long lineId, @RequestParam Long stationId) {
+        subwayLineService.deleteSubwaySection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }
