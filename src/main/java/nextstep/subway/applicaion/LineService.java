@@ -36,8 +36,13 @@ public class LineService {
         Station downStation = getStation(lineRequest.getDownStationId());
         Station upStation = getStation(lineRequest.getUpStationId());
 
-        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(),
-                upStation, downStation);
+        Line line = Line.builder()
+                .name(lineRequest.getName())
+                .color(lineRequest.getColor())
+                .distance(lineRequest.getDistance())
+                .upStation(upStation)
+                .downStation(downStation)
+                .build();
         return createLineResponse(lineRepository.save(line));
     }
 
@@ -70,14 +75,19 @@ public class LineService {
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = createStationResponses(line.getDownStation(), line.getUpStation());
 
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(stationResponses)
+                .build();
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return StationResponse.builder()
+                .id(station.getId())
+                .name(station.getName())
+                .build();
     }
 
     private List<StationResponse> createStationResponses(Station downStation, Station upStation) {
