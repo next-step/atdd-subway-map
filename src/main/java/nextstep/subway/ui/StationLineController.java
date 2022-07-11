@@ -34,7 +34,7 @@ public class StationLineController {
     @PutMapping("/lines/{id}")
     public ResponseEntity updateByStationLineId(@PathVariable Long id,
                                                 @RequestBody StationLineRequest stationLineRequest) {
-
+        stationLineService.updateByStationLineId(id, stationLineRequest);
         return ResponseEntity.ok().build();
     }
 
