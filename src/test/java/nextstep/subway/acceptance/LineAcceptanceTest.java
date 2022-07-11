@@ -78,8 +78,8 @@ public class LineAcceptanceTest {
 
     assertThat(line.getName()).isEqualTo("1호선");
     assertThat(line.getColor()).isEqualTo(Color.BLUE);
-    assertThat(line.getUpStationId()).isEqualTo(gangnamStation.getId());
-    assertThat(line.getDownStationId()).isEqualTo(gooriStation.getId());
+    assertThat(line.getUpStation().getId()).isEqualTo(gangnamStation.getId());
+    assertThat(line.getDownStation().getId()).isEqualTo(gooriStation.getId());
     assertThat(line.getDistance()).isEqualTo(10);
   }
 }
