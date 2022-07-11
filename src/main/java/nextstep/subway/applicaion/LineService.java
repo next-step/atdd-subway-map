@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -40,8 +41,15 @@ public class LineService {
 	}
 
 	public LineResponse findLineById(Long lineId) {
-		return LineResponse.of(lineRepository.findById(lineId).orElseThrow(
-				() -> new RuntimeException()
-		));
+		return LineResponse.of(lineRepository.findById(lineId)
+				.orElseThrow(RuntimeException::new));
+	}
+
+	@Transactional
+	public void updateLine(Long lineId, LineUpdateRequest lineUpdateRequest) {
+		Line line = lineRepository.findById(lineId)
+				.orElseThrow(RuntimeException::new);
+
+		line.update(lineUpdateRequest);
 	}
 }

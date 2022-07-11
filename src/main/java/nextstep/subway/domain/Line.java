@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -36,5 +38,10 @@ public class Line {
 
 	public List<Station> getStations() {
 		return stations;
+	}
+
+	public void update(LineUpdateRequest lineUpdateRequest) {
+		this.name = lineUpdateRequest.getName();
+		this.color = lineUpdateRequest.getColor();
 	}
 }
