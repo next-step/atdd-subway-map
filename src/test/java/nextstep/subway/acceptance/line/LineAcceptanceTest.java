@@ -1,48 +1,25 @@
 package nextstep.subway.acceptance.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.util.DatabaseCleanup;
-import org.junit.jupiter.api.BeforeEach;
+import nextstep.subway.acceptance.util.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
 import static nextstep.subway.acceptance.line.LineStationAssuredTemplate.*;
-import static nextstep.subway.acceptance.station.StationRestAssuredTemplate.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Profile("acceptance")
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String COLOR = "color";
 
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
-    @BeforeEach
-    void setUp() {
-        if (RestAssured.port == RestAssured.UNDEFINED_PORT) {
-            RestAssured.port = port;
-            databaseCleanup.afterPropertiesSet();
-        }
-        databaseCleanup.execute();
-    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -52,10 +29,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     void createLine() {
         // when 지하철 노선을 생성하면
-        Long 강남역_ID = getStationId("강남역");
-        Long 분당역_ID = getStationId("분당역");
-
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", "강남역", "분당역", 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
@@ -76,16 +50,10 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void findLines() {
         // given 2개의 지하철 노선을 생성하고
-        Long 강남역_ID = getStationId("강남역");
-        Long 분당역_ID = getStationId("분당역");
-
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", "강남역", "분당역", 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        Long 수서역_ID = getStationId("수서역");
-        Long 가천대역_ID = getStationId("가천대역");
-
-        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 수서역_ID, 가천대역_ID, 10);
+        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", "수서역", "가천대역", 10);
         assertThat(분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when 지하철 노선 목록을 조회하면
@@ -110,19 +78,10 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     void findLine() {
         // given 지하철 노선을 생성하고
-        Long 강남역_ID = getStationId("강남역");
-        Long 분당역_ID = getStationId("분당역");
-
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", "강남역", "분당역", 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> 수서역 = 지하철역_생성("수서역");
-        ExtractableResponse<Response> 가천대역 = 지하철역_생성("가천대역");
-
-        Long 수서역_ID = Long.parseLong(수서역.jsonPath().getString("id"));
-        Long 가천대역_ID = Long.parseLong(가천대역.jsonPath().getString("id"));
-
-        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 수서역_ID, 가천대역_ID, 10);
+        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", "수서역", "가천대역", 10);
         assertThat(분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         String 신분당선_ID = 노선_정보_조회(신분당선_생성, ID);
@@ -146,16 +105,10 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     void editLine() {
         // given 지하철 노선을 생성하고
-        Long 강남역_ID = getStationId("강남역");
-        Long 분당역_ID = getStationId("분당역");
-
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", "강남역", "분당역", 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        Long 수서역_ID = getStationId("수서역");
-        Long 가천대역_ID = getStationId("가천대역");
-
-        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 수서역_ID, 가천대역_ID, 10);
+        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", "수서역", "가천대역", 10);
         assertThat(분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         String 신분당선_ID = 노선_정보_조회(신분당선_생성, ID);
@@ -186,19 +139,10 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     void deleteLine() {
         // given 지하철 노선을 생성하고
-        Long 강남역_ID = getStationId("강남역");
-        Long 분당역_ID = getStationId("분당역");
-
-        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", 강남역_ID, 분당역_ID, 10);
+        ExtractableResponse<Response> 신분당선_생성 = 노선_생성(신분당선, "bg-red-600", "강남역", "분당역", 10);
         assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> 수서역 = 지하철역_생성("수서역");
-        ExtractableResponse<Response> 가천대역 = 지하철역_생성("가천대역");
-
-        Long 수서역_ID = Long.parseLong(수서역.jsonPath().getString("id"));
-        Long 가천대역_ID = Long.parseLong(가천대역.jsonPath().getString("id"));
-
-        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", 수서역_ID, 가천대역_ID, 10);
+        ExtractableResponse<Response> 분당선_생성 = 노선_생성(분당선, "bg-green-600", "수서역", "가천대역", 10);
         assertThat(분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         String 신분당선_ID = 노선_정보_조회(신분당선_생성, ID);
@@ -213,11 +157,6 @@ public class LineAcceptanceTest {
 
         List<Object> lineNames = 노선_목록_이름_조회(노선_목록_조회);
         assertThat(lineNames).doesNotContain(신분당선);
-    }
-
-    private Long getStationId(String stationName) {
-        ExtractableResponse<Response> station = 지하철역_생성(stationName);
-        return Long.parseLong(station.jsonPath().getString("id"));
     }
 
     private java.util.List<Object> 노선_목록_이름_조회(ExtractableResponse<Response> response) {

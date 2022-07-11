@@ -1,15 +1,10 @@
 package nextstep.subway.acceptance.station;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.util.DatabaseCleanup;
-import org.junit.jupiter.api.BeforeEach;
+import nextstep.subway.acceptance.util.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -18,30 +13,13 @@ import static nextstep.subway.acceptance.station.StationRestAssuredTemplate.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
     private static final String 강남역 = "강남역";
     private static final String 신림역 = "신림역";
     private static final String 신도림역 = "신도림역";
     private static final String STATION_NAME = "name";
     private static final String STATION_ID = "id";
     
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
-    @BeforeEach
-    void setUp() {
-        if (RestAssured.port == RestAssured.UNDEFINED_PORT) {
-            RestAssured.port = port;
-            databaseCleanup.afterPropertiesSet();
-        }
-        databaseCleanup.execute();
-    }
-
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
