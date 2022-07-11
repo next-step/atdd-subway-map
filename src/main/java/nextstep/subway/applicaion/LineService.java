@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LineService {
+
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
@@ -24,8 +25,9 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line savedLine = lineRepository.save(lineRequest.toEntity());
-        saveEndpoint(lineRequest, savedLine);
+        Line line = lineRepository.save(lineRequest.toEntity());
+        saveEndpoints(lineRequest, line);
+        Line savedLine = lineRepository.findById(line.getId()).orElseThrow();
         return LineResponse.convertedByEntity(savedLine);
     }
 
@@ -37,13 +39,16 @@ public class LineService {
 
     public LineResponse getLine(long lineId) {
         Line line = lineRepository.findById(lineId)
-            .orElseThrow(()->new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(lineId)));
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(lineId)));
         return LineResponse.convertedByEntity(line);
     }
 
     @Transactional
     public LineResponse updateLine(LineRequest lineRequest, long lineId) {
-        Line line = lineRequest.toEntity(lineId);
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(lineId)));
+        line.changeName(lineRequest.getName());
+        line.changeColor(lineRequest.getColor());
         Line updatedLine = lineRepository.save(line);
         return LineResponse.convertedByEntity(updatedLine);
     }
@@ -53,18 +58,19 @@ public class LineService {
         lineRepository.deleteById(lineId);
     }
 
-    private Station registerStationOnLine(long stationId, Line savedLine) {
-        Station upStation = stationRepository.findById(stationId)
-            .orElseThrow(()->new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(stationId)));
-        upStation.addLine(savedLine);
-        stationRepository.save(upStation);
-        return upStation;
-    }
 
-    private void saveEndpoint(LineRequest lineRequest, Line savedLine) {
-        Station upStation = registerStationOnLine(lineRequest.getUpStationId(), savedLine);
-        savedLine.add(upStation);
-        Station downStation = registerStationOnLine(lineRequest.getDownStationId(), savedLine);
-        savedLine.add(downStation);
+    private void saveEndpoints(LineRequest lineRequest, Line savedLine) {
+        long upStationId = lineRequest.getUpStationId();
+        long downStationId = lineRequest.getDownStationId();
+
+        Station upStation = stationRepository.findById(upStationId)
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(upStationId)));
+        savedLine.addUpEndpointStation(upStation);
+
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(downStationId)));
+        savedLine.addDownEndpointStation(downStation);
+
+        lineRepository.save(savedLine);
     }
 }

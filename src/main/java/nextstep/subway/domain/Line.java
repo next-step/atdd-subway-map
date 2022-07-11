@@ -1,13 +1,12 @@
 package nextstep.subway.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Line {
@@ -19,8 +18,13 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line")
-    private List<Station> stations = new ArrayList<>();
+    @OneToOne
+    @JoinColumn(name = "UP_ENDPOINT_STATION_ID")
+    private Station upEndpointStation;
+
+    @OneToOne
+    @JoinColumn(name = "DOWN_ENDPOINT_STATION_ID")
+    private Station downEndpointStation;
 
 
     public Line() {
@@ -48,11 +52,28 @@ public class Line {
     public String getColor() {
         return color;
     }
+    public Station getUpEndpointStation() {
+        return upEndpointStation;
+    }
 
-    public List<Station> getStations() {
-        return stations;
+    public Station getDownEndpointStation() {
+        return downEndpointStation;
     }
-    public void add(Station station) {
-        stations.add(station);
+
+    public void addUpEndpointStation(Station station) {
+        this.upEndpointStation = station;
     }
+
+    public void addDownEndpointStation(Station station) {
+        this.downEndpointStation = station;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeColor(String color) {
+        this.color = color;
+    }
+
 }

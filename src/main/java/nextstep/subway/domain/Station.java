@@ -1,12 +1,9 @@
 package nextstep.subway.domain;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Station {
@@ -15,9 +12,6 @@ public class Station {
     private Long id;
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "line_id")
-    private Line line;
 
     public Station() {
     }
@@ -32,13 +26,5 @@ public class Station {
 
     public String getName() {
         return name;
-    }
-
-    public Line getLine() {
-        return line;
-    }
-
-    public void addLine(Line line) {
-        this.line = line;
     }
 }

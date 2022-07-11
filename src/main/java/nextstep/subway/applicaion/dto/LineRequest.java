@@ -32,4 +32,12 @@ public class LineRequest {
     public long getDownStationId() {
         return downStationId;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
 }

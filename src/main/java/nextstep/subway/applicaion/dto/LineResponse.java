@@ -1,7 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import nextstep.subway.domain.Line;
 
 public class LineResponse {
@@ -34,9 +34,9 @@ public class LineResponse {
     }
 
     public static LineResponse convertedByEntity(Line line) {
-        List<StationResponse> stationResponses = line.getStations().stream()
-            .map(StationResponse::convertedByEntity)
-            .collect(Collectors.toList());
+        List<StationResponse> stationResponses = new ArrayList<>();
+        stationResponses.add(StationResponse.convertedByEntity(line.getUpEndpointStation()));
+        stationResponses.add(StationResponse.convertedByEntity(line.getDownEndpointStation()));
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 
