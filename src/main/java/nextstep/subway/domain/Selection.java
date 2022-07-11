@@ -11,7 +11,7 @@ public class Selection {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private long lineId
+	private long lineId;
 	private Long upStationId;
 	private Long downStationId;
 	private Long distance;
@@ -19,7 +19,8 @@ public class Selection {
 	protected Selection() {
 	}
 
-	public Selection(Long upStationId, Long downStationId, Long distance) {
+	public Selection(long lineId, Long upStationId, Long downStationId, Long distance) {
+		this.lineId = lineId;
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;
 		this.distance = distance;
