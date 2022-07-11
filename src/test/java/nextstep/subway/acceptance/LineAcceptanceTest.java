@@ -96,7 +96,6 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         checkResponseStatus(response, HttpStatus.OK);
 
         ExtractableResponse<Response> updatedResponse = getLine(id);
-
         assertThat(updatedResponse.jsonPath().getString("name")).isEqualTo("다른4호선");
         assertThat(updatedResponse.jsonPath().getString("color")).isEqualTo("bg-skyblue-400");
 
@@ -111,6 +110,13 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 정보가 삭제된다.")
     void deleteLineTest() {
+        long id = createLineAndGetId();
+
+        ExtractableResponse<Response> response = deleteLine(id);
+        checkResponseStatus(response, HttpStatus.NO_CONTENT);
+
+        ExtractableResponse<Response> getResponse = getLine(id);
+        checkResponseStatus(getResponse, HttpStatus.NOT_FOUND);
     }
 
 
@@ -158,6 +164,13 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
                 ))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLine(long id) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
