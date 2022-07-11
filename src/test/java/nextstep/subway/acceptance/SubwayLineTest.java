@@ -31,6 +31,7 @@ public class SubwayLineTest {
 	public static final String DOWN_STATION_NAME = "신사역";
 	public static Long upStationId;
 	public static Long downStationId;
+	public static ExtractableResponse<Response> setUpSubwayLine;
 
 	@Autowired
 	private StationService stationService;
@@ -45,8 +46,13 @@ public class SubwayLineTest {
 	void setUp() {
 		RestAssured.port = port;
 		databaseCleanup.execute();
+		subwayLineInit();
+	}
+
+	private void subwayLineInit() {
 		upStationId = stationService.saveStation(new StationRequest(UP_STATION_NAME)).getId();
 		downStationId = stationService.saveStation(new StationRequest(DOWN_STATION_NAME)).getId();
+		setUpSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
 	}
 
 	/**
@@ -57,11 +63,10 @@ public class SubwayLineTest {
 	@Test
 	void createSubwayLine() {
 		//when
-		ExtractableResponse<Response> response = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
-		JsonPath responseToJson = response.jsonPath();
+		JsonPath responseToJson = setUpSubwayLine.jsonPath();
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(setUpSubwayLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(responseToJson.getLong("id")).isNotNull();
 		assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME);
 		assertThat(responseToJson.getString("color")).isEqualTo(LINE_COLOR);
@@ -98,8 +103,6 @@ public class SubwayLineTest {
 	@Test
 	void findSubwayLineList() {
 	    //given
-		createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
-
 		Long 인천역 = stationService.saveStation(new StationRequest("인천역")).getId();
 		Long 청량리역 = stationService.saveStation(new StationRequest("청량리역")).getId();
 		createSubwayLine("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
@@ -134,8 +137,7 @@ public class SubwayLineTest {
 	@Test
 	void findSubwayLine() {
 	    //given
-		ExtractableResponse<Response> createSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
-		long subwayLineId = createSubwayLine.jsonPath().getLong("id");
+		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
 		ExtractableResponse<Response> response = findSubwayLine(subwayLineId);
@@ -168,8 +170,7 @@ public class SubwayLineTest {
 	@Test
 	void modifySubwayLine() {
 	    //given
-		ExtractableResponse<Response> createSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
-		long subwayLineId = createSubwayLine.jsonPath().getLong("id");
+		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
 		ExtractableResponse<Response> modifiedSubwayLine = modifySubwayLine(subwayLineId, "상현역", "bg-white-600");
@@ -207,8 +208,7 @@ public class SubwayLineTest {
 	@Test
 	void deleteSubwayLine() {
 	    //given
-		ExtractableResponse<Response> createSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
-		long subwayLineId = createSubwayLine.jsonPath().getLong("id");
+		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
 		ExtractableResponse<Response> response = deleteSubwayLine(subwayLineId);
