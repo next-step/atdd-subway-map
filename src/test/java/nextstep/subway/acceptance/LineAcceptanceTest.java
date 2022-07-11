@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static nextstep.subway.acceptance.StationAcceptanceTest.NAME;
 import static nextstep.subway.acceptance.StationAcceptanceTest.createStation;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
@@ -110,7 +111,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
 
         ExtractableResponse<Response> response = getLine(id);
 
-        Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -121,6 +122,30 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 정보가 수정된다.")
     void updateLineTest() {
+        long id = createLine(Map.of(
+                "name", "4호선",
+                "color", "bg-blue-300",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        ))
+                .jsonPath()
+                .getLong("id");
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(
+                        Map.of("name", "다른4호선",
+                                "color", "bg-skyblue-400"))
+                .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> updatedResponse = getLine(id);
+
+        assertThat(updatedResponse.jsonPath().getString("name")).isEqualTo("다른4호선");
+        assertThat(updatedResponse.jsonPath().getString("color")).isEqualTo("bg-skyblue-400");
 
     }
 
