@@ -18,7 +18,7 @@ public class LineRequestTemplate {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철노선_목록을_조회한다() {
+    public static ExtractableResponse<Response> 지하철노선_목록_조회를_요청한다() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
@@ -26,7 +26,7 @@ public class LineRequestTemplate {
     }
 
 
-    public static ExtractableResponse<Response> 지하철노선을_조회한다(long lineId) {
+    public static ExtractableResponse<Response> 지하철노선_조회를_요청한다(long lineId) {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + lineId)
                 .then().log().all()
@@ -57,8 +57,8 @@ public class LineRequestTemplate {
         return 지하철노선_수정을_요청한다(lineId, params);
     }
 
-    public static ExtractableResponse<Response> 노선을_생성한다(String name, String color, Long downStationId,
-                                                         Long upStationId, Long distance) {
+    public static ExtractableResponse<Response> 지하철노선을_생성한다(String name, String color, Long downStationId,
+                                                            Long upStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);

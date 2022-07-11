@@ -36,7 +36,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역_생성() {
         // when
         ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("강남역");
 
@@ -57,7 +57,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 조회한다.")
     @Test
-    void getStations() {
+    void 지하철역_조회() {
         // given
         지하철역을_생성한다("신도림역");
         지하철역을_생성한다("건대역");
@@ -78,7 +78,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 제거한다.")
     @Test
-    void deleteStation() {
+    void 지하철역_제거() {
         // given
         ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("홍대입구역");
         long stationId = createdResponse.jsonPath().getLong("id");

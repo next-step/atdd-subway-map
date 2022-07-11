@@ -1,6 +1,6 @@
 package nextstep.subway.acceptance.sample;
 
-import static nextstep.subway.acceptance.template.LineRequestTemplate.노선을_생성한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_생성한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
 
 import io.restassured.response.ExtractableResponse;
@@ -11,13 +11,13 @@ public class LineSampleData {
         long downStationId = 지하철역을_생성한다("광교역").jsonPath().getLong("id");
         long upStationId = 지하철역을_생성한다("신사역").jsonPath().getLong("id");
 
-        return 노선을_생성한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10);
+        return 지하철노선을_생성한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10);
     }
 
     public static ExtractableResponse<Response> 일호선_노선을_생성한다() {
         long downStationId = 지하철역을_생성한다("인천역").jsonPath().getLong("id");
         long upStationId = 지하철역을_생성한다("소요산역").jsonPath().getLong("id");
 
-        return 노선을_생성한다("1호선", "bg-blue-600", downStationId, upStationId, (long) 15);
+        return 지하철노선을_생성한다("1호선", "bg-blue-600", downStationId, upStationId, (long) 15);
     }
 }
