@@ -1,10 +1,12 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
 import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.repository.StationRepository;
 import nextstep.subway.domain.SubwayLine;
-import nextstep.subway.domain.SubwayLineRepository;
+import nextstep.subway.repository.SubwayLineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

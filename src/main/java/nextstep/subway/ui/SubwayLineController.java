@@ -1,8 +1,8 @@
 package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.SubwayLineRequest;
-import nextstep.subway.applicaion.SubwayLineResponse;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
+import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
 import nextstep.subway.applicaion.SubwayLineService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

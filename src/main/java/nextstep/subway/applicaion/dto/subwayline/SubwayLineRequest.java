@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.dto.subwayline;
 
 import lombok.AccessLevel;
 import lombok.Getter;
