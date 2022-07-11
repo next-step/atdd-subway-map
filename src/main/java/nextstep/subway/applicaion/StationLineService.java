@@ -38,7 +38,6 @@ public class StationLineService {
     }
 
     @Transactional(readOnly = true)
-
     public List<StationLineResponse> getStationLines() {
         List<StationLine> stationLines = stationLineRepository.findAll();
         return stationLines.stream()
