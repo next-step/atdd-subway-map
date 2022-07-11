@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Line {
     @Id
@@ -23,6 +26,7 @@ public class Line {
 
     private long downStationId;
 
+    @Getter(AccessLevel.NONE)
     private long distance;
 
     @Builder
@@ -32,26 +36,6 @@ public class Line {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public long getUpStationId() {
-        return upStationId;
-    }
-
-    public long getDownStationId() {
-        return downStationId;
     }
 
     public void update(LineUpdateRequest request) {

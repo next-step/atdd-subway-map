@@ -17,13 +17,17 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends AcceptanceTest{
+class LineAcceptanceTest extends AcceptanceTest{
+    private long 삼성역;
+    private long 역삼역;
+    private long 강남역;
+
     @BeforeEach
     public void setUp() {
         super.setUp();
-        지하철역_추가("삼성역");
-        지하철역_추가("역삼역");
-        지하철역_추가("강남역");
+        삼성역 = 지하철역_추가("삼성역").jsonPath().getLong("id");
+        역삼역 = 지하철역_추가("역삼역").jsonPath().getLong("id");
+        강남역 = 지하철역_추가("강남역").jsonPath().getLong("id");
     }
 
     private ExtractableResponse<Response> 지하철역_추가(String name){
@@ -50,11 +54,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선_생성() {
         // when
-        final ExtractableResponse<Response> response =
-                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10);
 
         // then
         List<String> names = 지하철_노선_이름_목록();
@@ -70,8 +70,8 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선_목록_조회() {
         // given
-        지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
-        지하철_노선_추가("분당선","bg-green-600",1,3,5);
+        지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10);
+        지하철_노선_추가("분당선","bg-green-600", 삼성역, 강남역,5);
 
         // when
         List<String> names = 지하철_노선_이름_목록();
@@ -91,9 +91,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선_조회() {
         // given
-        final ExtractableResponse<Response> addResponse =
-                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
-        final long id = addResponse.jsonPath().getLong("id");
+        final long id = 지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10);
 
         // when
         ExtractableResponse<Response> response =
@@ -117,9 +115,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선_수정() {
         // given
-        final ExtractableResponse<Response> addResponse =
-                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
-        final long id = addResponse.jsonPath().getLong("id");
+        final long id = 지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10);
 
         // when
         Map<String, String> params = new HashMap<>();
@@ -149,9 +145,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_노선_삭제() {
         // given
-        final ExtractableResponse<Response> addResponse =
-                지하철_노선_추가("신분당선","bg-red-600",1,2 ,10);
-        final long id = addResponse.jsonPath().getLong("id");
+        final long id = 지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10);
 
         // when
         ExtractableResponse<Response> response =
@@ -164,7 +158,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private ExtractableResponse<Response> 지하철_노선_추가(String name, String color, long upStationId, long downStationId, long distance) {
+    private long 지하철_노선_추가(String name, String color, long upStationId, long downStationId, long distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -172,12 +166,16 @@ public class LineAcceptanceTest extends AcceptanceTest{
         params.put("downStationId", String.valueOf(downStationId));
         params.put("distance", String.valueOf(distance));
 
-        return RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return response.jsonPath().getLong("id");
     }
 
     private List<String> 지하철_노선_이름_목록() {

@@ -1,11 +1,12 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line;
 
 import java.util.List;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LineResponse {
     private Long id;
     private String name;
