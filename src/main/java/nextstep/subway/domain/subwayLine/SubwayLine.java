@@ -1,6 +1,6 @@
 package nextstep.subway.domain.subwayLine;
 
-import nextstep.subway.domain.manyToMany.StationToSubwayLine;
+import nextstep.subway.domain.stationToSubwayBridge.StationToSubwayLine;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
 
