@@ -5,7 +5,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
-import org.assertj.core.api.AbstractStringAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.AcceptanceTestBase.*;
+import static nextstep.subway.acceptance.AcceptanceTestBase.assertStatusCode;
+import static nextstep.subway.acceptance.ResponseParser.*;
 import static nextstep.subway.station.StationAcceptanceTest.createStationRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
