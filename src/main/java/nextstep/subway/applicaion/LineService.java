@@ -11,61 +11,60 @@ import org.springframework.transaction.annotation.Transactional;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.StationLine;
-import nextstep.subway.domain.StationLineRepository;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.LineRepository;
 
 @Service
-public class StationLineService {
+public class LineService {
 	private static final String STATION_NAME = "지하철역";
 	private static final String NEW_STATION_NAME = "새로운지하철역";
 	private static final String ENTITY_NOT_FOUND_EXCEPTION_MESSAGE = "Entity Not Found ";
-	private StationLineRepository stationLineRepository;
+	private LineRepository lineRepository;
 
-	public StationLineService(StationLineRepository stationLineRepository) {
-		this.stationLineRepository = stationLineRepository;
+	public LineService(LineRepository lineRepository) {
+		this.lineRepository = lineRepository;
 	}
 
 	@Transactional
 	public StationLineResponse createStationLines(StationLineRequest stationLineRequest) {
-		StationLine stationLine = stationLineRepository.save(stationLineRequest.toStationLine());
-		return createStationLineResponse(stationLine);
+		Line line = lineRepository.save(stationLineRequest.toLine());
+		return createStationLineResponse(line);
 	}
 
 	public List<StationLineResponse> findAllStationLines() {
-		return stationLineRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+		return lineRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
 			.stream()
 			.map(this::createStationLineResponse)
 			.collect(Collectors.toList());
 	}
 
 	public StationLineResponse findStationLine(Long stationId) {
-		Optional<StationLine> stationLine = stationLineRepository.findById(stationId);
-		if (stationLine.isEmpty()) {
+		Optional<Line> line = lineRepository.findById(stationId);
+		if (line.isEmpty()) {
 			return null;
 		}
-		return createStationLineResponse(stationLine.get());
+		return createStationLineResponse(line.get());
 	}
 
 	@Transactional
 	public void updateStationLine(Long stationId, StationLineRequest stationLineRequest) {
-		StationLine stationLine = stationLineRepository.findById(stationId)
+		Line line = lineRepository.findById(stationId)
 			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
-		stationLine.updateStationLineInformation(stationLineRequest.getName(), stationLineRequest.getColor());
+		line.updateStationLineInformation(stationLineRequest.getName(), stationLineRequest.getColor());
 	}
 
 	@Transactional
 	public void deleteStationLine(Long stationId) {
-
-		stationLineRepository.delete(stationLineRepository.findById(stationId)
+		lineRepository.delete(lineRepository.findById(stationId)
 			.orElseThrow(() -> new RuntimeException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
 	}
 
-	private StationLineResponse createStationLineResponse(StationLine stationLine) {
-		return new StationLineResponse(stationLine.getId(),
-			stationLine.getName(),
-			stationLine.getColor(),
-			new StationResponse(stationLine.getUpStationId(), STATION_NAME),
-			new StationResponse(stationLine.getDownStationId(), NEW_STATION_NAME));
+	private StationLineResponse createStationLineResponse(Line line) {
+		return new StationLineResponse(line.getId(),
+			line.getName(),
+			line.getColor(),
+			new StationResponse(line.getUpStationId(), STATION_NAME),
+			new StationResponse(line.getDownStationId(), NEW_STATION_NAME));
 	}
 
 }

@@ -13,32 +13,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import nextstep.subway.applicaion.StationLineService;
+import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 
 @RestController
-public class StationLineController {
-	private StationLineService stationLineService;
+public class LineController {
+	private LineService lineService;
 
-	public StationLineController(StationLineService stationLineService) {
-		this.stationLineService = stationLineService;
+	public LineController(LineService lineService) {
+		this.lineService = lineService;
 	}
 
 	@PostMapping("/lines")
 	public ResponseEntity<StationLineResponse> createStationLine(@RequestBody StationLineRequest stationLineRequest) {
-		StationLineResponse stationLineResponse = stationLineService.createStationLines(stationLineRequest);
+		StationLineResponse stationLineResponse = lineService.createStationLines(stationLineRequest);
 		return ResponseEntity.created(URI.create("/lines/" + stationLineResponse.getId())).body(stationLineResponse);
 	}
 
 	@GetMapping(value = "/lines")
 	public ResponseEntity<List<StationLineResponse>> showAllStationsLines() {
-		return ResponseEntity.ok().body(stationLineService.findAllStationLines());
+		return ResponseEntity.ok().body(lineService.findAllStationLines());
 	}
 
 	@GetMapping("/lines/{id}")
 	public ResponseEntity<StationLineResponse> showStationLine(@PathVariable Long id) {
-		StationLineResponse stationLineResponse = stationLineService.findStationLine(id);
+		StationLineResponse stationLineResponse = lineService.findStationLine(id);
 		if (ObjectUtils.isEmpty(stationLineResponse)) {
 			return ResponseEntity.noContent().build();
 		}
@@ -48,13 +48,13 @@ public class StationLineController {
 	@PutMapping("/lines/{id}")
 	public ResponseEntity<Void> updateStationLine(@PathVariable Long id,
 		@RequestBody StationLineRequest stationLineRequest) {
-		stationLineService.updateStationLine(id, stationLineRequest);
+		lineService.updateStationLine(id, stationLineRequest);
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/lines/{id}")
 	public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
-		stationLineService.deleteStationLine(id);
+		lineService.deleteStationLine(id);
 		return ResponseEntity.noContent().build();
 	}
 }

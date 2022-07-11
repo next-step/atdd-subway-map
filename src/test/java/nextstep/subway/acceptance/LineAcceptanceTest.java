@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,13 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -22,27 +16,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 
 @DisplayName("지하철 노선 테스트")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationLIneAcceptanceTest {
-
-	private static final String LINE_COLOR_RED = "bg-red-600";
-	private static final String LINE_COLOR_BLUE = "bg-blue-600";
-
-	@LocalServerPort
-	int port;
-
-	@Autowired
-	List<JpaRepository> jpaRepositories;
-
-	@BeforeEach
-	void setUp() {
-		RestAssured.port = port;
-	}
-
-	@BeforeEach
-	void initializeData() {
-		this.jpaRepositories.forEach(JpaRepository::deleteAllInBatch);
-	}
+public class LineAcceptanceTest extends AcceptanceTest {
 
 	/**
 	 * When 지하철 노선을 생성하면
