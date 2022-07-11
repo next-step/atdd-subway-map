@@ -22,13 +22,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
 	 */
+	@DisplayName("지하철노선_생성")
 	@Test
-	void 지하철노선_생성() {
+	void createLine() {
 		//when
-		지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		지하철노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//then
-		assertThat(지하철라인_전체_조회()).containsAnyOf(SIN_BOONDANG_LINE);
+		assertThat(지하철노선_전체_조회()).containsAnyOf(SIN_BOONDANG_LINE);
 
 	}
 
@@ -37,14 +38,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 지하철 노선 목록을 조회하면
 	 * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
 	 */
+	@DisplayName("지하철노선_목록_조회")
 	@Test
-	void 지하철노선_목록_조회() {
+	void getLines() {
 		//given
-		지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		지하철라인_생성(SAMSUNG_STATION, LINE_COLOR_RED, 2, 3, 8);
+		지하철노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		지하철노선_생성(SAMSUNG_STATION, LINE_COLOR_RED, 2, 3, 8);
 
 		//when
-		List<String> names = 지하철라인_전체_조회();
+		List<String> names = 지하철노선_전체_조회();
 
 		//then
 		assertThat(names).hasSize(2)
@@ -56,13 +58,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 조회하면
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
+	@DisplayName("지하철노선_조회")
 	@Test
-	void 지하철노선_조회() {
+	void getLine() {
 		//given
-		long stationId = 지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long stationId = 지하철노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
-		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
+		Map<String, Object> response = 지하철노선_조회_BY_ID(stationId, HttpStatus.OK);
 
 		//then
 		assertEquals(SIN_BOONDANG_LINE, response.get("name"));
@@ -73,16 +76,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 수정하면
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
+	@DisplayName("지하철노선_수정")
 	@Test
-	void 지하철노선_수정() {
+	void updateLine() {
 		//given
-		long stationId = 지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long stationId = 지하철노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
-		지하철라인_수정(stationId, SAMSUNG_STATION, LINE_COLOR_BLUE);
+		지하철노선_수정(stationId, SAMSUNG_STATION, LINE_COLOR_BLUE);
 
 		//then
-		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.OK);
+		Map<String, Object> response = 지하철노선_조회_BY_ID(stationId, HttpStatus.OK);
 		assertEquals(SAMSUNG_STATION, response.get("name"));
 		assertEquals(LINE_COLOR_BLUE, response.get("color"));
 
@@ -93,21 +97,22 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 삭제하면
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
+	@DisplayName("지하철노선_삭제")
 	@Test
-	void 지하철노선_삭제() {
+	void deleteLine() {
 		//given
-		long stationId = 지하철라인_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long stationId = 지하철노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
-		지하철라인_삭제(stationId);
+		지하철노선_삭제(stationId);
 
 		//then
-		Map<String, Object> response = 지하철라인_조회_BY_ID(stationId, HttpStatus.NO_CONTENT);
+		Map<String, Object> response = 지하철노선_조회_BY_ID(stationId, HttpStatus.NO_CONTENT);
 		assertThat(response).isNull();
 
 	}
 
-	private Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upStationId,
+	static Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upStationId,
 		long downStationId,
 		long distance) {
 		Map<String, Object> requestParameter = new HashMap<>();
@@ -126,7 +131,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		return requestParameter;
 	}
 
-	private Long 지하철라인_생성(String stationName, String stationColor, long upStationId, long downStationId,
+	static Long 지하철노선_생성(String stationName, String stationColor, long upStationId, long downStationId,
 		long distance) {
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -138,7 +143,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 			.jsonPath().getLong("id");
 	}
 
-	private void 지하철라인_수정(long stationId, String stationName, String stationColor) {
+	private void 지하철노선_수정(long stationId, String stationName, String stationColor) {
 		RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.body(지하철라인_수정_파라미터생성(stationName, stationColor))
@@ -147,14 +152,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
 			.statusCode(HttpStatus.NO_CONTENT.value());
 	}
 
-	private void 지하철라인_삭제(long stationId) {
+	private void 지하철노선_삭제(long stationId) {
 		RestAssured.given().log().all()
 			.when().delete("/lines/" + stationId)
 			.then().log().all()
 			.statusCode(HttpStatus.NO_CONTENT.value());
 	}
 
-	private List<String> 지하철라인_전체_조회() {
+	private List<String> 지하철노선_전체_조회() {
 		return RestAssured.given().log().all()
 			.when().get("/lines")
 			.then().log().all()
@@ -162,7 +167,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 			.extract().jsonPath().getList("name", String.class);
 	}
 
-	private Map<String, Object> 지하철라인_조회_BY_ID(Long id, HttpStatus httpStatus) {
+	private Map<String, Object> 지하철노선_조회_BY_ID(Long id, HttpStatus httpStatus) {
 
 		ExtractableResponse response = RestAssured.given().log().all()
 			.when().get("/lines/" + id)
