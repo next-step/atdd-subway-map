@@ -1,4 +1,4 @@
-package nextstep.subway.domain.m2m;
+package nextstep.subway.domain.manyToMany;
 
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.subwayLine.SubwayLine;
