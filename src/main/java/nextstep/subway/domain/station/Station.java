@@ -23,7 +23,7 @@ public class Station {
     @OneToMany(mappedBy = "station", fetch = LAZY)
     private final List<StationToSubwayLine> subwayLines = new ArrayList<>();
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {

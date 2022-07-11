@@ -40,7 +40,7 @@ public class SubwayLine {
     @OneToMany(mappedBy = "subwayLine", fetch = LAZY)
     private List<StationToSubwayLine> stations = new ArrayList<>();
 
-    public SubwayLine() {
+    protected SubwayLine() {
     }
 
     public SubwayLine(String name, Integer distance, SubwayLineColor color, Station upStation, Station downStation) {
