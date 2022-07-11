@@ -1,9 +1,12 @@
 package nextstep.subway.applicaion.dto;
 
-public class StationRequest {
-    private String name;
+import lombok.Getter;
 
-    public String getName() {
-        return name;
-    }
+import javax.validation.constraints.NotBlank;
+
+@Getter
+public class StationRequest {
+
+    @NotBlank
+    private String name;
 }
