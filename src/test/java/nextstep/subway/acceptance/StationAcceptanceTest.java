@@ -11,16 +11,17 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
+
+    public static final String STATION_NAME1 = "강남역";
+    public static final String STATION_NAME2 = "삼성역";
+
     @LocalServerPort
     int port;
 
@@ -38,7 +39,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철_역_생성("강남역");
+        ExtractableResponse<Response> response = 지하철_역_생성(STATION_NAME1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,7 +47,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = 지하철_역_목록_조회()
                 .jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(STATION_NAME1);
     }
 
     /**
@@ -58,14 +59,15 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        지하철_역_생성("강남역");
-        지하철_역_생성("삼성역");
+        지하철_역_생성(STATION_NAME1);
+        지하철_역_생성(STATION_NAME1);
 
         // when
         ExtractableResponse<Response> response = 지하철_역_목록_조회();
 
         // then
         assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList("name")).isEqualTo(Arrays.asList(STATION_NAME1, STATION_NAME1));
     }
 
     /**
@@ -77,9 +79,9 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> toDeleteStation = 지하철_역_생성("강남역");
+        ExtractableResponse<Response> toDeleteStation = 지하철_역_생성(STATION_NAME1);
         Long id = toDeleteStation.jsonPath().getLong("id");
-        지하철_역_생성("삼성역");
+        지하철_역_생성(STATION_NAME2);
 
         // when
         지하철_역_제거(id);
