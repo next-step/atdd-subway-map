@@ -6,9 +6,9 @@ public class UpdateSubwayLineRequest {
 
     private final String color;
 
-    public UpdateSubwayLineRequest(String name, String color) {
-        this.name = name;
-        this.color = color;
+    private UpdateSubwayLineRequest() {
+        name = null;
+        color = null;
     }
 
     public String getName() {

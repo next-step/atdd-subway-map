@@ -12,12 +12,12 @@ public class CreateSubwayLineRequest {
 
     private final Integer distance;
 
-    public CreateSubwayLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    private CreateSubwayLineRequest() {
+        name = null;
+        color = null;
+        upStationId = null;
+        downStationId = null;
+        distance = null;
     }
 
     public String getName() {
