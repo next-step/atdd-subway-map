@@ -1,12 +1,10 @@
 package nextstep.subway.ui.dto.line;
 
 public class UpdateLineRequest {
-    private final String name;
-    private final String color;
+    private String name;
+    private String color;
 
-    public UpdateLineRequest(final String name, final String color) {
-        this.name = name;
-        this.color = color;
+    public UpdateLineRequest() {
     }
 
     public String getName() {
