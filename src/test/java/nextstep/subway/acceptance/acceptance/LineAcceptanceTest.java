@@ -1,5 +1,12 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.acceptance;
 
+import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노선을_생성한다;
+import static nextstep.subway.acceptance.sample.LineSampleData.일호선_노선을_생성한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.노선을_생성한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_목록을_조회한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_생성을_요청한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -13,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -30,16 +38,20 @@ public class LineAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
+     * Then 지하철 노산이 생성된다
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철노선을 생성한다.")
     @Test
     void 지하철역노선_생성() {
         // when
-        ExtractableResponse<Response> response = 신분당선_노선을_생성한다();
+        ExtractableResponse<Response> createdResponse = 신분당선_노선을_생성한다();
 
         // then
-        ExtractableResponse<Response> linesRequest = readAllLinesRequest();
+        assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        ExtractableResponse<Response> linesRequest = 지하철노선_목록을_조회한다();
         List<String> lineNames = linesRequest.jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf("신분당선");
     }
@@ -57,11 +69,10 @@ public class LineAcceptanceTest {
         일호선_노선을_생성한다();
 
         // when
-        ExtractableResponse<Response> linesResponse = readAllLinesRequest();
+        ExtractableResponse<Response> linesResponse = 지하철노선_목록을_조회한다();
 
         // then
         List<String> stationNames = linesResponse.jsonPath().getList("name", String.class);
-
         assertThat(stationNames).containsOnlyOnce("신분당선", "1호선");
     }
 
@@ -93,63 +104,5 @@ public class LineAcceptanceTest {
     @DisplayName("지하철역노선을 삭제한다.")
     @Test
     void 지하철역노선_삭제() {
-    }
-
-    private ExtractableResponse<Response> 신분당선_노선을_생성한다() {
-        long downStationId = 지하철역을_생성한다("광교역").jsonPath().getLong("id");
-        long upStationId = 지하철역을_생성한다("신사역").jsonPath().getLong("id");
-
-        return 노선을_생성한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10);
-    }
-
-    private ExtractableResponse<Response> 일호선_노선을_생성한다() {
-        long downStationId = 지하철역을_생성한다("인천역").jsonPath().getLong("id");
-        long upStationId = 지하철역을_생성한다("소요산역").jsonPath().getLong("id");
-
-        return 노선을_생성한다("1호선", "bg-blue-600", downStationId, upStationId, (long) 15);
-    }
-
-    private ExtractableResponse<Response> 노선을_생성한다(String name, String color,
-                                                   Long downStationId, Long upStationId, Long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return createLineRequest(params);
-    }
-
-    private ExtractableResponse<Response> 지하철역을_생성한다(String name) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-
-        return createStationRequest(params);
-    }
-
-    private ExtractableResponse<Response> createStationRequest(Map<String, Object> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> createLineRequest(Map<String, Object> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> readAllLinesRequest() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
     }
 }

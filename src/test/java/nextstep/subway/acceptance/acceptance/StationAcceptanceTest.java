@@ -1,20 +1,20 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.acceptance;
 
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_목록을_조회한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_삭제를_요청한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
 @DisplayName("지하철역 관련 기능")
@@ -38,9 +38,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createdResponse = 지하철역_생성을_요청한다(params);
+        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("강남역");
 
         // then
         assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -61,15 +59,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "신도림역");
-
-        지하철역_생성을_요청한다(params1);
-
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "건대역");
-
-        지하철역_생성을_요청한다(params2);
+        지하철역을_생성한다("신도림역");
+        지하철역을_생성한다("건대역");
 
         // when
         ExtractableResponse<Response> stationsResponse = 지하철역_목록을_조회한다();
@@ -89,10 +80,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "홍대입구역");
-
-        ExtractableResponse<Response> createdResponse = 지하철역_생성을_요청한다(params);
+        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("홍대입구역");
         long stationId = createdResponse.jsonPath().getLong("id");
 
         // when
@@ -103,28 +91,5 @@ public class StationAcceptanceTest {
         List<String> stationName = stationsResponse.jsonPath().getList("name", String.class);
 
         assertThat(stationName).doesNotContain("홍대입구역");
-    }
-
-    private ExtractableResponse<Response> 지하철역_생성을_요청한다(Map<String, String> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철역_삭제를_요청한다(long stationId) {
-        return RestAssured.given().log().all()
-                .when().delete("/stations/" + stationId)
-                .then().log().all()
-                .extract();
     }
 }
