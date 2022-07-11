@@ -4,9 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
+class LineAcceptanceTest {
 
     @LocalServerPort
     int port;
@@ -54,10 +53,8 @@ public class LineAcceptanceTest {
             .then().log().all()
             .extract();
 
-        final Map<String, Object> responseData = lineResponse.jsonPath().get();
-        assertThat(responseData.get("id")).isEqualTo(1L);
-        assertThat(responseData.get("name")).isEqualTo("신분당선");
-        assertThat(responseData.get("color")).isEqualTo("bg-red-600");
+        final List<String> name = lineResponse.jsonPath().getList("name", String.class);
+        assertThat(name).containsExactly("신분당선");
     }
 
 }
