@@ -7,6 +7,8 @@ import javax.persistence.Id;
 
 @Entity
 public class Station {
+    private static final int MINIMUM_NAME_SIZE = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,7 +18,7 @@ public class Station {
 
     public Station(Long id, String name) {
 
-        if (name == null || name.isBlank() || name.length() < 2) {
+        if (name == null || name.isBlank() || name.length() < MINIMUM_NAME_SIZE) {
             throw new IllegalArgumentException();
         }
 

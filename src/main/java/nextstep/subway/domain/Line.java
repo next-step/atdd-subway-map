@@ -7,7 +7,8 @@ import java.util.List;
 
 @Entity
 public class Line {
-
+    private static final int MINIMUM_NAME_SIZE = 2;
+    private static final int MINIMUM_COLOR_SIZE = 4;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,11 +22,11 @@ public class Line {
 
     public Line(Long id, String name, String color, int distance, List<Station> stations) {
 
-        if (name == null || name.isBlank() || name.length() < 2) {
+        if (name == null || name.isBlank() || name.length() < MINIMUM_NAME_SIZE) {
             throw new IllegalArgumentException("이름이 공백이거나 2글자 이하일 수 없습니다.");
         }
 
-        if (color.isBlank() || color.length() < 4) {
+        if (color.isBlank() || color.length() < MINIMUM_COLOR_SIZE) {
             throw new IllegalArgumentException("색이 공백이거나 4글자 이하일 수 없습니다.");
         }
 
