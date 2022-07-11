@@ -6,7 +6,6 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -28,18 +27,18 @@ public class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역_생성_테스트() {
         // when 지하철역을 생성하면
         ExtractableResponse<Response> response = 지하철역_생성(GANGNAM_STATION);
         assertAll(
                 // then 지하철역이 생성된다
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-                () -> assertThat(findStations().jsonPath().getList("name")).containsAnyOf(GANGNAM_STATION)
+                () -> assertThat(지하철역_목록_조회().jsonPath().getList("name")).containsAnyOf(GANGNAM_STATION)
         );
     }
 
-    private ExtractableResponse<Response> findStations() {
+    private ExtractableResponse<Response> 지하철역_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
@@ -53,13 +52,13 @@ public class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void findAllStations() {
+    void 지하철역_목록_조회_테스트() {
         // given 2개의 지하철역을 생성하고
         지하철역_생성(GANGNAM_STATION);
         지하철역_생성(YUKSAM_STATION);
 
         // when 지하철역 목록을 조회하면
-        List<String> stationNames = findStations().jsonPath().getList("name");
+        List<String> stationNames = 지하철역_목록_조회().jsonPath().getList("name");
 
         // then 2개의 지하철역을 응답 받는다
         assertAll(
@@ -78,17 +77,17 @@ public class StationAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철역 삭제한다.")
     @Test
-    void deleteStation() {
+    void 지하철역_삭제_테스트() {
         // 지하철역 생성
         ExtractableResponse<Response> createResponse = 지하철역_생성(GANGNAM_STATION);
         // 지하철역 삭제
-        ExtractableResponse<Response> deleteResponse = deleteStation(createResponse.jsonPath().get("id"));
+        ExtractableResponse<Response> deleteResponse = 지하철역_삭제(createResponse.jsonPath().get("id"));
         // 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-        List<String> stationNames = findStations().jsonPath().getList("name");
+        List<String> stationNames = 지하철역_목록_조회().jsonPath().getList("name");
         assertThat(stationNames).doesNotContain(GANGNAM_STATION);
     }
 
-    private ExtractableResponse<Response> deleteStation(int id) {
+    private ExtractableResponse<Response> 지하철역_삭제(int id) {
         return RestAssured.given().log().all()
                 .when().delete("/stations/" + id)
                 .then().log().all()
