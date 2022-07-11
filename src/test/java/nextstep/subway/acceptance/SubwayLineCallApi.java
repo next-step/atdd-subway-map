@@ -94,4 +94,36 @@ public class SubwayLineCallApi {
                 .then().log().all()
                 .extract();
     }
+
+    /**
+     * 지하철 구간 저장
+     * @param lineId
+     * @param params
+     * @return
+     */
+    public ExtractableResponse<Response> saveSubwaySection(Long lineId, Map<String, Object> params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * 지하철 구간 삭제
+     * @param lineId
+     * @param stationId
+     * @return
+     */
+    public ExtractableResponse<Response> deleteSubwaySectionById(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .param("stationId", stationId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
 }
