@@ -59,7 +59,7 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames.size()).isEqualTo(param.size());
+        assertThat(stationNames).hasSize(param.size());
         assertThat(stationNames).containsAll(param.values());
     }
 
@@ -83,7 +83,7 @@ public class StationAcceptanceTest {
 
         // then
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames.size()).isEqualTo(2);
+        assertThat(stationNames).hasSize(2);
         assertThat(stationNames).containsAll(createdStationNames);
     }
 
@@ -110,7 +110,7 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames.size()).isEqualTo(0);
+        assertThat(stationNames).hasSize(0);
     }
 
     private Map<String, String> createParam(String stationName) {

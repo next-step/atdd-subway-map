@@ -55,7 +55,7 @@ public class SubwayLineAcceptanceTest {
         final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
         final List<String> subwayLineNames = getSubwayLinesResponse.jsonPath().getList("name", String.class);
 
-        assertThat(subwayLineNames.size()).isEqualTo(1);
+        assertThat(subwayLineNames).hasSize(1);
         assertThat(subwayLineNames).contains(String.valueOf(params.get("name")));
     }
 
@@ -86,7 +86,7 @@ public class SubwayLineAcceptanceTest {
         // then
         final List<String> subwayLineNames = response.jsonPath().getList("name", String.class);
 
-        assertThat(subwayLineNames.size()).isEqualTo(paramsList.size());
+        assertThat(subwayLineNames).hasSize(paramsList.size());
         assertThat(subwayLineNames).containsAll(createdSubwayLineNames);
     }
 
@@ -170,7 +170,7 @@ public class SubwayLineAcceptanceTest {
         // then
         final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
         final List<Object> subwayLineIdList = getSubwayLinesResponse.jsonPath().getList("id");
-        assertThat(subwayLineIdList.size()).isEqualTo(0);
+        assertThat(subwayLineIdList).hasSize(0);
     }
 
     private Map<String, Object> createParams(List<String> keys, List<Object> values) {
