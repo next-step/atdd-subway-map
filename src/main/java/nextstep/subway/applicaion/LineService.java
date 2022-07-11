@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
     private StationRepository stationRepository;
@@ -30,7 +29,6 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line entity) {
-        System.out.println(entity.toString());
         Station upStation = findStationByStationId(entity.getUpStationId());
         Station downStation = findStationByStationId(entity.getDownStationId());
 

@@ -21,4 +21,20 @@ public class LineResponse {
     public Long getId() {
         return id;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
 }

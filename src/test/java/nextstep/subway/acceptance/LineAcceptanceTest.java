@@ -69,7 +69,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-//        assertThat(getLines("name")).isEqualTo("2호선");
+        assertThat(getLines("name").get(0)).isEqualTo("2호선");
     }
 
     private ExtractableResponse<Response> createLine(Map params) {
