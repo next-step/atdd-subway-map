@@ -123,7 +123,7 @@ public class LineAcceptanceTest {
 		// when
 		String name = RestAssured
 				.given()
-				.when().get("/lines/{}", 1)
+				.when().get("/lines/{lineId}", 1)
 				.then()
 				.extract().jsonPath().get("name");
 		// then
@@ -160,12 +160,12 @@ public class LineAcceptanceTest {
 				.given().log().all()
 				.body(params1)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().put("/lines/{}", 1)
+				.when().put("/lines/{lineId}", 1)
 				.then().log().all();
 		// then
 		String name = RestAssured
 				.given().log().all()
-				.when().get("/lines/{}", 1)
+				.when().get("/lines/{lineId}", 1)
 				.then().log().all()
 				.extract().jsonPath().get("name");
 		assertThat(name).isEqualTo("다른분당선");
@@ -195,7 +195,7 @@ public class LineAcceptanceTest {
 		// when
 		RestAssured
 				.given().log().all()
-				.when().delete("/lines/{}", 1)
+				.when().delete("/lines/{lineId}", 1)
 				.then().log().all();
 
 		// then

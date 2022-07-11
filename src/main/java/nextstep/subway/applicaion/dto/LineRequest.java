@@ -4,5 +4,5 @@ public class LineRequest {
 	private String name;
 	private String color;
 	private Long upStationId;
-	private Long downStation;
+	private Long downStationId;
 }
