@@ -1,5 +1,8 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class StationRequest {
     private String name;
 
