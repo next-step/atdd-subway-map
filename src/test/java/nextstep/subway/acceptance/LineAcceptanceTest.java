@@ -6,10 +6,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Color;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,26 +40,26 @@ public class LineAcceptanceTest {
     Map<String, Object> params = new HashMap<>();
     params.put("name", "도농역");
 
-    Station gangnamStation = RestAssured.given().log().all()
+    StationResponse gangnamStation = RestAssured.given().log().all()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/stations")
         .then().log().all()
-        .extract().as(Station.class);
+        .extract().as(StationResponse.class);
 
     params.put("name", "구리역");
 
-    Station gooriStation = RestAssured.given().log().all()
+    StationResponse gooriStation = RestAssured.given().log().all()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/stations")
         .then().log().all()
-        .extract().as(Station.class);
+        .extract().as(StationResponse.class);
 
     params.put("name", "1호선");
     params.put("color", Color.BLUE);
-    params.put("upStationId", gangnamStation);
-    params.put("downStationId", gooriStation);
+    params.put("upStationId", gangnamStation.getId());
+    params.put("downStationId", gooriStation.getId());
     params.put("distance", 10);
 
     ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -71,15 +71,15 @@ public class LineAcceptanceTest {
 
     assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-    Line line = RestAssured.given().log().all()
+    ExtractableResponse<Response> response1 = RestAssured.given().log().all()
         .when().get("/lines")
         .then().log().all()
-        .extract().as(Line.class);
+        .extract();
 
-    assertThat(line.getName()).isEqualTo("1호선");
-    assertThat(line.getColor()).isEqualTo(Color.BLUE);
-    assertThat(line.getUpStation().getId()).isEqualTo(gangnamStation.getId());
-    assertThat(line.getDownStation().getId()).isEqualTo(gooriStation.getId());
-    assertThat(line.getDistance()).isEqualTo(10);
+    List<String> names = response1.jsonPath().getList("name", String.class);
+    assertThat(names).containsAnyOf("1호선");
+
+    List<String> colors = response1.jsonPath().getList("color", String.class);
+    assertThat(colors).containsAnyOf(Color.BLUE.name());
   }
 }
