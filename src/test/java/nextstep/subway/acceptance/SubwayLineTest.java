@@ -129,10 +129,30 @@ public class SubwayLineTest {
 	@Test
 	void findSubwayLine() {
 	    //given
+		ExtractableResponse<Response> createSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
+		long subwayLineId = createSubwayLine.jsonPath().getLong("id");
 
-	    //when
+		//when
+		ExtractableResponse<Response> response = findSubwayLine(subwayLineId);
+		JsonPath responseToJson = response.jsonPath();
 
-	    //then
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME);
+		assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME);
+
+	}
+
+	private ExtractableResponse<Response> findSubwayLine(long responseId) {
+		return RestAssured
+				.given()
+					.log().all()
+					.accept(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+					.get("/lines/{id}", responseId)
+				.then()
+					.log().all()
+				.extract();
 	}
 
 	/**

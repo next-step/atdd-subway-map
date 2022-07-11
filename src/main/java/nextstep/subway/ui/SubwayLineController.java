@@ -29,4 +29,8 @@ public class SubwayLineController {
 		return ResponseEntity.ok().body(lineService.findAll());
 	}
 
+	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<SubwayLineResponse> findSubwayLine(@PathVariable Long id) {
+		return ResponseEntity.ok().body(lineService.findById(id));
+	}
 }

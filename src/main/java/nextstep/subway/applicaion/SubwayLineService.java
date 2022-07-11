@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,5 +41,18 @@ public class SubwayLineService {
 								line.getDownStationId()))
 				))
 				.collect(Collectors.toList());
+	}
+
+	public SubwayLineResponse findById(Long id) {
+		SubwayLine findLine = lineRepository.findById(id)
+				.orElseThrow(NoSuchElementException::new);
+
+		return new SubwayLineResponse(findLine,
+				stationRepository.findAllById(
+						List.of(
+								findLine.getUpStationId(),
+								findLine.getDownStationId()
+						)
+				));
 	}
 }
