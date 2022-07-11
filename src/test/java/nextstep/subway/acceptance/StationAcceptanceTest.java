@@ -3,14 +3,13 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,13 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("tableTruncator")
 public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    private DatabaseTruncator databaseTruncator;
+
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         RestAssured.port = port;
+        databaseTruncator.afterPropertiesSet();
     }
 
     private static Map<String, Object> station1;
@@ -46,6 +50,11 @@ public class StationAcceptanceTest {
 
         station3 = new HashMap<>();
         station3.put("name", "마곡나루역");
+    }
+
+    @AfterEach
+    void tableClear(){
+        databaseTruncator.cleanTable();
     }
 
 

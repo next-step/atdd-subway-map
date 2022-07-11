@@ -70,7 +70,7 @@ public class LineAcceptanceTest {
     }
 
     @AfterEach
-    void clear(){
+    void tableClear(){
         databaseTruncator.cleanTable();
     }
 
