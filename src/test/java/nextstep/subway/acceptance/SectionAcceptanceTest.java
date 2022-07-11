@@ -13,15 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("구간관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
     /**
      * Given A,B,C 라는 이름을 가진 3개의 역을 생성한다.
      * Given 노선을 생성하고 A역은 상행역, B역은 하행역으로 등록한다.
-     * When 상행역은 B이며 하행역은 C인 새로운 구간을 노선에 등록한다.
-     * Then 노선을 조회하고 상행역, 하행역을 확인한다.
-     * Then 구간을 조회하고 상행역, 하행역을 확인한다.
+     * When 상행역은 B이며 하행역은 C인 새로운 구간을 노선에 등록하고
+     * Then 등록된 노선의 상행역, 하행역을 확인한다.
      */
     @Test
     void 새로운_구간_등록(){
@@ -37,7 +37,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> response = 구간_등록_요청(lineId, bId, cId, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertAll(
+            ()->assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+            ()->assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(aId),
+            ()->assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(cId)
+        );
     }
 
     /**
