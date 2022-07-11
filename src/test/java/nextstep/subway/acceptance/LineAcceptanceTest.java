@@ -1,6 +1,8 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,24 +35,9 @@ public class LineAcceptanceTest {
 	@Test
 	void createLine() {
 		// when
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "신분당선");
-		params.put("color", "bg-red-600");
-		params.put("upStationId", "1");
-		params.put("downStationId", "2");
-
-		RestAssured
-				.given().log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines")
-				.then().log().all();
+		createLineFrom("신분당선", "bg-red-600", 1L, 2L);
 		// then
-		List<String> names = RestAssured
-				.given().log().all()
-				.when().get("/lines")
-				.then().log().all()
-				.extract().jsonPath().getList("name");
+		List<String> names = responseOfShowLines().jsonPath().getList("name");
 
 		assertThat(names.get(0)).isEqualTo("신분당선");
 	}
@@ -64,37 +51,11 @@ public class LineAcceptanceTest {
 	@Test
 	void showLines() {
 		// given
-		Map<String, String> params1 = new HashMap<>();
-		params1.put("name", "신분당선");
-		params1.put("color", "bg-red-600");
-		params1.put("upStationId", "1");
-		params1.put("downStationId", "2");
+		createLineFrom("신분당선", "bg-red-600", 1L, 2L);
+		createLineFrom("분당선", "bg-green-600", 1L, 2L);
 
-		RestAssured
-				.given().log().all()
-				.body(params1)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines")
-				.then().log().all();
-
-		Map<String, String> params2 = new HashMap<>();
-		params2.put("name", "분당선");
-		params2.put("color", "bg-green-600");
-		params2.put("upStationId", "1");
-		params2.put("downStationId", "3");
-
-		RestAssured
-				.given().log().all()
-				.body(params2)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines")
-				.then().log().all();
 		// when
-		List<Long> id = RestAssured
-				.given().log().all()
-				.when().get("/lines")
-				.then().log().all()
-				.extract().jsonPath().getList("id");
+		List<Long> id = responseOfShowLines().jsonPath().getList("id");
 		// then
 		assertThat(id).hasSize(2);
 	}
@@ -108,24 +69,12 @@ public class LineAcceptanceTest {
 	@Test
 	void showLine() {
 		// given
-		Map<String, String> params1 = new HashMap<>();
-		params1.put("name", "신분당선");
-		params1.put("color", "bg-red-600");
-		params1.put("upStationId", "1");
-		params1.put("downStationId", "2");
+		Number tmpId = createLineFrom("신분당선", "bg-red-600", 1L, 2L)
+				.jsonPath().get("id");
+		Long id = tmpId.longValue();
 
-		RestAssured
-				.given().log().all()
-				.body(params1)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines")
-				.then().log().all();
 		// when
-		String name = RestAssured
-				.given()
-				.when().get("/lines/{lineId}", 1)
-				.then()
-				.extract().jsonPath().get("name");
+		String name = responseOfShowLine(id).jsonPath().get("name");
 		// then
 		assertThat(name).isEqualTo("신분당선");
 	}
@@ -139,18 +88,10 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLine() {
 		// given
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "신분당선");
-		params.put("color", "bg-red-600");
-		params.put("upStationId", "1");
-		params.put("downStationId", "2");
+		Number tmpId = createLineFrom("신분당선", "bg-red-600", 1L, 2L)
+				.jsonPath().get("id");
+		Long id = tmpId.longValue();
 
-		RestAssured
-				.given().log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines")
-				.then().log().all();
 		// when
 		Map<String, String> params1 = new HashMap<>();
 		params1.put("name", "다른분당선");
@@ -160,14 +101,10 @@ public class LineAcceptanceTest {
 				.given().log().all()
 				.body(params1)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().put("/lines/{lineId}", 1)
+				.when().put("/lines/{lineId}", id)
 				.then().log().all();
 		// then
-		String name = RestAssured
-				.given().log().all()
-				.when().get("/lines/{lineId}", 1)
-				.then().log().all()
-				.extract().jsonPath().get("name");
+		String name = responseOfShowLine(id).jsonPath().get("name");
 		assertThat(name).isEqualTo("다른분당선");
 	}
 
@@ -180,30 +117,54 @@ public class LineAcceptanceTest {
 	@Test
 	void deleteLine() {
 		// given
-		Map<String, String> params = new HashMap<>();
-		params.put("name", "신분당선");
-		params.put("color", "bg-red-600");
-		params.put("upStationId", "1");
-		params.put("downStationId", "2");
+		Number tmpId = createLineFrom("신분당선", "bg-red-600", 1L, 2L)
+				.jsonPath().get("id");
+		Long id = tmpId.longValue();
 
+		// when
 		RestAssured
+				.given().log().all()
+				.when().delete("/lines/{lineId}", id)
+				.then().log().all();
+
+		// then
+		List<Long> ids = responseOfShowLines().jsonPath().getList("id");
+		assertThat(ids).isEmpty();
+	}
+
+	private ExtractableResponse<Response> createLineFrom(String name, String color, Long upStationId, Long downStationId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("name", name);
+		params.put("color", color);
+		params.put("upStationId", upStationId);
+		params.put("downStationId", downStationId);
+
+		return createLineFrom(params);
+	}
+
+	private ExtractableResponse<Response> createLineFrom(Map<String, Object> params) {
+		 return RestAssured
 				.given().log().all()
 				.body(params)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when().post("/lines")
-				.then().log().all();
-		// when
-		RestAssured
-				.given().log().all()
-				.when().delete("/lines/{lineId}", 1)
-				.then().log().all();
+				.then().log().all()
+				.extract();
+	}
 
-		// then
-		List<Long> id = RestAssured
+	private ExtractableResponse<Response> responseOfShowLine(Long id) {
+		return RestAssured
+				.given().log().all()
+				.when().get("/lines/{lineId}", id)
+				.then().log().all()
+				.extract();
+	}
+
+	private ExtractableResponse<Response> responseOfShowLines() {
+		return RestAssured
 				.given().log().all()
 				.when().get("/lines")
 				.then().log().all()
-				.extract().jsonPath().getList("id");
-		assertThat(id).isEmpty();
+				.extract();
 	}
 }
