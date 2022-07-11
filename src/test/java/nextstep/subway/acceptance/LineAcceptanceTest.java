@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
+    public static final int LINE_DISTANCE = 10;
+
     private long upStationId;
     private long downStationId;
 
@@ -40,7 +42,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철역_생성_요청("신갈역");
 
         // when
-        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10);
+        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // then
         List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
@@ -56,8 +58,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllLine() {
         // given
-        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10);
-        지하철노선_생성_요청("에버라인", "bg-red-600", upStationId, downStationId, 10);
+        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
+        지하철노선_생성_요청("에버라인", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // when
         List<String> lineNames = 지하철노선_목록_조회().jsonPath().getList("name", String.class);
@@ -75,7 +77,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findLine() {
         // given
-        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE).jsonPath().getLong("id");
 
         // when
         final ExtractableResponse<Response> response = 지하철노선_조회(lineId);
@@ -98,7 +100,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE).jsonPath().getLong("id");
 
         // when
         지하철노선_수정_요청(lineId, "다른분당선", "bg-red-610");
@@ -120,7 +122,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE).jsonPath().getLong("id");
 
         // when
         final ExtractableResponse<Response> response = 지하철노선_삭제_요청(lineId);
