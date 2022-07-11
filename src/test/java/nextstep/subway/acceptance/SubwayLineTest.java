@@ -28,6 +28,11 @@ public class SubwayLineTest {
 	public static final String LINE_COLOR = "bg-red-600";
 	public static final String UP_STATION_NAME = "광교중앙역";
 	public static final String DOWN_STATION_NAME = "신사역";
+	public static Long upStationId;
+	public static Long downStationId;
+
+	@Autowired
+	private StationService stationService;
 
 	@LocalServerPort
 	int port;
@@ -35,10 +40,9 @@ public class SubwayLineTest {
 	@BeforeEach
 	void setUp() {
 		RestAssured.port = port;
+		upStationId = stationService.saveStation(new StationRequest(UP_STATION_NAME)).getId();
+		downStationId = stationService.saveStation(new StationRequest(DOWN_STATION_NAME)).getId();
 	}
-
-	@Autowired
-	private StationService stationService;
 
 	/**
 	 * When 지하철 노선을 생성하면
@@ -47,10 +51,6 @@ public class SubwayLineTest {
 	@DisplayName("지하철노선을 생성한다.")
 	@Test
 	void createSubwayLine() {
-		//given
-		Long upStationId = stationService.saveStation(new StationRequest(UP_STATION_NAME)).getId();
-		Long downStationId = stationService.saveStation(new StationRequest(DOWN_STATION_NAME)).getId();
-
 		//when
 		ExtractableResponse<Response> response = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
 		JsonPath responseToJson = response.jsonPath();
@@ -93,10 +93,31 @@ public class SubwayLineTest {
 	@Test
 	void findSubwayLineList() {
 	    //given
+		createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
+
+		Long 인천역 = stationService.saveStation(new StationRequest("인천역")).getId();
+		Long 청량리역 = stationService.saveStation(new StationRequest("청량리역")).getId();
+		createSubwayLine("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
 
 	    //when
+		ExtractableResponse<Response> response = findSubwayLines();
+		JsonPath responseToJson = response.jsonPath();
 
-	    //then
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(responseToJson.getList("name")).containsExactly(LINE_NAME, "수인분당선");
+	}
+
+	private ExtractableResponse<Response> findSubwayLines() {
+		return RestAssured
+				.given()
+					.log().all()
+					.accept(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+					.get("/lines")
+				.then()
+					.log().all()
+				.extract();
 	}
 
 	/**
