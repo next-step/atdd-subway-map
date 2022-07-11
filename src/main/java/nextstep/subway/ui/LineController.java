@@ -3,13 +3,11 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,15 +31,7 @@ public class LineController {
 
 	@GetMapping("/lines/{lineId}")
 	public ResponseEntity<LineResponse> showLine(@PathVariable Long lineId) {
-		List<StationResponse> stations1 = new ArrayList<>();
-		StationResponse station1 = new StationResponse(1L, "지하철역");
-		StationResponse station2 = new StationResponse(2L, "새로운지하철역");
-		stations1.add(station1);
-		stations1.add(station2);
-
-		LineResponse line = new LineResponse(lineId, "신분당선", "bg-red-600", stations1);
-
-		return ResponseEntity.ok().body(line);
+		return ResponseEntity.ok().body(lineService.findLineById(lineId));
 	}
 
 	@PutMapping("/lines/{lineId}")

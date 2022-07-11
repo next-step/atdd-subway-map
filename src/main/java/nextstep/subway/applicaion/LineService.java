@@ -38,4 +38,10 @@ public class LineService {
 	public List<LineResponse> findAllLines() {
 		return LineResponse.listOf(lineRepository.findAll());
 	}
+
+	public LineResponse findLineById(Long lineId) {
+		return LineResponse.of(lineRepository.findById(lineId).orElseThrow(
+				() -> new RuntimeException()
+		));
+	}
 }
