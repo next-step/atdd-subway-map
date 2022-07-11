@@ -24,7 +24,7 @@ public class Line {
     private List<LineStation> lineStations = new ArrayList<>();
 
 
-    @Builder
+    @Builder(toBuilder = true)
     protected Line(Long id, String name, String color, Integer distance, List<LineStation> lineStations) {
         this.id = id;
         this.name = name;

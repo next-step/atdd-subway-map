@@ -20,7 +20,7 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        Long lineId = lineService.createLine(lineRequest.toDto());
+        Long lineId = lineService.createLine(lineRequest.toCreateDto());
 
         LineDto lineDto = lineService.getLine(lineId);
         LineResponse response = LineResponse.of(lineDto);
@@ -43,5 +43,15 @@ public class LineController {
         LineResponse response = LineResponse.of(lineDto);
 
         return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> updateLine(
+            @PathVariable Long id,
+            @RequestBody LineRequest lineRequest
+    ) {
+        lineService.updateLine(id, lineRequest.toUpdateDto());
+
+        return ResponseEntity.ok().build();
     }
 }

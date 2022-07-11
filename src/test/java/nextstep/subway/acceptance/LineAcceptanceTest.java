@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -136,6 +137,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
                 .body(
                         Map.of("name", "다른4호선",
                                 "color", "bg-skyblue-400"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();

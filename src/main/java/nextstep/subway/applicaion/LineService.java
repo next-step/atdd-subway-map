@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreateDto;
 import nextstep.subway.applicaion.dto.LineDto;
+import nextstep.subway.applicaion.dto.LineUpdateDto;
 import nextstep.subway.domain.LineStation;
 import nextstep.subway.domain.LineStationRepository;
 import nextstep.subway.domain.line.Line;
@@ -66,5 +67,13 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("line is not found"));
 
         return LineDto.of(line);
+    }
+
+    @Transactional
+    public void updateLine(Long id, LineUpdateDto lineUpdateDto) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("line is not found"));
+
+        lineRepository.save(lineUpdateDto.toDomain(line));
     }
 }

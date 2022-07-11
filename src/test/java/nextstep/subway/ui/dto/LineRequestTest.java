@@ -12,7 +12,7 @@ class LineRequestTest {
     @DisplayName("DTO 변환이 정상적으로 수행된다.")
     void toDtoTest() {
         LineRequest lineRequest = new LineRequest("4호선", "blue", 1L, 2L, 5);
-        LineCreateDto dto = lineRequest.toDto();
+        LineCreateDto dto = lineRequest.toCreateDto();
 
         assertThat(lineRequest.getName()).isEqualTo(dto.getName());
         assertThat(lineRequest.getColor()).isEqualTo(dto.getColor());
