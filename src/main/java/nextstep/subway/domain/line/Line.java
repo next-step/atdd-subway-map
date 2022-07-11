@@ -20,7 +20,7 @@ public class Line {
     private String color;
     private Integer distance;
 
-    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER)
     private List<LineStation> lineStations = new ArrayList<>();
 
 
