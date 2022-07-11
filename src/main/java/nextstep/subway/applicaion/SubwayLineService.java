@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,39 +94,23 @@ public class SubwayLineService {
     }
 
     private Station getStationByIdIfExists(Long stationId) {
-        final Optional<Station> findStation = stationRepository.findById(stationId);
-        if (findStation.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 지하철 역입니다.");
-        }
-
-        return findStation.get();
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 지하철 역입니다."));
     }
 
     private SubwayLine getSubwayLineByIdIfExists(Long subwayLineId) {
-        final Optional<SubwayLine> findSubwayLine = subwayLineRepository.findById(subwayLineId);
-        if (findSubwayLine.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 지하철 노선입니다.");
-        }
-
-        return findSubwayLine.get();
+        return subwayLineRepository.findById(subwayLineId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 지하철 노선입니다."));
     }
 
     private SubwayLineColor getSubwayLineColorByCodeIfExists(String stationLineColorCode) {
-        final Optional<SubwayLineColor> findSubwayLineColor = subwayLineColorRepository.findByCode(stationLineColorCode);
-        if (findSubwayLineColor.isEmpty()) {
-            throw new RuntimeException("사용할 수 없는 지하철 노선 색 코드입니다.");
-        }
-
-        return findSubwayLineColor.get();
+        return subwayLineColorRepository.findByCode(stationLineColorCode)
+                .orElseThrow(() -> new RuntimeException("사용할 수 없는 지하철 노선 색 코드입니다."));
     }
 
     private StationToSubwayLine getStationToSubwayLineIfExists(SubwayLine subwayLine, Station station) {
-        final Optional<StationToSubwayLine> findStationToSubwayLine = stationToSubwayLineRepository.findByStationAndSubwayLine(station, subwayLine);
-        if (findStationToSubwayLine.isEmpty()) {
-            throw new RuntimeException("연결되어있지 않는 지하철역과 지하철 노선의 관계입니다");
-        }
-
-        return findStationToSubwayLine.get();
+        return stationToSubwayLineRepository.findByStationAndSubwayLine(station, subwayLine)
+                .orElseThrow(() -> new RuntimeException("연결되어있지 않은 지하철역과 지하철 노선의 관계입니다."));
     }
 
     private void linkingStationAndSubwayLine(SubwayLine subwayLine, List<Station> stations) {
