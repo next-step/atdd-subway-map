@@ -36,8 +36,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createStationLine() {
         // given
-        지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        지하철역_생성_요청("기흥역");
+        지하철역_생성_요청("신갈역");
 
         // when
         지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, 10);
