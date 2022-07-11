@@ -11,10 +11,9 @@ public class Line {
 
     private String name;
     private String color;
+
     @Embedded
-    private Distance distance;
-    @Embedded
-    private Stations stations;
+    private Sections sections;
 
     protected Line() {
     }
@@ -23,8 +22,7 @@ public class Line {
         validation(name, color);
         this.name = name;
         this.color = color;
-        this.distance = new Distance(distance);
-        this.stations = new Stations(upStation, downStation);
+        this.sections = new Sections(this, distance, upStation, downStation);
     }
 
     public void changeInfo(String name, String color) {
@@ -56,6 +54,6 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        return stations.getStations();
+        return sections.getStation();
     }
 }
