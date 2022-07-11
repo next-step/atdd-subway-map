@@ -1,7 +1,8 @@
-package nextstep.subway.domain.stationToSubwayBridge;
+package nextstep.subway.repository;
 
-import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.subwayLine.SubwayLine;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationToSubwayLine;
+import nextstep.subway.domain.SubwayLine;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

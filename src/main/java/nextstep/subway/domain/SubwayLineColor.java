@@ -1,6 +1,6 @@
-package nextstep.subway.domain.subwayLineColor;
+package nextstep.subway.domain;
 
-import nextstep.subway.domain.subwayLine.SubwayLine;
+import nextstep.subway.domain.SubwayLine;
 
 import javax.persistence.*;
 import java.util.List;

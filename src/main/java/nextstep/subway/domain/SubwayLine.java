@@ -1,8 +1,4 @@
-package nextstep.subway.domain.subwayLine;
-
-import nextstep.subway.domain.stationToSubwayBridge.StationToSubwayLine;
-import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.subwayLineColor.SubwayLineColor;
+package nextstep.subway.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
