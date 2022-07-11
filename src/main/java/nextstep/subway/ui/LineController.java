@@ -1,7 +1,6 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.StationService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
@@ -23,13 +22,7 @@ public class LineController {
 
 	@PostMapping("/lines")
 	public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-		List<StationResponse> stations = new ArrayList<>();
-		StationResponse station1 = new StationResponse(1L, "지하철역");
-		StationResponse station2 = new StationResponse(2L, "새로운지하철역");
-		stations.add(station1);
-		stations.add(station2);
-		LineResponse line = new LineResponse(1L, "신분당선", "bg-red-600", stations);
-//		LineResponse line = lineService.saveLine(lineRequest);
+		LineResponse line = lineService.saveLine(lineRequest);
 		return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
 	}
 
