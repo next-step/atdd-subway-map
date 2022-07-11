@@ -143,7 +143,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철노선 생성")
     @Test
-    void createSubwayRoute() {
+    void createSubwayLine() {
 
     }
 
@@ -154,7 +154,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철노선 목록 조회")
     @Test
-    void getSubwayRoutes() {
+    void getSubwayLines() {
 
     }
 
@@ -165,7 +165,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철노선 조회")
     @Test
-    void getSubwayRoute() {
+    void getSubwayLine() {
 
     }
 
@@ -176,7 +176,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철노선 수정")
     @Test
-    void updateSubwayRoute() {
+    void updateSubwayLine() {
 
     }
 
@@ -187,8 +187,8 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철노선 삭제")
     @Test
-    void deleteSubwayRoute() {
-        
+    void deleteSubwayLine() {
+
     }
 
 }
