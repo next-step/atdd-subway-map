@@ -15,7 +15,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-public class StationAcceptanceTest extends AcceptanceTest{
+class StationAcceptanceTest extends AcceptanceTest{
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -71,8 +71,10 @@ public class StationAcceptanceTest extends AcceptanceTest{
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> names = response.jsonPath().getList("name", String.class);
-        assertThat(names).contains("강남역", "구로디지털단지역");
-        assertThat(names).hasSize(2);
+
+        assertThat(names)
+                .contains("강남역", "구로디지털단지역")
+                .hasSize(2);
     }
 
     // 지하철역 추가하는 공통 로직
