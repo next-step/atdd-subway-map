@@ -99,6 +99,41 @@ public class StationLineAcceptanceTest {
         assertThat(createStationLine.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철노선 수정")
+    @Test
+    void updateByStationLine() {
+        ExtractableResponse<Response> response = createStationLineAndValidate("2호선",
+                "bg-red-600",
+                createStationAndValidate("강남역"),
+                createStationAndValidate("역삼역"));
+
+        ExtractableResponse<Response> updateStationLine = RestAssured
+                .given().log().all()
+                .body(StationLineRequest.builder()
+                        .name("신분당선")
+                        .color("bg-yellow-300")
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", response.jsonPath().getLong("id"))
+                .then().log().all()
+                .extract();
+        assertThat(updateStationLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> findStationLine = RestAssured
+                .given().log().all()
+                .when().get("/lines/{id}", response.jsonPath().getLong("id"))
+                .then().log().all()
+                .extract();
+        assertThat(findStationLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(findStationLine.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(findStationLine.jsonPath().getString("color")).isEqualTo("bg-yellow-300");
+    }
+
     private ExtractableResponse<Response> createStationLineAndValidate(String stationLineName, String color, Long upStationId, Long downStationId) {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
