@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static nextstep.subway.section.SectionTestSource.sectionRequest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
@@ -69,14 +70,6 @@ class SectionControllerTest {
 
         // then
         result.andExpect(status().isNoContent());
-    }
-
-    private SectionRequest sectionRequest() {
-        return SectionRequest.builder()
-                .upStationId(2L)
-                .downStationId(4L)
-                .distance(10L)
-                .build();
     }
 
 }

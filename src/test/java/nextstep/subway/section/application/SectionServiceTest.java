@@ -1,8 +1,6 @@
 package nextstep.subway.section.application;
 
 import nextstep.subway.line.application.LineService;
-import nextstep.subway.line.domain.Line;
-import nextstep.subway.section.application.dto.SectionRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

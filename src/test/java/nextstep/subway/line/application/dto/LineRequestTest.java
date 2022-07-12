@@ -3,6 +3,7 @@ package nextstep.subway.line.application.dto;
 import nextstep.subway.line.domain.Line;
 import org.junit.jupiter.api.Test;
 
+import static nextstep.subway.line.LineTestSource.lineRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LineRequestTest {
@@ -13,9 +14,9 @@ class LineRequestTest {
 
         assertThat(lineRequest.getName()).isEqualTo("lineName");
         assertThat(lineRequest.getColor()).isEqualTo("bg-red-600");
-        assertThat(lineRequest.getUpStationId()).isEqualTo(1L);
-        assertThat(lineRequest.getDownStationId()).isEqualTo(2L);
-        assertThat(lineRequest.getDistance()).isEqualTo(10L);
+        assertThat(lineRequest.getUpStationId()).isEqualTo(2L);
+        assertThat(lineRequest.getDownStationId()).isEqualTo(3L);
+        assertThat(lineRequest.getDistance()).isEqualTo(4L);
     }
 
     @Test
@@ -42,16 +43,6 @@ class LineRequestTest {
         assertThat(line.getUpStationId()).isEqualTo(lineRequest.getUpStationId());
         assertThat(line.getDownStationId()).isEqualTo(lineRequest.getDownStationId());
         assertThat(line.getDistance()).isEqualTo(lineRequest.getDistance());
-    }
-
-    private LineRequest lineRequest() {
-        return LineRequest.builder()
-                .name("lineName")
-                .color("bg-red-600")
-                .upStationId(1L)
-                .downStationId(2L)
-                .distance(10L)
-                .build();
     }
 
 }
