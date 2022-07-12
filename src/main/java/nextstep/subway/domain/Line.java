@@ -4,12 +4,15 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +36,6 @@ public class Line {
     @Min(value = 1, message = "지하철 노선은 최소 1미터 이상이어야합니다.")
     private Long distance;
 
-    protected Line() {
-    }
 
     @Builder
     public Line(String name, String color, Long distance, Station upStation, Station downStation) {
