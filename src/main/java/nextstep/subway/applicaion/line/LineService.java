@@ -45,6 +45,12 @@ public class LineService {
 		return lines.stream().map(this::createLineResponse).collect(Collectors.toList());
 	}
 
+	public LineResponse findLineById(Long id) {
+		Line line = lineRepository.findById(id).orElseThrow();
+
+		return createLineResponse(line);
+	}
+
 	private LineResponse createLineResponse(Line line) {
 		Station upStation = stationService.getStationById(line.getUpStationId());
 		Station downStation = stationService.getStationById(line.getDownStationId());

@@ -38,7 +38,7 @@ public class StationService {
 
 
 	public Station getStationById(Long id) {
-		return stationRepository.findById(id).get();
+		return stationRepository.findById(id).orElseThrow();
 	}
 
 	private StationResponse createStationResponse(Station station) {

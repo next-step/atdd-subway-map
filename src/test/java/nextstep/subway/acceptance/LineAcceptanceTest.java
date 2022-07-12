@@ -6,9 +6,7 @@ import io.restassured.response.Response;
 import nextstep.subway.applicaion.line.dto.LineRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +15,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선 관련 기능")
-@DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LineAcceptanceTest extends AcceptanceTest {
 	@LocalServerPort
@@ -29,7 +26,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	Long stationId4;
 	Long stationId5;
 
-
 	@BeforeEach
 	public void beforeEach() {
 		RestAssured.port = port;
@@ -37,6 +33,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
 	@BeforeAll
 	public void beforeAll() {
+		RestAssured.port = port;
+
 		stationId1 = createStation("양재역").jsonPath().getLong("id");
 		stationId2 = createStation("양재시민의숲역").jsonPath().getLong("id");
 		stationId3 = createStation("청계산입구역").jsonPath().getLong("id");
@@ -48,10 +46,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
 	 */
-	@DisplayName("지하철노선을 생성한다.")
-	@Transactional
 	@Test
-	void createLine() {
+	@Sql(scripts = "/sql/truncate_line_table.sql")
+	void 지하철노선을_생성한다() {
 		//when
 		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10);
 		ExtractableResponse<Response> response = post("/lines", lineRequest);
@@ -73,16 +70,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 지하철 노선 목록을 조회하면
 	 * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
 	 */
-	@DisplayName("지하철노선을 조회한다.")
-	@Transactional
+	@Sql(scripts = "/sql/truncate_line_table.sql")
 	@Test
-	void getLineList() {
+	void 지하철노선_목록을_조회한다() {
 		//given
 		createLine("신분당선", "bg-red-600", stationId1, stationId2, 10);
 		createLine("2호선", "bg-greed-600", stationId4, stationId5, 10);
 
 		//when
 		ExtractableResponse<Response> response = get("/lines");
+
+		//then
 		assertThat(response.jsonPath().getList("")).hasSize(2);
 		assertThat(response.jsonPath().getList("name")).contains("신분당선");
 		assertThat(response.jsonPath().getList("[0].stations.name")).contains("양재역");
@@ -93,8 +91,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 조회하면
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
-	void getLine() {
+	@Sql(scripts = "/sql/truncate_line_table.sql")
+	@Test
+	void 지하철노선을_조회한다() {
+		//given
+		long id = createLine("신분당선", "bg-red-600", stationId1, stationId2, 10).jsonPath().getLong("id");
 
+		//when
+		ExtractableResponse<Response> response = get("/lines/" + id);
+		String name = response.jsonPath().get("name");
+
+		//then
+		assertThat(name).isEqualTo("신분당선");
+		assertThat(response.jsonPath().getList("stations")).hasSize(2);
 	}
 
 	/**
@@ -119,11 +128,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", name);
 
-		return RestAssured.given().port(port).log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/stations")
-			.then().log().all().extract();
+		return post("/stations", params);
 	}
 
 	ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
