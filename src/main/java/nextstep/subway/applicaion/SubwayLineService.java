@@ -30,24 +30,16 @@ public class SubwayLineService {
 		return new SubwayLineResponse(savedLine, upAndDownStation);
 	}
 
-	private List<Station> getUpAndDownStation(Long upStationId, Long downStationId) {
-		return stationRepository.findAllById(List.of(upStationId, downStationId));
-	}
-
 	@Transactional
 	public void modifySubwayLine(Long id, SubwayLineModifyRequest request) {
-		SubwayLine lineEntity = findSubwayLineEntityById(id);
-		lineEntity.modify(request);
-	}
-
-	private SubwayLine findSubwayLineEntityById(Long id) {
-		return lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
+		SubwayLine subwayLine = findSubwayLineById(id);
+		subwayLine.modify(request);
 	}
 
 	@Transactional
 	public void deleteSubwayLine(Long id) {
-		SubwayLine lineEntity = findSubwayLineEntityById(id);
-		lineRepository.delete(lineEntity);
+		SubwayLine subwayLine = findSubwayLineById(id);
+		lineRepository.delete(subwayLine);
 	}
 
 	public List<SubwayLineResponse> findAll() {
@@ -58,7 +50,15 @@ public class SubwayLineService {
 	}
 
 	public SubwayLineResponse findById(Long id) {
-		SubwayLine findLine = findSubwayLineEntityById(id);
-		return new SubwayLineResponse(findLine, getUpAndDownStation(findLine.getUpStationId(), findLine.getDownStationId()));
+		SubwayLine subwayLine = findSubwayLineById(id);
+		return new SubwayLineResponse(subwayLine, getUpAndDownStation(subwayLine.getUpStationId(), subwayLine.getDownStationId()));
+	}
+
+	private List<Station> getUpAndDownStation(Long upStationId, Long downStationId) {
+		return stationRepository.findAllById(List.of(upStationId, downStationId));
+	}
+
+	private SubwayLine findSubwayLineById(Long id) {
+		return lineRepository.findById(id).orElseThrow(NoSuchElementException::new);
 	}
 }
