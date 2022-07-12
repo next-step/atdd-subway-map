@@ -51,18 +51,6 @@ public class LineService {
         return LineResponse.of(findLine, stations);
     }
 
-    private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId)
-                .orElseThrow(NoSuchElementException::new);
-    }
-
-    private List<StationResponse> findAllStationInLine(Line line) {
-        return line.getAllStation()
-                .stream()
-                .map(StationResponse::of)
-                .collect(Collectors.toList());
-    }
-
     public void editLine(Long lineId, LineRequest request) {
         Line findLine = findLineById(lineId);
         findLine.edit(request.getName(), request.getColor(), request.getDistance());
@@ -84,7 +72,23 @@ public class LineService {
         Station downStation = stationRepository.findById(request.getDownStationId())
                 .orElseThrow(NoSuchElementException::new);
 
+        if (findLine.isAlreadyOwnStation(downStation)) {
+            throw new SectionException(ErrorCode.ALREADY_INCLUDED_STATION_EXCEPTION);
+        }
+
         findLine.addSection(new Section(findLine, upStation, downStation, request.getDistance()));
+    }
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    private List<StationResponse> findAllStationInLine(Line line) {
+        return line.getAllStation()
+                .stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
     }
 }
 

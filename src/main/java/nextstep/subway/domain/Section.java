@@ -58,6 +58,10 @@ public class Section {
         return downStation.getId();
     }
 
+    public boolean isOwnStation(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

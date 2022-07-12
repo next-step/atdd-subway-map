@@ -56,4 +56,11 @@ public class Sections {
     public boolean isDownStation(Station station) {
         return sections.get(sections.size() - 1).getDownStation().equals(station);
     }
+
+    public boolean isOwnStation(Station station) {
+        return sections.stream()
+                .filter(section -> section.isOwnStation(station))
+                .findAny()
+                .isPresent();
+    }
 }

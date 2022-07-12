@@ -69,6 +69,10 @@ public class Line {
         return sections.isDownStation(station);
     }
 
+    public boolean isAlreadyOwnStation(Station station) {
+        return sections.isOwnStation(station);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
