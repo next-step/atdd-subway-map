@@ -10,16 +10,24 @@ import java.util.Map;
 
 public class SectionSteps {
 
-    public static ExtractableResponse<Response> 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Long distance) {
+    public static ExtractableResponse<Response> 구간_등록(Long 노선_ID, Long 구간_상행역_ID, Long 구간_하행역_ID, Long distance) {
         return RestAssured.given().log().all()
-                .body(지하철_구간_등록_파라미터(upStationId, downStationId, distance))
+                .body(구간_등록_PARAM(구간_상행역_ID, 구간_하행역_ID, distance))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/" + lineId + "/sections")
+                .when().post("/lines/" + 노선_ID + "/sections")
                 .then().log().all()
                 .extract();
     }
 
-    private static Map<String, String> 지하철_구간_등록_파라미터(Long upStationId, Long downStationId, Long distance) {
+    public static Long 구간_상행역_ID(ExtractableResponse<Response> 구간) {
+        return Long.valueOf(구간.jsonPath().getString("upStationId"));
+    }
+
+    public static Long 구간_하행역_ID(ExtractableResponse<Response> 구간) {
+        return Long.valueOf(구간.jsonPath().getString("downStationId"));
+    }
+
+    private static Map<String, String> 구간_등록_PARAM(Long upStationId, Long downStationId, Long distance) {
         Map<String, String> param = new HashMap<>();
         param.put("upStationId", String.valueOf(upStationId));
         param.put("downStationId", String.valueOf(downStationId));

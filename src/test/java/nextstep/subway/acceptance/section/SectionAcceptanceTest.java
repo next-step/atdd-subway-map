@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.line.LineSteps.*;
-import static nextstep.subway.acceptance.section.SectionSteps.지하철_구간_등록;
+import static nextstep.subway.acceptance.section.SectionSteps.구간_등록;
+import static nextstep.subway.acceptance.section.SectionSteps.구간_상행역_ID;
 import static nextstep.subway.acceptance.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -25,17 +26,22 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 등록 생성")
     @Test
-    void 지하철_구간_등록_테스트() {
+    void 구간_등록_테스트() {
 
-        Long 강남역ID = ID(지하철역_생성(GANGNAM_STATION));
-        Long 역삼역ID = ID(지하철역_생성(YUKSAM_STATION));
-        Long 신분당노선ID = ID(지하철_노선_생성(SHIN_BUNDANG_LINE, BLUE, 강남역ID, 역삼역ID, DISTANCE));
+        Long 노선_상행역_ID = ID(지하철역_생성(GANGNAM_STATION));
+        Long 노선_하행역_ID = ID(지하철역_생성(YUKSAM_STATION));
+        ExtractableResponse<Response> 노선 = 노선_생성(SHIN_BUNDANG_LINE, BLUE, 노선_상행역_ID, 노선_하행역_ID, DISTANCE);
 
-        ExtractableResponse<Response> response = 지하철_구간_등록(신분당노선ID, 강남역ID, 역삼역ID, DISTANCE);
+        Long 구간_상행역_ID = 노선_하행역_ID;
+        Long 구간_하행역_ID = ID(지하철역_생성(NONHYUN_STATION));
+
+        ExtractableResponse<Response> 구간 = 구간_등록(ID(노선), 구간_상행역_ID, 구간_하행역_ID, DISTANCE);
 
         assertAll(
                 // then 지하철 구간 등록 성공 응답받는다.
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+                () -> assertThat(구간.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                // then 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+                () -> assertThat(구간_상행역_ID(구간)).isEqualTo(노선_하행역_ID(노선))
         );
 
     }

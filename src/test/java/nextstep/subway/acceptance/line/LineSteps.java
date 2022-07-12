@@ -19,16 +19,24 @@ public class LineSteps {
     public static final String BLUE = "blue";
     public static final Long DISTANCE = 5L;
 
-    public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public static ExtractableResponse<Response> 노선_생성(String 노선명, String 노선색, Long 노선_상행역_ID, Long 노선_하행역_ID, Long distance) {
         return RestAssured.given().log().all()
-                .body(지하철_노선_생성_파라미터(name, color, String.valueOf(upStationId), String.valueOf(downStationId), String.valueOf(distance)))
+                .body(노선_생성_PARAM(노선명, 노선색, String.valueOf(노선_상행역_ID), String.valueOf(노선_하행역_ID), String.valueOf(distance)))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
     }
 
-    private static Map<String, String> 지하철_노선_생성_파라미터(String name, String color, String upStationId, String downStationId, String distance) {
+    public static Long 노선_상행역_ID(ExtractableResponse<Response> 노선) {
+        return Long.valueOf(노선.jsonPath().getString("upStation.id"));
+    }
+
+    public static Long 노선_하행역_ID(ExtractableResponse<Response> 노선) {
+        return Long.valueOf(노선.jsonPath().getString("downStation.id"));
+    }
+
+    private static Map<String, String> 노선_생성_PARAM(String name, String color, String upStationId, String downStationId, String distance) {
         Map<String, String> param = new HashMap<>();
         param.put("name", name);
         param.put("color", color);

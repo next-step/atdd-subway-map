@@ -32,7 +32,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_생성_테스트() {
         // when 지하철 노선을 생성하면
-        ExtractableResponse<Response> response = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
+        ExtractableResponse<Response> response = 노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
 
         assertAll(
                 // then 지하철 노선이 생성된다
@@ -53,8 +53,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given 2개의 지하철역을 생성하고
-        지하철_노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
-        지하철_노선_생성(BUNDANG_LINE, BLUE, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
+        노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
+        노선_생성(BUNDANG_LINE, BLUE, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
 
         // when 지하철역 목록을 조회하면
         List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
@@ -76,7 +76,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회() {
         // given 지하철 노선을 생성하고
-        ExtractableResponse<Response> createLine = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
+        ExtractableResponse<Response> createLine = 노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
         // when 생성한 지하철 노선을 조회하면
         String lineName = 지하철_노선_조회(createLine.jsonPath().get("id")).jsonPath().get("name");
         // then 생성한 지하철 노선의 정보를 응답받을 수 있다.
@@ -92,7 +92,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정() {
         // given 지하철 노선 생성
-        ExtractableResponse<Response> createLine = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
+        ExtractableResponse<Response> createLine = 노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
         // When 지하철 노선 수정
         지하철_노선_수정(Long.valueOf(createLine.jsonPath().getString("id")), FIRST_LINE, GREEN);
         ExtractableResponse<Response> updatedLine = 지하철_노선_조회(createLine.jsonPath().get("id"));
@@ -112,7 +112,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제() {
         // given 지하철_노선_생성
-        ExtractableResponse<Response> createLine = 지하철_노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
+        ExtractableResponse<Response> createLine = 노선_생성(SHIN_BUNDANG_LINE, RED, ID(지하철역_생성(GANGNAM_STATION)), ID(지하철역_생성(YUKSAM_STATION)), DISTANCE);
         // When 지하철_노선_삭제
         ExtractableResponse<Response> deleteLineResponse = 지하철_노선_삭제(createLine.jsonPath().get("id"));
         // Then 해당 지하철 노선 정보를 찾을 수 없다
