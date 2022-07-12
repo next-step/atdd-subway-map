@@ -53,12 +53,10 @@ public class SubwayLineService {
     }
 
     @Transactional
-    public SubwayLineResponse saveSubwaySection(Long lineId, SubwaySectionRequest subwaySectionRequest) {
+    public void saveSubwaySection(Long lineId, SubwaySectionRequest subwaySectionRequest) {
         SubwayLine subwayLine = findSubwayLineById(lineId);
         Section newSection = subwaySectionRequest.toEntity();
         subwayLine.addSection(newSection);
-        SubwayLineResponse subwayLineResponse = createSubwayLineResponse(subwayLine);
-        return subwayLineResponse;
     }
 
     @Transactional

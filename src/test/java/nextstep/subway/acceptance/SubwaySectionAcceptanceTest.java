@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("지하철 노선 관련 기능")
+@DisplayName("지하철 구간 관련 기능")
 public class SubwaySectionAcceptanceTest extends AcceptanceTest {
 
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station", "section"};
@@ -55,8 +55,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> saveSectionResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간);
 
         // then
-        assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(saveSectionResponse.header("Location")).isNotNull();
+        assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
         ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(lineId);
@@ -129,8 +128,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> saveSectionResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간);
 
         // then
-        assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(saveSectionResponse.header("Location")).isNotNull();
+        assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // when
         ExtractableResponse<Response> findResponse = subwayLineCallApi.findSubwayLineById(lineId);
@@ -161,11 +159,11 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> saveSectionResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간);
 
         // then
-        assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(saveSectionResponse.header("Location")).isNotNull();
+        assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // when
-        Long stationId = ActualUtils.get(saveSectionResponse, "stations[0].id", Long.class);
+        ExtractableResponse<Response> findResponse = subwayLineCallApi.findSubwayLineById(lineId);
+        Long stationId = ActualUtils.get(findResponse, "stations[0].id", Long.class);
         ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwaySectionById(lineId, stationId);
 
         //then
