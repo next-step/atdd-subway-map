@@ -51,14 +51,7 @@ public class StationLineService {
     public void updateStationLine(Long id, StationLineRequest stationLineRequest) {
         StationLine existedStationLine = stationLineRepository.findById(id)
                 .orElseThrow();
-        StationLine updateRequestStationLine = stationLineRequest.toUpdateEntity(existedStationLine);
-
-        if(existedStationLine.equals(updateRequestStationLine)){
-            // 변경점이 없습니다.
-            System.out.println("같다");
-        } else {
-            stationLineRepository.save(updateRequestStationLine);
-        }
+        stationLineRequest.updateExistedStationLine(existedStationLine);
     }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine) {

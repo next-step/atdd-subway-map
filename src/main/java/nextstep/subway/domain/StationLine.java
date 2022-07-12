@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Objects;
 
 @Entity
 public class StationLine {
@@ -61,16 +60,23 @@ public class StationLine {
         return downStationId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StationLine that = (StationLine) o;
-        return Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(distance, that.distance) && Objects.equals(upStationId, that.upStationId) && Objects.equals(downStationId, that.downStationId);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, color, distance, upStationId, downStationId);
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setDistance(Long distance) {
+        this.distance = distance;
+    }
+
+    public void setUpStationId(Long upStationId) {
+        this.upStationId = upStationId;
+    }
+
+    public void setDownStationId(Long downStationId) {
+        this.downStationId = downStationId;
     }
 }
