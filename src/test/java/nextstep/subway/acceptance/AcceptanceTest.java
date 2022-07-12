@@ -28,4 +28,12 @@ public class AcceptanceTest {
 			.when().delete(path)
 			.then().log().all().extract();
 	}
+
+	ExtractableResponse<Response> put(String path, Object params) {
+		return RestAssured.given().log().all()
+			.body(params)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when().put(path)
+			.then().log().all().extract();
+	}
 }

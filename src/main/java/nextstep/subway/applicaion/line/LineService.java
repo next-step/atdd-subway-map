@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.line.domain.Line;
 import nextstep.subway.applicaion.line.domain.LineRepository;
 import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.line.dto.LineResponse;
+import nextstep.subway.applicaion.line.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.station.StationService;
 import nextstep.subway.applicaion.station.domain.Station;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,13 @@ public class LineService {
 		Line line = lineRepository.findById(id).orElseThrow();
 
 		return createLineResponse(line);
+	}
+
+	@Transactional
+	public void updateLineById(Long id, LineUpdateRequest lineRequest) {
+		Line line = lineRepository.findById(id).orElseThrow();
+		line.updateLine(lineRequest.getName(), lineRequest.getColor());
+		lineRepository.save(line);
 	}
 
 	private LineResponse createLineResponse(Line line) {

@@ -4,8 +4,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.line.dto.LineRequest;
+import nextstep.subway.applicaion.line.dto.LineUpdateRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
@@ -111,7 +113,24 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 수정하면
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
-	void updateLine() {
+	@Test
+	@Sql(scripts = "/sql/truncate_line_table.sql")
+	void 지하철노선을_업데이트한다() {
+		//given
+		long id = createLine("신분당선", "bg-red-600", stationId1, stationId2, 10).jsonPath().getLong("id");
+		LineUpdateRequest lineRequest = new LineUpdateRequest("분당선", "bg-blue-600");
+
+		//when
+		ExtractableResponse<Response> response = put("/lines/" + id, lineRequest);
+
+		//then
+		assertThat(response.response().getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+		ExtractableResponse<Response> lineResponse = get("/lines/" + id);
+		String name = lineResponse.jsonPath().get("name");
+		String color = lineResponse.jsonPath().get("color");
+		assertThat(name).isEqualTo("분당선");
+		assertThat(color).isEqualTo("bg-blue-600");
 
 	}
 
