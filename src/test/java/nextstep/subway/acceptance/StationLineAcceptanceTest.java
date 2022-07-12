@@ -99,5 +99,33 @@ public class StationLineAcceptanceTest {
         assertThat(lineNames).contains("경의중앙선", "분당선");
     }
 
+    /**
+     * given 지하철 노선을 생성하고
+     * when 생성된 지하철 노선을 조회하면
+     * then 생성된 노선을 응답받을 수 있다
+     */
+    @DisplayName("지하철 노선 단일 조회")
+    @Test
+    void getLine() {
+        // given 지하철 노선 생성
+        Map<String, Object> 우이신설 = Map.of("name", "우이신설", "color","gold", "upStationId",10L, "downStationId", 20L);
+        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
+                                                           .body(우이신설)
+                                                           .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                           .when().log().all()
+                                                           .post("/station/line")
+                                                           .then().log().all()
+                                                           .extract();
+        // when 지하철 노선 조회
+        String name = RestAssured.given().log().all()
+                              .pathParam("id", createResponse.jsonPath().get("id"))
+                              .when().log().all()
+                              .get("/station/line/{id}")
+                              .then().log().all()
+                              .extract().jsonPath().get("name");
+
+        // then 생성한 지하철 노선 확인
+        assertThat(name).isEqualTo("우이신설");
+    }
 
 }
