@@ -36,4 +36,10 @@ public class StationLineController {
         return  ResponseEntity.ok(stationLineService.findById(id));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<StationLineResponse> patchLine(
+            @PathVariable Long id, @RequestBody StationLineRequest.PatchRequest patchRequest) {
+        return ResponseEntity.ok(stationLineService.patch(id, patchRequest.toEntity()));
+    }
+
 }

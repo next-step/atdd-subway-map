@@ -34,6 +34,12 @@ public class StationLineService {
         return createLineResponse(repository.getById(id));
     }
 
+    public StationLineResponse patch(Long id, Line line) {
+        Line previousLine = repository.getById(id);
+        Line currentLine = new Line(previousLine.getId(), line.getName(), line.getColor(), line.getUpStationId(), line.getDownStationId());
+        return createLineResponse(repository.save(currentLine));
+    }
+
     private StationLineResponse createLineResponse(Line line) {
         return new StationLineResponse(
                 line.getId(), line.getName(), line.getColor(),
