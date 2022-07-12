@@ -54,6 +54,11 @@ public class LineService {
         lineRepository.findById(id).ifPresent(line -> lineRepository.save(line.changeFrom(request)));
     }
 
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses(line));
     }
