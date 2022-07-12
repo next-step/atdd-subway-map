@@ -32,6 +32,15 @@ public class RestAssuredTemplate {
                 .extract();
     }
 
+    public static <T> ExtractableResponse<Response> postRequestWithParameterAndRequestBody(String url, T parameter, T body) {
+        return RestAssured.given().log().all()
+                .body(body)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(url, parameter)
+                .then().log().all()
+                .extract();
+    }
+
     public static <T> ExtractableResponse<Response> deleteRequestWithParameter(String url, T parameter) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

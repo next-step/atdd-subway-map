@@ -99,7 +99,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
+    public static ExtractableResponse<Response> 지하철역_목록을_조회한다() {
         var response = getRequest("/stations");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
