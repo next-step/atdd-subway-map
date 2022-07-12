@@ -81,6 +81,18 @@ public class SubwayCallApi {
     }
 
     /**
+     * 지하철역 목록 조회 API 호출
+     * @return
+     */
+    public ExtractableResponse<Response> findStations() {
+        return RestAssured
+                .given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    /**
      * 지하철 저장
      * @param params
      * @return
@@ -91,6 +103,19 @@ public class SubwayCallApi {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * 지하철 삭제
+     * @param id
+     * @return
+     */
+    public ExtractableResponse<Response> deleteStationById(Long id) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/stations/{id}", id)
                 .then().log().all()
                 .extract();
     }

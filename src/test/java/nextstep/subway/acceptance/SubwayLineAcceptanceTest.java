@@ -12,13 +12,13 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineAcceptanceTest extends AcceptanceTest {
+public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
 
     private SubwayCallApi subwayCallApi;
 
-    public LineAcceptanceTest() {
+    public SubwayLineAcceptanceTest() {
         this.subwayCallApi = new SubwayCallApi();
     }
 
