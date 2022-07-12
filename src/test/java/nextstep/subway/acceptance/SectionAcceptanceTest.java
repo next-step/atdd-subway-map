@@ -150,6 +150,24 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Given 지하철 노선을 1개 생성
+     * When 노선에 역이 딱 하행역, 상행역 2개만 있는 경우에 삭제를 요청하면
+     * Then 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("지하철 노선에 상행, 하행 역 2개만 있는 경우 삭제할수 없다")
+    public void deleteWithOnlyOneSection() {
+        // given
+        Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+
+        // when
+        int statusCode = 지하철_구간_삭제(lineId, downStationId);
+
+        // then
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private int 지하철_구간_삭제(Long lineId, Long stationId) {
         return RestAssured
                 .given().log().all()
