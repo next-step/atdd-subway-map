@@ -1,19 +1,18 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static nextstep.subway.acceptance.LineRequestCollection.지하철_노선_생성;
 import static nextstep.subway.acceptance.LineRequestCollection.지하철_단일_노선_조회;
+import static nextstep.subway.acceptance.SectionRequestCollection.지하철_구간_등록;
+import static nextstep.subway.acceptance.SectionRequestCollection.지하철_구간_삭제;
 import static nextstep.subway.acceptance.StationRequestCollection.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -166,31 +165,5 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    private int 지하철_구간_삭제(Long lineId, Long stationId) {
-        return RestAssured
-                .given().log().all()
-                .queryParam("stationId", stationId)
-                .when().delete("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract()
-                .statusCode();
-    }
-
-    public int 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Integer distance) {
-        HashMap<String, String> requestParam = new HashMap<>();
-        requestParam.put("upStationId", upStationId.toString());
-        requestParam.put("downStationId", downStationId.toString());
-        requestParam.put("distance", distance.toString());
-
-        return RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestParam)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract()
-                .statusCode();
     }
 }
