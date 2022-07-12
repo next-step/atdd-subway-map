@@ -2,9 +2,9 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.Line.Line;
+import nextstep.subway.domain.Line.LineRepository;
+import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

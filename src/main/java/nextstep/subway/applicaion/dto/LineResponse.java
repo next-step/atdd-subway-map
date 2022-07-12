@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.domain.Station;
+import nextstep.subway.domain.station.Station;
 
 public class LineResponse {
 
