@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -17,15 +19,21 @@ public class Line {
     public Line() {
     }
 
+    @OneToMany
+    @JoinColumn(name = "line_id")
+    private List<Station> stations;
+
     public Line(String name, String color, List<Station> stations) {
         this.name = name;
         this.color = color;
         this.stations = stations;
     }
 
-    @OneToMany
-    @JoinColumn(name = "line_id")
-    private List<Station> stations;
+    public Line changeFrom(LineUpdateRequest lineUpdateRequest) {
+        this.name = lineUpdateRequest.getName();
+        this.color = lineUpdateRequest.getColor();
+        return this;
+    }
 
     public Long getId() {
         return id;
