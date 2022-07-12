@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -110,13 +111,6 @@ class LineAcceptanceTest {
         assertThat(endStation).isEqualTo("신촌역");
     }
 
-    private ExtractableResponse<Response> findOneLine() {
-        return RestAssured.given().log().all()
-            .when().get("/lines/1")
-            .then().log().all()
-            .extract();
-    }
-
     /*
     Given 지하철 노선을 생성하고
     When 생성한 지하철 노선을 수정하면
@@ -144,6 +138,29 @@ class LineAcceptanceTest {
         assertThat(getLinesResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
+    /*
+    Given 지하철 노선을 생성하고
+    When 생성한 지하철 노선을 삭제하면
+    Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @Test
+    void removeLines() {
+        //given
+        stationAcceptanceTest.createSubwayStation("신촌역");
+        stationAcceptanceTest.createSubwayStation("합정역");
+
+        createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
+
+        //when
+        final ExtractableResponse<Response> removeResponse = RestAssured.given().log().all()
+            .when().delete("/lines/1")
+            .then().log().all()
+            .extract();
+
+        //then
+        assertThat(removeResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
     private void createSubwayLines(final String name, final String color,
         final long upStationId, final long downStationId, final int distance) {
         final Map<String, Object> param = Map.of(
@@ -159,5 +176,12 @@ class LineAcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines")
             .then();
+    }
+
+    private ExtractableResponse<Response> findOneLine() {
+        return RestAssured.given().log().all()
+            .when().get("/lines/1")
+            .then().log().all()
+            .extract();
     }
 }
