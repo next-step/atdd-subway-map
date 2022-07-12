@@ -27,10 +27,8 @@ public class LineService {
     }
 
     public LineResponse createLine(LineRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(NoSuchElementException::new);
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(NoSuchElementException::new);
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
         Line savedLine = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
         List<StationResponse> stations = findAllStationInLine(savedLine);
         return LineResponse.of(savedLine, stations);
@@ -62,16 +60,13 @@ public class LineService {
 
     public void addSection(Long lineId, SectionRequest request) {
         Line findLine = findLineById(lineId);
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                .orElseThrow(NoSuchElementException::new);
 
+        Station upStation = findStationById(request.getUpStationId());
         if (!findLine.isOwnDownStation(upStation)) {
             throw new SectionException(ErrorCode.INVALID_UP_STATION_EXCEPTION);
         }
 
-        Station downStation = stationRepository.findById(request.getDownStationId())
-                .orElseThrow(NoSuchElementException::new);
-
+        Station downStation = findStationById(request.getDownStationId());
         if (findLine.isAlreadyOwnStation(downStation)) {
             throw new SectionException(ErrorCode.ALREADY_INCLUDED_STATION_EXCEPTION);
         }
@@ -79,8 +74,19 @@ public class LineService {
         findLine.addSection(new Section(findLine, upStation, downStation, request.getDistance()));
     }
 
+    public void deleteSection(Long lineId, Long stationId) {
+        Line findLine = findLineById(lineId);
+        Station findStation = findStationById(stationId);
+        findLine.deleteLastSection(findStation);
+    }
+
     private Line findLineById(Long lineId) {
         return lineRepository.findById(lineId)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    private Station findStationById(Long stationId) {
+        return stationRepository.findById(stationId)
                 .orElseThrow(NoSuchElementException::new);
     }
 

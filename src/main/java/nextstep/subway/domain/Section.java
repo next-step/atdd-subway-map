@@ -50,16 +50,12 @@ public class Section {
         this.downStation = downStation;
     }
 
-    public Long getUpStationId() {
-        return upStation.getId();
-    }
-
-    public Long getDownStationId() {
-        return downStation.getId();
-    }
-
     public boolean isOwnStation(Station station) {
         return upStation.equals(station) || downStation.equals(station);
+    }
+
+    public boolean isOwnDownStation(Station station) {
+        return this.downStation.equals(station);
     }
 
     @Override

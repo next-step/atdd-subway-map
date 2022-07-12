@@ -63,4 +63,12 @@ public class Sections {
                 .findAny()
                 .isPresent();
     }
+
+    public void deleteLastSection(Station station) {
+        Section lastSection = sections.get(sections.size() - 1);
+        if (!lastSection.isOwnDownStation(station)) {
+            throw new SectionException(ErrorCode.CAN_NOT_DELETE_SECTION_EXCEPTION);
+        }
+        sections.remove(lastSection);
+    }
 }

@@ -73,6 +73,10 @@ public class Line {
         return sections.isOwnStation(station);
     }
 
+    public void deleteLastSection(Station station) {
+        sections.deleteLastSection(station);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
