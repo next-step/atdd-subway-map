@@ -32,19 +32,25 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id)
+        return createLineResponse(findLineOrElseThrow(id));
+    }
+
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = findLineOrElseThrow(id);
+        lineRepository.save(line.update(lineRequest));
+    }
+
+    public void deleteLine(Long id) {
+        lineRepository.delete(findLineOrElseThrow(id));
+    }
+
+    private Line findLineOrElseThrow(Long id) {
+        return lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchLineException("해당 id의 지하철 노선이 존재하지 않습니다."));
-        return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line);
     }
 
-    public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NoSuchLineException("해당 id의 지하철 노선이 존재하지 않습니다."));
-
-        lineRepository.save(line.update(lineRequest));
-    }
 }

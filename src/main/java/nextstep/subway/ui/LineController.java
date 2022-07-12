@@ -37,13 +37,24 @@ public class LineController {
     }
 
     @PutMapping("/lines/{id}")
-    public HttpStatus updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         try {
             lineService.updateLine(id, lineRequest);
         } catch (NoSuchLineException e) {
-            return HttpStatus.BAD_REQUEST;
+            return ResponseEntity.badRequest().build();
         }
 
-        return HttpStatus.OK;
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+        try {
+            lineService.deleteLine(id);
+        } catch (NoSuchLineException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }
