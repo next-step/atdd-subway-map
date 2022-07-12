@@ -199,8 +199,9 @@ class LineAcceptanceTest {
                 .then().log().all().extract();
     }
 
-    private void putLineById(Long id, Map<String, Object> params) {
+    private void putLineById(Long id, Map<String, String> params) {
         RestAssured.given().log().all()
+                .headers("Content-Type", "application/json; charset=UTF-8")
                 .body(params)
                 .when().put("/lines/" + id)
                 .then().log().all();

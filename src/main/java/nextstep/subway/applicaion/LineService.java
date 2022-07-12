@@ -49,6 +49,7 @@ public class LineService {
                 .orElseGet(LineResponse::new);
     }
 
+    @Transactional
     public void updateLineById(Long id, LineUpdateRequest request) {
         lineRepository.findById(id).ifPresent(line -> lineRepository.save(line.changeFrom(request)));
     }
