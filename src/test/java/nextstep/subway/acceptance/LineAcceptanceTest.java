@@ -26,6 +26,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	Long stationId1;
 	Long stationId2;
 	Long stationId3;
+	Long stationId4;
+	Long stationId5;
 
 
 	@BeforeEach
@@ -38,6 +40,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		stationId1 = createStation("양재역").jsonPath().getLong("id");
 		stationId2 = createStation("양재시민의숲역").jsonPath().getLong("id");
 		stationId3 = createStation("청계산입구역").jsonPath().getLong("id");
+		stationId4 = createStation("사당역").jsonPath().getLong("id");
+		stationId5 = createStation("방배역").jsonPath().getLong("id");
 	}
 
 	/**
@@ -51,6 +55,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		//when
 		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10);
 		ExtractableResponse<Response> response = post("/lines", lineRequest);
+		String location = response.header("Location");
+
 
 		//then
 		Integer id = response.jsonPath().getInt("id");
@@ -59,6 +65,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(id).isNotNull();
 		assertThat(name).isEqualTo("신분당선");
 		assertThat(stations).isNotEmpty();
+		assertThat(location).matches("^/lines/[0-9]+");
 	}
 
 	/**
@@ -71,8 +78,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getLineList() {
 		//given
-		Long upStationId = createStation("양재역").jsonPath().getLong("id");
-		Long downStationId = createStation("양재시민의숲역").jsonPath().getLong("id");
+		createLine("신분당선", "bg-red-600", stationId1, stationId2, 10);
+		createLine("2호선", "bg-greed-600", stationId4, stationId5, 10);
+
+		//when
+		ExtractableResponse<Response> response = get("/lines");
+		assertThat(response.jsonPath().getList("")).hasSize(2);
+		assertThat(response.jsonPath().getList("name")).contains("신분당선");
+//		assertThat(response.jsonPath().getList("").get(0))
 	}
 
 	/**
@@ -111,5 +124,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().post("/stations")
 			.then().log().all().extract();
+	}
+
+	ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+		LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
+		return post("/lines", lineRequest);
 	}
 }
