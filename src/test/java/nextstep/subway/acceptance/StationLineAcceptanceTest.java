@@ -193,13 +193,13 @@ public class StationLineAcceptanceTest {
                 .then().log().all();
 
         //then
-        long id = RestAssured.given().log().all()
-                                     .pathParam("id", line.getId())
+        List<Long> ids = RestAssured.given().log().all()
                                      .when().log().all()
-                                     .get("/station/line/{id}")
+                                     .get("/station/line")
                                      .then().log().all()
-                                     .extract().jsonPath().getLong("id");
-        assertThat(id).isNotEqualTo(line.getId());
+                                     .extract().jsonPath().getList("id", Long.class);
+
+        assertThat(ids).isEmpty();
 
     }
 
