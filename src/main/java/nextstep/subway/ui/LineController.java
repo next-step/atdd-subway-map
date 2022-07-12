@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.exceptions.NoSuchLineException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +34,16 @@ public class LineController {
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> findLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findLine(id));
+    }
+
+    @PutMapping("/lines/{id}")
+    public HttpStatus updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        try {
+            lineService.updateLine(id, lineRequest);
+        } catch (NoSuchLineException e) {
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        return HttpStatus.OK;
     }
 }

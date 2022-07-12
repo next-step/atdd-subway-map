@@ -138,6 +138,7 @@ public class LineAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(updatedLineResponse.jsonPath().get("name").equals(updateParams.get("name"))).isTrue();
         assertThat(updatedLineResponse.jsonPath().get("color").equals(updateParams.get("color"))).isTrue();
+        assertThat(updatedLineResponse.jsonPath().getInt("distance")).isEqualTo(LINE_5.get("distance"));
     }
 
 

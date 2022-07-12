@@ -41,4 +41,10 @@ public class LineService {
         return new LineResponse(line);
     }
 
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchLineException("해당 id의 지하철 노선이 존재하지 않습니다."));
+
+        lineRepository.save(line.update(lineRequest));
+    }
 }

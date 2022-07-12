@@ -43,6 +43,17 @@ public class Line {
         this.distance = lineRequest.getDistance();
     }
 
+    public Line update(LineRequest lineRequest) {
+        return new Line(
+                this.id,
+                lineRequest.getName().isEmpty() ? this.name : lineRequest.getName(),
+                lineRequest.getColor().isEmpty() ? this.color : lineRequest.getColor(),
+                lineRequest.getUpStationId() == null ? this.upStationId : lineRequest.getUpStationId(),
+                lineRequest.getDownStationId() == null ? this.downStationId : lineRequest.getDownStationId(),
+                lineRequest.getDistance() == null ? this.distance : lineRequest.getDistance()
+        );
+    }
+
     public Long getId() {
         return id;
     }
