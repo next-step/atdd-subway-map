@@ -14,6 +14,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRunTime(RuntimeException exception) {
         log.error("[" + exception.getClass().getName() + "] " + exception.getMessage());
+        return ResponseEntity.internalServerError().body(exception.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException exception) {
+        log.error("[" + exception.getClass().getName() + "] " + exception.getMessage());
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 }
