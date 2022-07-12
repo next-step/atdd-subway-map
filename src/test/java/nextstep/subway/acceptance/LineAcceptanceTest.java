@@ -91,6 +91,11 @@ public class LineAcceptanceTest {
 
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void findLine() {
@@ -105,6 +110,36 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().get("name").equals(LINE_5.get("name"))).isTrue();
         assertThat(response.jsonPath().get("color").equals(LINE_5.get("color"))).isTrue();
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        Map<String, String> updateParams = new HashMap<>();
+        updateParams.put("name", "5호선 상행선");
+        updateParams.put("color", "#996CAC");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(updateParams)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/" + id)
+                .then().log().all()
+                .extract();
+        ExtractableResponse<Response> updatedLineResponse = 지하철_노선_조회(id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(updatedLineResponse.jsonPath().get("name").equals(updateParams.get("name"))).isTrue();
+        assertThat(updatedLineResponse.jsonPath().get("color").equals(updateParams.get("color"))).isTrue();
+    }
+
 
     private ExtractableResponse<Response> 지하철_노선_조회(int id) {
         return RestAssured.given().log().all()
