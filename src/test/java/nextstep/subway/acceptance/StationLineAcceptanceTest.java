@@ -12,6 +12,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -61,6 +62,41 @@ public class StationLineAcceptanceTest {
                                                            .extract();
 
         assertThat(selectResponse.jsonPath().getList("name")).containsAnyOf("신분당선");
+    }
+
+    /** given 2개의 지하철 노선을 생성하고
+     *  when 지하철 노선 목록을 조회하면
+     *  then 생성된 지하철 노선을 확인할 수 있다
+     */
+    @DisplayName("지하철 노선 목록 조회")
+    @Test
+    void getLines() {
+        // given 2개의 지하철 노선 생성
+        Map<String, Object> 경의중앙선 = Map.of("name" ,"경의중앙선", "color", "blue", "upStationId", 3L, "downStationId", 4L);
+        RestAssured.given().log().all()
+                   .body(경의중앙선)
+                   .contentType(MediaType.APPLICATION_JSON_VALUE)
+                   .when().log().all()
+                   .post("/station/line")
+                   .then().log().all();
+
+        Map<String, Object> 분당선 = Map.of("name" ,"분당선", "color", "yellow", "upStationId", 5L, "downStationId", 6L);
+        RestAssured.given().log().all()
+                   .body(분당선)
+                   .contentType(MediaType.APPLICATION_JSON_VALUE)
+                   .when().log().all()
+                   .post("/station/line")
+                   .then().log().all();
+
+        //when 지하철 노선 목록 조회
+        List<String> lineNames = RestAssured.given().log().all()
+                                       .when().log().all()
+                                       .get("/station/line")
+                                       .then().log().all()
+                                       .extract().jsonPath().getList("name", String.class);
+
+        //then 생성된 지하철 노선 확인
+        assertThat(lineNames).contains("경의중앙선", "분당선");
     }
 
 
