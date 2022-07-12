@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -126,7 +127,11 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.jsonPath().getList("name")).isEmpty();
+        assertThat(filterStationByName(response.jsonPath().getList("name"), "강남역")).isEmpty();
+    }
+
+    private List<String> filterStationByName(List<String> stationNames, String stationName) {
+        return stationNames.stream().filter(n -> n.equals(stationName)).collect(Collectors.toList());
     }
 
 }
