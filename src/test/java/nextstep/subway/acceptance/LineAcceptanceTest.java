@@ -112,12 +112,24 @@ class LineAcceptanceTest {
      * */
     @DisplayName("지하철노선을 조회한다.")
     @Test
+    @DirtiesContext
     void getLine() {
         // given
+        Map<String, Object> params = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        createLines(params);
 
         // when
+        ExtractableResponse<Response> response = findLineById(1L);
 
         // then
+        assertThat(response.jsonPath().getList("name", String.class)).contains("신분당선");
     }
 
     /**
@@ -162,6 +174,12 @@ class LineAcceptanceTest {
     private ExtractableResponse<Response> findAllLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all().extract();
+    }
+
+    private ExtractableResponse<Response> findLineById(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + id)
                 .then().log().all().extract();
     }
 
