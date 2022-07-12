@@ -49,8 +49,8 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    private Station findStation(Long upStationId) {
-        return stationRepository.findById(upStationId).orElseThrow(() ->
+    private Station findStation(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() ->
                 new IllegalArgumentException("역이 없습니다.")
         );
     }
@@ -86,6 +86,13 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLind(lineId);
+        Station station = findStation(stationId);
+        line.removeSection(station);
     }
 
 }

@@ -35,8 +35,8 @@ public class Line {
         sections.addSection(this,section);
     }
 
-    public void removeSection(Section section) {
-        sections.removeSection(section);
+    public void removeSection(Station station) {
+        sections.removeSection(station);
     }
 
     private void validation(String name, String color) {

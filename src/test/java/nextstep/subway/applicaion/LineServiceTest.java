@@ -1,10 +1,7 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.*;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,8 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -234,6 +230,60 @@ class LineServiceTest {
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
                 lineService.addSection(1L, sectionRequest)
+        );
+    }
+
+    @Test
+    void 구간을_삭제한다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Station 송파역 = new Station(3L, "송파역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
+        Section section = new Section(10L, 암사역, 송파역);
+        _8호선.addSection(section);
+
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+        given(stationRepository.findById(3L)).willReturn(Optional.of(송파역));
+
+        // then
+        assertThatNoException().isThrownBy(() ->
+                lineService.deleteSection(1L, 3L)
+        );
+    }
+
+    @Test
+    void 구간을_삭제할_때_마지막_역이_아니면_예외를_발생시킨다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Station 송파역 = new Station(3L, "송파역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
+        Section section = new Section(10L, 암사역, 송파역);
+        _8호선.addSection(section);
+
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.deleteSection(1L, 2L)
+        );
+    }
+
+    @Test
+    void 구간이_하나_남았을때는_삭제할_수_없다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
+
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.deleteSection(1L, 2L)
         );
     }
 

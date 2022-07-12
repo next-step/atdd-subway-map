@@ -59,16 +59,16 @@ public class Sections {
         }
     }
 
-    public void removeSection(Section section) {
+    public void removeSection(Station station) {
         Section lastSection = getLastSection();
-        if (!lastSection.equals(section)) {
+        if (!lastSection.isSameDownStation(station)) {
             throw new IllegalArgumentException("현재 구간은 마지막 구간이 아닙니다.");
         }
 
         if (sections.size() == LIMIT_SECTIONS_SIZE) {
             throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없습니다.");
         }
-        sections.remove(section);
+        sections.remove(lastSection);
     }
 
     private Section getLastSection() {

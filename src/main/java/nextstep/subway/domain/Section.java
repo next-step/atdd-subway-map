@@ -50,6 +50,10 @@ public class Section {
         return getStations().contains(section.downStation);
     }
 
+    public boolean isSameDownStation(Station station) {
+        return downStation.equals(station);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
