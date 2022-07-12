@@ -1,0 +1,40 @@
+### 지하철 노선 등록
+POST http://localhost:8080/lines
+Content-Type: application/json
+Accept: application/json
+Content-Length: 118
+
+{
+  "name": "신분당선",
+  "color": "bg-red-600",
+  "upStationId": 1,
+  "downStationId": 2,
+  "distance": 10
+}
+
+
+### 지하철 노선 목록
+GET http://localhost:8080/lines
+Accept: application/json
+
+
+### 지하철 노선 조회
+GET http://localhost:8080/lines/1
+Accept: application/json
+
+
+### 지하철 노선 수정
+PUT http://localhost:8080/lines/1
+Content-Type: application/json
+Accept: application/json
+Content-Length: 58
+
+{
+  "name": "다른분당선",
+  "color": "bg-blue-600"
+}
+
+
+### 지하철 노석 삭제
+DELETE http://localhost:8080/lines/1
+

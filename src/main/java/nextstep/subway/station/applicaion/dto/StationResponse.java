@@ -1,8 +1,12 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.station.applicaion.dto;
 
 public class StationResponse {
+
     private Long id;
     private String name;
+
+    private StationResponse() {
+    }
 
     public StationResponse(Long id, String name) {
         this.id = id;
