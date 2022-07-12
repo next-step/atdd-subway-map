@@ -168,4 +168,39 @@ public class StationLineAcceptanceTest {
         assertThat(line.getColor()).isEqualTo("red");
     }
 
+    /**
+     * given 지하철 노선을 생성하고
+     * when 생성된 노선을 삭제하면
+     * then 해당 노선을 조회할 수 없다
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+        //given
+        Map<String, Object> 신림선 = Map.of("name", "신림선", "color", "blue", "upStationId", 80L, "downStationId",90L);
+        Line line = RestAssured.given().log().all()
+                             .body(신림선)
+                             .contentType(MediaType.APPLICATION_JSON_VALUE)
+                             .when().log().all()
+                             .post("/station/line")
+                             .then().log().all()
+                             .extract().as(Line.class);
+        //when
+        RestAssured.given().log().all()
+                .pathParam("id", line.getId())
+                .when().log().all()
+                .delete("/station/line/{id}")
+                .then().log().all();
+
+        //then
+        long id = RestAssured.given().log().all()
+                                     .pathParam("id", line.getId())
+                                     .when().log().all()
+                                     .get("/station/line/{id}")
+                                     .then().log().all()
+                                     .extract().jsonPath().getLong("id");
+        assertThat(id).isNotEqualTo(line.getId());
+
+    }
+
 }
