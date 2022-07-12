@@ -36,6 +36,12 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(toList());
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses(line));
     }
