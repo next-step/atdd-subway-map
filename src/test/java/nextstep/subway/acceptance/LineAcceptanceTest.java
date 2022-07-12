@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
 public class LineAcceptanceTest extends AcceptanceTest {
-    public static final int LINE_DISTANCE = 10;
+    private static final int LINE_DISTANCE = 10;
 
     private long upStationId;
     private long downStationId;

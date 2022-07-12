@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class LineService {
-    public static final String LINE_NOT_FOUND = "노선이 존재하지 않습니다.";
-    public static final String STATION_NOT_FOUND = "지하철역이 존재하지 않습니다.";
+    private static final String LINE_NOT_FOUND = "노선이 존재하지 않습니다.";
+    private static final String STATION_NOT_FOUND = "지하철역이 존재하지 않습니다.";
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
