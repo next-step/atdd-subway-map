@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철노선 관련 기능")
@@ -162,5 +163,37 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void updateLine(Map params, String id) {
         update(params, "/lines/", id);
+    }
+
+    /**
+     * Given 지하철노선을 생성하고
+     * When 그 지하철노선을 삭제하면
+     * Then 지하철노선 목록 조회 시 삭제한 노선을 찾을 수 없다
+     */
+    // TODO: 지하철노선 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철노선을 제거한다.")
+    @Test
+    void deleteLine() {
+        // given
+        createStations();
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "2호선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", "1");
+        params.put("downStationId", "3");
+        params.put("distance", "10");
+        ExtractableResponse<Response> response = createLines(params);
+        String createdId = response.jsonPath().getString("id");
+        assertThat(getLine("name", createdId)).isEqualTo("2호선");
+
+        // when
+        deleteLine(createdId);
+
+        // then
+        assertThat(getList("name", "/lines")).hasSize(0);
+    }
+
+    private void deleteLine(String id) {
+        delete("/lines/", id);
     }
 }

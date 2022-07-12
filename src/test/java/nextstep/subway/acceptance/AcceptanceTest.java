@@ -44,4 +44,11 @@ public abstract class AcceptanceTest {
                 .when().put(path + id)
                 .then().log().all();
     }
+
+    protected void delete(String path, String id) {
+        RestAssured
+                .given().log().all()
+                .when().delete(path + id)
+                .then().statusCode(204);
+    }
 }
