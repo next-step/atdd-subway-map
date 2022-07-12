@@ -48,12 +48,13 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/line")
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.jsonPath().get("name").equals("5호선")).isTrue();
 
         // then
         List<String> lineNames = RestAssured.given().log().all()
