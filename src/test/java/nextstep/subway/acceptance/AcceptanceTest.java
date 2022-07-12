@@ -36,4 +36,12 @@ public abstract class AcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().getList(variable, String.class);
     }
+
+    protected void update(Map params, String path, String id) {
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path + id)
+                .then().log().all();
+    }
 }

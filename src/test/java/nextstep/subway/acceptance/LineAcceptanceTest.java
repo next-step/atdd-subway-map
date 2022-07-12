@@ -131,4 +131,36 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .extract().jsonPath().get(variable);
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 수정된 지하철 노선을 응답 받는다
+     */
+    // TODO: 지하철 노선 수정 인수 테스트 메서드 생성
+    @DisplayName("지하철노선을 수정한다.")
+    @Test
+    void updateLine() {
+        // given
+        createStations();
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "2호선");
+        params.put("color", "bg-red-600");
+        params.put("upStationId", "1");
+        params.put("downStationId", "3");
+        params.put("distance", "10");
+        createLines(params);
+
+        // when
+        params.put("name", "2호선-임시");
+        params.put("color", "bg-blue-600");
+        updateLine(params, "1");
+
+        // then
+        assertThat(getLine("name", "1")).isEqualTo("2호선-임시");
+    }
+
+    private void updateLine(Map params, String id) {
+        update(params, "/lines/", id);
+    }
 }
