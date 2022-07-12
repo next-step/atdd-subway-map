@@ -3,13 +3,14 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.init.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,16 +18,20 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Sql("classpath:/truncate.sql")
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 	@LocalServerPort
 	int port;
 
+	@Autowired
+	private DatabaseCleanup databaseCleanup;
+
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
+
+		databaseCleanup.execute();
 
 		createStation(Map.of("name", "지하철역"));
 		createStation(Map.of("name", "새로운지하철역"));
