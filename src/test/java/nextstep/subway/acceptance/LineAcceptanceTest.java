@@ -139,8 +139,20 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 삭제하면
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
-	void deleteLine() {
+	@Test
+	@Sql(scripts = "/sql/truncate_line_table.sql")
+	void 지하철노선을_삭제한다() {
+		//given
+		long id = createLine("신분당선", "bg-red-600", stationId1, stationId2, 10).jsonPath().getLong("id");
 
+		//when
+		ExtractableResponse<Response> response = delete("/lines/" + id);
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+		ExtractableResponse<Response> lineResponse = get("/lines/" + id);
+		assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 	}
 
 	ExtractableResponse<Response> createStation(String name) {
