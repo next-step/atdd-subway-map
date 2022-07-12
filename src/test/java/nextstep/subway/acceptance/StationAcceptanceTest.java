@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.acceptance.SubwayTestUtils.createStationWithName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -102,19 +103,4 @@ class StationAcceptanceTest extends AcceptanceTest {
         );
 
     }
-
-    ExtractableResponse<Response> createStationWithName(String stationName) {
-        var requestBody = new HashMap<String, String>();
-        requestBody.put("name", stationName);
-
-        return RestAssured
-                .given()
-                    .body(requestBody)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .extract();
-    }
-
 }
