@@ -34,18 +34,18 @@ public class Sections {
     }
 
     public void changeUpStation(Station upStation) {
-        Section firstSection = sections.get(0);
+        Section firstSection = getFirstSection();
         firstSection.changeUpStation(upStation);
     }
 
     public void changeDownStation(Station downStation) {
-        Section lastSection = sections.get(sections.size() - 1);
+        Section lastSection = sections.get(getLastIndex());
         lastSection.changeDownStation(downStation);
     }
 
     public List<Station> getStations() {
         final List<Station> stations = new ArrayList<>();
-        stations.add(sections.get(0).getUpStation());
+        stations.add(getFirstSection().getUpStation());
         for (Section section : sections) {
             stations.add(section.getDownStation());
         }
@@ -53,25 +53,31 @@ public class Sections {
     }
 
     public boolean isDownStation(Station station) {
-        return sections.get(sections.size() - 1).getDownStation().equals(station);
+        return sections.get(getLastIndex()).getDownStation().equals(station);
     }
 
     public boolean isOwnStation(Station station) {
         return sections.stream()
-                .filter(section -> section.isOwnStation(station))
-                .findAny()
-                .isPresent();
+                .anyMatch(section -> section.isOwnStation(station));
     }
 
     public void deleteLastSection(Station station) {
         if (!isValidSize()) {
             throw new SectionException(ErrorCode.CAN_NOT_DELETE_SECTION_EXCEPTION);
         }
-        Section lastSection = sections.get(sections.size() - 1);
+        Section lastSection = sections.get(getLastIndex());
         if (!lastSection.isOwnDownStation(station)) {
             throw new SectionException(ErrorCode.CAN_NOT_DELETE_SECTION_EXCEPTION);
         }
         sections.remove(lastSection);
+    }
+
+    private int getLastIndex() {
+        return sections.size() - 1;
+    }
+
+    private Section getFirstSection() {
+        return sections.get(0);
     }
 
     private boolean isValidSize() {
