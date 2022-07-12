@@ -1,6 +1,8 @@
 package nextstep.subway.application;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.common.exception.CustomException;
+import nextstep.subway.common.exception.ResponseCode;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -18,9 +20,6 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class LineService {
-    private static final String LINE_NOT_FOUND = "노선이 존재하지 않습니다.";
-    private static final String STATION_NOT_FOUND = "지하철역이 존재하지 않습니다.";
-
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
@@ -58,11 +57,11 @@ public class LineService {
 
     private Station findStation(long stationId) {
         return stationRepository.findById(stationId)
-                                .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
+                                .orElseThrow(() -> new CustomException(ResponseCode.STATION_NOT_FOUND));
     }
 
     private Line findLine(final Long lineId) {
         return lineRepository.findById(lineId)
-                             .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
+                             .orElseThrow(() -> new CustomException(ResponseCode.LINE_NOT_FOUND));
     }
 }
