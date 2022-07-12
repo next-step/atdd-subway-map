@@ -20,7 +20,7 @@ public class Sections {
     private static final String UP_STATION_ID = "upStationId";
     private static final String DOWN_STATION_ID = "downStationId";
 
-    @OneToMany(mappedBy = "subwayLine", cascade = { CascadeType.PERSIST })
+    @OneToMany(mappedBy = "subwayLine", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {
