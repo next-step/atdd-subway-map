@@ -59,4 +59,9 @@ public class LineService {
                 .orElseThrow(() -> new IllegalArgumentException("번호에 해당하는 노선이 없습니다."));
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
 }
