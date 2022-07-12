@@ -151,17 +151,16 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
                 .extract();
     }
 
-
-    private ExtractableResponse<Response> getLines() {
+    public static ExtractableResponse<Response> getLine(long id) {
         return RestAssured.given().log().all()
-                .when().get("/lines")
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> getLine(long id) {
+    private ExtractableResponse<Response> getLines() {
         return RestAssured.given().log().all()
-                .when().get("/lines/{id}", id)
+                .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
