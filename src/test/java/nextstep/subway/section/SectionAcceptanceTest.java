@@ -1,6 +1,7 @@
 package nextstep.subway.section;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
@@ -172,6 +173,7 @@ class SectionAcceptanceTest {
         return RestAssured
                 .given().log().all()
                 .body(createSectionParams(신규상행역, 신규하행역))
+                .contentType(ContentType.JSON)
                 .when().post("/lines/{id}/sections", 신분당선)
                 .then().log().all()
                 .extract();
