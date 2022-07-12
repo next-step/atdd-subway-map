@@ -14,8 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
-    public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
-
     private final SubwayCallApi subwayCallApi;
 
     public SubwayLineAcceptanceTest() {
@@ -24,8 +22,6 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
     @Override
     protected void preprocessing() {
-        cleanUpSchema.execute(CLEAN_UP_TABLES);
-
         subwayCallApi.saveStation(Param.강남역);
         subwayCallApi.saveStation(Param.양재역);
         subwayCallApi.saveStation(Param.역삼역);

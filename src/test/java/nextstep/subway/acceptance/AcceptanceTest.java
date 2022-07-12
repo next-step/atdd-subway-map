@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,12 +17,17 @@ public abstract class AcceptanceTest {
     private int port;
 
     @Autowired
-    protected CleanUpSchema cleanUpSchema;
+    private CleanUpSchema cleanUpSchema;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
         preprocessing();
+    }
+
+    @AfterEach
+    void tearDown() {
+        cleanUpSchema.execute();
     }
 
     protected void preprocessing() {

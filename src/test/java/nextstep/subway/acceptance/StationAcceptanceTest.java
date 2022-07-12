@@ -14,17 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 
-    public static final String CLEAN_UP_TABLE = "station";
-
     private final SubwayCallApi subwayCallApi;
 
     public StationAcceptanceTest() {
         this.subwayCallApi = new SubwayCallApi();
-    }
-
-    @Override
-    protected void preprocessing() {
-        cleanUpSchema.execute(CLEAN_UP_TABLE);
     }
 
     /**
