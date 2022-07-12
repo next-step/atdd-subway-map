@@ -2,6 +2,8 @@ package nextstep.subway.domain;
 
 
 
+import nextstep.subway.applicaion.dto.LineRequest;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,16 +32,35 @@ public class Line {
     @NotNull
     private Integer distance;
 
-    public Line() {
+    public Line(LineRequest lineRequest) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
+        this.upStationId = lineRequest.getUpStationId();
+        this.downStationId = lineRequest.getDownStationId();
+        this.distance = lineRequest.getDistance();
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public Long getId() {
+        return id;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }

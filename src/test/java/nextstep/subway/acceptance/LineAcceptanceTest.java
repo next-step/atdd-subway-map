@@ -3,17 +3,19 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.awt.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선도 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -65,7 +67,13 @@ public class LineAcceptanceTest {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
-        List<String> stationName = extract.jsonPath().getList("name", String.class);
+
+        Assertions.assertAll(
+                () -> assertThat(extract.jsonPath().getList("stations.name")).containsExactly("강남역", "양재역"),
+                () -> assertThat(extract.jsonPath().getString("name")).contains("신분당선"),
+                () -> assertThat(extract.jsonPath().getList("stations.id")).contains(1, 2),
+                () -> assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
 
     }
 
