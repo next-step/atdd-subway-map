@@ -8,9 +8,9 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 /**
- * 지하철 노선 관련 API 호출 관련 클래스
+ * 지하철 노선, 구간 관련 API 호출 관련 클래스
  */
-public class SubwayLineCallApi {
+public class SubwayCallApi {
     /**
      * 지하철 노선 저장
      * @param params
@@ -101,7 +101,7 @@ public class SubwayLineCallApi {
      * @param params
      * @return
      */
-    public ExtractableResponse<Response> saveSubwaySection(Long lineId, Map<String, Object> params) {
+    public ExtractableResponse<Response> saveSection(Long lineId, Map<String, Object> params) {
         return RestAssured
                 .given().log().all()
                 .body(params)
@@ -117,7 +117,7 @@ public class SubwayLineCallApi {
      * @param stationId
      * @return
      */
-    public ExtractableResponse<Response> deleteSubwaySectionById(Long lineId, Long stationId) {
+    public ExtractableResponse<Response> deleteSectionById(Long lineId, Long stationId) {
         return RestAssured
                 .given().log().all()
                 .queryParam("stationId", stationId)

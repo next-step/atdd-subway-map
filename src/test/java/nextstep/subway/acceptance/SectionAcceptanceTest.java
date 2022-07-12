@@ -13,26 +13,26 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
-public class SubwaySectionAcceptanceTest extends AcceptanceTest {
+public class SectionAcceptanceTest extends AcceptanceTest {
 
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station", "section"};
 
     @Autowired
     private CleanUpSchema cleanUpSchema;
 
-    private SubwayLineCallApi subwayLineCallApi;
+    private SubwayCallApi subwayCallApi;
 
-    public SubwaySectionAcceptanceTest() {
-        this.subwayLineCallApi = new SubwayLineCallApi();
+    public SectionAcceptanceTest() {
+        this.subwayCallApi = new SubwayCallApi();
     }
 
     @Override
     protected void preprocessing() {
         cleanUpSchema.execute(CLEAN_UP_TABLES);
 
-        subwayLineCallApi.saveStation(Param.강남역);
-        subwayLineCallApi.saveStation(Param.양재역);
-        subwayLineCallApi.saveStation(Param.양재시민의숲역);
+        subwayCallApi.saveStation(Param.강남역);
+        subwayCallApi.saveStation(Param.양재역);
+        subwayCallApi.saveStation(Param.양재시민의숲역);
     }
 
     /**
@@ -44,7 +44,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
     @Test
     void createSubwaySection() {
         // given
-        ExtractableResponse<Response> saveLineResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveLineResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,13 +52,13 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
 
         // when
         Long lineId = ActualUtils.get(saveLineResponse, "id", Long.class);
-        ExtractableResponse<Response> saveSectionResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간);
+        ExtractableResponse<Response> saveSectionResponse = subwayCallApi.saveSection(lineId, Param.신분당선_구간);
 
         // then
         assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(lineId);
+        ExtractableResponse<Response> response = subwayCallApi.findSubwayLineById(lineId);
         assertThat(ActualUtils.getList(response, "stations.name", String.class)).isEqualTo(List.of("강남역","양재역","양재시민의숲역"));
     }
 
@@ -71,7 +71,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
     @Test
     void given_createSubwaySection_when_upStationIdNotInLastStation_then_exception() {
         // given
-        ExtractableResponse<Response> saveLineResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveLineResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -79,7 +79,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
 
         // when
         Long lineId = ActualUtils.get(saveLineResponse, "id", Long.class);
-        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간_잘못된_상행역);
+        ExtractableResponse<Response> saveResponse = subwayCallApi.saveSection(lineId, Param.신분당선_구간_잘못된_상행역);
 
         // then
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -94,7 +94,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
     @Test
     void given_createSubwaySection_when_downStationIdAlreadySaveStation_then_exception() {
         // given
-        ExtractableResponse<Response> saveLineResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveLineResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -102,7 +102,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
 
         // when
         Long lineId = ActualUtils.get(saveLineResponse, "id", Long.class);
-        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간_잘못된_하행역);
+        ExtractableResponse<Response> saveResponse = subwayCallApi.saveSection(lineId, Param.신분당선_구간_잘못된_하행역);
 
         // then
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -117,7 +117,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSubwaySection() {
         // given
-        ExtractableResponse<Response> saveLineResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveLineResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -125,15 +125,15 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
 
         // when
         Long lineId = ActualUtils.get(saveLineResponse, "id", Long.class);
-        ExtractableResponse<Response> saveSectionResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간);
+        ExtractableResponse<Response> saveSectionResponse = subwayCallApi.saveSection(lineId, Param.신분당선_구간);
 
         // then
         assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // when
-        ExtractableResponse<Response> findResponse = subwayLineCallApi.findSubwayLineById(lineId);
+        ExtractableResponse<Response> findResponse = subwayCallApi.findSubwayLineById(lineId);
         Long stationId = ActualUtils.get(findResponse, "stations[2].id", Long.class);
-        ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwaySectionById(lineId, stationId);
+        ExtractableResponse<Response> response = subwayCallApi.deleteSectionById(lineId, stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -148,7 +148,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
     @Test
     void given_createSubwaySection_when_deleteNotLastStationId_then_exception() {
         // given
-        ExtractableResponse<Response> saveLineResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveLineResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -156,15 +156,15 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
 
         // when
         Long lineId = ActualUtils.get(saveLineResponse, "id", Long.class);
-        ExtractableResponse<Response> saveSectionResponse = subwayLineCallApi.saveSubwaySection(lineId, Param.신분당선_구간);
+        ExtractableResponse<Response> saveSectionResponse = subwayCallApi.saveSection(lineId, Param.신분당선_구간);
 
         // then
         assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // when
-        ExtractableResponse<Response> findResponse = subwayLineCallApi.findSubwayLineById(lineId);
+        ExtractableResponse<Response> findResponse = subwayCallApi.findSubwayLineById(lineId);
         Long stationId = ActualUtils.get(findResponse, "stations[0].id", Long.class);
-        ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwaySectionById(lineId, stationId);
+        ExtractableResponse<Response> response = subwayCallApi.deleteSectionById(lineId, stationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -179,7 +179,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
     @Test
     void given_createSubwaySection_when_deleteOneOfSection_then_exception() {
         // given
-        ExtractableResponse<Response> saveLineResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveLineResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -188,7 +188,7 @@ public class SubwaySectionAcceptanceTest extends AcceptanceTest {
         // when
         Long lineId = ActualUtils.get(saveLineResponse, "id", Long.class);
         Long stationId = ActualUtils.get(saveLineResponse, "stations[1].id", Long.class);
-        ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwaySectionById(lineId, stationId);
+        ExtractableResponse<Response> response = subwayCallApi.deleteSectionById(lineId, stationId);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

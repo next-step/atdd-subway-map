@@ -13,26 +13,26 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class SubwayLineAcceptanceTest extends AcceptanceTest {
+public class LineAcceptanceTest extends AcceptanceTest {
 
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
 
     @Autowired
     private CleanUpSchema cleanUpSchema;
 
-    private SubwayLineCallApi subwayLineCallApi;
+    private SubwayCallApi subwayCallApi;
 
-    public SubwayLineAcceptanceTest() {
-        this.subwayLineCallApi = new SubwayLineCallApi();
+    public LineAcceptanceTest() {
+        this.subwayCallApi = new SubwayCallApi();
     }
 
     @Override
     protected void preprocessing() {
         cleanUpSchema.execute(CLEAN_UP_TABLES);
 
-        subwayLineCallApi.saveStation(Param.강남역);
-        subwayLineCallApi.saveStation(Param.양재역);
-        subwayLineCallApi.saveStation(Param.역삼역);
+        subwayCallApi.saveStation(Param.강남역);
+        subwayCallApi.saveStation(Param.양재역);
+        subwayCallApi.saveStation(Param.역삼역);
     }
 
     /**
@@ -43,14 +43,14 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void createSubwayLine() {
         // when
-        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // then
         assertThat(saveResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(saveResponse.header("Location")).isNotEmpty();
 
         // then
-        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLines();
+        ExtractableResponse<Response> response = subwayCallApi.findSubwayLines();
         assertThat(ActualUtils.get(response, "[0].name", String.class)).isEqualTo("신분당선");
         assertThat(ActualUtils.get(response, "[0].color", String.class)).isEqualTo("bg-red-600");
         assertThat(ActualUtils.getList(response, "[0].stations.name", String.class)).isEqualTo(List.of("강남역","양재역"));
@@ -65,11 +65,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void getSubwayLines() {
         // given
-        subwayLineCallApi.saveSubwayLine(Param.신분당선);
-        subwayLineCallApi.saveSubwayLine(Param.이호선);
+        subwayCallApi.saveSubwayLine(Param.신분당선);
+        subwayCallApi.saveSubwayLine(Param.이호선);
 
         // when
-        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLines();
+        ExtractableResponse<Response> response = subwayCallApi.findSubwayLines();
 
         // then
         assertThat(ActualUtils.getList(response, "name", String.class)).isEqualTo(List.of("신분당선", "2호선"));
@@ -85,11 +85,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void getSubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = ActualUtils.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(id);
+        ExtractableResponse<Response> response = subwayCallApi.findSubwayLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -107,17 +107,17 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void modifySubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = ActualUtils.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> modifyResponse = subwayLineCallApi.modifySubwayLineById(id, Param.이호선으로_수정);
+        ExtractableResponse<Response> modifyResponse = subwayCallApi.modifySubwayLineById(id, Param.이호선으로_수정);
 
         // then
         assertThat(modifyResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        ExtractableResponse<Response> response = subwayLineCallApi.findSubwayLineById(id);
+        ExtractableResponse<Response> response = subwayCallApi.findSubwayLineById(id);
         assertThat(ActualUtils.get(response, "name", String.class)).isEqualTo("2호선");
         assertThat(ActualUtils.get(response, "color", String.class)).isEqualTo("bg-green-600");
     }
@@ -131,11 +131,11 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteSubwayLine() {
         // given
-        ExtractableResponse<Response> saveResponse = subwayLineCallApi.saveSubwayLine(Param.신분당선);
+        ExtractableResponse<Response> saveResponse = subwayCallApi.saveSubwayLine(Param.신분당선);
 
         // when
         Long id = ActualUtils.get(saveResponse, "id", Long.class);
-        ExtractableResponse<Response> response = subwayLineCallApi.deleteSubwayLineById(id);
+        ExtractableResponse<Response> response = subwayCallApi.deleteSubwayLineById(id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

@@ -53,14 +53,14 @@ public class SubwayLineService {
     }
 
     @Transactional
-    public void saveSubwaySection(Long lineId, SubwaySectionRequest subwaySectionRequest) {
+    public void saveSection(Long lineId, SectionRequest sectionRequest) {
         SubwayLine subwayLine = findSubwayLineById(lineId);
-        Section newSection = subwaySectionRequest.toEntity();
+        Section newSection = sectionRequest.toEntity();
         subwayLine.addSection(newSection);
     }
 
     @Transactional
-    public void deleteSubwaySection(Long lineId, Long stationId) {
+    public void deleteSection(Long lineId, Long stationId) {
         SubwayLine subwayLine = findSubwayLineById(lineId);
         subwayLine.removeStation(stationId);
     }
