@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+import static nextstep.subway.applicaion.dto.StationLineRequest.*;
+
 @RestController
 @RequestMapping("/station/line")
 public class StationLineController {
@@ -20,7 +22,7 @@ public class StationLineController {
     }
 
     @PostMapping
-    public ResponseEntity<StationLineResponse> create(@RequestBody StationLineRequest request) {
+    public ResponseEntity<StationLineResponse> create(@RequestBody PostRequest request) {
         StationLineResponse response = stationLineService.save(request.toEntity());
         return ResponseEntity.created(URI.create("/station/line/" + response.getId())).body(response);
     }
@@ -38,7 +40,7 @@ public class StationLineController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<StationLineResponse> patchLine(
-            @PathVariable Long id, @RequestBody StationLineRequest.PatchRequest patchRequest) {
+            @PathVariable Long id, @RequestBody PatchRequest patchRequest) {
         return ResponseEntity.ok(stationLineService.patch(id, patchRequest.toEntity()));
     }
 
