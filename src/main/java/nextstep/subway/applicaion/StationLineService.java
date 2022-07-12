@@ -50,8 +50,8 @@ public class StationLineService {
     @Transactional
     public void updateStationLine(Long id, StationLineRequest stationLineRequest) {
         StationLine existedStationLine = stationLineRepository.findById(id)
-                .orElseThrow();
-        stationLineRequest.updateExistedStationLine(existedStationLine);
+                .orElseThrow(() -> new RuntimeException("수정할 StationLine이 존재하지 않습니다."));
+        existedStationLine.updateByStationLineRequest(stationLineRequest);
     }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine) {

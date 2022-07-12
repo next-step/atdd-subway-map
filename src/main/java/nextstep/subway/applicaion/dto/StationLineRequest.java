@@ -32,12 +32,4 @@ public class StationLineRequest {
     public StationLine toEntity(){
         return new StationLine(this.name, this.color, this.distance, this.upStationId, this.downStationId);
     }
-
-    public void updateExistedStationLine(StationLine stationLine){
-        if(this.name != null) stationLine.setName(this.name);
-        if(this.color != null) stationLine.setColor(this.color);
-        if(this.upStationId != null) stationLine.setUpStationId(this.upStationId);
-        if(this.downStationId != null) stationLine.setDownStationId(this.downStationId);
-        if(this.distance != null) stationLine.setDistance(this.distance);
-    }
 }

@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.StationLineRequest;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,15 +25,6 @@ public class StationLine {
         this.name = name;
         this.distance = distance;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-    }
-
-    public StationLine(Long id, String name, String color, Long distance, Long upStationId, Long downStationId) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.distance = distance;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
     }
@@ -60,23 +53,11 @@ public class StationLine {
         return downStationId;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setDistance(Long distance) {
-        this.distance = distance;
-    }
-
-    public void setUpStationId(Long upStationId) {
-        this.upStationId = upStationId;
-    }
-
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
+    public void updateByStationLineRequest(StationLineRequest stationLineRequest) {
+        if (stationLineRequest.getName() != null) this.name = stationLineRequest.getName();
+        if (stationLineRequest.getColor() != null) this.color = stationLineRequest.getColor();
+        if (stationLineRequest.getUpStationId() != null) this.upStationId = stationLineRequest.getUpStationId();
+        if (stationLineRequest.getDownStationId() != null) this.downStationId = stationLineRequest.getDownStationId();
+        if (stationLineRequest.getDistance() != null) this.distance = stationLineRequest.getDistance();
     }
 }
