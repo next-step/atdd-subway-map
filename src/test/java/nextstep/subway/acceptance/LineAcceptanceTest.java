@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -42,7 +43,7 @@ class LineAcceptanceTest {
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-     * */
+     */
     @DisplayName("지하철노선을 생성한다.")
     @Test
     @DirtiesContext
@@ -73,7 +74,7 @@ class LineAcceptanceTest {
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-     * */
+     */
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
     @DirtiesContext
@@ -109,7 +110,7 @@ class LineAcceptanceTest {
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-     * */
+     */
     @DisplayName("지하철노선을 조회한다.")
     @Test
     @DirtiesContext
@@ -136,22 +137,37 @@ class LineAcceptanceTest {
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
-     * */
+     */
     @DisplayName("지하철노선을 수정한다.")
     @Test
+    @DirtiesContext
     void putLine() {
         // given
+        Map<String, Object> params = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        createLines(params);
 
         // when
+        putLineById(1L, Map.of("name", "5호선", "color", "bg-purple-600"));
 
         // then
+        assertAll(
+                () -> assertThat(findLineById(1L).jsonPath().getString("name")).isEqualTo("5호선"),
+                () -> assertThat(findLineById(1L).jsonPath().getString("color")).isEqualTo("bg-purple-600")
+        );
     }
 
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
-     * */
+     */
     @DisplayName("지하철노선을 삭제한다.")
     @Test
     void deleteLine() {
@@ -181,6 +197,13 @@ class LineAcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + id)
                 .then().log().all().extract();
+    }
+
+    private void putLineById(Long id, Map<String, Object> params) {
+        RestAssured.given().log().all()
+                .body(params)
+                .when().put("/lines/" + id)
+                .then().log().all();
     }
 
 }
