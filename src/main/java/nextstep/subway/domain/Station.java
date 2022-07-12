@@ -12,6 +12,7 @@ public class Station {
     private Long id;
     private String name;
 
+
     public Station() {
     }
 
