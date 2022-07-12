@@ -172,10 +172,24 @@ class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
+        Map<String, Object> params = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        createLines(params);
 
         // when
+        deleteLineById(1L);
 
         // then
+        assertAll(
+                () -> assertThat(findLineById(1L).jsonPath().getString("name")).isNullOrEmpty(),
+                () -> assertThat(findLineById(1L).jsonPath().getString("color")).isNullOrEmpty()
+        );
     }
 
     private ExtractableResponse<Response> createLines(Map<String, Object> params) {
@@ -204,6 +218,12 @@ class LineAcceptanceTest {
                 .headers("Content-Type", "application/json; charset=UTF-8")
                 .body(params)
                 .when().put("/lines/" + id)
+                .then().log().all();
+    }
+
+    private void deleteLineById(Long id) {
+        RestAssured.given().log().all()
+                .when().delete("/lines/" + id)
                 .then().log().all();
     }
 
