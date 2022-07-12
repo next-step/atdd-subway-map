@@ -1,7 +1,7 @@
 package nextstep.subway.ui.dto.line;
 
-import nextstep.subway.domain.line.Line;
-import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;

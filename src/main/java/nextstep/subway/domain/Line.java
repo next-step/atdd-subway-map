@@ -1,6 +1,5 @@
-package nextstep.subway.domain.line;
+package nextstep.subway.domain;
 
-import nextstep.subway.domain.station.Station;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Entity;

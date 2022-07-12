@@ -1,6 +1,6 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.domain.line.LineService;
+import nextstep.subway.application.LineService;
 import nextstep.subway.ui.dto.line.CreateLineRequest;
 import nextstep.subway.ui.dto.line.LineResponse;
 import nextstep.subway.ui.dto.line.UpdateLineRequest;

@@ -1,7 +1,9 @@
-package nextstep.subway.domain.line;
+package nextstep.subway.application;
 
-import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.dto.line.CreateLineRequest;
 import nextstep.subway.ui.dto.line.LineResponse;
 import nextstep.subway.ui.dto.line.UpdateLineRequest;
