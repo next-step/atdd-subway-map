@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.domain.Line;
@@ -15,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -51,7 +51,7 @@ public class StationLineAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         //then
-        assertThat(노선_목록을_조회한다().jsonPath().getList("name")).containsAnyOf("신분당선");
+        assertThat(노선_목록을_조회한다().getList("name")).containsAnyOf("신분당선");
     }
 
 
@@ -71,11 +71,8 @@ public class StationLineAcceptanceTest {
                         new Line("분당선", "yellow", 5L, 6L));
         노선을_생성한다(분당선);
 
-        //when
-        ExtractableResponse<Response> lines = 노선_목록을_조회한다();
-
-        //then 생성된 지하철 노선 확인
-        assertThat(lines.jsonPath().getList("name", String.class)).contains("경의중앙선", "분당선");
+        //when, then
+        assertThat(노선_목록을_조회한다().getList("name", String.class)).contains("경의중앙선", "분당선");
     }
 
     /**
@@ -86,22 +83,13 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void getLine() {
-        // given 지하철 노선 생성
-        Map<String, Object> 우이신설 = Map.of("name", "우이신설", "color","gold", "upStationId",10L, "downStationId", 20L);
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                                                           .body(우이신설)
-                                                           .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                           .when().log().all()
-                                                           .post("/station/line")
-                                                           .then().log().all()
-                                                           .extract();
-        // when 지하철 노선 조회
-        String name = RestAssured.given().log().all()
-                              .pathParam("id", createResponse.jsonPath().getLong("id"))
-                              .when().log().all()
-                              .get("/station/line/{id}")
-                              .then().log().all()
-                              .extract().jsonPath().get("name");
+        // given
+        Map<String, Object> 우이신설 = createLineRequestBody(
+                        new Line("우이신설", "gold", 10L, 20L));
+        ExtractableResponse<Response> createResponse = 노선을_생성한다(우이신설);
+
+        // when
+        String name = 노선_단일_조회(createResponse.jsonPath().getLong("id"), "name");
 
         // then 생성한 지하철 노선 확인
         assertThat(name).isEqualTo("우이신설");
@@ -116,30 +104,15 @@ public class StationLineAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        Map<String, Object> 경춘선 = new HashMap<>();
-        경춘선.put("name", "경춘선");
-        경춘선.put("color", "green");
-        경춘선.put("upStationId", 20L);
-        경춘선.put("downStationId", 21L);
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                                                           .body(경춘선)
-                                                           .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                           .when().log().all()
-                                                           .post("/station/line")
-                                                           .then().log().all()
-                                                           .extract();
+        Map<String, Object> 경춘선 = createLineRequestBody(
+                new Line("경춘선", "green", 20L, 21L));
+        Long id = 노선을_생성한다(경춘선).jsonPath().getLong("id");
+
         //when
         경춘선.put("name", "춘경선");
         경춘선.put("color", "red");
-        Line line = RestAssured.given().log().all()
-                               .pathParam("id", createResponse.jsonPath().getLong("id"))
-                               .and()
-                               .body(경춘선)
-                               .contentType(MediaType.APPLICATION_JSON_VALUE)
-                               .when().log().all()
-                               .patch("/station/line/{id}")
-                               .then().log().all()
-                               .extract().as(Line.class);
+        Line line = 노선_정보를_수정한다(경춘선, id);
+
         //then
         assertThat(line.getName()).isEqualTo("춘경선");
         assertThat(line.getColor()).isEqualTo("red");
@@ -154,36 +127,33 @@ public class StationLineAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        Map<String, Object> 신림선 = Map.of("name", "신림선", "color", "blue", "upStationId", 80L, "downStationId",90L);
-        Line line = RestAssured.given().log().all()
-                             .body(신림선)
-                             .contentType(MediaType.APPLICATION_JSON_VALUE)
-                             .when().log().all()
-                             .post("/station/line")
-                             .then().log().all()
-                             .extract().as(Line.class);
+        Map<String, Object> 신림선 = createLineRequestBody(
+                        new Line("신림선", "blue", 80L, 90L));
+        Line line = 노선을_생성한다(신림선).as(Line.class);
+
         //when
-        RestAssured.given().log().all()
-                .pathParam("id", line.getId())
-                .when().log().all()
-                .delete("/station/line/{id}")
-                .then().log().all();
+        assertThat(노선을_삭제한다(line)).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        List<Long> ids = RestAssured.given().log().all()
-                                     .when().log().all()
-                                     .get("/station/line")
-                                     .then().log().all()
-                                     .extract().jsonPath().getList("id", Long.class);
+        assertThat(노선_목록을_조회한다().getList("id", Long.class)).isEmpty();
+    }
 
-        assertThat(ids).isEmpty();
+    private int 노선을_삭제한다(Line line) {
+        return RestAssured.given().log().all()
+                          .pathParam("id", line.getId())
+                          .when().log().all()
+                          .delete(STATION_LINE_REQUEST_PATH + "/{id}")
+                          .then().log().all()
+                   .extract().statusCode();
     }
 
     private Map<String, Object> createLineRequestBody(Line line) {
-        return Map.of("name", line.getName(),
-                "color", line.getColor(),
-                "upStationId", line.getUpStationId(),
-                "downStationId", line.getDownStationId());
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", line.getName());
+        body.put("color", line.getColor());
+        body.put("upStationId", line.getUpStationId());
+        body.put("downStationId", line.getDownStationId());
+        return body;
     }
 
     private ExtractableResponse<Response> 노선을_생성한다(Map<String, Object> body) {
@@ -196,12 +166,33 @@ public class StationLineAcceptanceTest {
                           .extract();
     }
 
-    private ExtractableResponse<Response> 노선_목록을_조회한다() {
+    private JsonPath 노선_목록을_조회한다() {
         return RestAssured.given().log().all()
                           .when().log().all()
                           .get(STATION_LINE_REQUEST_PATH)
                           .then().log().all()
-                          .extract();
+                          .extract().jsonPath();
+    }
+
+    private String 노선_단일_조회(Long id, String fieldName) {
+        return RestAssured.given().log().all()
+                          .pathParam("id", id)
+                          .when().log().all()
+                          .get(STATION_LINE_REQUEST_PATH + "/{id}")
+                          .then().log().all()
+                          .extract().jsonPath().get(fieldName);
+    }
+
+    private Line 노선_정보를_수정한다(Map<String, Object> body, Long id) {
+        return RestAssured.given().log().all()
+                          .pathParam("id", id)
+                          .and()
+                          .body(body)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().log().all()
+                          .patch(STATION_LINE_REQUEST_PATH+ "/{id}")
+                          .then().log().all()
+                          .extract().as(Line.class);
     }
 
 }
