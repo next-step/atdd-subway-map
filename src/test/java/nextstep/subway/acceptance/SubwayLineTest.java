@@ -139,13 +139,15 @@ public class SubwayLineTest {
 
 		//when
 		ExtractableResponse<Response> modifiedSubwayLine = 지하철노선을_수정한다(subwayLineId, "상현역", "bg-white-600");
-		JsonPath findSubwayLineJson = 지하철노선_하나를_조회한다(subwayLineId).jsonPath();
 
 		//then
 		assertAll(
 				() -> assertThat(modifiedSubwayLine.statusCode()).isEqualTo(HttpStatus.OK.value()),
-				() -> assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역"),
-				() -> assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600")
+				() -> {
+					JsonPath findSubwayLineJson = 지하철노선_하나를_조회한다(subwayLineId).jsonPath();
+					assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역");
+					assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600");
+				}
 		);
 	}
 
