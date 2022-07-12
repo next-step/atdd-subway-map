@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.*;
 @Sql("classpath:/truncate.sql")
 public class StationLineAcceptanceTest {
 
+    public static String STATION_LINE_REQUEST_PATH = "/station/line";
     @LocalServerPort
     int port;
 
@@ -41,31 +42,41 @@ public class StationLineAcceptanceTest {
     @DisplayName("노선을 생성한다")
     @Test
     void createLine() {
-        //given 노선을 생성하면
-        Map<String, Object> body = Map.of("name", "신분당선",
-                                            "color", "red",
-                                            "upStationId", 1,
-                                            "downStationId", 3);
+        //given
+        Map<String, Object> body = createLineRequestBody(
+                new Line("신분당선", "red", 1L, 3L));
+        ExtractableResponse<Response> createResponse = 노선을_생성한다(body);
 
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                                                            .body(body)
-                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                            .when().log().all()
-                                                            .post("/station/line")
-                                                            .then().log().all()
-                                                            .extract();
-
-        //when 노선이 생성된다
+        //when
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        //then 목록 조회 시 생성된 노선을 찾을 수 있다
-        ExtractableResponse<Response> selectResponse = RestAssured.given().log().all()
-                                                           .when().log().all()
-                                                           .get("/station/line")
-                                                           .then().log().all()
-                                                           .extract();
+        //then
+        assertThat(노선_목록을_조회한다().jsonPath().getList("name")).containsAnyOf("신분당선");
+    }
 
-        assertThat(selectResponse.jsonPath().getList("name")).containsAnyOf("신분당선");
+    private Map<String, Object> createLineRequestBody(Line line) {
+        return Map.of("name", line.getName(),
+                "color", line.getColor(),
+                "upStationId", line.getUpStationId(),
+                "downStationId", line.getDownStationId());
+    }
+
+    private ExtractableResponse<Response> 노선을_생성한다(Map<String, Object> body) {
+        return RestAssured.given().log().all()
+                          .body(body)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().log().all()
+                          .post(STATION_LINE_REQUEST_PATH)
+                          .then().log().all()
+                          .extract();
+    }
+
+    private ExtractableResponse<Response> 노선_목록을_조회한다() {
+        return RestAssured.given().log().all()
+                          .when().log().all()
+                          .get(STATION_LINE_REQUEST_PATH)
+                          .then().log().all()
+                          .extract();
     }
 
     /** given 2개의 지하철 노선을 생성하고
