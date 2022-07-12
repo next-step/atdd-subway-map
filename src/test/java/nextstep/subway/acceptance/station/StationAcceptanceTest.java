@@ -10,15 +10,12 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static nextstep.subway.acceptance.station.StationSteps.지하철역_생성;
+import static nextstep.subway.acceptance.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
-
-    static final String GANGNAM_STATION = "강남역";
-    static final String YUKSAM_STATION = "역삼역";
 
     /**
      * When 지하철역을 생성하면

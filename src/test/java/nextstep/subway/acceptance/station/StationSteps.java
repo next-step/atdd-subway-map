@@ -10,6 +10,9 @@ import java.util.Map;
 
 public class StationSteps {
 
+    public static final String GANGNAM_STATION = "강남역";
+    public static final String YUKSAM_STATION = "역삼역";
+
     public static ExtractableResponse<Response> 지하철역_생성(String stationName) {
         Map<String, String> param = new HashMap<>();
         param.put("name", stationName);
@@ -21,15 +24,8 @@ public class StationSteps {
                 .extract();
     }
 
-    public static Long 지하철역_생성_후_ID_반환(String stationName) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", stationName);
-        return Long.valueOf(RestAssured.given().log().all()
-                .body(param)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id"));
+    public static Long ID(ExtractableResponse<Response> 생성) {
+        return Long.valueOf(생성.jsonPath().getString("id"));
     }
 
 }
