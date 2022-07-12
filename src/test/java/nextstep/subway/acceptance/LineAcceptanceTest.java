@@ -149,9 +149,7 @@ public class LineAcceptanceTest {
         지하철_노선_생성(LINE_2);
 
         // when
-        RestAssured.given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all();
+        지하철_노선_삭제(id);
 
         // then
         List<Integer> ids = 지하철_노선_목록_조회().jsonPath().getList("id");
@@ -159,6 +157,12 @@ public class LineAcceptanceTest {
                 .filter(lineId -> lineId == id)
                 .count())
                 .isEqualTo(0);
+    }
+
+    private void 지하철_노선_삭제(int id) {
+        RestAssured.given().log().all()
+                .when().delete("/lines/" + id)
+                .then().log().all();
     }
 
     private ExtractableResponse<Response> 지하철_노선_수정(int id, Map<String, String> updateParams) {
