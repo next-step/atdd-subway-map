@@ -62,12 +62,12 @@ class SectionAcceptanceTest {
 
 
     /**
-     * Given 신규상행역이 기존 노선에 등록되어 있는 새로운 구간을
+     * Given 신규하행역이 기존 노선에 등록되어 있는 새로운 구간을
      * When 지하철 노선에 등록하면
      * Then 에러가 발생하고 하행역이 변경되지 않는다.
      */
 
-    @DisplayName("신규상행역이 기존 노선에 등록되어 있는 새로운 구간은 등록에 실패한다.")
+    @DisplayName("신규하행역이 기존 노선에 등록되어 있는 새로운 구간은 등록에 실패한다.")
     @Test
     void createSectionFail_AlreadyRegisteredUpStationId() {
         // given
