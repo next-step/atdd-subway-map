@@ -3,8 +3,8 @@ package nextstep.subway.ui;
 import java.net.URI;
 import java.util.List;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineCreate.Request;
-import nextstep.subway.applicaion.dto.LineCreate.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,18 +25,18 @@ public class LineController {
   }
 
   @PostMapping("/lines")
-  public ResponseEntity<Response> createLine(@RequestBody Request request) {
-    Response response = lineService.createLine(request);
+  public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    LineResponse response = lineService.createLine(lineRequest);
     return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
   }
 
   @GetMapping("/lines")
-  public ResponseEntity<List<Response>> getAllLine() {
+  public ResponseEntity<List<LineResponse>> getAllLine() {
     return ResponseEntity.ok().body(lineService.getAllLine());
   }
 
   @GetMapping("/lines/{id}")
-  public ResponseEntity<Response> getLine(@PathVariable Long id) {
+  public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
     return ResponseEntity.ok().body(lineService.getLine(id));
   }
 

@@ -3,11 +3,9 @@ package nextstep.subway.applicaion;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
-import nextstep.subway.applicaion.dto.LineCreate;
-import nextstep.subway.applicaion.dto.LineCreate.Request;
-import nextstep.subway.applicaion.dto.LineCreate.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -29,27 +27,27 @@ public class LineService {
   }
 
   @Transactional
-  public Response createLine(Request request) {
-    Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow(
+  public LineResponse createLine(LineRequest lineRequest) {
+    Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(
         () -> new EntityNotFoundException("station not found"));
 
-    Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow(
+    Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(
         () -> new EntityNotFoundException("station not found"));
 
-    Line line = lineRepository.save(Request.createLine(request, upStation, downStation));
+    Line line = lineRepository.save(LineRequest.createLine(lineRequest, upStation, downStation));
 
-    return Response.createResponse(line);
+    return LineResponse.createResponse(line);
   }
 
-  public List<Response> getAllLine() {
-    return lineRepository.findAll().stream().map(Response::createResponse).collect(toList());
+  public List<LineResponse> getAllLine() {
+    return lineRepository.findAll().stream().map(LineResponse::createResponse).collect(toList());
   }
 
-  public Response getLine(Long id) {
+  public LineResponse getLine(Long id) {
     Line line = lineRepository.findById(id).orElseThrow(
         () -> new EntityNotFoundException("line not found")
     );
-    return Response.createResponse(line);
+    return LineResponse.createResponse(line);
   }
 
   @Transactional
