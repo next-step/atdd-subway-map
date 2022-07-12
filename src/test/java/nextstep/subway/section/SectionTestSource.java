@@ -24,4 +24,12 @@ public class SectionTestSource {
                 .build();
     }
 
+    public static SectionRequest sectionRequest(final Long upStationId) {
+        return SectionRequest.builder()
+                .upStationId(upStationId)
+                .downStationId(8L)
+                .distance(10L)
+                .build();
+    }
+
 }

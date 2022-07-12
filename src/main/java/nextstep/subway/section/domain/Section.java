@@ -47,6 +47,10 @@ public class Section {
         return distance;
     }
 
+    public boolean isDuplicated(final Section section) {
+        return downStationId.equals(section.getUpStationId()) || downStationId.equals(section.getDownStationId());
+    }
+
     public static class SectionBuilder {
         private Long lineId;
         private Long upStationId;
