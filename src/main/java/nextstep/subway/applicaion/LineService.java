@@ -61,4 +61,9 @@ public class LineService {
     line.changeName(lineUpdateRequest.getName());
     line.changeColor(lineUpdateRequest.getColor());
   }
+
+  @Transactional
+  public void deleteLine(Long id) {
+    lineRepository.deleteById(id);
+  }
 }
