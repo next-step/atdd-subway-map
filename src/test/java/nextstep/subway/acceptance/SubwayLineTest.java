@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 import static nextstep.subway.acceptance.StationUtils.지하철역을_등록한다;
 import static nextstep.subway.acceptance.SubwayLineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,7 +92,13 @@ public class SubwayLineTest {
 		//then
 		assertAll(
 				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-				() -> assertThat(responseToJson.getList("name")).containsExactly(LINE_NAME, "수인분당선")
+				() -> assertThat(responseToJson.getList("name")).containsExactly(LINE_NAME, "수인분당선"),
+				() -> {
+					List<String> list = responseToJson.getList("stations.name", String.class);
+					assertThat(list).hasSize(2);
+					assertThat(list.get(0)).contains("광교중앙역", "신사역");
+					assertThat(list.get(1)).contains("인천역", "청량리역");
+				}
 		);
 	}
 
@@ -114,7 +122,7 @@ public class SubwayLineTest {
 		assertAll(
 				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
 				() -> assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME),
-				() ->assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME)
+				() -> assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME)
 		);
 	}
 
