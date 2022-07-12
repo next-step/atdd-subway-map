@@ -42,4 +42,10 @@ public class StationLineController {
         return ResponseEntity.ok(stationLineService.patch(id, patchRequest.toEntity()));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+        stationLineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

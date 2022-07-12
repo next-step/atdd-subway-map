@@ -46,4 +46,9 @@ public class StationLineService {
                 line.getUpStationId(), line.getDownStationId()
         );
     }
+
+    @Transactional
+    public void deleteLineById(Long id) {
+        repository.deleteById(id);
+    }
 }
