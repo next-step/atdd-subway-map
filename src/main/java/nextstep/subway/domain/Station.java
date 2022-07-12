@@ -11,7 +11,7 @@ public class Station {
 
     private String name;
 
-    private Station() {
+    protected Station() {
     }
 
     private Station(String name) {
