@@ -128,7 +128,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         assertThat(노선_이름_목록).doesNotContain("신분당선");
     }
 
-    private ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
+    public static ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -146,7 +146,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 노선_목록_조회_요청() {
+    public static ExtractableResponse<Response> 노선_목록_조회_요청() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
@@ -155,7 +155,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 노선_조회_요청(Long id) {
+    public static ExtractableResponse<Response> 노선_조회_요청(Long id) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/lines/{id}", id)
                 .then().log().all()
