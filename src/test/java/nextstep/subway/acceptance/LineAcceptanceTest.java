@@ -87,6 +87,31 @@ class LineAcceptanceTest {
 
     }
 
+    /*
+    Given 지하철 노선을 생성하고
+    When 생성한 지하철 노선을 조회하면
+    Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @Test
+    @DisplayName("지하철 노선 조회")
+    void getOneLine() {
+        //given
+        stationAcceptanceTest.createSubwayStation("합정역");
+        stationAcceptanceTest.createSubwayStation("신촌역");
+
+        createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
+
+        //when
+        final ExtractableResponse<Response> getLinesResponse = RestAssured.given().log().all()
+            .when().get("/lines/1")
+            .then().log().all()
+            .extract();
+
+        //then
+        String name = getLinesResponse.jsonPath().get("name");
+        assertThat(name).isEqualTo("2호선");
+    }
+
     private void createSubwayLines(final String name, final String color,
         final long upStationId, final long downStationId, final int distance) {
         final Map<String, Object> param = Map.of(
