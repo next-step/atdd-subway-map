@@ -30,6 +30,10 @@ public class StationLineService {
                          .toList();
     }
 
+    public StationLineResponse findById(Long id) {
+        return createLineResponse(repository.getById(id));
+    }
+
     private StationLineResponse createLineResponse(Line line) {
         return new StationLineResponse(
                 line.getId(), line.getName(), line.getColor(),

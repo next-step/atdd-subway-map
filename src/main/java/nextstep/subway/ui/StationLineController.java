@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/station")
+@RequestMapping("/station/line")
 public class StationLineController {
 
     private final StationLineService stationLineService;
@@ -19,16 +19,21 @@ public class StationLineController {
         this.stationLineService = stationLineService;
     }
 
-    @PostMapping("/line")
+    @PostMapping
     public ResponseEntity<StationLineResponse> create(@RequestBody StationLineRequest request) {
         StationLineResponse response = stationLineService.save(request.toEntity());
         return ResponseEntity.created(URI.create("/station/line/" + response.getId())).body(response);
     }
 
-    @GetMapping("/line")
+    @GetMapping
     public ResponseEntity<List<StationLineResponse>> findAll() {
         List<StationLineResponse> response = stationLineService.findAllStationLines();
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<StationLineResponse> findById(@PathVariable Long id) {
+        return  ResponseEntity.ok(stationLineService.findById(id));
     }
 
 }
