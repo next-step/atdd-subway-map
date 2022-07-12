@@ -163,7 +163,7 @@ public class LineAcceptanceTest {
   }
 
   /**
-   * Given 지하철 노선을 생성하고
+   * Given 지하철 노선을 생성하고
    * When 생성한 지하철 노선을 조회하면
    * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
    */
@@ -213,5 +213,59 @@ public class LineAcceptanceTest {
 
     String colors = response.jsonPath().getString("color");
     assertThat(colors).isEqualTo(Color.BLUE.name());
+  }
+
+  /**
+   * Given 지하철 노선을 생성하고
+   * When 생성한 지하철 노선을 수정하면
+   * Then 해당 지하철 노선 정보는 수정된다
+   */
+  @Test
+  void 지하철_노선_수정() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("name", "도농역");
+
+    StationResponse donongStation = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/stations")
+        .then().log().all()
+        .extract().as(StationResponse.class);
+
+    params.put("name", "구리역");
+
+    StationResponse gooriStation = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/stations")
+        .then().log().all()
+        .extract().as(StationResponse.class);
+
+    params.put("name", "1호선");
+    params.put("color", Color.BLUE);
+    params.put("upStationId", donongStation.getId());
+    params.put("downStationId", gooriStation.getId());
+    params.put("distance", 10);
+
+    ExtractableResponse<Response> donongGooriLine = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/lines")
+        .then().log().all()
+        .extract();
+
+    assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+    params.put("name", "3호선");
+    params.put("color", Color.ORANGE);
+
+    ExtractableResponse<Response> updateDonongGooriLine = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().put("/lines")
+        .then().log().all()
+        .extract();
+
+    assertThat(updateDonongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
   }
 }
