@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선 관련 기능")
 @AcceptanceTest
-class LineAcceptanceTest {
+public class LineAcceptanceTest {
 
     @LocalServerPort
     int port;
@@ -185,7 +185,7 @@ class LineAcceptanceTest {
         return params;
     }
 
-    private ExtractableResponse<Response> getLineRequest(final Long id) {
+    public static ExtractableResponse<Response> getLineRequest(final Long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/{idd}", id)
                 .then().log().all()
@@ -206,5 +206,28 @@ class LineAcceptanceTest {
                 .when().delete("/lines/{id}", id)
                 .then().log().all()
                 .extract();
+    }
+
+    public static ExtractableResponse<Response> createLineRequest(final Map<String, Object> params) {
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(ContentType.JSON)
+                .when().post("/lines")
+                .then().log().all().extract();
+    }
+
+    public static Map<String, Object> createLineParams(
+            final String lineName,
+            final Long upStationId,
+            final Long downStationId) {
+
+        final Map<String, Object> params = new HashMap<>();
+        params.put("name", lineName);
+        params.put("color", "bg-red-600");
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", 10);
+        return params;
     }
 }
