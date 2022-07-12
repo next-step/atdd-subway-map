@@ -1,11 +1,20 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,8 +36,31 @@ class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
+        Map<String, Object> params = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        List<String> lineNames = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract().jsonPath().getList("name", String.class);
+
+        assertThat(lineNames).containsAnyOf("신분당선");
+
     }
 
 
