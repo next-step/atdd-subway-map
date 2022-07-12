@@ -14,7 +14,7 @@ public class LineCreateDto {
     private final String color;
     private final Long upStationId;
     private final Long downStationId;
-    private final int distance;
+    private final Integer distance;
 
     public Line toDomain() {
         return Line.builder()

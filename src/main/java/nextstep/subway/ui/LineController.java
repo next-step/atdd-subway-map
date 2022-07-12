@@ -8,6 +8,7 @@ import nextstep.subway.ui.dto.LineResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Valid  LineRequest lineRequest) {
         LineDto lineDto = lineService.createLine(lineRequest.toCreateDto());
         LineResponse response = LineResponse.of(lineDto);
 
