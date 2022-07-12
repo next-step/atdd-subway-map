@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class SubwayLineUtils {
 
-	public static ExtractableResponse<Response> 지하철노선을_등록한다(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+	public static ExtractableResponse<Response> 지하철_노선을_등록한다(String name, String color, Long upStationId, Long downStationId, Integer distance) {
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("name", name);
@@ -31,7 +31,7 @@ public class SubwayLineUtils {
 				.extract();
 	}
 
-	public static ExtractableResponse<Response> 지하철노선_목록을_조회한다() {
+	public static ExtractableResponse<Response> 지하철_노선_목록을_조회한다() {
 		return RestAssured
 				.given()
 					.log().all()
@@ -43,7 +43,7 @@ public class SubwayLineUtils {
 				.extract();
 	}
 
-	public static ExtractableResponse<Response> 지하철노선_하나를_조회한다(Long subwayLineId) {
+	public static ExtractableResponse<Response> 지하철_노선_하나를_조회한다(Long subwayLineId) {
 		return RestAssured
 				.given()
 					.log().all()
@@ -55,7 +55,7 @@ public class SubwayLineUtils {
 				.extract();
 	}
 
-	public static ExtractableResponse<Response> 지하철노선을_수정한다(Long subwayLineId, String name, String color) {
+	public static ExtractableResponse<Response> 지하철_노선을_수정한다(Long subwayLineId, String name, String color) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("name", name);
 		params.put("color", color);

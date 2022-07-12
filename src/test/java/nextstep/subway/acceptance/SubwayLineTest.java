@@ -48,7 +48,7 @@ public class SubwayLineTest {
 	private void subwayLineInit() {
 		upStationId = 지하철역을_등록한다(UP_STATION_NAME).jsonPath().getLong("id");
 		downStationId = 지하철역을_등록한다(DOWN_STATION_NAME).jsonPath().getLong("id");
-		setUpSubwayLine = 지하철노선을_등록한다(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
+		setUpSubwayLine = 지하철_노선을_등록한다(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
 	}
 
 	/**
@@ -83,10 +83,10 @@ public class SubwayLineTest {
 		//given
 		Long 인천역 = 지하철역을_등록한다("인천역").jsonPath().getLong("id");
 		Long 청량리역 = 지하철역을_등록한다("청량리역").jsonPath().getLong("id");
-		지하철노선을_등록한다("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
+		지하철_노선을_등록한다("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
 
 		//when
-		ExtractableResponse<Response> response = 지하철노선_목록을_조회한다();
+		ExtractableResponse<Response> response = 지하철_노선_목록을_조회한다();
 		JsonPath responseToJson = response.jsonPath();
 
 		//then
@@ -115,7 +115,7 @@ public class SubwayLineTest {
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = 지하철노선_하나를_조회한다(subwayLineId);
+		ExtractableResponse<Response> response = 지하철_노선_하나를_조회한다(subwayLineId);
 		JsonPath responseToJson = response.jsonPath();
 
 		//then
@@ -138,13 +138,13 @@ public class SubwayLineTest {
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> modifiedSubwayLine = 지하철노선을_수정한다(subwayLineId, "상현역", "bg-white-600");
+		ExtractableResponse<Response> modifiedSubwayLine = 지하철_노선을_수정한다(subwayLineId, "상현역", "bg-white-600");
 
 		//then
 		assertAll(
 				() -> assertThat(modifiedSubwayLine.statusCode()).isEqualTo(HttpStatus.OK.value()),
 				() -> {
-					JsonPath findSubwayLineJson = 지하철노선_하나를_조회한다(subwayLineId).jsonPath();
+					JsonPath findSubwayLineJson = 지하철_노선_하나를_조회한다(subwayLineId).jsonPath();
 					assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역");
 					assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600");
 				}
@@ -168,7 +168,7 @@ public class SubwayLineTest {
 		//then
 		assertAll(
 				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-				() -> assertThat(지하철노선_하나를_조회한다(subwayLineId).jsonPath().getString("name")).isNull()
+				() -> assertThat(지하철_노선_하나를_조회한다(subwayLineId).jsonPath().getString("name")).isNull()
 		);
 	}
 }
