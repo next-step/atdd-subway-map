@@ -9,6 +9,7 @@ import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Distance;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +46,7 @@ public class LineService {
     }
 
     public LineResponse getOneLine(final Long id) {
-        final Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
+        final Line line = findById(id);
 
         return new LineResponse(
             line.getId(), line.getName(), line.getColor(),
@@ -55,10 +55,20 @@ public class LineService {
 
     @Transactional
     public void updateLine(final Long id, final LineUpdateRequest request) {
-        final Line line = lineRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
+        final Line line = findById(id);
 
         line.updateNameAndColor(request.getName(), request.getColor());
+    }
+
+    private Line findById(final Long id) {
+        return lineRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("해당하는 노선을 찾을 수 없습니다."));
+    }
+
+    @Transactional
+    public void removeLine(final Long id) {
+        final Line line = findById(id);
+        lineRepository.delete(line);
     }
 
 }
