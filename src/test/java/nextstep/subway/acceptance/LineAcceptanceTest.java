@@ -268,4 +268,55 @@ public class LineAcceptanceTest {
 
     assertThat(updateDonongGooriLine.statusCode()).isEqualTo(HttpStatus.OK.value());
   }
+
+  /**
+   * Given 지하철 노선을 생성하고
+   * When 생성한 지하철 노선을 삭제하면
+   * Then 해당 지하철 노선 정보는 삭제된다
+   */
+  @Test
+  void 지하철_노선_삭제() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("name", "도농역");
+
+    StationResponse donongStation = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/stations")
+        .then().log().all()
+        .extract().as(StationResponse.class);
+
+    params.put("name", "구리역");
+
+    StationResponse gooriStation = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/stations")
+        .then().log().all()
+        .extract().as(StationResponse.class);
+
+    params.put("name", "1호선");
+    params.put("color", Color.BLUE);
+    params.put("upStationId", donongStation.getId());
+    params.put("downStationId", gooriStation.getId());
+    params.put("distance", 10);
+
+    ExtractableResponse<Response> donongGooriLine = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/lines")
+        .then().log().all()
+        .extract();
+
+    assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+    ExtractableResponse<Response> deleteDonongGooriLine = RestAssured.given().log().all()
+        .body(params)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().delete("/lines/" + donongGooriLine.jsonPath().getLong("id"))
+        .then().log().all()
+        .extract();
+
+    assertThat(deleteDonongGooriLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
 }
