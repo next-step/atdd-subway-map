@@ -97,10 +97,9 @@ public class LineAcceptanceTest {
         // given
         ExtractableResponse<Response> lineCreatedResponse = 지하철_노선_생성(LINE_5);
         지하철_노선_생성(LINE_2);
-
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines" + lineCreatedResponse.jsonPath().get("id"))
+                .when().get("/lines/" + lineCreatedResponse.jsonPath().get("id"))
                 .then().log().all()
                 .extract();
 
