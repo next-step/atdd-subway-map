@@ -9,12 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static nextstep.subway.acceptance.StationUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -37,13 +35,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = registerStation("강남역");
+        ExtractableResponse<Response> response = 지하철역을_등록한다("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = findStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록을_찾는다().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -56,11 +54,11 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        registerStation("역삼역");
-        registerStation("선릉역");
+        지하철역을_등록한다("역삼역");
+        지하철역을_등록한다("선릉역");
 
         //when
-        ExtractableResponse<Response> response = findStations();
+        ExtractableResponse<Response> response = 지하철역_목록을_찾는다();
 
         List<String> responseList = response.jsonPath().getList("name", String.class);
 
@@ -70,6 +68,7 @@ public class StationAcceptanceTest {
                 .hasSize(2)
                 .containsExactly("역삼역", "선릉역");
     }
+
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -80,54 +79,15 @@ public class StationAcceptanceTest {
     void deleteStation() {
         //given
         String stationName = "삼성역";
-        ExtractableResponse<Response> response = registerStation(stationName);
+        ExtractableResponse<Response> response = 지하철역을_등록한다(stationName);
 
         //when
         Integer id = response.jsonPath().get("id");
-        ExtractableResponse<Response> deleteResponse = deleteStation(id);
-        List<String> findStations = findStations().jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> deleteResponse = 지하철역을_삭제한다(id);
+        List<String> findStations = 지하철역_목록을_찾는다().jsonPath().getList("name", String.class);
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(findStations).doesNotContain(stationName);
     }
-
-    private ExtractableResponse<Response> registerStation(String stationName) {
-        Map<String, String> param = new HashMap<>();
-        param.put("name", stationName);
-
-        return RestAssured
-                .given()
-                    .log().all()
-                    .body(param)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then()
-                    .log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> findStations() {
-        return RestAssured
-                .given()
-                    .log().all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> deleteStation(Integer id) {
-        return RestAssured
-                .given()
-                    .log().all()
-                .when()
-                    .delete("/stations/" + id)
-                .then()
-                    .log().all()
-                .extract();
-    }
-
 }

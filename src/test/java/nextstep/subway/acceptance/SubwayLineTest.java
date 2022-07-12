@@ -5,8 +5,6 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.DatabaseCleanup;
-import nextstep.subway.applicaion.StationService;
-import nextstep.subway.applicaion.dto.station.StationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static nextstep.subway.acceptance.StationUtils.*;
+import static nextstep.subway.acceptance.SubwayLineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능 테스트")
@@ -34,9 +30,6 @@ public class SubwayLineTest {
 	public static ExtractableResponse<Response> setUpSubwayLine;
 
 	@Autowired
-	private StationService stationService;
-
-	@Autowired
 	private DatabaseCleanup databaseCleanup;
 
 	@LocalServerPort
@@ -50,9 +43,9 @@ public class SubwayLineTest {
 	}
 
 	private void subwayLineInit() {
-		upStationId = stationService.saveStation(new StationRequest(UP_STATION_NAME)).getId();
-		downStationId = stationService.saveStation(new StationRequest(DOWN_STATION_NAME)).getId();
-		setUpSubwayLine = createSubwayLine(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
+		upStationId = 지하철역을_등록한다(UP_STATION_NAME).jsonPath().getLong("id");
+		downStationId = 지하철역을_등록한다(DOWN_STATION_NAME).jsonPath().getLong("id");
+		setUpSubwayLine = 지하철노선을_등록한다(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
 	}
 
 	/**
@@ -73,26 +66,6 @@ public class SubwayLineTest {
 		assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME);
 	}
 
-	private ExtractableResponse<Response> createSubwayLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-
-		Map<String, Object> params = new HashMap<>();
-		params.put("name", name);
-		params.put("color", color);
-		params.put("upStationId", upStationId);
-		params.put("downStationId", downStationId);
-		params.put("distance", distance);
-
-		return RestAssured
-				.given()
-					.log().all()
-					.body(params)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-					.post("/lines")
-				.then()
-					.log().all()
-				.extract();
-	}
 
 	/**
 	 * Given 2개의 지하철 노선을 생성하고
@@ -103,12 +76,12 @@ public class SubwayLineTest {
 	@Test
 	void findSubwayLineList() {
 	    //given
-		Long 인천역 = stationService.saveStation(new StationRequest("인천역")).getId();
-		Long 청량리역 = stationService.saveStation(new StationRequest("청량리역")).getId();
-		createSubwayLine("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
+		Long 인천역 = 지하철역을_등록한다("인천역").jsonPath().getLong("id");
+		Long 청량리역 = 지하철역을_등록한다("청량리역").jsonPath().getLong("id");
+		지하철노선을_등록한다("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
 
 	    //when
-		ExtractableResponse<Response> response = findSubwayLines();
+		ExtractableResponse<Response> response = 지하철노선_목록을_조회한다();
 		JsonPath responseToJson = response.jsonPath();
 
 		//then
@@ -116,17 +89,6 @@ public class SubwayLineTest {
 		assertThat(responseToJson.getList("name")).containsExactly(LINE_NAME, "수인분당선");
 	}
 
-	private ExtractableResponse<Response> findSubwayLines() {
-		return RestAssured
-				.given()
-					.log().all()
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-					.get("/lines")
-				.then()
-					.log().all()
-				.extract();
-	}
 
 	/**
 	 * Given 지하철 노선을 생성하고
@@ -140,25 +102,13 @@ public class SubwayLineTest {
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = findSubwayLine(subwayLineId);
+		ExtractableResponse<Response> response = 지하철노선_하나를_조회한다(subwayLineId);
 		JsonPath responseToJson = response.jsonPath();
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME);
 		assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME);
-	}
-
-	private ExtractableResponse<Response> findSubwayLine(long responseId) {
-		return RestAssured
-				.given()
-					.log().all()
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-					.get("/lines/{id}", responseId)
-				.then()
-					.log().all()
-				.extract();
 	}
 
 	/**
@@ -173,30 +123,13 @@ public class SubwayLineTest {
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> modifiedSubwayLine = modifySubwayLine(subwayLineId, "상현역", "bg-white-600");
-		JsonPath findSubwayLineJson = findSubwayLine(subwayLineId).jsonPath();
+		ExtractableResponse<Response> modifiedSubwayLine = 지하철노선을_수정한다(subwayLineId, "상현역", "bg-white-600");
+		JsonPath findSubwayLineJson = 지하철노선_하나를_조회한다(subwayLineId).jsonPath();
 
 		//then
 		assertThat(modifiedSubwayLine.statusCode()).isEqualTo(HttpStatus.OK.value());
 		assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역");
 		assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600");
-	}
-
-	private ExtractableResponse<Response> modifySubwayLine(Long subwayLineId, String name, String color) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("name", name);
-		params.put("color", color);
-
-		return RestAssured
-				.given()
-					.log().all()
-					.body(params)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-					.put("/lines/{id}", subwayLineId)
-				.then()
-					.log().all()
-				.extract();
 	}
 
 	/**
@@ -211,20 +144,9 @@ public class SubwayLineTest {
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = deleteSubwayLine(subwayLineId);
+		ExtractableResponse<Response> response = 지하철_노선을_삭제한다(subwayLineId);
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-	}
-
-	private ExtractableResponse<Response> deleteSubwayLine(long subwayLineId) {
-		return RestAssured
-				.given()
-					.log().all()
-				.when()
-					.delete("/lines/{id}", subwayLineId)
-				.then()
-					.log().all()
-				.extract();
 	}
 }
