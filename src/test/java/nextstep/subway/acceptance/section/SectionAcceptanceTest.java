@@ -27,11 +27,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_구간_등록_테스트() {
 
-        Long gangnamStationId = ID(지하철역_생성(GANGNAM_STATION));
-        Long yuksamStationId = ID(지하철역_생성(YUKSAM_STATION));
-        Long shinbundangLineId = ID(지하철_노선_생성(SHIN_BUNDANG_LINE, BLUE, gangnamStationId, yuksamStationId, DISTANCE));
+        Long 강남역ID = ID(지하철역_생성(GANGNAM_STATION));
+        Long 역삼역ID = ID(지하철역_생성(YUKSAM_STATION));
+        Long 신분당노선ID = ID(지하철_노선_생성(SHIN_BUNDANG_LINE, BLUE, 강남역ID, 역삼역ID, DISTANCE));
 
-        ExtractableResponse<Response> response = 지하철_구간_등록(shinbundangLineId, gangnamStationId, yuksamStationId, DISTANCE);
+        ExtractableResponse<Response> response = 지하철_구간_등록(신분당노선ID, 강남역ID, 역삼역ID, DISTANCE);
 
         assertAll(
                 // then 지하철 구간 등록 성공 응답받는다.

@@ -25,10 +25,25 @@ public class Section {
 
     }
 
-    public Section(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Section(Station upStation, Station downStation, Long distance) {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
 }
