@@ -1,6 +1,7 @@
 package nextstep.subway.section;
 
 import nextstep.subway.section.application.dto.SectionRequest;
+import nextstep.subway.section.application.dto.SectionResponse;
 import nextstep.subway.section.domain.Section;
 
 import static nextstep.subway.line.LineTestSource.lineId;
@@ -18,6 +19,14 @@ public class SectionTestSource {
 
     public static SectionRequest sectionRequest() {
         return SectionRequest.builder()
+                .upStationId(6L)
+                .downStationId(8L)
+                .distance(10L)
+                .build();
+    }
+
+    public static Section section() {
+        return Section.builder()
                 .upStationId(6L)
                 .downStationId(8L)
                 .distance(10L)

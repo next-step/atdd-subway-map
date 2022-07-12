@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.section.application.SectionService;
 import nextstep.subway.section.application.dto.SectionRequest;
+import nextstep.subway.section.application.dto.SectionResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,7 +39,7 @@ class SectionControllerTest {
     void 구간등록() throws Exception {
         final SectionRequest sectionRequest = sectionRequest();
 
-        doReturn(new LineResponse())
+        doReturn(new SectionResponse())
                 .when(sectionService)
                 .addSection(anyLong(), any(SectionRequest.class));
 

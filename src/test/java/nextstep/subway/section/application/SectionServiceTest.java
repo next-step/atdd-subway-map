@@ -3,6 +3,8 @@ package nextstep.subway.section.application;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
+import nextstep.subway.section.application.dto.SectionResponse;
+import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.domain.SectionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import static nextstep.subway.section.SectionTestSource.section;
 import static nextstep.subway.section.SectionTestSource.sectionRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,6 +71,31 @@ class SectionServiceTest {
 
         // then
         assertThat(result.getMessage()).isEqualTo("신규하행역이 이미 등록되어 있습니다.");
+    }
+
+    @Test
+    void 구간추가성공() {
+        // given
+        final Line line = line();
+        final SectionRequest sectionRequest = sectionRequest(line.getDownStationId());
+
+        doReturn(line)
+                .when(lineService)
+                .findLineById(lineId);
+
+        doReturn(Collections.emptyList())
+                .when(sectionRepository)
+                .findAllByLineId(lineId);
+
+        doReturn(section())
+                .when(sectionRepository)
+                .save(any(Section.class));
+
+        // when
+        final SectionResponse result = target.addSection(lineId, sectionRequest);
+
+        // then
+        assertThat(result).isNotNull();
     }
 
 }

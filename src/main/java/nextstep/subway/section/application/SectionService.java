@@ -4,6 +4,7 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
+import nextstep.subway.section.application.dto.SectionResponse;
 import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.domain.SectionRepository;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
-    public LineResponse addSection(final long lineId, final SectionRequest sectionRequest) {
+    public SectionResponse addSection(final long lineId, final SectionRequest sectionRequest) {
         final Line line = lineService.findLineById(lineId);
         final Section section = sectionRequest.toSection(lineId);
 
@@ -33,7 +34,16 @@ public class SectionService {
             throw new IllegalArgumentException("신규하행역이 이미 등록되어 있습니다.");
         }
 
-        return null;
+        return createSectionResponse(sectionRepository.save(section));
+    }
+
+    private SectionResponse createSectionResponse(final Section savedSection) {
+        return SectionResponse.builder()
+                .id(savedSection.getId())
+                .upStationId(savedSection.getUpStationId())
+                .downStationId(savedSection.getDownStationId())
+                .distance(savedSection.getDistance())
+                .build();
     }
 
     private boolean hasCircularSection(final long lineId, final Section section) {
