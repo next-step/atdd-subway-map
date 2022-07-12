@@ -14,13 +14,17 @@ public class LineResponse {
     private String color;
     private List<StationResponse> stations;
 
-    public LineResponse(Line line, List<Station> stations) {
+    private LineResponse(Line line, List<Station> stations) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
         this.stations = stations.stream()
-                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .map(station -> StationResponse.from(station.getId(), station.getName()))
                 .collect(toList());
+    }
+
+    public static LineResponse from(Line line, List<Station> stations) {
+        return new LineResponse(line, stations);
     }
 
     public Long getId() {

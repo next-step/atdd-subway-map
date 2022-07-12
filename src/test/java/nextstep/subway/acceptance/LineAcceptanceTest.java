@@ -224,11 +224,16 @@ public class LineAcceptanceTest {
     }
 
     private ExtractableResponse<Response> createLineRequest(String name, String color, Long upStationId, Long downStationId, int distance) {
-        LineRequest line = new LineRequest(name, color, upStationId, downStationId, distance);
+        Map<String, Object> lineRequest = new HashMap<>();
+        lineRequest.put("name", name);
+        lineRequest.put("color", color);
+        lineRequest.put("upStationId", upStationId);
+        lineRequest.put("downStationId", downStationId);
+        lineRequest.put("distance", distance);
 
         ExtractableResponse<Response> createLineResponse = RestAssured
                 .given().log().all()
-                .body(line)
+                .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()

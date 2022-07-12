@@ -60,7 +60,7 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
         List<Station> findStations = findUpAndDownStation(line.getUpStationId(), line.getDownStationId());
-        return new LineResponse(line, findStations);
+        return LineResponse.from(line, findStations);
     }
 
     private List<Station> findUpAndDownStation(Long upStationId, Long downStationId) {

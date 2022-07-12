@@ -11,11 +11,15 @@ public class Station {
 
     private String name;
 
-    public Station() {
+    private Station() {
     }
 
-    public Station(String name) {
+    private Station(String name) {
         this.name = name;
+    }
+
+    public static Station from(String name) {
+        return new Station(name);
     }
 
     public Long getId() {
