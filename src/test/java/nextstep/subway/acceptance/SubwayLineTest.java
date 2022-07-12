@@ -166,6 +166,9 @@ public class SubwayLineTest {
 		ExtractableResponse<Response> response = 지하철_노선을_삭제한다(subwayLineId);
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		assertAll(
+				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+				() -> assertThat(지하철노선_하나를_조회한다(subwayLineId).jsonPath().getString("name")).isNull()
+		);
 	}
 }
