@@ -17,7 +17,7 @@ public class Line {
     private Long downStationId;
     private int distance;
 
-    public Line() {
+    private Line() {
 
     }
 
