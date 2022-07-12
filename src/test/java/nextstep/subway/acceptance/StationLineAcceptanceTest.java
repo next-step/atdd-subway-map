@@ -4,8 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.StationLineRequest;
-import nextstep.subway.applicaion.dto.StationLineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,10 +41,17 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철노선 생성")
     @Test
     void createStationLine() {
-        createStationLineAndValidate("2호선",
+        // when 지하철 노선 생성
+        ExtractableResponse<Response> createStationLine = createStationLineAndValidate("2호선",
                 "bg-red-600",
                 createStationAndValidate("강남역"),
                 createStationAndValidate("역삼역"));
+
+        // when 지하철 노선 목록 조회
+        ExtractableResponse<Response> response = findAllStationLineAndValidate();
+
+        assertThat(response.jsonPath().getList("id", Long.class))
+                .contains(createStationLine.jsonPath().getLong("id"));
     }
 
     /**
@@ -57,6 +62,7 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철노선 목록 조회")
     @Test
     void findAllStationLineTest() {
+        // given 2개의 지하철 노선 생성
         createStationLineAndValidate("1호선",
                 "bg-blue-600",
                 createStationAndValidate("수원역"),
@@ -67,13 +73,9 @@ public class StationLineAcceptanceTest {
                 createStationAndValidate("강남역"),
                 createStationAndValidate("역삼역"));
 
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        //  when 지하철 노선 목록을 조회
+        ExtractableResponse<Response> response = findAllStationLineAndValidate();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getList("$")).hasSize(2);
     }
 
@@ -85,18 +87,17 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철노선 조회")
     @Test
     void findByStationLineByIdTest() {
-        ExtractableResponse<Response> response = createStationLineAndValidate("2호선",
+        // given 지하철 노선 생성
+        Long createStationLineId = createStationLineAndValidate("2호선",
                 "bg-red-600",
                 createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"));
+                createStationAndValidate("역삼역"))
+                .jsonPath().getLong("id");
 
-        ExtractableResponse<Response> createStationLine = RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
+        // when 생성한 지하철 노선 조회
+        ExtractableResponse<Response> response = findByStationLineId(createStationLineId);
 
-        assertThat(createStationLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+        validateHttpStatus(response, HttpStatus.OK);
     }
 
     /**
@@ -107,32 +108,28 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철노선 수정")
     @Test
     void updateByStationLine() {
-        ExtractableResponse<Response> response = createStationLineAndValidate("2호선",
+        // given 지하철 노선 생성
+        Long stationLineId = createStationLineAndValidate("2호선",
                 "bg-red-600",
                 createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"));
+                createStationAndValidate("역삼역"))
+                .jsonPath().getLong("id");
 
-        ExtractableResponse<Response> updateStationLine = RestAssured
-                .given().log().all()
-                .body(StationLineRequest.builder()
-                        .name("신분당선")
-                        .color("bg-yellow-300")
-                        .build())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
-        assertThat(updateStationLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+        StationLineRequest stationLineRequest = StationLineRequest.builder()
+                .name("신분당선")
+                .color("bg-yellow-300")
+                .build();
 
-        ExtractableResponse<Response> findStationLine = RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
-        assertThat(findStationLine.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(findStationLine.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(findStationLine.jsonPath().getString("color")).isEqualTo("bg-yellow-300");
+        // when 지하철 노선 수정
+        updateByStationLineIdAndValidate(stationLineId, stationLineRequest);
+
+        ExtractableResponse<Response> response = findByStationLineId(stationLineId);
+
+        assertThat(response.jsonPath().getString("name")).isEqualTo(stationLineRequest.getName());
+        assertThat(response.jsonPath().getString("color")).isEqualTo(stationLineRequest.getColor());
     }
+
+
 
     /**
      * Given 지하철 노선을 생성하고
@@ -142,22 +139,24 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteByStationLine() {
-        ExtractableResponse response = createStationLineAndValidate("2호선",
+        // given 지하철 노선 생성
+        Long stationLineId = createStationLineAndValidate("2호선",
                 "bg-red-600",
                 createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"));
+                createStationAndValidate("역삼역"))
+                .jsonPath().getLong("id");
 
-        ExtractableResponse<Response> deleteStationLine = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{id}", response.jsonPath().getLong("id"))
-                .then().log().all()
-                .extract();
-        assertThat(deleteStationLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        // when 지하철 노선 삭제
+        deleteByStationLineIdAndValidate(stationLineId);
 
+        ExtractableResponse<Response> response = findAllStationLineAndValidate();
+        assertThat(response.jsonPath().getList("id", Long.class)).doesNotContain(stationLineId);
     }
 
-    private ExtractableResponse<Response> createStationLineAndValidate(String stationLineName, String color, Long upStationId, Long downStationId) {
+    private ExtractableResponse<Response> createStationLineAndValidate(String stationLineName,
+                                                                       String color,
+                                                                       Long upStationId,
+                                                                       Long downStationId) {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .body(StationLineRequest.builder()
@@ -172,10 +171,7 @@ public class StationLineAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.jsonPath().getString("name")).isEqualTo(stationLineName);
-        assertThat(response.jsonPath().getString("color")).isEqualTo(color);
-
+        validateHttpStatus(response, HttpStatus.CREATED);
         return response;
     }
 
@@ -187,9 +183,56 @@ public class StationLineAcceptanceTest {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        validateHttpStatus(response, HttpStatus.CREATED);
 
         return response.jsonPath().getLong("id");
+    }
+
+    private void validateHttpStatus(ExtractableResponse<Response> response, HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+    }
+
+    private ExtractableResponse<Response> findAllStationLineAndValidate() {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        validateHttpStatus(response, HttpStatus.OK);
+        return response;
+    }
+
+    private ExtractableResponse<Response> findByStationLineId(Long stationLineId) {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines/{id}", stationLineId)
+                .then().log().all()
+                .extract();
+    }
+
+    private void updateByStationLineIdAndValidate(Long stationLineId,
+                                                  StationLineRequest stationLineRequest) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .body(stationLineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}", stationLineId)
+                .then().log().all()
+                .extract();
+
+        validateHttpStatus(response, HttpStatus.OK);
+    }
+
+    private void deleteByStationLineIdAndValidate(Long stationLineId) {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}", stationLineId)
+                .then().log().all()
+                .extract();
+
+        validateHttpStatus(response, HttpStatus.NO_CONTENT);
     }
 
 }

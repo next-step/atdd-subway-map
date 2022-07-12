@@ -43,28 +43,25 @@ public class StationLineService {
                 .collect(Collectors.toList());
     }
 
-    public StationLineResponse findByStationLineId(Long id) {
-        StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선입니다."));
-
+    public StationLineResponse findByStationLineId(Long stationLineId) {
+        StationLine stationLine = findByStationLine(stationLineId);
         return StationLineResponse.of(stationLine, findByUpStationAndDownStation(stationLine));
     }
 
     @Transactional
-    public void updateByStationLineId(Long id, StationLineRequest stationLineRequest) {
-        StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선입니다."));
-
+    public void updateByStationLineId(Long stationLineId, StationLineRequest stationLineRequest) {
+        StationLine stationLine = findByStationLine(stationLineId);
         stationLine.update(stationLineRequest.getName(), stationLineRequest.getColor());
     }
 
-    public void deleteByStationLineId(Long id) {
-        StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지하철 노선입니다."));
-
-        stationLineRepository.deleteById(stationLine.getId());
+    @Transactional
+    public void deleteByStationLineId(Long stationLineId) {
+        stationLineRepository.deleteById(stationLineId);
     }
 
+    private StationLine findByStationLine(Long stationLineId) {
+        return stationLineRepository.findById(stationLineId).get();
+    }
 
     private List<StationResponse> findByUpStationAndDownStation(StationLine stationLine) {
         return stationRepository.findAllById(List.of(

@@ -21,5 +21,4 @@ public class StationResponse {
                 .name(station.getName())
                 .build();
     }
-
 }
