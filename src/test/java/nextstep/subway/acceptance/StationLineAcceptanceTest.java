@@ -44,7 +44,7 @@ public class StationLineAcceptanceTest {
     void createLine() {
         //given
         Map<String, Object> body = createLineRequestBody(
-                new Line("신분당선", "red", 1L, 3L));
+                        new Line("신분당선", "red", 1L, 3L));
         ExtractableResponse<Response> createResponse = 노선을_생성한다(body);
 
         //when
@@ -54,30 +54,6 @@ public class StationLineAcceptanceTest {
         assertThat(노선_목록을_조회한다().jsonPath().getList("name")).containsAnyOf("신분당선");
     }
 
-    private Map<String, Object> createLineRequestBody(Line line) {
-        return Map.of("name", line.getName(),
-                "color", line.getColor(),
-                "upStationId", line.getUpStationId(),
-                "downStationId", line.getDownStationId());
-    }
-
-    private ExtractableResponse<Response> 노선을_생성한다(Map<String, Object> body) {
-        return RestAssured.given().log().all()
-                          .body(body)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when().log().all()
-                          .post(STATION_LINE_REQUEST_PATH)
-                          .then().log().all()
-                          .extract();
-    }
-
-    private ExtractableResponse<Response> 노선_목록을_조회한다() {
-        return RestAssured.given().log().all()
-                          .when().log().all()
-                          .get(STATION_LINE_REQUEST_PATH)
-                          .then().log().all()
-                          .extract();
-    }
 
     /** given 2개의 지하철 노선을 생성하고
      *  when 지하철 노선 목록을 조회하면
@@ -86,32 +62,20 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        // given 2개의 지하철 노선 생성
-        Map<String, Object> 경의중앙선 = Map.of("name" ,"경의중앙선", "color", "blue", "upStationId", 3L, "downStationId", 4L);
-        RestAssured.given().log().all()
-                   .body(경의중앙선)
-                   .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().log().all()
-                   .post("/station/line")
-                   .then().log().all();
+        //given
+        Map<String, Object> 경의중앙선 = createLineRequestBody(
+                        new Line("경의중앙선", "blue", 3L, 4L));
+        노선을_생성한다(경의중앙선);
 
-        Map<String, Object> 분당선 = Map.of("name" ,"분당선", "color", "yellow", "upStationId", 5L, "downStationId", 6L);
-        RestAssured.given().log().all()
-                   .body(분당선)
-                   .contentType(MediaType.APPLICATION_JSON_VALUE)
-                   .when().log().all()
-                   .post("/station/line")
-                   .then().log().all();
+        Map<String, Object> 분당선 = createLineRequestBody(
+                        new Line("분당선", "yellow", 5L, 6L));
+        노선을_생성한다(분당선);
 
-        //when 지하철 노선 목록 조회
-        List<String> lineNames = RestAssured.given().log().all()
-                                       .when().log().all()
-                                       .get("/station/line")
-                                       .then().log().all()
-                                       .extract().jsonPath().getList("name", String.class);
+        //when
+        ExtractableResponse<Response> lines = 노선_목록을_조회한다();
 
         //then 생성된 지하철 노선 확인
-        assertThat(lineNames).contains("경의중앙선", "분당선");
+        assertThat(lines.jsonPath().getList("name", String.class)).contains("경의중앙선", "분당선");
     }
 
     /**
@@ -213,6 +177,31 @@ public class StationLineAcceptanceTest {
                                      .extract().jsonPath().getList("id", Long.class);
 
         assertThat(ids).isEmpty();
+    }
+
+    private Map<String, Object> createLineRequestBody(Line line) {
+        return Map.of("name", line.getName(),
+                "color", line.getColor(),
+                "upStationId", line.getUpStationId(),
+                "downStationId", line.getDownStationId());
+    }
+
+    private ExtractableResponse<Response> 노선을_생성한다(Map<String, Object> body) {
+        return RestAssured.given().log().all()
+                          .body(body)
+                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                          .when().log().all()
+                          .post(STATION_LINE_REQUEST_PATH)
+                          .then().log().all()
+                          .extract();
+    }
+
+    private ExtractableResponse<Response> 노선_목록을_조회한다() {
+        return RestAssured.given().log().all()
+                          .when().log().all()
+                          .get(STATION_LINE_REQUEST_PATH)
+                          .then().log().all()
+                          .extract();
     }
 
 }
