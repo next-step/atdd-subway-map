@@ -7,15 +7,13 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-@DisplayName("지하철노선 관련 기능")
+@DisplayName("지하철 노선 관련 기능")
 @Sql(scripts = {"classpath:sql/truncate.sql","classpath:sql/createStations.sql"})
 public class LineAcceptanceTest extends BaseAcceptanceTest {
 
