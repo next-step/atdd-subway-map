@@ -36,6 +36,34 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철역 구간을 생성하고
+     * When 노선을 조회하면
+     * Then 지하철 노선의 정보에서 해당 구간을 찾을 수 있다.
+     */
+    @Test
+    void 지하철역_구간을_조회한다() {
+        // given
+        var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
+        구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
+
+        // when
+        구간을_삭제한다(_8호선, 한성백제역);
+
+        // then
+        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
+
+        // then
+        assertAll(() -> {
+            assertThat(조회한_8호선.getName()).isEqualTo("8호선");
+            assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
+            assertThat(조회한_8호선.getStationResponses()).containsExactly(
+                    new StationResponse(1L, "모란역"),
+                    new StationResponse(2L, "암사역")
+            );
+        });
+    }
+
+    /**
+     * Given 지하철역 구간을 생성하고
      * When 지하철역 노선 목록 조회 시
      * Then 지하철 노선 목록 조회 시 추가 된 구간을 조회할 수 있다.
      */
@@ -89,9 +117,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
 
         // when
-        구간을_삭제한다(_8호선, 한성백제역);
-
-        // then
         var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
 
         // then
@@ -100,7 +125,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
             assertThat(조회한_8호선.getStationResponses()).containsExactly(
                     new StationResponse(1L, "모란역"),
-                    new StationResponse(2L, "암사역")
+                    new StationResponse(2L, "암사역"),
+                    new StationResponse(3L, "한성백제역")
             );
         });
     }
