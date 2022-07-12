@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineSaveRequest;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Distance;
 import nextstep.subway.domain.Line;
@@ -23,6 +24,7 @@ public class LineService {
         this.stationService = stationService;
     }
 
+    @Transactional
     public LineResponse createLines(final LineSaveRequest request) {
         final List<StationResponse> endStations = stationService.findEndStations(List.of(request.getUpStationId(), request.getDownStationId()));
 
@@ -49,6 +51,14 @@ public class LineService {
         return new LineResponse(
             line.getId(), line.getName(), line.getColor(),
             stationService.findEndStations(List.of(line.getUpStationId(), line.getDownStationId())));
+    }
+
+    @Transactional
+    public void updateLine(final Long id, final LineUpdateRequest request) {
+        final Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
+
+        line.updateNameAndColor(request.getName(), request.getColor());
     }
 
 }

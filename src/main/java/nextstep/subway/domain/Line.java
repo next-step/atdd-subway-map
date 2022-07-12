@@ -59,4 +59,9 @@ public class Line {
         return distance;
     }
 
+    public void updateNameAndColor(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+    }
+
 }
