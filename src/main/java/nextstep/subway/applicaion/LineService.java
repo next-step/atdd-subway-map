@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -41,6 +40,15 @@ public class LineService {
                 line.getId(), line.getName(), line.getColor(),
                 stationService.findEndStations(List.of(line.getUpStationId(), line.getDownStationId())))
             ).collect(Collectors.toList());
+    }
+
+    public LineResponse getOneLine(final Long id) {
+        final Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("해당하는 노선을 찾을 수 없습니다."));
+
+        return new LineResponse(
+            line.getId(), line.getName(), line.getColor(),
+            stationService.findEndStations(List.of(line.getUpStationId(), line.getDownStationId())));
     }
 
 }
