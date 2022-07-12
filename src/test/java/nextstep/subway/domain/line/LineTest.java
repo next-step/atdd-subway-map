@@ -22,21 +22,6 @@ class LineTest {
                 .isThrownBy(() -> createMockLine("color"));
     }
 
-
-    @Test
-    @DisplayName("Line 등록시 상행역 id는 필수 값이어야 한다.")
-    void lineRequiredUpStationIdTest() {
-        assertThatNullPointerException()
-                .isThrownBy(() -> createMockLine("upStationId"));
-    }
-
-    @Test
-    @DisplayName("Line 등록시 하행역 id는 필수 값이어야 한다.")
-    void lineRequiredDownStationIdTest() {
-        assertThatNullPointerException()
-                .isThrownBy(() -> createMockLine("downStationId"));
-    }
-
     @Test
     @DisplayName("Line 등록시 거리는 필수 값이어야 한다.")
     void lineRequiredDistanceTest() {
@@ -49,8 +34,6 @@ class LineTest {
         Line line = Line.builder()
                 .name("name")
                 .color("color")
-                .upStationId(1L)
-                .downStationId(2L)
                 .distance(10)
                 .build();
 
@@ -63,16 +46,6 @@ class LineTest {
             case "color": {
                 return line.toBuilder()
                         .color(null)
-                        .build();
-            }
-            case "upStationId": {
-                return line.toBuilder()
-                        .upStationId(null)
-                        .build();
-            }
-            case "downStationId": {
-                return line.toBuilder()
-                        .downStationId(null)
                         .build();
             }
             case "distance": {

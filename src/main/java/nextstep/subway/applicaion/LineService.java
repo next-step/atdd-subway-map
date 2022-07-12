@@ -6,6 +6,8 @@ import nextstep.subway.applicaion.dto.LineDto;
 import nextstep.subway.applicaion.dto.LineUpdateDto;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
+import nextstep.subway.domain.line.Section;
+import nextstep.subway.domain.line.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.exception.NotFoundException;
@@ -21,14 +23,26 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
+
     private final StationRepository stationRepository;
 
 
     @Transactional
-    public LineDto createLine(final LineCreateDto lineDto) {
+    public long createLine(final LineCreateDto lineDto) {
         Line line = lineRepository.save(lineDto.toDomain());
 
-        return convertToLineDto(line);
+        Station upStation = findByStation(lineDto.getUpStationId());
+        Station downStation = findByStation(lineDto.getDownStationId());
+
+        sectionRepository.save(
+                Section.builder()
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .line(line)
+                        .build());
+
+        return line.getId();
     }
 
     public List<LineDto> getLines() {
@@ -36,36 +50,40 @@ public class LineService {
 
 
         return lines.stream()
-                .map(this::convertToLineDto)
+                .map(LineDto::of)
                 .collect(Collectors.toUnmodifiableList());
     }
 
     public LineDto getLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("line is not found"));
+        Line line = findByLine(id);
 
-        return convertToLineDto(line);
+        return LineDto.of(line);
     }
 
     @Transactional
     public void updateLine(Long id, LineUpdateDto lineUpdateDto) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("line is not found"));
+        Line line = findByLine(id);
 
         lineRepository.save(lineUpdateDto.toDomain(line));
     }
 
-    private LineDto convertToLineDto(Line line) {
-        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
-
-        return LineDto.of(line, stations);
-    }
-
     @Transactional
     public void deleteLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("line is not found"));
+        Line line = findByLine(id);
 
+        List<Section> sections = sectionRepository.findByLine(line);
+
+        sectionRepository.deleteAllInBatch(sections);
         lineRepository.delete(line);
+    }
+
+    private Line findByLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("line is not found"));
+    }
+
+    private Station findByStation(Long lineDto) {
+        return stationRepository.findById(lineDto)
+                .orElseThrow(() -> new NotFoundException("station id is not found"));
     }
 }
