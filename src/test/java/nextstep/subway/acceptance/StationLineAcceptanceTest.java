@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql("classpath:/truncate.sql")
 public class StationLineAcceptanceTest {
 
     @LocalServerPort
@@ -200,7 +202,6 @@ public class StationLineAcceptanceTest {
                                      .extract().jsonPath().getList("id", Long.class);
 
         assertThat(ids).isEmpty();
-
     }
 
 }
