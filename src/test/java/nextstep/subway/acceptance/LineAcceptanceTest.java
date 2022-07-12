@@ -50,10 +50,7 @@ class LineAcceptanceTest {
         createSubwayLines("신분당선", "bg-red-600", 1, 2, 10);
 
         //then
-        final ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
+        final ExtractableResponse<Response> lineResponse = findOneLine();
 
         final List<String> name = lineResponse.jsonPath().getList("name", String.class);
         assertThat(name).containsExactly("신분당선");
@@ -102,14 +99,49 @@ class LineAcceptanceTest {
         createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
 
         //when
-        final ExtractableResponse<Response> getLinesResponse = RestAssured.given().log().all()
+        final ExtractableResponse<Response> getLinesResponse = findOneLine();
+
+        //then
+        String lineName = getLinesResponse.jsonPath().get("name");
+        String startStation = getLinesResponse.jsonPath().get("stations[0].name");
+        String endStation = getLinesResponse.jsonPath().get("stations[1].name");
+        assertThat(lineName).isEqualTo("2호선");
+        assertThat(startStation).isEqualTo("합정역");
+        assertThat(endStation).isEqualTo("신촌역");
+    }
+
+    private ExtractableResponse<Response> findOneLine() {
+        return RestAssured.given().log().all()
             .when().get("/lines/1")
             .then().log().all()
             .extract();
+    }
+
+    /*
+    Given 지하철 노선을 생성하고
+    When 생성한 지하철 노선을 수정하면
+    Then 해당 지하철 노선 정보는 수정된다
+     */
+    @Test
+    @DisplayName("지하철 노선 수정")
+    void updateLines() {
+        stationAcceptanceTest.createSubwayStation("신촌역");
+        stationAcceptanceTest.createSubwayStation("합정역");
+
+        createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
+
+        //when
+        final Map<String, String> param = Map.of("name", "다른분당선", "color", "bg-red-600");
+        RestAssured.given().log().all()
+            .body(param)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines/1")
+            .then().log().all();
 
         //then
-        String name = getLinesResponse.jsonPath().get("name");
-        assertThat(name).isEqualTo("2호선");
+        final ExtractableResponse<Response> getLinesResponse = findOneLine();
+        assertThat(getLinesResponse.jsonPath().getString("name")).isEqualTo("다른분당선");
+        assertThat(getLinesResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
     }
 
     private void createSubwayLines(final String name, final String color,
