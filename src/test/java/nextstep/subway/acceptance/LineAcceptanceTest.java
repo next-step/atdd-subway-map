@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.common.LineRestAssured;
+import nextstep.subway.common.StationRestAssured;
 import nextstep.subway.domain.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql("/subway.sql")
@@ -24,8 +23,19 @@ import org.springframework.test.context.jdbc.Sql;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
 
+  private static final String donongStation = "도농역";
+  private static final String gooriStation = "구리역";
+  private static final String ducksoStation = "구리역";
+
+  private static final String firstLine = "1호선";
+  private static final String secondLine = "2호선";
+  private static final String thirdLine = "3호선";
+
   @LocalServerPort
   int port;
+
+  private final StationRestAssured stationRestAssured = new StationRestAssured();
+  private final LineRestAssured lineRestAssured = new LineRestAssured();
 
   @BeforeEach
   public void setUp() {
@@ -39,49 +49,19 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_생성() {
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", "도농역");
+    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
+    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
+    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
+    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
 
-    StationResponse donongStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
+    saveLine(secondLine, donongStation, gooriStation);
 
-    params.put("name", "구리역");
+    ExtractableResponse<Response> response = lineRestAssured.findAllLine();
 
-    StationResponse gooriStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
-
-    params.put("name", "1호선");
-    params.put("color", Color.BLUE);
-    params.put("upStationId", donongStation.getId());
-    params.put("downStationId", gooriStation.getId());
-    params.put("distance", 10);
-
-    ExtractableResponse<Response> response = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
-
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    ExtractableResponse<Response> response1 = RestAssured.given().log().all()
-        .when().get("/lines")
-        .then().log().all()
-        .extract();
-
-    List<String> names = response1.jsonPath().getList("name", String.class);
+    List<String> names = response.jsonPath().getList("name", String.class);
     assertThat(names).containsAnyOf("1호선");
 
-    List<String> colors = response1.jsonPath().getList("color", String.class);
+    List<String> colors = response.jsonPath().getList("color", String.class);
     assertThat(colors).containsAnyOf(Color.BLUE.name());
   }
 
@@ -92,71 +72,20 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_목록_조회() {
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", "도농역");
+    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
+    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
+    ExtractableResponse<Response> ducksoStationResponse = stationRestAssured.saveStation(ducksoStation);
+    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
+    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
+    StationResponse ducksoStation = ducksoStationResponse.as(StationResponse.class);
 
-    StationResponse donongStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
+    saveLine(firstLine, donongStation, gooriStation);
+    saveLine(secondLine, donongStation, ducksoStation);
 
-    params.put("name", "구리역");
-
-    StationResponse gooriStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
-
-    params.put("name", "덕소역");
-
-    StationResponse ducksoStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
-
-    params.put("name", "1호선");
-    params.put("color", Color.BLUE);
-    params.put("upStationId", donongStation.getId());
-    params.put("downStationId", gooriStation.getId());
-    params.put("distance", 10);
-
-    ExtractableResponse<Response> donongGooriLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
-
-    assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    params.put("name", "2호선");
-    params.put("color", Color.GREEN);
-    params.put("upStationId", donongStation.getId());
-    params.put("downStationId", ducksoStation.getId());
-    params.put("distance", 10);
-
-    ExtractableResponse<Response> donongDucksoLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
-
-    assertThat(donongDucksoLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    ExtractableResponse<Response> response = RestAssured.given().log().all()
-        .when().get("/lines")
-        .then().log().all()
-        .extract();
+    ExtractableResponse<Response> response = lineRestAssured.findAllLine();
 
     List<String> names = response.jsonPath().getList("name", String.class);
-    assertThat(names).containsAnyOf("1호선", "2호선");
+    assertThat(names).containsAnyOf(firstLine, secondLine);
 
     List<String> colors = response.jsonPath().getList("color", String.class);
     assertThat(colors).containsAnyOf(Color.BLUE.name(), Color.GREEN.name());
@@ -169,47 +98,17 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_조회() {
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", "도농역");
+    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
+    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
+    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
+    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
 
-    StationResponse donongStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
+    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStation, gooriStation);
 
-    params.put("name", "구리역");
-
-    StationResponse gooriStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
-
-    params.put("name", "1호선");
-    params.put("color", Color.BLUE);
-    params.put("upStationId", donongStation.getId());
-    params.put("downStationId", gooriStation.getId());
-    params.put("distance", 10);
-
-    ExtractableResponse<Response> donongGooriLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
-
-    assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    ExtractableResponse<Response> response = RestAssured.given().log().all()
-        .when().get("/lines/" + donongGooriLine.jsonPath().getLong("id"))
-        .then().log().all()
-        .extract();
+    ExtractableResponse<Response> response = lineRestAssured.findLine(donongGooriLine.jsonPath().getLong("id"));
 
     String names = response.jsonPath().getString("name");
-    assertThat(names).isEqualTo("1호선");
+    assertThat(names).isEqualTo(firstLine);
 
     String colors = response.jsonPath().getString("color");
     assertThat(colors).isEqualTo(Color.BLUE.name());
@@ -222,50 +121,14 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_수정() {
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", "도농역");
+    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
+    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
+    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
+    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
 
-    StationResponse donongStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
+    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStation, gooriStation);
 
-    params.put("name", "구리역");
-
-    StationResponse gooriStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
-
-    params.put("name", "1호선");
-    params.put("color", Color.BLUE);
-    params.put("upStationId", donongStation.getId());
-    params.put("downStationId", gooriStation.getId());
-    params.put("distance", 10);
-
-    ExtractableResponse<Response> donongGooriLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
-
-    assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    params.put("name", "3호선");
-    params.put("color", Color.ORANGE);
-
-    ExtractableResponse<Response> updateDonongGooriLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().put("/lines/" + donongGooriLine.jsonPath().getLong("id"))
-        .then().log().all()
-        .extract();
-
+    ExtractableResponse<Response> updateDonongGooriLine = lineRestAssured.updateLine(donongGooriLine.jsonPath().getLong("id"), thirdLine, Color.ORANGE);
     assertThat(updateDonongGooriLine.statusCode()).isEqualTo(HttpStatus.OK.value());
   }
 
@@ -276,47 +139,21 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_삭제() {
-    Map<String, Object> params = new HashMap<>();
-    params.put("name", "도농역");
+    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
+    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
+    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
+    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
 
-    StationResponse donongStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
+    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStation, gooriStation);
 
-    params.put("name", "구리역");
+    ExtractableResponse<Response> deleteDonongGooriLine = lineRestAssured.deleteLine(donongGooriLine.jsonPath().getLong("id"));
+    assertThat(deleteDonongGooriLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
 
-    StationResponse gooriStation = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stations")
-        .then().log().all()
-        .extract().as(StationResponse.class);
-
-    params.put("name", "1호선");
-    params.put("color", Color.BLUE);
-    params.put("upStationId", donongStation.getId());
-    params.put("downStationId", gooriStation.getId());
-    params.put("distance", 10);
-
-    ExtractableResponse<Response> donongGooriLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then().log().all()
-        .extract();
-
+  private ExtractableResponse<Response> saveLine(String name, StationResponse upStationResponse, StationResponse downeStationResponse1) {
+    ExtractableResponse<Response> donongGooriLine = lineRestAssured.saveLine(name, upStationResponse, downeStationResponse1);
     assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-    ExtractableResponse<Response> deleteDonongGooriLine = RestAssured.given().log().all()
-        .body(params)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().delete("/lines/" + donongGooriLine.jsonPath().getLong("id"))
-        .then().log().all()
-        .extract();
-
-    assertThat(deleteDonongGooriLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    return donongGooriLine;
   }
 }
