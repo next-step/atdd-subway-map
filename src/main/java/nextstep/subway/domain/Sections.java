@@ -4,6 +4,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,18 @@ public class Sections {
         }
     }
 
+    public void removeSection(Section section) {
+        Section lastSection = getLastSection();
+        if (!lastSection.equals(section)) {
+            throw new IllegalArgumentException("현재 구간은 마지막 구간이 아닙니다.");
+        }
+        sections.remove(section);
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size() - 1);
+    }
+
     public List<Station> getStation() {
         return sections.stream()
                 .map(Section::getStations)
@@ -65,5 +79,4 @@ public class Sections {
                 .distinct()
                 .collect(Collectors.toList());
     }
-
 }

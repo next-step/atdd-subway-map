@@ -35,6 +35,10 @@ public class Line {
         sections.addSection(this,section);
     }
 
+    public void removeSection(Section section) {
+        sections.removeSection(section);
+    }
+
     private void validation(String name, String color) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("노선의 이름을 작성해주세요");
