@@ -14,6 +14,15 @@ public class Line {
 
     private String color;
 
+    public Line() {
+    }
+
+    public Line(String name, String color, List<Station> stations) {
+        this.name = name;
+        this.color = color;
+        this.stations = stations;
+    }
+
     @OneToMany
     private List<Station> stations;
 
