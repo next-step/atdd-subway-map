@@ -36,4 +36,8 @@ public class Selection {
 	public Long getDownStationId() {
 		return downStationId;
 	}
+
+	public Long getDistance() {
+		return distance;
+	}
 }

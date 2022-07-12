@@ -1,5 +1,8 @@
 package nextstep.subway.applicaion;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,16 +49,23 @@ public class SelectionService {
 
 	}
 
-	public void getSelectionList(long lineId) {
-
+	public List<SelectionResponse> getSelectionList(long lineId) {
+		return selectionRepository.findByLineIdOrderById(lineId)
+			.stream()
+			.map(this::createSelectionResponse)
+			.collect(Collectors.toList());
 	}
 
-	public void getSelection(long lineId, long selectionId) {
-
+	public SelectionResponse getSelection(long selectionId) {
+		return createSelectionResponse(selectionRepository.findById(selectionId)
+			.orElseThrow(IllegalArgumentException::new));
 	}
 
 	private SelectionResponse createSelectionResponse(Selection selection) {
-		return new SelectionResponse(selection.getId());
+		return new SelectionResponse(selection.getId(),
+			selection.getUpStationId(),
+			selection.getDownStationId(),
+			selection.getDistance());
 	}
 
 }

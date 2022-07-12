@@ -19,4 +19,7 @@ public class SelectionRequest {
 		return downStationId;
 	}
 
+	public Long getDistance() {
+		return distance;
+	}
 }
