@@ -5,7 +5,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -18,9 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StationAcceptanceTest extends AcceptanceTest {
 
     public static final String CLEAN_UP_TABLE = "station";
-
-    @Autowired
-    private CleanUpSchema cleanUpSchema;
 
     @Override
     protected void preprocessing() {
@@ -42,8 +38,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = getStationNames(findStations());
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(ActualUtils.getList(response, "name", String.class)).containsAnyOf("강남역");
     }
 
     /**
@@ -62,8 +57,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = findStations();
 
         // then
-        List<String> names = getStationNames(response);
-        assertThat(names).isEqualTo(List.of("낙성대역", "구로디지털단지역"));
+        assertThat(ActualUtils.getList(response, "name", String.class)).isEqualTo(List.of("낙성대역", "구로디지털단지역"));
     }
 
     /**
@@ -87,7 +81,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<String> names = getStationNames(findStations());
+        List<String> names = ActualUtils.getList(findStations(), "name", String.class);
         assertThat(names.contains("서울대입구역")).isFalse();
     }
 
@@ -116,15 +110,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
-    }
-
-    /**
-     * Response에서 지하철역 이름 목록 추출
-     * @param response
-     * @return
-     */
-    private List<String> getStationNames(ExtractableResponse<Response> response) {
-        return response.jsonPath().getList("name", String.class);
     }
 
 }
