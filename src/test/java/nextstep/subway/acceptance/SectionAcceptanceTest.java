@@ -108,14 +108,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Then 정상 삭제된다
      */
     @Test
+    @DisplayName("지하철 노선에 등록된 하행 종점역을 제거할 수 있다")
     public void deleteSection() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
         Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
-        int statusCode = 지하철_구간_등록(lineId, downStationId, stationId, 1);
+        지하철_구간_등록(lineId, downStationId, stationId, 1);
 
         // when
-        지하철_구간_삭제(lineId, stationId);
+        int statusCode = 지하철_구간_삭제(lineId, stationId);
 
         // then
         ExtractableResponse<Response> response = 지하철_단일_노선_조회(lineId);
@@ -125,6 +126,28 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(statusCode).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(stationNames).doesNotContain("성수역")
         );
+    }
+
+    /**
+     * Given : 지하철 노선을 1개 생성
+     * Given : 추가할 역 1개 생성
+     * Given : 구간을 생성
+     * When : 하행 종점역이 아닌 지하철 구간 제거를 요청하면
+     * Then : 예외를 발생한다.
+     */
+    @Test
+    @DisplayName("하행 종점역이 아닌 역을 삭제요청할 경우 예외를 발생시킨다")
+    public void deleteSectionUnsuitableStation() {
+        // given
+        Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        지하철_구간_등록(lineId, downStationId, stationId, 1);
+
+        // when
+        int statusCode = 지하철_구간_삭제(lineId, upStationId);
+
+        // then
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private int 지하철_구간_삭제(Long lineId, Long stationId) {
