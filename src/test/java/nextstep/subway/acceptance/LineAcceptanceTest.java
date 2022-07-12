@@ -170,6 +170,7 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철노선을 삭제한다.")
     @Test
+    @DirtiesContext
     void deleteLine() {
         // given
         Map<String, Object> params = Map.of(
