@@ -9,6 +9,8 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-    private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository,
+                       SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     public List<LineResponse> findAllLines() {
@@ -36,13 +41,10 @@ public class LineService {
         Station downStation = getStation(lineRequest.getDownStationId());
         Station upStation = getStation(lineRequest.getUpStationId());
 
-        Line line = Line.builder()
-                .name(lineRequest.getName())
-                .color(lineRequest.getColor())
-                .distance(lineRequest.getDistance())
-                .upStation(upStation)
-                .downStation(downStation)
-                .build();
+        Section section = Section.createSection(downStation, upStation, lineRequest.getDistance());
+        sectionRepository.save(section);
+
+        Line line = Line.createLine(lineRequest.getName(), lineRequest.getColor(), section);
         return createLineResponse(lineRepository.save(line));
     }
 
@@ -73,7 +75,8 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses = createStationResponses(line.getDownStation(), line.getUpStation());
+        List<StationResponse> stationResponses =
+                createStationResponses(line.getDownStationTerminal(), line.getUpStationTerminal());
 
         return LineResponse.builder()
                 .id(line.getId())
