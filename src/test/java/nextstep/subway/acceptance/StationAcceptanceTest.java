@@ -72,7 +72,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteStation() {
 		//given
-		Integer id = createStation("녹번역").jsonPath().get("id");
+		Long id = createStation("녹번역").jsonPath().get("id");
 
 		//when
 		ExtractableResponse<Response> response = delete("/stations/" + id);
@@ -85,7 +85,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 		assertThat(stations).doesNotContain("녹번역");
 	}
 
-	ExtractableResponse<Response> createStation(String name) {
+	private ExtractableResponse<Response> createStation(String name) {
 		Map<String, String> params = new HashMap<>();
 		params.put("name", name);
 
