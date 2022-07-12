@@ -24,7 +24,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
 
         createStation(Map.of(NAME, "남태령역"));
         createStation(Map.of(NAME, "사당역"));
-        createStation(Map.of(NAME, "방배역"));
+        createStation(Map.of(NAME, "총신대입구역"));
     }
 
     /**
@@ -136,7 +136,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
                 .getLong("id");
     }
 
-    private ExtractableResponse<Response> createLine(String name, String color, long upStationId, long downStationId, int distance) {
+    public static ExtractableResponse<Response> createLine(String name, String color, long upStationId, long downStationId, int distance) {
         return RestAssured.given().log().all()
                 .body(Map.of(
                         "name", name,
