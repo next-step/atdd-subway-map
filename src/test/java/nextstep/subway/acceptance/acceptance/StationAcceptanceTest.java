@@ -2,7 +2,7 @@ package nextstep.subway.acceptance.acceptance;
 
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_목록을_조회한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_삭제를_요청한다;
-import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
@@ -38,7 +38,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("강남역");
+        ExtractableResponse<Response> createdResponse = 지하철역_생성을_요청한다("강남역");
 
         // then
         assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -59,8 +59,8 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_조회() {
         // given
-        지하철역을_생성한다("신도림역");
-        지하철역을_생성한다("건대역");
+        지하철역_생성을_요청한다("신도림역");
+        지하철역_생성을_요청한다("건대역");
 
         // when
         ExtractableResponse<Response> stationsResponse = 지하철역_목록을_조회한다();
@@ -80,7 +80,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_제거() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("홍대입구역");
+        ExtractableResponse<Response> createdResponse = 지하철역_생성을_요청한다("홍대입구역");
         long stationId = createdResponse.jsonPath().getLong("id");
 
         // when
