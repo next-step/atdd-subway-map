@@ -13,9 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import static nextstep.subway.acceptance.StationUtils.*;
+import static nextstep.subway.acceptance.StationUtils.지하철역을_등록한다;
 import static nextstep.subway.acceptance.SubwayLineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -59,11 +60,13 @@ public class SubwayLineTest {
 		JsonPath responseToJson = setUpSubwayLine.jsonPath();
 
 		//then
-		assertThat(setUpSubwayLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(responseToJson.getLong("id")).isNotNull();
-		assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME);
-		assertThat(responseToJson.getString("color")).isEqualTo(LINE_COLOR);
-		assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME);
+		assertAll(
+				() -> assertThat(setUpSubwayLine.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+				() -> assertThat(responseToJson.getLong("id")).isNotNull(),
+				() -> assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME),
+				() -> assertThat(responseToJson.getString("color")).isEqualTo(LINE_COLOR),
+				() -> assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME)
+		);
 	}
 
 
@@ -75,18 +78,20 @@ public class SubwayLineTest {
 	@DisplayName("지하철노선 목록을 조회한다.")
 	@Test
 	void findSubwayLineList() {
-	    //given
+		//given
 		Long 인천역 = 지하철역을_등록한다("인천역").jsonPath().getLong("id");
 		Long 청량리역 = 지하철역을_등록한다("청량리역").jsonPath().getLong("id");
 		지하철노선을_등록한다("수인분당선", "bg-yellow-600", 인천역, 청량리역, 20);
 
-	    //when
+		//when
 		ExtractableResponse<Response> response = 지하철노선_목록을_조회한다();
 		JsonPath responseToJson = response.jsonPath();
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(responseToJson.getList("name")).containsExactly(LINE_NAME, "수인분당선");
+		assertAll(
+				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+				() -> assertThat(responseToJson.getList("name")).containsExactly(LINE_NAME, "수인분당선")
+		);
 	}
 
 
@@ -98,7 +103,7 @@ public class SubwayLineTest {
 	@DisplayName("지하철노선을 조회한다.")
 	@Test
 	void findSubwayLine() {
-	    //given
+		//given
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
@@ -106,9 +111,11 @@ public class SubwayLineTest {
 		JsonPath responseToJson = response.jsonPath();
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME);
-		assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME);
+		assertAll(
+				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+				() -> assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME),
+				() ->assertThat(responseToJson.getList("stations.name")).containsExactly(UP_STATION_NAME, DOWN_STATION_NAME)
+		);
 	}
 
 	/**
@@ -119,7 +126,7 @@ public class SubwayLineTest {
 	@DisplayName("지하철노선을 수정한다.")
 	@Test
 	void modifySubwayLine() {
-	    //given
+		//given
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
@@ -127,9 +134,11 @@ public class SubwayLineTest {
 		JsonPath findSubwayLineJson = 지하철노선_하나를_조회한다(subwayLineId).jsonPath();
 
 		//then
-		assertThat(modifiedSubwayLine.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역");
-		assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600");
+		assertAll(
+				() -> assertThat(modifiedSubwayLine.statusCode()).isEqualTo(HttpStatus.OK.value()),
+				() -> assertThat(findSubwayLineJson.getString("name")).isEqualTo("상현역"),
+				() -> assertThat(findSubwayLineJson.getString("color")).isEqualTo("bg-white-600")
+		);
 	}
 
 	/**
@@ -140,7 +149,7 @@ public class SubwayLineTest {
 	@DisplayName("지하철노선을 삭제한다.")
 	@Test
 	void deleteSubwayLine() {
-	    //given
+		//given
 		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
 
 		//when
