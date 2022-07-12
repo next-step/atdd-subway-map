@@ -1,19 +1,16 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import nextstep.subway.domain.station.Station;
+
+@Getter
+@RequiredArgsConstructor
 public class StationResponse {
-    private Long id;
-    private String name;
+    private final Long id;
+    private final String name;
 
-    public StationResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public static StationResponse fromStation(Station station) {
+        return new StationResponse(station.getId(), station.getName());
     }
 }

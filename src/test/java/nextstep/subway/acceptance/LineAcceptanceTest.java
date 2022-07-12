@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import static nextstep.subway.acceptance.SubwayTestUtils.BUNDANG_LINE_REQUEST;
 import static nextstep.subway.acceptance.SubwayTestUtils.SINBUNDANG_LINE_REQUEST;
 import static nextstep.subway.acceptance.SubwayTestUtils.createLine;
+import static nextstep.subway.acceptance.SubwayTestUtils.createStationWithName;
 import static nextstep.subway.acceptance.SubwayTestUtils.getAllLines;
 import static nextstep.subway.acceptance.SubwayTestUtils.getLine;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +28,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindTheLineCreatedWhenLineWasCreated() {
         // when
+        createStationWithName("광교역");
+        createStationWithName("광교중앙역");
+        createStationWithName("상현역");
         var creationResponse = createLine(SINBUNDANG_LINE_REQUEST);
 
         // then
@@ -47,6 +51,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindSameNumberOfLinesWhenLinesWereCreated() {
         // given
+        createStationWithName("광교역");
+        createStationWithName("광교중앙역");
+        createStationWithName("상현역");
         createLine(SINBUNDANG_LINE_REQUEST);
         createLine(BUNDANG_LINE_REQUEST);
 
@@ -73,6 +80,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canGetResponseOfLineInformationByLineId() {
         // given
+        createStationWithName("광교역");
+        createStationWithName("광교중앙역");
+        createStationWithName("상현역");
         var creationResponse = createLine(BUNDANG_LINE_REQUEST);
         var createdLineId = creationResponse.body().jsonPath().getLong("id");
 
@@ -101,6 +111,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canModifyLineInformationWhichCreated() {
         // given
+        createStationWithName("광교역");
+        createStationWithName("광교중앙역");
+        createStationWithName("상현역");
         var creationResponse = createLine(SINBUNDANG_LINE_REQUEST);
         var createdLineId = creationResponse.jsonPath().getLong("id");
 
@@ -137,6 +150,9 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeCreatedLine() {
         // given
+        createStationWithName("광교역");
+        createStationWithName("광교중앙역");
+        createStationWithName("상현역");
         var creationResponse = createLine(BUNDANG_LINE_REQUEST);
         var createdLineId = creationResponse.jsonPath().getLong("id");
 

@@ -1,12 +1,19 @@
 package nextstep.subway.domain.line;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
+import nextstep.subway.domain.section.Section;
+import nextstep.subway.domain.station.Station;
 
 @Getter
 @Entity
@@ -18,26 +25,32 @@ public class Line {
     private String name;
     @NotBlank
     private String color;
+
     @NotNull
-    private Long upStationId;
-    @NotNull
-    private Long downStationId;
-    @NotNull
-    private Long distance;
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "start_section_id")
+    private Section startSection;
 
     public Line() {}
 
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
-        this.id = id;
+    public Line(String name, String color, Section startSection) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.startSection = startSection;
     }
 
     public void changeNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public List<Station> getStations() {
+        var stations = new ArrayList<Station>();
+        var currentSection = startSection;
+        while (currentSection != null) {
+            stations.add(currentSection.getStation());
+            currentSection = currentSection.getNextSection();
+        }
+        return stations;
     }
 }

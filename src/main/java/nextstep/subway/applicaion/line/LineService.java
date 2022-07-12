@@ -6,6 +6,9 @@ import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
+import nextstep.subway.domain.section.Section;
+import nextstep.subway.domain.section.SectionRepository;
+import nextstep.subway.domain.station.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class LineService {
 
     private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
     public LineResponse create(LineCreationRequest request) {
-        var line = new Line(
-                null,
-                request.getName(),
-                request.getColor(),
-                request.getUpStationId(),
-                request.getDownStationId(),
-                request.getDistance());
+        var upStation = stationRepository.findById(request.getUpStationId())
+                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 역 ID 입니다."));
+        var downStation = stationRepository.findById(request.getDownStationId())
+                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 역 ID 입니다."));
+        var firstSection = sectionRepository.save(new Section(upStation, request.getDistance()));
+        var secondSection = sectionRepository.save(new Section(downStation));
+        firstSection.setNextSection(secondSection);
+
+        var line = new Line(request.getName(), request.getColor(), firstSection);
 
         return LineResponse.fromLine(lineRepository.save(line));
     }
