@@ -74,7 +74,7 @@ public class LineAcceptanceTest {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-    @DisplayName("지하철 노선을 조회한다.")
+    @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showAllLines() {
         // given
@@ -89,6 +89,24 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getList("name"))
                 .isEqualTo(Arrays.asList(LINE_5.get("name"), LINE_2.get("name")));
 
+    }
+
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void findLine() {
+        // given
+        ExtractableResponse<Response> lineCreatedResponse = 지하철_노선_생성(LINE_5);
+        지하철_노선_생성(LINE_2);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/lines" + lineCreatedResponse.jsonPath().get("id"))
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.jsonPath().get("name").equals(LINE_5.get("name"))).isTrue();
+        assertThat(response.jsonPath().get("color").equals(LINE_5.get("color"))).isTrue();
     }
 
 
