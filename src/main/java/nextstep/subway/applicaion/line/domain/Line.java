@@ -16,6 +16,9 @@ public class Line {
 	private Long downStationId;
 	private Integer distance;
 
+	public Line() {
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -26,6 +29,14 @@ public class Line {
 
 	public String getColor() {
 		return color;
+	}
+
+	public Long getUpStationId() {
+		return upStationId;
+	}
+
+	public Long getDownStationId() {
+		return downStationId;
 	}
 
 	public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {

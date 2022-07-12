@@ -85,7 +85,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> response = get("/lines");
 		assertThat(response.jsonPath().getList("")).hasSize(2);
 		assertThat(response.jsonPath().getList("name")).contains("신분당선");
-//		assertThat(response.jsonPath().getList("").get(0))
+		assertThat(response.jsonPath().getList("[0].stations.name")).contains("양재역");
 	}
 
 	/**

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,5 +37,23 @@ public class LineService {
 		Line line = lineRepository.save(lineRequest.toLine());
 
 		return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(upStation, downStation));
+	}
+
+	public List<LineResponse> findAllLines() {
+		List<Line> lines = lineRepository.findAll();
+
+		return lines.stream().map(this::createLineResponse).collect(Collectors.toList());
+	}
+
+	private LineResponse createLineResponse(Line line) {
+		Station upStation = stationService.getStationById(line.getUpStationId());
+		Station downStation = stationService.getStationById(line.getDownStationId());
+
+		return new LineResponse(
+			line.getId(),
+			line.getName(),
+			line.getColor(),
+			List.of(upStation, downStation)
+		);
 	}
 }
