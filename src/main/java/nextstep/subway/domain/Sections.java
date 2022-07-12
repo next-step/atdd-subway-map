@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class Sections {
     private final static int LIMIT_SECTIONS_SIZE = 1;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
     private final List<Section> sections = new ArrayList<>();
 
     protected Sections() {

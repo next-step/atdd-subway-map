@@ -136,7 +136,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 노선을_조회한다(Long id) {
+    public static ExtractableResponse<Response> 노선을_조회한다(Long id) {
         var response = getRequestWithParameter("/lines/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
