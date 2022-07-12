@@ -18,13 +18,6 @@ import org.springframework.test.context.jdbc.Sql;
 @DisplayName("지하철노선 관련 기능")
 @Sql(scripts = {"classpath:sql/truncate.sql","classpath:sql/createStations.sql"})
 public class LineAcceptanceTest extends BaseAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
 
     /**
      * When 지하철 노선을 생성하면
