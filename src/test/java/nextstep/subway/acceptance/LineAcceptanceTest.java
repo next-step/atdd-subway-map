@@ -129,7 +129,7 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> response = findLineById(1L);
 
         // then
-        assertThat(response.jsonPath().getList("name", String.class)).contains("신분당선");
+        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
     }
 
     /**
