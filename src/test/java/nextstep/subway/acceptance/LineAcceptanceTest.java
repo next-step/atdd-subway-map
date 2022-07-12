@@ -69,6 +69,29 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsAnyOf("5호선");
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void showAllLines() {
+        // given
+        지하철_노선_생성(LINE_5);
+        지하철_노선_생성(LINE_2);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회();
+
+        // then
+        assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList("name"))
+                .isEqualTo(Arrays.asList(LINE_5.get("name"), LINE_2.get("name")));
+
+    }
+
+
     private ExtractableResponse<Response> 지하철_노선_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
