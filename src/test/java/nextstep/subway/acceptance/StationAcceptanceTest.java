@@ -3,21 +3,22 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
+@Sql({"classpath:subway.init.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
     @LocalServerPort
@@ -58,11 +59,16 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        String station1 = "강남역";
-        String station2 = "신논현역";
+        String 강남역 = "강남역";
+        String 신논현역 = "신논현역";
 
-        createStationRequest(station1);
-        createStationRequest(station2);
+        ExtractableResponse<Response> 강남역_생성_응답 = createStationRequest(강남역);
+        ExtractableResponse<Response> 신논현역_생성_응답 = createStationRequest(신논현역);
+
+        assertAll(
+                () -> assertThat(강남역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(신논현역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
+        );
 
         // when
         List<String> stationNames = findAllStationsRequest();
@@ -81,15 +87,19 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String station = "강남역";
-        createStationRequest(station);
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> 강남역_생성_응답 = createStationRequest(강남역);
+        Long 강남역_고유번호 = 강남역_생성_응답.jsonPath().getLong("id");
 
         // when
-        RestAssured.given().log().all()
-                .when().delete("/stations/{id}", 1L)
-                .then().log().all();
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/{id}", 강남역_고유번호)
+                .then().log().all()
+                .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
         List<String> stationNames = findAllStationsRequest();
         assertThat(stationNames).hasSize(0);
     }

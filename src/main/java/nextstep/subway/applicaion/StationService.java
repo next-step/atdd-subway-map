@@ -21,7 +21,7 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        Station station = stationRepository.save(Station.from(stationRequest.getName()));
         return createStationResponse(station);
     }
 
@@ -37,9 +37,6 @@ public class StationService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return StationResponse.from(station.getId(), station.getName());
     }
 }
