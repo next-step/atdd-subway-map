@@ -3,16 +3,16 @@ package nextstep.subway.applicaion.dto;
 import java.util.Arrays;
 import java.util.List;
 
-public class StationLineResponse {
+public class LineResponse {
 	private Long id;
 	private String name;
 	private String color;
 	private List<StationResponse> stations;
 
-	public StationLineResponse() {
+	public LineResponse() {
 	}
 
-	public StationLineResponse(Long id, String name, String color, StationResponse upStationResponse,
+	public LineResponse(Long id, String name, String color, StationResponse upStationResponse,
 		StationResponse downStationResponse) {
 
 		this.id = id;

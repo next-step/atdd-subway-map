@@ -13,25 +13,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import nextstep.subway.applicaion.SelectionService;
-import nextstep.subway.applicaion.dto.SelectionRequest;
-import nextstep.subway.applicaion.dto.SelectionResponse;
+import nextstep.subway.applicaion.SectionService;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 
 @RestController
 @RequestMapping("/lines")
-public class SelectionController {
+public class SectionController {
 
-	private SelectionService selectionService;
+	private SectionService selectionService;
 
-	public SelectionController(SelectionService selectionService) {
+	public SectionController(SectionService selectionService) {
 		this.selectionService = selectionService;
 	}
 
 	@PostMapping(value = "{lineId}/selection")
-	public ResponseEntity<SelectionResponse> createSelection(@PathVariable long lineId,
-		@RequestBody SelectionRequest selectionRequest) {
-		SelectionResponse selectionResponse = selectionService.createSelection(lineId, selectionRequest);
-		return ResponseEntity.created(URI.create("/lines/" + lineId + "/selection")).body(selectionResponse);
+	public ResponseEntity<SectionResponse> createSection(@PathVariable long lineId,
+		@RequestBody SectionRequest sectionRequest) {
+		SectionResponse sectionResponse = selectionService.createSelection(lineId, sectionRequest);
+		return ResponseEntity.created(URI.create("/lines/" + lineId + "/selection")).body(sectionResponse);
 	}
 
 	@DeleteMapping(value = "{lineId}/selection")
@@ -41,12 +41,12 @@ public class SelectionController {
 	}
 
 	@GetMapping(value = "{lineId}/selection")
-	public ResponseEntity<List<SelectionResponse>> getSelectionList(@PathVariable long lineId) {
+	public ResponseEntity<List<SectionResponse>> getSelectionList(@PathVariable long lineId) {
 		return ResponseEntity.ok().body(selectionService.getSelectionList(lineId));
 	}
 
 	@GetMapping(value = "/selection/{selectionId}")
-	public ResponseEntity<SelectionResponse> getSelection(@PathVariable long selectionId) {
+	public ResponseEntity<SectionResponse> getSelection(@PathVariable long selectionId) {
 		return ResponseEntity.ok().body(selectionService.getSelection(selectionId));
 	}
 

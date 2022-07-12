@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-public class Selections {
-	private final List<Selection> values;
+public class Sections {
+	private final List<Section> values;
 
-	public Selections(List<Selection> selectionList) {
+	public Sections(List<Section> selectionList) {
 		values = new ArrayList<>(selectionList);
 	}
 
@@ -17,11 +17,11 @@ public class Selections {
 			throw new IllegalStateException();
 		}
 
-		Selection selection = values.stream()
+		Section section = values.stream()
 			.reduce((first, second) -> second)
 			.orElseThrow(IllegalStateException::new);
 
-		if (selection.getDownStationId() != stationId) {
+		if (section.getDownStationId() != stationId) {
 			throw new IllegalStateException();
 		}
 

@@ -6,7 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Selection {
+public class Section {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -15,10 +15,10 @@ public class Selection {
 	private Long downStationId;
 	private Long distance;
 
-	protected Selection() {
+	protected Section() {
 	}
 
-	public Selection(long lineId, Long upStationId, Long downStationId, Long distance) {
+	public Section(long lineId, Long upStationId, Long downStationId, Long distance) {
 		this.lineId = lineId;
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;

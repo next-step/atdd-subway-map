@@ -7,8 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import nextstep.subway.applicaion.dto.StationLineRequest;
-import nextstep.subway.applicaion.dto.StationLineResponse;
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -25,39 +25,39 @@ public class LineService {
 	}
 
 	@Transactional
-	public StationLineResponse createStationLines(StationLineRequest stationLineRequest) {
-		Line line = lineRepository.save(stationLineRequest.toLine());
-		return createStationLineResponse(line);
+	public LineResponse createLines(LineRequest LineRequest) {
+		Line line = lineRepository.save(LineRequest.toLine());
+		return createLineResponse(line);
 	}
 
-	public List<StationLineResponse> findAllStationLines() {
+	public List<LineResponse> findAllLines() {
 		return lineRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
 			.stream()
-			.map(this::createStationLineResponse)
+			.map(this::createLineResponse)
 			.collect(Collectors.toList());
 	}
 
-	public StationLineResponse findStationLine(Long stationId) {
+	public LineResponse findLine(Long stationId) {
 
-		return createStationLineResponse(lineRepository.findById(stationId)
+		return createLineResponse(lineRepository.findById(stationId)
 			.orElseThrow(IllegalArgumentException::new));
 	}
 
 	@Transactional
-	public void updateStationLine(Long stationId, StationLineRequest stationLineRequest) {
+	public void updateLine(Long stationId, LineRequest LineRequest) {
 		Line line = lineRepository.findById(stationId)
 			.orElseThrow(() -> new IllegalArgumentException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
-		line.updateStationLineInformation(stationLineRequest.getName(), stationLineRequest.getColor());
+		line.updateStationLineInformation(LineRequest.getName(), LineRequest.getColor());
 	}
 
 	@Transactional
-	public void deleteStationLine(Long stationId) {
+	public void deleteLine(Long stationId) {
 		lineRepository.delete(lineRepository.findById(stationId)
 			.orElseThrow(() -> new IllegalArgumentException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
 	}
 
-	private StationLineResponse createStationLineResponse(Line line) {
-		return new StationLineResponse(line.getId(),
+	private LineResponse createLineResponse(Line line) {
+		return new LineResponse(line.getId(),
 			line.getName(),
 			line.getColor(),
 			new StationResponse(line.getUpStationId(), STATION_NAME),

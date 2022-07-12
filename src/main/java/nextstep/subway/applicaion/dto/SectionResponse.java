@@ -1,12 +1,12 @@
 package nextstep.subway.applicaion.dto;
 
-public class SelectionResponse {
+public class SectionResponse {
 	private long selectionId;
 	private long upStationId;
 	private long downStationId;
 	private long distance;
 
-	public SelectionResponse(long selectionId, long upStationId, long downStationId, long distance) {
+	public SectionResponse(long selectionId, long upStationId, long downStationId, long distance) {
 		this.selectionId = selectionId;
 		this.upStationId = upStationId;
 		this.downStationId = downStationId;
