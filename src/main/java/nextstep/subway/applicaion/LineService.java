@@ -2,6 +2,7 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -46,6 +47,10 @@ public class LineService {
         return lineRepository.findById(id)
                 .map(this::createLineResponse)
                 .orElseGet(LineResponse::new);
+    }
+
+    public void updateLineById(Long id, LineUpdateRequest request) {
+        lineRepository.findById(id).ifPresent(line -> lineRepository.save(line.changeFrom(request)));
     }
 
     private LineResponse createLineResponse(Line line) {
