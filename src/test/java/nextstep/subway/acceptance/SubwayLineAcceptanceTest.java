@@ -60,6 +60,12 @@ public class SubwayLineAcceptanceTest {
 
         // then - 지하철 목록 조회 시 생성한 노선을 찾을 수 있다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        List<String> lineNames = getSubwayLines()
+                .jsonPath()
+                .getList("name", String.class);
+        assertThat(lineNames).containsAnyOf("9호선");
     }
 
     /**
