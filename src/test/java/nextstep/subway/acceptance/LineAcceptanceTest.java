@@ -262,10 +262,10 @@ public class LineAcceptanceTest {
     ExtractableResponse<Response> updateDonongGooriLine = RestAssured.given().log().all()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().put("/lines")
+        .when().put("/lines/" + donongGooriLine.jsonPath().getLong("id"))
         .then().log().all()
         .extract();
 
-    assertThat(updateDonongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    assertThat(updateDonongGooriLine.statusCode()).isEqualTo(HttpStatus.OK.value());
   }
 }

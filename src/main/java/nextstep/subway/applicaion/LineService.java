@@ -8,6 +8,7 @@ import javax.persistence.EntityNotFoundException;
 import nextstep.subway.applicaion.dto.LineCreate;
 import nextstep.subway.applicaion.dto.LineCreate.Request;
 import nextstep.subway.applicaion.dto.LineCreate.Response;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -49,5 +50,15 @@ public class LineService {
         () -> new EntityNotFoundException("line not found")
     );
     return Response.createResponse(line);
+  }
+
+  @Transactional
+  public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
+    Line line = lineRepository.findById(id).orElseThrow(
+        () -> new EntityNotFoundException("line not found")
+    );
+
+    line.changeName(lineUpdateRequest.getName());
+    line.changeColor(lineUpdateRequest.getColor());
   }
 }

@@ -42,6 +42,14 @@ public class Line {
     this.distance = distance;
   }
 
+  public void changeName(String name) {
+    this.name = name;
+  }
+
+  public void changeColor(Color color) {
+    this.color = color;
+  }
+
   public Long getId() {
     return id;
   }
