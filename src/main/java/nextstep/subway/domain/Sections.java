@@ -19,13 +19,13 @@ public class Sections {
     }
 
     public Sections(List<Section> sections) {
-        if (isInvalidSize(sections)) {
+        if (isValidSize(sections)) {
             throw new SectionException(ErrorCode.INVALID_SIZE_SECTIONS);
         }
         this.sections = sections;
     }
 
-    private boolean isInvalidSize(List<Section> sections) {
+    private boolean isValidSize(List<Section> sections) {
         return sections.size() < 1;
     }
 
@@ -49,7 +49,6 @@ public class Sections {
         for (Section section : sections) {
             stations.add(section.getDownStation());
         }
-
         return stations;
     }
 
@@ -65,10 +64,17 @@ public class Sections {
     }
 
     public void deleteLastSection(Station station) {
+        if (!isValidSize()) {
+            throw new SectionException(ErrorCode.CAN_NOT_DELETE_SECTION_EXCEPTION);
+        }
         Section lastSection = sections.get(sections.size() - 1);
         if (!lastSection.isOwnDownStation(station)) {
             throw new SectionException(ErrorCode.CAN_NOT_DELETE_SECTION_EXCEPTION);
         }
         sections.remove(lastSection);
+    }
+
+    private boolean isValidSize() {
+        return sections.size() > 1;
     }
 }
