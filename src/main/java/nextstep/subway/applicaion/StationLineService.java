@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,9 +32,13 @@ public class StationLineService {
     }
 
     public StationLineResponse findStationLine(Long id) {
-        StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow();
+        StationLine stationLine = getStationLineOrThrow(id);
         return createStationLineResponse(stationLine);
+    }
+
+    private StationLine getStationLineOrThrow(Long id) {
+        return stationLineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(String.format("해당 %d의 id 값을 가진 StationLine은 존재하지 않습니다.", id)));
     }
 
     public List<StationLineResponse> findAllStationLines() {
@@ -49,8 +54,7 @@ public class StationLineService {
 
     @Transactional
     public void updateStationLine(Long id, StationLineRequest stationLineRequest) {
-        StationLine existedStationLine = stationLineRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("수정할 StationLine이 존재하지 않습니다."));
+        StationLine existedStationLine = getStationLineOrThrow(id);
         existedStationLine.updateByStationLineRequest(stationLineRequest);
     }
 
@@ -67,10 +71,15 @@ public class StationLineService {
 
     private List<Station> findRelatedStations(StationLine stationLine) {
         List<Station> stations = new ArrayList<>();
-        Station upStation = stationRepository.findById(stationLine.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(stationLine.getDownStationId()).orElseThrow();
+        Station upStation = getStationOrThrow(stationLine.getUpStationId());
+        Station downStation = getStationOrThrow(stationLine.getDownStationId());
         stations.add(upStation);
         stations.add(downStation);
         return stations;
+    }
+
+    private Station getStationOrThrow(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(String.format("해당 %d의 id 값을 가진 Station은 존재하지 않습니다.", id)));
     }
 }
