@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.*;
-import nextstep.subway.domain.Section;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.domain.SubwayLineRepository;
@@ -55,14 +54,12 @@ public class SubwayLineService {
     @Transactional
     public void saveSection(Long lineId, SectionRequest sectionRequest) {
         SubwayLine subwayLine = findSubwayLineById(lineId);
-        Section newSection = sectionRequest.toEntity();
-        subwayLine.addSection(newSection);
+        subwayLine.addSection(sectionRequest.toEntity());
     }
 
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
-        SubwayLine subwayLine = findSubwayLineById(lineId);
-        subwayLine.removeStation(stationId);
+        findSubwayLineById(lineId).removeStation(stationId);
     }
 
     private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {

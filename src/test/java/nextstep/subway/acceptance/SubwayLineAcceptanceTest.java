@@ -16,7 +16,7 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station"};
 
-    private SubwayCallApi subwayCallApi;
+    private final SubwayCallApi subwayCallApi;
 
     public SubwayLineAcceptanceTest() {
         this.subwayCallApi = new SubwayCallApi();

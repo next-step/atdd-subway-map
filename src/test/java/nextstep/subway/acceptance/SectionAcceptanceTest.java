@@ -16,7 +16,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     public static final String[] CLEAN_UP_TABLES = {"subway_line", "station", "section"};
 
-    private SubwayCallApi subwayCallApi;
+    private final SubwayCallApi subwayCallApi;
 
     public SectionAcceptanceTest() {
         this.subwayCallApi = new SubwayCallApi();
