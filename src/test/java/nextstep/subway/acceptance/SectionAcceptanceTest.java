@@ -79,6 +79,27 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Given 지하철 노선을 1개 생성
+     * When 기존의 노선에 등록된 하행역을 상행역으로 하고
+     * When 기존 노선에 등록되있는 역중 하나를 하행역으로 하고
+     * When 구간 생성 요청을 하면
+     * Then 예외를 발생시킨다
+     */
+    @Test
+    @DisplayName("기존 노선에 있는 역은 새 구간의 하행역이 될수없다")
+    public void addSectionWithInvalidDownStation() {
+        // given
+        Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+
+        // when
+        int statusCode = 지하철_구간_등록_요청(lineId, downStationId, upStationId, 3);
+
+        // then
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     public int 지하철_구간_등록_요청(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         HashMap<String, String> requestParam = new HashMap<>();
         requestParam.put("upStationId", upStationId.toString());
