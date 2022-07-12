@@ -14,15 +14,15 @@ public class Selections {
 
 	public boolean isDeletable(long stationId) {
 		if (CollectionUtils.isEmpty(values)) {
-			throw new IllegalArgumentException();
+			throw new IllegalStateException();
 		}
 
 		Selection selection = values.stream()
 			.reduce((first, second) -> second)
-			.orElseThrow(IllegalArgumentException::new);
+			.orElseThrow(IllegalStateException::new);
 
 		if (selection.getDownStationId() != stationId) {
-			throw new IllegalArgumentException();
+			throw new IllegalStateException();
 		}
 
 		return true;
