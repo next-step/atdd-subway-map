@@ -1,5 +1,7 @@
 package nextstep.subway.line.domain;
 
+import nextstep.subway.section.domain.Section;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,6 +20,15 @@ public class Line {
     private Long distance;
 
     protected Line() {
+    }
+
+    public Line(final Long id, final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     public Long getId() {
@@ -44,13 +55,8 @@ public class Line {
         return distance;
     }
 
-    public Line(final Long id, final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public boolean isConnectableSection(final Section section) {
+        return downStationId.equals(section.getUpStationId());
     }
 
     public static class LineBuilder {

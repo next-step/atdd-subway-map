@@ -66,7 +66,7 @@ public class LineService {
     }
 
 
-    private Line findLineById(final Long id) {
+    public Line findLineById(final Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 노선이 존재하지 않습니다."));
     }
