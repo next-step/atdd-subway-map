@@ -40,7 +40,14 @@ public class LineService {
     return Response.createResponse(line);
   }
 
-  public List<Response> getLines() {
+  public List<Response> getAllLine() {
     return lineRepository.findAll().stream().map(Response::createResponse).collect(toList());
+  }
+
+  public Response getLine(Long id) {
+    Line line = lineRepository.findById(id).orElseThrow(
+        () -> new EntityNotFoundException("line not found")
+    );
+    return Response.createResponse(line);
   }
 }

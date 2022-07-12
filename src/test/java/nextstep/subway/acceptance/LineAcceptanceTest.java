@@ -208,10 +208,10 @@ public class LineAcceptanceTest {
         .then().log().all()
         .extract();
 
-    List<String> names = response.jsonPath().getList("name", String.class);
-    assertThat(names).containsAnyOf("1호선");
+    String names = response.jsonPath().getString("name");
+    assertThat(names).isEqualTo("1호선");
 
-    List<String> colors = response.jsonPath().getList("color", String.class);
-    assertThat(colors).containsAnyOf(Color.BLUE.name());
+    String colors = response.jsonPath().getString("color");
+    assertThat(colors).isEqualTo(Color.BLUE.name());
   }
 }
