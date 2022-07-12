@@ -6,8 +6,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -17,11 +15,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    private static final String NAME = "name";
-    @LocalServerPort
-    int port;
+public class StationAcceptanceTest extends BaseAcceptanceTest {
+    public static final String NAME = "name";
 
     @BeforeEach
     public void setUp() {
@@ -40,7 +35,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = createStation(Map.of(NAME, "강남역"));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        checkResponseStatus(response, HttpStatus.CREATED);
 
         // then
         List<String> stationNames = getAllStations()
@@ -62,12 +57,11 @@ public class StationAcceptanceTest {
         createStation(Map.of(NAME, "신논현역"));
 
         // when
-        List<Map<String, Object>> response = getAllStations()
-                .jsonPath()
-                .getList(".");
+        ExtractableResponse<Response> response = getAllStations();
+        checkResponseStatus(response, HttpStatus.OK);
 
         // then
-        assertThat(response).hasSize(2);
+        assertThat(response.jsonPath().getList(".")).hasSize(2);
     }
 
     /**
@@ -84,7 +78,8 @@ public class StationAcceptanceTest {
                 .getLong("id");
 
         // when
-        deleteStation(id);
+        ExtractableResponse<Response> response = deleteStation(id);
+        checkResponseStatus(response, HttpStatus.NO_CONTENT);
 
         // then
         List<Long> allStationIds = getAllStations()
@@ -96,7 +91,7 @@ public class StationAcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> createStation(Map<String, String> params) {
+    public static ExtractableResponse<Response> createStation(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -112,10 +107,11 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private void deleteStation(long id) {
-        RestAssured.given().log().all()
+    private ExtractableResponse<Response> deleteStation(long id) {
+        return RestAssured.given().log().all()
                 .when().delete("/stations/{id}", id)
-                .then().log().all();
+                .then().log().all()
+                .extract();
     }
 
 }
