@@ -60,20 +60,13 @@ public class Line {
         return downEndpointStation;
     }
 
-    public void addUpEndpointStation(Station station) {
-        this.upEndpointStation = station;
-    }
-
-    public void addDownEndpointStation(Station station) {
-        this.downEndpointStation = station;
-    }
-
-    public void changeName(String name) {
+    public void changeNameAndColor(String name, String color) {
         this.name = name;
-    }
-
-    public void changeColor(String color) {
         this.color = color;
     }
 
+    public void addEndpointStation(Station upStation, Station downStation) {
+        this.upEndpointStation = upStation;
+        this.downEndpointStation = downStation;
+    }
 }

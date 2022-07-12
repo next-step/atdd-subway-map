@@ -47,8 +47,7 @@ public class LineService {
     public LineResponse updateLine(LineRequest lineRequest, long lineId) {
         Line line = lineRepository.findById(lineId)
             .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(lineId)));
-        line.changeName(lineRequest.getName());
-        line.changeColor(lineRequest.getColor());
+        line.changeNameAndColor(lineRequest.getName(), lineRequest.getColor());
         Line updatedLine = lineRepository.save(line);
         return LineResponse.convertedByEntity(updatedLine);
     }
@@ -60,17 +59,14 @@ public class LineService {
 
 
     private void saveEndpoints(LineRequest lineRequest, Line savedLine) {
-        long upStationId = lineRequest.getUpStationId();
-        long downStationId = lineRequest.getDownStationId();
-
-        Station upStation = stationRepository.findById(upStationId)
-            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(upStationId)));
-        savedLine.addUpEndpointStation(upStation);
-
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(downStationId)));
-        savedLine.addDownEndpointStation(downStation);
-
+        Station upStation = getStation(lineRequest.getUpStationId());
+        Station downStation = getStation(lineRequest.getDownStationId());
+        savedLine.addEndpointStation(upStation, downStation);
         lineRepository.save(savedLine);
+    }
+
+    private Station getStation(long stationId) {
+        return stationRepository.findById(stationId)
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(stationId)));
     }
 }
