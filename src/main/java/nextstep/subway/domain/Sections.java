@@ -4,13 +4,12 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
+    private final static int LIMIT_SECTIONS_SIZE = 1;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private final List<Section> sections = new ArrayList<>();
@@ -64,6 +63,10 @@ public class Sections {
         Section lastSection = getLastSection();
         if (!lastSection.equals(section)) {
             throw new IllegalArgumentException("현재 구간은 마지막 구간이 아닙니다.");
+        }
+
+        if (sections.size() == LIMIT_SECTIONS_SIZE) {
+            throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없습니다.");
         }
         sections.remove(section);
     }

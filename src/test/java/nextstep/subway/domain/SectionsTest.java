@@ -123,4 +123,19 @@ class SectionsTest {
                 sections.removeSection(section2)
         );
     }
+
+    @Test
+    void 마지막_구간은_삭제할_수_없다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line line = new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역);
+        Sections sections = new Sections(line, 10L, 모란역, 암사역);
+
+        Section section = new Section(10L, 모란역, 암사역);
+
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                sections.removeSection(section)
+        );
+    }
 }
