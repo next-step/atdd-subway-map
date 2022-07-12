@@ -1,9 +1,7 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.domain.station;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.ui.dto.station.StationRequest;
+import nextstep.subway.ui.dto.station.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +25,8 @@ public class StationService {
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
-                .collect(Collectors.toList());
+                                .map(this::createStationResponse)
+                                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -38,8 +36,8 @@ public class StationService {
 
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
-                station.getId(),
-                station.getName()
+            station.getId(),
+            station.getName()
         );
     }
 }

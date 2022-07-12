@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.ui.dto.station;
 
 public class StationRequest {
     private String name;
