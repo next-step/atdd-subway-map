@@ -21,9 +21,8 @@ public class Line {
     public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
-        final Section section = new Section(this, upStationId, downStationId, distance);
         final List<Section> sections = new ArrayList<>();
-        sections.add(section);
+        sections.add(new Section(this, upStationId, downStationId, distance));
         this.sections = Sections.of(sections);
     }
 
@@ -47,6 +46,10 @@ public class Line {
         return sections.getDownStationId();
     }
 
+    public Sections getSections() {
+        return sections;
+    }
+
     public Long getDistance() {
         return sections.getTotalDistance();
     }
@@ -63,5 +66,9 @@ public class Line {
 
     public void addSection(Section section) {
         sections.add(section);
+    }
+
+    public boolean containsStationId(Long stationId) {
+        return sections.containsStationId(stationId);
     }
 }

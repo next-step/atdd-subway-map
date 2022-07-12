@@ -2,18 +2,16 @@ package nextstep.subway.applicaion.dto;
 
 public class SectionRequest {
 
-    private String downStationId;
-
     private String upStationId;
-
+    private String downStationId;
     private Integer distance;
-
-    public String getDownStationId() {
-        return downStationId;
-    }
 
     public String getUpStationId() {
         return upStationId;
+    }
+
+    public String getDownStationId() {
+        return downStationId;
     }
 
     public Integer getDistance() {

@@ -156,7 +156,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철노선_목록_조회요청() {
+    public static ExtractableResponse<Response> 지하철노선_목록_조회요청() {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
