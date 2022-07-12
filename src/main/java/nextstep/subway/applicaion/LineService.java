@@ -42,6 +42,12 @@ public class LineService {
                 .collect(toList());
     }
 
+    public LineResponse findLineById(Long id) {
+        return lineRepository.findById(id)
+                .map(this::createLineResponse)
+                .orElseGet(LineResponse::new);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses(line));
     }
