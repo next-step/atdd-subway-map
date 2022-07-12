@@ -136,6 +136,31 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getInt("distance")).isEqualTo(LINE_5.get("distance"));
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        지하철_노선_생성(LINE_2);
+
+        // when
+        RestAssured.given().log().all()
+                .when().delete("/lines/" + id)
+                .then().log().all();
+
+        // then
+        List<Integer> ids = 지하철_노선_목록_조회().jsonPath().getList("id");
+        assertThat(ids.stream()
+                .filter(lineId -> lineId == id)
+                .count())
+                .isEqualTo(0);
+    }
+
     private ExtractableResponse<Response> 지하철_노선_수정(int id, Map<String, String> updateParams) {
         return RestAssured.given().log().all()
                 .body(updateParams)
