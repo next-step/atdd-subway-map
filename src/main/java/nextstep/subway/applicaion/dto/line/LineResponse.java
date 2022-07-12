@@ -1,7 +1,7 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.applicaion.dto.line;
 
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
+import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.station.Station;
 
 public class LineResponse {
     private final Long id;

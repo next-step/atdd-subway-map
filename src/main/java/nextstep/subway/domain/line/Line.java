@@ -1,6 +1,6 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.line;
 
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.line.LineRequest;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
