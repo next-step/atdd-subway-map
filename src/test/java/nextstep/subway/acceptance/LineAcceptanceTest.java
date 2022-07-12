@@ -6,33 +6,20 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
 import java.util.Map;
-import nextstep.subway.config.DataBaseCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("acceptance")
-class LineAcceptanceTest {
+@DisplayName("노선 관련 인수 테스트")
+class LineAcceptanceTest extends BaseAcceptance {
 
     final StationAcceptanceTest stationAcceptanceTest = new StationAcceptanceTest();
 
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    DataBaseCleaner dataBaseCleaner;
-
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
+        RestAssured.port = super.port;
         dataBaseCleaner.afterPropertiesSet();
         dataBaseCleaner.tableClear();
     }
@@ -44,17 +31,14 @@ class LineAcceptanceTest {
     @Test
     @DisplayName("지하철 노선 생성")
     void createLines() {
-        stationAcceptanceTest.createSubwayStation("강남역");
-        stationAcceptanceTest.createSubwayStation("양재역");
-
         //when
-        createSubwayLines("신분당선", "bg-red-600", 1, 2, 10);
+        shinbundangLine();
 
         //then
         final ExtractableResponse<Response> lineResponse = findOneLine();
 
-        final List<String> name = lineResponse.jsonPath().getList("name", String.class);
-        assertThat(name).containsExactly("신분당선");
+        final String name = lineResponse.jsonPath().getString("name");
+        assertThat(name).isEqualTo("신분당선");
     }
 
     /*
@@ -65,11 +49,8 @@ class LineAcceptanceTest {
     @Test
     @DisplayName("지하철 노선 목록 조회")
     void getLines() {
+        shinbundangLine();
         stationAcceptanceTest.createSubwayStation("까치울역");
-        stationAcceptanceTest.createSubwayStation("사당역");
-        stationAcceptanceTest.createSubwayStation("판교역");
-        //give
-        createSubwayLines("신분당선", "bg-red-600", 1, 2, 10);
         createSubwayLines("분당선", "bg-red-600", 1, 3, 10);
 
         //when
@@ -94,10 +75,7 @@ class LineAcceptanceTest {
     @DisplayName("지하철 노선 조회")
     void getOneLine() {
         //given
-        stationAcceptanceTest.createSubwayStation("합정역");
-        stationAcceptanceTest.createSubwayStation("신촌역");
-
-        createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
+        shinbundangLine();
 
         //when
         final ExtractableResponse<Response> getLinesResponse = findOneLine();
@@ -106,9 +84,9 @@ class LineAcceptanceTest {
         String lineName = getLinesResponse.jsonPath().get("name");
         String startStation = getLinesResponse.jsonPath().get("stations[0].name");
         String endStation = getLinesResponse.jsonPath().get("stations[1].name");
-        assertThat(lineName).isEqualTo("2호선");
-        assertThat(startStation).isEqualTo("합정역");
-        assertThat(endStation).isEqualTo("신촌역");
+        assertThat(lineName).isEqualTo("신분당선");
+        assertThat(startStation).isEqualTo("강남역");
+        assertThat(endStation).isEqualTo("양재역");
     }
 
     /*
@@ -119,10 +97,7 @@ class LineAcceptanceTest {
     @Test
     @DisplayName("지하철 노선 수정")
     void updateLines() {
-        stationAcceptanceTest.createSubwayStation("신촌역");
-        stationAcceptanceTest.createSubwayStation("합정역");
-
-        createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
+        shinbundangLine();
 
         //when
         final Map<String, String> param = Map.of("name", "다른분당선", "color", "bg-red-600");
@@ -144,12 +119,10 @@ class LineAcceptanceTest {
     Then 해당 지하철 노선 정보는 삭제된다
      */
     @Test
+    @DisplayName("지하철 노선 삭제")
     void removeLines() {
         //given
-        stationAcceptanceTest.createSubwayStation("신촌역");
-        stationAcceptanceTest.createSubwayStation("합정역");
-
-        createSubwayLines("2호선", "bg-green-600", 1, 2, 10);
+        shinbundangLine();
 
         //when
         final ExtractableResponse<Response> removeResponse = RestAssured.given().log().all()
@@ -159,6 +132,13 @@ class LineAcceptanceTest {
 
         //then
         assertThat(removeResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void shinbundangLine() {
+        stationAcceptanceTest.createSubwayStation("강남역");
+        stationAcceptanceTest.createSubwayStation("양재역");
+
+        createSubwayLines("신분당선", "bg-red-600", 1, 2, 10);
     }
 
     private void createSubwayLines(final String name, final String color,
