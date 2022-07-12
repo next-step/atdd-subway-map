@@ -40,9 +40,10 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         // then
         checkResponseStatus(response, HttpStatus.CREATED);
 
-        ExtractableResponse<Response> getResponse = getLines();
+        ExtractableResponse<Response> getResponse = getLine(response.jsonPath().getLong("id"));
+        checkResponseStatus(getResponse, HttpStatus.OK);
 
-        assertThat(getResponse.jsonPath().getList("name", String.class)).containsAnyOf("4호선");
+        assertThat(getResponse.jsonPath().getString("name")).isEqualTo("4호선");
     }
 
     /**
