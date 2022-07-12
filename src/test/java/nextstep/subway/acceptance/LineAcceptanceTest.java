@@ -26,6 +26,16 @@ class LineAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        createStation("지하철역");
+        createStation("새로운지하철역");
+        createStation("또다른지하철역");
+    }
+
+    private void createStation(String stationName) {
+        RestAssured.given()
+                .body(Map.of("name", stationName))
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().post("/stations");
     }
 
     /**
