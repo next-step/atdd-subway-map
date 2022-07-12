@@ -52,7 +52,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
          * Given A,B 라는 이름을 가진 2개의 역을 생성한다.
          * Given 노선(A역은 상행역, B역은 하행역)을 생성한다.
          * When 새로운 구간(B역은 상행역 A역은 하행역)을 노선에 등록한다.
-         * Then 노선에 새로운 구간을 등록할 수 없다.
+         * Then 새로운 구간의 하행역이 노선에 존재해서 등록할 수 없다.
          */
         @Test
         void 새로운_구간의_하행역이_노선에_이미_등록되어있는경우() {
@@ -74,7 +74,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
          * Given A,B,C,D 라는 이름을 가진 4개의 역을 생성한다.
          * Given 노선(A역은 상행역, B역은 하행역)을 생성한다.
          * When 새로운 구간(C역은 상행역 D역은 하행역)을 노선에 등록한다.
-         * Then 노선에 새로운 구간을 등록할 수 없다.
+         * Then 노선의 하행역과 구간의 상행역이 일치하지 않아 등록할 수 없다.
          */
         @Test
         void 새로운_구간의_상행역이_노선의_하행역이_아닌_경우() {
