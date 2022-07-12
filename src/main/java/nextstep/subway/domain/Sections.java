@@ -24,12 +24,12 @@ public class Sections {
     }
 
     public void addSection(Line line, Section section) {
-        validation(section);
+        addSectionValidation(section);
         sections.add(section);
         section.setLine(line);
     }
 
-    private void validation(Section section) {
+    private void addSectionValidation(Section section) {
         isContains(section);
         isUpStation(section);
         isDownStation(section);
