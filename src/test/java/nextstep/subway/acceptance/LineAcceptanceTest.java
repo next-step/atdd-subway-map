@@ -126,19 +126,23 @@ public class LineAcceptanceTest {
         updateParams.put("color", "#996CAC");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> updatedResponse = 지하철_노선_수정(id, updateParams);
+        ExtractableResponse<Response> response = 지하철_노선_조회(id);
+
+        // then
+        assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().get("name").equals(updateParams.get("name"))).isTrue();
+        assertThat(response.jsonPath().get("color").equals(updateParams.get("color"))).isTrue();
+        assertThat(response.jsonPath().getInt("distance")).isEqualTo(LINE_5.get("distance"));
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정(int id, Map<String, String> updateParams) {
+        return RestAssured.given().log().all()
                 .body(updateParams)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/" + id)
                 .then().log().all()
                 .extract();
-        ExtractableResponse<Response> updatedLineResponse = 지하철_노선_조회(id);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(updatedLineResponse.jsonPath().get("name").equals(updateParams.get("name"))).isTrue();
-        assertThat(updatedLineResponse.jsonPath().get("color").equals(updateParams.get("color"))).isTrue();
-        assertThat(updatedLineResponse.jsonPath().getInt("distance")).isEqualTo(LINE_5.get("distance"));
     }
 
 
