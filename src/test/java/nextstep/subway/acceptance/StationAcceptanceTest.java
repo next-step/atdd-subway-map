@@ -3,9 +3,11 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.domain.StationRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,11 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest extends AcceptanceTest {
 
+    @Autowired
+    private StationRepository stationRepository;
+
     @AfterEach
-    void cleanUp() {
-        final ExtractableResponse<Response> 지하철역_목록_응답 = 지하철역_목록_조회요청();
-        final List<Long> ids = 지하철역_목록_응답.jsonPath().getList("id", Long.class);
-        ids.forEach(this::지하철역_삭제요청);
+    public void cleanUp() {
+        stationRepository.deleteAllInBatch();
     }
 
     /**
@@ -90,6 +93,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 .getList("name", String.class);
         assertThat(names).contains(name);
     }
+
     private void 지하철역_목록에_포함되어있지_않다(String... name) {
         final ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록_조회요청();
         final List<String> names = 지하철역_목록

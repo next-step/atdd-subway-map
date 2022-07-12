@@ -1,9 +1,8 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -13,22 +12,19 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-
-    private Long upStationId;
-
-    private Long downStationId;
-
-    private Long distance;
+    @Embedded
+    private Sections sections;
 
     public Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        final Section section = new Section(this, upStationId, downStationId, distance);
+        final List<Section> sections = new ArrayList<>();
+        sections.add(section);
+        this.sections = Sections.of(sections);
     }
 
     public Long getId() {
@@ -44,15 +40,15 @@ public class Line {
     }
 
     public Long getUpStationId() {
-        return upStationId;
+        return sections.getUpStationId();
     }
 
     public Long getDownStationId() {
-        return downStationId;
+        return sections.getDownStationId();
     }
 
     public Long getDistance() {
-        return distance;
+        return sections.getTotalDistance();
     }
 
     public Line update(Line line) {
@@ -62,15 +58,10 @@ public class Line {
         if (line.getColor() != null) {
             color = line.getColor();
         }
-        if (line.getUpStationId() != null) {
-            upStationId = line.getUpStationId();
-        }
-        if (line.getDownStationId() != null) {
-            downStationId = line.getDownStationId();
-        }
-        if (line.getDistance() != null) {
-            distance = line.getDistance();
-        }
         return this;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
     }
 }

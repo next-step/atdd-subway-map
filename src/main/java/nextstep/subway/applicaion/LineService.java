@@ -1,11 +1,9 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
+import nextstep.subway.domain.Section;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +26,7 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        final Line line = lineRepository.save(lineRequest.toDomain());
+        final Line line = lineRepository.save(lineRequest.toEntity());
         return createLineResponse(line);
     }
 
@@ -56,12 +54,23 @@ public class LineService {
     @Transactional
     public LineResponse updateById(Long id, LineRequest lineRequest) {
         final Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
-        final Line update = line.update(lineRequest.toDomain());
+        final Line update = line.update(lineRequest.toEntity());
         return createLineResponse(update);
     }
 
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public SectionResponse saveSection(Long lineId, SectionRequest sectionRequest) {
+        final Line line = lineRepository.findById(lineId).orElseThrow(IllegalArgumentException::new);
+        final Long upStationId = Long.parseLong(sectionRequest.getUpStationId());
+        final Long downStationId = Long.parseLong(sectionRequest.getDownStationId());
+        final Section section = new Section(line, upStationId, downStationId, sectionRequest.getDistance());
+        line.addSection(section);
+
+        return new SectionResponse(section.getUpStationId(), section.getDownStationId(), section.getDistance());
     }
 }

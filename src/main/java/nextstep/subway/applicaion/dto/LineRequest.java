@@ -12,7 +12,7 @@ public class LineRequest {
 
     private Long downStationId;
 
-    private Long distance;
+    private Integer distance;
 
     public String getName() {
         return name;
@@ -30,17 +30,12 @@ public class LineRequest {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
-    public Line toDomain() {
-        return new Line(
-                name,
-                color,
-                upStationId,
-                downStationId,
-                distance
-        );
+    public Line toEntity() {
+        return new Line(name, color, upStationId, downStationId, distance);
     }
+
 }
