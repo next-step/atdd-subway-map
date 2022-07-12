@@ -36,10 +36,9 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     void createLineTest() {
         // when
         ExtractableResponse<Response> response = createLine("4호선", "bg-blue-300", 1, 2, 10);
-
-        // then
         checkResponseStatus(response, HttpStatus.CREATED);
 
+        // then
         ExtractableResponse<Response> getResponse = getLine(response.jsonPath().getLong("id"));
         checkResponseStatus(getResponse, HttpStatus.OK);
 
@@ -54,14 +53,15 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 목록이 조회된다.")
     void getLinesTest() {
-        // when
+        // given
         createLine("4호선", "bg-blue-300", 1, 2, 10);
         createLine("2호선", "bg-green-300", 2, 3, 10);
 
         // when
         ExtractableResponse<Response> response = getLines();
-
         checkResponseStatus(response, HttpStatus.OK);
+
+        // then
         assertThat(response.jsonPath().getList(".")).hasSize(2);
         assertThat(response.jsonPath().getList("name", String.class)).contains("4호선", "2호선");
 
@@ -76,10 +76,13 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 상세 정보가 조회된다.")
     void getLineTest() {
+        // given
         long id = createLineAndGetId();
 
+        // when
         ExtractableResponse<Response> response = getLine(id);
 
+        // then
         checkResponseStatus(response, HttpStatus.OK);
     }
 
@@ -91,11 +94,14 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 정보가 수정된다.")
     void updateLineTest() {
+        // given
         long id = createLineAndGetId();
 
+        // when
         ExtractableResponse<Response> response = updateLine(id, "다른4호선", "bg-skyblue-400");
         checkResponseStatus(response, HttpStatus.OK);
 
+        // then
         ExtractableResponse<Response> updatedResponse = getLine(id);
         assertThat(updatedResponse.jsonPath().getString("name")).isEqualTo("다른4호선");
         assertThat(updatedResponse.jsonPath().getString("color")).isEqualTo("bg-skyblue-400");
@@ -111,11 +117,14 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 정보가 삭제된다.")
     void deleteLineTest() {
+        // given
         long id = createLineAndGetId();
 
+        // when
         ExtractableResponse<Response> response = deleteLine(id);
         checkResponseStatus(response, HttpStatus.NO_CONTENT);
 
+        // then
         ExtractableResponse<Response> getResponse = getLine(id);
         checkResponseStatus(getResponse, HttpStatus.NOT_FOUND);
     }
