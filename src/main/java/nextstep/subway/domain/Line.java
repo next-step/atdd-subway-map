@@ -54,18 +54,18 @@ public class Line {
 
 	public boolean isRegistrable(long upStationIdFromSelection, long downStationIdFromSelection) {
 		if (upStationIdFromSelection != this.downStationId) {
-			throw new IllegalArgumentException();
+			throw new IllegalStateException();
 		}
 
 		if (this.upStationId == downStationIdFromSelection || this.downStationId == downStationIdFromSelection) {
-			throw new IllegalArgumentException();
+			throw new IllegalStateException();
 		}
 		return true;
 	}
 
 	public boolean isDeletable(long stationId) {
 		if (this.downStationId != stationId) {
-			throw new IllegalArgumentException();
+			throw new IllegalStateException();
 		}
 		return true;
 	}

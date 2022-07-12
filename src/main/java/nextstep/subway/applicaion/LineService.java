@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -39,11 +38,9 @@ public class LineService {
 	}
 
 	public StationLineResponse findStationLine(Long stationId) {
-		Optional<Line> line = lineRepository.findById(stationId);
-		if (line.isEmpty()) {
-			return null;
-		}
-		return createStationLineResponse(line.get());
+
+		return createStationLineResponse(lineRepository.findById(stationId)
+			.orElseThrow(IllegalArgumentException::new));
 	}
 
 	@Transactional

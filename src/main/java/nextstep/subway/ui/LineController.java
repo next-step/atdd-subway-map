@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,11 +37,7 @@ public class LineController {
 
 	@GetMapping("/lines/{id}")
 	public ResponseEntity<StationLineResponse> showStationLine(@PathVariable Long id) {
-		StationLineResponse stationLineResponse = lineService.findStationLine(id);
-		if (ObjectUtils.isEmpty(stationLineResponse)) {
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.ok().body(stationLineResponse);
+		return ResponseEntity.ok().body(lineService.findStationLine(id));
 	}
 
 	@PutMapping("/lines/{id}")
