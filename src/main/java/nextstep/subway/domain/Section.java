@@ -42,11 +42,11 @@ public class Section {
         return List.of(upStation, downStation);
     }
 
-    public boolean isUpStation(Section section) {
+    public boolean matchDownStation(Section section) {
         return downStation.equals(section.upStation);
     }
 
-    public boolean isDownStation(Section section) {
+    public boolean matchStation(Section section) {
         return getStations().contains(section.downStation);
     }
 

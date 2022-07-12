@@ -31,8 +31,8 @@ public class Sections {
 
     private void addSectionValidation(Section section) {
         isContains(section);
-        isUpStation(section);
-        isDownStation(section);
+        matchDownStation(section);
+        matchStation(section);
     }
 
     private void isContains(Section section) {
@@ -41,18 +41,18 @@ public class Sections {
         }
     }
 
-    private void isUpStation(Section section) {
+    private void matchDownStation(Section section) {
         boolean isUpStation = sections.stream().anyMatch(currentSection ->
-                currentSection.isUpStation(section)
+                currentSection.matchDownStation(section)
         );
         if (!isUpStation) {
             throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
     }
 
-    private void isDownStation(Section section) {
+    private void matchStation(Section section) {
         boolean isDownStation = sections.stream().anyMatch(currentSection ->
-                currentSection.isDownStation(section)
+                currentSection.matchStation(section)
         );
         if (isDownStation) {
             throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");

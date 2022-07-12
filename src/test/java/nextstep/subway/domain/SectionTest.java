@@ -45,7 +45,7 @@ class SectionTest {
         Section newSection = new Section(10L, 모란역1, 송파역);
 
         // then
-        assertThat(currentSection.isUpStation(newSection)).isTrue();
+        assertThat(currentSection.matchDownStation(newSection)).isTrue();
     }
 
     @Test
@@ -60,7 +60,7 @@ class SectionTest {
         Section newSection = new Section(10L, 송파역, 모란역1);
 
         // then
-        assertThat(currentSection.isDownStation(newSection)).isTrue();
+        assertThat(currentSection.matchStation(newSection)).isTrue();
     }
 
 
