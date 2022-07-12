@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,15 +41,13 @@ public class SelectionController {
 	}
 
 	@GetMapping(value = "{lineId}/selection")
-	public ResponseEntity<Void> getSelectionList(@PathVariable long lineId,
-		@RequestBody SelectionRequest selectionRequest) {
-		return null;
+	public ResponseEntity<List<SelectionResponse>> getSelectionList(@PathVariable long lineId) {
+		return ResponseEntity.ok().body(selectionService.getSelectionList(lineId));
 	}
 
-	@GetMapping(value = "{lineId}/selection/{selectionId}")
-	public ResponseEntity<SelectionResponse> getSelection(@PathVariable long lineId,
-		@PathVariable long selectionId) {
-		return null;
+	@GetMapping(value = "/selection/{selectionId}")
+	public ResponseEntity<SelectionResponse> getSelection(@PathVariable long selectionId) {
+		return ResponseEntity.ok().body(selectionService.getSelection(selectionId));
 	}
 
 }
