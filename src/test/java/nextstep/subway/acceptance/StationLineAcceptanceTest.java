@@ -49,6 +49,34 @@ public class StationLineAcceptanceTest {
                 createStationAndValidate("역삼역"));
     }
 
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철노선 목록 조회")
+    @Test
+    void findAllStationLineTest() {
+        createStationLineAndValidate("1호선",
+                "bg-blue-600",
+                createStationAndValidate("수원역"),
+                createStationAndValidate("세류역"));
+
+        createStationLineAndValidate("2호선",
+                "bg-red-600",
+                createStationAndValidate("강남역"),
+                createStationAndValidate("역삼역"));
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("$")).hasSize(2);
+    }
+
     private void createStationLineAndValidate(String stationLineName, String color, Long upStationId, Long downStationId) {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
