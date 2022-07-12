@@ -1,6 +1,5 @@
 package nextstep.subway.domain.section;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -23,7 +22,7 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next_section_id")
     private Section nextSection;
 
