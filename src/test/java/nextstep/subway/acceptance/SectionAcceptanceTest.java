@@ -46,7 +46,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
 
         // when
-        int statusCode = 지하철_구간_등록_요청(lineId, downStationId, stationId, 1);
+        int statusCode = 지하철_구간_등록(lineId, downStationId, stationId, 1);
 
         // then
         ExtractableResponse<Response> response = 지하철_단일_노선_조회(lineId);
@@ -73,7 +73,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
 
         // when
-        int statusCode = 지하철_구간_등록_요청(lineId, upStationId, stationId, 3);
+        int statusCode = 지하철_구간_등록(lineId, upStationId, stationId, 3);
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -94,13 +94,50 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
 
         // when
-        int statusCode = 지하철_구간_등록_요청(lineId, downStationId, upStationId, 3);
+        int statusCode = 지하철_구간_등록(lineId, downStationId, upStationId, 3);
 
         // then
         assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    public int 지하철_구간_등록_요청(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+    /**
+     * Given 지하철 노선을 1개 생성
+     * Given 추가할 역 1개 생성
+     * Given 구간을 생성
+     * When 지하철 구간 제거를 요청하면
+     * Then 정상 삭제된다
+     */
+    @Test
+    public void deleteSection() {
+        // given
+        Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
+        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        int statusCode = 지하철_구간_등록(lineId, downStationId, stationId, 1);
+
+        // when
+        지하철_구간_삭제(lineId, stationId);
+
+        // then
+        ExtractableResponse<Response> response = 지하철_단일_노선_조회(lineId);
+        List<String> stationNames = response.jsonPath().getList("station.name", String.class);
+
+        assertAll(
+                () -> assertThat(statusCode).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(stationNames).doesNotContain("성수역")
+        );
+    }
+
+    private int 지하철_구간_삭제(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract()
+                .statusCode();
+    }
+
+    public int 지하철_구간_등록(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         HashMap<String, String> requestParam = new HashMap<>();
         requestParam.put("upStationId", upStationId.toString());
         requestParam.put("downStationId", downStationId.toString());
