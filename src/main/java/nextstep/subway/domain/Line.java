@@ -24,6 +24,7 @@ public class Line {
     }
 
     @OneToMany
+    @JoinColumn(name = "line_id")
     private List<Station> stations;
 
     public Long getId() {

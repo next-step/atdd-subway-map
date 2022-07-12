@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ class LineAcceptanceTest {
      * */
     @DisplayName("지하철노선을 생성한다.")
     @Test
+    @DirtiesContext
     void createLine() {
         // when
         Map<String, Object> params = Map.of(
@@ -54,20 +56,13 @@ class LineAcceptanceTest {
                 "distance", 10
         );
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = createLines(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> lineNames = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all().extract().jsonPath().getList("name", String.class);
+        List<String> lineNames = findAllLines().jsonPath().getList("name", String.class);
 
         assertThat(lineNames).containsAnyOf("신분당선");
 
@@ -81,15 +76,34 @@ class LineAcceptanceTest {
      * */
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
+    @DirtiesContext
     void getLines() {
         // given
+        Map<String, Object> params1 = Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        );
+
+        Map<String, Object> params2 = Map.of(
+                "name", "분당선",
+                "color", "bg-yellow-600",
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 20
+        );
+
+        createLines(params1);
+        createLines(params2);
 
         // when
+        List<String> lineNames = findAllLines().jsonPath().getList("name", String.class);
 
         // then
+        assertThat(lineNames).containsExactly("신분당선", "분당선");
     }
-
-
 
     /**
      * Given 지하철 노선을 생성하고
@@ -134,6 +148,21 @@ class LineAcceptanceTest {
         // when
 
         // then
+    }
+
+    private ExtractableResponse<Response> createLines(Map<String, Object> params) {
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> findAllLines() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract();
     }
 
 }
