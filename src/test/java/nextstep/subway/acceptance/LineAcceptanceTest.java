@@ -95,22 +95,28 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        ExtractableResponse<Response> lineCreatedResponse = 지하철_노선_생성(LINE_5);
+        int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
         지하철_노선_생성(LINE_2);
+
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines/" + lineCreatedResponse.jsonPath().get("id"))
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철_노선_조회(id);
 
         // then
         assertThat(response.jsonPath().get("name").equals(LINE_5.get("name"))).isTrue();
         assertThat(response.jsonPath().get("color").equals(LINE_5.get("color"))).isTrue();
     }
 
+    private ExtractableResponse<Response> 지하철_노선_조회(int id) {
+        return RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + id)
+                .then().log().all()
+                .extract();
+    }
 
     private ExtractableResponse<Response> 지하철_노선_목록_조회() {
         return RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
