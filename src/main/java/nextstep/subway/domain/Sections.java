@@ -37,10 +37,10 @@ public class Sections {
 
     private void validateSection(Section lastSection, Section additionalSection) {
         if (!lastSection.isMatchDownStation(additionalSection.upStation())) {
-            throw new InvalidMatchEndStationException(additionalSection.upStation().getId());
+            throw new InvalidMatchEndStationException(additionalSection.upStation().id());
         }
         if(this.hasStation(additionalSection.downStation())) {
-            throw new StationAlreadyExistsException(additionalSection.downStation().getId());
+            throw new StationAlreadyExistsException(additionalSection.downStation().id());
         }
     }
 
