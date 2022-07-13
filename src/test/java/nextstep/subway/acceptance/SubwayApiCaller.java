@@ -7,6 +7,7 @@ import java.util.List;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.applicaion.dto.StationSectionRequest;
 import org.springframework.http.MediaType;
 
 public class SubwayApiCaller {
@@ -120,5 +121,22 @@ public class SubwayApiCaller {
                     .log().all()
                     .statusCode(204)
                     .extract();
+    }
+
+    public static ExtractableResponse<Response> 지하철구간_등록(String lineUrl, Long upStationId, Long downStationId, Integer distance) {
+        //when
+        StationSectionRequest request = new StationSectionRequest(upStationId,downStationId,distance);
+        ExtractableResponse<Response> response = RestAssured
+                .given()
+                    .log().all()
+                    .body(request)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post(lineUrl+"/sections")
+                .then()
+                    .statusCode(201)
+                    .log().all()
+                    .extract();
+        return response;
     }
 }
