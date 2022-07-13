@@ -52,12 +52,12 @@ public class Line {
 		this.color = stationColor;
 	}
 
-	public boolean isRegistrable(long upStationIdFromSelection, long downStationIdFromSelection) {
-		if (upStationIdFromSelection != this.downStationId) {
+	public boolean isRegistrable(long upStationIdFromSction, long downStationIdFromSection) {
+		if (upStationIdFromSction != this.downStationId) {
 			throw new IllegalStateException();
 		}
 
-		if (this.upStationId == downStationIdFromSelection || this.downStationId == downStationIdFromSelection) {
+		if (this.upStationId == downStationIdFromSection || this.downStationId == downStationIdFromSection) {
 			throw new IllegalStateException();
 		}
 		return true;
@@ -70,7 +70,7 @@ public class Line {
 		return true;
 	}
 
-	public void updateDownStationId(long downStationIdFromSelection) {
-		this.downStationId = downStationIdFromSelection;
+	public void updateDownStationId(long downStationIdFromSection) {
+		this.downStationId = downStationIdFromSection;
 	}
 }

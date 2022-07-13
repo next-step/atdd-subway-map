@@ -8,8 +8,8 @@ import org.springframework.util.CollectionUtils;
 public class Sections {
 	private final List<Section> values;
 
-	public Sections(List<Section> selectionList) {
-		values = new ArrayList<>(selectionList);
+	public Sections(List<Section> sectionList) {
+		values = new ArrayList<>(sectionList);
 	}
 
 	public boolean isDeletable(long stationId) {

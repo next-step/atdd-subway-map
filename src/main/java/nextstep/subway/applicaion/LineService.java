@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion;
 
+import static nextstep.subway.common.exception.errorcode.EntityErrorCode.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.common.exception.BusinessException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 
@@ -17,7 +20,6 @@ import nextstep.subway.domain.LineRepository;
 public class LineService {
 	private static final String STATION_NAME = "지하철역";
 	private static final String NEW_STATION_NAME = "새로운지하철역";
-	private static final String ENTITY_NOT_FOUND_EXCEPTION_MESSAGE = "Entity Not Found ";
 	private LineRepository lineRepository;
 
 	public LineService(LineRepository lineRepository) {
@@ -40,20 +42,20 @@ public class LineService {
 	public LineResponse findLine(Long stationId) {
 
 		return createLineResponse(lineRepository.findById(stationId)
-			.orElseThrow(IllegalArgumentException::new));
+			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND)));
 	}
 
 	@Transactional
 	public void updateLine(Long stationId, LineRequest LineRequest) {
 		Line line = lineRepository.findById(stationId)
-			.orElseThrow(() -> new IllegalArgumentException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE));
+			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
 		line.updateStationLineInformation(LineRequest.getName(), LineRequest.getColor());
 	}
 
 	@Transactional
 	public void deleteLine(Long stationId) {
 		lineRepository.delete(lineRepository.findById(stationId)
-			.orElseThrow(() -> new IllegalArgumentException(ENTITY_NOT_FOUND_EXCEPTION_MESSAGE)));
+			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND)));
 	}
 
 	private LineResponse createLineResponse(Line line) {

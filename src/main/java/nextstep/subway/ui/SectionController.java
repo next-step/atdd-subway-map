@@ -21,33 +21,33 @@ import nextstep.subway.applicaion.dto.SectionResponse;
 @RequestMapping("/lines")
 public class SectionController {
 
-	private SectionService selectionService;
+	private SectionService sectionService;
 
-	public SectionController(SectionService selectionService) {
-		this.selectionService = selectionService;
+	public SectionController(SectionService sectionService) {
+		this.sectionService = sectionService;
 	}
 
-	@PostMapping(value = "{lineId}/selection")
+	@PostMapping(value = "{lineId}/section")
 	public ResponseEntity<SectionResponse> createSection(@PathVariable long lineId,
 		@RequestBody SectionRequest sectionRequest) {
-		SectionResponse sectionResponse = selectionService.createSelection(lineId, sectionRequest);
-		return ResponseEntity.created(URI.create("/lines/" + lineId + "/selection")).body(sectionResponse);
+		SectionResponse sectionResponse = sectionService.createSection(lineId, sectionRequest);
+		return ResponseEntity.created(URI.create("/lines/" + lineId + "/section")).body(sectionResponse);
 	}
 
-	@DeleteMapping(value = "{lineId}/selection")
-	public ResponseEntity<Void> deleteSelection(@PathVariable long lineId, @RequestParam("stationId") long stationId) {
-		selectionService.deleteSelection(lineId, stationId);
+	@DeleteMapping(value = "{lineId}/section")
+	public ResponseEntity<Void> deleteSection(@PathVariable long lineId, @RequestParam("stationId") long stationId) {
+		sectionService.deleteSection(lineId, stationId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping(value = "{lineId}/selection")
-	public ResponseEntity<List<SectionResponse>> getSelectionList(@PathVariable long lineId) {
-		return ResponseEntity.ok().body(selectionService.getSelectionList(lineId));
+	@GetMapping(value = "{lineId}/section")
+	public ResponseEntity<List<SectionResponse>> getSectionList(@PathVariable long lineId) {
+		return ResponseEntity.ok().body(sectionService.getSectionList(lineId));
 	}
 
-	@GetMapping(value = "/selection/{selectionId}")
-	public ResponseEntity<SectionResponse> getSelection(@PathVariable long selectionId) {
-		return ResponseEntity.ok().body(selectionService.getSelection(selectionId));
+	@GetMapping(value = "/section/{sectionId}")
+	public ResponseEntity<SectionResponse> getSection(@PathVariable long sectionId) {
+		return ResponseEntity.ok().body(sectionService.getSection(sectionId));
 	}
 
 }

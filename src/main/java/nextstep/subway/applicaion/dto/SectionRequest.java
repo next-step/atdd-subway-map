@@ -7,7 +7,7 @@ public class SectionRequest {
 	private Long downStationId;
 	private Long distance;
 
-	public Section toSelection(long lineId) {
+	public Section toSection(long lineId) {
 		return new Section(lineId, this.upStationId, this.downStationId, this.distance);
 	}
 

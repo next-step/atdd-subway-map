@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.common.exception.errorcode.EntityErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,8 +108,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		지하철_노선_삭제(stationId);
 
 		//then
-		Map<String, Object> response = 지하철_노선_조회_BY_ID(stationId, HttpStatus.NO_CONTENT);
-		assertThat(response).isNull();
+		Map<String, Object> response = 지하철_노선_조회_BY_ID(stationId, HttpStatus.OK);
+		assertEquals(ENTITY_NOT_FOUND.toString(), response.get("errorCode"));
 
 	}
 

@@ -1,7 +1,9 @@
 package nextstep.subway.acceptance;
 
 import static nextstep.subway.acceptance.LineAcceptanceTest.*;
+import static nextstep.subway.common.exception.errorcode.EntityErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +18,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 
 @DisplayName("구간등록 테스트")
-public class SelectionAcceptanceTest extends AcceptanceTest {
+public class SectionAcceptanceTest extends AcceptanceTest {
 	private static final String baseUrlPrefix = "/lines";
 	/**
 	 * 1. 구간 등록
@@ -29,8 +31,8 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	 *
 	 * 	2. 구간 제거
 	 * 	 2.1 station 에 등록된 역인지 체크
-	 * 	 2.2 해당 Line 의 마지막 selection 의 downStationId와 동일한지 체크
-	 * 	 2.3 stationLine 이 등록된 selection 이 없는 경우 삭제 불가능
+	 * 	 2.2 해당 Line 의 마지막 section 의 downStationId와 동일한지 체크
+	 * 	 2.3 stationLine 이 등록된 section 이 없는 경우 삭제 불가능
 	 */
 
 	/**
@@ -40,13 +42,13 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("지하철구간 생성")
 	@Test
-	void createSelection() {
+	void createsection() {
 		//given
 		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		//when
-		long selectionId = 지하철_구간_생성(lineId, 2, 3, 1);
+		long sectionId = 지하철_구간_생성(lineId, 2, 3, 1);
 		//then
-		assertThat(지하철_구간_조회_BY_ID(selectionId, HttpStatus.OK)).isEqualTo(selectionId);
+		assertThat(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId")).isEqualTo((int)sectionId);
 
 	}
 
@@ -57,17 +59,17 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("지하철구간 목록 조회")
 	@Test
-	void getSelections() {
+	void getSections() {
 		//given
 		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 
 		//when
-		long selection1 = 지하철_구간_생성(lineId, 2, 3, 1);
-		long selection2 = 지하철_구간_생성(lineId, 3, 4, 1);
+		long section1 = 지하철_구간_생성(lineId, 2, 3, 1);
+		long section2 = 지하철_구간_생성(lineId, 3, 4, 1);
 
 		//then
 		assertThat(지하철_구간_목록_조회(lineId)).hasSize(2)
-			.containsExactly((int)selection1, (int)selection2);
+			.containsExactly((int)section1, (int)section2);
 	}
 
 	/**
@@ -81,9 +83,9 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 		//given
 		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
 		//when
-		long selectionId = 지하철_구간_생성(lineId, 2, 3, 1);
+		long sectionId = 지하철_구간_생성(lineId, 2, 3, 1);
 		//then
-		assertThat(지하철_구간_조회_BY_ID(selectionId, HttpStatus.OK)).isEqualTo(selectionId);
+		assertThat(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId")).isEqualTo((int)sectionId);
 	}
 
 	/**
@@ -94,38 +96,39 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("지하철구간 삭제")
 	@Test
-	void deleteSelection() {
+	void deleteSection() {
 		//given
 		long lindId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		long selectionId = 지하철_구간_생성(lindId, 2, 3, 1);
+		long sectionId = 지하철_구간_생성(lindId, 2, 3, 1);
 		//when
 		지하철_구간_삭제(lindId, 3);
 		//then
-		assertThat(지하철_구간_조회_BY_ID(selectionId, HttpStatus.NO_CONTENT)).isNull();
+		Map<String, Object> response = 지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK);
+		assertEquals(ENTITY_NOT_FOUND.toString(), response.get("errorCode"));
 	}
 
 	private long 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance) {
-		String postUrl = String.format("%s/%s/selection", baseUrlPrefix, lineId);
+		String postUrl = String.format("%s/%s/section", baseUrlPrefix, lineId);
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.body(지하철_구간_생성_파라미터생성(upStationId, downStationId, distance))
 			.when().post(postUrl)
 			.then().log().all()
 			.statusCode(HttpStatus.CREATED.value())
-			.extract().jsonPath().getLong("selectionId");
+			.extract().jsonPath().getLong("sectionId");
 	}
 
 	private List<Integer> 지하철_구간_목록_조회(long lineId) {
-		String selectPath = String.format("%s/%s/selection", baseUrlPrefix, lineId);
+		String selectPath = String.format("%s/%s/section", baseUrlPrefix, lineId);
 		return RestAssured.given().log().all()
 			.when().get(selectPath)
 			.then().log().all()
 			.statusCode(HttpStatus.OK.value())
-			.extract().jsonPath().getList("selectionId");
+			.extract().jsonPath().getList("sectionId");
 	}
 
-	private Long 지하철_구간_조회_BY_ID(long selectionId, HttpStatus httpStatus) {
-		String selectPath = String.format("%s/selection/%s", baseUrlPrefix, selectionId);
+	private Map<String, Object> 지하철_구간_조회_BY_ID(long sectionId, HttpStatus httpStatus) {
+		String selectPath = String.format("%s/section/%s", baseUrlPrefix, sectionId);
 		ExtractableResponse extractableResponse = RestAssured.given().log().all()
 			.when().get(selectPath)
 			.then().log().all()
@@ -133,13 +136,13 @@ public class SelectionAcceptanceTest extends AcceptanceTest {
 			.extract();
 
 		if (httpStatus == HttpStatus.OK) {
-			return extractableResponse.jsonPath().getLong("selectionId");
+			return extractableResponse.jsonPath().get();
 		}
 		return null;
 	}
 
 	private void 지하철_구간_삭제(long lineId, long stationId) {
-		String deleteUrl = String.format("%s/%s/selection?stationId=%s", baseUrlPrefix, lineId, stationId);
+		String deleteUrl = String.format("%s/%s/section?stationId=%s", baseUrlPrefix, lineId, stationId);
 		RestAssured.given().log().all()
 			.when().delete(deleteUrl)
 			.then().log().all()
