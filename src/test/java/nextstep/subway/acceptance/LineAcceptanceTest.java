@@ -63,7 +63,7 @@ public class LineAcceptanceTest {
         String lineName = getResponse.jsonPath().getString("[0].name");
         String lineColor = getResponse.jsonPath().getString("[0].color");
 
-        assertThat(lineName).isEqualTo("신분당선");
+        assertThat(lineName).isEqualTo(신분당선);
         assertThat(lineColor).isEqualTo("bg-red-600");
     }
 
@@ -76,42 +76,29 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        final String 강남역 = "강남역";
+        final String 판교역 = "판교역";
+        final String 부평구청역 = "부평구청역";
+        final String 장암역 = "장암역";
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        final String 신분당선 = "신분당선";
+        final String 칠호선 = "7호선";
 
-        params.put("name", "판교역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest(강남역));
+        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest(판교역));
+        ExtractableResponse<Response> stationCreationResponse3 = StationApiCall.createStation(new StationRequest(부평구청역));
+        ExtractableResponse<Response> stationCreationResponse4 = StationApiCall.createStation(new StationRequest(장암역));
 
-        params.put("name", "부평구청역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        Long 강남역_아이디 = getId(stationCreationResponse1);
+        Long 판교역_아이디 = getId(stationCreationResponse2);
+        Long 부평구청역_아이디 = getId(stationCreationResponse3);
+        Long 장암역_아이디 = getId(stationCreationResponse4);
 
-        params.put("name", "장암역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 판교역_아이디, 10));
+        LineApiCall.createLine(new LineRequest(칠호선, "bg-brown-600", 부평구청역_아이디, 장암역_아이디, 10));
 
-        ExtractableResponse<Response> response1 = createLine(new Line("신분당선", "bg-red-600", 3L, 4L, 10));
-        ExtractableResponse<Response> response2 = createLine(new Line("7호선", "bg-brown-600", 5L, 6L, 10));
-
-        List<String> lineNames = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-
+        List<String> lineNames = LineApiCall.getLines().jsonPath().getList("name", String.class);
         assertThat(lineNames).contains("신분당선", "7호선");
-
     }
 
     /**
@@ -193,10 +180,6 @@ public class LineAcceptanceTest {
     // 응답객체 id 데이터 조회
     private Long getId(ExtractableResponse<Response> response) {
         return response.jsonPath().getLong("id");
-    }
-
-    private ExtractableResponse<Response> createLine(Line line) {
-        return null;
     }
 
 
