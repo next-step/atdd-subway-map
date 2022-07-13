@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import nextstep.subway.exception.DuplicateDownStationException;
 import nextstep.subway.exception.NonMatchLastStationException;
+import nextstep.subway.exception.NonMatchLastStationException.Message;
 import nextstep.subway.exception.SectionNotFoundException;
 import nextstep.subway.exception.UnableRemoveSectionException;
 
@@ -15,12 +16,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nextstep.subway.exception.NonMatchLastStationException.Message.DOWN_STATION_ID;
+import static nextstep.subway.exception.NonMatchLastStationException.Message.UP_STATION_ID;
+
 @Embeddable
 public class Sections {
-    private static final String UP_STATION_ID = "upStationId";
-    private static final String DOWN_STATION_ID = "downStationId";
 
-    @OneToMany(mappedBy = "subwayLine", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "subwayLine",
+            orphanRemoval = true,
+            cascade = { CascadeType.PERSIST, CascadeType.REMOVE }
+    )
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {
@@ -62,7 +68,7 @@ public class Sections {
         }
     }
 
-    private void validateNonMatchLastStation(Long stationId, String message) {
+    private void validateNonMatchLastStation(Long stationId, Message message) {
         if (this.sections.isEmpty()) {
             return;
         }
