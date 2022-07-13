@@ -48,7 +48,23 @@ public class Section {
         this.line = line;
     }
 
+    public Station upStation() {
+        return upStation;
+    }
+
+    public Station downStation() {
+        return downStation;
+    }
+
+    public boolean hasStation(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
     public List<Station> stations() {
         return List.of(upStation, downStation);
+    }
+
+    public boolean isMatchDownStation(Station station) {
+        return downStation.equals(station);
     }
 }
