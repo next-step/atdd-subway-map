@@ -20,6 +20,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     /**
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * Then 지하철 노선의 구간목록의 첫 번째 구간의 상행역과 하행역이 노선의 상행 종점역과 하행 종점역이다.
      */
     @Test
     @DisplayName("지하철 노선을 생성한다.")
@@ -27,6 +28,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         //when
         Map<String, Object> requestBody = setRequestBody("신분당선", "bg-red-600",1,2,10);
         ExtractableResponse<Response> response = createLine(requestBody);
+        int lineId = response.jsonPath().getInt("id");
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -34,6 +36,17 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
         assertThat(response.jsonPath().getList("stations.id",Integer.class)).containsExactlyInAnyOrder(1,2);
+
+        //then
+        ExtractableResponse<Response> section = RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        assertThat(section.jsonPath().getInt("[0].upStationId")).isEqualTo(1);
+        assertThat(section.jsonPath().getInt("[0].downStationId")).isEqualTo(2);
+        assertThat(section.jsonPath().getInt("[0].distance")).isEqualTo(10);
     }
 
     /**
