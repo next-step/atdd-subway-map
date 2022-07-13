@@ -22,6 +22,10 @@ public class StationResponse {
 		return name;
 	}
 
+	public static StationResponse from(Station station) {
+		return new StationResponse(station.getId(), station.getName());
+	}
+
 	public static List<StationResponse> fromList(List<Station> stationList) {
 		return stationList.stream()
 			.map(station -> new StationResponse(station.getId(), station.getName()))

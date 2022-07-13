@@ -32,7 +32,7 @@ public class LineService {
 	public LineResponse createLine(LineRequest lineRequest) {
 		Station upStation = getStation(lineRequest.getUpStationId());
 		Station downStation = getStation(lineRequest.getDownStationId());
-		Line line = lineRequest.toEntity(upStation, downStation);
+		Line line = lineRequest.toEntity(new Section(upStation, downStation, lineRequest.getDistance()));
 		return LineResponse.from(lineRepository.save(line));
 	}
 
@@ -42,8 +42,7 @@ public class LineService {
 	}
 
 	public List<LineResponse> getAllLine() {
-		List<Line> lineList = lineRepository.findAll();
-		return LineResponse.fromList(lineList);
+		return LineResponse.fromList(lineRepository.findAll());
 	}
 
 	public LineResponse getLine(Long lineId) {
@@ -69,6 +68,6 @@ public class LineService {
 		Line line = getLineById(lineId);
 		Station upStation = getStation(sectionRequest.getUpStationId());
 		Station downStation = getStation(sectionRequest.getDownStationId());
-		line.addSection(new Section(line, upStation, downStation, sectionRequest.getDistance()));
+		line.addSection(new Section(upStation, downStation, sectionRequest.getDistance()));
 	}
 }
