@@ -1,7 +1,7 @@
 package nextstep.subway.infra;
 
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.station.StationRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

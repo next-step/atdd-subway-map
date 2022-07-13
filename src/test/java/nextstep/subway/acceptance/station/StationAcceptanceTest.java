@@ -32,7 +32,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 강남역_생성 = 지하철역_생성(강남역);
         assertThat(강남역_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-
         // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
         ExtractableResponse<Response> 지하철역_조회 = 지하철역_조회();
         assertThat(지하철역_조회.statusCode()).isEqualTo(HttpStatus.OK.value());

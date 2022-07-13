@@ -1,6 +1,4 @@
-package nextstep.subway.domain;
-
-import org.springframework.stereotype.Repository;
+package nextstep.subway.domain.station;
 
 import java.util.List;
 import java.util.Optional;

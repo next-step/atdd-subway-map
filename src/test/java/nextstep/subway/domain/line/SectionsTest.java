@@ -1,8 +1,9 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.line;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,16 +13,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class StationsTest {
+class SectionsTest {
     @Test
     @DisplayName("역들 안에 들어가는 역이 두 개 이상이 아니면 IllegalArgumentException 예외를 발생한다.")
     void test2() {
         // given
-        List<Station> stationList = List.of(강남역);
+        Section 구간 = new Section(null, 강남역.getId(), 분당역.getId(), 10);
+        List<Section> stationList = new ArrayList<>();
 
         // when & then
         assertThatThrownBy(
-            () -> new Stations(stationList)
+            () -> new Sections(stationList)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -29,17 +31,15 @@ class StationsTest {
     @DisplayName("역들 안에는 상행 종점역과 하행 종점역이 포함된다.")
     void test3() {
         // given
-        Station 상행종점역 = 강남역;
-        Station 하행종점역 = 분당역;
+        Section 구간 = new Section(null, 강남역.getId(), 분당역.getId(), 10);
 
         // when
-        Stations stations = new Stations(Arrays.asList(상행종점역, 하행종점역));
+        Sections stations = new Sections(Arrays.asList(구간));
 
         // then
         assertAll(
-            () -> assertThat(stations.getStations()).hasSize(2),
-            () -> assertThat(stations.getStations()).contains(상행종점역),
-            () -> assertThat(stations.getStations()).contains(하행종점역)
+            () -> assertThat(stations.getSections()).hasSize(1),
+            () -> assertThat(stations.getSections()).contains(구간)
         );
     }
 }
