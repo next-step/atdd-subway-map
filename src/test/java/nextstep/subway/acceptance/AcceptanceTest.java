@@ -22,7 +22,6 @@ public abstract class AcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        preprocessing();
     }
 
     @AfterEach
@@ -30,6 +29,4 @@ public abstract class AcceptanceTest {
         cleanUpSchema.execute();
     }
 
-    protected void preprocessing() {
-    }
 }

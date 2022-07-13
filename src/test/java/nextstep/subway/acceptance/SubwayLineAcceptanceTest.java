@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,8 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
         this.subwayCallApi = new SubwayCallApi();
     }
 
-    @Override
-    protected void preprocessing() {
+    @BeforeEach
+    void preprocessing() {
         subwayCallApi.saveStation(Param.강남역);
         subwayCallApi.saveStation(Param.양재역);
         subwayCallApi.saveStation(Param.역삼역);
