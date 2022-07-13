@@ -14,7 +14,7 @@ public class Distance {
 
     public Distance(long distance) {
         if (distance < MIN_DISTANCE) {
-            throw new IllegalArgumentException("거리는 1 이상이어야 합니다.");
+            throw new IllegalArgumentException(String.format("거리는 %d 이상이어야 합니다.", MIN_DISTANCE));
         }
         this.distance = distance;
     }
