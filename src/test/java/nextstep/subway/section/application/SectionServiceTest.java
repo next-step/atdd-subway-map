@@ -1,6 +1,5 @@
 package nextstep.subway.section.application;
 
-import nextstep.subway.line.LineTestSource;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
@@ -13,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static nextstep.subway.line.LineTestSource.lineId;
+import static nextstep.subway.line.LineTestSource.lineWithSection;
 import static nextstep.subway.section.SectionTestSource.sectionRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,7 +32,7 @@ class SectionServiceTest {
     @Test
     void 구간추가실패_신규상행역이기존의하행역이아님() {
         // given
-        doReturn(LineTestSource.lineWithSection())
+        doReturn(lineWithSection())
                 .when(lineService)
                 .findLineById(lineId);
 
@@ -48,7 +48,7 @@ class SectionServiceTest {
     @Test
     void 구간추가실패_신규하행역이이미등록되어있음() {
         // given
-        final Line line = LineTestSource.lineWithSection();
+        final Line line = lineWithSection();
         final SectionRequest sectionRequest = sectionRequest(line.getLastDownStationId());
 
         doReturn(line)
@@ -67,7 +67,7 @@ class SectionServiceTest {
     @Test
     void 구간추가성공() {
         // given
-        final Line line = LineTestSource.lineWithSection();
+        final Line line = lineWithSection();
         final SectionRequest sectionRequest = sectionRequest(line.getLastDownStationId(), 2022L);
 
         doReturn(line)
@@ -79,6 +79,25 @@ class SectionServiceTest {
 
         // then
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    void 구간삭제실패_신규하행역이이미등록되어있음() {
+        // given
+        final Line line = lineWithSection();
+        final Long stationId = 101L;
+
+        doReturn(line)
+                .when(lineService)
+                .findLineById(lineId);
+
+        // when
+        final IllegalStateException result = assertThrows(
+                IllegalStateException.class,
+                () -> target.deleteSection(lineId, stationId));
+
+        // then
+        assertThat(result.getMessage()).isEqualTo("해당 역을 삭제할 수 없습니다.");
     }
 
 }

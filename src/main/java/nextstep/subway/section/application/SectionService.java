@@ -47,8 +47,10 @@ public class SectionService {
                 .build();
     }
 
+    @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
-
+        final Line line = lineService.findLineById(lineId);
+        line.removeLastSection(stationId);
     }
 
 }

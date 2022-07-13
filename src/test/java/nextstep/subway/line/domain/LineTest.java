@@ -3,9 +3,11 @@ package nextstep.subway.line.domain;
 import nextstep.subway.section.domain.Section;
 import org.junit.jupiter.api.Test;
 
+import static nextstep.subway.line.LineTestSource.line;
 import static nextstep.subway.line.LineTestSource.lineWithSection;
 import static nextstep.subway.section.SectionTestSource.section;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LineTest {
 
@@ -65,6 +67,45 @@ class LineTest {
         final Long result = line.getLastDownStationId();
 
         assertThat(result).isEqualTo(9L);
+    }
+
+    @Test
+    void 구간삭제불가능_구간이1개임() {
+        final Line line = lineWithSection();
+
+        final IllegalStateException result = assertThrows(
+                IllegalStateException.class,
+                () -> line.removeLastSection(line.getLastDownStationId()));
+
+        assertThat(result).hasMessageContaining("해당 역을 삭제할 수 없습니다.");
+    }
+
+    @Test
+    void 구간삭제불가능_하행종점역이아님() {
+        final Line line = line();
+        final Section section1 = section(200L, 201L);
+        final Section section2 = section(201L, 202L);
+        line.addSection(section1);
+        line.addSection(section2);
+
+        final IllegalStateException result = assertThrows(
+                IllegalStateException.class,
+                () -> line.removeLastSection(section1.getDownStationId()));
+
+        assertThat(result).hasMessageContaining("해당 역을 삭제할 수 없습니다.");
+    }
+
+    @Test
+    void 구간삭제가능() {
+        final Line line = line();
+        final Section section1 = section(200L, 201L);
+        final Section section2 = section(201L, 202L);
+        line.addSection(section1);
+        line.addSection(section2);
+
+        line.removeLastSection(section2.getDownStationId());
+
+        assertThat(line.getLastDownStationId()).isEqualTo(section1.getDownStationId());
     }
 
 }

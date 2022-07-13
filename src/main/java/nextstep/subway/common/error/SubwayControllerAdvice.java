@@ -11,9 +11,18 @@ public class SubwayControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handlerIllegalArgumentException(final IllegalArgumentException e) {
+        return createBadRequestResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handlerIllegalStateException(final IllegalStateException e) {
+        return createBadRequestResponse(e.getMessage());
+    }
+
+    private ResponseEntity<ErrorResponse> createBadRequestResponse(final String message) {
         final HttpStatus status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status)
-                .body(new ErrorResponse(status.name(), e.getMessage()));
+                .body(new ErrorResponse(status.name(), message));
     }
 
 }

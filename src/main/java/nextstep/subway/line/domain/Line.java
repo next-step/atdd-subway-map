@@ -16,7 +16,7 @@ public class Line {
     private String color;
 
     // TODO(MinKyu): fetch join
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sectionList = new ArrayList<>();
 
     protected Line() {
@@ -68,7 +68,7 @@ public class Line {
         if (sectionList.isEmpty()) {
             throw new IllegalStateException("Section이 없습니다.");
         }
-        return sectionList.get(sectionList.size() - 1).getDownStationId();
+        return sectionList.get(getLastIndex()).getDownStationId();
     }
 
     public void addSection(final Section section) {
@@ -84,6 +84,26 @@ public class Line {
     public boolean hasCircularSection(final Section section) {
         return sectionList.stream()
                 .anyMatch(section::isDuplicated);
+    }
+
+    public void removeLastSection(final Long stationId) {
+        if (!canRemoveSection(stationId)) {
+            throw new IllegalStateException("해당 역을 삭제할 수 없습니다.");
+        }
+
+        sectionList.remove(getLastIndex());
+    }
+
+    private boolean canRemoveSection(final Long stationId) {
+        if (sectionList.size() <= 1) {
+            return false;
+        }
+
+        return getLastDownStationId().equals(stationId);
+    }
+
+    private int getLastIndex() {
+        return sectionList.size() - 1;
     }
 
     public static class LineBuilder {
