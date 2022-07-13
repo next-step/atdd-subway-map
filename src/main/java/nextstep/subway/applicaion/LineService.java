@@ -7,8 +7,6 @@ import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,20 +14,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(lineRequest.toDomain());
 
-        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
-
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+        return new LineResponse(line.getId(), line.getName(), line.getColor(),
+                List.of(stationService.findStation(line.getUpStationId()),
+                        stationService.findStation(line.getDownStationId())));
     }
 
     public List<LineResponse> findAllLines() {
@@ -43,14 +41,16 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()))
+                List.of(stationService.findStation(line.getUpStationId()),
+                        stationService.findStation(line.getDownStationId()))
         );
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         return new LineResponse(line.getId(), line.getName(), line.getColor(),
-                stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId())));
+                List.of(stationService.findStation(line.getUpStationId()),
+                        stationService.findStation(line.getDownStationId())));
     }
 
     @Transactional
