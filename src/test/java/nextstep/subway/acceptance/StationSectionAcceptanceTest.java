@@ -55,4 +55,29 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
                 new StationResponse(역삼역,"역삼역"),
                 new StationResponse(선릉역,"선릉역"));
     }
+
+    /**
+     * Given 지하철 구간을 생성하고
+     * When 생성한 지하철 구간을 삭제하면
+     * Then 해당 지하철 노선 조회 시 해당 지하철 구간 정보는 삭제된다
+     */
+    @DisplayName("지하철 구간 제거")
+    @Test
+    void deleteStationSection() {
+        //given
+        String 신분당선_저장_위치 = 신분당선.header("Location");
+        Long 지하철구간 = 지하철구간_등록(신분당선_저장_위치, 역삼역, 선릉역, 7)
+                .as(StationSectionResponse.class).getDownStationId();
+
+        //when
+        지하철구간_삭제(신분당선_저장_위치, 지하철구간);
+
+        //then
+        StationLineResponse stationLineResponses = 지하철노선_조회(신분당선_저장_위치);
+
+        assertThat(stationLineResponses.getName()).isEqualTo("신분당선");
+        assertThat(stationLineResponses.getStations()).containsExactly(
+                new StationResponse(강남역,"강남역"),
+                new StationResponse(역삼역,"역삼역"));
+    }
 }
