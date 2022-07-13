@@ -31,8 +31,8 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public List<StationResponse> findEndStations(final List<Long> idList) {
-        return stationRepository.findAllByIdIn(idList)
+    public List<StationResponse> findBothEndStations(final List<Long> bothEndIdList) {
+        return stationRepository.findAllByIdIn(bothEndIdList)
             .stream().map(this::createStationResponse)
             .collect(Collectors.toList());
     }
