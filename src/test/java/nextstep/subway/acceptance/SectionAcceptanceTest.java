@@ -31,7 +31,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUpStations() {
-        Arrays.stream(STATIONS.values()).forEach(station -> {
+        List.of(STATIONS.광교역, STATIONS.광교중앙역, STATIONS.상현역, STATIONS.성복역).forEach(station -> {
             var stationId = createStationWithName(station.name()).jsonPath().getLong("id");
             stationIds.put(station, stationId);
             }
@@ -128,6 +128,24 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 존재하지 않는 역을 포함한 구간을 노선에 등록하면
      * Then 에러가 발생한다
      */
+    @DisplayName("존재하지 않는 역을 포함한 구간 등록 불가")
+    @Test
+    void canNotCreateSectionWithStationWhichIsNotExist() {
+        // given
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
+        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
+
+        // when
+        var sectionCreationResponse = createSection(lineId, STATIONS.광교역, STATIONS.수지구청역, 3L);
+
+        // then
+        assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
 
     /**
      * Given 2개 이상의 구간이 포함된 지하철 노선을 등록하고
