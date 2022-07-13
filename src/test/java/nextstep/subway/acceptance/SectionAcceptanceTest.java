@@ -27,16 +27,28 @@ import static org.springframework.http.HttpStatus.OK;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest {
 
+	@Autowired
+	DatabaseCleanup databaseCleanup;
+
 	@LocalServerPort
 	int port;
 
-	@Autowired
-	DatabaseCleanup databaseCleanup;
+	private static long upStationId;
+	private static long downStationId;
+	private static long subwayLineId;
+	private static long otherStationId;
 
 	@BeforeEach
 	void setUp() {
 		RestAssured.port = port;
 		databaseCleanup.execute();
+		subwayLineInit();
+	}
+
+	private void subwayLineInit() {
+		upStationId = 지하철역을_등록한다("광교역").jsonPath().getLong("id");
+		downStationId = 지하철역을_등록한다("광교중앙역").jsonPath().getLong("id");
+		subwayLineId = 지하철_노선을_등록한다("신분당선", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
 	}
 
 	/**
@@ -49,12 +61,7 @@ public class SectionAcceptanceTest {
 	@Test
 	void registerSection() {
 		//given
-		long upStationId = 지하철역을_등록한다("광교역").jsonPath().getLong("id");
-		long downStationId = 지하철역을_등록한다("광교중앙역").jsonPath().getLong("id");
-		long subwayLineId = 지하철_노선을_등록한다("신분당선", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
-
-		//given
-		long otherStationId = 지하철역을_등록한다("상현역").jsonPath().getLong("id");
+		otherStationId = 지하철역을_등록한다("상현역").jsonPath().getLong("id");
 
 		//when
 		ExtractableResponse<Response> response = 지하철_구간을_등록한다(subwayLineId, downStationId, otherStationId, 5);
@@ -79,12 +86,7 @@ public class SectionAcceptanceTest {
 	@Test
 	void deleteSection() {
 		//given
-		long upStationId = 지하철역을_등록한다("광교역").jsonPath().getLong("id");
-		long downStationId = 지하철역을_등록한다("광교중앙역").jsonPath().getLong("id");
-		long subwayLineId = 지하철_노선을_등록한다("신분당선", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
-
-		//given
-		long otherStationId = 지하철역을_등록한다("상현역").jsonPath().getLong("id");
+		otherStationId = 지하철역을_등록한다("상현역").jsonPath().getLong("id");
 		지하철_구간을_등록한다(subwayLineId, downStationId, otherStationId, 5);
 
 		//when
