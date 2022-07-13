@@ -8,7 +8,6 @@ import nextstep.subway.station.applicaion.StationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -31,13 +30,12 @@ public class LineService {
         return createLineResponse(savedLine);
     }
 
-
     private LineResponse createLineResponse(final Line savedLine) {
         return LineResponse.builder()
                 .id(savedLine.getId())
                 .name(savedLine.getName())
                 .color(savedLine.getColor())
-                .stations(stationService.findStations(Arrays.asList(savedLine.getUpStationId(), savedLine.getDownStationId()))).build();
+                .stations(stationService.findStations(List.of(savedLine.getFirstUpStationId(), savedLine.getLastDownStationId()))).build();
     }
 
     public List<LineResponse> findAllLines() {
@@ -50,8 +48,7 @@ public class LineService {
     @Transactional
     public void modifyLine(final Long id, final LineRequest lineRequest) {
         final Line line = findLineById(id);
-
-        lineRepository.save(lineRequest.toLine(line.getId()));
+        line.modify(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional

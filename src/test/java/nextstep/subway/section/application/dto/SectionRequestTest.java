@@ -12,19 +12,17 @@ class SectionRequestTest {
     void 빌더() {
         final SectionRequest result = sectionRequest();
 
-        assertThat(result.getUpStationId()).isEqualTo(6L);
-        assertThat(result.getDownStationId()).isEqualTo(8L);
+        assertThat(result.getUpStationId()).isEqualTo(8L);
+        assertThat(result.getDownStationId()).isEqualTo(9L);
         assertThat(result.getDistance()).isEqualTo(10L);
     }
 
     @Test
     void Section으로변환() {
-        final long lineId = 20L;
         final SectionRequest sectionRequest = sectionRequest();
 
-        final Section result = sectionRequest.toSection(lineId);
+        final Section result = sectionRequest.toSection();
 
-        assertThat(result.getLineId()).isEqualTo(lineId);
         assertThat(result.getUpStationId()).isEqualTo(sectionRequest.getUpStationId());
         assertThat(result.getDownStationId()).isEqualTo(sectionRequest.getDownStationId());
         assertThat(result.getDistance()).isEqualTo(sectionRequest.getDistance());

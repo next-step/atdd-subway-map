@@ -1,5 +1,6 @@
 package nextstep.subway.section.application;
 
+import nextstep.subway.line.LineTestSource;
 import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
@@ -12,9 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
-
-import static nextstep.subway.line.LineTestSource.line;
 import static nextstep.subway.line.LineTestSource.lineId;
 import static nextstep.subway.section.SectionTestSource.section;
 import static nextstep.subway.section.SectionTestSource.sectionRequest;
@@ -37,7 +35,7 @@ class SectionServiceTest {
     @Test
     void 구간추가실패_신규상행역이기존의하행역이아님() {
         // given
-        doReturn(line())
+        doReturn(LineTestSource.lineWithSection())
                 .when(lineService)
                 .findLineById(lineId);
 
@@ -53,16 +51,12 @@ class SectionServiceTest {
     @Test
     void 구간추가실패_신규하행역이이미등록되어있음() {
         // given
-        final Line line = line();
-        final SectionRequest sectionRequest = sectionRequest(line.getDownStationId());
+        final Line line = LineTestSource.lineWithSection();
+        final SectionRequest sectionRequest = sectionRequest(line.getLastDownStationId());
 
         doReturn(line)
                 .when(lineService)
                 .findLineById(lineId);
-
-        doReturn(Collections.singletonList(section(sectionRequest.getDownStationId())))
-                .when(sectionRepository)
-                .findAllByLineId(lineId);
 
         // when
         final IllegalArgumentException result = assertThrows(
@@ -76,16 +70,12 @@ class SectionServiceTest {
     @Test
     void 구간추가성공() {
         // given
-        final Line line = line();
-        final SectionRequest sectionRequest = sectionRequest(line.getDownStationId());
+        final Line line = LineTestSource.lineWithSection();
+        final SectionRequest sectionRequest = sectionRequest(line.getLastDownStationId(), 2022L);
 
         doReturn(line)
                 .when(lineService)
                 .findLineById(lineId);
-
-        doReturn(Collections.emptyList())
-                .when(sectionRepository)
-                .findAllByLineId(lineId);
 
         doReturn(section())
                 .when(sectionRepository)

@@ -1,6 +1,7 @@
 package nextstep.subway.line.application.dto;
 
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.section.domain.Section;
 
 public class LineRequest {
 
@@ -47,22 +48,18 @@ public class LineRequest {
     }
 
     public Line toLine() {
-        return Line.builder()
+        final Line line = Line.builder()
                 .name(name)
                 .color(color)
-                .upStationId(upStationId)
-                .downStationId(downStationId)
-                .distance(distance).build();
-    }
+                .build();
 
-    public Line toLine(final Long id) {
-        return Line.builder()
-                .id(id)
-                .name(name)
-                .color(color)
+        final Section section = Section.builder()
                 .upStationId(upStationId)
                 .downStationId(downStationId)
                 .distance(distance).build();
+
+        line.addSection(section);
+        return line;
     }
 
     public static class LineRequestBuilder {

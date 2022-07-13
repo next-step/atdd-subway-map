@@ -32,9 +32,8 @@ public class SectionRequest {
         return distance;
     }
 
-    public Section toSection(final long lineId) {
+    public Section toSection() {
         return Section.builder()
-                .lineId(lineId)
                 .upStationId(upStationId)
                 .downStationId(downStationId)
                 .distance(distance)

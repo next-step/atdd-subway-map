@@ -1,9 +1,8 @@
 package nextstep.subway.section.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.line.domain.Line;
+
+import javax.persistence.*;
 
 @Entity
 public class Section {
@@ -11,7 +10,9 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long lineId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Line line;
     private Long upStationId;
     private Long downStationId;
     private Long distance;
@@ -19,9 +20,9 @@ public class Section {
     protected Section() {
     }
 
-    public Section(final Long id, final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
+    private Section(final Long id, final Line line, final Long upStationId, final Long downStationId, final Long distance) {
         this.id = id;
-        this.lineId = lineId;
+        this.line = line;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
@@ -31,8 +32,8 @@ public class Section {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
     public Long getUpStationId() {
@@ -51,14 +52,18 @@ public class Section {
         return downStationId.equals(section.getUpStationId()) || downStationId.equals(section.getDownStationId());
     }
 
+    public void setLine(final Line line) {
+        this.line = line;
+    }
+
     public static class SectionBuilder {
-        private Long lineId;
+        private Line line;
         private Long upStationId;
         private Long downStationId;
         private Long distance;
 
-        public SectionBuilder lineId(final Long lineId) {
-            this.lineId = lineId;
+        public SectionBuilder line(final Line line) {
+            this.line = line;
             return this;
         }
 
@@ -78,7 +83,7 @@ public class Section {
         }
 
         public Section build() {
-            return new Section(null, lineId, upStationId, downStationId, distance);
+            return new Section(null, line, upStationId, downStationId, distance);
         }
 
     }

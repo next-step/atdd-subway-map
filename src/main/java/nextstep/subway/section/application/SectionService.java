@@ -1,7 +1,6 @@
 package nextstep.subway.section.application;
 
 import nextstep.subway.line.application.LineService;
-import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
 import nextstep.subway.section.application.dto.SectionResponse;
@@ -24,16 +23,17 @@ public class SectionService {
 
     public SectionResponse addSection(final long lineId, final SectionRequest sectionRequest) {
         final Line line = lineService.findLineById(lineId);
-        final Section section = sectionRequest.toSection(lineId);
+        final Section section = sectionRequest.toSection();
 
-        if (!line.isConnectableSection(section)) {
+        if (!line.isConnectable(section)) {
             throw new IllegalArgumentException("신규상행역이 기존의 하행역이 아닙니다.");
         }
 
-        if (hasCircularSection(lineId, section)) {
+        if (line.hasCircularSection(section)) {
             throw new IllegalArgumentException("신규하행역이 이미 등록되어 있습니다.");
         }
 
+        line.addSection(section);
         return createSectionResponse(sectionRepository.save(section));
     }
 
@@ -44,12 +44,6 @@ public class SectionService {
                 .downStationId(savedSection.getDownStationId())
                 .distance(savedSection.getDistance())
                 .build();
-    }
-
-    private boolean hasCircularSection(final long lineId, final Section section) {
-        return sectionRepository.findAllByLineId(lineId)
-                .stream()
-                .anyMatch(section::isDuplicated);
     }
 
     public void deleteSection(final long lineId, final String stationId) {

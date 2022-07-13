@@ -2,10 +2,9 @@ package nextstep.subway.line.domain;
 
 import nextstep.subway.section.domain.Section;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -15,20 +14,18 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    private List<Section> sectionList = new ArrayList<>();
 
     protected Line() {
     }
 
-    public Line(final Long id, final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
+    public Line(final Long id, final String name, final String color, final List<Section> sectionList) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.sectionList = sectionList;
     }
 
     public Long getId() {
@@ -43,29 +40,56 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public List<Section> getSectionList() {
+        return sectionList;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public boolean isConnectable(final Section section) {
+        if (sectionList.isEmpty()) {
+            return true;
+        }
+
+        return isConnectableSection(section);
     }
 
-    public Long getDistance() {
-        return distance;
+    private boolean isConnectableSection(final Section section) {
+        return getLastDownStationId().equals(section.getUpStationId());
     }
 
-    public boolean isConnectableSection(final Section section) {
-        return downStationId.equals(section.getUpStationId());
+    public Long getFirstUpStationId() {
+        if (sectionList.isEmpty()) {
+            throw new IllegalStateException("Section이 없습니다.");
+        }
+        return sectionList.get(0).getUpStationId();
+    }
+
+    public Long getLastDownStationId() {
+        if (sectionList.isEmpty()) {
+            throw new IllegalStateException("Section이 없습니다.");
+        }
+        return sectionList.get(sectionList.size() - 1).getDownStationId();
+    }
+
+    public void addSection(final Section section) {
+        sectionList.add(section);
+        section.setLine(this);
+    }
+
+    public void modify(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public boolean hasCircularSection(final Section section) {
+        return sectionList.stream()
+                .anyMatch(section::isDuplicated);
     }
 
     public static class LineBuilder {
         private Long id;
         private String name;
         private String color;
-        private Long upStationId;
-        private Long downStationId;
-        private Long distance;
+        private List<Section> sectionList = new ArrayList<>();
 
         public Line.LineBuilder id(final Long id) {
             this.id = id;
@@ -80,27 +104,15 @@ public class Line {
         public Line.LineBuilder color(final String color) {
             this.color = color;
             return this;
-
-        }
-        public Line.LineBuilder upStationId(final Long upStationId) {
-            this.upStationId = upStationId;
-            return this;
-
         }
 
-        public Line.LineBuilder downStationId(final Long downStationId) {
-            this.downStationId = downStationId;
-            return this;
-
-        }
-
-        public Line.LineBuilder distance(final Long distance) {
-            this.distance = distance;
+        public Line.LineBuilder sectionList(final List<Section> sectionList) {
+            this.sectionList = sectionList;
             return this;
         }
 
         public Line build() {
-            return new Line(id, name, color, upStationId, downStationId, distance);
+            return new Line(id, name, color, sectionList);
         }
 
     }
