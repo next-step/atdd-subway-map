@@ -37,7 +37,7 @@ public class LineService {
 
     private Station findStationByStationId(Long id) {
         return stationRepository.findById(id)
-                                .orElseThrow(() -> new IllegalArgumentException("노선에 해당하는 역이 없습니다."));
+                                .orElseThrow(() -> new IllegalArgumentException(id + "번 역은 존재하지 않습니다."));
     }
 
     public List<LineResponse> findAllLines() {
@@ -47,16 +47,18 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("번호에 해당하는 노선이 없습니다."));
-
+        Line line = getLine(id);
         return createLineResponse(line);
+    }
+
+    private Line getLine(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(id + "번 노선은 존재하지 않습니다."));
     }
 
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("번호에 해당하는 노선이 없습니다."));
+        Line line = getLine(id);
         line.update(lineRequest.getName(), lineRequest.getColor());
     }
 
