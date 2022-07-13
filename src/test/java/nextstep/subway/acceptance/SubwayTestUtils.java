@@ -53,8 +53,11 @@ public class SubwayTestUtils {
                     .extract();
     }
 
-    public static final LineCreationRequest SINBUNDANG_LINE_REQUEST = new LineCreationRequest(
-            "신분당선", "bg-red-600", 1L, 2L, 10L);
-    public static final LineCreationRequest BUNDANG_LINE_REQUEST = new LineCreationRequest(
-            "분당선", "bg-green-600", 1L, 3L, 20L);
+    public enum STATIONS {
+        광교역,
+        광교중앙역,
+        상현역,
+        성복역,
+        수지구청역;
+    }
 }

@@ -8,9 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import nextstep.subway.acceptance.SubwayTestUtils.STATIONS;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.SectionCreationRequest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,6 +24,22 @@ import org.springframework.http.MediaType;
 
 @DisplayName("구간관리 관련 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
+
+    private Map<STATIONS, Long> stationIds = new HashMap<>();
+
+    @BeforeEach
+    void setUpStations() {
+        Arrays.stream(STATIONS.values()).forEach(station -> {
+            var stationId = createStationWithName(station.name()).jsonPath().getLong("id");
+            stationIds.put(station, stationId);
+            }
+        );
+    }
+
+    @AfterEach
+    void cleanStations() {
+        stationIds.clear();
+    }
 
     /**
      * Given 지하철 노선을 등록하고
@@ -28,14 +50,19 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindSectionOfLineWhichCreated() {
         // given
-        var upStationId = createStationWithName("광교역").jsonPath().getLong("id");
-        var downStationId = createStationWithName("광교중앙역").jsonPath().getLong("id");
-        var newStationId = createStationWithName("상현역").jsonPath().getLong("id");
-        var lineCreationRequest = new LineCreationRequest("신분당선", "bg-red-600", upStationId, downStationId, 10L);
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
         var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
 
         // when
-        var sectionCreationRequest = new SectionCreationRequest(newStationId, downStationId, 3L);
+        var sectionCreationRequest = new SectionCreationRequest(
+                stationIds.get(STATIONS.상현역),
+                stationIds.get(STATIONS.광교중앙역),
+                3L);
         var sectionCreationResponse = RestAssured
                 .given()
                     .pathParam("lineId", lineId)
@@ -53,7 +80,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 () -> assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(stationNames).isEqualTo(List.of("광교역", "광교중앙역", "상현역"))
+                () -> assertThat(stationNames).isEqualTo(List.of(
+                        STATIONS.광교역.name(), STATIONS.광교중앙역.name(), STATIONS.상현역.name()))
         );
     }
 
