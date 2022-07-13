@@ -11,4 +11,9 @@ public class ExceptionAdvice {
     public ResponseEntity<ExceptionResponse> exceptionHandler(IllegalArgumentException e) {
         return ResponseEntity.internalServerError().body(new ExceptionResponse(e.getMessage()));
     }
+
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<ExceptionResponse> exceptionHandler(RuntimeException e) {
+        return ResponseEntity.internalServerError().body(new ExceptionResponse(e.getMessage()));
+    }
 }
