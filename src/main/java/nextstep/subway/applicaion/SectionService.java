@@ -32,8 +32,8 @@ public class SectionService {
 	public SectionResponse createSection(long lineId, SectionRequest sectionRequest) {
 		Line line = lineRepository.findById(lineId)
 			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
-		line.isRegistrable(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
-		line.updateDownStationId(sectionRequest.getDownStationId());
+		//line.isRegistrable(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+		//line.updateDownStationId(sectionRequest.getDownStationId());
 		return createSectionResponse(sectionRepository.save(sectionRequest.toSection(lineId)));
 	}
 
@@ -41,7 +41,7 @@ public class SectionService {
 	public void deleteSection(long lineId, long stationId) {
 		Line line = lineRepository.findById(lineId)
 			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
-		line.isDeletable(stationId);
+		//line.isDeletable(stationId);
 
 		Sections sections = new Sections(sectionRepository.findByLineIdOrderById(lineId));
 		sections.isDeletable(stationId);

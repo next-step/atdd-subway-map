@@ -11,15 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.common.exception.BusinessException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 
 @Service
 public class LineService {
-	private static final String STATION_NAME = "지하철역";
-	private static final String NEW_STATION_NAME = "새로운지하철역";
+	
 	private LineRepository lineRepository;
 
 	public LineService(LineRepository lineRepository) {
@@ -61,9 +59,7 @@ public class LineService {
 	private LineResponse createLineResponse(Line line) {
 		return new LineResponse(line.getId(),
 			line.getName(),
-			line.getColor(),
-			new StationResponse(line.getUpStationId(), STATION_NAME),
-			new StationResponse(line.getDownStationId(), NEW_STATION_NAME));
+			line.getColor());
 	}
 
 }

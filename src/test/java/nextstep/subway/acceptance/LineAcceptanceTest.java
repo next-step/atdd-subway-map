@@ -27,7 +27,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void createLine() {
 		//when
-		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 
 		//then
 		assertThat(지하철_노선_전체_조회()).containsAnyOf(SIN_BOONDANG_LINE);
@@ -43,8 +43,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getLines() {
 		//given
-		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
-		지하철_노선_생성(SAMSUNG_STATION, LINE_COLOR_RED, 2, 3, 8);
+		지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
+		지하철_노선_생성(SAMSUNG_STATION, LINE_COLOR_RED);
 
 		//when
 		List<String> names = 지하철_노선_전체_조회();
@@ -63,7 +63,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getLine() {
 		//given
-		long stationId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long stationId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 
 		//when
 		Map<String, Object> response = 지하철_노선_조회_BY_ID(stationId, HttpStatus.OK);
@@ -81,7 +81,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void updateLine() {
 		//given
-		long stationId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long stationId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 
 		//when
 		지하철_노선_수정(stationId, SAMSUNG_STATION, LINE_COLOR_BLUE);
@@ -102,7 +102,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteLine() {
 		//given
-		long stationId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long stationId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 
 		//when
 		지하철_노선_삭제(stationId);
@@ -113,15 +113,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
 	}
 
-	static Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor, long upStationId,
-		long downStationId,
-		long distance) {
+	static Map<String, Object> 지하철노선_생성_파라미터생성(String stationName, String stationColor) {
 		Map<String, Object> requestParameter = new HashMap<>();
 		requestParameter.put("name", stationName);
 		requestParameter.put("color", stationColor);
-		requestParameter.put("upStationId", upStationId);
-		requestParameter.put("downStationId", downStationId);
-		requestParameter.put("distance", distance);
+
 		return requestParameter;
 	}
 
@@ -132,11 +128,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 		return requestParameter;
 	}
 
-	static Long 지하철_노선_생성(String stationName, String stationColor, long upStationId, long downStationId,
-		long distance) {
+	static Long 지하철_노선_생성(String stationName, String stationColor) {
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.body(지하철노선_생성_파라미터생성(stationName, stationColor, upStationId, downStationId, distance))
+			.body(지하철노선_생성_파라미터생성(stationName, stationColor))
 			.when().post("/lines")
 			.then().log().all()
 			.statusCode(HttpStatus.CREATED.value())

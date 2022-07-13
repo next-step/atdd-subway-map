@@ -42,13 +42,13 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("지하철구간 생성")
 	@Test
-	void createsection() {
+	void createSection() {
 		//given
-		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 		//when
 		long sectionId = 지하철_구간_생성(lineId, 2, 3, 1);
 		//then
-		assertThat(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId")).isEqualTo((int)sectionId);
+		assertEquals(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId"), (int)sectionId);
 
 	}
 
@@ -61,7 +61,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getSections() {
 		//given
-		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 
 		//when
 		long section1 = 지하철_구간_생성(lineId, 2, 3, 1);
@@ -81,11 +81,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철구간_조회() {
 		//given
-		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 		//when
 		long sectionId = 지하철_구간_생성(lineId, 2, 3, 1);
 		//then
-		assertThat(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId")).isEqualTo((int)sectionId);
+		assertEquals(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId"), (int)sectionId);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteSection() {
 		//given
-		long lindId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED, 1, 2, 10);
+		long lindId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 		long sectionId = 지하철_구간_생성(lindId, 2, 3, 1);
 		//when
 		지하철_구간_삭제(lindId, 3);
