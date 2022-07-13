@@ -53,4 +53,8 @@ public class Line {
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toSet());
     }
+
+    public boolean inValidSectionDelete() {
+        return this.sections.size() < 2;
+    }
 }

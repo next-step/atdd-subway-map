@@ -102,7 +102,7 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
         // given
         long sectionId = createSectionAndGetId(lineId, 2, 3);
         ExtractableResponse<Response> afterCreateLineResponse = getLine(lineId);
-        assertThat(afterCreateLineResponse.jsonPath().getList("stations")).hasSize(2);
+        assertThat(afterCreateLineResponse.jsonPath().getList("stations")).hasSize(3);
 
         // when
         ExtractableResponse<Response> response = deleteSection(lineId, sectionId);
