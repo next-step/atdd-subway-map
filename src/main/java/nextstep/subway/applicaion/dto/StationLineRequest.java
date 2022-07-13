@@ -37,11 +37,11 @@ public class StationLineRequest {
     }
 
 
-    public static class PatchRequest {
+    public static class PutRequest {
         private final String  name;
         private final String color;
 
-        public PatchRequest(String name, String color) {
+        public PutRequest(String name, String color) {
             this.name = name;
             this.color = color;
         }

@@ -1,7 +1,6 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.StationLineService;
-import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,10 +37,10 @@ public class StationLineController {
         return  ResponseEntity.ok(stationLineService.findById(id));
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<StationLineResponse> patchLine(
-            @PathVariable Long id, @RequestBody PatchRequest patchRequest) {
-        return ResponseEntity.ok(stationLineService.patch(id, patchRequest.toEntity()));
+            @PathVariable Long id, @RequestBody PutRequest putRequest) {
+        return ResponseEntity.ok(stationLineService.patch(id, putRequest.toEntity()));
     }
 
     @DeleteMapping("/{id}")

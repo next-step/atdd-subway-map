@@ -191,7 +191,7 @@ public class StationLineAcceptanceTest {
                           .body(body)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when().log().all()
-                          .patch(STATION_LINE_REQUEST_PATH+ "/{id}")
+                          .put(STATION_LINE_REQUEST_PATH+ "/{id}")
                           .then().log().all()
                           .extract().as(Line.class);
     }
