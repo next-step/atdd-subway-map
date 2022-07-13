@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -59,19 +61,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
 
         // when
-        var sectionCreationRequest = new SectionCreationRequest(
-                stationIds.get(STATIONS.상현역),
-                stationIds.get(STATIONS.광교중앙역),
-                3L);
-        var sectionCreationResponse = RestAssured
-                .given()
-                    .pathParam("lineId", lineId)
-                    .body(sectionCreationRequest, ObjectMapperType.JACKSON_2)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/lines/{lineId}/sections")
-                .then()
-                    .extract();
+        var sectionCreationResponse = createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
 
         // then
         var stationNames = getLine(lineId)
@@ -103,20 +93,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
         var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
 
         // when
-        var sectionCreationRequest = new SectionCreationRequest(
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                3L);
-        var sectionCreationResponse = RestAssured
-                .given()
-                    .pathParam("lineId", lineId)
-                    .body(sectionCreationRequest, ObjectMapperType.JACKSON_2)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/lines/{lineId}/sections")
-                .then()
-                    .extract();
+        var sectionCreationResponse = createSection(lineId, STATIONS.광교중앙역, STATIONS.광교역, 3L);
 
+        // then
         assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -155,4 +134,21 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 노선에 등록되지 않은 역을 제거하면
      * Then 에러가 발생한다
      */
+
+
+    private ExtractableResponse<Response> createSection(Long lineId, STATIONS upStation, STATIONS downStation, Long distance) {
+        var sectionCreationRequest = new SectionCreationRequest(
+                stationIds.get(downStation),
+                stationIds.get(upStation),
+                distance);
+        return RestAssured
+                .given()
+                    .pathParam("lineId", lineId)
+                    .body(sectionCreationRequest, ObjectMapperType.JACKSON_2)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/lines/{lineId}/sections")
+                .then()
+                    .extract();
+    }
 }
