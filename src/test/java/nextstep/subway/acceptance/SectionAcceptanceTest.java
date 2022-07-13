@@ -210,6 +210,25 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 하행종점역이 아닌 역을 제거하면
      * Then 에러가 발생한다
      */
+    @DisplayName("하행 좀정역이 아닌 역 제거 불가")
+    @Test
+    void canNotDeleteNotLastStationFromLine() {
+        // given
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
+        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
+        createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
+
+        // when
+        var deleteResponse = deleteSection(lineId, STATIONS.광교중앙역);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given 지하철 노선을 등록하고
@@ -241,7 +260,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
                     .queryParam("stationId", stationIds.get(station))
                 .when()
                     .delete("/lines/{lineId}/sections")
-                .then()
+                .then().log().all()
                     .extract();
     }
 }
