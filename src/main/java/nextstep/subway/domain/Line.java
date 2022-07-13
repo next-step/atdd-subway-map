@@ -4,47 +4,53 @@ import lombok.Getter;
 import lombok.ToString;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 
 @Getter
 @ToString
 @Entity
 public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+
     private String name;
-    @Column(nullable = false)
     private String color;
 
-    @Column(nullable = false)
     private Long upStationId;
-    @Column(nullable = false)
     private Long downStationId;
-    @Column(nullable = false)
-    private Integer distance;
+    @Embedded
+    private Sections sections;
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    protected Line() {
     }
 
-    public Line() {}
+    public Line(String name, String color, int distance, Station upStation, Station downStation) {
+        nameAndColorValidation(name, color);
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStation.getId();
+        this.downStationId = downStation.getId();
+        this.sections = new Sections(this, distance, upStation, downStation);
+    }
+
+    public List<Station> getStations() {
+        return sections.getStation();
+    }
 
     public void modifyLine(String name, String color){
+        nameAndColorValidation(name, color);
         this.name = name;
         this.color = color;
     }
 
-    public void modifyLineValidation(String name, String color){
+    public void nameAndColorValidation(String name, String color){
         if(!StringUtils.hasText(name)){
             throw new IllegalArgumentException("name을 입력하여 주십시오.");
         }
@@ -52,4 +58,5 @@ public class Line {
             throw new IllegalArgumentException("color을 입력하여 주십시오.");
         }
     }
+
 }

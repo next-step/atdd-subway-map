@@ -16,9 +16,9 @@ public class LineRequest {
     private String name;
     @NotBlank(message = "color 공백 입력 불가")
     private String color;
-    @NotBlank(message = "upStationId 공백 입력 불가")
+
     private Long upStationId;
-    @NotBlank(message = "downStationId 공백 입력 불가")
+
     private Long downStationId;
 
     @Min(value = 1, message = "1~30 사이의 값을 입력해주세요.")
