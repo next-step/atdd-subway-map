@@ -46,6 +46,32 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
 
         // when
+        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
+
+        // then
+        assertAll(() -> {
+            assertThat(조회한_8호선.getName()).isEqualTo("8호선");
+            assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
+            assertThat(조회한_8호선.getStationResponses()).containsExactly(
+                    new StationResponse(1L, "모란역"),
+                    new StationResponse(2L, "암사역"),
+                    new StationResponse(3L, "한성백제역")
+            );
+        });
+    }
+
+    /**
+     * Given 지하철역 구간을 생성하고
+     * When 지하철역 구간을 삭제하면
+     * Then 지하철 노선 조회 시 삭제 된 구간이 존재하지 않는다.
+     */
+    @Test
+    void 지하철역_구간을_삭제한다() {
+        // given
+        var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
+        구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
+
+        // when
         구간을_삭제한다(_8호선, 한성백제역);
 
         // then
@@ -105,31 +131,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     }
 
-    /**
-     * Given 지하철역 구간을 생성하고
-     * When 지하철역 구간을 삭제하면
-     * Then 지하철 노선 조회 시 삭제 된 구간이 존재하지 않는다.
-     */
-    @Test
-    void 지하철역_구간을_삭제한다() {
-        // given
-        var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
-        구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
 
-        // when
-        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
-
-        // then
-        assertAll(() -> {
-            assertThat(조회한_8호선.getName()).isEqualTo("8호선");
-            assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
-            assertThat(조회한_8호선.getStationResponses()).containsExactly(
-                    new StationResponse(1L, "모란역"),
-                    new StationResponse(2L, "암사역"),
-                    new StationResponse(3L, "한성백제역")
-            );
-        });
-    }
 
     private ExtractableResponse<Response> 구간을_만들다(Long id, Long upStationId, Long downStationId, Long distance) {
         var sectionRequest = new SectionRequest(upStationId, downStationId, distance);
