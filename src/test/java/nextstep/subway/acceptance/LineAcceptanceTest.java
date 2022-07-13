@@ -142,8 +142,11 @@ public class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations");
 
+        ExtractableResponse<Response> createResponse = createLine(new Line("1호선", "bg-blue-600", 7L, 8L, 10));
+        Long lineId = createResponse.jsonPath().getLong("id");
 
-
+        ExtractableResponse<Response> updateResponse = updateLine(lineId);
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
@@ -171,6 +174,14 @@ public class LineAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
+    }
+
+    // 지하철 노선 업데이트
+    private ExtractableResponse<Response> updateLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().put("/lines/{id}", id)
+                .then().log().all()
+                .extract();
     }
 
 
