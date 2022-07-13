@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선도 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql
+@Sql("/truncate.sql")
 public class LineAcceptanceTest {
     @LocalServerPort
     int port;
@@ -205,15 +205,15 @@ public class LineAcceptanceTest {
         sinlimLine.put("downStationId", downSinlimStationId);
         sinlimLine.put("distance", "10");
 
-        RestAssured
+        String id = RestAssured
                 .given().log().all()
                 .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
-                .then().log().all();
+                .then().log().all().extract().jsonPath().getString("id");
 
         ExtractableResponse<Response> extract = RestAssured
-                .given().log().all()
-                .when().get("/lines/1")
+                .given().log().all().pathParam("id", id)
+                .when().get("/lines/{id}")
                 .then().log().all().extract();
 
         Assertions.assertAll(
@@ -259,11 +259,11 @@ public class LineAcceptanceTest {
         sinlimLine.put("distance", "10");
 
         //저장
-        RestAssured
+        String id = RestAssured
                 .given().log().all()
                 .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
-                .then().log().all();
+                .then().log().all().extract().jsonPath().getString("id");
 
         Map<String, String> updateParam = new HashMap<>();
         updateParam.put("name", "구미선");
@@ -271,14 +271,14 @@ public class LineAcceptanceTest {
 
         //수정
         ExtractableResponse<Response> putExtract = RestAssured
-                .given().log().all().body(updateParam).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/1")
+                .given().log().all().pathParam("id",id).body(updateParam).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}")
                 .then().log().all().extract();
 
         //수정된 데이터 출력
         ExtractableResponse<Response> getExtract = RestAssured
-                .given().log().all()
-                .when().get("/lines/1")
+                .given().log().all().pathParam("id", id)
+                .when().get("/lines/{id}")
                 .then().log().all().extract();
         assertThat(getExtract.jsonPath().getString("name")).isEqualTo("구미선");
         assertThat(getExtract.response().statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -320,15 +320,15 @@ public class LineAcceptanceTest {
         sinlimLine.put("distance", "10");
 
         //저장
-        RestAssured
+        String id = RestAssured
                 .given().log().all()
                 .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
-                .then().log().all();
+                .then().log().all().extract().jsonPath().getString("id");
 
         ExtractableResponse<Response> extract = RestAssured
-                .given().log().all()
-                .when().delete("/lines/1")
+                .given().log().all().pathParam("id", id)
+                .when().delete("/lines/{id}")
                 .then().log().all().extract();
 
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
