@@ -30,7 +30,6 @@ public class Line {
 
     public void edit(String name, String color, Integer distance) {
         if (name != null && !name.isBlank()) {
-            System.out.println("name = " + name);
             this.name = name;
         }
         if (color != null && !color.isBlank()) {
