@@ -14,11 +14,11 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static nextstep.subway.acceptance.utils.DataUtils.*;
 import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_등록한다;
 import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_삭제한다;
 import static nextstep.subway.acceptance.utils.StationUtils.지하철역을_등록한다;
 import static nextstep.subway.acceptance.utils.SubwayLineUtils.지하철_노선_하나를_조회한다;
-import static nextstep.subway.acceptance.utils.SubwayLineUtils.지하철_노선을_등록한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.OK;
@@ -33,9 +33,6 @@ public class SectionAcceptanceTest {
 	@LocalServerPort
 	int port;
 
-	private static long upStationId;
-	private static long downStationId;
-	private static long subwayLineId;
 	private static long otherStationId;
 
 	@BeforeEach
@@ -43,12 +40,6 @@ public class SectionAcceptanceTest {
 		RestAssured.port = port;
 		databaseCleanup.execute();
 		subwayLineInit();
-	}
-
-	private void subwayLineInit() {
-		upStationId = 지하철역을_등록한다("광교역").jsonPath().getLong("id");
-		downStationId = 지하철역을_등록한다("광교중앙역").jsonPath().getLong("id");
-		subwayLineId = 지하철_노선을_등록한다("신분당선", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
 	}
 
 	/**

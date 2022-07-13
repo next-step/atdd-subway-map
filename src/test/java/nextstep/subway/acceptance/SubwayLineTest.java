@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static nextstep.subway.acceptance.utils.DataUtils.*;
 import static nextstep.subway.acceptance.utils.StationUtils.지하철역을_등록한다;
 import static nextstep.subway.acceptance.utils.SubwayLineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,14 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("지하철 노선 관련 기능 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SubwayLineTest {
-
-	public static final String LINE_NAME = "신분당선";
-	public static final String LINE_COLOR = "bg-red-600";
-	public static final String UP_STATION_NAME = "광교중앙역";
-	public static final String DOWN_STATION_NAME = "신사역";
-	public static Long upStationId;
-	public static Long downStationId;
-	public static ExtractableResponse<Response> setUpSubwayLine;
 
 	@Autowired
 	private DatabaseCleanup databaseCleanup;
@@ -45,12 +38,6 @@ public class SubwayLineTest {
 		subwayLineInit();
 	}
 
-	private void subwayLineInit() {
-		upStationId = 지하철역을_등록한다(UP_STATION_NAME).jsonPath().getLong("id");
-		downStationId = 지하철역을_등록한다(DOWN_STATION_NAME).jsonPath().getLong("id");
-		setUpSubwayLine = 지하철_노선을_등록한다(LINE_NAME, LINE_COLOR, upStationId, downStationId, 10);
-	}
-
 	/**
 	 * When 지하철 노선을 생성하면
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
@@ -59,11 +46,11 @@ public class SubwayLineTest {
 	@Test
 	void createSubwayLine() {
 		//when
-		JsonPath responseToJson = setUpSubwayLine.jsonPath();
+		JsonPath responseToJson = subwayLineResponse.jsonPath();
 
 		//then
 		assertAll(
-				() -> assertThat(setUpSubwayLine.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+				() -> assertThat(subwayLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
 				() -> assertThat(responseToJson.getLong("id")).isNotNull(),
 				() -> assertThat(responseToJson.getString("name")).isEqualTo(LINE_NAME),
 				() -> assertThat(responseToJson.getString("color")).isEqualTo(LINE_COLOR),
@@ -96,7 +83,7 @@ public class SubwayLineTest {
 				() -> {
 					List<String> list = responseToJson.getList("stations.name", String.class);
 					assertThat(list).hasSize(2);
-					assertThat(list.get(0)).contains("광교중앙역", "신사역");
+					assertThat(list.get(0)).contains("광교역", "광교중앙역");
 					assertThat(list.get(1)).contains("인천역", "청량리역");
 				}
 		);
@@ -104,16 +91,13 @@ public class SubwayLineTest {
 
 
 	/**
-	 * Given 지하철 노선을 생성하고
+	 * Given 지하철 노선을 생성하고 (subwayLineInit()으로 생성)
 	 * When 생성한 지하철 노선을 조회하면
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
 	@DisplayName("지하철노선을 조회한다.")
 	@Test
 	void findSubwayLine() {
-		//given
-		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
-
 		//when
 		ExtractableResponse<Response> response = 지하철_노선_하나를_조회한다(subwayLineId);
 		JsonPath responseToJson = response.jsonPath();
@@ -127,16 +111,13 @@ public class SubwayLineTest {
 	}
 
 	/**
-	 * Given 지하철 노선을 생성하고
+	 * Given 지하철 노선을 생성하고 (subwayLineInit()으로 생성)
 	 * When 생성한 지하철 노선을 수정하면
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
 	@DisplayName("지하철노선을 수정한다.")
 	@Test
 	void modifySubwayLine() {
-		//given
-		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
-
 		//when
 		ExtractableResponse<Response> modifiedSubwayLine = 지하철_노선을_수정한다(subwayLineId, "상현역", "bg-white-600");
 
@@ -152,16 +133,13 @@ public class SubwayLineTest {
 	}
 
 	/**
-	 * Given 지하철 노선을 생성하고
+	 * Given 지하철 노선을 생성하고 (subwayLineInit()으로 생성)
 	 * When 생성한 지하철 노선을 삭제하면
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
 	@DisplayName("지하철노선을 삭제한다.")
 	@Test
 	void deleteSubwayLine() {
-		//given
-		long subwayLineId = setUpSubwayLine.jsonPath().getLong("id");
-
 		//when
 		ExtractableResponse<Response> response = 지하철_노선을_삭제한다(subwayLineId);
 
