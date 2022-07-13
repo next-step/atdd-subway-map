@@ -5,7 +5,6 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
 import nextstep.subway.section.application.dto.SectionResponse;
-import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.domain.SectionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,11 +13,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static nextstep.subway.line.LineTestSource.lineId;
-import static nextstep.subway.section.SectionTestSource.section;
 import static nextstep.subway.section.SectionTestSource.sectionRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
@@ -76,10 +73,6 @@ class SectionServiceTest {
         doReturn(line)
                 .when(lineService)
                 .findLineById(lineId);
-
-        doReturn(section())
-                .when(sectionRepository)
-                .save(any(Section.class));
 
         // when
         final SectionResponse result = target.addSection(lineId, sectionRequest);

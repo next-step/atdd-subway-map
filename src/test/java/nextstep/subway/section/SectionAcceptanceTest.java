@@ -197,19 +197,19 @@ class SectionAcceptanceTest {
     }
 
     private void 구간삭제에성공함(final ExtractableResponse<Response> 삭제결과) {
-        assertThat(삭제결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    private void 구간삭제에실패함(final ExtractableResponse<Response> 삭제결과) {
         assertThat(삭제결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    private void 구간삭제에실패함(final ExtractableResponse<Response> 삭제결과) {
+        assertThat(삭제결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private AbstractLongAssert<?> 하행역이변경되지않음(final Long 역) {
-        return assertThat((Long) getLineRequest(신분당선).jsonPath().getLong("downStationId")).isNotEqualTo(역);
+        return assertThat((Long) getLineRequest(신분당선).jsonPath().getLong("stations[1].id")).isNotEqualTo(역);
     }
 
     private AbstractLongAssert<?> 하행역이변경됨(final Long 역) {
-        return assertThat((Long) getLineRequest(신분당선).jsonPath().getLong("downStationId")).isEqualTo(역);
+        return assertThat((Long) getLineRequest(신분당선).jsonPath().getLong("stations[1].id")).isEqualTo(역);
     }
 
     private Map<String, Object> createSectionParams(final Long upStationId, final Long downStationId) {

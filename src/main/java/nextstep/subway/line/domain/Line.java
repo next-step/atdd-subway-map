@@ -15,6 +15,7 @@ public class Line {
     private String name;
     private String color;
 
+    // TODO(MinKyu): fetch join
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Section> sectionList = new ArrayList<>();
 

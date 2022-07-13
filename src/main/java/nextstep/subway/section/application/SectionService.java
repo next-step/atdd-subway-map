@@ -21,6 +21,7 @@ public class SectionService {
         this.sectionRepository = sectionRepository;
     }
 
+    @Transactional
     public SectionResponse addSection(final long lineId, final SectionRequest sectionRequest) {
         final Line line = lineService.findLineById(lineId);
         final Section section = sectionRequest.toSection();
@@ -34,15 +35,15 @@ public class SectionService {
         }
 
         line.addSection(section);
-        return createSectionResponse(sectionRepository.save(section));
+        return createSectionResponse(section);
     }
 
-    private SectionResponse createSectionResponse(final Section savedSection) {
+    private SectionResponse createSectionResponse(final Section section) {
         return SectionResponse.builder()
-                .id(savedSection.getId())
-                .upStationId(savedSection.getUpStationId())
-                .downStationId(savedSection.getDownStationId())
-                .distance(savedSection.getDistance())
+                .id(section.getId())
+                .upStationId(section.getUpStationId())
+                .downStationId(section.getDownStationId())
+                .distance(section.getDistance())
                 .build();
     }
 
