@@ -5,12 +5,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 @DisplayName("지하철역 관련 기능")
 class StationAcceptanceTest extends BaseAcceptance {
@@ -98,12 +96,4 @@ class StationAcceptanceTest extends BaseAcceptance {
         assertThat(name).isNotIn("잠실역");
     }
 
-    public ExtractableResponse<Response> createSubwayStation(final String station) {
-        return RestAssured.given().log().all()
-            .body(Map.of("name", station))
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
-    }
 }
