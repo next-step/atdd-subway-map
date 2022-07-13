@@ -35,8 +35,8 @@ public class LineResponse {
 
     public static LineResponse convertedByEntity(Line line) {
         List<StationResponse> stationResponses = new ArrayList<>();
-        stationResponses.add(StationResponse.convertedByEntity(line.getUpEndpointStation()));
-        stationResponses.add(StationResponse.convertedByEntity(line.getDownEndpointStation()));
+        stationResponses.add(StationResponse.convertedByEntity(line.getUpEndpoint()));
+        stationResponses.add(StationResponse.convertedByEntity(line.getDownEndpoint()));
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 

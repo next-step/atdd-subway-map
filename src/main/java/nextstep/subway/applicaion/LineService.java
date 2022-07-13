@@ -78,8 +78,8 @@ public class LineService {
     }
 
     private void saveSection(Line line, long distance) {
-        Station upStation = getStation(line.getUpEndpointStation().getId());
-        Station downStation = getStation(line.getDownEndpointStation().getId());
+        Station upStation = getStation(line.getUpEndpoint().getId());
+        Station downStation = getStation(line.getDownEndpoint().getId());
         Section section = new Section(line, upStation, downStation, distance);
         sectionRepository.save(section);
     }
