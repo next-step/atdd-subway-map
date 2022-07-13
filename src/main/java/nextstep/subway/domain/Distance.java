@@ -14,11 +14,11 @@ public class Distance {
     }
 
     public Distance(final int value) {
-        value(value);
+        valueValidation(value);
         this.value = value;
     }
 
-    private void value(final int value) {
+    private void valueValidation(final int value) {
         if (value <= 0) {
             throw new IllegalArgumentException("지하철 노선의 거리 값이 0보다 커야합니다.");
         }
