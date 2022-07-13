@@ -37,9 +37,8 @@ public class LineService {
     }
 
     public void remove(Long lineId) {
-        var line = getLine(lineId);
-        lineRepository.delete(line);
-        sectionService.removeSections(line.getStartSection());
+        lineRepository.deleteById(lineId);
+        sectionService.removeSections(lineId);
     }
 
     private Line getLine(Long lineId) {

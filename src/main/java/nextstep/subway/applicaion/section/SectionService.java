@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion.section;
 
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.SectionRepository;
@@ -26,14 +25,8 @@ public class SectionService {
         return firstSection;
     }
 
-    public void removeSections(Section firstSection) {
-        var sections = new ArrayList<Section>();
-        var currentSection = firstSection;
-        while (currentSection != null) {
-            sections.add(currentSection);
-            currentSection = currentSection.getNextSection();
-        }
-        sectionRepository.deleteAll(sections);
+    public void removeSections(Long lineId) {
+        sectionRepository.deleteAllByLineId(lineId);
     }
 
     private Station getStation(Long stationId) {
