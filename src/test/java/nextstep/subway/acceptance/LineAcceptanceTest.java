@@ -237,4 +237,26 @@ class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
 	}
 
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역)
+	 * when 판교역을 제거한다.
+	 * then 노선에 구간이 하나뿐이므로 예외가 발생한다.
+	 */
+	@DisplayName("구간이 1개인 경우 삭제 요청시 에러 발생")
+	@Test
+	void deleteOnlySectionTest() {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+
+		//when
+		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 판교역_번호);
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("1개뿐인 구간은 삭제할 수 없습니다.");
+	}
+
 }
