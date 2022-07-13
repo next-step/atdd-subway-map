@@ -23,6 +23,7 @@ public class SectionService {
         var firstSection = sectionRepository.save(new Section(lineId, upStation));
         var secondSection = sectionRepository.save(new Section(lineId, downStation));
         firstSection.setNextSection(secondSection, request.getDistance());
+        secondSection.setPrevSection(firstSection);
         return firstSection;
     }
 
@@ -42,6 +43,16 @@ public class SectionService {
 
         var nextSection = sectionRepository.save(new Section(lineId, downStation));
         section.setNextSection(nextSection, request.getDistance());
+        nextSection.setPrevSection(section);
+    }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        var station = getStation(stationId);
+        sectionRepository.findByLineIdAndStation(lineId, station)
+                .ifPresent(section -> {
+                    section.getPrevSection().resetNextSection();
+                    sectionRepository.delete(section);
+                });
     }
 
     public void removeSections(Long lineId) {

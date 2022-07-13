@@ -33,6 +33,10 @@ public class Section {
     private Long lineId;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prev_section_id")
+    private Section prevSection;
+
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next_section_id")
     private Section nextSection;
 
@@ -53,5 +57,14 @@ public class Section {
     public void setNextSection(Section nextSection, Long distance) {
         this.nextSection = nextSection;
         this.distance = distance;
+    }
+
+    public void setPrevSection(Section prevSection) {
+        this.prevSection = prevSection;
+    }
+
+    public void resetNextSection() {
+        this.nextSection = null;
+        this.distance = 0L;
     }
 }
