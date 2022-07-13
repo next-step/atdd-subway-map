@@ -7,21 +7,22 @@ import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SectionService {
 
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
 
-    public Section createInitialSection(Long upStationId, Long downStationId, Long distance) {
+    public Section createInitialSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
         var upStation = getStation(upStationId);
         var downStation = getStation(downStationId);
-        var firstSection = sectionRepository.save(new Section(upStation, distance));
-        var secondSection = sectionRepository.save(new Section(downStation));
+        var firstSection = sectionRepository.save(new Section(lineId, upStation, distance));
+        var secondSection = sectionRepository.save(new Section(lineId, downStation));
         firstSection.setNextSection(secondSection);
-
         return firstSection;
     }
 

@@ -19,11 +19,13 @@ public class LineService {
     private final SectionService sectionService;
 
     public LineResponse create(LineCreationRequest request) {
-        var firstSection = sectionService.createInitialSection(
+        var line = new Line(request.getName(), request.getColor());
+        var startSection = sectionService.createInitialSection(
+                line.getId(),
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance());
-        var line = new Line(request.getName(), request.getColor(), firstSection);
+        line.setStartSection(startSection);
         return LineResponse.fromLine(lineRepository.save(line));
     }
 

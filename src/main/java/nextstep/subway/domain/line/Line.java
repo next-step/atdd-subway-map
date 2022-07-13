@@ -9,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
@@ -25,22 +24,24 @@ public class Line {
     @NotBlank
     private String color;
 
-    @NotNull
     @OneToOne
     @JoinColumn(name = "start_section_id")
     private Section startSection;
 
     public Line() {}
 
-    public Line(String name, String color, Section startSection) {
+    public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.startSection = startSection;
     }
 
     public void changeNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void setStartSection(Section section) {
+        this.startSection = section;
     }
 
     public List<Station> getStations() {
