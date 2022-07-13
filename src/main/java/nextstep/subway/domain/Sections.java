@@ -39,7 +39,7 @@ public class Sections {
         for (Section section : sections) {
             stations.add(section.getDownStation());
         }
-        return stations;
+        return new ArrayList<>(stations);
     }
 
     public boolean hasDownStation(Station station) {
