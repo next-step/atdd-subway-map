@@ -20,19 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-	@LocalServerPort
-	int port;
-
-	@Autowired
-	private DatabaseCleanup databaseCleanup;
+public class LineAcceptanceTest extends BaseAcceptanceTest{
 
 	@BeforeEach
 	public void setUp() {
-		RestAssured.port = port;
-
-		databaseCleanup.execute();
-
 		createStation(Map.of("name", "지하철역"));
 		createStation(Map.of("name", "새로운지하철역"));
 		createStation(Map.of("name", "또다른지하철역"));
