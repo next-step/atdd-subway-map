@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @Sql("init.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LineAcceptanceTest {
+class LineAcceptanceTest extends AcceptanceTest {
 
     @LocalServerPort
     int port;
@@ -132,6 +132,7 @@ class LineAcceptanceTest {
         지하철_노선_삭제(id);
 
         // then
+        지하철_노선_조회_실패(id);
         List<String> lineNames = 지하철_노선_목록_조회();
         assertThat(lineNames).doesNotContain(FIRST_LINE_NAME);
     }
@@ -152,7 +153,7 @@ class LineAcceptanceTest {
 
         ExtractableResponse<Response> response = lineApiCaller.createLine(params);
 
-        지하철_노선_응답_확인(response.statusCode(), HttpStatus.CREATED);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.CREATED);
         assertThat(response.jsonPath().getString("name")).isEqualTo((String) params.get("name"));
         assertThat(response.jsonPath().getString("color")).isEqualTo((String) params.get("color"));
         return response;
@@ -161,7 +162,7 @@ class LineAcceptanceTest {
     List<String> 지하철_노선_목록_조회() {
         ExtractableResponse<Response> response = lineApiCaller.getLines();
 
-        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
 
         return response.jsonPath().getList("name", String.class);
     }
@@ -169,7 +170,7 @@ class LineAcceptanceTest {
     Map<String, String> 지하철_노선_조회_성공(long id) {
         ExtractableResponse<Response> response = lineApiCaller.getLineById(id);
 
-        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
 
         return Map.of("name", response.jsonPath().getString("name"),
                 "color", response.jsonPath().getString("color"));
@@ -178,7 +179,7 @@ class LineAcceptanceTest {
     void 지하철_노선_조회_실패(long id) {
         ExtractableResponse<Response> response = lineApiCaller.getLineById(id);
 
-        지하철_노선_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
     void 지하철_노선_수정(long id, String name, String color) {
@@ -188,16 +189,12 @@ class LineAcceptanceTest {
 
         ExtractableResponse<Response> response = lineApiCaller.modifyLineById(id, params);
 
-        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
     }
 
     void 지하철_노선_삭제(long id) {
         ExtractableResponse<Response> response = lineApiCaller.deleteLineById(id);
 
-        지하철_노선_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
-    }
-
-    static void 지하철_노선_응답_확인(int statusCode, HttpStatus status) {
-        assertThat(statusCode).isEqualTo(status.value());
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 }

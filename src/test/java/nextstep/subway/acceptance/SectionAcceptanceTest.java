@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 @Sql("init.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SectionAcceptanceTest {
+class SectionAcceptanceTest extends AcceptanceTest {
 
     @LocalServerPort
     int port;
@@ -97,26 +97,22 @@ class SectionAcceptanceTest {
 
         ExtractableResponse<Response> response = sectionApiCaller.createLineSectionById(lineId, params);
 
-        지하철_구간_응답_확인(response.statusCode(), HttpStatus.OK);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
     }
 
     void 지하철_구간_삭제(long lineId, long stationId) {
         ExtractableResponse<Response> response = sectionApiCaller.deleteLineSectionById(lineId, stationId);
 
-        지하철_구간_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
     Map<String, List<Long>> 지하철_구간_조회_성공(long lineId) {
         ExtractableResponse<Response> response = sectionApiCaller.getLineSectionById(lineId);
 
-        지하철_구간_응답_확인(response.statusCode(), HttpStatus.OK);
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
         return Map.of(
                 "upStationId", response.jsonPath().getList("upStationId", Long.class),
                 "downStationId", response.jsonPath().getList("downStationId", Long.class)
         );
-    }
-
-    static void 지하철_구간_응답_확인(int statusCode, HttpStatus status) {
-        assertThat(statusCode).isEqualTo(status.value());
     }
 }
