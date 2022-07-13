@@ -20,10 +20,19 @@ public class SectionService {
     public Section createInitialSection(Long lineId, SectionCreationRequest request) {
         var upStation = getStation(request.getUpStationId());
         var downStation = getStation(request.getDownStationId());
-        var firstSection = sectionRepository.save(new Section(lineId, upStation, request.getDistance()));
+        var firstSection = sectionRepository.save(new Section(lineId, upStation));
         var secondSection = sectionRepository.save(new Section(lineId, downStation));
-        firstSection.setNextSection(secondSection);
+        firstSection.setNextSection(secondSection, request.getDistance());
         return firstSection;
+    }
+
+    public void addSection(Long lineId, SectionCreationRequest request) {
+        var upStation = getStation(request.getUpStationId());
+        var section = sectionRepository.findByLineIdAndStation(lineId, upStation)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선이거나 노선에 상행역이 없습니다."));
+        var downStation = getStation(request.getDownStationId());
+        var nextSection = sectionRepository.save(new Section(lineId, downStation));
+        section.setNextSection(nextSection, request.getDistance());
     }
 
     public void removeSections(Long lineId) {

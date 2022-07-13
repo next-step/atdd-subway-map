@@ -13,6 +13,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import nextstep.subway.domain.station.Station;
 
 @Table(uniqueConstraints = {
@@ -20,6 +21,7 @@ import nextstep.subway.domain.station.Station;
 })
 @Getter
 @Entity
+@ToString
 @NoArgsConstructor
 public class Section {
 
@@ -27,6 +29,7 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private Long lineId;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -47,12 +50,8 @@ public class Section {
         this.distance = 0L;
     }
 
-    public Section(Long lineId, Station station, Long distance) {
-        this(lineId, station);
-        this.distance = distance;
-    }
-
-    public void setNextSection(Section nextSection) {
+    public void setNextSection(Section nextSection, Long distance) {
         this.nextSection = nextSection;
+        this.distance = distance;
     }
 }

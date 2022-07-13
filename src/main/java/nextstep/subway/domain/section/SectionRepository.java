@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
     void deleteAllByLineId(Long lineId);
+
     Optional<Section> findByLineIdAndStation(Long lineId, Station station);
 }
