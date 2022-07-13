@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class StationLineController {
     }
 
     @PostMapping
-    public ResponseEntity<StationLineResponse> create(@RequestBody PostRequest request) {
+    public ResponseEntity<StationLineResponse> create(@Valid  @RequestBody PostRequest request) {
         StationLineResponse response = stationLineService.save(request.toEntity());
         return ResponseEntity.created(URI.create("/station/line/" + response.getId())).body(response);
     }
