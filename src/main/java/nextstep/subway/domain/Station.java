@@ -9,7 +9,7 @@ public class Station {
     private Long id;
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {
