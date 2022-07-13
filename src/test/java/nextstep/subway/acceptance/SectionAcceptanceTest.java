@@ -51,13 +51,13 @@ public class SectionAcceptanceTest {
 		//given
 		long upStationId = 지하철역을_등록한다("광교역").jsonPath().getLong("id");
 		long downStationId = 지하철역을_등록한다("광교중앙역").jsonPath().getLong("id");
-		long subwayLineId = 지하철_노선을_등록한다("광교중앙역", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
+		long subwayLineId = 지하철_노선을_등록한다("신분당선", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
 
 		//given
 		long otherStationId = 지하철역을_등록한다("상현역").jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = 지하철_구간을_등록한다(downStationId, otherStationId, 5, subwayLineId);
+		ExtractableResponse<Response> response = 지하철_구간을_등록한다(subwayLineId, downStationId, otherStationId, 5);
 
 		//then
 		Assertions.assertAll(
@@ -69,7 +69,7 @@ public class SectionAcceptanceTest {
 		);
 	}
 
-	private ExtractableResponse<Response> 지하철_구간을_등록한다(Long upStationId, Long downStationId, Integer distance, Long subwayLineId) {
+	private ExtractableResponse<Response> 지하철_구간을_등록한다(Long subwayLineId, Long upStationId, Long downStationId, Integer distance) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("upStationId", upStationId);
 		params.put("downStationId", downStationId);
@@ -77,13 +77,13 @@ public class SectionAcceptanceTest {
 
 		return RestAssured
 				.given()
-				.log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.log().all()
+					.body(params)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
-				.post("/lines/{subwayLineId}/sections", subwayLineId)
+					.post("/lines/{subwayLineId}/sections", subwayLineId)
 				.then()
-				.log().all()
+					.log().all()
 				.extract();
 	}
 }
