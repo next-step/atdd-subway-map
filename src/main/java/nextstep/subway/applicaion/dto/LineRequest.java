@@ -10,7 +10,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Getter
-@Setter
 public class LineRequest {
     @NotBlank(message = "name 공백 입력 불가")
     private String name;

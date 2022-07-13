@@ -101,6 +101,37 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 
     }
 
+    @Test
+    @DisplayName("구간생성을 실패한다.")
+    void failCreateSection(){
+        //given
+        String 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        구간_생성(초록선_시작ID, 구간생성테스트_종착역ID, 초록선_라인ID);
+        //새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다
+        // Exception 발생
+    }
+    @Test
+    @DisplayName("구간생성을 실패한다 두번째 시나리오.")
+    void failCreateSection2(){
+        //given
+        String 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        구간_생성(새로운구간_종착ID, 초록선_시작ID, 초록선_라인ID);
+        //새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
+        // Exception 발생
+    }
 
+    @Test
+    @DisplayName("구간을 제거한다_실페 케이스1")
+    void failDeleteSection(){
+
+        String 구간제거테스트_종작역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+
+        구간_생성(새로운구간_종착ID, 구간제거테스트_종작역ID, 초록선_라인ID);
+
+        구간_제거(초록선_라인ID, 새로운구간_종착ID);
+
+        //지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
+        // Exception 발생
+    }
 
 }
