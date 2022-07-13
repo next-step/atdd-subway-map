@@ -105,7 +105,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      * Given 추가할 역 1개 생성
      * Given 구간을 생성
      * When 지하철 구간 제거를 요청하면
-     * Then 정상 삭제된다
+     * Then 노선 목록에서 삭제된 구간은 조회할 수 없다
      */
     @Test
     @DisplayName("지하철 노선에 등록된 하행 종점역을 제거할 수 있다")
