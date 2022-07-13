@@ -63,14 +63,16 @@ public class Sections {
     }
 
     private void validateNonMatchLastStation(Long stationId, String message) {
+        if (this.sections.isEmpty()) {
+            return;
+        }
         if (!isLastStation(stationId)) {
             throw new NonMatchLastStationException(message);
         }
     }
 
     private boolean isLastStation(Long stationId) {
-        return !sections.isEmpty()
-                && stationId.equals(getLastDownStationId());
+        return stationId.equals(getLastDownStationId());
     }
 
     private Long getLastDownStationId() {
