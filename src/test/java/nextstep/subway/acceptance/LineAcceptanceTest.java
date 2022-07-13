@@ -229,7 +229,57 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 수정")
     @Test
     void updateSubwayLine() {
+        Map<String, String> upSinlimParam = new HashMap<>();
+        upSinlimParam.put("name", "신림역");
 
+        String upSinlimStationId = RestAssured.given().log().all()
+                .body(upSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> downSinlimParam = new HashMap<>();
+        downSinlimParam.put("name", "당곡역");
+
+        String downSinlimStationId = RestAssured.given().log().all()
+                .body(downSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> sinlimLine = new HashMap<>();
+        sinlimLine.put("name", "신림선");
+        sinlimLine.put("color", "bg-red-600");
+        sinlimLine.put("upStationId", upSinlimStationId);
+        sinlimLine.put("downStationId", downSinlimStationId);
+        sinlimLine.put("distance", "10");
+
+        //저장
+        RestAssured
+                .given().log().all()
+                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all();
+
+        Map<String, String> updateParam = new HashMap<>();
+        updateParam.put("name", "구미선");
+        updateParam.put("color", "bg-blue-30000");
+
+        //수정
+        ExtractableResponse<Response> putExtract = RestAssured
+                .given().log().all().body(updateParam).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/1")
+                .then().log().all().extract();
+
+        //수정된 데이터 출력
+        ExtractableResponse<Response> getExtract = RestAssured
+                .given().log().all()
+                .when().get("/lines/1")
+                .then().log().all().extract();
+        assertThat(getExtract.jsonPath().getString("name")).isEqualTo("구미선");
+        assertThat(getExtract.response().statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -240,6 +290,6 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteSubwayLine() {
-
+        
     }
 }

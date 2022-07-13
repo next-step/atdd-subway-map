@@ -49,13 +49,17 @@ public class LineService {
     }
 
     public LineResponse findStationLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 호선은 없습니다."));
+        Line line = lineRepository.findById(id)
+                                  .orElseThrow(() -> new IllegalArgumentException("해당 호선은 없습니다."));
         return new LineResponse(line.getId(), line.getName(), line.getColor(), findStationsRelatedLine(line));
     }
 
     @Transactional
     public void updateStationLine(LineUpdateRequest request, Long id) {
+        Line line = lineRepository.findById(id)
+                                  .orElseThrow(() -> new IllegalArgumentException("해당 호선은 업습니다"));
 
+        line.updateNameAndColor(request.getName(), request.getColor());
     }
 
     public void deleteStationLine(Long id) {
