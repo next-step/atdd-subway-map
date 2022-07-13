@@ -4,13 +4,13 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.DatabaseCleanup;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -18,9 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.utils.StationUtils.지하철역을_등록한다;
-import static nextstep.subway.acceptance.utils.SubwayLineUtils.*;
+import static nextstep.subway.acceptance.utils.SubwayLineUtils.지하철_노선_하나를_조회한다;
 import static nextstep.subway.acceptance.utils.SubwayLineUtils.지하철_노선을_등록한다;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpStatus.OK;
 
 @DisplayName("지하철 구간 인수 테스트")
@@ -60,8 +61,8 @@ public class SectionAcceptanceTest {
 		ExtractableResponse<Response> response = 지하철_구간을_등록한다(subwayLineId, downStationId, otherStationId, 5);
 
 		//then
-		Assertions.assertAll(
-				() ->assertThat(response.statusCode()).isEqualTo(OK.value()),
+		assertAll(
+				() -> assertThat(response.statusCode()).isEqualTo(OK.value()),
 				() -> {
 					List<String> stationList = 지하철_노선_하나를_조회한다(subwayLineId).jsonPath().getList("stations.name");
 					assertThat(stationList).containsExactly("광교역", "상현역");
@@ -82,6 +83,55 @@ public class SectionAcceptanceTest {
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.when()
 					.post("/lines/{subwayLineId}/sections", subwayLineId)
+				.then()
+					.log().all()
+				.extract();
+	}
+
+	/**
+	 * GIVEN 지하철 노선을 등록한다
+	 * GIVEN 지하철 노선에 새로운 구간을 추가한다.
+	 * WHEN 지하철 구간의 종점역을 제거한다
+	 * THEN 지하철 구간의 종점역이 바뀐것을 확인할 수 있다.
+	 */
+	@DisplayName("지하철 구간을 삭제한다.")
+	@Test
+	void deleteSection() {
+		//given
+		long upStationId = 지하철역을_등록한다("광교역").jsonPath().getLong("id");
+		long downStationId = 지하철역을_등록한다("광교중앙역").jsonPath().getLong("id");
+		long subwayLineId = 지하철_노선을_등록한다("신분당선", "bg-red-600", upStationId, downStationId, 5).jsonPath().getLong("id");
+
+		//given
+		long otherStationId = 지하철역을_등록한다("상현역").jsonPath().getLong("id");
+		지하철_구간을_등록한다(subwayLineId, downStationId, otherStationId, 5);
+
+		//when
+		ExtractableResponse<Response> response = 지하철_구간을_삭제한다(subwayLineId, otherStationId);
+
+		//then
+		assertAll(
+				() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+				() -> {
+					List<String> stationList = 지하철_노선_하나를_조회한다(subwayLineId).jsonPath().getList("stations.name");
+					assertThat(stationList).containsExactly("광교역", "광교중앙역");
+				}
+		);
+
+	}
+
+	private ExtractableResponse<Response> 지하철_구간을_삭제한다(long subwayLineId, long stationId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("subwayLineId", subwayLineId);
+		params.put("sectionId", stationId);
+
+		return RestAssured
+				.given()
+					.log().all()
+					.body(params)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.when()
+					.delete("/lines/{subwayLineId}/sections?stationId={sectionId}", subwayLineId, stationId)
 				.then()
 					.log().all()
 				.extract();
