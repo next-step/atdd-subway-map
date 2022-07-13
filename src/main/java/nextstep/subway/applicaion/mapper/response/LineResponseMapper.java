@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion.mapper.response;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
@@ -10,25 +11,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class LineResponseMapper implements ResponseMapper<Line, LineResponse> {
 
     private final StationRepository stationRepository;
     private final StationResponseMapper stationResponseMapper;
 
-    public LineResponseMapper(StationRepository stationRepository, StationResponseMapper stationResponseMapper) {
-        this.stationRepository = stationRepository;
-        this.stationResponseMapper = stationResponseMapper;
-    }
-
     @Override
     public LineResponse map(Line line) {
         List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
 
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                stations.stream().map(stationResponseMapper::map).collect(Collectors.toList())
-        );
+        return LineResponse.builder()
+                .id(line.getId())
+                .name(line.getName())
+                .color(line.getColor())
+                .stations(stations.stream().map(stationResponseMapper::map).collect(Collectors.toList()))
+                .build();
     }
 }

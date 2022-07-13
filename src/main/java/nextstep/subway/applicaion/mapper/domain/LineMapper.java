@@ -9,12 +9,12 @@ public class LineMapper implements DomainMapper<LineRequest, Line> {
 
     @Override
     public Line map(LineRequest lineRequest) {
-        return new Line(
-                lineRequest.getName(),
-                lineRequest.getColor(),
-                lineRequest.getUpStationId(),
-                lineRequest.getDownStationId(),
-                lineRequest.getDistance()
-        );
+        return Line.builder()
+                .name(lineRequest.getName())
+                .color(lineRequest.getColor())
+                .upStationId(lineRequest.getUpStationId())
+                .downStationId(lineRequest.getDownStationId())
+                .distance(lineRequest.getDistance())
+                .build();
     }
 }

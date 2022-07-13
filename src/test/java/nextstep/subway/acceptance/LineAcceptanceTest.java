@@ -88,7 +88,7 @@ class LineAcceptanceTest {
         long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
 
         // when
-        Map<String, String> response = 지하철_노선_조회(id);
+        Map<String, String> response = 지하철_노선_조회_성공(id);
 
         // then
         assertThat(response)
@@ -104,7 +104,7 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선_수정_테스트() {
         // given
-        long id = 지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10).jsonPath().getLong("id");
+        long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
         String newLineName = "다른분당선";
         String newLineColor = "bg-blue-600";
 
@@ -112,7 +112,7 @@ class LineAcceptanceTest {
         지하철_노선_수정(id, newLineName, newLineColor);
 
         // then
-        Map<String, String> response = 지하철_노선_조회(id);
+        Map<String, String> response = 지하철_노선_조회_성공(id);
         assertThat(response)
                 .containsEntry("name", newLineName)
                 .containsEntry("color", newLineColor);
@@ -126,7 +126,7 @@ class LineAcceptanceTest {
     @Test
     void 지하철_노선_삭제_테스트() {
         // given
-        long id = 지하철_노선_생성(FIRST_LINE_NAME, "bg-red-600", 1, 2, 10).jsonPath().getLong("id");
+        long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
 
         // when
         지하철_노선_삭제(id);
@@ -142,7 +142,7 @@ class LineAcceptanceTest {
         stationApiCaller.createStation(Map.of("name", "또다른지하철역"));
     }
 
-    ExtractableResponse<Response> 지하철_노선_생성(String name, String color, int upStationId, int downStationId, int distance) {
+    ExtractableResponse<Response> 지하철_노선_생성(String name, String color, long upStationId, long downStationId, long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -152,7 +152,7 @@ class LineAcceptanceTest {
 
         ExtractableResponse<Response> response = lineApiCaller.createLine(params);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.CREATED);
         assertThat(response.jsonPath().getString("name")).isEqualTo((String) params.get("name"));
         assertThat(response.jsonPath().getString("color")).isEqualTo((String) params.get("color"));
         return response;
@@ -161,18 +161,24 @@ class LineAcceptanceTest {
     List<String> 지하철_노선_목록_조회() {
         ExtractableResponse<Response> response = lineApiCaller.getLines();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
 
         return response.jsonPath().getList("name", String.class);
     }
 
-    Map<String, String> 지하철_노선_조회(long id) {
+    Map<String, String> 지하철_노선_조회_성공(long id) {
         ExtractableResponse<Response> response = lineApiCaller.getLineById(id);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
 
         return Map.of("name", response.jsonPath().getString("name"),
                 "color", response.jsonPath().getString("color"));
+    }
+
+    void 지하철_노선_조회_실패(long id) {
+        ExtractableResponse<Response> response = lineApiCaller.getLineById(id);
+
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 
     void 지하철_노선_수정(long id, String name, String color) {
@@ -182,12 +188,16 @@ class LineAcceptanceTest {
 
         ExtractableResponse<Response> response = lineApiCaller.modifyLineById(id, params);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.OK);
     }
 
     void 지하철_노선_삭제(long id) {
         ExtractableResponse<Response> response = lineApiCaller.deleteLineById(id);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_노선_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
+    }
+
+    static void 지하철_노선_응답_확인(int statusCode, HttpStatus status) {
+        assertThat(statusCode).isEqualTo(status.value());
     }
 }

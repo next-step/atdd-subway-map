@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.mapper.domain.LineMapper;
@@ -14,21 +15,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class LineService {
 
     private final LineRepository lineRepository;
     private final LineMapper lineMapper;
     private final LineResponseMapper lineResponseMapper;
 
-    public LineService(LineRepository lineRepository, LineMapper lineMapper, LineResponseMapper lineResponseMapper) {
-        this.lineRepository = lineRepository;
-        this.lineMapper = lineMapper;
-        this.lineResponseMapper = lineResponseMapper;
-    }
-
     @Transactional
     public LineResponse createLine(LineRequest lineRequest) {
         Line line = lineRepository.save(lineMapper.map(lineRequest));
+
         return lineResponseMapper.map(line);
     }
 
@@ -51,8 +48,7 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id + "번 노선을 찾지 못했습니다."));
 
-        line.setName(lineRequest.getName());
-        line.setColor(lineRequest.getColor());
+        line.modifyNameAndColor(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional
