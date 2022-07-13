@@ -35,7 +35,7 @@ public class LineService {
                 .id(savedLine.getId())
                 .name(savedLine.getName())
                 .color(savedLine.getColor())
-                .stations(stationService.findStations(List.of(savedLine.getFirstUpStationId(), savedLine.getLastDownStationId()))).build();
+                .stations(stationService.findStations(savedLine.getFirstAndLastStationId())).build();
     }
 
     public List<LineResponse> findAllLines() {

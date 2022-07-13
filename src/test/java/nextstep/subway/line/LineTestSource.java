@@ -2,6 +2,7 @@ package nextstep.subway.line;
 
 import nextstep.subway.line.application.dto.LineRequest;
 import nextstep.subway.line.domain.Line;
+import nextstep.subway.section.domain.Section;
 
 import static nextstep.subway.section.SectionTestSource.section;
 
@@ -33,6 +34,17 @@ public class LineTestSource {
                 .name("lineName")
                 .color("bg-red-600")
                 .build();
+    }
+
+    public static Line line(final Section section) {
+        final Line line = Line.builder()
+                .id(lineId)
+                .name("lineName")
+                .color("bg-red-600")
+                .build();
+
+        line.addSection(section);
+        return line;
     }
 
     public static Line lineWithSection() {

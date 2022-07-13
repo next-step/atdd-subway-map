@@ -1,11 +1,9 @@
 package nextstep.subway.section.domain;
 
-import nextstep.subway.line.domain.Line;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.line.LineTestSource.line;
-import static nextstep.subway.line.LineTestSource.lineWithSection;
 import static nextstep.subway.section.SectionTestSource.section;
+import static nextstep.subway.section.SectionTestSource.sections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -13,99 +11,102 @@ class SectionsTest {
 
     @Test
     void section이연결가능함() {
-        final Line line = lineWithSection();
-        final Section section = section(line.getLastDownStationId());
+        final Section section = section(1L, 2L);
+        final Sections sections = sections(section);
 
-        final boolean result = line.isConnectable(section);
+        final boolean result = sections.isConnectable(section(2L, 3L));
 
         assertThat(result).isTrue();
     }
 
     @Test
     void section이연결가능하지않음() {
-        final Line line = lineWithSection();
-        final Section section = section(2020L);
+        final Section section = section(1L, 2L);
+        final Sections sections = sections(section);
 
-        final boolean result = line.isConnectable(section);
+        final boolean result = sections.isConnectable(section(10L, 21L));
 
         assertThat(result).isFalse();
     }
 
     @Test
     void section이순환함() {
-        final Line line = lineWithSection();
-        final Section section = section(line.getLastDownStationId());
+        final Section section = section(1L, 2L);
+        final Sections sections = sections(section);
 
-        final boolean result = line.hasCircularSection(section);
+        final boolean result = sections.hasCircularSection(section(2L, 1L));
 
         assertThat(result).isTrue();
     }
 
     @Test
     void section이순환하지않음() {
-        final Line line = lineWithSection();
-        final Section section = section(line.getLastDownStationId(), 2022L);
+        final Section section1 = section(1L, 2L);
+        final Sections sections = sections(section1);
 
-        final boolean result = line.hasCircularSection(section);
+        final boolean result = sections.hasCircularSection(section(2L, 3L));
 
         assertThat(result).isFalse();
     }
 
     @Test
     void 상행종점역조회() {
-        final Line line = lineWithSection();
+        final Section section1 = section(1L, 2L);
+        final Sections sections = sections(section1);
 
-        final Long result = line.getFirstUpStationId();
+        final Long result = sections.getFirstUpStationId();
 
-        assertThat(result).isEqualTo(8L);
+        assertThat(result).isEqualTo(1L);
     }
 
     @Test
     void 하행종점역조회() {
-        final Line line = lineWithSection();
+        final Section section1 = section(1L, 2L);
+        final Sections sections = sections(section1);
 
-        final Long result = line.getLastDownStationId();
+        final Long result = sections.getLastDownStationId();
 
-        assertThat(result).isEqualTo(9L);
+        assertThat(result).isEqualTo(2L);
     }
 
     @Test
     void 구간삭제불가능_구간이1개임() {
-        final Line line = lineWithSection();
+        final Section section1 = section(1L, 2L);
+        final Sections sections = sections(section1);
 
         final IllegalStateException result = assertThrows(
                 IllegalStateException.class,
-                () -> line.removeLastSection(line.getLastDownStationId()));
+                () -> sections.removeLastSection(section1.getDownStationId()));
 
         assertThat(result).hasMessageContaining("해당 역을 삭제할 수 없습니다.");
     }
 
     @Test
     void 구간삭제불가능_하행종점역이아님() {
-        final Line line = line();
-        final Section section1 = section(200L, 201L);
-        final Section section2 = section(201L, 202L);
-        line.addSection(section1);
-        line.addSection(section2);
+        final Section section1 = section(1L, 2L);
+        final Sections sections = sections(section1);
+
+        final Section section2 = section(2L, 3L);
+        sections.addSection(section2);
 
         final IllegalStateException result = assertThrows(
                 IllegalStateException.class,
-                () -> line.removeLastSection(section1.getDownStationId()));
+                () -> sections.removeLastSection(section1.getDownStationId()));
 
         assertThat(result).hasMessageContaining("해당 역을 삭제할 수 없습니다.");
     }
 
     @Test
     void 구간삭제가능() {
-        final Line line = line();
-        final Section section1 = section(200L, 201L);
-        final Section section2 = section(201L, 202L);
-        line.addSection(section1);
-        line.addSection(section2);
+        final Section section1 = section(1L, 2L);
+        final Sections sections = sections(section1);
 
-        line.removeLastSection(section2.getDownStationId());
+        final Section section2 = section(2L, 3L);
+        sections.addSection(section2);
 
-        assertThat(line.getLastDownStationId()).isEqualTo(section1.getDownStationId());
+        sections.removeLastSection(section2.getDownStationId());
+
+        assertThat(sections.getLastDownStationId()).isEqualTo(section1.getDownStationId());
     }
 
 }

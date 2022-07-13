@@ -4,6 +4,7 @@ import nextstep.subway.section.domain.Section;
 import nextstep.subway.section.domain.Sections;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -56,16 +57,12 @@ public class Line {
         return sections.hasCircularSection(section);
     }
 
-    public void removeLastSection(final Long stationId) {
+    public void removeStation(final Long stationId) {
         sections.removeLastSection(stationId);
     }
 
-    public Long getFirstUpStationId() {
-        return sections.getFirstUpStationId();
-    }
-
-    public Long getLastDownStationId() {
-        return sections.getLastDownStationId();
+    public List<Long> getFirstAndLastStationId() {
+        return List.of(sections.getFirstUpStationId(), sections.getLastDownStationId());
     }
 
     public static class LineBuilder {

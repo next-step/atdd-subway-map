@@ -40,7 +40,7 @@ class LineServiceTest {
                 .save(any(Line.class));
         doReturn(Collections.emptyList())
                 .when(stationService)
-                .findStations(Arrays.asList(line.getFirstUpStationId(), line.getLastDownStationId()));
+                .findStations(line.getFirstAndLastStationId());
 
         final LineResponse response = target.createLine(lineRequest);
 
@@ -70,7 +70,7 @@ class LineServiceTest {
                 .findAll();
         doReturn(Collections.emptyList())
                 .when(stationService)
-                .findStations(Arrays.asList(line.getFirstUpStationId(), line.getLastDownStationId()));
+                .findStations(line.getFirstAndLastStationId());
 
         final List<LineResponse> result = target.findAllLines();
 

@@ -4,14 +4,15 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
 import nextstep.subway.section.application.dto.SectionResponse;
+import nextstep.subway.section.domain.Section;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static nextstep.subway.line.LineTestSource.lineId;
-import static nextstep.subway.line.LineTestSource.lineWithSection;
+import static nextstep.subway.line.LineTestSource.*;
+import static nextstep.subway.section.SectionTestSource.section;
 import static nextstep.subway.section.SectionTestSource.sectionRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,8 +46,9 @@ class SectionServiceTest {
     @Test
     void 구간추가실패_신규하행역이이미등록되어있음() {
         // given
-        final Line line = lineWithSection();
-        final SectionRequest sectionRequest = sectionRequest(line.getLastDownStationId());
+        final Section section = section();
+        final Line line = line(section);
+        final SectionRequest sectionRequest = sectionRequest(section.getDownStationId());
 
         doReturn(line)
                 .when(lineService)
@@ -64,8 +66,9 @@ class SectionServiceTest {
     @Test
     void 구간추가성공() {
         // given
-        final Line line = lineWithSection();
-        final SectionRequest sectionRequest = sectionRequest(line.getLastDownStationId(), 2022L);
+        final Section section = section();
+        final Line line = line(section);
+        final SectionRequest sectionRequest = sectionRequest(section.getDownStationId(), 2022L);
 
         doReturn(line)
                 .when(lineService)
