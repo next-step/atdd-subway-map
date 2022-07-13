@@ -50,7 +50,30 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         assertThat(구간_생성_요청_결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    private ExtractableResponse<Response> 구간_등록_요청(long id, long downStationId, long upStationId, int distance, HttpStatus httpStatus) {
+    /**
+     * `Given` 지하철 노선을 조회하고
+     * `When` 구간(`상행역` : 조회한 노선의 하행 종점역, `하행역` : 노선에 등록되어 있는 역)을 등록하면
+     * `Then` 400 에러 코드를 응답받는다.
+     */
+    @Test
+    @DisplayName("구간 등록 예외 - 잘못된 하행역")
+    void createSection_invalid_wrong_downStation() {
+        // given
+        final long _2호선_노선_ID = 1L;
+        ExtractableResponse<Response> response = LineAcceptanceTest.노선_조회_요청(_2호선_노선_ID);
+        List<Long> _2호선_지하철역_ID_목록 = response.jsonPath().getList("stations.id", Long.class);
+        final int 하행역_INDEX = 1;
+        final long _2호선_하행종점역_ID = _2호선_지하철역_ID_목록.get(하행역_INDEX);
+
+        // when
+        ExtractableResponse<Response> 구간_생성_요청_결과 =
+                구간_등록_요청(_2호선_노선_ID, _2호선_하행종점역_ID, 1L, 5, HttpStatus.BAD_REQUEST);
+
+        // then
+        assertThat(구간_생성_요청_결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private ExtractableResponse<Response> 구간_등록_요청(long id, long upStationId, long downStationId, int distance, HttpStatus httpStatus) {
         final Map<String, Object> params = new HashMap<>();
         params.put("downStationId", downStationId);
         params.put("upStationId", upStationId);
