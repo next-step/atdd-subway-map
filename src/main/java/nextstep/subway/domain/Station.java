@@ -15,7 +15,7 @@ public class Station {
     public Station() {
     }
 
-    public Station(String name) {
+    public Station(final String name) {
         this.name = name;
     }
 
