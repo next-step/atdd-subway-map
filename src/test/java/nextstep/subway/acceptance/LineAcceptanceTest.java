@@ -1,7 +1,5 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.SubwayTestUtils.BUNDANG_LINE_REQUEST;
-import static nextstep.subway.acceptance.SubwayTestUtils.SINBUNDANG_LINE_REQUEST;
 import static nextstep.subway.acceptance.SubwayTestUtils.createLine;
 import static nextstep.subway.acceptance.SubwayTestUtils.createStationWithName;
 import static nextstep.subway.acceptance.SubwayTestUtils.getAllLines;
@@ -11,7 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
+import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -19,6 +19,19 @@ import org.springframework.http.MediaType;
 
 @DisplayName("노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTest {
+
+    private LineCreationRequest sinbundangLineRequest;
+    private LineCreationRequest bundangLineRequest;
+
+    @BeforeEach
+    void setStations() {
+        var firstStationId = createStationWithName("광교역").jsonPath().getLong("id");
+        var secondStationId = createStationWithName("광교중앙역").jsonPath().getLong("id");
+        var thirdStationId = createStationWithName("상현역").jsonPath().getLong("id");
+
+        sinbundangLineRequest = new LineCreationRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10L);
+        bundangLineRequest = new LineCreationRequest("분당선", "bg-green-600", firstStationId, thirdStationId, 20L);
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -28,17 +41,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindTheLineCreatedWhenLineWasCreated() {
         // when
-        createStationWithName("광교역");
-        createStationWithName("광교중앙역");
-        createStationWithName("상현역");
-        var creationResponse = createLine(SINBUNDANG_LINE_REQUEST);
+        var creationResponse = createLine(sinbundangLineRequest);
 
         // then
         var lineNames = getAllLines().jsonPath().getList("name", String.class);
 
         assertAll(
                 () -> assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(lineNames).containsExactlyInAnyOrder(SINBUNDANG_LINE_REQUEST.getName())
+                () -> assertThat(lineNames).containsExactlyInAnyOrder(sinbundangLineRequest.getName())
         );
     }
 
@@ -51,11 +61,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindSameNumberOfLinesWhenLinesWereCreated() {
         // given
-        createStationWithName("광교역");
-        createStationWithName("광교중앙역");
-        createStationWithName("상현역");
-        createLine(SINBUNDANG_LINE_REQUEST);
-        createLine(BUNDANG_LINE_REQUEST);
+        createLine(sinbundangLineRequest);
+        createLine(bundangLineRequest);
 
         // when
         var lineQueryResponse = getAllLines();
@@ -65,8 +72,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(lineNames).containsExactlyInAnyOrder(
-                        SINBUNDANG_LINE_REQUEST.getName(),
-                        BUNDANG_LINE_REQUEST.getName()
+                        sinbundangLineRequest.getName(),
+                        bundangLineRequest.getName()
                 )
         );
     }
@@ -80,10 +87,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canGetResponseOfLineInformationByLineId() {
         // given
-        createStationWithName("광교역");
-        createStationWithName("광교중앙역");
-        createStationWithName("상현역");
-        var creationResponse = createLine(BUNDANG_LINE_REQUEST);
+        var creationResponse = createLine(bundangLineRequest);
         var createdLineId = creationResponse.body().jsonPath().getLong("id");
 
         // when
@@ -97,8 +101,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(id).isEqualTo(createdLineId),
-                () -> assertThat(name).isEqualTo(BUNDANG_LINE_REQUEST.getName()),
-                () -> assertThat(color).isEqualTo(BUNDANG_LINE_REQUEST.getColor())
+                () -> assertThat(name).isEqualTo(bundangLineRequest.getName()),
+                () -> assertThat(color).isEqualTo(bundangLineRequest.getColor())
         );
     }
 
@@ -111,10 +115,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canModifyLineInformationWhichCreated() {
         // given
-        createStationWithName("광교역");
-        createStationWithName("광교중앙역");
-        createStationWithName("상현역");
-        var creationResponse = createLine(SINBUNDANG_LINE_REQUEST);
+        var creationResponse = createLine(sinbundangLineRequest);
         var createdLineId = creationResponse.jsonPath().getLong("id");
 
         // when
@@ -150,10 +151,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeCreatedLine() {
         // given
-        createStationWithName("광교역");
-        createStationWithName("광교중앙역");
-        createStationWithName("상현역");
-        var creationResponse = createLine(BUNDANG_LINE_REQUEST);
+        var creationResponse = createLine(bundangLineRequest);
         var createdLineId = creationResponse.jsonPath().getLong("id");
 
         // when
