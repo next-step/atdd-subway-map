@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.section.SectionRequest;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SubwayLine;
+import nextstep.subway.exception.AlreadyRegisterException;
+import nextstep.subway.exception.ErrorMessage;
 import nextstep.subway.repository.SectionRepository;
 import nextstep.subway.repository.SubwayLineRepository;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,10 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
 		Section section = request.toSection();
 
+		if (hasSameStation(subwayLine, section)) {
+			throw new AlreadyRegisterException(ErrorMessage.ALREADY_REGISTER_SECTION.value());
+		}
+
 		sectionRepository.save(section);
 		subwayLine.saveSection(section);
 	}
@@ -31,5 +37,10 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
 		Section deleteSection = subwayLine.deleteSection(stationId);
 		sectionRepository.delete(deleteSection);
+	}
+
+	private boolean hasSameStation(SubwayLine subwayLine, Section section) {
+		return subwayLine.getDownStationId().equals(section.getDownStationId()) ||
+				subwayLine.getUpStationId().equals(section.getDownStationId());
 	}
 }

@@ -1,15 +1,21 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.DatabaseCleanup;
+import nextstep.subway.acceptance.utils.SectionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 
-import static nextstep.subway.acceptance.utils.DataUtils.subwayLineInit;
+import static nextstep.subway.acceptance.utils.DataUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 구간 실패 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,11 +41,15 @@ public class SectionFailureTest {
 	@DisplayName("중복역을 구간에 등록하면 오류가 발생한다")
 	@Test
 	void duplicateFailure() {
-	    //given
-
 	    //when
+		ExtractableResponse<Response> registerUpStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, downStationId, upStationId, 10);
+		ExtractableResponse<Response> registerDownStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, downStationId, downStationId, 10);
 
-	    //then
+		//then
+		assertAll(
+				() -> assertThat(registerUpStation.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+				() -> assertThat(registerDownStation.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value())
+		);
 	}
 
 	/**
