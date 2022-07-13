@@ -167,14 +167,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         createSection(lineId, STATIONS.상현역, STATIONS.성복역, 4L);
 
         // when
-        var deleteResponse = RestAssured
-                .given()
-                    .pathParam("lineId", lineId)
-                    .queryParam("stationId", stationIds.get(STATIONS.성복역))
-                .when()
-                    .delete("/lines/{lineId}/sections")
-                .then()
-                    .extract();
+        var deleteResponse = deleteSection(lineId, STATIONS.성복역);
 
         // then
         var stationNames = getLine(lineId).jsonPath()
@@ -206,14 +199,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
 
         // when
-        var deleteResponse = RestAssured
-                .given()
-                    .pathParam("lineId", lineId)
-                    .queryParam("stationId", stationIds.get(STATIONS.광교중앙역))
-                .when()
-                    .delete("/lines/{lineId}/sections")
-                .then()
-                    .extract();
+        var deleteResponse = deleteSection(lineId, STATIONS.광교중앙역);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -244,6 +230,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                     .post("/lines/{lineId}/sections")
+                .then()
+                    .extract();
+    }
+
+    private ExtractableResponse<Response> deleteSection(Long lineId, STATIONS station) {
+        return RestAssured
+                .given()
+                    .pathParam("lineId", lineId)
+                    .queryParam("stationId", stationIds.get(station))
+                .when()
+                    .delete("/lines/{lineId}/sections")
                 .then()
                     .extract();
     }
