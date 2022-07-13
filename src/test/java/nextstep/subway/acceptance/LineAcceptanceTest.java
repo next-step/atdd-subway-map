@@ -162,6 +162,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 	}
 
+	/**
+	 * given 신분당선 노선을 생성함 (신분당선의 하행 종점은 판교역)
+	 * when 상행 논현역, 하행 신사역 구간을 신분당선에 등록 요청함
+	 * then 새로운 구간의 상행이 하행 종점과 일치하지 않으므로 에러 발생
+	 */
 	@DisplayName("새로운 구간의 상행역이 노선의 하행종점이 아닐경우 에러 발생 테스트")
 	@Test
 	void upStationDownStationTest() throws Exception {
@@ -177,11 +182,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("하행 종점이 추가하려는 구간의 상행역과 일치하지 않습니다");
 	}
 
-	private Long 신분당선_노선_생성되어_있음() {
-		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
-		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
-		return 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
-	}
 }

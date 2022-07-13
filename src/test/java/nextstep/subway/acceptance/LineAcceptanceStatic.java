@@ -1,5 +1,7 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.acceptance.StationAcceptanceStatic.*;
+
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -62,6 +64,12 @@ public class LineAcceptanceStatic {
 			.post("/lines/{lineId}/sections", 신분당선_노선_번호)
 			.then().log().all().extract();
 		return response;
+	}
+
+	public static Long 신분당선_노선_생성되어_있음() {
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		return 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
 	}
 
 }
