@@ -1,6 +1,6 @@
-package nextstep.subway.line.domain;
+package nextstep.subway.section.domain;
 
-import nextstep.subway.section.domain.Section;
+import nextstep.subway.line.domain.Line;
 import org.junit.jupiter.api.Test;
 
 import static nextstep.subway.line.LineTestSource.line;
@@ -9,7 +9,7 @@ import static nextstep.subway.section.SectionTestSource.section;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class LineTest {
+class SectionsTest {
 
     @Test
     void section이연결가능함() {

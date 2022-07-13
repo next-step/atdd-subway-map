@@ -4,7 +4,6 @@ import nextstep.subway.line.application.LineService;
 import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
 import nextstep.subway.section.application.dto.SectionResponse;
-import nextstep.subway.section.domain.SectionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,8 +25,6 @@ class SectionServiceTest {
 
     @Mock
     private LineService lineService;
-    @Mock
-    private SectionRepository sectionRepository;
 
     @Test
     void 구간추가실패_신규상행역이기존의하행역이아님() {

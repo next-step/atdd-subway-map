@@ -11,7 +11,7 @@ public class LineRequest {
     private final Long downStationId;
     private final Long distance;
 
-    public LineRequest() {
+    private LineRequest() {
         this.name = null;
         this.color = null;
         this.upStationId = null;
@@ -19,7 +19,7 @@ public class LineRequest {
         this.distance = null;
     }
 
-    public LineRequest(final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
+    private LineRequest(final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

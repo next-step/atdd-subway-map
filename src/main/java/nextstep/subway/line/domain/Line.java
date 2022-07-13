@@ -1,10 +1,9 @@
 package nextstep.subway.line.domain;
 
 import nextstep.subway.section.domain.Section;
+import nextstep.subway.section.domain.Sections;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Line {
@@ -15,18 +14,26 @@ public class Line {
     private String name;
     private String color;
 
-    // TODO(MinKyu): fetch join
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> sectionList = new ArrayList<>();
+    @Embedded
+    private final Sections sections = new Sections();
 
     protected Line() {
     }
 
-    public Line(final Long id, final String name, final String color, final List<Section> sectionList) {
+    public Line(final Long id, final String name, final String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sectionList = sectionList;
+    }
+
+    public void modify(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public void addSection(final Section section) {
+        sections.addSection(section);
+        section.setLine(this);
     }
 
     public Long getId() {
@@ -41,76 +48,30 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSectionList() {
-        return sectionList;
-    }
-
     public boolean isConnectable(final Section section) {
-        if (sectionList.isEmpty()) {
-            return true;
-        }
-
-        return isConnectableSection(section);
-    }
-
-    private boolean isConnectableSection(final Section section) {
-        return getLastDownStationId().equals(section.getUpStationId());
-    }
-
-    public Long getFirstUpStationId() {
-        if (sectionList.isEmpty()) {
-            throw new IllegalStateException("Section이 없습니다.");
-        }
-        return sectionList.get(0).getUpStationId();
-    }
-
-    public Long getLastDownStationId() {
-        if (sectionList.isEmpty()) {
-            throw new IllegalStateException("Section이 없습니다.");
-        }
-        return sectionList.get(getLastIndex()).getDownStationId();
-    }
-
-    public void addSection(final Section section) {
-        sectionList.add(section);
-        section.setLine(this);
-    }
-
-    public void modify(final String name, final String color) {
-        this.name = name;
-        this.color = color;
+        return sections.isConnectable(section);
     }
 
     public boolean hasCircularSection(final Section section) {
-        return sectionList.stream()
-                .anyMatch(section::isDuplicated);
+        return sections.hasCircularSection(section);
     }
 
     public void removeLastSection(final Long stationId) {
-        if (!canRemoveSection(stationId)) {
-            throw new IllegalStateException("해당 역을 삭제할 수 없습니다.");
-        }
-
-        sectionList.remove(getLastIndex());
+        sections.removeLastSection(stationId);
     }
 
-    private boolean canRemoveSection(final Long stationId) {
-        if (sectionList.size() <= 1) {
-            return false;
-        }
-
-        return getLastDownStationId().equals(stationId);
+    public Long getFirstUpStationId() {
+        return sections.getFirstUpStationId();
     }
 
-    private int getLastIndex() {
-        return sectionList.size() - 1;
+    public Long getLastDownStationId() {
+        return sections.getLastDownStationId();
     }
 
     public static class LineBuilder {
         private Long id;
         private String name;
         private String color;
-        private List<Section> sectionList = new ArrayList<>();
 
         public Line.LineBuilder id(final Long id) {
             this.id = id;
@@ -127,13 +88,8 @@ public class Line {
             return this;
         }
 
-        public Line.LineBuilder sectionList(final List<Section> sectionList) {
-            this.sectionList = sectionList;
-            return this;
-        }
-
         public Line build() {
-            return new Line(id, name, color, sectionList);
+            return new Line(id, name, color);
         }
 
     }

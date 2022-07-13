@@ -5,7 +5,6 @@ import nextstep.subway.line.domain.Line;
 import nextstep.subway.section.application.dto.SectionRequest;
 import nextstep.subway.section.application.dto.SectionResponse;
 import nextstep.subway.section.domain.Section;
-import nextstep.subway.section.domain.SectionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class SectionService {
 
     private final LineService lineService;
-    private final SectionRepository sectionRepository;
 
-    public SectionService(final LineService lineService, final SectionRepository sectionRepository) {
+    public SectionService(final LineService lineService) {
         this.lineService = lineService;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional

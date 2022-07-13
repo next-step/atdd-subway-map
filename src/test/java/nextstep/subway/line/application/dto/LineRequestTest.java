@@ -26,7 +26,7 @@ class LineRequestTest {
 
         assertThat(line.getName()).isEqualTo(lineRequest.getName());
         assertThat(line.getColor()).isEqualTo(lineRequest.getColor());
-        assertThat(line.getSectionList()).isNotEmpty();
+        assertThat(line.getFirstUpStationId()).isNotNull();
     }
 
 }

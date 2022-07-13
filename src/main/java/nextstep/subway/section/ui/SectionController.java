@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-public class SectionController {
+class SectionController {
 
     private final SectionService sectionService;
 

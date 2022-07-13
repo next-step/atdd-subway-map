@@ -1,6 +1,6 @@
 package nextstep.subway.common.error;
 
-public class ErrorResponse {
+class ErrorResponse {
 
     private final String code;
     private final String desc;
@@ -10,7 +10,7 @@ public class ErrorResponse {
         this.desc = null;
     }
 
-    public ErrorResponse(final String code, final String desc) {
+    ErrorResponse(final String code, final String desc) {
         this.code = code;
         this.desc = desc;
     }
