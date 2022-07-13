@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.SectionService;
 import nextstep.subway.applicaion.dto.section.SectionRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,5 +16,11 @@ public class SectionController {
 	public ResponseEntity<Void> registerSection(@PathVariable Long subwayLineId, @RequestBody SectionRequest request) {
 		sectionService.saveSection(subwayLineId, request);
 		return ResponseEntity.ok().build();
+	}
+
+	@DeleteMapping("/lines/{subwayLineId}/sections")
+	public ResponseEntity<Void> deleteSection(@PathVariable Long subwayLineId, @RequestParam("stationId") Long stationId) {
+		sectionService.delete(subwayLineId, stationId);
+		return ResponseEntity.noContent().build();
 	}
 }

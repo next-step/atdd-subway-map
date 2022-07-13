@@ -8,6 +8,7 @@ import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Entity
 @Getter
@@ -45,5 +46,16 @@ public class SubwayLine {
 		sectionList.add(section);
 		section.addSubwayLine(this);
 		this.downStationId = section.getDownStationId();
+	}
+
+	public Section deleteSection(Long stationId) {
+		Section section = sectionList.stream()
+				.filter(s -> s.getDownStationId().equals(stationId))
+				.findAny()
+				.orElseThrow(NoSuchElementException::new);
+
+		this.downStationId = section.getUpStationId();
+		sectionList.remove(section);
+		return section;
 	}
 }

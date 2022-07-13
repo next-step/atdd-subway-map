@@ -12,19 +12,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class SectionService {
 
 	private final SubwayLineRepository subwayLineRepository;
 	private final SectionRepository sectionRepository;
 
-	@Transactional
 	public void saveSection(Long subwayLineId, SectionRequest request) {
 		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
 		Section section = request.toSection();
 
 		sectionRepository.save(section);
 		subwayLine.saveSection(section);
+	}
+
+	public void delete(Long subwayLineId, Long stationId) {
+		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
+		Section deleteSection = subwayLine.deleteSection(stationId);
+		sectionRepository.delete(deleteSection);
 	}
 }
