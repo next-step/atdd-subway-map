@@ -48,17 +48,18 @@ public class SectionService {
 
     public void deleteSection(Long lineId, Long stationId) {
         var station = getStation(stationId);
-        sectionRepository.findByLineIdAndStation(lineId, station)
-                .ifPresent(section -> {
-                    if (!section.isLastSection()) {
-                        throw new IllegalStateException("하행 종점이 아니면 구간을 삭제할 수 없습니다.");
-                    }
-                    if (section.getPrevSection().isFirstSection()) {
-                        throw new IllegalStateException("상/하행 종점만 존재하는 경우 구간을 삭제할 수 없습니다.");
-                    }
-                    section.getPrevSection().resetNextSection();
-                    sectionRepository.delete(section);
-                });
+        var section = sectionRepository.findByLineIdAndStation(lineId, station)
+                .orElseThrow(() -> new IllegalStateException("노선에 없는 역을 삭제할 수 없습니다."));
+
+        if (!section.isLastSection()) {
+            throw new IllegalStateException("하행 종점이 아니면 구간을 삭제할 수 없습니다.");
+        }
+        if (section.getPrevSection().isFirstSection()) {
+            throw new IllegalStateException("상/하행 종점만 존재하는 경우 구간을 삭제할 수 없습니다.");
+        }
+
+        section.getPrevSection().resetNextSection();
+        sectionRepository.delete(section);
     }
 
     public void removeSections(Long lineId) {
