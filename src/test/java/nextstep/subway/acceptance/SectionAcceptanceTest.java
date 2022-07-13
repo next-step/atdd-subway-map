@@ -141,7 +141,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
 
         // when
-        var sectionCreationResponse = createSection(lineId, STATIONS.광교역, STATIONS.수지구청역, 3L);
+        var sectionCreationResponse = createSection(lineId, STATIONS.광교중앙역, STATIONS.수지구청역, 3L);
 
         // then
         assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
