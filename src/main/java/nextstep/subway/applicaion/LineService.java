@@ -2,12 +2,14 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateDto;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,6 +53,15 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public Line findLine(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException(lineId + "번 id로 조회되는 노선이 없습니다."));
+    }
 
+    @Transactional
+    public void updateLine(Long id, LineUpdateDto updateDto) {
+        Line line = findLine(id);
+        line.updateLine(updateDto);
 
+        lineRepository.save(line);
+    }
 }

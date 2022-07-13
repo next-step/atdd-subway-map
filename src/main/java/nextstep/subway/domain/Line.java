@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineUpdateDto;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -50,5 +52,10 @@ public class Line {
 
     public int getDistance() {
         return distance;
+    }
+
+    public void updateLine(LineUpdateDto dto) {
+        this.name = dto.getName();
+        this.color = dto.getColor();
     }
 }

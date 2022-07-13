@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineUpdateDto;
 import nextstep.subway.domain.Line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -142,11 +143,22 @@ public class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations");
 
-        ExtractableResponse<Response> createResponse = createLine(new Line("1호선", "bg-blue-600", 7L, 8L, 10));
+        ExtractableResponse<Response> createResponse = createLine(new Line("1호선", "bg-blue-600", 1L, 2L, 10));
         Long lineId = createResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> updateResponse = updateLine(lineId);
+        String name = "새로운노선";
+        String color = "bg-deepblue-600";
+
+        ExtractableResponse<Response> updateResponse = updateLine(lineId, new LineUpdateDto(name, color));
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+        assertThat(lineNames).contains("새로운노선");
 
     }
 
@@ -166,6 +178,8 @@ public class LineAcceptanceTest {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+
+
     }
 
     // 지하철역 이름 조회
@@ -177,8 +191,10 @@ public class LineAcceptanceTest {
     }
 
     // 지하철 노선 업데이트
-    private ExtractableResponse<Response> updateLine(Long id) {
+    private ExtractableResponse<Response> updateLine(Long id, LineUpdateDto updateDto) {
         return RestAssured.given().log().all()
+                .body(updateDto)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
