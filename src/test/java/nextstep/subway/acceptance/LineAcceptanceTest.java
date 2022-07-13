@@ -185,4 +185,29 @@ class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(response.jsonPath().getString("errorMessage")).contains("하행 종점이 추가하려는 구간의 상행역과 일치하지 않습니다");
 	}
 
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역)
+	 * when [판교역 - 정자역] 구간을 등록 요청
+	 * then 새로운 구간의 하행(정자역)이 신분당선노선에 이미 등록되어 있으므로 에러 발생!
+	 */
+	@DisplayName("새로운 구간의 하행이 이미 노선에 등록되어있을 경우 에러 발생")
+	@Test
+	void alreadyRegisteredSection() {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+
+		Map<String, Object> 구간_등록_요청값 = Map.of("upStationId", 판교역_번호, "downStationId", 정자역_번호, "distance", 15);
+
+		//when
+		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("새로운 구간의 하행역은 해당 노선에 등록되어서는 안됩니다");
+
+	}
+
 }
