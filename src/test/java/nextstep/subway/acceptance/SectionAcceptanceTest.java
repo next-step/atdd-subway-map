@@ -38,7 +38,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         // given
         final long _2호선_노선_ID = 1L;
         ExtractableResponse<Response> response = LineAcceptanceTest.노선_조회_요청(_2호선_노선_ID);
-        List<Long> _2호선_지하철역_ID_목록 = response.jsonPath().getList("id", Long.class);
+        List<Long> _2호선_지하철역_ID_목록 = response.jsonPath().getList("stations.id", Long.class);
         final int 상행역_INDEX = 0;
         final long _2호선_상행종점역_ID = _2호선_지하철역_ID_목록.get(상행역_INDEX);
 
