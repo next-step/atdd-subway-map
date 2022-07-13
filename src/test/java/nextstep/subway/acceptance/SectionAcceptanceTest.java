@@ -32,9 +32,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	 *
 	 *
 	 * 	2. 구간 제거
-	 * 	 2.1 station 에 등록된 역인지 체크
 	 * 	 2.2 해당 Line 의 마지막 section 의 downStationId와 동일한지 체크
-	 * 	 2.3 등록된 section 이 없는 경우 삭제 불가능
+	 * 	 2.3 등록된 section 이 1개인 경우 삭제 불가능
 	 */
 	long lineId;
 
@@ -44,7 +43,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	}
 
 	/**
-	 * given 지하철 노선 생성하고
+	 * given
 	 * when 지하철 구간을 생성하면
 	 * then 지하철 구간  조회 시 생성한 노선정보와 일치 한다.
 	 */
@@ -54,25 +53,45 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 		//given
 
 		//when
-		int sectionId = 지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+		int sectionId = (int)지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED,
+			"sectionId");
 		//then
 		assertTrue(등록된_구간정보와_조회된_구간정보_일치여부(sectionId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1));
 
 	}
 
 	/**
-	 * given 지하철 구간 생성하고
-	 * when 지하철 신규 구간 상행역이 기존구간 하행역이 아닌 경우로 등록하면
-	 * then INVALID_STATUS 코드 응답 받는다
+	 * given
+	 * when  지하철 구간 생성하고
+	 * then 지하철 신규 구간 상행역이 기존구간 하행역이 아닌 경우로 등록하면 INVALID_STATUS 코드 응답 받는다
 	 */
 	@DisplayName("지하철구간_생성_상행역이_기존_구간_하행_종점이_아닌경우")
 	@Test
 	void createSectionErrorCase1() {
 		//when
-		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED, "sectionId");
 
 		//then
-		assertEquals("INVALID_STATUS", 지하철_구간_생성_오류(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1));
+		assertEquals("INVALID_STATUS",
+			지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.OK, "errorCode"));
+	}
+
+	/**
+	 * given
+	 * when 지하철 구간 생성하고
+	 * then 지하철 신규 구간 하행역이 기존구간에 등록된 역이면 INVALID_STATUS 코드 응답 받는다
+	 */
+	@DisplayName("지하철구간_생성_상행역이_기존_구간_하행_종점이_아닌경우")
+	@Test
+	void createSectionErrorCase2() {
+		//given
+
+		//when
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED, "sectionId");
+
+		//then
+		assertEquals("INVALID_STATUS",
+			지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.OK, "errorCode"));
 	}
 
 	/**
@@ -86,8 +105,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 		//given
 
 		//when
-		int section1 = 지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
-		int section2 = 지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2);
+		int section1 = (int)지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED,
+			"sectionId");
+		int section2 = (int)지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2, HttpStatus.CREATED,
+			"sectionId");
 
 		//then
 		assertThat(지하철_구간_목록_조회(lineId)).hasSize(2)
@@ -95,7 +116,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	}
 
 	/**
-	 * given 지하철 노선 생성하고
+	 * given
 	 * when 지하철 구간을 생성하고
 	 * then 생성한 지하철 구간 정보를 응답 받을 수 있다.
 	 */
@@ -105,14 +126,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 		//given
 
 		//when
-		long sectionId = 지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+		long sectionId = (int)지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED,
+			"sectionId");
 		//then
 		assertEquals(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId"), (int)sectionId);
 	}
 
 	/**
-	 * given 지하철 노선 생성하고
-	 * given 지하철 구간을 생성하고
+	 * given
+	 * given 지하철 구간을 생성을 2번 하고
 	 * when 지하철 구간을 삭제하면
 	 * then 지하철 구간정보는 삭제된다
 	 */
@@ -121,34 +143,62 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	void deleteSection() {
 		//given
 
-		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
-		long sectionId = 지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2);
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED, "sectionId");
+		long sectionId = (int)지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2, HttpStatus.CREATED,
+			"sectionId");
 		//when
-		지하철_구간_삭제(lineId, 4);
+		지하철_구간_삭제(lineId, DOWN_STATION_ID_2);
 		//then
 		assertEquals(ENTITY_NOT_FOUND.toString(), 지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("errorCode"));
 	}
 
-	private int 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance) {
-		String postUrl = String.format("%s/%s/section", baseUrlPrefix, lineId);
-		return RestAssured.given().log().all()
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.body(지하철_구간_생성_파라미터생성(upStationId, downStationId, distance))
-			.when().post(postUrl)
-			.then().log().all()
-			.statusCode(HttpStatus.CREATED.value())
-			.extract().jsonPath().getInt("sectionId");
+	/**
+	 * given
+	 * given
+	 * when 지하철 구간을 생성을 2번 하고
+	 * then 첫번쨰 등록된 구간을 삭제하면 INVALID_STATUS 코드 응답 받는다
+	 */
+	@DisplayName("지하철구간 삭제요청시, 마지막 section 의 하행역이 아닌경우 오류")
+	@Test
+	void deleteSectionErrorCase1() {
+		//given
+
+		//when
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED, "sectionId");
+		지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2, HttpStatus.CREATED, "sectionId");
+
+		//then
+		assertEquals("INVALID_STATUS", 지하철_구간_삭제_응답(lineId, DOWN_STATION_ID_1));
 	}
 
-	private String 지하철_구간_생성_오류(long lineId, long upStationId, long downStationId, long distance) {
+	/**
+	 * given
+	 * given
+	 * when 지하철 구간을 생성을 1번 하고
+	 * then 첫번쨰 등록된 구간을 삭제하면 INVALID_STATUS 코드 응답 받는다
+	 */
+	@DisplayName("지하철구간 1개있을떄 삭제 요청시 오류 ")
+	@Test
+	void deleteSectionErrorCase2() {
+		//given
+
+		//when
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1, HttpStatus.CREATED, "sectionId");
+
+		//then
+		assertEquals("INVALID_STATUS", 지하철_구간_삭제_응답(lineId, DOWN_STATION_ID_1));
+	}
+
+	private Object 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance, HttpStatus httpStatus,
+		String returnName) {
 		String postUrl = String.format("%s/%s/section", baseUrlPrefix, lineId);
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.body(지하철_구간_생성_파라미터생성(upStationId, downStationId, distance))
 			.when().post(postUrl)
 			.then().log().all()
-			.statusCode(HttpStatus.OK.value())
-			.extract().jsonPath().getString("errorCode");
+			.statusCode(httpStatus.value())
+			.extract().jsonPath().get(returnName);
 	}
 
 	private List<Integer> 지하철_구간_목록_조회(long lineId) {
@@ -177,6 +227,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 			.when().delete(deleteUrl)
 			.then().log().all()
 			.statusCode(HttpStatus.NO_CONTENT.value());
+	}
+
+	private String 지하철_구간_삭제_응답(long lineId, long stationId) {
+		String deleteUrl = String.format("%s/%s/section?stationId=%s", baseUrlPrefix, lineId, stationId);
+		return RestAssured.given().log().all()
+			.when().delete(deleteUrl)
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value())
+			.extract().jsonPath().getString("errorCode");
 	}
 
 	private Map<String, Object> 지하철_구간_생성_파라미터생성(long upStationId, long downStationId, long distance) {
