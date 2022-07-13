@@ -14,10 +14,10 @@ public class Section {
     private Line line;
 
     @ManyToOne
-    public Station upStation;
+    private Station upStation;
 
     @ManyToOne
-    public Station downStation;
+    private Station downStation;
 
     @Embedded
     private Distance distance;
@@ -42,16 +42,20 @@ public class Section {
         return List.of(upStation, downStation);
     }
 
-    public boolean matchDownStation(Section section) {
-        return downStation.equals(section.upStation);
+    public boolean matchStation(Station station) {
+        return getStations().contains(station);
     }
 
-    public boolean matchStation(Section section) {
-        return getStations().contains(section.downStation);
-    }
-
-    public boolean isSameDownStation(Station station) {
+    public boolean matchDownStation(Station station) {
         return downStation.equals(station);
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
     }
 
     @Override

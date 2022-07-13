@@ -43,7 +43,7 @@ public class Sections {
 
     private void matchDownStation(Section section) {
         boolean isUpStation = sections.stream().anyMatch(currentSection ->
-                currentSection.matchDownStation(section)
+                currentSection.matchDownStation(section.getUpStation())
         );
         if (!isUpStation) {
             throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
@@ -52,7 +52,7 @@ public class Sections {
 
     private void matchStation(Section section) {
         boolean isDownStation = sections.stream().anyMatch(currentSection ->
-                currentSection.matchStation(section)
+                currentSection.matchStation(section.getDownStation())
         );
         if (isDownStation) {
             throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
@@ -61,7 +61,7 @@ public class Sections {
 
     public void removeSection(Station station) {
         Section lastSection = getLastSection();
-        if (!lastSection.isSameDownStation(station)) {
+        if (!lastSection.matchDownStation(station)) {
             throw new IllegalArgumentException("현재 구간은 마지막 구간이 아닙니다.");
         }
 
