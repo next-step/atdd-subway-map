@@ -52,7 +52,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         List<String> stationList = response.jsonPath().getList("stations.name", String.class);
         assertAll(
                 () -> assertThat(statusCode).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(stationList.get(2)).isEqualTo("성수역")
+                () -> assertThat(stationList).containsExactly("강남역", "건대입구역", "성수역")
         );
     }
 
