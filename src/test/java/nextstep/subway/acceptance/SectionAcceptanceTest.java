@@ -235,6 +235,25 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 노선에 등록되지 않은 역을 제거하면
      * Then 에러가 발생한다
      */
+    @DisplayName("노선에 등록되지 않은 역 제거 불가")
+    @Test
+    void canNotDeleteStationNotInLine() {
+        // given
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
+        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
+        createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
+
+        // when
+        var deleteResponse = deleteSection(lineId, STATIONS.성복역);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
 
     private ExtractableResponse<Response> createSection(Long lineId, STATIONS upStation, STATIONS downStation, Long distance) {
