@@ -33,7 +33,7 @@ public class Sections {
 		this.sections.add(section);
 	}
 
-	public void validateAddSection(Section section) {
+	private void validateAddSection(Section section) {
 		if (!isSameLastDownStation(section.getUpStation())) {
 			throw new BusinessException(ErrorCode.LAST_STATION_NOT_MATCH_UP_STATION);
 		}
@@ -43,7 +43,7 @@ public class Sections {
 		}
 	}
 
-	public boolean isSameLastDownStation(Station station) {
+	private boolean isSameLastDownStation(Station station) {
 		return getLastStation().equals(station);
 	}
 
@@ -60,7 +60,17 @@ public class Sections {
 			.collect(Collectors.toList());
 	}
 
-	public Station getLastStation() {
-		return sections.get(sections.size() - 1).getDownStation();
+	private Station getLastStation() {
+		return getLastSection().getDownStation();
+	}
+
+	public Section getLastSection() {
+		return sections.get(sections.size() - 1);
+	}
+
+	public void validateDeleteSection(Station station) {
+		if (!isSameLastDownStation(station)) {
+			throw new BusinessException(ErrorCode.IS_NOT_LAST_STATION);
+		}
 	}
 }
