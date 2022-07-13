@@ -18,4 +18,8 @@ public class LineCreationRequest {
         this.downStationId = downStationId;
         this.distance = distance;
     }
+
+    public SectionCreationRequest getSectionCreationRequest() {
+        return new SectionCreationRequest(downStationId, upStationId, distance);
+    }
 }

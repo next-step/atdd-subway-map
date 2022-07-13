@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.section;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.dto.SectionCreationRequest;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
@@ -16,10 +17,10 @@ public class SectionService {
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
 
-    public Section createInitialSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        var upStation = getStation(upStationId);
-        var downStation = getStation(downStationId);
-        var firstSection = sectionRepository.save(new Section(lineId, upStation, distance));
+    public Section createInitialSection(Long lineId, SectionCreationRequest request) {
+        var upStation = getStation(request.getUpStationId());
+        var downStation = getStation(request.getDownStationId());
+        var firstSection = sectionRepository.save(new Section(lineId, upStation, request.getDistance()));
         var secondSection = sectionRepository.save(new Section(lineId, downStation));
         firstSection.setNextSection(secondSection);
         return firstSection;
