@@ -9,7 +9,10 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String name;
+
+    @Column
     private String color;
 
     @Embedded
@@ -32,7 +35,7 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        sections.addSection(this,section);
+        sections.addSection(this, section);
     }
 
     public void removeSection(Station station) {
