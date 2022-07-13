@@ -152,6 +152,41 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 마지막 구간을 제거하면
      * Then 지하철 노선 조회시 마지막 구간이 제거된 노선을 확인할 수 있다
      */
+    @DisplayName("노선의 마지막 구간 삭제")
+    @Test
+    void canDeleteLastSectionFromLine() {
+        // given
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
+        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
+        createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
+        createSection(lineId, STATIONS.상현역, STATIONS.성복역, 4L);
+
+        // when
+        var deleteResponse = RestAssured
+                .given()
+                    .pathParam("lineId", lineId)
+                    .queryParam("stationId", stationIds.get(STATIONS.성복역))
+                .when()
+                    .delete("/lines/{lineId}/sections")
+                .then()
+                    .extract();
+
+        // then
+        var stationNames = getLine(lineId).jsonPath()
+                .getList("stations.name", String.class);
+
+        assertAll(
+                () -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(stationNames).containsExactly(
+                        STATIONS.광교역.name(), STATIONS.광교중앙역.name(), STATIONS.상현역.name()
+                )
+        );
+    }
 
     /**
      * Given 1개 구간만 포함된 지하철 노선을 등록하고
