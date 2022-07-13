@@ -373,7 +373,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = deleteSection(createdStationLineId, upStationId);
 
         // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -400,7 +400,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = deleteSection(createdStationLineId, downStationId);
 
         // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ExtractableResponse<Response> createStationLine(String stationLineName, String stationLineColor, Long upStationId, Long downStationId

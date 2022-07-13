@@ -52,4 +52,10 @@ public class StationLineController {
     public ResponseEntity<StationLineResponse> registerSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest){
         return ResponseEntity.ok().body(stationLineService.registerSection(id, sectionRequest));
     }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam(value = "stationId") Long stationId){
+        stationLineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
 }

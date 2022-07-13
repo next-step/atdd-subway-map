@@ -119,4 +119,26 @@ public class StationLineService {
 
         return createStationLineResponse(stationLine);
     }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        StationLine stationLine = getStationLineOrThrow(id);
+        Station downStation = getStationOrThrow(stationLine.getDownStationId());
+        Station deleteStation = getStationOrThrow(stationId);
+        List<Long> stationIdsIncludedInLine = stationLine.stationIdsIncludedInLine();
+
+        if (!downStation.equals(deleteStation)) {
+            throw new BusinessException("삭제하려는 역이 하행 종점역이 아닙니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        if (stationIdsIncludedInLine.isEmpty()) {
+            throw new BusinessException("지하철 노선에 상행 종점역과 하행 종점역만 존재합니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        // 통과
+        Long newDownStationId = stationIdsIncludedInLine.get(stationIdsIncludedInLine.size() - 1);
+        stationLine.setDownStationId(newDownStationId);
+        String newstationsIncludedInLine = StringUtils.join(stationIdsIncludedInLine.remove(newDownStationId), ",");
+        stationLine.setStationsIncluded(newstationsIncludedInLine);
+    }
 }
