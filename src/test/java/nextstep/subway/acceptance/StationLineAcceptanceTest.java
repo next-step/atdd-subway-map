@@ -216,7 +216,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
                 .getList("stations.id", Long.class);
         Long newDownStationId = stationIdIncludedSection.get(stationIdIncludedSection.size() - 1);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(newDownStationId).isEqualTo(newStationId);
     }
 
@@ -267,7 +267,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = createSection(createdStationLineId, upStationId, newStationId, distance);
 
         // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -295,7 +295,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> response = createSection(createdStationLineId, downStationId, upStationId, distance);
 
         // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**

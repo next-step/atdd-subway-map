@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.StationLineService;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.MediaType;
@@ -45,5 +46,10 @@ public class StationLineController {
     public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
         stationLineService.deleteStationLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<StationLineResponse> registerSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest){
+        return ResponseEntity.ok().body(stationLineService.registerSection(id, sectionRequest));
     }
 }
