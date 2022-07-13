@@ -54,4 +54,14 @@ public class LineAcceptanceStatic {
 		return 지하철_노선_생성_요청(param).jsonPath().getLong("id");
 	}
 
+	public static ExtractableResponse<Response> 구간_등록_요청(Long 신분당선_노선_번호, Map<String, Object> param) {
+		ExtractableResponse<Response> response = RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.body(param)
+			.when()
+			.post("/lines/{lineId}/sections", 신분당선_노선_번호)
+			.then().log().all().extract();
+		return response;
+	}
+
 }

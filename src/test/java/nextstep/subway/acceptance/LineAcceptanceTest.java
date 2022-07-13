@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import static nextstep.subway.acceptance.LineAcceptanceStatic.*;
 import static nextstep.subway.acceptance.StationAcceptanceStatic.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
@@ -10,9 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.acceptance_infra.AcceptanceTest;
@@ -147,26 +146,26 @@ class LineAcceptanceTest extends AcceptanceTest {
 	@DisplayName("구간 등록 기능 테스트")
 	@Test
 	void addSectionTest() {
-
 		//given
-		Long 신분당선_상행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
-		Long 신분당선_하행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
-		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 신분당선_상행종점역_번호, 신분당선_하행종점역_번호, 10);
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
 
 		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의숲역"));
-		Long 양재역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재역"));
-		Map<String, Object> param = Map.of("downStationId", 양재시민의_숲역_번호, "upStationId", 양재역_번호, "distance", 10);
+		Map<String, Object> 구간_등록_요청값 = Map.of("upStationId", 판교역_번호, "downStationId", 양재시민의_숲역_번호, "distance", 10);
 
 		//when
-		ExtractableResponse<Response> response = RestAssured.given().log().all()
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.body(param)
-			.when()
-			.post("/lines/{lineId}/sections", 신분당선_노선_번호)
-			.then().log().all().extract();
+		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
+		ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(신분당선_노선_번호);
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+		assertAll(
+			() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+			() -> assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+			() -> assertThat(getLineResponse.jsonPath().getList("stations.id", Long.class))
+				.containsAll(List.of(정자역_번호, 판교역_번호, 양재시민의_숲역_번호))
+		);
+
 	}
 
 }
