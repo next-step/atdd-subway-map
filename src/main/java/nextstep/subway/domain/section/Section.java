@@ -67,4 +67,12 @@ public class Section {
         this.nextSection = null;
         this.distance = 0L;
     }
+
+    public boolean isLastSection() {
+        return nextSection == null;
+    }
+
+    public boolean isFirstSection() {
+        return prevSection == null;
+    }
 }
