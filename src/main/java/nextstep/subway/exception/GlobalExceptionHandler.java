@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException exception) {
-        log.error(parseMessage(exception));
+        log.warn(parseMessage(exception));
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
