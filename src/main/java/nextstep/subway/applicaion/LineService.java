@@ -27,7 +27,7 @@ public class LineService {
 
     @Transactional
     public LineResponse createLines(final LineSaveRequest request) {
-        final List<StationResponse> endStations = stationService.findEndStations(List.of(request.getUpStationId(), request.getDownStationId()));
+        final List<StationResponse> endStations = stationService.findBothEndStations(List.of(request.getUpStationId(), request.getDownStationId()));
 
         final Line savedLine = lineRepository.save(new Line(request.getName(),
             request.getColor(), request.getUpStationId(), request.getDownStationId(), new Distance(request.getDistance())));
@@ -41,7 +41,7 @@ public class LineService {
         return linesList.stream()
             .map(line -> new LineResponse(
                 line.getId(), line.getName(), line.getColor(),
-                stationService.findEndStations(List.of(line.getUpStationId(), line.getDownStationId())))
+                stationService.findBothEndStations(List.of(line.getUpStationId(), line.getDownStationId())))
             ).collect(Collectors.toList());
     }
 
@@ -50,7 +50,7 @@ public class LineService {
 
         return new LineResponse(
             line.getId(), line.getName(), line.getColor(),
-            stationService.findEndStations(List.of(line.getUpStationId(), line.getDownStationId())));
+            stationService.findBothEndStations(List.of(line.getUpStationId(), line.getDownStationId())));
     }
 
     @Transactional
