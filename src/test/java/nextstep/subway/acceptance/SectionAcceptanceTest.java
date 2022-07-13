@@ -44,14 +44,6 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest{
         assertThat(line.jsonPath().getInt("stations[1].id")).isEqualTo(3);
     }
 
-    private ExtractableResponse<Response> getSections(long lineId) {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}/sections",lineId)
-                .then().log().all()
-                .extract();
-    }
-
     /**
      * When     새로운 구간의 상행역이 해당 노선에 등록된 하행 종점역이 아니면
      * Then     에러처리한다.
@@ -164,6 +156,14 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest{
             .given().log().all()
             .param("stationId", stationId)
             .when().delete("/lines/{id}/sections", lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> getSections(long lineId) {
+        return RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}/sections",lineId)
             .then().log().all()
             .extract();
     }
