@@ -17,16 +17,16 @@ import nextstep.subway.domain.LineRepository;
 
 @Service
 public class LineService {
-	
-	private LineRepository lineRepository;
+
+	private final LineRepository lineRepository;
 
 	public LineService(LineRepository lineRepository) {
 		this.lineRepository = lineRepository;
 	}
 
 	@Transactional
-	public LineResponse createLines(LineRequest LineRequest) {
-		Line line = lineRepository.save(LineRequest.toLine());
+	public LineResponse createLines(LineRequest lineRequest) {
+		Line line = lineRepository.save(lineRequest.toLine());
 		return createLineResponse(line);
 	}
 
@@ -44,10 +44,10 @@ public class LineService {
 	}
 
 	@Transactional
-	public void updateLine(Long stationId, LineRequest LineRequest) {
+	public void updateLine(Long stationId, LineRequest lineRequest) {
 		Line line = lineRepository.findById(stationId)
 			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
-		line.updateStationLineInformation(LineRequest.getName(), LineRequest.getColor());
+		line.updateStationLineInformation(lineRequest.getName(), lineRequest.getColor());
 	}
 
 	@Transactional

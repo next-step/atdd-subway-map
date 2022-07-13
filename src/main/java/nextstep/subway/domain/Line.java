@@ -38,28 +38,5 @@ public class Line {
 		this.name = stationName;
 		this.color = stationColor;
 	}
-/*
-	public boolean isRegistrable(long upStationIdFromSction, long downStationIdFromSection) {
-		if (upStationIdFromSction != this.downStationId) {
-			throw new IllegalStateException();
-		}
 
-		if (this.upStationId == downStationIdFromSection || this.downStationId == downStationIdFromSection) {
-			throw new IllegalStateException();
-		}
-		return true;
-	}
-
-	public boolean isDeletable(long stationId) {
-		if (this.downStationId != stationId) {
-			throw new IllegalStateException();
-		}
-		return true;
-	}
-
-	public void updateDownStationId(long downStationIdFromSection) {
-		this.downStationId = downStationIdFromSection;
-	}
-
- */
 }

@@ -20,8 +20,8 @@ import nextstep.subway.domain.Sections;
 @Service
 public class SectionService {
 
-	private LineRepository lineRepository;
-	private SectionRepository sectionRepository;
+	private final LineRepository lineRepository;
+	private final SectionRepository sectionRepository;
 
 	public SectionService(LineRepository lineRepository, SectionRepository sectionRepository) {
 		this.lineRepository = lineRepository;
@@ -30,26 +30,19 @@ public class SectionService {
 
 	@Transactional
 	public SectionResponse createSection(long lineId, SectionRequest sectionRequest) {
-		Line line = lineRepository.findById(lineId)
-			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
-		//line.isRegistrable(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
-		//line.updateDownStationId(sectionRequest.getDownStationId());
+		validationOfLind(lineId);
+		Sections sections = new Sections(sectionRepository.findByLineIdOrderById(lineId));
+		sections.validationOfRegistration(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+
 		return createSectionResponse(sectionRepository.save(sectionRequest.toSection(lineId)));
 	}
 
 	@Transactional
 	public void deleteSection(long lineId, long stationId) {
-		Line line = lineRepository.findById(lineId)
-			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
-		//line.isDeletable(stationId);
-
+		validationOfLind(lineId);
 		Sections sections = new Sections(sectionRepository.findByLineIdOrderById(lineId));
-		sections.isDeletable(stationId);
-
-		Section section = sectionRepository.findByDownStationId(stationId)
-			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
-		sectionRepository.delete(section);
-
+		sections.validationOfDelete(stationId);
+		sectionRepository.delete(sections.getLastSection());
 	}
 
 	public List<SectionResponse> getSectionList(long lineId) {
@@ -69,6 +62,11 @@ public class SectionService {
 			section.getUpStationId(),
 			section.getDownStationId(),
 			section.getDistance());
+	}
+
+	private Line validationOfLind(long lineId) {
+		return lineRepository.findById(lineId)
+			.orElseThrow(() -> new BusinessException(ENTITY_NOT_FOUND));
 	}
 
 }
