@@ -15,8 +15,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static nextstep.subway.acceptance.StationUtils.지하철역을_등록한다;
-import static nextstep.subway.acceptance.SubwayLineUtils.*;
+import static nextstep.subway.acceptance.utils.StationUtils.지하철역을_등록한다;
+import static nextstep.subway.acceptance.utils.SubwayLineUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
