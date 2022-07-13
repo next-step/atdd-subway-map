@@ -64,4 +64,11 @@ public class LineService {
 
         lineRepository.save(line);
     }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        Line line = findLine(id);
+
+        lineRepository.delete(line);
+    }
 }
