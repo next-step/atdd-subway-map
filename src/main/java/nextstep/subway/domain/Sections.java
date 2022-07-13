@@ -9,6 +9,7 @@ import nextstep.subway.exception.UnableRemoveSectionException;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,7 @@ public class Sections {
             orphanRemoval = true,
             cascade = { CascadeType.PERSIST, CascadeType.REMOVE }
     )
+    @OrderBy("registerDateTime asc")
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {

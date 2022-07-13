@@ -1,6 +1,9 @@
 package nextstep.subway.domain;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Section {
@@ -13,6 +16,9 @@ public class Section {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private SubwayLine subwayLine;
+
+    @CreatedDate
+    private LocalDateTime registerDateTime;
 
     public Section() {
     }
