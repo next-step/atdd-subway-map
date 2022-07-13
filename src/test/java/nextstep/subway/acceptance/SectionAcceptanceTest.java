@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철 구간 관련 기능")
 @Sql(scripts = {
@@ -31,7 +30,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
     @DisplayName("지하철 노선의 하행 종점역에 구간을 등록한다.")
     void registerSectionTest() {
         //when
-        Map<String, Object> requestBody = getRequestBody("2","3");
+        Map<String, Object> requestBody = getRequestBody("2","3",10);
         ExtractableResponse<Response> createdSection = createSection(requestBody);
 
         //then
@@ -44,11 +43,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
         assertThat(sections.jsonPath().getList("id",Integer.class)).contains(sectionId);
 
         //then
-        ExtractableResponse<Response> line = RestAssured
-            .given().log().all()
-            .when().get("/lines/{id}",1)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> line = getLine(1);
         assertThat(line.jsonPath().getInt("stations[1].id")).isEqualTo(3);
     }
 
@@ -60,7 +55,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
     @DisplayName("지하철 노선의 하행 종점역이 아닌 역에 구간을 등록한다.")
     void registerIllegalUpStationSectionTest() {
         //when
-        Map<String, Object> requestBody = getRequestBody("1","3");
+        Map<String, Object> requestBody = getRequestBody("1","3",10);
         ExtractableResponse<Response> createdSection = createSection(requestBody);
 
         //then
@@ -78,7 +73,20 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
     @DisplayName("지하철 노선의 하행 종점역의 구간을 제거한다.")
     void removeSectionTest() {
         //given
+        Map<String, Object> requestBody = getRequestBody("2","3",10);
+        ExtractableResponse<Response> createdSection = createSection(requestBody);
+        int createdSectionId = createdSection.jsonPath().getInt("id");
 
+        //when
+        deleteSection(1,2);
+
+        //then
+        ExtractableResponse<Response> lines = getLines();
+        assertThat(lines.jsonPath().getList("id",Integer.class)).doesNotContain(createdSectionId);
+
+        //then
+        ExtractableResponse<Response> line = getLine(1);
+        assertThat(line.jsonPath().getInt("stations[1].id")).isEqualTo(3);
 
     }
 
@@ -113,12 +121,37 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
             .extract();
     }
 
-    private Map<String, Object> getRequestBody(String upStationId, String downStationId) {
+    private Map<String, Object> getRequestBody(String upStationId, String downStationId, long distance) {
         Map<String,Object> requestBody = new HashMap<>();
         requestBody.put("upStationId", upStationId);
         requestBody.put("downStationId",downStationId);
-        requestBody.put("distance", 10);
+        requestBody.put("distance", distance);
         return requestBody;
+    }
+
+    private ExtractableResponse<Response> getLine(long lineId) {
+        return RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}",lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> getLines() {
+        return RestAssured
+            .given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private void deleteSection(long lineId, long stationId) {
+        RestAssured
+            .given().log().all()
+            .param("stationId", stationId)
+            .when().delete("/lines/{id}/sections", lineId)
+            .then().log().all()
+            .extract();
     }
 
 }
