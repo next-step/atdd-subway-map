@@ -64,8 +64,8 @@ public class Line {
         return sections.getStations();
     }
 
-    public boolean isOwnDownStation(Station station) {
-        return sections.isDownStation(station);
+    public boolean hasDownStation(Station station) {
+        return sections.hasDownStation(station);
     }
 
     public boolean isAlreadyOwnStation(Station station) {

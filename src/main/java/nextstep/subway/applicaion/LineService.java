@@ -62,7 +62,7 @@ public class LineService {
         Line findLine = findLineById(lineId);
 
         Station upStation = findStationById(request.getUpStationId());
-        if (!findLine.isOwnDownStation(upStation)) {
+        if (!findLine.hasDownStation(upStation)) {
             throw new SectionException(ErrorCode.INVALID_UP_STATION_EXCEPTION);
         }
 

@@ -52,7 +52,7 @@ public class Sections {
         return stations;
     }
 
-    public boolean isDownStation(Station station) {
+    public boolean hasDownStation(Station station) {
         return sections.get(getLastIndex()).getDownStation().equals(station);
     }
 

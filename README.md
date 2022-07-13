@@ -5,7 +5,7 @@
 ## 3차 PR TODO List
 
 - [x] Line 의 edit 메서드 안의 디버깅 코드 삭제
-- [ ] Line 의 isOwnDownStation 메서드 이름에 대하여 다시한번 생각해보기, hasStation or contains 과 같은
+- [x] Line 의 isOwnDownStation 메서드 이름에 대하여 다시한번 생각해보기, hasStation or contains 과 같은
 - [ ] Sections 의 size 검증 부분을 isEmpty()로 변경하기
 - [ ] Sections 의 사용하지 않는 메서드 제거
 - [ ] Sections 에서 불변 리스트를 반환하기
