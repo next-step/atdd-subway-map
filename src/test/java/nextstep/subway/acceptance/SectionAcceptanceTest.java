@@ -193,6 +193,31 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 하행종점역을 제거하면
      * Then 에러가 발생한다
      */
+    @DisplayName("상/하행 좀점만 남은 경우 구간 삭제 불가")
+    @Test
+    void canNotDeleteLastRemainSection() {
+        // given
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
+        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
+
+        // when
+        var deleteResponse = RestAssured
+                .given()
+                    .pathParam("lineId", lineId)
+                    .queryParam("stationId", stationIds.get(STATIONS.광교중앙역))
+                .when()
+                    .delete("/lines/{lineId}/sections")
+                .then()
+                    .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given 2개 이상의 구간이 포함된 지하철 노선을 등록하고
