@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import io.restassured.response.ExtractableResponse;
 @DisplayName("구간등록 테스트")
 public class SectionAcceptanceTest extends AcceptanceTest {
 	private static final String baseUrlPrefix = "/lines";
+
 	/**
 	 * 1. 구간 등록
 	 * 	1.1 노선등록이 되어 있어야만함
@@ -32,24 +34,45 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	 * 	2. 구간 제거
 	 * 	 2.1 station 에 등록된 역인지 체크
 	 * 	 2.2 해당 Line 의 마지막 section 의 downStationId와 동일한지 체크
-	 * 	 2.3 stationLine 이 등록된 section 이 없는 경우 삭제 불가능
+	 * 	 2.3 등록된 section 이 없는 경우 삭제 불가능
 	 */
+	long lineId;
+
+	@BeforeEach
+	void setupLineData() {
+		lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
+	}
 
 	/**
 	 * given 지하철 노선 생성하고
 	 * when 지하철 구간을 생성하면
-	 * then 지하철 구간 목록 조회 시 생성한 노선을 찾을 수 있다
+	 * then 지하철 구간  조회 시 생성한 노선정보와 일치 한다.
 	 */
 	@DisplayName("지하철구간 생성")
 	@Test
 	void createSection() {
 		//given
-		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
-		//when
-		long sectionId = 지하철_구간_생성(lineId, 2, 3, 1);
-		//then
-		assertEquals(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId"), (int)sectionId);
 
+		//when
+		int sectionId = 지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+		//then
+		assertTrue(등록된_구간정보와_조회된_구간정보_일치여부(sectionId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1));
+
+	}
+
+	/**
+	 * given 지하철 구간 생성하고
+	 * when 지하철 신규 구간 상행역이 기존구간 하행역이 아닌 경우로 등록하면
+	 * then INVALID_STATUS 코드 응답 받는다
+	 */
+	@DisplayName("지하철구간_생성_상행역이_기존_구간_하행_종점이_아닌경우")
+	@Test
+	void createSectionErrorCase1() {
+		//when
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+
+		//then
+		assertEquals("INVALID_STATUS", 지하철_구간_생성_오류(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1));
 	}
 
 	/**
@@ -61,15 +84,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getSections() {
 		//given
-		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
 
 		//when
-		long section1 = 지하철_구간_생성(lineId, 2, 3, 1);
-		long section2 = 지하철_구간_생성(lineId, 3, 4, 1);
+		int section1 = 지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+		int section2 = 지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2);
 
 		//then
 		assertThat(지하철_구간_목록_조회(lineId)).hasSize(2)
-			.containsExactly((int)section1, (int)section2);
+			.containsExactly(section1, section2);
 	}
 
 	/**
@@ -79,11 +101,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("지하철구간 조회")
 	@Test
-	void 지하철구간_조회() {
+	void getSelection() {
 		//given
-		long lineId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
+
 		//when
-		long sectionId = 지하철_구간_생성(lineId, 2, 3, 1);
+		long sectionId = 지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
 		//then
 		assertEquals(지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("sectionId"), (int)sectionId);
 	}
@@ -98,16 +120,16 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteSection() {
 		//given
-		long lindId = 지하철_노선_생성(SIN_BOONDANG_LINE, LINE_COLOR_RED);
-		long sectionId = 지하철_구간_생성(lindId, 2, 3, 1);
+
+		지하철_구간_생성(lineId, UP_STATION_ID_1, DOWN_STATION_ID_1, DISTANCE_1);
+		long sectionId = 지하철_구간_생성(lineId, UP_STATION_ID_2, DOWN_STATION_ID_2, DISTANCE_2);
 		//when
-		지하철_구간_삭제(lindId, 3);
+		지하철_구간_삭제(lineId, 4);
 		//then
-		Map<String, Object> response = 지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK);
-		assertEquals(ENTITY_NOT_FOUND.toString(), response.get("errorCode"));
+		assertEquals(ENTITY_NOT_FOUND.toString(), 지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK).get("errorCode"));
 	}
 
-	private long 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance) {
+	private int 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance) {
 		String postUrl = String.format("%s/%s/section", baseUrlPrefix, lineId);
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -115,7 +137,18 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 			.when().post(postUrl)
 			.then().log().all()
 			.statusCode(HttpStatus.CREATED.value())
-			.extract().jsonPath().getLong("sectionId");
+			.extract().jsonPath().getInt("sectionId");
+	}
+
+	private String 지하철_구간_생성_오류(long lineId, long upStationId, long downStationId, long distance) {
+		String postUrl = String.format("%s/%s/section", baseUrlPrefix, lineId);
+		return RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.body(지하철_구간_생성_파라미터생성(upStationId, downStationId, distance))
+			.when().post(postUrl)
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value())
+			.extract().jsonPath().getString("errorCode");
 	}
 
 	private List<Integer> 지하철_구간_목록_조회(long lineId) {
@@ -135,10 +168,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 			.statusCode(httpStatus.value())
 			.extract();
 
-		if (httpStatus == HttpStatus.OK) {
-			return extractableResponse.jsonPath().get();
-		}
-		return null;
+		return extractableResponse.jsonPath().get();
 	}
 
 	private void 지하철_구간_삭제(long lineId, long stationId) {
@@ -155,5 +185,31 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 		requestParameter.put("downStationId", downStationId);
 		requestParameter.put("distance", distance);
 		return requestParameter;
+	}
+
+	private boolean 등록된_구간정보와_조회된_구간정보_일치여부(int sectionId, int upStationId, int downStationId,
+		int distance) {
+
+		Map<String, Object> response = 지하철_구간_조회_BY_ID(sectionId, HttpStatus.OK);
+
+		int registeredSectionId = (int)response.get("sectionId");
+		int registeredUpStationId = (int)response.get("upStationId");
+		int registeredDownStationId = (int)response.get("downStationId");
+		int registeredDistance = (int)response.get("distance");
+
+		if (sectionId != registeredSectionId) {
+			return false;
+		}
+		if (upStationId != registeredUpStationId) {
+			return false;
+		}
+		if (downStationId != registeredDownStationId) {
+			return false;
+		}
+		if (distance != registeredDistance) {
+			return false;
+		}
+
+		return true;
 	}
 }

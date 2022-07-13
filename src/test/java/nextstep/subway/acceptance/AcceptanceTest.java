@@ -17,6 +17,13 @@ public abstract class AcceptanceTest {
 	static final String LINE_COLOR_RED = "bg-red-600";
 	static final String LINE_COLOR_BLUE = "bg-blue-600";
 
+	static final int UP_STATION_ID_1 = 2;
+	static final int DOWN_STATION_ID_1 = 3;
+	static final int DISTANCE_1 = 10;
+	static final int UP_STATION_ID_2 = 3;
+	static final int DOWN_STATION_ID_2 = 4;
+	static final int DISTANCE_2 = 7;
+
 	@LocalServerPort
 	int port;
 
