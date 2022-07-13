@@ -32,6 +32,10 @@ public class SectionService {
         var section = sectionRepository.findByLineIdAndStation(lineId, upStation)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선이거나 노선에 상행역이 없습니다."));
 
+        if (section.getNextSection() != null) {
+            throw new IllegalStateException("종점이 아닌 역에 구간을 추가할 수 없습니다.");
+        }
+
         if (isExistSection(lineId, downStation)) {
             throw new IllegalStateException("이미 노선에 존재하는 역입니다.");
         }
