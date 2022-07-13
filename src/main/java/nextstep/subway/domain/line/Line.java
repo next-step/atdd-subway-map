@@ -1,7 +1,5 @@
 package nextstep.subway.domain.line;
 
-import nextstep.subway.applicaion.dto.line.LineRequest;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,12 +20,12 @@ public class Line {
     public Line() {
     }
 
-    public Line(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
-        this.upStationId = lineRequest.getUpStationId();
-        this.downStationId = lineRequest.getDownStationId();
-        this.distance = lineRequest.getDistance();
+    public Line(Builder builder) {
+        this.name = builder.name;
+        this.color = builder.color;
+        this.upStationId = builder.upStationId;
+        this.downStationId = builder.downStationId;
+        this.distance = builder.distance;
     }
 
     public void update(String name, String color) {
@@ -59,15 +57,43 @@ public class Line {
         return distance;
     }
 
-    @Override
-    public String toString() {
-        return "Line{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", upStationId=" + upStationId +
-                ", downStationId=" + downStationId +
-                ", distance=" + distance +
-                '}';
+    public static class Builder {
+        private String name;
+        private String color;
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
+
+        public Builder() {
+        }
+
+        public Builder name(String val) {
+            name = val;
+            return this;
+        }
+
+        public Builder color(String val) {
+            color = val;
+            return this;
+        }
+
+        public Builder upStationId(Long val) {
+            upStationId = val;
+            return this;
+        }
+
+        public Builder downStationId(Long val) {
+            downStationId = val;
+            return this;
+        }
+
+        public Builder distance(Long val) {
+            distance = val;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(this);
+        }
     }
 }
