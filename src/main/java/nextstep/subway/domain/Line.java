@@ -14,6 +14,7 @@ public class Line {
     private String color;
     private Long upStationId;
     private Long downStationId;
+    private Integer distance;
     public Line() {
     }
 
@@ -26,11 +27,20 @@ public class Line {
     }
 
     public Line(Long id, String name, String color, Long upStationId, Long downStationId) {
+        this(id, name, color, upStationId, downStationId, 0);
+    }
+
+    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        this(0L, name, color, upStationId, downStationId, distance);
+    }
+
+    public Line(Long id, String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
+        this.distance = distance;
     }
 
     public Long getId() {
@@ -53,4 +63,7 @@ public class Line {
         return downStationId;
     }
 
+    public Integer getDistance() {
+        return distance;
+    }
 }

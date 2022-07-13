@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.StationLineRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,15 +36,14 @@ public class StationLineService {
     }
 
     public StationLineResponse patch(Long id, Line line) {
-        Line previousLine = repository.getById(id);
-        Line currentLine = new Line(previousLine.getId(), line.getName(), line.getColor(), line.getUpStationId(), line.getDownStationId());
-        return createLineResponse(repository.save(currentLine));
+        BeanUtils.copyProperties(repository.getById(id), line);
+        return createLineResponse(repository.save(line));
     }
 
     private StationLineResponse createLineResponse(Line line) {
         return new StationLineResponse(
                 line.getId(), line.getName(), line.getColor(),
-                line.getUpStationId(), line.getDownStationId()
+                line.getUpStationId(), line.getDownStationId(), line.getDistance()
         );
     }
 
