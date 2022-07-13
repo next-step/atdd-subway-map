@@ -48,6 +48,14 @@ public class Section {
         this.line = line;
     }
 
+    public Long id() {
+        return id;
+    }
+
+    public Distance distance() {
+        return distance;
+    }
+
     public Station upStation() {
         return upStation;
     }

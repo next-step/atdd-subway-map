@@ -1,10 +1,13 @@
 package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineModifyRequest;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.exception.InvalidMatchEndStationException;
+import nextstep.subway.domain.exception.NotFoundLineException;
+import nextstep.subway.domain.exception.NotFoundStationException;
+import nextstep.subway.domain.exception.StationAlreadyExistsException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class LineController {
 
     private final LineService lineService;
@@ -45,5 +49,22 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id, @RequestBody @Validated SectionRequest sectionRequest) {
+        try {
+            SectionResponse section = lineService.addSection(id, sectionRequest);
+            return ResponseEntity.created(URI.create("/lines/" + id)).body(section);
+        } catch (InvalidMatchEndStationException | StationAlreadyExistsException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (NotFoundLineException | NotFoundStationException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
