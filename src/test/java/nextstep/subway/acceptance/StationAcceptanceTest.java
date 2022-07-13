@@ -9,17 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static nextstep.subway.acceptance.StationPrepare.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
@@ -37,26 +35,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_조회_요청();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -69,7 +54,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() {
+        지하철역_생성_요청("잠실역");
+        지하철역_생성_요청("선릉역");
 
+        List<String> 지하철역_목록 = 지하철역_조회_요청();
+
+        assertThat(지하철역_목록).containsExactly("잠실역", "선릉역");
+        assertThat(지하철역_목록).hasSize(2);
     }
 
     /**
@@ -81,6 +72,11 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
+        ExtractableResponse<Response> 교대역 = 지하철역_생성_요청("교대역");
 
+        지하철역_삭제_요청(교대역.header("Location"));
+
+        List<String> 지하철역_목록 = 지하철역_조회_요청();
+        assertThat(지하철역_목록).doesNotContain("교대역");
     }
 }
