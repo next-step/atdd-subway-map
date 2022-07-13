@@ -43,4 +43,18 @@ public class Sections {
         return sections.stream()
                 .anyMatch(section -> section.containsStationId(stationId));
     }
+
+    public void deleteSection(Long stationId) {
+        validateToDelete(stationId);
+        sections.remove(sections.size() - 1);
+    }
+
+    private void validateToDelete(Long stationId) {
+        if (sections.size() == 1) {
+            throw new IllegalArgumentException("지하철 노선에 구간이 1개인 경우 역을 삭제할 수 없다.");
+        }
+        if (!Objects.equals(getDownStationId(), stationId)) {
+            throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다.");
+        }
+    }
 }

@@ -71,4 +71,8 @@ public class Line {
     public boolean containsStationId(Long stationId) {
         return sections.containsStationId(stationId);
     }
+
+    public void deleteSection(Long stationId) {
+        sections.deleteSection(stationId);
+    }
 }

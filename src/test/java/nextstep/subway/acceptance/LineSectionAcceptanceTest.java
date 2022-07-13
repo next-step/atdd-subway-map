@@ -63,7 +63,6 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     void 지하철노선_구간_생성_인수테스트() {
         // when
         지하철노선_구간을_추가요청한다(분당선, 판교역, 광교역, "10");
-
         // then
         지하철노선_구간에서_찾을수있다("광교역");
     }
@@ -74,10 +73,9 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철노선_구간_추가_실패_인수테스트() {
         // when
-        final ExtractableResponse<Response> response = 지하철노선_구간을_추가요청한다(분당선, 양재역, 광교역, "15");
-
+        var response = 지하철노선_구간을_추가요청한다(분당선, 양재역, 광교역, "15");
         // then
-        구간_등록에_실패한다(response);
+        요청의_응닶이_실패하였다(response);
     }
 
     // when 추가하려는 구간의 하행역이 이미 해당 노선에 등록되어 있는 역일경우
@@ -86,16 +84,55 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철노선_구간_추가_실패_인수테스트_2() {
         // when
-        final ExtractableResponse<Response> response = 지하철노선_구간을_추가요청한다(분당선, 판교역, 강남역, "10");
-
+        var response = 지하철노선_구간을_추가요청한다(분당선, 판교역, 강남역, "10");
         // then
-        구간_등록에_실패한다(response);
+        요청의_응닶이_실패하였다(response);
     }
 
-    private void 지하철노선_구간에서_찾을수있다(String stationName) {
-        final JsonPath jsonPath = LineAcceptanceTest.지하철노선_목록_조회요청().jsonPath();
-        final String names = jsonPath.getString("stations.name");
-        assertThat(names.contains(stationName)).isTrue();
+    // when 지하철 노선에 구간을 제거하면
+    // then 구간이 제거된다
+    @DisplayName("지하철노선에서 특정구간을 제거한다")
+    @Test
+    void 지하철노선의_특정구간을_제거한다() {
+        // given
+        지하철노선_구간을_추가요청한다(분당선, 판교역, 광교역, "20");
+        // when
+        지하철노선_구간삭제_요청한다(분당선, 광교역);
+        // then
+        지하철노선_구간에서_찾을수_없다("광교역");
+    }
+
+    // when 노선의 마지막 하행종점역이 아닌 역을 제거 요청하면
+    // then 구간 제거 요청에 실패한다
+    @DisplayName("노선의 마지막 구간만 제거할 수 있다")
+    @Test
+    void 지하철노선의_마지막_구간만_제거할수있다() {
+        // given
+        지하철노선_구간을_추가요청한다(분당선, 판교역, 광교역, "20");
+        // when
+        var response = 지하철노선_구간삭제_요청한다(분당선, 판교역);
+        // then
+        요청의_응닶이_실패하였다(response);
+    }
+
+    // when 노선의 구간이 하나만 있을때 구간 제거 요청하면
+    // then 구간 제거 요청에 실패한다
+    @DisplayName("노선의 구간이 하나만 있을때 구간을 제거할 수 없다")
+    @Test
+    void 지하철노선에_구간이_하나만_있을때_제거할수없다() {
+        // when
+        var response = 지하철노선_구간삭제_요청한다(분당선, 판교역);
+        // then
+        요청의_응닶이_실패하였다(response);
+    }
+
+    private ExtractableResponse<Response> 지하철노선_구간삭제_요청한다(ExtractableResponse<Response> line, ExtractableResponse<Response> station) {
+        final long lineId = line.jsonPath().getLong("id");
+        final long stationId = station.jsonPath().getLong("id");
+        return RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + stationId)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> 지하철노선_구간을_추가요청한다(ExtractableResponse<Response> line, ExtractableResponse<Response> upStationId, ExtractableResponse<Response> downStationId, String distance) {
@@ -113,9 +150,21 @@ public class LineSectionAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private void 구간_등록에_실패한다(ExtractableResponse<Response> response) {
+    private void 요청의_응닶이_실패하였다(ExtractableResponse<Response> response) {
         final int statusCode = response.statusCode();
         assertThat(statusCode).isEqualTo(500);
+    }
+
+    private void 지하철노선_구간에서_찾을수있다(String stationName) {
+        final JsonPath jsonPath = LineAcceptanceTest.지하철노선_목록_조회요청().jsonPath();
+        final String names = jsonPath.getString("stations.name");
+        assertThat(names.contains(stationName)).isTrue();
+    }
+
+    private void 지하철노선_구간에서_찾을수_없다(String stationName) {
+        final JsonPath jsonPath = LineAcceptanceTest.지하철노선_목록_조회요청().jsonPath();
+        final String names = jsonPath.getString("stations.name");
+        assertThat(names.contains(stationName)).isFalse();
     }
 
 }
