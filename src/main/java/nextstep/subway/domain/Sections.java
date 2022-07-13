@@ -13,6 +13,8 @@ import nextstep.subway.exception.ErrorCode;
 
 @Embeddable
 public class Sections {
+	private final static int MINIMUM_SECTION_SIZE = 1;
+
 	@OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
 	private final List<Section> sections = new ArrayList<>();
 
@@ -69,6 +71,9 @@ public class Sections {
 	}
 
 	public void validateDeleteSection(Station station) {
+		if (sections.size() <= MINIMUM_SECTION_SIZE) {
+			throw new BusinessException(ErrorCode.IS_ONLY_SECTION);
+		}
 		if (!isSameLastDownStation(station)) {
 			throw new BusinessException(ErrorCode.IS_NOT_LAST_STATION);
 		}
