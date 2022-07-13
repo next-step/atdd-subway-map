@@ -13,9 +13,12 @@ public class ErrorResponse {
 		return new ErrorResponse(errorCode, errorMessage);
 	}
 
-	public static ErrorResponse from(ErrorCode errorCode) {
-		return new ErrorResponse(errorCode.getStatusCode(), errorCode.getErrorMessage());
+	public int getStatusCode() {
+		return statusCode;
 	}
 
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 }
 

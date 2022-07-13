@@ -8,6 +8,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 
+import nextstep.subway.exception.BusinessException;
+import nextstep.subway.exception.ErrorCode;
+
 @Embeddable
 public class Sections {
 	@OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
@@ -22,11 +25,25 @@ public class Sections {
 	}
 
 	public void addSection(Section section) {
+		if (sections.isEmpty()) {
+			this.sections.add(section);
+			return;
+		}
+		validateAddSection(section);
 		this.sections.add(section);
 	}
 
-	public List<Station> getStationList() {
+	public void validateAddSection(Section section) {
+		if (!isSameLastDownStation(section.getUpStation())) {
+			throw new BusinessException(ErrorCode.LAST_STATION_NOT_MATCH_UP_STATION);
+		}
+	}
 
+	public boolean isSameLastDownStation(Station station) {
+		return getLastStation().equals(station);
+	}
+
+	public List<Station> getStationList() {
 		return sections.stream()
 			.map(Section::getStationList)
 			.flatMap(List::stream)
@@ -34,4 +51,7 @@ public class Sections {
 			.collect(Collectors.toList());
 	}
 
+	public Station getLastStation() {
+		return sections.get(sections.size() - 1).getDownStation();
+	}
 }
