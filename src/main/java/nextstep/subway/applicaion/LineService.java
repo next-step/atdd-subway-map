@@ -5,8 +5,10 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Section;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,5 +64,19 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void addSectionToLine(Long id, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Section section = toSection(line, sectionRequest);
+        line.addSection(section);
+    }
+
+    private Section toSection(Line line, SectionRequest sectionRequest) {
+        return new Section(line
+                , stationService.findStation(sectionRequest.getUpStationId())
+                , stationService.findStation(sectionRequest.getDownStationId())
+                , sectionRequest.getDistance());
     }
 }
