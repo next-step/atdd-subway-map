@@ -1,11 +1,10 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.StationCreateDto;
 import nextstep.subway.applicaion.dto.StationDto;
-import nextstep.subway.ui.dto.StationRequest;
-import nextstep.subway.ui.dto.StationResponse;
-import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.domain.entity.Station;
+import nextstep.subway.domain.service.StationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,29 +12,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StationService {
-    private StationRepository stationRepository;
+public class StationApiService {
+    private final StationService stationService;
 
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
 
     @Transactional
     public StationDto saveStation(StationCreateDto stationCreateDto) {
-        Station station = stationRepository.save(new Station(stationCreateDto.getName()));
+        Station station = stationService.save(new Station(stationCreateDto.getName()));
         return createStationResponse(station);
     }
 
     public List<StationDto> findAllStations() {
-        return stationRepository.findAll().stream()
+        return stationService.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+        stationService.deleteById(id);
     }
 
     private StationDto createStationResponse(Station station) {

@@ -1,7 +1,7 @@
 package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.SectionService;
+import nextstep.subway.applicaion.SectionApiService;
 import nextstep.subway.applicaion.dto.SectionDto;
 import nextstep.subway.ui.dto.SectionRequest;
 import nextstep.subway.ui.dto.SectionResponse;
@@ -15,13 +15,13 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class LineSectionController {
 
-    private final SectionService sectionService;
+    private final SectionApiService sectionApiService;
 
     @PostMapping("/lines/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(
             @PathVariable Long lineId,
             @RequestBody @Valid SectionRequest sectionRequest) {
-        SectionDto sectionDto = sectionService.createSection(lineId, sectionRequest);
+        SectionDto sectionDto = sectionApiService.createSection(lineId, sectionRequest);
         SectionResponse response = SectionResponse.of(sectionDto);
 
         return ResponseEntity.created(URI.create("/lines/" + lineId)).body(response);
@@ -32,7 +32,7 @@ public class LineSectionController {
             @PathVariable Long lineId,
             @PathVariable Long sectionId
     ) {
-        sectionService.deleteSection(lineId, sectionId);
+        sectionApiService.deleteSection(lineId, sectionId);
 
         return ResponseEntity.noContent().build();
     }

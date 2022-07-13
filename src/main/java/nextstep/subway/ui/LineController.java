@@ -1,7 +1,7 @@
 package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.LineApiService;
 import nextstep.subway.applicaion.dto.LineDto;
 import nextstep.subway.ui.dto.LineRequest;
 import nextstep.subway.ui.dto.LineResponse;
@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LineController {
 
-    private final LineService lineService;
+    private final LineApiService lineApiService;
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody @Valid  LineRequest lineRequest) {
-        long lineId = lineService.createLine(lineRequest.toCreateDto());
-        LineDto lineDto = lineService.getLine(lineId);
+        long lineId = lineApiService.createLine(lineRequest.toCreateDto());
+        LineDto lineDto = lineApiService.getLine(lineId);
 
         LineResponse response = LineResponse.of(lineDto);
 
@@ -31,7 +31,7 @@ public class LineController {
 
     @GetMapping("/lines")
     public ResponseEntity<List<LineResponse>> getLines() {
-        List<LineDto> lineDtos = lineService.getLines();
+        List<LineDto> lineDtos = lineApiService.getLines();
 
         return ResponseEntity.ok(lineDtos.stream()
                 .map(LineResponse::of)
@@ -40,7 +40,7 @@ public class LineController {
 
     @GetMapping("/lines/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        LineDto lineDto = lineService.getLine(id);
+        LineDto lineDto = lineApiService.getLine(id);
         LineResponse response = LineResponse.of(lineDto);
 
         return ResponseEntity.ok().body(response);
@@ -51,14 +51,14 @@ public class LineController {
             @PathVariable Long id,
             @RequestBody LineRequest lineRequest
     ) {
-        lineService.updateLine(id, lineRequest.toUpdateDto());
+        lineApiService.updateLine(id, lineRequest.toUpdateDto());
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
-        lineService.deleteLine(id);
+        lineApiService.deleteLine(id);
 
         return ResponseEntity.noContent().build();
     }

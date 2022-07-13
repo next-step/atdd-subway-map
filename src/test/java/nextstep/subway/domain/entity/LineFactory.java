@@ -1,4 +1,4 @@
-package nextstep.subway.domain.line;
+package nextstep.subway.domain.entity;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

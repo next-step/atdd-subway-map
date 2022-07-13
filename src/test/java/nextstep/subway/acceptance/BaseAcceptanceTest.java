@@ -2,16 +2,13 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.boot.test.context.SpringBootTest;
+import nextstep.subway.BaseSpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Sql("classpath:/truncate.sql")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BaseAcceptanceTest {
+public class BaseAcceptanceTest extends BaseSpringBootTest {
 
     @LocalServerPort
     protected int port;
