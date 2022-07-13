@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.domain.Fixture.강남역;
-import static nextstep.subway.domain.Fixture.분당역;
-import static org.assertj.core.api.Assertions.*;
+import static nextstep.subway.domain.line.Fixture.강남역;
+import static nextstep.subway.domain.line.Fixture.분당역;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class SectionTest {

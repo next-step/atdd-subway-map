@@ -3,26 +3,47 @@ package nextstep.subway.domain.line;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.OrderBy;
+import java.util.*;
 
 @Embeddable
 public class Sections {
-    private static final int MINIMUM_STATIONS_SIZE = 1;
     @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Section> sections;
+    @OrderBy("id asc")
+    private List<Section> sections = new LinkedList<>();
 
     protected Sections() {/*no-op*/}
 
-    public Sections(final List<Section> sections) {
-        if (sections.size() < MINIMUM_STATIONS_SIZE) {
-            throw new IllegalArgumentException("역은 상행 종점역, 하행 종점역 두 개의 정보를 포함해야 합니다.");
-        }
-
-        this.sections = new ArrayList<>(sections);
+    public Sections(final Section section) {
+        sections.add(section);
     }
 
     public List<Section> getSections() {
         return List.copyOf(sections);
+    }
+
+    public void addSection(Section addSection) {
+        if (getSections().stream()
+            .anyMatch(section -> Objects.equals(section.getUpStationId(), addSection.getDownStationId())
+                || Objects.equals(section.getDownStationId(), addSection.getDownStationId()))) {
+            throw new IllegalArgumentException("등록하는 구간의 하행 종점역이 노선에 포함되는 역이 될 수 없습니다.");
+        }
+
+        if (!getSections().get(sections.size() - 1).getDownStationId().equals(addSection.getUpStationId())) {
+            throw new IllegalArgumentException("등록하는 구간의 상행역이 노선의 하행 종점역이어야 합니다.");
+        }
+
+        sections.add(addSection);
+    }
+
+    public void deleteSection(Long downStationId) {
+        if (getSections().size() == 1) {
+            throw new IllegalStateException("노선 안에 구간이 하나 뿐입니다.");
+        }
+
+        if (!getSections().get(sections.size() - 1).getDownStationId().equals(downStationId)) {
+            throw new IllegalArgumentException("하행 종점역만 삭제할 수 있습니다.");
+        }
+        sections.remove(sections.size() - 1);
     }
 }

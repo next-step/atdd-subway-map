@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import java.util.List;
-
-import static nextstep.subway.domain.Fixture.노선역목록;
+import static nextstep.subway.domain.line.Fixture.구간;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -17,10 +15,9 @@ class LineTest {
     @Test
     @DisplayName("노선은 식별자, 이름, 색, 거리, 역들의 정보를 가진다.")
     void test1() {
-        List<Section> lineStations = 노선역목록;
         // when & then
         assertDoesNotThrow(
-            () -> new Line(null, "신분당선", "bg-red-600", lineStations)
+            () -> new Line(null, "신분당선", "bg-red-600", 구간)
         );
     }
 
@@ -34,7 +31,7 @@ class LineTest {
 
         // when & then
         assertThatThrownBy(
-            () -> new Line(선, "bg-red-600", 노선역목록)
+            () -> new Line(선, "bg-red-600", 구간)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -46,7 +43,7 @@ class LineTest {
 
         // when & then
         assertThatThrownBy(
-            () -> new Line("신분당선", 색, 노선역목록)
+            () -> new Line("신분당선", 색, 구간)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 }

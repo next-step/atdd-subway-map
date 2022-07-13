@@ -1,6 +1,5 @@
 package nextstep.subway.domain.station;
 
-import nextstep.subway.domain.station.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

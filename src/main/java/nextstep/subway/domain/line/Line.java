@@ -19,7 +19,7 @@ public class Line {
 
     protected Line() {/*no-op*/}
 
-    public Line(Long id, String name, String color, List<Section> sections) {
+    public Line(Long id, String name, String color, Section section) {
 
         if (name == null || name.isBlank() || name.length() < MINIMUM_NAME_SIZE) {
             throw new IllegalArgumentException("이름이 공백이거나 2글자 이하일 수 없습니다.");
@@ -32,11 +32,11 @@ public class Line {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sections = new Sections(sections);
+        this.sections = new Sections(section);
     }
 
-    public Line(String name, String color, List<Section> sections) {
-        this(null, name, color, sections);
+    public Line(String name, String color, Section section) {
+        this(null, name, color, section);
     }
 
     public Long getId() {
