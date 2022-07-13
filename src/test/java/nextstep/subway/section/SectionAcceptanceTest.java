@@ -158,7 +158,7 @@ class SectionAcceptanceTest {
 
         // then
         구간삭제에성공함(삭제결과);
-        하행역이변경됨(신규상행역);
+        하행역이변경됨(하행역);
     }
 
     private Long 신분당선을생성함() {
