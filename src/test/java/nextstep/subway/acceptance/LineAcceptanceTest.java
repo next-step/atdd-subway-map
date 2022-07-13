@@ -8,14 +8,12 @@ import nextstep.subway.api.StationApiCall;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineUpdateDto;
 import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.domain.Line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
@@ -109,35 +107,28 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLines() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "인천역");
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        final String 인천역 = "인천역";
+        final String 소요산역 = "소요산역";
 
-        params.put("name", "소요산역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        final String 일호선 = "1호선";
 
-        ExtractableResponse<Response> createResponse = createLine(new Line("1호선", "bg-blue-600", 1L, 2L, 10));
-        Long lineId = createResponse.jsonPath().getLong("id");
+        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest(인천역));
+        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest(소요산역));
 
-        String name = "새로운노선";
-        String color = "bg-deepblue-600";
+        Long 인천역_아이디 = getId(stationCreationResponse1);
+        Long 소요산역_아이디 = getId(stationCreationResponse2);
 
-        ExtractableResponse<Response> updateResponse = updateLine(lineId, new LineUpdateDto(name, color));
+        ExtractableResponse<Response> createResponse = LineApiCall.createLine(new LineRequest(일호선, "bg-blue-600", 인천역_아이디, 소요산역_아이디, 10));
+        Long 일호선_아이디 = createResponse.jsonPath().getLong("id");
+
+        String lineName = "새로운노선";
+        String lineColor = "bg-deepblue-600";
+
+        ExtractableResponse<Response> updateResponse = LineApiCall.updateLine(일호선_아이디, new LineUpdateDto(lineName, lineColor));
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-
-        List<String> lineNames = getResponse.jsonPath().getList("name", String.class);
+        List<String> lineNames = LineApiCall.getLines().jsonPath().getList("name", String.class);
         assertThat(lineNames).contains("새로운노선");
 
     }
@@ -150,30 +141,19 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLines() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "수원역");
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest("수원역"));
+        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest("죽전역"));
 
-        params.put("name", "정자역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        Long 수원역_아이디 = getId(stationCreationResponse1);
+        Long 죽전역_아이디 = getId(stationCreationResponse1);
 
-        ExtractableResponse<Response> createResponse = createLine(new Line("분당선", "bg-yellow-600", 1L, 2L, 10));
+        ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest("분당선", "bg-yellow-600", 수원역_아이디, 죽전역_아이디, 10));
 
-        Long lineId = createResponse.jsonPath().getLong("id");
+        Long 분당선_아이디 = lineCreationResponse.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .when().delete("/lines/{id}", lineId)
-                .then().log().all()
-                .extract();
-
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> lineDeletionResponse = LineApiCall.deleteLine(분당선_아이디);
+        assertThat(lineDeletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 
@@ -181,27 +161,5 @@ public class LineAcceptanceTest {
     private Long getId(ExtractableResponse<Response> response) {
         return response.jsonPath().getLong("id");
     }
-
-
-    // 지하철역 이름 조회
-    private List<String> getStationNames() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
-
-    // 지하철 노선 업데이트
-    private ExtractableResponse<Response> updateLine(Long id, LineUpdateDto updateDto) {
-        return RestAssured.given().log().all()
-                .body(updateDto)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", id)
-                .then().log().all()
-                .extract();
-    }
-
-
-
 
 }

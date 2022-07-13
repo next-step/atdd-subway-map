@@ -19,9 +19,4 @@ public class StationApiCall {
                 .extract();
     }
 
-
-
-
-
-
 }
