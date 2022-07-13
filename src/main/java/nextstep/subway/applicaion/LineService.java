@@ -92,6 +92,13 @@ public class LineService {
         return LineResponse.of(line);
     }
 
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineOne(lineId);
+        Section lastSection = line.validationAndSectionDelete(line, stationId);
+        stationRepository.delete(lastSection.getDownStation());
+        line.modifyDownStationId(lastSection.getUpStation().getId());
+    }
+
     @Transactional(readOnly = true)
     public List<SectionResponse> findAllSection(){
         List<Section> sections = sectionRepository.findAll();

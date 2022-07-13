@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @ToString
@@ -73,6 +74,10 @@ public class Line {
 
     public void addSection(Section section) {
         sections.addSection(this,section);
+    }
+
+    public Section validationAndSectionDelete(Line line, Long stationId){
+        return sections.validationAndSectionDelete(line, stationId);
     }
 
 }

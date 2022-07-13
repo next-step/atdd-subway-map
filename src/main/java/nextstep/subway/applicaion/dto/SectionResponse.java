@@ -13,14 +13,14 @@ import nextstep.subway.domain.Station;
 public class SectionResponse {
     private Long id;
 
-    private Line line;
+    private Long lineId;
     public Station upStation;
     public Station downStation;
     private Integer distance;
 
-    public SectionResponse(Long id, Line line, Station upStation, Station downStation, Integer distance) {
+    public SectionResponse(Long id, Long lineId, Station upStation, Station downStation, Integer distance) {
         this.id = id;
-        this.line = line;
+        this.lineId = lineId;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -29,7 +29,7 @@ public class SectionResponse {
     public static SectionResponse of(Section section) {
         return new SectionResponse(
                 section.getId(),
-                section.getLine(),
+                section.getLine().getId(),
                 section.getUpStation(),
                 section.getDownStation(),
                 section.getDistance()
