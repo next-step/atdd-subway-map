@@ -7,6 +7,8 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.exception.ExceptionMessages;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -17,17 +19,22 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository,
+        SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(lineRequest.toEntity());
         saveEndpoints(lineRequest, line);
-        Line savedLine = lineRepository.findById(line.getId()).orElseThrow();
+        Line savedLine = lineRepository.findById(line.getId())
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(line.getId())));
+        saveSection(savedLine,lineRequest.getDistance());
         return LineResponse.convertedByEntity(savedLine);
     }
 
@@ -69,4 +76,12 @@ public class LineService {
         return stationRepository.findById(stationId)
             .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(stationId)));
     }
+
+    private void saveSection(Line line, long distance) {
+        Station upStation = getStation(line.getUpEndpointStation().getId());
+        Station downStation = getStation(line.getDownEndpointStation().getId());
+        Section section = new Section(line, upStation, downStation, distance);
+        sectionRepository.save(section);
+    }
+
 }
