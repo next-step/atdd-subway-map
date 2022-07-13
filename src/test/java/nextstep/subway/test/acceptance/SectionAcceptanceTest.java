@@ -1,6 +1,8 @@
 package nextstep.subway.test.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,8 +11,11 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.test.acceptance.LineTestMethod.지하철노선_단일조회;
 import static nextstep.subway.test.acceptance.LineTestMethod.지하철노선_생성;
 import static nextstep.subway.test.acceptance.StationTestMethod.지하철역_생성;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
  * @author a1101466 on 2022/07/10
@@ -30,7 +35,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     public void lineTestSetUp() {
         파랑선_시작ID = 지하철역_생성("구일역").jsonPath().getString("id");
         파랑선_종착ID = 지하철역_생성("구로역").jsonPath().getString("id");;
-        초록선_시작ID = 지하철역_생성("신도립역").jsonPath().getString("id");;
+        초록선_시작ID = 지하철역_생성("신도림역").jsonPath().getString("id");;
         초록선_종착ID = 지하철역_생성("문래역").jsonPath().getString("id");;
 
         지하철노선_생성("파랑선", 파랑선_시작ID, 파랑선_종착ID, "blue", "10");
@@ -49,19 +54,20 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 
         String 새로운구간_종착ID = 지하철역_생성("합정역").jsonPath().getString("id");
 
-        Map<String, String> params = new HashMap<>();
-        params.put("downStationId", 새로운구간_종착ID );
-        params.put("upStationId", 초록선_종착ID);
-        params.put("distance", "10");
+        구간_생성(초록선_종착ID, 새로운구간_종착ID, 초록선_라인ID);
 
-        RestAssured
-                .given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{lineId}/sections")
-                .then().log().all()
-                .extract();
+        String 새로운구간_종착ID2 = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+
+
+        구간_생성(새로운구간_종착ID, 새로운구간_종착ID2, 초록선_라인ID);
+        assertAll(
+                () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath().getString("downStationId")).isEqualTo("6"),
+                () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath()
+                        .getList("stations.name"))
+                        .contains("신도림역","문래역","합정역","홍대입구역")
+        );
+
+
     }
 
     /**
@@ -81,6 +87,22 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                 .then().log().all()
                 .extract();
 
+    }
+
+    public static ExtractableResponse<Response> 구간_생성(String 구간시작ID, String 구간종료ID, long 라인ID){
+        Map<String, String> params = new HashMap<>();
+        params.put("downStationId", 구간종료ID );
+        params.put("upStationId", 구간시작ID);
+        params.put("distance", "10");
+
+        return RestAssured
+                .given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{lineId}/sections", 라인ID)
+                .then().log().all()
+                .extract();
     }
 
 }

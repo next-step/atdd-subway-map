@@ -2,7 +2,9 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import lombok.ToString;
+import nextstep.subway.exception.BusinessException;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -57,6 +59,20 @@ public class Line {
         if(!StringUtils.hasText(color)){
             throw new IllegalArgumentException("color을 입력하여 주십시오.");
         }
+    }
+
+    public void vlidationSectionStation(Long reqUpstationId, Long reqDownStationId){
+        if(this.downStationId != reqUpstationId)
+            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다");
+
+    }
+
+    public void modifyDownStationId(Long reqUpstationId){
+        this.downStationId = reqUpstationId;
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(this,section);
     }
 
 }

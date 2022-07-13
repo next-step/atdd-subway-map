@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import org.aspectj.weaver.ast.Test;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -36,4 +38,26 @@ public class Sections {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+    public void addSection(Line line, Section section) {
+        addSectionValidation(section);
+        sections.add(section);
+        section.setLine(line);
+    }
+
+    public void addSectionValidation(Section section){
+        Boolean checkDownStation =
+                getStation().stream()
+                        .anyMatch(
+                                currentStation -> currentStation.getId().equals(section.getDownStation().getId())
+                        );
+        if(checkDownStation){
+            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.");
+        }
+    }
+
+    Boolean checkDuplicateStation(Section section){
+        return getStation().contains(section.downStation);
+    }
+
 }

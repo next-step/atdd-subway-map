@@ -2,11 +2,13 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SectionRepository;
+import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
@@ -43,8 +45,8 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
+
+        Line line =  findLineOne(id);
 
         return LineResponse.of(line);
     }
@@ -75,9 +77,36 @@ public class LineService {
         );
     }
 
+
+    public LineResponse addSection(Long id, SectionRequest sectionRequest) {
+
+        Line line = findLineOne(id);
+        line.vlidationSectionStation(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+
+        Station upStation = findStationById(sectionRequest.getUpStationId());
+        Station downStation = findStationById(sectionRequest.getDownStationId());
+        Section section = new Section(sectionRequest.getDistance(), upStation, downStation);
+        line.addSection(section);
+        line.modifyDownStationId(sectionRequest.getDownStationId());
+
+        return LineResponse.of(line);
+    }
+
     @Transactional(readOnly = true)
     public List<SectionResponse> findAllSection(){
         List<Section> sections = sectionRepository.findAll();
-        return sections.stream().map(SectionResponse::of).collect(Collectors.toList());
+        return sections.stream()
+                .map(SectionResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Section> findSectionByLine(Line line){
+        return sectionRepository.findByLine(line);
+    }
+
+    private Line findLineOne(Long id){
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
     }
 }
