@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.acceptance_infra.AcceptanceTest;
@@ -238,10 +237,4 @@ class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
 	}
 
-	private ExtractableResponse<Response> 구간_삭제_요청(Long lineId, Long stationId) {
-		return RestAssured.given().log().all()
-			.when()
-			.delete("/lines/{lineId}/sections?stationid={stationId}", lineId, stationId)
-			.then().log().all().extract();
-	}
 }

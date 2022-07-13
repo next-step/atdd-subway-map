@@ -72,4 +72,11 @@ public class LineAcceptanceStatic {
 		return 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
 	}
 
+	public static ExtractableResponse<Response> 구간_삭제_요청(Long lineId, Long stationId) {
+		return RestAssured.given().log().all()
+			.when()
+			.delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
+			.then().log().all().extract();
+	}
+
 }
