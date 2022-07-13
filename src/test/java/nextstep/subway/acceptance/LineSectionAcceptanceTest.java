@@ -95,7 +95,25 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철 노선에 구간 제거가 성공한다.")
     void deleteSelectionTest() {
-        throw new RuntimeException("todo");
+
+        // given
+        long lineId = createLineAndGetId(1, 2);
+
+        // given
+        long sectionId = createSectionAndGetId(lineId, 2, 3);
+        ExtractableResponse<Response> afterCreateLineResponse = getLine(lineId);
+        assertThat(afterCreateLineResponse.jsonPath().getList("stations")).hasSize(2);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(lineId, sectionId);
+
+        // then
+        checkResponseStatus(response, HttpStatus.NO_CONTENT);
+
+        ExtractableResponse<Response> afterDeleteLineResponse = getLine(lineId);
+        assertThat(afterDeleteLineResponse.jsonPath().getList("stations")).hasSize(2);
+        assertThat(afterDeleteLineResponse.jsonPath().getList("stations.name")).doesNotContain("총신대입구역");
+
     }
 
     /**
@@ -106,11 +124,24 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철 노선에 구간 제거가 실패한다.")
     void deleteSelectionFailTest() {
-        throw new RuntimeException("todo");
+        // given
+        long lineId = createLineAndGetId(1, 2);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(lineId, 2);
+
+        // then
+        checkResponseStatus(response, HttpStatus.BAD_REQUEST);
     }
 
     private long createLineAndGetId(long upStationId, long downStationId) {
         return createLine("4호선", "bg-blue-300", upStationId, downStationId, 10)
+                .jsonPath()
+                .getLong("id");
+    }
+
+    private long createSectionAndGetId(long lineId, long upStationId, long downStationId) {
+        return createSection(lineId, upStationId, downStationId, 10)
                 .jsonPath()
                 .getLong("id");
     }
@@ -124,6 +155,13 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
                         "distance", distance
                 ))
                 .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteSection(long lineId, long sectionId) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/{lineId}/sections/{sectionId}", lineId, sectionId)
                 .then().log().all()
                 .extract();
     }

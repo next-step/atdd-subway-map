@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.dto.SectionDto;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
 import nextstep.subway.domain.line.Section;
@@ -23,7 +24,7 @@ public class SectionService {
     private final StationRepository stationRepository;
 
     @Transactional
-    public void createSection(Long lineId, SectionRequest sectionRequest) {
+    public SectionDto createSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundException("line is not found"));
 
@@ -53,7 +54,7 @@ public class SectionService {
             throw new BadRequestException("downStation is already connected");
         }
 
-        sectionRepository.save(
+        Section section = sectionRepository.save(
                 Section.builder()
                         .upStation(newUpStation)
                         .downStation(newDownStation)
@@ -61,5 +62,6 @@ public class SectionService {
                         .build()
         );
 
+        return SectionDto.of(section);
     }
 }
