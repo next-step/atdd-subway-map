@@ -134,18 +134,17 @@ public class SubwayApiCaller {
                 .when()
                     .post(lineUrl+"/sections")
                 .then()
-                    .statusCode(201)
                     .log().all()
                     .extract();
         return response;
     }
 
-    public static ExtractableResponse<Response> 지하철구간_삭제(String 신분당선_저장_위치, Long 선릉역) {
+    public static ExtractableResponse<Response> 지하철구간_삭제(String lineUrl, Long 선릉역) {
         return RestAssured
                 .given()
                     .log().all()
                 .when()
-                    .delete(신분당선_저장_위치+"/sections?stationId="+선릉역)
+                    .delete(lineUrl+"/sections?stationId="+선릉역)
                 .then()
                     .log().all()
                     .extract();
