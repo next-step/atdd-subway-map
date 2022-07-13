@@ -6,6 +6,7 @@ import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.exception.AlreadyRegisterException;
 import nextstep.subway.exception.ErrorMessage;
+import nextstep.subway.exception.SameUpStationException;
 import nextstep.subway.repository.SectionRepository;
 import nextstep.subway.repository.SubwayLineRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,10 @@ public class SectionService {
 			throw new AlreadyRegisterException(ErrorMessage.ALREADY_REGISTER_SECTION.value());
 		}
 
+		if (isSameUpStation(subwayLine.getUpStationId(), section.getUpStationId())) {
+			throw new SameUpStationException(ErrorMessage.CANNOT_REGISTER_WITH_UPSTATION.value());
+		}
+
 		sectionRepository.save(section);
 		subwayLine.saveSection(section);
 	}
@@ -42,5 +47,9 @@ public class SectionService {
 	private boolean hasSameStation(SubwayLine subwayLine, Section section) {
 		return subwayLine.getDownStationId().equals(section.getDownStationId()) ||
 				subwayLine.getUpStationId().equals(section.getDownStationId());
+	}
+
+	private boolean isSameUpStation(Long subwayLineUpStationId, Long sectionUpStationId) {
+		return subwayLineUpStationId.equals(sectionUpStationId);
 	}
 }

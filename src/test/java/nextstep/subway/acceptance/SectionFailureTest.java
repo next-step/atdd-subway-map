@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.DatabaseCleanup;
 import nextstep.subway.acceptance.utils.SectionUtils;
+import nextstep.subway.acceptance.utils.StationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class SectionFailureTest {
 	@DisplayName("중복역을 구간에 등록하면 오류가 발생한다")
 	@Test
 	void duplicateFailure() {
-	    //when
+		//when
 		ExtractableResponse<Response> registerUpStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, downStationId, upStationId, 10);
 		ExtractableResponse<Response> registerDownStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, downStationId, downStationId, 10);
 
@@ -52,6 +53,23 @@ public class SectionFailureTest {
 		);
 	}
 
+	/*
+	 * WHEN 노선의 상행역을 구간의 상행역으로 등록하려면
+	 * THEN 오류가 발생한다.
+	 */
+	@DisplayName("노선의 상행역을 구간의 상행역으로 등록하려면 오류가 발생한다.")
+	@Test
+	void registerFailure() {
+		//given
+		long otherStationId = StationUtils.지하철역을_등록한다("상현역").jsonPath().getLong("id");
+
+		//when
+		ExtractableResponse<Response> registerWithUpStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, upStationId, otherStationId, 10);
+
+		//then
+		assertThat(registerWithUpStation.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+	}
+
 	/**
 	 * WHEN 하행역이 아닌 역을 제거하려면
 	 * THEN 오류가 발생한다.
@@ -59,11 +77,11 @@ public class SectionFailureTest {
 	@DisplayName("하행역이 아닌 역을 제거하려면 오류가 발생한다")
 	@Test
 	void deleteFailureOnUpStation() {
-	    //given
+		//given
 
-	    //when
+		//when
 
-	    //then
+		//then
 	}
 
 	/**
@@ -73,10 +91,10 @@ public class SectionFailureTest {
 	@DisplayName("구간이 1개인 경우에 역을 제거하려면 오류가 발생한다")
 	@Test
 	void deleteFailure() {
-	    //given
+		//given
 
-	    //when
+		//when
 
-	    //then
+		//then
 	}
 }
