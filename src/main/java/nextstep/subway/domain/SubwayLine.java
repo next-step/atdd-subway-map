@@ -52,7 +52,6 @@ public class SubwayLine {
     }
 
     public void removeStation(Long stationId) {
-        Section section = this.sections.remove(stationId);
-        section.clearSubwayLine();
+        this.sections.remove(stationId);
     }
 }

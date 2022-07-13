@@ -30,12 +30,13 @@ public class Sections {
         this.sections.add(newSection);
     }
 
-    public Section remove(Long downStationId) {
+    public void remove(Long downStationId) {
         validNonMatchLastStation(downStationId, DOWN_STATION_ID);
         validRemoveSection();
+
         Section section = getSectionById(downStationId);
         this.sections.remove(section);
-        return section;
+        section.clearSubwayLine();
     }
 
     public Set<Long> getStationIds() {
