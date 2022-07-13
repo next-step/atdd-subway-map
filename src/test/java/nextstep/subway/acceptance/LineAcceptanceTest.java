@@ -259,4 +259,29 @@ class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(response.jsonPath().getString("errorMessage")).contains("1개뿐인 구간은 삭제할 수 없습니다.");
 	}
 
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역 - 양재시민의 숲역 - 양재역)
+	 * when 양재역을 제거한다.
+	 * then 노선의 구간이 2개이상이고 양재역이 하행 종점이므로 삭제가 가능하다.
+	 */
+	@DisplayName("노선의 구간 삭제 테스트")
+	@Test
+	void deleteSectionTest() throws Exception {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의 숲역"));
+		Long 양재역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재역"));
+
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+		구간_등록_요청(신분당선_노선_번호, Map.of("upStationId", 판교역_번호, "downStationId", 양재시민의_숲역_번호, "distance", 10));
+		구간_등록_요청(신분당선_노선_번호, Map.of("upStationId", 양재시민의_숲역_번호, "downStationId", 양재역_번호, "distance", 10));
+
+		//when
+		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 양재역_번호);
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
 }
