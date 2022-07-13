@@ -22,19 +22,26 @@ public class Section {
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @Embedded
-    private Stations stations;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station upStation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station downStation;
 
     @Embedded
     private Distance distance;
 
-    private Section(Stations stations, Distance distance) {
-        this.stations = stations;
+    private Section(Station upStation, Station downStation, Distance distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
     public static Section create(Station upStation, Station downStation, int distance) {
-        return new Section(Stations.create(upStation, downStation), new Distance(distance));
+        if (upStation.equals(downStation)) {
+            throw new InvalidUpDownStationException();
+        }
+        return new Section(upStation, downStation, new Distance(distance));
     }
 
     public void setLine(Line line) {
@@ -42,6 +49,6 @@ public class Section {
     }
 
     public List<Station> stations() {
-        return stations.toList();
+        return List.of(upStation, downStation);
     }
 }
