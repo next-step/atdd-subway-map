@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -17,8 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 @Sql(scripts = {
         "classpath:sql/truncate.sql",
-        "classpath:sql/createStations.sql",
-        "classpath:sql/createLine.sql"})
+        "classpath:sql/createStations.sql"})
 class SectionAcceptanceTest extends BaseAcceptanceTest{
 
     /**
