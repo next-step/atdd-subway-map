@@ -1,14 +1,27 @@
 package nextstep.subway.acceptance;
 
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
-public class SectionAcceptanceTest extends BaseAcceptanceTest{
+@Sql(scripts = {
+        "classpath:sql/truncate.sql",
+        "classpath:sql/createStations.sql",
+        "classpath:sql/createLine.sql"})
+class SectionAcceptanceTest extends BaseAcceptanceTest{
 
     /**
-     * Given    하행 종점역에 등록할 새로운 구간을 생성하고
      * When     새로운 구간을 지하철 노선의 하행 종점역에 등록하면
      * Then     지하철 노선의 구간 목록에서 생성된 구간을 찾을 수 있다.
      * Then     지하철 노선의 하행 종점역이 변경된다.
@@ -16,7 +29,30 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest{
     @Test
     @DisplayName("지하철 노선의 하행 종점역에 구간을 등록한다.")
     void registerSectionTest() {
+        //given
+        Map<String,Object> requestBody = new HashMap<>();
+        requestBody.put("downStationId","3");
+        requestBody.put("upStationId","2");
+        requestBody.put("distance",10);
+        ExtractableResponse<Response> createdSection = RestAssured
+                .given().log().all()
+                .body(requestBody)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
 
+        //when
+        ExtractableResponse<Response> sections = RestAssured
+                .given().log().all()
+                .when().get("/sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        int sectionId = createdSection.jsonPath().getInt("id");
+        assertThat(sections.jsonPath().getList("id",Integer.class)).contains(sectionId);
+        assertThat(createdSection.jsonPath().getInt("downStationId")).isEqualTo(3);
     }
 
     /**
