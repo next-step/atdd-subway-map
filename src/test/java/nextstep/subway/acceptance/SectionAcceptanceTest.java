@@ -90,6 +90,35 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 하행역이 노선 내 포함된 구간을 노선에 등록하면
      * Then 에러가 발생한다
      */
+    @DisplayName("하행역이 노선에 포함된 구간 등록 불가")
+    @Test
+    void canNotCreateSectionWithDownStationAlreadyInLineSections() {
+        // given
+        var lineCreationRequest = new LineCreationRequest(
+                "신분당선",
+                "bg-red-600",
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                10L);
+        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
+
+        // when
+        var sectionCreationRequest = new SectionCreationRequest(
+                stationIds.get(STATIONS.광교역),
+                stationIds.get(STATIONS.광교중앙역),
+                3L);
+        var sectionCreationResponse = RestAssured
+                .given()
+                    .pathParam("lineId", lineId)
+                    .body(sectionCreationRequest, ObjectMapperType.JACKSON_2)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                    .post("/lines/{lineId}/sections")
+                .then()
+                    .extract();
+
+        assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Given 지하철 노선을 등록하고
