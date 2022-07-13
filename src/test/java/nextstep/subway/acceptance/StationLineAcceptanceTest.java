@@ -220,25 +220,6 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
         assertThat(newDownStationId).isEqualTo(newStationId);
     }
 
-    private ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return RestAssured.given()
-                .log()
-                .all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{lineId}/sections", lineId)
-                .then()
-                .log()
-                .all()
-                .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고
      * When 새로운 구간의 상행역이 해당 노선에 등록된 하행 종점역이 아닌 상태로 구간을 등록하면
@@ -335,14 +316,6 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
-        return RestAssured.given().log().all()
-                .param("stationId", stationId)
-                .when().delete("/lines/{lineId}/sections",lineId)
-                .then().log().all()
-                .extract();
-    }
-
     /**
      * Given 지하철 노선을 생성하고, 생성한 지하철 노선에 올바른 조건의 구간을 등록하고
      * When 해당 지하철 노선에 등록되었으나 하행종점역이 아닌 역을 삭제하면
@@ -401,6 +374,33 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 
         // Then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{lineId}/sections", lineId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .param("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections",lineId)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> createStationLine(String stationLineName, String stationLineColor, Long upStationId, Long downStationId

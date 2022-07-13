@@ -89,18 +89,36 @@ public class StationLineService {
 
     @Transactional
     public StationLineResponse registerSection(Long id, SectionRequest sectionRequest) {
+        Station Upstation = getStationOrThrow(sectionRequest.getUpStationId());
+        Station downStation = getStationOrThrow(sectionRequest.getDownStationId());
+
         StationLine stationLine = getStationLineOrThrow(id);
         Station lineUpstation = getStationOrThrow(stationLine.getUpStationId());
         Station lineDownStation = getStationOrThrow(stationLine.getDownStationId());
-        List<Long> stationIdsIncludedInLine = stationLine.stationIdsIncludedInLine();
 
+        List<Long> stationIdsIncludedInLine = stationLine.stationIdsIncludedInLine();
         List<Station> stationsIncludedInLine = stationIdsIncludedInLine.stream()
                 .map(stationId -> getStationOrThrow(stationId))
                 .collect(Collectors.toList());
 
-        Station Upstation = getStationOrThrow(sectionRequest.getUpStationId());
-        Station downStation = getStationOrThrow(sectionRequest.getDownStationId());
+        validateRegisterSectionCondition(lineUpstation, lineDownStation, stationsIncludedInLine, Upstation, downStation);
 
+        stationLine.setDownStationId(downStation.getId());
+
+        stationsIncludedInLine.add(Upstation);
+        String newstationsIncludedInLine = stationListToIdStringSeperatedComma(stationsIncludedInLine);
+        stationLine.setStationsIncluded(newstationsIncludedInLine);
+
+        return createStationLineResponse(stationLine);
+    }
+
+    private String stationListToIdStringSeperatedComma(List<Station> stationsIncludedInLine) {
+        return StringUtils.join(stationsIncludedInLine.stream()
+                .map(station -> String.valueOf(station.getId()))
+                .collect(Collectors.toList()), ",");
+    }
+
+    private void validateRegisterSectionCondition(Station lineUpstation, Station lineDownStation, List<Station> stationsIncludedInLine, Station Upstation, Station downStation) {
         if (!lineDownStation.equals(Upstation)) {
             throw new BusinessException("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닙니다.", HttpStatus.BAD_REQUEST);
         }
@@ -108,25 +126,26 @@ public class StationLineService {
         if (stationsIncludedInLine.contains(downStation) || lineUpstation.equals(downStation) || lineDownStation.equals(downStation)) {
             throw new BusinessException("새로운 구간의 하행역이 해당 노선에 이미 등록되어있습니다.", HttpStatus.BAD_REQUEST);
         }
-
-        // 통과
-        stationsIncludedInLine.add(Upstation);
-        stationLine.setDownStationId(downStation.getId());
-        String newstationsIncludedInLine = StringUtils.join(stationsIncludedInLine.stream()
-                .map(station -> String.valueOf(station.getId()))
-                .collect(Collectors.toList()), ",");
-        stationLine.setStationsIncluded(newstationsIncludedInLine);
-
-        return createStationLineResponse(stationLine);
     }
 
     @Transactional
     public void deleteSection(Long id, Long stationId) {
-        StationLine stationLine = getStationLineOrThrow(id);
-        Station downStation = getStationOrThrow(stationLine.getDownStationId());
         Station deleteStation = getStationOrThrow(stationId);
+
+        StationLine stationLine = getStationLineOrThrow(id);
+        Station lineDownStation = getStationOrThrow(stationLine.getDownStationId());
         List<Long> stationIdsIncludedInLine = stationLine.stationIdsIncludedInLine();
 
+        validateDeleteSectionCondition(lineDownStation, deleteStation, stationIdsIncludedInLine);
+
+        Long newDownStationId = stationIdsIncludedInLine.get(stationIdsIncludedInLine.size() - 1);
+        stationLine.setDownStationId(newDownStationId);
+
+        String newstationsIncludedInLine = StringUtils.join(stationIdsIncludedInLine.remove(newDownStationId), ",");
+        stationLine.setStationsIncluded(newstationsIncludedInLine);
+    }
+
+    private void validateDeleteSectionCondition(Station downStation, Station deleteStation, List<Long> stationIdsIncludedInLine) {
         if (!downStation.equals(deleteStation)) {
             throw new BusinessException("삭제하려는 역이 하행 종점역이 아닙니다.", HttpStatus.BAD_REQUEST);
         }
@@ -134,11 +153,6 @@ public class StationLineService {
         if (stationIdsIncludedInLine.isEmpty()) {
             throw new BusinessException("지하철 노선에 상행 종점역과 하행 종점역만 존재합니다.", HttpStatus.BAD_REQUEST);
         }
-
-        // 통과
-        Long newDownStationId = stationIdsIncludedInLine.get(stationIdsIncludedInLine.size() - 1);
-        stationLine.setDownStationId(newDownStationId);
-        String newstationsIncludedInLine = StringUtils.join(stationIdsIncludedInLine.remove(newDownStationId), ",");
-        stationLine.setStationsIncluded(newstationsIncludedInLine);
+        return;
     }
 }
