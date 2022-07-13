@@ -290,6 +290,45 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteSubwayLine() {
-        
+        Map<String, String> upSinlimParam = new HashMap<>();
+        upSinlimParam.put("name", "신림역");
+
+        String upSinlimStationId = RestAssured.given().log().all()
+                .body(upSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> downSinlimParam = new HashMap<>();
+        downSinlimParam.put("name", "당곡역");
+
+        String downSinlimStationId = RestAssured.given().log().all()
+                .body(downSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> sinlimLine = new HashMap<>();
+        sinlimLine.put("name", "신림선");
+        sinlimLine.put("color", "bg-red-600");
+        sinlimLine.put("upStationId", upSinlimStationId);
+        sinlimLine.put("downStationId", downSinlimStationId);
+        sinlimLine.put("distance", "10");
+
+        //저장
+        RestAssured
+                .given().log().all()
+                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all();
+
+        ExtractableResponse<Response> extract = RestAssured
+                .given().log().all()
+                .when().delete("/lines/1")
+                .then().log().all().extract();
+
+        assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

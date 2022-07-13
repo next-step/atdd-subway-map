@@ -63,5 +63,7 @@ public class LineService {
     }
 
     public void deleteStationLine(Long id) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 호선은 없습니다."));
+        lineRepository.deleteById(line.getId());
     }
 }
