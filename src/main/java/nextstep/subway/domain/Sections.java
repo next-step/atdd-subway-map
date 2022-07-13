@@ -24,15 +24,15 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {
-        validNonMatchLastStation(newSection.getUpStationId(), UP_STATION_ID);
+        validateNonMatchLastStation(newSection.getUpStationId(), UP_STATION_ID);
         validDuplicatedDownStation(newSection.getDownStationId());
 
         this.sections.add(newSection);
     }
 
     public void remove(Long downStationId) {
-        validNonMatchLastStation(downStationId, DOWN_STATION_ID);
-        validRemoveSection();
+        validateNonMatchLastStation(downStationId, DOWN_STATION_ID);
+        validateRemoveSection();
 
         Section section = getSectionById(downStationId);
         this.sections.remove(section);
@@ -56,21 +56,21 @@ public class Sections {
                 .orElseThrow(() -> new SectionNotFoundException(stationId));
     }
 
-    private void validRemoveSection() {
+    private void validateRemoveSection() {
         if (this.sections.size() <= 1) {
             throw new UnableRemoveSectionException();
         }
     }
 
-    private void validNonMatchLastStation(Long downStationId, String message) {
-        if (isNonMatchLastStation(downStationId)) {
+    private void validateNonMatchLastStation(Long stationId, String message) {
+        if (!isLastStation(stationId)) {
             throw new NonMatchLastStationException(message);
         }
     }
 
-    private boolean isNonMatchLastStation(Long stationId) {
+    private boolean isLastStation(Long stationId) {
         return !sections.isEmpty()
-                && !stationId.equals(getLastDownStationId());
+                && stationId.equals(getLastDownStationId());
     }
 
     private Long getLastDownStationId() {
