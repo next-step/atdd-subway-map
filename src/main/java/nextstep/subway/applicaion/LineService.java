@@ -35,6 +35,7 @@ public class LineService {
     }
 
     private List<StationResponse> findStationsRelatedLine(Line savedLine) {
+
         return stationRepository.findAllById(List.of(savedLine.getUpStationId(), savedLine.getDownStationId()))
                                 .stream()
                                 .map(StationResponse::of)
@@ -42,7 +43,12 @@ public class LineService {
     }
 
     public List<LineResponse> findAllStationsLines() {
-        return null;
+
+        List<LineResponse> collect = lineRepository.findAll()
+                .stream()
+                .map(line -> new LineResponse(line.getId(), line.getName(), line.getColor(), findStationsRelatedLine(line)))
+                .collect(Collectors.toList());
+        return collect;
     }
 
     public LineResponse findStationLine(Long id) {

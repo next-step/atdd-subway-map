@@ -35,20 +35,21 @@ public class LineAcceptanceTest {
     @Test
     void createSubwayLine() {
         //given
-        Map<String, String> stationParams = new HashMap<>();
-        stationParams.put("name", "강남역");
+        Map<String, String> upStation = new HashMap<>();
+        upStation.put("name", "강남역");
 
         String upStationId = RestAssured.given().log().all()
-                .body(stationParams)
+                .body(upStation)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract().jsonPath().getString("id");
 
-        stationParams.put("name", "양재역");
+        Map<String, String> downStation = new HashMap<>();
+        downStation.put("name", "양재역");
 
         String downStationId = RestAssured.given().log().all()
-                .body(stationParams)
+                .body(downStation)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
@@ -85,11 +86,89 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 목록 조회")
     @Test
     void getSubwayLines() {
+        Map<String, String> upSinbundangParam = new HashMap<>();
+        upSinbundangParam.put("name", "강남역");
 
+        String upSinbundagStationId = RestAssured.given().log().all()
+                .body(upSinbundangParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> downSingbundangParam = new HashMap<>();
+        downSingbundangParam.put("name", "양재역");
+
+        String downSinbundangStationId = RestAssured.given().log().all()
+                .body(downSingbundangParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> sinbundangLine = new HashMap<>();
+        sinbundangLine.put("name", "신분당선");
+        sinbundangLine.put("color", "bg-red-600");
+        sinbundangLine.put("upStationId", upSinbundagStationId);
+        sinbundangLine.put("downStationId", downSinbundangStationId);
+        sinbundangLine.put("distance", "10");
+
+        RestAssured
+                .given().log().all()
+                .body(sinbundangLine).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all();
+
+
+
+
+        Map<String, String> upSinlimParam = new HashMap<>();
+        upSinlimParam.put("name", "신림역");
+
+        String upSinlimStationId = RestAssured.given().log().all()
+                .body(upSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> downSinlimParam = new HashMap<>();
+        downSinlimParam.put("name", "당곡역");
+
+        String downSinlimStationId = RestAssured.given().log().all()
+                .body(downSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> sinlimLine = new HashMap<>();
+        sinlimLine.put("name", "신림선");
+        sinlimLine.put("color", "bg-red-600");
+        sinlimLine.put("upStationId", upSinlimStationId);
+        sinlimLine.put("downStationId", downSinlimStationId);
+        sinlimLine.put("distance", "10");
+
+        RestAssured
+                .given().log().all()
+                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all();
+
+        ExtractableResponse<Response> extract = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all().extract();
+
+        Assertions.assertAll(
+                () -> assertThat(extract.jsonPath().getList("name")).contains("신분당선", "신림선"),
+                () -> assertThat(extract.jsonPath().getList("station").size()).isEqualTo(2),
+                () -> assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.OK.value())
+        );
     }
 
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
@@ -100,7 +179,7 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
@@ -111,7 +190,7 @@ public class LineAcceptanceTest {
     }
 
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */

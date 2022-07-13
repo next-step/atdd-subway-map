@@ -32,6 +32,9 @@ public class Line {
     @NotNull
     private Integer distance;
 
+    public Line() {
+    }
+
     public Line(LineRequest lineRequest) {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
