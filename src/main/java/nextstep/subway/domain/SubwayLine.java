@@ -44,8 +44,7 @@ public class SubwayLine {
         if (this.sections == null) {
             this.sections = new Sections();
         }
-        this.sections.add(section);
-        section.setSubwayLine(this);
+        this.sections.add(new Section(section, this));
     }
 
     public Set<Long> getStationIds() {

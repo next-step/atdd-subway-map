@@ -23,7 +23,10 @@ public class Section {
         this.distance = distance;
     }
 
-    public void setSubwayLine(SubwayLine subwayLine) {
+    public Section(Section section, SubwayLine subwayLine) {
+        this.upStationId = section.upStationId;
+        this.downStationId = section.downStationId;
+        this.distance = section.distance;
         this.subwayLine = subwayLine;
     }
 
