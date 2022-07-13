@@ -15,7 +15,7 @@ import nextstep.subway.exception.ErrorCode;
 public class Sections {
 	private final static int MINIMUM_SECTION_SIZE = 1;
 
-	@OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Section> sections = new ArrayList<>();
 
 	protected Sections() {
@@ -68,6 +68,11 @@ public class Sections {
 
 	public Section getLastSection() {
 		return sections.get(sections.size() - 1);
+	}
+
+	public void removeSection(Station station) {
+		validateDeleteSection(station);
+		sections.remove(getLastSection());
 	}
 
 	public void validateDeleteSection(Station station) {
