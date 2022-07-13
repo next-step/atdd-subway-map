@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선도 관련 기능")
@@ -175,7 +176,49 @@ public class LineAcceptanceTest {
     @DisplayName("지하철노선 조회")
     @Test
     void getSubwayLine() {
+        Map<String, String> upSinlimParam = new HashMap<>();
+        upSinlimParam.put("name", "신림역");
 
+        String upSinlimStationId = RestAssured.given().log().all()
+                .body(upSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> downSinlimParam = new HashMap<>();
+        downSinlimParam.put("name", "당곡역");
+
+        String downSinlimStationId = RestAssured.given().log().all()
+                .body(downSinlimParam)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getString("id");
+
+        Map<String, String> sinlimLine = new HashMap<>();
+        sinlimLine.put("name", "신림선");
+        sinlimLine.put("color", "bg-red-600");
+        sinlimLine.put("upStationId", upSinlimStationId);
+        sinlimLine.put("downStationId", downSinlimStationId);
+        sinlimLine.put("distance", "10");
+
+        RestAssured
+                .given().log().all()
+                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines")
+                .then().log().all();
+
+        ExtractableResponse<Response> extract = RestAssured
+                .given().log().all()
+                .when().get("/lines/1")
+                .then().log().all().extract();
+
+        Assertions.assertAll(
+                () -> assertThat(extract.jsonPath().getString("name")).isEqualTo("신림선"),
+                () -> assertThat(extract.jsonPath().getList("stations").size()).isEqualTo(2),
+                () -> assertThat(extract.jsonPath().getList("stations.name")).containsExactly("신림역","당곡역")
+        );
     }
 
     /**

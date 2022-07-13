@@ -35,7 +35,6 @@ public class LineService {
     }
 
     private List<StationResponse> findStationsRelatedLine(Line savedLine) {
-
         return stationRepository.findAllById(List.of(savedLine.getUpStationId(), savedLine.getDownStationId()))
                                 .stream()
                                 .map(StationResponse::of)
@@ -43,16 +42,15 @@ public class LineService {
     }
 
     public List<LineResponse> findAllStationsLines() {
-
-        List<LineResponse> collect = lineRepository.findAll()
-                .stream()
-                .map(line -> new LineResponse(line.getId(), line.getName(), line.getColor(), findStationsRelatedLine(line)))
-                .collect(Collectors.toList());
-        return collect;
+        return lineRepository.findAll()
+                            .stream()
+                            .map(line -> new LineResponse(line.getId(), line.getName(), line.getColor(), findStationsRelatedLine(line)))
+                            .collect(Collectors.toList());
     }
 
     public LineResponse findStationLine(Long id) {
-        return null;
+        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 호선은 없습니다."));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), findStationsRelatedLine(line));
     }
 
     @Transactional
