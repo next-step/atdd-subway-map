@@ -206,7 +206,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.jsonPath().getString("errorMessage")).contains("새로운 구간의 하행역은 해당 노선에 등록되어서는 안됩니다");
+		assertThat(response.jsonPath().getString("errorMessage")).contains("추가하려는 구간의 하행이 이미 노선에 추가되어 있습니다.");
 
 	}
 
