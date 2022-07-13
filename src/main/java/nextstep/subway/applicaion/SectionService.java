@@ -16,12 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SectionService {
+
     private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
 
     public SectionService(SectionRepository sectionRepository, LineRepository lineRepository,
-            StationRepository stationRepository) {
+        StationRepository stationRepository) {
 
         this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
@@ -35,18 +36,20 @@ public class SectionService {
 
     @Transactional
     public SectionResponse registerSection(long lineId, SectionRequest sectionRequest) {
-        Line line = lineRepository.findById(lineId).orElseThrow();
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(lineId)));
         Long upStationId = sectionRequest.getUpStationId();
         Long downEndpointStationId = line.getDownEndpoint().getId();
         checkRegisterEndpointId(upStationId, downEndpointStationId);
-        Section section = saveSection(line,sectionRequest);
+        Section section = saveSection(line, sectionRequest);
         registerDownEndpoint(sectionRequest, line);
         return SectionResponse.convertedByEntity(section);
     }
 
     @Transactional
     public void removeSection(long lineId, long stationId) {
-        Line line = lineRepository.findById(lineId).orElseThrow();
+        Line line = lineRepository.findById(lineId)
+            .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(lineId)));
         checkRemoveEndPointId(stationId, line.getDownEndpoint().getId());
         checkSectionCount();
         removeDownEndpoint(line);
@@ -54,7 +57,10 @@ public class SectionService {
     }
 
     private void registerDownEndpoint(SectionRequest sectionRequest, Line line) {
-        Station downEndpoint = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
+        Station downEndpoint = stationRepository.findById(sectionRequest.getDownStationId())
+            .orElseThrow(() -> new RuntimeException(
+                ExceptionMessages.getNoStationExceptionMessage(sectionRequest.getDownStationId())));
+
         line.modifyDownEndpoint(downEndpoint);
         lineRepository.save(line);
     }
@@ -93,8 +99,13 @@ public class SectionService {
     }
 
     private void removeDownEndpoint(Line line) {
-        Section section = sectionRepository.findSectionByDownStationIdAndLineId(line.getDownEndpoint().getId(), line.getId());
-        Station downStation = stationRepository.findById(section.getUpStation().getId()).orElseThrow();
+        Section section = sectionRepository.findSectionByDownStationIdAndLineId(line.getDownEndpoint().getId(),
+            line.getId());
+
+        Station downStation = stationRepository.findById(section.getUpStation().getId())
+            .orElseThrow(() -> new RuntimeException(
+                ExceptionMessages.getNoStationExceptionMessage(section.getUpStation().getId())));
+
         line.modifyDownEndpoint(downStation);
         lineRepository.save(line);
     }
