@@ -19,28 +19,18 @@ public class Sections {
     }
 
     public Sections(List<Section> sections) {
-        if (isValidSize(sections)) {
+        if (isInvalidSectionsSize(sections)) {
             throw new SectionException(ErrorCode.INVALID_SIZE_SECTIONS);
         }
         this.sections = sections;
     }
 
-    private boolean isValidSize(List<Section> sections) {
-        return sections.size() < 1;
+    private boolean isInvalidSectionsSize(List<Section> sections) {
+        return sections.isEmpty();
     }
 
     public void add(Section section) {
         this.sections.add(section);
-    }
-
-    public void changeUpStation(Station upStation) {
-        Section firstSection = getFirstSection();
-        firstSection.changeUpStation(upStation);
-    }
-
-    public void changeDownStation(Station downStation) {
-        Section lastSection = sections.get(getLastIndex());
-        lastSection.changeDownStation(downStation);
     }
 
     public List<Station> getStations() {

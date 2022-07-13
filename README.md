@@ -6,8 +6,8 @@
 
 - [x] Line 의 edit 메서드 안의 디버깅 코드 삭제
 - [x] Line 의 isOwnDownStation 메서드 이름에 대하여 다시한번 생각해보기, hasStation or contains 과 같은
-- [ ] Sections 의 size 검증 부분을 isEmpty()로 변경하기
-- [ ] Sections 의 사용하지 않는 메서드 제거
+- [x] Sections 의 size 검증 부분을 isEmpty()로 변경하기
+- [x] Sections 의 사용하지 않는 메서드 제거
 - [ ] Sections 에서 불변 리스트를 반환하기
 - [ ] 에러 메시지를 별도의 클래스로 모아서 사용하는 이유 고민해보기
 - [ ] SectionAcceptanceTest 에 stationList.get(2) 의 매직넘버의 의미가 불명확함, 구간이 추가 되었으니 노선 전체의 지하철역을 순서대로 존재하는지 검증
