@@ -53,7 +53,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
         String 보라선_종착ID = 지하철역_생성("오목교").jsonPath().getString("id");
 
         ExtractableResponse<Response> response =
-                지하철노선_생성("보라선", 보라선_시작ID, 보라선_종착ID, "purple", "31" );
+                지하철노선_생성("보라선", 보라선_시작ID, 보라선_종착ID, "purple", "29" );
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getLong("id")).isNotNull(),
