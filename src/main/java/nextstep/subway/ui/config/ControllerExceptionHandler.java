@@ -22,4 +22,11 @@ public class ControllerExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ExceptionResponse(exception.getMessage()));
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ExceptionResponse> illegalStateExceptionHandler(IllegalStateException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ExceptionResponse(exception.getMessage()));
+    }
 }

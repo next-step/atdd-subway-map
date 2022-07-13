@@ -28,9 +28,14 @@ public class SectionService {
 
     public void addSection(Long lineId, SectionCreationRequest request) {
         var upStation = getStation(request.getUpStationId());
+        var downStation = getStation(request.getDownStationId());
         var section = sectionRepository.findByLineIdAndStation(lineId, upStation)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선이거나 노선에 상행역이 없습니다."));
-        var downStation = getStation(request.getDownStationId());
+
+        if (isExistSection(lineId, downStation)) {
+            throw new IllegalStateException("이미 노선에 존재하는 역입니다.");
+        }
+
         var nextSection = sectionRepository.save(new Section(lineId, downStation));
         section.setNextSection(nextSection, request.getDistance());
     }
@@ -42,5 +47,9 @@ public class SectionService {
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 역 ID 입니다."));
+    }
+
+    private boolean isExistSection(Long lineId, Station station) {
+        return sectionRepository.findByLineIdAndStation(lineId, station).isPresent();
     }
 }
