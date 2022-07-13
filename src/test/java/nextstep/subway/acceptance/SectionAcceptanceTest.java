@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.exception.ExceptionMessages;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -12,11 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철 구간 관련 기능")
 @Sql(scripts = {
         "classpath:sql/truncate.sql",
-        "classpath:sql/createStations.sql"})
+        "classpath:sql/createStations.sql",
+        "classpath:sql/createLine.sql"})
 class SectionAcceptanceTest extends BaseAcceptanceTest{
 
     /**
@@ -27,52 +30,42 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
     @Test
     @DisplayName("지하철 노선의 하행 종점역에 구간을 등록한다.")
     void registerSectionTest() {
-        //given
-        Map<String,Object> requestBody = new HashMap<>();
-        requestBody.put("downStationId","3");
-        requestBody.put("upStationId","2");
-        requestBody.put("distance",10);
-        ExtractableResponse<Response> createdSection = RestAssured
-                .given().log().all()
-                .body(requestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
-
         //when
-        ExtractableResponse<Response> sections = RestAssured
-                .given().log().all()
-                .when().get("/sections")
-                .then().log().all()
-                .extract();
+        Map<String, Object> requestBody = getRequestBody("2","3");
+        ExtractableResponse<Response> createdSection = createSection(requestBody);
 
         //then
+        ExtractableResponse<Response> sections = RestAssured
+                .given().log().all()
+                .when().get("/lines/{id}/sections",1)
+                .then().log().all()
+                .extract();
         int sectionId = createdSection.jsonPath().getInt("id");
         assertThat(sections.jsonPath().getList("id",Integer.class)).contains(sectionId);
-        assertThat(createdSection.jsonPath().getInt("downStationId")).isEqualTo(3);
+
+        //then
+        ExtractableResponse<Response> line = RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}",1)
+            .then().log().all()
+            .extract();
+        assertThat(line.jsonPath().getInt("stations[1].id")).isEqualTo(3);
     }
 
     /**
-     * Given    새로운 구간을 생성하고
      * When     새로운 구간의 상행역이 해당 노선에 등록된 하행 종점역이 아니면
      * Then     에러처리한다.
      */
     @Test
     @DisplayName("지하철 노선의 하행 종점역이 아닌 역에 구간을 등록한다.")
     void registerIllegalUpStationSectionTest() {
+        //when
+        Map<String, Object> requestBody = getRequestBody("1","3");
+        ExtractableResponse<Response> createdSection = createSection(requestBody);
 
-    }
-
-    /**
-     * Given    새로운 구간을 생성하고
-     * When     새로운 구간의 하행역이 해당 노선에 등록되어있는 역이면
-     * Then     에러처리한다.
-     */
-    @Test
-    @DisplayName("지하철 노선의 하행 종점역이 아닌 역에 구간을 등록한다.")
-    void registerIllegalDownStationSectionTest() {
-
+        //then
+        assertThat(createdSection.jsonPath().getString("message"))
+            .isEqualTo(ExceptionMessages.getNoEndpointInputExceptionMessage(1,2));
     }
 
     /**
@@ -84,6 +77,8 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
     @Test
     @DisplayName("지하철 노선의 하행 종점역의 구간을 제거한다.")
     void removeSectionTest() {
+        //given
+
 
     }
 
@@ -106,6 +101,24 @@ class SectionAcceptanceTest extends BaseAcceptanceTest{
     @DisplayName("지하철 노선의 구간이 1개일 때 구간을 제거한다.")
     void remainAtLeastOneSectionTest() {
 
+    }
+
+    private ExtractableResponse<Response> createSection(Map<String, Object> requestBody) {
+        return RestAssured
+            .given().log().all()
+            .body(requestBody)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/lines/{id}/sections",1)
+            .then().log().all()
+            .extract();
+    }
+
+    private Map<String, Object> getRequestBody(String upStationId, String downStationId) {
+        Map<String,Object> requestBody = new HashMap<>();
+        requestBody.put("upStationId", upStationId);
+        requestBody.put("downStationId",downStationId);
+        requestBody.put("distance", 10);
+        return requestBody;
     }
 
 }
