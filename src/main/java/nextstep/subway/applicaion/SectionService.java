@@ -12,6 +12,7 @@ import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SectionService {
@@ -32,27 +33,30 @@ public class SectionService {
         return sections.stream().map(SectionResponse::convertedByEntity).collect(Collectors.toList());
     }
 
+    @Transactional
     public SectionResponse registerSection(long lineId, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(lineId).orElseThrow();
         Long upStationId = sectionRequest.getUpStationId();
         Long downEndpointStationId = line.getDownEndpoint().getId();
-        if (!canRegisterSection(upStationId, downEndpointStationId)) {
-            throw new IllegalArgumentException(
-                ExceptionMessages.getNoEndpointInputExceptionMessage(upStationId, downEndpointStationId));
-        }
-        Section section = saveSection(line, sectionRequest.getDistance());
-        changeDownEndpoint(sectionRequest, line);
+        checkRegisterEndpointId(upStationId, downEndpointStationId);
+        Section section = saveSection(line,sectionRequest);
+        registerDownEndpoint(sectionRequest, line);
         return SectionResponse.convertedByEntity(section);
     }
 
-    private void changeDownEndpoint(SectionRequest sectionRequest, Line line) {
+    @Transactional
+    public void removeSection(long lineId, long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow();
+        checkRemoveEndPointId(stationId, line.getDownEndpoint().getId());
+        checkSectionCount();
+        removeDownEndpoint(line);
+        sectionRepository.deleteSectionByDownStationIdAndLineId(stationId, lineId);
+    }
+
+    private void registerDownEndpoint(SectionRequest sectionRequest, Line line) {
         Station downEndpoint = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow();
         line.modifyDownEndpoint(downEndpoint);
         lineRepository.save(line);
-    }
-
-    private boolean canRegisterSection(long upStationId, long downEndpoint) {
-        return downEndpoint == upStationId;
     }
 
     private Station getStation(long stationId) {
@@ -60,10 +64,38 @@ public class SectionService {
             .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoStationExceptionMessage(stationId)));
     }
 
-    private Section saveSection(Line line, long distance) {
-        Station upStation = getStation(line.getUpEndpoint().getId());
-        Station downStation = getStation(line.getDownEndpoint().getId());
-        Section section = new Section(line, upStation, downStation, distance);
+    private Section saveSection(Line line, SectionRequest sectionRequest) {
+        Station upStation = getStation(sectionRequest.getUpStationId());
+        Station downStation = getStation(sectionRequest.getDownStationId());
+        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
         return sectionRepository.save(section);
+    }
+
+    private void checkRegisterEndpointId(long upStationId, long downEndpointStationId) {
+        if (upStationId != downEndpointStationId) {
+            throw new IllegalArgumentException(
+                ExceptionMessages.getNotEndpointInputExceptionMessage(upStationId, downEndpointStationId));
+        }
+    }
+
+    private void checkRemoveEndPointId(long stationId, long downEndpointStationId) {
+        if (downEndpointStationId != stationId) {
+            throw new IllegalArgumentException(
+                ExceptionMessages.getNotEndpointInputExceptionMessage(stationId, downEndpointStationId));
+        }
+    }
+
+    private void checkSectionCount() {
+        long sectionCount = sectionRepository.count();
+        if (sectionCount == 1) {
+            throw new RuntimeException(ExceptionMessages.getNeedAtLeastOneSectionExceptionMessage());
+        }
+    }
+
+    private void removeDownEndpoint(Line line) {
+        Section section = sectionRepository.findSectionByDownStationIdAndLineId(line.getDownEndpoint().getId(), line.getId());
+        Station downStation = stationRepository.findById(section.getUpStation().getId()).orElseThrow();
+        line.modifyDownEndpoint(downStation);
+        lineRepository.save(line);
     }
 }
