@@ -10,7 +10,9 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.acceptance_infra.AcceptanceTest;
@@ -135,6 +137,36 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 		//then
 		assertThat(updateLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+	}
+
+	/**
+	 * given 지하철 역, 노선을 생성하고
+	 * when 노선에 새로운 구간을 등록하면
+	 * then 노선 조회시 구간이 조회된다.
+	 */
+	@DisplayName("구간 등록 기능 테스트")
+	@Test
+	void addSectionTest() {
+
+		//given
+		Long 신분당선_상행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 신분당선_하행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 신분당선_상행종점역_번호, 신분당선_하행종점역_번호, 10);
+
+		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의숲역"));
+		Long 양재역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재역"));
+		Map<String, Object> param = Map.of("downStationId", 양재시민의_숲역_번호, "upStationId", 양재역_번호);
+
+		//when
+		ExtractableResponse<Response> response = RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.body(param)
+			.when()
+			.post("/lines/{lineId}/sections", 신분당선_노선_번호)
+			.then().log().all().extract();
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 	}
 
 }
