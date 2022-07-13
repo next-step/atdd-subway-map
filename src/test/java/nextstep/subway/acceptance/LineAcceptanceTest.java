@@ -3,19 +3,16 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.domain.line.LineRepository;
-import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.applicaion.dto.line.LineRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -31,13 +28,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void createLine() {
         // when
         createStations();
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
-        ExtractableResponse<Response> response = createLines(params);
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 3L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -58,8 +50,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         create(params, "/stations");
     }
 
-    private ExtractableResponse<Response> createLines(Map params) {
-        ExtractableResponse<Response> response = create(params, "/lines");
+    private ExtractableResponse<Response> createLines(LineRequest dto) {
+        ExtractableResponse<Response> response = create(dto, "/lines");
         return response;
     }
 
@@ -74,19 +66,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLines() {
         // given
         createStations();
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
-        createLines(params);
-        params.put("name", "신분당선");
-        params.put("color", "bg-green-300");
-        params.put("upStationId", "1");
-        params.put("downStationId", "4");
-        params.put("distance", "3");
-        createLines(params);
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 3L, 10L);
+        createLines(dto);
+        dto = new LineRequest("신분당선", "bg-green-300", 1L, 4L, 3L);
+        createLines(dto);
 
         // then
         assertThat(getList("name", "/lines")).containsExactly("2호선", "신분당선");
@@ -103,25 +86,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void getLine() {
         // given
         createStations();
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
-        createLines(params);
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 3L, 10L);
+        createLines(dto);
 
         // then
         assertThat(getLine("name", "1")).isEqualTo("2호선");
 
         // given
-        params = new HashMap<>();
-        params.put("name", "신분당선");
-        params.put("color", "bg-green-300");
-        params.put("upStationId", "1");
-        params.put("downStationId", "4");
-        params.put("distance", "3");
-        createLines(params);
+        dto = new LineRequest("신분당선", "bg-green-300", 1L, 4L, 3L);
+        createLines(dto);
 
         // then
         assertAll(() -> {
@@ -148,15 +121,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void updateLine() {
         // given
         createStations();
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
-        createLines(params);
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 3L, 10L);
+        createLines(dto);
 
         // when
+        Map<String, String> params = new HashMap<>();
         params.put("name", "2호선-임시");
         params.put("color", "bg-blue-600");
         updateLine(params, "1");
@@ -180,13 +149,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     void deleteLine() {
         // given
         createStations();
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "2호선");
-        params.put("color", "bg-red-600");
-        params.put("upStationId", "1");
-        params.put("downStationId", "3");
-        params.put("distance", "10");
-        ExtractableResponse<Response> response = createLines(params);
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 3L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
         String createdId = response.jsonPath().getString("id");
         assertThat(getLine("name", createdId)).isEqualTo("2호선");
 

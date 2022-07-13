@@ -30,6 +30,15 @@ public abstract class AcceptanceTest {
                 .extract();
     }
 
+    protected <T> ExtractableResponse<Response> create(T dto, String path) {
+        return RestAssured.given().log().all()
+                .body(dto)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(path)
+                .then().log().all()
+                .extract();
+    }
+
     protected List<String> getList(String variable, String path) {
         return RestAssured.given().log().all()
                 .when().get(path)
