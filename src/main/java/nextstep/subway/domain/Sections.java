@@ -37,10 +37,19 @@ public class Sections {
 		if (!isSameLastDownStation(section.getUpStation())) {
 			throw new BusinessException(ErrorCode.LAST_STATION_NOT_MATCH_UP_STATION);
 		}
+
+		if (containsStation(section.getDownStation())) {
+			throw new BusinessException(ErrorCode.ALREADY_CONTAINS_STATION);
+		}
 	}
 
 	public boolean isSameLastDownStation(Station station) {
 		return getLastStation().equals(station);
+	}
+
+	public boolean containsStation(Station station) {
+		return sections.stream()
+			.anyMatch(section -> section.containsStation(station));
 	}
 
 	public List<Station> getStationList() {
