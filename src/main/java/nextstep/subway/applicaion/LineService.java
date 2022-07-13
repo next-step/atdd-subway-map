@@ -35,13 +35,15 @@ public class LineService {
         return createLineResponse(findLineOrElseThrow(id));
     }
 
+    @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findLineOrElseThrow(id);
         lineRepository.save(line.update(lineRequest));
     }
 
-    public void deleteLine(Long id) {
-        lineRepository.delete(findLineOrElseThrow(id));
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
     }
 
     private Line findLineOrElseThrow(Long id) {

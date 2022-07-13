@@ -4,7 +4,6 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.exceptions.NoSuchLineException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +49,7 @@ public class LineController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         try {
-            lineService.deleteLine(id);
+            lineService.deleteLineById(id);
         } catch (NoSuchLineException e) {
             return ResponseEntity.badRequest().build();
         }
