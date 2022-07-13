@@ -263,10 +263,11 @@ class LineAcceptanceTest extends AcceptanceTest {
 	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역 - 양재시민의 숲역 - 양재역)
 	 * when 양재역을 제거한다.
 	 * then 노선의 구간이 2개이상이고 양재역이 하행 종점이므로 삭제가 가능하다.
+	 * then 노선의 모든 구간 조회시 삭제된 역이 조회되지 않는다.
 	 */
 	@DisplayName("노선의 구간 삭제 테스트")
 	@Test
-	void deleteSectionTest() throws Exception {
+	void deleteSectionTest() {
 
 		//given
 		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
@@ -280,8 +281,10 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 		//when
 		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 양재역_번호);
+		ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(신분당선_노선_번호);
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		assertThat(getLineResponse.jsonPath().getList("stations.id", Long.class)).doesNotContain(양재역_번호);
 	}
 }
