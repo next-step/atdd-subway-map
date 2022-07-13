@@ -11,12 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_등록한다;
+import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_삭제한다;
 import static nextstep.subway.acceptance.utils.StationUtils.지하철역을_등록한다;
 import static nextstep.subway.acceptance.utils.SubwayLineUtils.지하철_노선_하나를_조회한다;
 import static nextstep.subway.acceptance.utils.SubwayLineUtils.지하철_노선을_등록한다;
@@ -70,24 +69,6 @@ public class SectionAcceptanceTest {
 		);
 	}
 
-	private ExtractableResponse<Response> 지하철_구간을_등록한다(Long subwayLineId, Long upStationId, Long downStationId, Integer distance) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("upStationId", upStationId);
-		params.put("downStationId", downStationId);
-		params.put("distance", distance);
-
-		return RestAssured
-				.given()
-					.log().all()
-					.body(params)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-					.post("/lines/{subwayLineId}/sections", subwayLineId)
-				.then()
-					.log().all()
-				.extract();
-	}
-
 	/**
 	 * GIVEN 지하철 노선을 등록한다
 	 * GIVEN 지하철 노선에 새로운 구간을 추가한다.
@@ -117,23 +98,5 @@ public class SectionAcceptanceTest {
 					assertThat(stationList).containsExactly("광교역", "광교중앙역");
 				}
 		);
-
-	}
-
-	private ExtractableResponse<Response> 지하철_구간을_삭제한다(long subwayLineId, long stationId) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("subwayLineId", subwayLineId);
-		params.put("sectionId", stationId);
-
-		return RestAssured
-				.given()
-					.log().all()
-					.body(params)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when()
-					.delete("/lines/{subwayLineId}/sections?stationId={sectionId}", subwayLineId, stationId)
-				.then()
-					.log().all()
-				.extract();
 	}
 }
