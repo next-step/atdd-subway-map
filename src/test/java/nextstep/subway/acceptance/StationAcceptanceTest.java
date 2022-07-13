@@ -6,30 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 
 @DisplayName("지하철역 관련 기능")
-@Sql("/truncate.sql")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-	protected static final String SIN_BOONDANG_LINE = "신분당선";
-	protected static final String SAMSUNG_STATION = "삼성역";
-	@LocalServerPort
-	int port;
-
-	@BeforeEach
-	public void setUp() {
-		RestAssured.port = port;
-	}
+public class StationAcceptanceTest extends AcceptanceTest {
 
 	/**
 	 * When 지하철역을 생성하면
@@ -84,10 +69,7 @@ public class StationAcceptanceTest {
 		long stationId = 지하철역_생성(SAMSUNG_STATION);
 
 		//when
-		RestAssured.given().log().all()
-			.when().delete("/stations/" + stationId)
-			.then().log().all()
-			.statusCode(HttpStatus.NO_CONTENT.value());
+		지하철역_삭제(stationId);
 
 		//then
 		List<String> stations = 지하철역_조회();
@@ -116,5 +98,12 @@ public class StationAcceptanceTest {
 			.then().log().all()
 			.statusCode(HttpStatus.OK.value())
 			.extract().jsonPath().getList("name", String.class);
+	}
+
+	private void 지하철역_삭제(long stationId) {
+		RestAssured.given().log().all()
+			.when().delete("/stations/" + stationId)
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
 	}
 }
