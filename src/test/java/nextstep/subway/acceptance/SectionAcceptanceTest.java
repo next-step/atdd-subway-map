@@ -73,6 +73,30 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         assertThat(구간_생성_요청_결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * `Given` 지하철 노선을 조회하고
+     * `When` 구간(`상행역` : 조회한 노선의 하행 종점역, `하행역` : 노선에 등록되어 있지 않은 역)을 등록하면
+     * `Then` 해당 지하철 노선을 조회 시 등록한 구간을 찾을 수 있다.
+     */
+    @Test
+    @DisplayName("구간 등록")
+    void createSection() {
+        // given
+        final long _2호선_노선_ID = 1L;
+        ExtractableResponse<Response> response = LineAcceptanceTest.노선_조회_요청(_2호선_노선_ID);
+        List<Long> _2호선_지하철역_ID_목록 = response.jsonPath().getList("stations.id", Long.class);
+        final int 하행역_INDEX = 1;
+        final long _2호선_하행종점역_ID = _2호선_지하철역_ID_목록.get(하행역_INDEX);
+
+        // when
+        구간_등록_요청(_2호선_노선_ID, _2호선_하행종점역_ID, 3L, 5, HttpStatus.CREATED);
+
+        // then
+        ExtractableResponse<Response> 노선_조회_응답 = LineAcceptanceTest.노선_조회_요청(_2호선_노선_ID);
+        List<String> _2호선_지하철역_이름_목록 = 노선_조회_응답.jsonPath().getList("stations.name", String.class);
+        assertThat(_2호선_지하철역_이름_목록).containsOnly("강남역", "역삼역", "판교역");
+    }
+
     private ExtractableResponse<Response> 구간_등록_요청(long id, long upStationId, long downStationId, int distance, HttpStatus httpStatus) {
         final Map<String, Object> params = new HashMap<>();
         params.put("downStationId", downStationId);
