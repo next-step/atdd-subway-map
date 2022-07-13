@@ -85,14 +85,14 @@ public class StationLineAcceptanceTest {
     void getLine() {
         // given
         Map<String, Object> 우이신설 = createLineRequestBody(
-                        new Line("우이신설", "gold", 10L, 20L));
+                        new Line("우이신설", "gold", 10L, 20L, 10));
         ExtractableResponse<Response> createResponse = 노선을_생성한다(우이신설);
 
         // when
-        String name = 노선_단일_조회(createResponse.jsonPath().getLong("id"), "name");
+        JsonPath 노선 = 노선_단일_조회(createResponse.jsonPath().getLong("id"));
 
         // then 생성한 지하철 노선 확인
-        assertThat(name).isEqualTo("우이신설");
+        assertThat(노선.getString("name")).isEqualTo("우이신설");
     }
 
     /**
@@ -105,7 +105,7 @@ public class StationLineAcceptanceTest {
     void updateLine() {
         //given
         Map<String, Object> 경춘선 = createLineRequestBody(
-                new Line("경춘선", "green", 20L, 21L));
+                new Line("경춘선", "green", 20L, 21L, 11));
         Long id = 노선을_생성한다(경춘선).jsonPath().getLong("id");
 
         //when
@@ -128,7 +128,7 @@ public class StationLineAcceptanceTest {
     void deleteLine() {
         //given
         Map<String, Object> 신림선 = createLineRequestBody(
-                        new Line("신림선", "blue", 80L, 90L));
+                        new Line("신림선", "blue", 80L, 90L, 12));
         Line line = 노선을_생성한다(신림선).as(Line.class);
 
         //when
@@ -153,6 +153,7 @@ public class StationLineAcceptanceTest {
         body.put("color", line.getColor());
         body.put("upStationId", line.getUpStationId());
         body.put("downStationId", line.getDownStationId());
+        body.put("distance", line.getDistance());
         return body;
     }
 
@@ -174,13 +175,13 @@ public class StationLineAcceptanceTest {
                           .extract().jsonPath();
     }
 
-    private String 노선_단일_조회(Long id, String fieldName) {
+    private JsonPath 노선_단일_조회(Long id) {
         return RestAssured.given().log().all()
                           .pathParam("id", id)
                           .when().log().all()
                           .get(STATION_LINE_REQUEST_PATH + "/{id}")
                           .then().log().all()
-                          .extract().jsonPath().get(fieldName);
+                          .extract().jsonPath();
     }
 
     private Line 노선_정보를_수정한다(Map<String, Object> body, Long id) {
