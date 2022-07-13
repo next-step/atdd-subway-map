@@ -80,10 +80,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역을_제거한다() {
         // given
-        var 잠실역 = 역을_만들다("잠실역").as(StationResponse.class);
+        var 잠실역 = 역을_만들다("잠실역").as(StationResponse.class).getId();
 
         // when
-        역을_삭제한다(잠실역.getId());
+        역을_삭제한다(잠실역);
 
         // then
         var 지하철역_목록 = 지하철역_목록을_조회한다();
