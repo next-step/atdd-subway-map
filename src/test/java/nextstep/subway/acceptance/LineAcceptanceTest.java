@@ -3,7 +3,11 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.api.LineApiCall;
+import nextstep.subway.api.StationApiCall;
+import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineUpdateDto;
+import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.domain.Line;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,38 +44,27 @@ public class LineAcceptanceTest {
     @Test
     void createSubwayLine() {
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        final String 강남역 = "강남역";
+        final String 광교역 = "광교역";
 
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        final String 신분당선 = "신분당선";
 
-        params.put("name", "광교역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest(강남역));
+        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest(광교역));
 
-        ExtractableResponse<Response> createResponse = createLine(new Line("신분당선", "bg-red-600", 1L, 2L, 10));
+        Long 강남역_아이디 = getId(stationCreationResponse1);
+        Long 광교역_아이디 = getId(stationCreationResponse2);
 
-        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 광교역_아이디, 10));
+        assertThat(lineCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> getResponse = LineApiCall.getLines();
 
         String lineName = getResponse.jsonPath().getString("[0].name");
         String lineColor = getResponse.jsonPath().getString("[0].color");
 
         assertThat(lineName).isEqualTo("신분당선");
         assertThat(lineColor).isEqualTo("bg-red-600");
-
-        List<String> stationNames = getStationNames();
-        System.out.println(stationNames);
-
     }
 
     /**
@@ -197,25 +190,15 @@ public class LineAcceptanceTest {
 
     }
 
-
-    // 지하철노선 생성
-    private ExtractableResponse<Response> createLine(Line line) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", line.getName());
-        params.put("color", line.getColor());
-        params.put("upStationId", line.getUpStationId());
-        params.put("downStationId", line.getDownStationId());
-        params.put("distance", line.getDistance());
-
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-
+    // 응답객체 id 데이터 조회
+    private Long getId(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
+
+    private ExtractableResponse<Response> createLine(Line line) {
+        return null;
+    }
+
 
     // 지하철역 이름 조회
     private List<String> getStationNames() {
