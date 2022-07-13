@@ -1,6 +1,5 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -9,19 +8,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
-
 @Entity
-public class Line {
+public class Section {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String name;
-	private String color;
-
-	@Embedded
-	private Sections sections;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "line_id")
+	private Line line;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "up_station_id")
@@ -33,12 +28,11 @@ public class Line {
 
 	private int distance;
 
-	public Line() {
+	protected Section() {
 	}
 
-	public Line(String name, String color, Station upStation, Station downStation, int distance) {
-		this.name = name;
-		this.color = color;
+	public Section(Line line, Station upStation, Station downStation, int distance) {
+		this.line = line;
 		this.upStation = upStation;
 		this.downStation = downStation;
 		this.distance = distance;
@@ -48,12 +42,8 @@ public class Line {
 		return id;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public String getColor() {
-		return color;
+	public Line getLine() {
+		return line;
 	}
 
 	public Station getUpStation() {
@@ -68,17 +58,7 @@ public class Line {
 		return distance;
 	}
 
-	public void update(LineUpdateRequest lineUpdateRequest) {
-		if (lineUpdateRequest.getName() != null) {
-			this.name = lineUpdateRequest.getName();
-		}
-		if (lineUpdateRequest.getColor() != null) {
-			this.color = lineUpdateRequest.getColor();
-		}
-	}
-
-	public void addSection(Section section) {
-		this.sections.addSection(section);
-		section.setLine(this);
+	public void setLine(Line line) {
+		this.line = line;
 	}
 }

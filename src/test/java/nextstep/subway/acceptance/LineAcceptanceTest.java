@@ -155,7 +155,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
 		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의숲역"));
 		Long 양재역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재역"));
-		Map<String, Object> param = Map.of("downStationId", 양재시민의_숲역_번호, "upStationId", 양재역_번호);
+		Map<String, Object> param = Map.of("downStationId", 양재시민의_숲역_번호, "upStationId", 양재역_번호, "distance", 10);
 
 		//when
 		ExtractableResponse<Response> response = RestAssured.given().log().all()
