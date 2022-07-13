@@ -56,11 +56,13 @@ public class LineService {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new NoSuchElementException("노선을 찾을 수 없습니다."));
 
-        line.modify(lineRequest.getName(), lineRequest.getColor());
+        line.modifyLine(lineRequest.getName(), lineRequest.getColor());
     }
 
 
     public void deleteLineById(Long lineId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new NoSuchElementException("삭제 대상을 찾을 수 없습니다."));
         lineRepository.deleteById(lineId);
     }
 

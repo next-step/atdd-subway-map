@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,8 +39,17 @@ public class Line {
 
     public Line() {}
 
-    public void modify(String name, String color){
+    public void modifyLine(String name, String color){
         this.name = name;
         this.color = color;
+    }
+
+    public void modifyLineValidation(String name, String color){
+        if(!StringUtils.hasText(name)){
+            throw new IllegalArgumentException("name을 입력하여 주십시오.");
+        }
+        if(!StringUtils.hasText(color)){
+            throw new IllegalArgumentException("color을 입력하여 주십시오.");
+        }
     }
 }
