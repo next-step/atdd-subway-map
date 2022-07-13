@@ -36,9 +36,10 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 		// when
 		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L);
 		// then
-		List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
+		List<String> lineNames =
+				지하철_노선_목록_조회().jsonPath().getList("name");
 
-		assertThat(lineNames.get(0)).isEqualTo("신분당선");
+		assertThat(lineNames).contains("신분당선");
 	}
 
 	/**
@@ -54,10 +55,10 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 		지하철_노선_생성("분당선", "bg-green-600", 1L, 3L);
 
 		// when
-		List<Long> lineId = 지하철_노선_목록_조회().jsonPath().getList("id");
+		List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
 
 		// then
-		assertThat(lineId).hasSize(2);
+		assertThat(lineNames).contains("신분당선", "분당선");
 	}
 
 	/**
@@ -69,11 +70,12 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void showLine() {
 		// given
-		Integer lineId = 지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L)
-				.jsonPath().get("id");
+		Integer lineId =
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().get("id");
 
 		// when
-		String lineName = 지하철_노선_조회(lineId).jsonPath().get("name");
+		String lineName =
+				지하철_노선_조회(lineId).jsonPath().get("name");
 
 		// then
 		assertThat(lineName).isEqualTo("신분당선");
@@ -88,14 +90,15 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void updateLine() {
 		// given
-		Integer LineId = 지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L)
-				.jsonPath().get("id");
+		Integer LineId =
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().get("id");
 
 		// when
 		지하철_노선_수정(LineId, "다른분당선", "bg-red-600");
 
 		// then
-		String lineName = 지하철_노선_조회(LineId).jsonPath().get("name");
+		String lineName =
+				지하철_노선_조회(LineId).jsonPath().get("name");
 		assertThat(lineName).isEqualTo("다른분당선");
 	}
 
@@ -108,14 +111,15 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void deleteLine() {
 		// given
-		Integer lineId = 지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L)
-				.jsonPath().get("id");
+		Integer lineId =
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().get("id");
 
 		// when
 		지하철_노선_삭제(lineId);
 
 		// then
-		List<Long> lineIds = 지하철_노선_목록_조회().jsonPath().getList("id");
+		List<Long> lineIds =
+				지하철_노선_목록_조회().jsonPath().getList("id");
 		assertThat(lineIds).isEmpty();
 	}
 
