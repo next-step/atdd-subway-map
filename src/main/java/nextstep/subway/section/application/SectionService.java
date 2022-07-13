@@ -47,7 +47,7 @@ public class SectionService {
                 .build();
     }
 
-    public void deleteSection(final long lineId, final String stationId) {
+    public void deleteSection(final Long lineId, final Long stationId) {
 
     }
 

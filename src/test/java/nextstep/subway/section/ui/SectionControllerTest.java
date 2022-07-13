@@ -61,7 +61,7 @@ class SectionControllerTest {
 
         doNothing()
                 .when(sectionService)
-                .deleteSection(lineId, stationId);
+                .deleteSection(lineId, Long.valueOf(stationId));
 
         // when
         final ResultActions result = target.perform(
