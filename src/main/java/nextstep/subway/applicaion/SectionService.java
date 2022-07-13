@@ -1,7 +1,7 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.section.SectionRequest;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.repository.SectionRepository;

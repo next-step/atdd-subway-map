@@ -2,7 +2,7 @@ package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.SectionService;
-import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.section.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
