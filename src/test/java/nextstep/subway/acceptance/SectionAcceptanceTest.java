@@ -13,6 +13,7 @@ import static nextstep.subway.acceptance.LineRequestCollection.지하철_노선_
 import static nextstep.subway.acceptance.LineRequestCollection.지하철_단일_노선_조회;
 import static nextstep.subway.acceptance.SectionRequestCollection.지하철_구간_등록;
 import static nextstep.subway.acceptance.SectionRequestCollection.지하철_구간_삭제;
+import static nextstep.subway.acceptance.StationRequestCollection.성수역_생성;
 import static nextstep.subway.acceptance.StationRequestCollection.지하철역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -42,7 +43,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void addSection() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
-        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        Long stationId = 성수역_생성();
 
         // when
         int statusCode = 지하철_구간_등록(lineId, downStationId, stationId, 1);
@@ -69,7 +70,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void addSectionWithInvalidUpStation() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
-        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        Long stationId = 성수역_생성();
 
         // when
         int statusCode = 지하철_구간_등록(lineId, upStationId, stationId, 3);
@@ -90,7 +91,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void addSectionWithInvalidDownStation() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
-        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        성수역_생성();
 
         // when
         int statusCode = 지하철_구간_등록(lineId, downStationId, upStationId, 3);
@@ -111,7 +112,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void deleteSection() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
-        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        Long stationId = 성수역_생성();
         지하철_구간_등록(lineId, downStationId, stationId, 1);
 
         // when
@@ -139,7 +140,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     public void deleteSectionUnsuitableStation() {
         // given
         Long lineId = 지하철_노선_생성("2호선", "bg-blue-600", upStationId, downStationId, 10).jsonPath().getLong("id");
-        Long stationId = 지하철역_생성("성수역").jsonPath().getLong("id");
+        Long stationId = 성수역_생성();
         지하철_구간_등록(lineId, downStationId, stationId, 1);
 
         // when

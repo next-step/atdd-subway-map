@@ -33,4 +33,8 @@ public class StationRequestCollection {
                 .then().log().all()
                 .extract();
     }
+
+    public static Long 성수역_생성() {
+        return 지하철역_생성("성수역").jsonPath().getLong("id");
+    }
 }
