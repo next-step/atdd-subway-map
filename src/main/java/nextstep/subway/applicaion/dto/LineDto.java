@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.domain.line.Line;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class LineDto {
                 .stations(
                         line.getStations().stream()
                                 .map(StationDto::of)
+                                .sorted(Comparator.comparing(StationDto::getId))
                                 .collect(Collectors.toUnmodifiableList()))
                 .build();
     }

@@ -4,7 +4,6 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
         //then
         ExtractableResponse<Response> lineResponse = getLine(lineId);
         assertThat(lineResponse.jsonPath().getList("stations")).hasSize(3);
-        assertThat(lineResponse.jsonPath().getList("stations")).containsAnyOf("총신대입구역");
+        assertThat(lineResponse.jsonPath().getList("stations.name")).containsAnyOf("총신대입구역");
 
     }
 

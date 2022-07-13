@@ -31,7 +31,7 @@ public class Line {
     @Column(nullable = false)
     private Integer distance;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "line")
     private List<Section> sections = new ArrayList<>();
 
 

@@ -43,6 +43,8 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
         checkResponseStatus(getResponse, HttpStatus.OK);
 
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo("4호선");
+        assertThat(getResponse.jsonPath().getList("stations")).hasSize(2);
+        assertThat(getResponse.jsonPath().getList("stations.name")).contains("남태령역", "사당역");
     }
 
     /**
