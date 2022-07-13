@@ -162,6 +162,41 @@ public class LineAcceptanceTest {
 
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLines() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "수원역");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        params.put("name", "정자역");
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations");
+
+        ExtractableResponse<Response> createResponse = createLine(new Line("분당선", "bg-yellow-600", 1L, 2L, 10));
+
+        Long lineId = createResponse.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+                .when().delete("/lines/{id}", lineId)
+                .then().log().all()
+                .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+    }
+
 
     // 지하철노선 생성
     private ExtractableResponse<Response> createLine(Line line) {
