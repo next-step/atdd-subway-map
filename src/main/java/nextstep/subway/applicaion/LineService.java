@@ -15,8 +15,8 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-	private StationRepository stationRepository;
-	private LineRepository lineRepository;
+	private final StationRepository stationRepository;
+	private final LineRepository lineRepository;
 
 	public LineService(StationRepository stationRepository, LineRepository lineRepository) {
 		this.stationRepository = stationRepository;
