@@ -52,10 +52,10 @@ public class LineController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id, @RequestBody @Validated SectionRequest sectionRequest) {
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody @Validated SectionRequest sectionRequest) {
         try {
-            SectionResponse section = lineService.addSection(id, sectionRequest);
-            return ResponseEntity.created(URI.create("/lines/" + id)).body(section);
+            LineResponse line = lineService.addSection(id, sectionRequest);
+            return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
         } catch (InvalidMatchEndStationException | StationAlreadyExistsException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

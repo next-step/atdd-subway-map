@@ -59,13 +59,13 @@ public class LineService {
     }
 
     @Transactional
-    public SectionResponse addSection(Long lineId, SectionRequest sectionRequest) {
+    public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
         Line line = findLine(lineId);
 
         Station upStation = stationService.findStation(sectionRequest.getUpStationId());
         Station downStation = stationService.findStation(sectionRequest.getDownStationId());
         Section section = Section.create(upStation, downStation, sectionRequest.getDistance());
         line.addSection(section);
-        return SectionResponse.from(section);
+        return LineResponse.from(line);
     }
 }
