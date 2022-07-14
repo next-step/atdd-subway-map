@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.utils.DataUtils.*;
 import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_등록한다;
+import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_삭제한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -78,9 +79,10 @@ public class SectionFailureTest {
 	@Test
 	void deleteFailureOnUpStation() {
 		//when
-
+		ExtractableResponse<Response> deleteUpStation = 지하철_구간을_삭제한다(subwayLineId, upStationId);
 
 		//then
+		assertThat(deleteUpStation.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
 	/**

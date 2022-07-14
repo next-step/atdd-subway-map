@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.section.SectionRequest;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.exception.AlreadyRegisterException;
+import nextstep.subway.exception.CannotDeleteException;
 import nextstep.subway.exception.ErrorCode;
 import nextstep.subway.exception.SameUpStationException;
 import nextstep.subway.repository.SectionRepository;
@@ -40,8 +41,17 @@ public class SectionService {
 
 	public void delete(Long subwayLineId, Long stationId) {
 		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
+
+		if (isNotSameDownStationId(stationId, subwayLine)) {
+			throw new CannotDeleteException(ErrorCode.CANNOT_DELETE_WITH_NOT_SAME_DOWN_STATION.getMessage());
+		}
+
 		Section deleteSection = subwayLine.deleteSection(stationId);
 		sectionRepository.delete(deleteSection);
+	}
+
+	private boolean isNotSameDownStationId(Long stationId, SubwayLine subwayLine) {
+		return !subwayLine.getDownStationId().equals(stationId);
 	}
 
 	private boolean hasSameStation(SubwayLine subwayLine, Section section) {
