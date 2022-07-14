@@ -105,14 +105,14 @@ public class LineAcceptanceTest {
         long lineId = 신분당선_노선을_생성한다().jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> lineUpdatedResponse = 지하철노선을_수정을_요청한다(lineId, "신도림역", "bg-green-600");
+        ExtractableResponse<Response> lineUpdatedResponse = 지하철노선을_수정을_요청한다(lineId, "2호선", "bg-green-600");
 
         // then
         assertThat(lineUpdatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(lineId);
         String lineName = lineResponse.jsonPath().getObject("name", String.class);
-        assertThat(lineName).containsAnyOf("신도림역");
+        assertThat(lineName).containsAnyOf("2호선");
 
         String lineColor = lineResponse.jsonPath().getObject("color", String.class);
         assertThat(lineColor).containsAnyOf("bg-green-600");
