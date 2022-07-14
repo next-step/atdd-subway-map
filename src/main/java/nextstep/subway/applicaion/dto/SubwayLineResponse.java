@@ -17,8 +17,8 @@ public class SubwayLineResponse {
         this.stations = stations;
     }
 
-    public SubwayLineResponse(SubwayLine subwayLine, StationResponse upStation, StationResponse downStation) {
-        this(subwayLine.getId(), subwayLine.getName(), subwayLine.getColor(), List.of(upStation, downStation));
+    public SubwayLineResponse(SubwayLine subwayLine, List<StationResponse> stations) {
+        this(subwayLine.getId(), subwayLine.getName(), subwayLine.getColor(), stations);
     }
 
     public long getId() {

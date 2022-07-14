@@ -1,9 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.SubwayLineService;
-import nextstep.subway.applicaion.dto.SubwayLineModifyRequest;
-import nextstep.subway.applicaion.dto.SubwayLineResponse;
-import nextstep.subway.applicaion.dto.SubwayLineSaveRequest;
+import nextstep.subway.applicaion.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,40 +11,49 @@ import java.util.List;
 @RestController
 public class SubwayLineController {
 
-    public static final String SUBWAY_LINE_URI = "/lines";
-    public static final String SUBWAY_LINE_BY_ID_URI = "/lines/{id}";
-
     private final SubwayLineService subwayLineService;
 
     public SubwayLineController(SubwayLineService subwayLineService) {
         this.subwayLineService = subwayLineService;
     }
 
-    @GetMapping(SUBWAY_LINE_URI)
+    @GetMapping("/lines")
     public ResponseEntity<List<SubwayLineResponse>> getSubwayLines() {
         return ResponseEntity.ok(subwayLineService.getSubwayLines());
     }
 
-    @GetMapping(SUBWAY_LINE_BY_ID_URI)
+    @GetMapping("/lines/{id}")
     public ResponseEntity<SubwayLineResponse> getSubwayLine(@PathVariable Long id) {
         return ResponseEntity.ok(subwayLineService.getSubwayLineById(id));
     }
 
-    @PostMapping(SUBWAY_LINE_URI)
+    @PostMapping("/lines")
     public ResponseEntity<SubwayLineResponse> saveSubwayLine(@RequestBody SubwayLineSaveRequest subwayLineSaveRequest) {
         SubwayLineResponse response = subwayLineService.saveSubwayLine(subwayLineSaveRequest);
-        return ResponseEntity.created(URI.create(SUBWAY_LINE_URI + response.getId())).body(response);
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 
-    @PutMapping(SUBWAY_LINE_BY_ID_URI)
+    @PutMapping("/lines/{id}")
     public ResponseEntity<Void> modifySubwayLine(@PathVariable Long id, @RequestBody SubwayLineModifyRequest subwayLineModifyRequest) {
         subwayLineService.modifySubwayLine(id, subwayLineModifyRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(SUBWAY_LINE_BY_ID_URI)
+    @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
         subwayLineService.deleteSubwayLine(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> saveSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        subwayLineService.saveSection(id, sectionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable("id") Long lineId, @RequestParam Long stationId) {
+        subwayLineService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

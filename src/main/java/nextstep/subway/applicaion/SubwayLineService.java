@@ -1,26 +1,20 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.SubwayLineModifyRequest;
-import nextstep.subway.applicaion.dto.SubwayLineResponse;
-import nextstep.subway.applicaion.dto.SubwayLineSaveRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.StationRepository;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.domain.SubwayLineRepository;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.SubwayLineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class SubwayLineService {
-
-    private static final String NOT_FOUND_SUBWAY_LINE = "not found subway line id by ";
-    private static final String NOT_FOUND_STATION = "not found station id by ";
-
     private final StationRepository stationRepository;
     private final SubwayLineRepository subwayLineRepository;
 
@@ -30,31 +24,26 @@ public class SubwayLineService {
     }
 
     public List<SubwayLineResponse> getSubwayLines() {
-        List<SubwayLine> all = subwayLineRepository.findAll();
-        return all.stream()
+        return subwayLineRepository.findAll().stream()
                 .map(this::createSubwayLineResponse)
                 .collect(Collectors.toList());
     }
 
     public SubwayLineResponse getSubwayLineById(Long id) {
-        return subwayLineRepository.findById(id)
-                .map(this::createSubwayLineResponse)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUBWAY_LINE + id));
+        return createSubwayLineResponse(findSubwayLineById(id));
     }
 
     @Transactional
     public SubwayLineResponse saveSubwayLine(SubwayLineSaveRequest subwayLineSaveRequest) {
         SubwayLine subwayLine = subwayLineSaveRequest.toEntity();
-        SubwayLine save = subwayLineRepository.save(subwayLine);
-        return createSubwayLineResponse(save);
+        subwayLineRepository.save(subwayLine);
+        return createSubwayLineResponse(subwayLine);
     }
 
     @Transactional
     public void modifySubwayLine(Long id, SubwayLineModifyRequest subwayLineModifyRequest) {
-        SubwayLine subwayLine = subwayLineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUBWAY_LINE + id));
+        SubwayLine subwayLine = findSubwayLineById(id);
         subwayLine.modify(subwayLineModifyRequest.getName(), subwayLineModifyRequest.getColor());
-        subwayLineRepository.save(subwayLine);
     }
 
     @Transactional
@@ -62,15 +51,30 @@ public class SubwayLineService {
         subwayLineRepository.deleteById(id);
     }
 
-    private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
-        StationResponse upStation = createSubwayResponse(subwayLine.getUpStationId());
-        StationResponse downStation = createSubwayResponse(subwayLine.getDownStationId());
-        return new SubwayLineResponse(subwayLine, upStation, downStation);
+    @Transactional
+    public void saveSection(Long lineId, SectionRequest sectionRequest) {
+        SubwayLine subwayLine = findSubwayLineById(lineId);
+        subwayLine.addSection(sectionRequest.toEntity());
     }
 
-    private StationResponse createSubwayResponse(Long id) {
-        return stationRepository.findById(id)
-                .map(StationResponse::new)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_STATION + id));
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        findSubwayLineById(lineId).removeStation(stationId);
     }
+
+    private SubwayLineResponse createSubwayLineResponse(SubwayLine subwayLine) {
+        return new SubwayLineResponse(subwayLine, createStationResponseList(subwayLine.getStationIds()));
+    }
+
+    private List<StationResponse> createStationResponseList(Set<Long> ids) {
+        return stationRepository.findAllById(ids).stream()
+                .map(StationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    private SubwayLine findSubwayLineById(Long id) {
+        return subwayLineRepository.findById(id)
+                .orElseThrow(() -> new SubwayLineNotFoundException(id));
+    }
+
 }
