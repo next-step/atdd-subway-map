@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import nextstep.subway.exception.SectionNotDownEndStationException;
 import nextstep.subway.exception.SectionNotMatchedException;
 import nextstep.subway.exception.StationAlreadyExistInSectionException;
 
@@ -50,5 +51,17 @@ public class Sections {
 
     private int getDownEndStationIndex() {
         return sections.size() - 1;
+    }
+
+    public void deleteSection(Long stationId) {
+        Section downEndStation = getDownEndStation();
+        if (!downEndStation.isMatchedStationId(stationId)) {
+            throw new SectionNotDownEndStationException();
+        }
+        removeDownEndSection();
+    }
+
+    private void removeDownEndSection() {
+        sections.remove(getDownEndStationIndex());
     }
 }

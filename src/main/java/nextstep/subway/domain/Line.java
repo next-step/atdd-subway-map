@@ -71,4 +71,8 @@ public class Line {
         sections.addSection(section);
         this.downStationId = section.getDownStation().getId();
     }
+
+    public void deleteSection(Long stationId) {
+        sections.deleteSection(stationId);
+    }
 }

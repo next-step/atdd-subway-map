@@ -85,4 +85,9 @@ public class LineService {
                 , stationService.findStation(sectionRequest.getDownStationId())
                 , sectionRequest.getDistance());
     }
+
+    public void deleteSectionFromLine(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
+        line.deleteSection(stationId);
+    }
 }
