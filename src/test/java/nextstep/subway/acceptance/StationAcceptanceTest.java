@@ -11,7 +11,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,10 +38,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response = createStations(params);
+        ExtractableResponse<Response> response = createStations("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -61,8 +57,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        createStations(Map.of("name", "강남역"));
-        createStations(Map.of("name", "선릉역"));
+        createStations("강남역");
+        createStations("선릉역");
 
         //when
         final var response = findAllStations();
@@ -84,7 +80,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        createStations(Map.of("name", "강남역"));
+        createStations("강남역");
 
         // when
         deleteStationById(1);
@@ -93,9 +89,9 @@ public class StationAcceptanceTest {
         assertThat(filterStationByName(findAllStations().jsonPath().getList("name"), "강남역")).isEmpty();
     }
 
-    private ExtractableResponse<Response> createStations(Map<String, String> params) {
+    private ExtractableResponse<Response> createStations(String stationName) {
         return RestAssured.given().log().all()
-                .body(params)
+                .body(Map.of("name", stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
