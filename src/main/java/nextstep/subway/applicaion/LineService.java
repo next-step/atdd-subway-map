@@ -35,7 +35,7 @@ public class LineService {
 	public LineResponse createLine(LineRequest lineRequest) {
 		Station upStation = getStation(lineRequest.getUpStationId());
 		Station downStation = getStation(lineRequest.getDownStationId());
-		Line line = lineRequest.toEntity(new Section(upStation, downStation, lineRequest.getDistance()));
+		Line line = lineRequest.toEntity(upStation, downStation);
 		return LineResponse.from(lineRepository.save(line));
 	}
 
