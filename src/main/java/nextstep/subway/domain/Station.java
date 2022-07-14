@@ -1,9 +1,6 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Station {
@@ -12,7 +9,7 @@ public class Station {
     private Long id;
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
     public Station(String name) {
