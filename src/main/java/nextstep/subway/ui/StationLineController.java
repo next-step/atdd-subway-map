@@ -22,7 +22,7 @@ public class StationLineController {
     @PostMapping
     public ResponseEntity<StationLineResponse> createLine(@Valid  @RequestBody PostRequest request) {
         StationLineResponse response = stationLineService.save(request.toEntity());
-        return ResponseEntity.created(URI.create("/station/line/" + response.getId())).body(response);
+        return ResponseEntity.created(URI.create("/lines/" + response.getId())).body(response);
     }
 
     @GetMapping
