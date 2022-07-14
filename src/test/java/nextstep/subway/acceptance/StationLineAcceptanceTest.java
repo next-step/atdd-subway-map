@@ -27,13 +27,12 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("노선을 생성한다")
     @Test
     void createLine() {
-        String linePath = SubwayRequestPath.LINE.getValue();
-        ValidatableResponse postResponse = lineRestAssured.postRequest(linePath, LineFactory.mock("신분당선", "red"));
+        String lineRootPath = SubwayRequestPath.LINE.getValue();
+        ValidatableResponse postResponse = lineRestAssured.postRequest(lineRootPath, LineFactory.mock("신분당선", "red"));
 
         postResponse.statusCode(equalTo(HttpStatus.CREATED.value()));
 
-        lineRestAssured.getRequest(linePath)
-                       .assertThat().body("name", contains("신분당선"));
+        lineRestAssured.getRequest(lineRootPath).assertThat().body("name", contains("신분당선"));
     }
 
 
@@ -44,11 +43,11 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철 노선 목록 조회")
     @Test
     void getLines() {
-        String linePath = SubwayRequestPath.LINE.getValue();
-        lineRestAssured.postRequest(linePath, LineFactory.mock("경의중앙선", "blue"));
-        lineRestAssured.postRequest(linePath, LineFactory.mock("분당선", "yellow"));
+        String lineRootPath = SubwayRequestPath.LINE.getValue();
+        lineRestAssured.postRequest(lineRootPath, LineFactory.mock("경의중앙선", "blue"));
+        lineRestAssured.postRequest(lineRootPath, LineFactory.mock("분당선", "yellow"));
 
-        lineRestAssured.getRequest(linePath)
+        lineRestAssured.getRequest(lineRootPath)
                        .assertThat().body("name", contains("경의중앙선", "분당선"));
     }
 
@@ -60,13 +59,12 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철 노선 단일 조회")
     @Test
     void getLine() {
-        ValidatableResponse postResponse = lineRestAssured.postRequest(
+        ValidatableResponse 노선_등록결과 = lineRestAssured.postRequest(
                 SubwayRequestPath.LINE.getValue(), LineFactory.mock("우이신설", "blue"));
 
-        long id = postResponse.extract().jsonPath().getLong("id");
+        String nextLocation = 노선_등록결과.extract().header("Location");
 
-        lineRestAssured.getRequest(SubwayRequestPath.LINE.addPathParam(), id)
-                       .assertThat().body("name", equalTo("우이신설"));
+        lineRestAssured.getRequest(nextLocation).assertThat().body("name", equalTo("우이신설"));
     }
 
     /**
@@ -77,16 +75,15 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철 노선 정보 수정")
     @Test
     void updateLine() {
-        Line 경춘선 = lineRestAssured.postRequest(
-                SubwayRequestPath.LINE.getValue(), LineFactory.mock("경춘선", "green"))
-                                  .extract().as(Line.class);
+        ValidatableResponse 노선_등록결과 =
+                lineRestAssured.postRequest(SubwayRequestPath.LINE.getValue(), LineFactory.mock("경춘선", "green"));
 
-        String pathParam = SubwayRequestPath.LINE.addPathParam();
-        lineRestAssured.putRequest(pathParam,  경춘선.getId(), LineFactory.mock("춘경선", "red"));
+        String nextLocation = 노선_등록결과.extract().header("Location");
+        lineRestAssured.putRequest(nextLocation, LineFactory.mock("춘경선", "red"));
 
-        ValidatableResponse 변경된_노선 = lineRestAssured.getRequest(pathParam, 경춘선.getId());
-        변경된_노선.body("name", equalTo("춘경선"));
-        변경된_노선.body("color", equalTo("red"));
+        ValidatableResponse 변경된_노선_조회결과 = lineRestAssured.getRequest(nextLocation);
+        변경된_노선_조회결과.body("name", equalTo("춘경선"));
+        변경된_노선_조회결과.body("color", equalTo("red"));
     }
 
 
@@ -98,14 +95,13 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteLine() {
-        String linePath = SubwayRequestPath.LINE.getValue();
-        Line line = lineRestAssured.postRequest(linePath, LineFactory.mock("신림선", "blue"))
-                                   .extract().as(Line.class);
+        String lineRootPath = SubwayRequestPath.LINE.getValue();
+        ValidatableResponse 노선_등록결과 =
+                lineRestAssured.postRequest(lineRootPath, LineFactory.mock("경춘선", "green"));
 
-        lineRestAssured.deleteRequest(SubwayRequestPath.LINE.addPathParam(), line.getId())
-                       .statusCode(HttpStatus.NO_CONTENT.value());
+        String nextLocation = 노선_등록결과.extract().header("Location");
+        lineRestAssured.deleteRequest(nextLocation).statusCode(HttpStatus.NO_CONTENT.value());
 
-        lineRestAssured.getRequest(linePath)
-                       .assertThat().body("id", hasSize(0));
+        lineRestAssured.getRequest(lineRootPath).assertThat().body("id", hasSize(0));
     }
 }
