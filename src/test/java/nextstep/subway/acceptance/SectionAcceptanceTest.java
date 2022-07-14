@@ -142,6 +142,20 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * When 지하철 역을 삭제하면
+     * Then 상행 종점역과 하행 종점역만 있는 경우, 잘못된 요청 처리가 된다
+     */
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 역을 삭제할 수 없다.")
+    @Test
+    void notDeleteSectionWithOneSection() {
+        // when - 지하철 역 삭제 요청을 한다
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 하행역);
+        
+        // then - 한 개의 구간만 잇는 경우, 잘못된 요청 오류가 발생한다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+    
     private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long 신분당선, Long 신규역) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
