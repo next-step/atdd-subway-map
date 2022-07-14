@@ -36,6 +36,6 @@ public class LineRequest {
 	}
 
 	public Line toEntity(Station upStation, Station downStation) {
-		return new Line(this.name, this.color, new Section(upStation, downStation, this.distance)):
+		return new Line(this.name, this.color, new Section(upStation, downStation, this.distance));
 	}
 }
