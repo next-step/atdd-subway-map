@@ -4,14 +4,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nextstep.subway.exception.BadRequestException;
+import nextstep.subway.domain.entity.collections.Sections;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,8 +27,8 @@ public class Line {
     @Column(nullable = false)
     private Integer distance;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
 
     @Builder(toBuilder = true)
@@ -47,11 +43,8 @@ public class Line {
         this.distance = distance;
     }
 
-    public Set<Station> getStations() {
-        return sections.stream()
-                .map(section -> new Station[]{section.getUpStation(), section.getDownStation()})
-                .flatMap(Arrays::stream)
-                .collect(Collectors.toSet());
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 
     public void updateNameAndColor(final String name, final String color) {
@@ -67,25 +60,6 @@ public class Line {
     }
 
     public void deleteStation(Station station) {
-        if (inValidSectionDelete()) {
-            throw new BadRequestException("section can not delete");
-        }
-
-        Station lastStation = sections.get(getLastIndex()).getDownStation();
-
-        if (!station.equals(lastStation)) {
-            throw new BadRequestException("section can not delete");
-        }
-
-        sections.remove(getLastIndex());
+        sections.deleteStation(station);
     }
-
-    private int getLastIndex() {
-        return sections.size() - 1;
-    }
-
-    private boolean inValidSectionDelete() {
-        return this.sections.size() < 2;
-    }
-
 }
