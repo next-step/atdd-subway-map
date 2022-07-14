@@ -32,15 +32,19 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {
-        validateNonMatchLastStation(newSection.getUpStationId(), UP_STATION_ID);
-        validDuplicatedDownStation(newSection.getDownStationId());
+        if (!this.sections.isEmpty()) {
+            validateNonMatchLastStation(newSection.getUpStationId(), UP_STATION_ID);
+            validateDuplicatedDownStation(newSection.getDownStationId());
+        }
 
         this.sections.add(newSection);
     }
 
     public void remove(Long downStationId) {
-        validateNonMatchLastStation(downStationId, DOWN_STATION_ID);
-        validateRemoveSection();
+        if (!this.sections.isEmpty()) {
+            validateNonMatchLastStation(downStationId, DOWN_STATION_ID);
+            validateRemoveSection();
+        }
 
         Section section = getSectionById(downStationId);
         this.sections.remove(section);
@@ -71,9 +75,6 @@ public class Sections {
     }
 
     private void validateNonMatchLastStation(Long stationId, Message message) {
-        if (this.sections.isEmpty()) {
-            return;
-        }
         if (!isLastStation(stationId)) {
             throw new NonMatchLastStationException(message);
         }
@@ -87,7 +88,7 @@ public class Sections {
         return sections.get(sections.size() - 1).getDownStationId();
     }
 
-    private void validDuplicatedDownStation(Long downStationId) {
+    private void validateDuplicatedDownStation(Long downStationId) {
         if (isDuplicatedDownStation(downStationId)) {
             throw new DuplicateDownStationException();
         }
