@@ -21,11 +21,11 @@ public class Line {
     protected Line() {
     }
 
-    public Line(String name, String color, long distance, Station upStation, Station downStation) {
+    public Line(String name, String color) {
         validation(name, color);
         this.name = name;
         this.color = color;
-        this.sections = new Sections(this, distance, upStation, downStation);
+        this.sections = new Sections();
     }
 
     public void changeInfo(String name, String color) {

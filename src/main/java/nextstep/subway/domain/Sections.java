@@ -17,12 +17,6 @@ public class Sections {
     protected Sections() {
     }
 
-    public Sections(Line line, long distance, Station upStation, Station downStation) {
-        Section section = new Section(distance, upStation, downStation);
-        section.setLine(line);
-        sections.add(section);
-    }
-
     public void addSection(Line line, Section section) {
         addSectionValidation(section);
         sections.add(section);
@@ -30,9 +24,11 @@ public class Sections {
     }
 
     private void addSectionValidation(Section section) {
-        isContains(section);
-        matchDownStation(section);
-        matchStation(section);
+        if(sections.size() > 0) {
+            isContains(section);
+            matchDownStation(section);
+            matchStation(section);
+        }
     }
 
     private void isContains(Section section) {
