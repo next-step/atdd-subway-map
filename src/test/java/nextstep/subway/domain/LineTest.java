@@ -19,7 +19,7 @@ class LineTest {
         Line line = new Line("name", "color", stations);
 
         //when
-        Line changedLine = line.changeFrom(new LineUpdateRequest("new name", "new color"));
+        Line changedLine = line.changeBy(new LineUpdateRequest("new name", "new color"));
 
         //then
         assertAll(
