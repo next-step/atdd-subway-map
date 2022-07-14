@@ -5,6 +5,7 @@ import lombok.Getter;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class Sections {
 
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OrderBy("id asc")
     private final List<Section> sectionList = new ArrayList<>();
 
     protected Sections() {
