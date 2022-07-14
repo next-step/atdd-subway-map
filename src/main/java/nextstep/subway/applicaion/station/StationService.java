@@ -1,9 +1,9 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.station;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.station.dto.StationRequest;
+import nextstep.subway.applicaion.station.dto.StationResponse;
+import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.station.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
