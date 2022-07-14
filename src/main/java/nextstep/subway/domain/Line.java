@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import lombok.ToString;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Embedded;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -77,4 +79,7 @@ public class Line {
         return sections.validationAndSectionDelete(line, stationId);
     }
 
+    public List<Section> getSectionList(){
+        return sections.getSectionList();
+    }
 }

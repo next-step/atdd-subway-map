@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import lombok.Getter;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -14,10 +16,11 @@ import java.util.stream.Collectors;
  * @description
  */
 @Embeddable
+@Getter
 public class Sections {
 
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
-    private final List<Section> sections = new ArrayList<>();
+    private final List<Section> sectionList = new ArrayList<>();
 
     protected Sections() {
     }
@@ -25,11 +28,11 @@ public class Sections {
     public Sections(Line line, int distance, Station upStation, Station downStation) {
         Section section = new Section(distance, upStation, downStation);
         section.setLine(line);
-        sections.add(section);
+        sectionList.add(section);
     }
 
     public List<Station> getStation() {
-        return sections.stream()
+        return sectionList.stream()
                 .map(Section::getStations)
                 .flatMap(List::stream)
                 .distinct()
@@ -38,7 +41,7 @@ public class Sections {
 
     public void addSection(Line line, Section section) {
         addSectionValidation(section);
-        sections.add(section);
+        sectionList.add(section);
         section.setLine(line);
     }
 
@@ -54,15 +57,15 @@ public class Sections {
     }
 
     public Section validationAndSectionDelete(Line line, Long stationId){
-        Section lastSection = sections.get(sections.size()-1);
+        Section lastSection = sectionList.get(sectionList.size()-1);
 
         if(!Objects.equals(lastSection.getDownStation().getId(), stationId))
             throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.");
 
-        if(sections.size() < 2)
+        if(sectionList.size() < 2)
             throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.");
 
-        sections.remove(lastSection);
+        sectionList.remove(lastSection);
         return lastSection;
     }
 

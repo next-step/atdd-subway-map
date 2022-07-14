@@ -38,4 +38,13 @@ public class SectionTestMethod {
                 .extract();
 
     }
+
+    public static ExtractableResponse<Response> 구간목록을_조회한다(){
+        return RestAssured
+                .given().log().all()
+                .when()
+                .get("/lines/sections")
+                .then().log().all()
+                .extract();
+    }
 }

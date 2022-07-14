@@ -7,12 +7,12 @@ import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -22,12 +22,10 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest lineRequest) {
@@ -100,15 +98,16 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public List<SectionResponse> findAllSection(){
-        List<Section> sections = sectionRepository.findAll();
+
+        List<Line> lines =  lineRepository.findAll();
+        List<Section> sections = new ArrayList<>();
+
+        lines.forEach(
+                list -> sections.addAll(list.getSectionList())
+        );
         return sections.stream()
                 .map(SectionResponse::of)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Section> findSectionByLine(Line line){
-        return sectionRepository.findByLine(line);
     }
 
     private Line findLineOne(Long id){

@@ -90,14 +90,14 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 
     @Test
     @DisplayName("구간을 조회한다")
-    public ExtractableResponse<Response> getSections(){
+    public void getSections(){
 
-        return RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/sections")
-                .then().log().all()
-                .extract();
+       ExtractableResponse<Response> response = 구간목록을_조회한다();
+
+       assertAll(
+               () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+               () -> assertThat(response.jsonPath().getList("id").size()).isEqualTo(3)
+       );
 
     }
 
