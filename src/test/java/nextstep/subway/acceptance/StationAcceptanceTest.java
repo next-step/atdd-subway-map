@@ -3,17 +3,15 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.StationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -24,9 +22,12 @@ public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    StationClient stationClient;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        stationClient = new StationClient();
     }
 
     /**
@@ -38,26 +39,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = stationClient.create("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = stationClient.findAll().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -70,29 +58,17 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        RestAssured.given().log().all()
-                .body(Map.of("name", "강남역"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
-
-        RestAssured.given().log().all()
-                .body(Map.of("name", "선릉역"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
+        stationClient.create("강남역");
+        stationClient.create("선릉역");
 
         //when
-        final var response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        final var response = stationClient.findAll();
 
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("name")).hasSize(2)
+                () -> assertThat(response.jsonPath().getList("name")).hasSize(2),
+                () -> assertThat(response.jsonPath().getList("name")).containsExactly("강남역", "선릉역")
         );
     }
 
@@ -101,32 +77,17 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given
-        RestAssured.given().log().all()
-                .body(Map.of("name", "강남역"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all();
+        stationClient.create("강남역");
 
         // when
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/1")
-                .then().log().all();
+        stationClient.deleteById(1);
 
         // then
-
-        final var response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-
-        assertThat(response.jsonPath().getList("name")).isEmpty();
+        assertThat(stationClient.findAll().jsonPath().getList("name")).doesNotContain("강남역");
     }
 
 }
