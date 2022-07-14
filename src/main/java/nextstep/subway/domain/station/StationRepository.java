@@ -3,7 +3,7 @@ package nextstep.subway.domain.station;
 import java.util.List;
 import java.util.Optional;
 
-public interface StationRepository{
+public interface StationRepository {
 
     List<Station> findAll();
 

@@ -6,13 +6,13 @@ public class LineResponse {
     private final Long id;
     private final String name;
     private final String color;
-    private final StationResponses stations;
+    private final SectionsResponse sectionsResponse;
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public LineResponse(Long id, String name, String color, List<SectionResponse> sectionsResponse) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = new StationResponses(stations);
+        this.sectionsResponse = new SectionsResponse(sectionsResponse);
     }
 
     public Long getId() {
@@ -27,7 +27,7 @@ public class LineResponse {
         return color;
     }
 
-    public StationResponses getStations() {
-        return stations;
+    public SectionsResponse getStations() {
+        return sectionsResponse;
     }
 }

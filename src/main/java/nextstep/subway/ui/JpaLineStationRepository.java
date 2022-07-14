@@ -1,7 +1,7 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.domain.line.Section;
 import nextstep.subway.domain.line.LineStationRepository;
+import nextstep.subway.domain.line.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

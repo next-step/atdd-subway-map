@@ -3,7 +3,6 @@ package nextstep.subway.domain.line;
 import nextstep.subway.applicaion.dto.LineRequest;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class Line {
