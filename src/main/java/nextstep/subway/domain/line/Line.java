@@ -9,6 +9,7 @@ public class Line {
     private static final int MINIMUM_NAME_SIZE = 2;
     private static final int MINIMUM_COLOR_SIZE = 4;
     @Id
+    @JoinColumn(name="line_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
