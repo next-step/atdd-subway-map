@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.StationLineService;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +14,13 @@ import static nextstep.subway.applicaion.dto.StationLineRequest.*;
 
 @RestController
 @RequestMapping("/station/line")
+@RequiredArgsConstructor
 public class StationLineController {
 
     private final StationLineService stationLineService;
 
-    public StationLineController(StationLineService stationLineService) {
-        this.stationLineService = stationLineService;
-    }
-
     @PostMapping
-    public ResponseEntity<StationLineResponse> create(@Valid  @RequestBody PostRequest request) {
+    public ResponseEntity<StationLineResponse> createLine(@Valid  @RequestBody PostRequest request) {
         StationLineResponse response = stationLineService.save(request.toEntity());
         return ResponseEntity.created(URI.create("/station/line/" + response.getId())).body(response);
     }
@@ -39,9 +37,10 @@ public class StationLineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StationLineResponse> patchLine(
+    public ResponseEntity<Void> putLine(
             @PathVariable Long id, @RequestBody PutRequest putRequest) {
-        return ResponseEntity.ok(stationLineService.patch(id, putRequest.toEntity()));
+        stationLineService.update(putRequest.toEntity(id));
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

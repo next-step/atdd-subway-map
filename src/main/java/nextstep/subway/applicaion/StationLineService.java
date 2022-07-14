@@ -1,23 +1,21 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.StationLineRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StationLineService {
 
     private final StationLineRepository repository;
-
-    public StationLineService(StationLineRepository repository) {
-        this.repository = repository;
-    }
 
     @Transactional
     public StationLineResponse save(Line line) {
@@ -28,16 +26,16 @@ public class StationLineService {
         return repository.findAll()
                          .stream()
                          .map(this::createLineResponse)
-                         .toList();
+                         .collect(Collectors.toList());
     }
 
     public StationLineResponse findById(Long id) {
         return createLineResponse(repository.getById(id));
     }
 
-    public StationLineResponse patch(Long id, Line line) {
-        BeanUtils.copyProperties(repository.getById(id), line);
-        return createLineResponse(repository.save(line));
+    @Transactional
+    public void update(Line line) {
+        createLineResponse(repository.save(line));
     }
 
     private StationLineResponse createLineResponse(Line line) {

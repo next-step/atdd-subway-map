@@ -2,53 +2,51 @@ package nextstep.subway.acceptance.client;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import nextstep.subway.domain.Line;
 import org.springframework.http.MediaType;
 
-public class LineRestAssured {
+public class SubwayRestAssured<T> {
 
-    public static String STATION_LINE_REQUEST_PATH = "/station/line";
 
-    public ValidatableResponse getRequest() {
+    public ValidatableResponse getRequest(String path) {
         return RestAssured.given().log().all()
                           .when().log().all()
-                          .get(STATION_LINE_REQUEST_PATH)
+                          .get(path)
                           .then().log().all();
     }
 
-    public ValidatableResponse getRequest(Long id) {
+    public ValidatableResponse getRequest(String path, Long id) {
         return RestAssured.given().log().all()
                           .pathParam("id", id)
                           .when().log().all()
-                          .get(STATION_LINE_REQUEST_PATH + "/{id}")
+                          .get(path)
                           .then().log().all();
     }
 
-    public ValidatableResponse postRequest(Line body) {
+    public ValidatableResponse postRequest(String path, T body) {
         return RestAssured.given().log().all()
                           .body(body)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when().log().all()
-                          .post(STATION_LINE_REQUEST_PATH)
+                          .post(path)
                           .then().log().all();
     }
 
-    public ValidatableResponse putRequest(Line body, Long id) {
-        return RestAssured.given().log().all()
+    public void putRequest(String path, Long id, T body) {
+         RestAssured.given().log().all()
                           .pathParam("id", id)
                           .and()
                           .body(body)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when().log().all()
-                          .put(STATION_LINE_REQUEST_PATH+ "/{id}")
+                          .put(path)
                           .then().log().all();
     }
 
-    public ValidatableResponse deleteRequest(Line line) {
+    public ValidatableResponse deleteRequest(String path, Long id) {
         return RestAssured.given().log().all()
-                          .pathParam("id", line.getId())
+                          .pathParam("id", id)
                           .when().log().all()
-                          .delete(STATION_LINE_REQUEST_PATH + "/{id}")
+                          .delete(path)
                           .then().log().all();
     }
 }

@@ -1,6 +1,8 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line;
 
 import javax.validation.constraints.Min;
@@ -9,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 public class StationLineRequest {
     private StationLineRequest() {}
     @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class PostRequest {
         @NotBlank(message = "name is required")
         private String name;
@@ -22,7 +25,12 @@ public class StationLineRequest {
         private Integer distance;
 
         public Line toEntity() {
-            return new Line(name, color, upStationId, downStationId, distance);
+            return Line.builder()
+                        .name(name).
+                        color(color)
+                        .upStationId(upStationId)
+                        .distance(distance)
+                        .build();
         }
     }
 
@@ -37,8 +45,12 @@ public class StationLineRequest {
             this.color = color;
         }
 
-        public Line toEntity() {
-            return new Line(name, color);
+        public Line toEntity(Long id) {
+            return Line.builder()
+                       .id(id)
+                       .name(this.getName())
+                       .color(this.getColor())
+                       .build();
         }
     }
 
