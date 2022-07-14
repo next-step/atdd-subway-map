@@ -54,11 +54,9 @@ public class Line {
                 .collect(Collectors.toSet());
     }
 
-    public Line updateNameAndColor(final String name, final String color) {
+    public void updateNameAndColor(final String name, final String color) {
         this.name = name;
         this.color = color;
-
-        return this;
     }
 
     public void addSection(Section section) {
