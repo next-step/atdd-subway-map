@@ -1,9 +1,11 @@
 package nextstep.subway.acceptance;
 
 import static nextstep.subway.acceptance.StationAcceptanceStatic.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
@@ -77,6 +79,26 @@ public class LineAcceptanceStatic {
 			.when()
 			.delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
 			.then().log().all().extract();
+	}
+
+	public static void 하행종점_상행역_불일치_에러가_발생함(ExtractableResponse<Response> response) {
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("하행 종점이 추가하려는 구간의 상행역과 일치하지 않습니다");
+	}
+
+	public static void 이미_추가된_노선_추가_에러가_발생함(ExtractableResponse<Response> response) {
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("추가하려는 구간의 하행이 이미 노선에 추가되어 있습니다.");
+	}
+
+	public static void 마지막_구간이_아닌구가_제거_에러가_발생함(ExtractableResponse<Response> response) {
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
+	}
+
+	public static void 한개_뿐인_구간삭제_에러가_발생함(ExtractableResponse<Response> response) {
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		assertThat(response.jsonPath().getString("errorMessage")).contains("1개뿐인 구간은 삭제할 수 없습니다.");
 	}
 
 }

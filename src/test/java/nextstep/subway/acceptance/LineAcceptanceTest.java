@@ -181,8 +181,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.jsonPath().getString("errorMessage")).contains("하행 종점이 추가하려는 구간의 상행역과 일치하지 않습니다");
+		하행종점_상행역_불일치_에러가_발생함(response);
 	}
 
 	/**
@@ -205,8 +204,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.jsonPath().getString("errorMessage")).contains("추가하려는 구간의 하행이 이미 노선에 추가되어 있습니다.");
+		이미_추가된_노선_추가_에러가_발생함(response);
 
 	}
 
@@ -233,8 +231,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 양재시민의_숲역_번호);
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
+		마지막_구간이_아닌구가_제거_에러가_발생함(response);
 	}
 
 	/**
@@ -255,8 +252,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 판교역_번호);
 
 		//then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-		assertThat(response.jsonPath().getString("errorMessage")).contains("1개뿐인 구간은 삭제할 수 없습니다.");
+		한개_뿐인_구간삭제_에러가_발생함(response);
 	}
 
 	/**
