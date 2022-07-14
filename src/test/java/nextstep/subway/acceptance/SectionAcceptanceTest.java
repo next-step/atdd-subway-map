@@ -68,7 +68,7 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given 지하철 구간을 등록하고
+     * Given 신규역을 생성하고
      * When 새로운 구간을 등록하면
      * Then 기등록된 구간의 하행 종점역과 다르므로 새로운 구간 등록에 실패한다
      */
@@ -76,14 +76,31 @@ public class SectionAcceptanceTest {
     @Test
     void addNewUpStationNotMatchedPreviouslyDownStation() {
         // given -  지하철 구간을 등록한다
-        지하철_구간_등록_요청(신분당선, 상행역, 하행역, 2);
+        신규역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
 
         // when - 새로운 지하철 구간을 등록한다
-        신규역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
         ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 상행역, 신규역, 8);
 
         
         // then - 기등록된 구간의 하행 종점역과 다르므로 새로운 구간 등록에 실패한다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 신규역을 생성하고
+     * When 새로운 지하철 구간을 등록할 때
+     * Then 신규 구간의 하행역은 해당 노선에 등록되어 있는 역일 수 없다
+     */
+    @DisplayName("신규 구간의 하행역은 해당 노선에 이미 등록된 역일 수 없다.")
+    @Test
+    void notContainDownStationInLine() {
+        // given - 신규역을 생성한다
+        신규역 = 지하철역_생성_요청("신논현역").jsonPath().getLong("id");
+
+        // when - 신규 구간을 등록한다
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 하행역, 신규역, 8);
+
+        // then - 신규 구간의 하행역은 해당 노선에 등록되어 있는 역인 경우, 잘못된 요청이다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
