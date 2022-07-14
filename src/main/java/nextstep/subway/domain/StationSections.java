@@ -10,20 +10,12 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class StationSections {
 
+    private static final int SECTION_MIN_COUNT = 1;
+
     @OneToMany(mappedBy = "stationLine", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<StationSection> stationSections = new ArrayList<>();
 
     public StationSections() {
-    }
-
-    public StationSections(List<StationSection> stationSections) {
-        this.stationSections = stationSections;
-    }
-
-    public StationSection findLastSection() {
-        return stationSections.stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 노선에는 구간이 존재하지 않습니다."));
     }
 
     public void addSection(StationLine stationLine, StationSection stationSection) {
@@ -33,13 +25,16 @@ public class StationSections {
     }
 
     public List<Long> getStationIds() {
-        List<Long> upStationIds = stationSections.stream()
-                .map(StationSection::getUpStationId)
+        List<Long> stationIds = new ArrayList<>();
+        stationSections.forEach(
+                section -> {
+                    stationIds.add(section.getDownStationId());
+                    stationIds.add(section.getUpStationId());
+                }
+        );
+        return stationIds.stream()
+                .distinct()
                 .collect(Collectors.toList());
-        Long downStationId = getLastSection().getDownStationId();
-        List<Long> stationIds = new ArrayList<>(upStationIds);
-        stationIds.add(downStationId);
-        return stationIds;
     }
 
     private boolean isExistStation(StationSection stationSection) {
@@ -53,21 +48,20 @@ public class StationSections {
     }
 
     private void validateSection(StationSection stationSection) {
-        if(stationSections.isEmpty()){
-            return;
-        }
-
         if (isExistStation(stationSection)) {
             throw new IllegalArgumentException("해당 하행역은 이미 노선에 존재합니다.");
         }
 
-        if (isSameLastUpStationAndDownStation(stationSection)) {
+        if (isNoneSameLastUpStationAndDownStation(stationSection)) {
             throw new IllegalArgumentException("해당 하행역은 마지막 구간의 상행역이 아닙니다.");
         }
     }
 
-    private boolean isSameLastUpStationAndDownStation(StationSection stationSection) {
-        return getLastSection().isSameUpStationAndDownStation(stationSection);
+    private boolean isNoneSameLastUpStationAndDownStation(StationSection stationSection) {
+        if(stationSections.isEmpty()){
+            return false;
+        }
+        return getLastSection().isNoneSameDownStationId(stationSection.getUpStationId());
     }
 
     private StationSection getLastSection() {
@@ -76,5 +70,31 @@ public class StationSections {
 
     private int getLastIndex() {
         return stationSections.size() - 1;
+    }
+
+    public StationSection findByDownStationId(Long stationId) {
+        validateDeleteCondition(stationId);
+        return getLastSection();
+    }
+
+    private void validateDeleteCondition(Long stationId) {
+        if (isNoneLastSectionDownStation(stationId)) {
+            throw new IllegalArgumentException("마지막 구간만 제거할 수 있습니다.");
+        }
+        if (hasMinSize()) {
+            throw new IllegalStateException("노선에 구간이 1개일 경우 삭제할 수 없습니다.");
+        }
+    }
+
+    private boolean hasMinSize() {
+        return stationSections.size() <= SECTION_MIN_COUNT;
+    }
+
+    private boolean isNoneLastSectionDownStation(Long stationId) {
+        return getLastSection().isNoneSameDownStationId(stationId);
+    }
+
+    public void delete(StationSection section) {
+        stationSections.remove(section);
     }
 }

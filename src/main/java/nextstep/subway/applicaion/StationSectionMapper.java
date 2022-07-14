@@ -19,7 +19,7 @@ public class StationSectionMapper {
         return new StationSectionResponse(
                 stationSection.getId(),
                 stationSection.getUpStationId(),
-                stationSection.getUpStationId(),
+                stationSection.getDownStationId(),
                 stationSection.getDistance()
         );
     }

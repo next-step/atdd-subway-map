@@ -53,4 +53,12 @@ public class StationLine {
     public List<Long> getStationIds(){
         return stationSections.getStationIds();
     }
+
+    public StationSection findSectionByDownStationId(Long stationId) {
+        return stationSections.findByDownStationId(stationId);
+    }
+
+    public void deleteSection(StationSection section) {
+        stationSections.delete(section);
+    }
 }

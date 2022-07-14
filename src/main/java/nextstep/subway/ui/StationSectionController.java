@@ -5,9 +5,11 @@ import nextstep.subway.applicaion.StationSectionService;
 import nextstep.subway.applicaion.dto.StationSectionRequest;
 import nextstep.subway.applicaion.dto.StationSectionResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,5 +29,14 @@ public class StationSectionController {
         StationSectionResponse stationLine = stationSectionService.createStationSection(request, lineId);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/section/" + stationLine.getId()))
                 .body(stationLine);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity deleteStationSection(
+            @PathVariable Long lineId,
+            @RequestParam Long stationId
+    ) {
+        stationSectionService.deleteStationSection(lineId,stationId);
+        return ResponseEntity.noContent().build();
     }
 }
