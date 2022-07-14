@@ -104,6 +104,33 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Given 지하철 구간이 등록되고
+     * When 지하철 역을 삭재하면
+     * Then 하행 종점역인 경우, 정상적으로 삭제된다
+     */
+    @DisplayName("삭제 요청된 역이 지하철 노선의 하행 종점역인 경우, 정상 삭제처리 된다.")
+    @Test
+    void deleteSection() {
+        // given - 지하철 구간을 등록한다
+        신규역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
+        지하철_구간_등록_요청(신분당선, 하행역, 신규역, 8);
+
+        // when - 지하철 역을 삭제요청 한다
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 신규역);
+
+        // then - 삭제 요청한 지하철 역이 하행 종점역이므로 정상적으로 삭제된다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long 신분당선, Long 신규역) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{lineId}/stations?stationId={stationId}", 신분당선, 신규역)
+                .then().log().all()
+                .extract();
+    }
+
     private ExtractableResponse<Response> 지하철_구간_등록_요청(Long 신분당선, Long 상행역, Long 하행역, int distance) {
         return RestAssured.given().log().all()
                 .body(지하철_구간_등록_파라미터_생성(상행역, 하행역, distance))
