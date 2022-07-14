@@ -14,8 +14,8 @@ import java.util.Map;
  * @description
  */
 public class SectionTestMethod {
-    public static ExtractableResponse<Response> 구간_생성(String 구간시작ID, String 구간종료ID, Long 라인ID){
-        Map<String, String> params = new HashMap<>();
+    public static ExtractableResponse<Response> 구간_생성(Long 구간시작ID, Long 구간종료ID, Long 라인ID){
+        Map<String, Object> params = new HashMap<>();
         params.put("downStationId", 구간종료ID );
         params.put("upStationId", 구간시작ID);
         params.put("distance", "10");
@@ -29,11 +29,11 @@ public class SectionTestMethod {
                 .then().log().all()
                 .extract();
     }
-    public static ExtractableResponse<Response> 구간_제거(Long 삭제대상라인ID, String 삭제대상_StatsId){
+    public static ExtractableResponse<Response> 구간_제거(Long 삭제대상라인ID, Long 삭제대상_StatsId){
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .delete("/lines/{lineId}/sections?stationId="+삭제대상_StatsId,삭제대상라인ID)
+                .delete("/lines/{lineId}/sections/{deleteStationId}",삭제대상라인ID, 삭제대상_StatsId)
                 .then().log().all()
                 .extract();
 

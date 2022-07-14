@@ -20,26 +20,26 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  */
 public class SectionAcceptanceTest extends AcceptanceTest{
 
-    public String 파랑선_시작ID;
-    public String 파랑선_종착ID;
-    public String 초록선_시작ID;
-    public String 초록선_종착ID;
+    public Long 파랑선_시작ID;
+    public Long 파랑선_종착ID;
+    public Long 초록선_시작ID;
+    public Long 초록선_종착ID;
 
     public Long 초록선_라인ID;
 
-    public String 새로운구간_종착ID;
+    public Long 새로운구간_종착ID;
     @BeforeEach
     public void lineTestSetUp() {
-        파랑선_시작ID = 지하철역_생성("구일역").jsonPath().getString("id");
-        파랑선_종착ID = 지하철역_생성("구로역").jsonPath().getString("id");;
-        초록선_시작ID = 지하철역_생성("신도림역").jsonPath().getString("id");;
-        초록선_종착ID = 지하철역_생성("문래역").jsonPath().getString("id");;
+        파랑선_시작ID = 지하철역_생성("구일역").jsonPath().getLong("id");
+        파랑선_종착ID = 지하철역_생성("구로역").jsonPath().getLong("id");;
+        초록선_시작ID = 지하철역_생성("신도림역").jsonPath().getLong("id");;
+        초록선_종착ID = 지하철역_생성("문래역").jsonPath().getLong("id");;
 
-        지하철노선_생성("파랑선", 파랑선_시작ID, 파랑선_종착ID, "blue", "10");
-        초록선_라인ID = 지하철노선_생성("초록선", 초록선_시작ID, 초록선_종착ID, "green", "10")
+        지하철노선_생성("파랑선", 파랑선_시작ID, 파랑선_종착ID, "blue", DEFAULT_DISTANCE);
+        초록선_라인ID = 지하철노선_생성("초록선", 초록선_시작ID, 초록선_종착ID, "green", DEFAULT_DISTANCE)
                 .jsonPath().getLong("id");
 
-        새로운구간_종착ID = 지하철역_생성("합정역").jsonPath().getString("id");
+        새로운구간_종착ID = 지하철역_생성("합정역").jsonPath().getLong("id");
 
         구간_생성(초록선_종착ID, 새로운구간_종착ID, 초록선_라인ID);
     }
@@ -53,11 +53,11 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철구간을 생성한다")
     void createSection(){
 
-        String 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        Long 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
         구간_생성(새로운구간_종착ID, 구간생성테스트_종착역ID, 초록선_라인ID);
 
         assertAll(
-                () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath().getString("downStationId")).isEqualTo(구간생성테스트_종착역ID),
+                () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath().getLong("downStationId")).isEqualTo(구간생성테스트_종착역ID),
                 () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath()
                         .getList("stations.name"))
                         .contains("신도림역","문래역","합정역","홍대입구역")
@@ -76,7 +76,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("구간을 제거한다")
     void deleteSection(){
 
-        String 구간제거테스트_종작역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        Long 구간제거테스트_종작역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
 
         구간_생성(새로운구간_종착ID, 구간제거테스트_종작역ID, 초록선_라인ID);
 
@@ -105,7 +105,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("구간생성을 실패한다.")
     void failCreateSection(){
         //given
-        String 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        Long 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
         구간_생성(초록선_시작ID, 구간생성테스트_종착역ID, 초록선_라인ID);
         //새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다
         // Exception 발생
@@ -114,7 +114,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("구간생성을 실패한다 두번째 시나리오.")
     void failCreateSection2(){
         //given
-        String 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        Long 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
         구간_생성(새로운구간_종착ID, 초록선_시작ID, 초록선_라인ID);
         //새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
         // Exception 발생
@@ -124,7 +124,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("구간을 제거한다_실페 케이스1")
     void failDeleteSection(){
 
-        String 구간제거테스트_종작역ID = 지하철역_생성("홍대입구역").jsonPath().getString("id");
+        Long 구간제거테스트_종작역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
 
         구간_생성(새로운구간_종착ID, 구간제거테스트_종작역ID, 초록선_라인ID);
 

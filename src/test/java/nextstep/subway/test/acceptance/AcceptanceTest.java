@@ -20,6 +20,8 @@ public class AcceptanceTest {
     @Autowired
     private DatabaseCleanup databaseCleanup;
 
+    protected final Integer DEFAULT_DISTANCE = 10;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;

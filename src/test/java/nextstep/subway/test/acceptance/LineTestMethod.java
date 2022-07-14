@@ -14,9 +14,9 @@ import java.util.Map;
  * @description
  */
 public class LineTestMethod {
-    public static ExtractableResponse<Response> 지하철노선_생성(String lineName, String upStationId, String downStationId,
-                                           String color, String distance){
-        Map<String, String> params = new HashMap<>();
+    public static ExtractableResponse<Response> 지하철노선_생성(String lineName, Long upStationId, Long downStationId,
+                                           String color, Integer distance){
+        Map<String, Object> params = new HashMap<>();
         params.put("name", lineName);
         params.put("color", color);
         params.put("upStationId", upStationId);
@@ -52,7 +52,7 @@ public class LineTestMethod {
                 .extract();
     }
 
-    public static void 지하철노선_수정(Map<String , String> params, Long lineId){
+    public static void 지하철노선_수정(Map<String , Object> params, Long lineId){
         RestAssured
                 .given().log().all()
                 .body(params)

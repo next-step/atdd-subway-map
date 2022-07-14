@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * @project subway
  * @description
  */
-@ControllerAdvice
+@RestControllerAdvice
 public class ValidExceptionController {
     /**
      * @valid  유효성체크에 통과하지 못하면  MethodArgumentNotValidException 이 발생한다.
