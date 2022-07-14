@@ -8,16 +8,21 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.station.StationRestAssuredTemplate.지하철역_생성;
+
 public class LineStationAssuredTemplate {
 
     private static final String BASE_URI = "/lines";
 
-    public static ExtractableResponse<Response> 노선_생성(String name, String color, long upStationId, long downStationId, int distance) {
+    public static ExtractableResponse<Response> 노선_생성(String name, String color, String upStationName, String downStationName, int distance) {
+        ExtractableResponse<Response> upStation = 지하철역_생성(upStationName);
+        ExtractableResponse<Response> downStation = 지하철역_생성(downStationName);
+
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
+        params.put("upStationId", Long.parseLong(upStation.jsonPath().getString("id")));
+        params.put("downStationId", Long.parseLong(downStation.jsonPath().getString("id")));
         params.put("distance", distance);
 
         return RestAssured

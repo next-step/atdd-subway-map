@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 public class LineController {
     private final LineService lineService;
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(LineController.class);
 
     public LineController(LineService lineService) {
         this.lineService = lineService;

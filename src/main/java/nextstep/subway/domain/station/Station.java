@@ -1,13 +1,13 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.station;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Station {
+    private static final int MINIMUM_NAME_SIZE = 2;
+
     @Id
+    @Column(name = "station_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
@@ -16,7 +16,7 @@ public class Station {
 
     public Station(Long id, String name) {
 
-        if (name == null || name.isBlank() || name.length() < 2) {
+        if (name == null || name.isBlank() || name.length() < MINIMUM_NAME_SIZE) {
             throw new IllegalArgumentException();
         }
 
