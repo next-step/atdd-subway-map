@@ -28,24 +28,6 @@ public class SectionApiService {
         Station newUpStation = stationService.findStation(sectionRequest.getUpStationId());
         Station newDownStation = stationService.findStation(sectionRequest.getDownStationId());
 
-        // 1. 신규 상행선은 하행선에 값이 있어야 한다.
-        boolean availableConnectStation = sectionService.existsByLineAndDownStation(line, newUpStation);
-        if (!availableConnectStation) { // 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-            throw new BadRequestException("upStation required connected line downStation");
-        }
-
-        // 2. 신규 상행선은 상행선에 값이 있으면 안된다.
-        boolean isConnectStation = sectionService.existsByLineAndUpStation(line, newUpStation);
-        if (isConnectStation) {
-            throw new BadRequestException("upStation is already connected");
-        }
-
-        // 3. 신규 하행선은 상행선 또는 하행선에 값이 있으면 안된다.
-        boolean existNewDownStation = sectionService.existsByLineAnyStation(line, newDownStation);
-        if (existNewDownStation) {
-            throw new BadRequestException("downStation is already connected");
-        }
-
         line.addSection(
                 Section.builder()
                         .upStation(newUpStation)

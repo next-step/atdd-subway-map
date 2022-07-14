@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nextstep.subway.domain.entity.collections.Sections;
 
 import javax.persistence.*;
 import java.util.List;
@@ -60,6 +59,6 @@ public class Line {
     }
 
     public void deleteStation(Station station) {
-        sections.deleteStation(station);
+        sections.delete(station);
     }
 }

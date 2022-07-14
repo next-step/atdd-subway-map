@@ -19,7 +19,8 @@ public class Station {
     }
 
     @Builder
-    public Station(String name) {
+    public Station(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 

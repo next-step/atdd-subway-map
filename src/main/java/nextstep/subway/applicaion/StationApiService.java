@@ -20,7 +20,7 @@ public class StationApiService {
 
     @Transactional
     public StationDto saveStation(StationCreateDto stationCreateDto) {
-        Station station = stationService.save(new Station(stationCreateDto.getName()));
+        Station station = stationService.save(Station.builder().name(stationCreateDto.getName()).build());
         return createStationResponse(station);
     }
 
