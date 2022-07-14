@@ -1,16 +1,12 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.StationLineRequest;
-import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.ArrayList;
-import java.util.Arrays;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Entity
 public class StationLine {
@@ -19,20 +15,16 @@ public class StationLine {
     private Long id;
     private String name;
     private String color;
-    private Long distance;
-    private Long upStationId;
-    private Long downStationId;
-    private String stationsIncluded;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stationLine", orphanRemoval = true)
+    List<Section> sections = new LinkedList<>();
 
     public StationLine() {
     }
 
-    public StationLine(String name, String color, Long distance, Long upStationId, Long downStationId) {
+    public StationLine(String name, String color) {
         this.name = name;
-        this.distance = distance;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
     }
 
     public Long getId() {
@@ -47,40 +39,28 @@ public class StationLine {
         return color;
     }
 
-    public Long getDistance() {
-        return distance;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public String getStationsIncluded() {
-        return stationsIncluded;
-    }
-
-    public void setDownStationId(Long downStationId) {
-        this.downStationId = downStationId;
-    }
-
-    public void setStationsIncluded(String stationIncluded) {
-        this.stationsIncluded = stationIncluded;
+    public List<Section> getSections() {
+        return sections;
     }
 
     public void updateByStationLineRequest(StationLineRequest stationLineRequest) {
-        if (stationLineRequest.getName() != null) this.name = stationLineRequest.getName();
-        if (stationLineRequest.getColor() != null) this.color = stationLineRequest.getColor();
-        if (stationLineRequest.getUpStationId() != null) this.upStationId = stationLineRequest.getUpStationId();
-        if (stationLineRequest.getDownStationId() != null) this.downStationId = stationLineRequest.getDownStationId();
-        if (stationLineRequest.getDistance() != null) this.distance = stationLineRequest.getDistance();
+        if (stationLineRequest.getName() != null){
+            this.name = stationLineRequest.getName();
+        }
+        if (stationLineRequest.getColor() != null) {
+            this.color = stationLineRequest.getColor();
+        }
     }
 
-    public List<Long> stationIdsIncludedInLine(){
-        if(StringUtils.isBlank(this.stationsIncluded)) return new ArrayList<>();
-        return Arrays.stream(this.stationsIncluded.split(",")).map(s -> Long.parseLong(s)).collect(Collectors.toList());
+    public Set<Long> getStationIdsIncluded() {
+        Set<Long> stations = new HashSet<>();
+        List<Section> sections = this.getSections();
+
+        for (Section section : sections){
+            stations.add(section.getUpStationId());
+            stations.add(section.getDownStationId());
+        }
+
+        return stations;
     }
 }

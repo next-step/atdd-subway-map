@@ -3,17 +3,12 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationLine;
-import nextstep.subway.domain.StationLineRepository;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.BusinessException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,15 +17,18 @@ import java.util.stream.Collectors;
 public class StationLineService {
     private StationLineRepository stationLineRepository;
     private StationRepository stationRepository;
+    private SectionRepository sectionRepository;
 
-    public StationLineService(StationLineRepository stationLineRepository, StationRepository stationRepository) {
+    public StationLineService(StationLineRepository stationLineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
         this.stationLineRepository = stationLineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
     public StationLineResponse saveStationLine(StationLineRequest stationLineRequest) {
         StationLine stationLine = stationLineRepository.save(stationLineRequest.toEntity());
+        sectionRepository.save(stationLineRequest.toSection(stationLine));
         return createStationLineResponse(stationLine);
     }
 
@@ -63,7 +61,10 @@ public class StationLineService {
     }
 
     private StationLineResponse createStationLineResponse(StationLine stationLine) {
-        List<Station> stations = findRelatedStations(stationLine);
+        List<Station> stations = stationLine.getStationIdsIncluded()
+                .stream()
+                .map(id -> getStationOrThrow(id))
+                .collect(Collectors.toList());
 
         return new StationLineResponse(
                 stationLine.getId(),
@@ -73,15 +74,6 @@ public class StationLineService {
         );
     }
 
-    private List<Station> findRelatedStations(StationLine stationLine) {
-        List<Station> stations = new ArrayList<>();
-        Station upStation = getStationOrThrow(stationLine.getUpStationId());
-        Station downStation = getStationOrThrow(stationLine.getDownStationId());
-        stations.add(upStation);
-        stations.add(downStation);
-        return stations;
-    }
-
     private Station getStationOrThrow(Long id) {
         return stationRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(String.format("해당 %d의 id 값을 가진 Station은 존재하지 않습니다.", id), HttpStatus.BAD_REQUEST));
@@ -89,41 +81,33 @@ public class StationLineService {
 
     @Transactional
     public StationLineResponse registerSection(Long id, SectionRequest sectionRequest) {
-        Station Upstation = getStationOrThrow(sectionRequest.getUpStationId());
-        Station downStation = getStationOrThrow(sectionRequest.getDownStationId());
-
         StationLine stationLine = getStationLineOrThrow(id);
-        Station lineUpstation = getStationOrThrow(stationLine.getUpStationId());
-        Station lineDownStation = getStationOrThrow(stationLine.getDownStationId());
+        Section section = sectionRequest.toEntity(stationLine);
+        Station upStation = getStationOrThrow(section.getUpStationId());
+        Station downStation = getStationOrThrow(section.getDownStationId());
 
-        List<Long> stationIdsIncludedInLine = stationLine.stationIdsIncludedInLine();
-        List<Station> stationsIncludedInLine = stationIdsIncludedInLine.stream()
+        List<Section> sectionsIncludedInLine = stationLine.getSections();
+        Long lineDownStationId = sectionsIncludedInLine.get(sectionsIncludedInLine.size() - 1)
+                .getDownStationId();
+        List<Station> stationsIncludedInLine = stationLine.getStationIdsIncluded()
+                .stream()
                 .map(stationId -> getStationOrThrow(stationId))
                 .collect(Collectors.toList());
+        Station lineDownStation = getStationOrThrow(lineDownStationId);
 
-        validateRegisterSectionCondition(lineUpstation, lineDownStation, stationsIncludedInLine, Upstation, downStation);
 
-        stationLine.setDownStationId(downStation.getId());
+        validateRegisterSectionCondition(upStation, downStation, stationsIncludedInLine, lineDownStation);
 
-        stationsIncludedInLine.add(Upstation);
-        String newstationsIncludedInLine = stationListToIdStringSeperatedComma(stationsIncludedInLine);
-        stationLine.setStationsIncluded(newstationsIncludedInLine);
-
+        sectionRepository.save(section);
         return createStationLineResponse(stationLine);
     }
 
-    private String stationListToIdStringSeperatedComma(List<Station> stationsIncludedInLine) {
-        return StringUtils.join(stationsIncludedInLine.stream()
-                .map(station -> String.valueOf(station.getId()))
-                .collect(Collectors.toList()), ",");
-    }
-
-    private void validateRegisterSectionCondition(Station lineUpstation, Station lineDownStation, List<Station> stationsIncludedInLine, Station Upstation, Station downStation) {
-        if (!lineDownStation.equals(Upstation)) {
+    private void validateRegisterSectionCondition(Station upStation, Station downStation, List<Station> stationsIncludedInLine, Station lineDownStation) {
+        if (!lineDownStation.equals(upStation)) {
             throw new BusinessException("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닙니다.", HttpStatus.BAD_REQUEST);
         }
 
-        if (stationsIncludedInLine.contains(downStation) || lineUpstation.equals(downStation) || lineDownStation.equals(downStation)) {
+        if (stationsIncludedInLine.contains(downStation)) {
             throw new BusinessException("새로운 구간의 하행역이 해당 노선에 이미 등록되어있습니다.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -131,28 +115,26 @@ public class StationLineService {
     @Transactional
     public void deleteSection(Long id, Long stationId) {
         Station deleteStation = getStationOrThrow(stationId);
-
         StationLine stationLine = getStationLineOrThrow(id);
-        Station lineDownStation = getStationOrThrow(stationLine.getDownStationId());
-        List<Long> stationIdsIncludedInLine = stationLine.stationIdsIncludedInLine();
+        List<Section> sections = stationLine.getSections();
 
-        validateDeleteSectionCondition(lineDownStation, deleteStation, stationIdsIncludedInLine);
+        validateDeleteSectionCondition(deleteStation, sections);
 
-        Long newDownStationId = stationIdsIncludedInLine.get(stationIdsIncludedInLine.size() - 1);
-        stationLine.setDownStationId(newDownStationId);
-
-        String newstationsIncludedInLine = StringUtils.join(stationIdsIncludedInLine.remove(newDownStationId), ",");
-        stationLine.setStationsIncluded(newstationsIncludedInLine);
+        Section lineLastSection = sections.get(sections.size() - 1);
+        sectionRepository.delete(lineLastSection);
     }
 
-    private void validateDeleteSectionCondition(Station downStation, Station deleteStation, List<Long> stationIdsIncludedInLine) {
-        if (!downStation.equals(deleteStation)) {
+    private void validateDeleteSectionCondition(Station deleteStation, List<Section> sections) {
+        Long lineDownStationId = sections.get(sections.size() - 1)
+                .getDownStationId();
+        Station targetStation = getStationOrThrow(lineDownStationId);
+        if (!targetStation
+                .equals(deleteStation)) {
             throw new BusinessException("삭제하려는 역이 하행 종점역이 아닙니다.", HttpStatus.BAD_REQUEST);
         }
 
-        if (stationIdsIncludedInLine.isEmpty()) {
+        if (sections.size() == 1) {
             throw new BusinessException("지하철 노선에 상행 종점역과 하행 종점역만 존재합니다.", HttpStatus.BAD_REQUEST);
         }
-        return;
     }
 }

@@ -1,5 +1,8 @@
 package nextstep.subway.applicaion.dto;
 
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.StationLine;
+
 public class SectionRequest {
     private Long downStationId;
     private Long upStationId;
@@ -17,12 +20,7 @@ public class SectionRequest {
         return distance;
     }
 
-    @Override
-    public String toString() {
-        return "SectionRequest{" +
-                "downStationId=" + downStationId +
-                ", upStationId=" + upStationId +
-                ", distance=" + distance +
-                '}';
+    public Section toEntity(StationLine stationLine){
+        return new Section(this.distance, this.upStationId, this.downStationId, stationLine);
     }
 }
