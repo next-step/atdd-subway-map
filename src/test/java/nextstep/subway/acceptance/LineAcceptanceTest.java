@@ -46,13 +46,7 @@ class LineAcceptanceTest {
     @DirtiesContext
     void createLine() {
         // when
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
+        Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         ExtractableResponse<Response> response = createLines(params);
 
@@ -77,21 +71,8 @@ class LineAcceptanceTest {
     @DirtiesContext
     void getLines() {
         // given
-        Map<String, Object> params1 = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
-
-        Map<String, Object> params2 = Map.of(
-                "name", "분당선",
-                "color", "bg-yellow-600",
-                "upStationId", 1,
-                "downStationId", 3,
-                "distance", 20
-        );
+        Map<String, Object> params1 = params("신분당선", "bg-red-600", 1L, 2L, 10L);
+        Map<String, Object> params2 = params("분당선", "bg-yellow-600", 1L, 3L, 20L);
 
         createLines(params1);
         createLines(params2);
@@ -113,13 +94,7 @@ class LineAcceptanceTest {
     @DirtiesContext
     void getLine() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
+        Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         createLines(params);
 
@@ -140,13 +115,7 @@ class LineAcceptanceTest {
     @DirtiesContext
     void putLine() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
+        Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         createLines(params);
 
@@ -170,13 +139,7 @@ class LineAcceptanceTest {
     @DirtiesContext
     void deleteLine() {
         // given
-        Map<String, Object> params = Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        );
+        Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         createLines(params);
 
@@ -187,6 +150,16 @@ class LineAcceptanceTest {
         assertAll(
                 () -> assertThat(findLineById(1L).jsonPath().getString("name")).isNullOrEmpty(),
                 () -> assertThat(findLineById(1L).jsonPath().getString("color")).isNullOrEmpty()
+        );
+    }
+
+    private Map<String, Object> params(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        return Map.of(
+                "name", name,
+                "color", color,
+                "upStationId", upStationId,
+                "downStationId", downStationId,
+                "distance", distance
         );
     }
 
