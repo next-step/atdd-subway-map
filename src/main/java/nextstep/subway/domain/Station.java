@@ -28,6 +28,6 @@ public class Station {
     }
 
     public boolean isMatched(Station upStation) {
-        return this.id.equals(upStation.id);
+        return this.name.equals(upStation.name);
     }
 }

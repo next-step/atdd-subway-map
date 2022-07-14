@@ -63,4 +63,8 @@ public class Section {
     public boolean isMatched(Section section) {
         return this.downStation.isMatched(section.upStation);
     }
+
+    public boolean contains(Station station) {
+        return upStation.isMatched(station) || downStation.isMatched(station);
+    }
 }

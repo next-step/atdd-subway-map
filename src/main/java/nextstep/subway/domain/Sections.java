@@ -6,6 +6,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import nextstep.subway.exception.SectionNotMatchedException;
+import nextstep.subway.exception.StationAlreadyExistInSectionException;
 
 @Embeddable
 public class Sections {
@@ -30,7 +31,16 @@ public class Sections {
         if (!downEndStation.isMatched(section)) {
             throw new SectionNotMatchedException();
         }
+
+        if(stationsContain(section.getDownStation())){
+            throw new StationAlreadyExistInSectionException();
+        }
         sections.add(section);
+    }
+
+    private boolean stationsContain(Station station) {
+        return sections.stream()
+                .anyMatch(section -> section.contains(station));
     }
 
     private Section getDownEndStation() {
