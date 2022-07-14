@@ -93,7 +93,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
      */
     @Test
     @DisplayName("구간 제거 - 마지막 구간이 아닌 경우")
-    void deleteSection() {
+    void deleteSection_not_last_section() {
         // given
         Long 신규역_ID = 지하철역_생성("신규역");
         구간_등록(신규역_ID);
@@ -104,6 +104,25 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         // then
         List<Long> _2호선_지하철_목록 = 노선_지하철_목록_조회(_2호선_ID);
         assertThat(_2호선_지하철_목록).contains(신규역_ID);
+    }
+
+    /**
+     * `Given` 지하철 노선을 생성하고
+     * `When` 마지막 구간을 제거하면
+     * `Then` 400 에러 코드를 응답받고 구간이 그대로 남아있다.
+     */
+    @Test
+    @DisplayName("구간 제거 - 구간이 한개인(노선 생성만 이루어진 단계) 경우")
+    void deleteSection_only_one_section() {
+        // given
+        Long 신분당선_ID = 노선_생성("신분당선", "bg-green-600", 상행역_ID, 하행역_ID, 10);
+
+        // when
+        구간_제거_요청(신분당선_ID, 하행역_ID, HttpStatus.BAD_REQUEST);
+
+        // then
+        List<Long> 신분당선_지하철_목록 = 노선_지하철_목록_조회(신분당선_ID);
+        assertThat(신분당선_지하철_목록).containsOnly(상행역_ID, 하행역_ID);
     }
 
     private ExtractableResponse<Response> 구간_등록_요청(long id, long upStationId, long downStationId, int distance, HttpStatus httpStatus) {
