@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.DatabaseCleanup;
-import nextstep.subway.acceptance.utils.SectionUtils;
 import nextstep.subway.acceptance.utils.StationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +14,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.utils.DataUtils.*;
+import static nextstep.subway.acceptance.utils.SectionUtils.지하철_구간을_등록한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -43,8 +43,8 @@ public class SectionFailureTest {
 	@Test
 	void duplicateFailure() {
 		//when
-		ExtractableResponse<Response> registerUpStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, downStationId, upStationId, 10);
-		ExtractableResponse<Response> registerDownStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, downStationId, downStationId, 10);
+		ExtractableResponse<Response> registerUpStation = 지하철_구간을_등록한다(subwayLineId, downStationId, upStationId, 10);
+		ExtractableResponse<Response> registerDownStation = 지하철_구간을_등록한다(subwayLineId, downStationId, downStationId, 10);
 
 		//then
 		assertAll(
@@ -64,7 +64,7 @@ public class SectionFailureTest {
 		long otherStationId = StationUtils.지하철역을_등록한다("상현역").jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> registerWithUpStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, upStationId, otherStationId, 10);
+		ExtractableResponse<Response> registerWithUpStation = 지하철_구간을_등록한다(subwayLineId, upStationId, otherStationId, 10);
 
 		//then
 		assertThat(registerWithUpStation.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -77,9 +77,8 @@ public class SectionFailureTest {
 	@DisplayName("하행역이 아닌 역을 제거하려면 오류가 발생한다")
 	@Test
 	void deleteFailureOnUpStation() {
-		//given
-
 		//when
+
 
 		//then
 	}
