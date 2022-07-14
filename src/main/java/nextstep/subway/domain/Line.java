@@ -1,9 +1,7 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -16,31 +14,34 @@ public class Line {
     private String name;
     private String color;
 
-    private Long upStationId;
-    private Long downStationId;
     private Integer distance;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public Line(String name, String color, Station upStation, Station downStation, Integer distance) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.sections.add(new Section(this, upStation, downStation, distance));
+    }
+
+    public void edit(String name, String color, Integer distance) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (color != null && !color.isBlank()) {
+            this.color = color;
+        }
+        if (distance != null) {
+            this.distance = distance;
+        }
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
     }
 
     public String getName() {
@@ -55,22 +56,24 @@ public class Line {
         return distance;
     }
 
-    public void edit(Line line) {
-        if (line.getName() != null && !line.getName().isBlank()) {
-            name = line.getName();
-        }
-        if (line.getColor() != null && !line.getColor().isBlank()) {
-            color = line.getColor();
-        }
-        if (line.getUpStationId() != null) {
-            upStationId = line.getUpStationId();
-        }
-        if (line.getDownStationId() != null) {
-            downStationId = line.getDownStationId();
-        }
-        if (line.getDistance() != null) {
-            distance = line.getDistance();
-        }
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
+    public List<Station> getAllStation() {
+        return sections.getStations();
+    }
+
+    public boolean hasDownStation(Station station) {
+        return sections.hasDownStation(station);
+    }
+
+    public boolean isAlreadyOwnStation(Station station) {
+        return sections.isOwnStation(station);
+    }
+
+    public void deleteLastSection(Station station) {
+        sections.deleteLastSection(station);
     }
 
     @Override

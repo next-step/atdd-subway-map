@@ -68,9 +68,15 @@ public class LineRequestCollection {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철_노선_생성(String lineName, String color) {
+    public static ExtractableResponse<Response> 일호선_생성() {
+        Long upStationId = 지하철역_생성("서울역").jsonPath().getLong("id");
+        Long downStationId = 지하철역_생성("시청역").jsonPath().getLong("id");
+        return 지하철_노선_생성("1호선", "bg-blue-600", upStationId, downStationId, 10);
+    }
+
+    public static ExtractableResponse<Response> 이호선_생성() {
         Long upStationId = 지하철역_생성("강남역").jsonPath().getLong("id");
         Long downStationId = 지하철역_생성("건대입구역").jsonPath().getLong("id");
-        return 지하철_노선_생성(lineName, color, upStationId, downStationId, 10);
+        return 지하철_노선_생성("2호선", "bg-green-600", upStationId, downStationId, 10);
     }
 }
