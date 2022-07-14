@@ -15,8 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.ResponseParser.getIdFromResponse;
-import static nextstep.subway.line.LineAcceptanceTest.*;
-import static nextstep.subway.station.StationAcceptanceTest.createStationRequest;
+import static nextstep.subway.line.LineRestAssuredTestSource.노선생성;
+import static nextstep.subway.line.LineRestAssuredTestSource.노선조회;
+import static nextstep.subway.station.StationRestAssuredTestSource.역을생성함;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("구간 관련 기능")
@@ -156,11 +157,7 @@ class SectionAcceptanceTest {
     }
 
     private Long 신분당선을생성함() {
-        return getIdFromResponse(createLineRequest(createLineParams("신분당선", 상행역, 하행역)));
-    }
-
-    private Long 역을생성함(final String stationName) {
-        return getIdFromResponse(createStationRequest(stationName));
+        return getIdFromResponse(노선생성("신분당선", 상행역, 하행역));
     }
 
     private ExtractableResponse<Response> 새로운구간을등록함(final Long 신규상행역, final Long 신규하행역) {
@@ -199,11 +196,11 @@ class SectionAcceptanceTest {
     }
 
     private AbstractLongAssert<?> 하행역이변경되지않음(final Long 역) {
-        return assertThat((Long) getLineRequest(신분당선).jsonPath().getLong("stations[1].id")).isNotEqualTo(역);
+        return assertThat((Long) 노선조회(신분당선).jsonPath().getLong("stations[1].id")).isNotEqualTo(역);
     }
 
     private AbstractLongAssert<?> 하행역이변경됨(final Long 역) {
-        return assertThat((Long) getLineRequest(신분당선).jsonPath().getLong("stations[1].id")).isEqualTo(역);
+        return assertThat((Long) 노선조회(신분당선).jsonPath().getLong("stations[1].id")).isEqualTo(역);
     }
 
     private Map<String, Object> createSectionParams(final Long upStationId, final Long downStationId) {
