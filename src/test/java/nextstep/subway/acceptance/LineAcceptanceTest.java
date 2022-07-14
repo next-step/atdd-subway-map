@@ -11,8 +11,7 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
-import static nextstep.subway.acceptance.StationAcceptanceTest.NAME;
-import static nextstep.subway.acceptance.StationAcceptanceTest.createStation;
+import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
@@ -22,9 +21,9 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     public void setUp() {
         RestAssured.port = port;
 
-        createStation(Map.of(NAME, "남태령역"));
-        createStation(Map.of(NAME, "사당역"));
-        createStation(Map.of(NAME, "총신대입구역"));
+//        createStation(Map.of(NAME, "남태령역"));
+//        createStation(Map.of(NAME, "사당역"));
+//        createStation(Map.of(NAME, "총신대입구역"));
     }
 
     /**
@@ -35,7 +34,10 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @DisplayName("지하철노선을 생성한다.")
     void createLineTest() {
         // when
-        ExtractableResponse<Response> response = createLine("4호선", "bg-blue-300", 1, 2, 10);
+        long upStationId = createStationAndGetId(Map.of(NAME, "남태령역"));
+        long downStationId = createStationAndGetId(Map.of(NAME, "사당역"));
+
+        ExtractableResponse<Response> response = createLine("4호선", "bg-blue-300", upStationId, downStationId, 10);
         checkResponseStatus(response, HttpStatus.CREATED);
 
         // then
@@ -55,9 +57,14 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     @DisplayName("지하철노선의 목록이 조회된다.")
     void getLinesTest() {
+        long upStationId = createStationAndGetId(Map.of(NAME, "남태령역"));
+        long downStationId = createStationAndGetId(Map.of(NAME, "사당역"));
+
         // given
-        createLine("4호선", "bg-blue-300", 1, 2, 10);
-        createLine("2호선", "bg-green-300", 2, 3, 10);
+        createLine("4호선", "bg-blue-300", upStationId, downStationId, 10);
+
+        long nextStationId = createStationAndGetId(Map.of(NAME, "총신대입구역"));
+        createLine("2호선", "bg-green-300", downStationId, nextStationId, 10);
 
         // when
         ExtractableResponse<Response> response = getLines();
@@ -133,7 +140,10 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
 
 
     private long createLineAndGetId() {
-        return createLine("4호선", "bg-blue-300", 1, 2, 10)
+        long upStationId = createStationAndGetId(Map.of(NAME, "남태령역"));
+        long downStationId = createStationAndGetId(Map.of(NAME, "사당역"));
+
+        return createLine("4호선", "bg-blue-300", upStationId, downStationId, 10)
                 .jsonPath()
                 .getLong("id");
     }
