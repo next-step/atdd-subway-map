@@ -17,19 +17,16 @@ public class StationLine {
 
     private String color;
 
-    private int distance;
-
     @Embedded
-    private Stations stations;
+    private StationSections stationSections;
+
 
     protected StationLine() {
     }
 
-    public StationLine(String name, String color, int distance, Stations stations) {
+    public StationLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.stations = stations;
     }
 
     public String getName() {
@@ -40,10 +37,6 @@ public class StationLine {
         return color;
     }
 
-    public Stations getStations() {
-        return stations;
-    }
-
     public Long getId() {
         return id;
     }
@@ -51,5 +44,9 @@ public class StationLine {
     public void changeNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(StationSection stationSection) {
+        stationSections.addSection(this, stationSection);
     }
 }
