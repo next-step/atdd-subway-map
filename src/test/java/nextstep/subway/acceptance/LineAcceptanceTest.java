@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,7 +23,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createLine() {
+    void testCreateLine() {
         // when
         final ExtractableResponse<Response> response = testRestApi(
                 HttpMethod.POST,
@@ -42,10 +41,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final JsonPath resultPath = testRestApi(
-                HttpMethod.GET,
-                "/lines"
-        ).jsonPath();
+        final JsonPath resultPath = getAllLines();
         assertThat(resultPath.getList("name")).containsOnly("신분당선");
         assertThat(resultPath.getList("color")).containsOnly("bg-red-600");
         assertThat(resultPath.getList("upStationId")).containsOnly(1);
@@ -60,30 +56,22 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void getLineList() {
+    void testGetLineList() {
         // given
-        testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "신분당선",
-                        "color", "bg-red-600",
-                        "upStationId", 1,
-                        "downStationId", 2,
-                        "distance", 10
-                )
-        );
-        testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "분당선",
-                        "color", "bg-yellow-660",
-                        "upStationId", 1,
-                        "downStationId", 3,
-                        "distance", 15
-                )
-        );
+        createLine(Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        ));
+        createLine(Map.of(
+                "name", "분당선",
+                "color", "bg-yellow-660",
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 15
+        ));
 
         // when
         final ExtractableResponse<Response> response = testRestApi(
@@ -95,10 +83,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        final JsonPath resultPath = testRestApi(
-                HttpMethod.GET,
-                "/lines"
-        ).jsonPath();
+        final JsonPath resultPath = response.jsonPath();
         assertThat(resultPath.getList("name")).hasSize(2).containsOnly("신분당선", "분당선");
         assertThat(resultPath.getList("color")).hasSize(2).containsOnly("bg-red-600", "bg-yellow-660");
         assertThat(resultPath.getList("upStationId")).hasSize(2).containsOnly(1);
@@ -113,30 +98,22 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철 노션을 조회한다.")
     @Test
-    void getLine() {
+    void testGetLine() {
         // given
-        final ExtractableResponse<Response> newBundangLineResponse = testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "신분당선",
-                        "color", "bg-red-600",
-                        "upStationId", 1,
-                        "downStationId", 2,
-                        "distance", 10
-                )
-        );
-        testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "분당선",
-                        "color", "bg-yellow-660",
-                        "upStationId", 1,
-                        "downStationId", 3,
-                        "distance", 15
-                )
-        );
+        final ExtractableResponse<Response> newBundangLineResponse = createLine(Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        ));
+        createLine(Map.of(
+                "name", "분당선",
+                "color", "bg-yellow-660",
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 15
+        ));
 
         // when
         final ExtractableResponse<Response> response = testRestApi(
@@ -167,19 +144,15 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철 노선을 수정한다.")
     @Test
-    void updateLine() {
+    void testUpdateLine() {
         // when
-        final ExtractableResponse<Response> response = testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "신분당선",
-                        "color", "bg-red-600",
-                        "upStationId", 1,
-                        "downStationId", 2,
-                        "distance", 10
-                )
-        );
+        final ExtractableResponse<Response> response = createLine(Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        ));
         final Long targetId = response.jsonPath().getLong("id");
 
         // when
@@ -197,12 +170,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         assertThat(result.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        final JsonPath responsePath = testRestApi(
-                HttpMethod.GET,
-                "/lines/{id}",
-                Collections.emptyMap(),
-                targetId
-        ).jsonPath();
+        final JsonPath responsePath = getLine(targetId);
         assertThat(responsePath.getString("name")).isEqualTo("닥터나우선");
         assertThat(responsePath.getString("color")).isEqualTo("bg-orange-630");
     }
@@ -214,30 +182,22 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
-    void deleteLine() {
+    void testDeleteLine() {
         // given
-        final JsonPath pathNotToBeDeleted = testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "신분당선",
-                        "color", "bg-red-600",
-                        "upStationId", 1,
-                        "downStationId", 2,
-                        "distance", 10
-                )
-        ).jsonPath();
-        final JsonPath pathToBeDeleted = testRestApi(
-                HttpMethod.POST,
-                "/lines",
-                Map.of(
-                        "name", "분당선",
-                        "color", "bg-yellow-660",
-                        "upStationId", 1,
-                        "downStationId", 3,
-                        "distance", 15
-                )
-        ).jsonPath();
+        final JsonPath pathNotToBeDeleted = createLine(Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1,
+                "downStationId", 2,
+                "distance", 10
+        )).jsonPath();
+        final JsonPath pathToBeDeleted = createLine(Map.of(
+                "name", "분당선",
+                "color", "bg-yellow-660",
+                "upStationId", 1,
+                "downStationId", 3,
+                "distance", 15
+        )).jsonPath();
 
         // when
         final ExtractableResponse<Response> deleteResponse = testRestApi(
@@ -251,11 +211,32 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        final List<String> remainedStations = testRestApi(
-                HttpMethod.GET,
-                "/lines"
-        ).jsonPath().getList("name");
+        final List<String> remainedStations = getAllLines().getList("name");
         assertThat(remainedStations).contains(pathNotToBeDeleted.getString("name"));
         assertThat(remainedStations).doesNotContain(pathToBeDeleted.getString("name"));
+    }
+
+    private JsonPath createLine(final Map<String, Object> request) {
+        return testRestApi(
+                HttpMethod.POST,
+                "/lines",
+                request
+        ).jsonPath();
+    }
+
+    private JsonPath getAllLines() {
+        return testRestApi(
+                HttpMethod.GET,
+                "/lines"
+        ).jsonPath();
+    }
+
+    private JsonPath getLine(final Long id) {
+        return testRestApi(
+                HttpMethod.GET,
+                "/lines{id}",
+                Collections.emptyMap(),
+                id
+        ).jsonPath();
     }
 }

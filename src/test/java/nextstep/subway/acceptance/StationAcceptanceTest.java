@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +25,7 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void testCreateStation() {
         // when
         final ExtractableResponse<Response> response = testRestApi(
                 HttpMethod.POST,
@@ -36,10 +37,7 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final List<String> stationNames = testRestApi(
-                HttpMethod.GET,
-                "/stations"
-        ).jsonPath().getList("name", String.class);
+        final List<String> stationNames = getAllStations().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -50,12 +48,10 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void getStations() {
+    void testGetStations() {
         // given
         final List<String> stationNamesToInsert = List.of("선릉역", "역삼역");
-        stationNamesToInsert.forEach((stationName) -> testRestApi(
-                HttpMethod.POST,
-                "/stations",
+        stationNamesToInsert.forEach((stationName) -> createStation(
                 Map.of("name", stationName)
         ));
 
@@ -81,7 +77,7 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void testDeleteStation() {
         // given
         final String stationNameToBeDeleted = "선릉역";
         final String stationNameToBeRemained = "역삼역";
@@ -89,11 +85,9 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
 
         // given
         final List<Map<Object, Object>> respondedBody = stationNamesToInsert.stream()
-                .map((stationName) -> testRestApi(
-                        HttpMethod.POST,
-                        "/stations",
+                .map((stationName) -> createStation(
                         Map.of("name", stationName)
-                ).jsonPath().getMap("$"))
+                ).getMap("$"))
                 .collect(Collectors.toList());
         final Map<Object, Object> stationToBeDeleted = respondedBody.get(0);
 
@@ -109,11 +103,32 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        final List<String> remainedStations = testRestApi(
-                HttpMethod.GET,
-                "/stations"
-        ).jsonPath().getList("name");
+        final List<String> remainedStations = getAllStations().getList("name");
         assertThat(remainedStations).doesNotContain(stationNameToBeDeleted);
         assertThat(remainedStations).contains(stationNameToBeRemained);
+    }
+
+    private JsonPath createStation(final Map<String, Object> request) {
+        return testRestApi(
+                HttpMethod.POST,
+                "/stations",
+                request
+        ).jsonPath();
+    }
+
+    private JsonPath getAllStations() {
+        return testRestApi(
+                HttpMethod.GET,
+                "/stations"
+        ).jsonPath();
+    }
+
+    private JsonPath getStation(final Long id) {
+        return testRestApi(
+                HttpMethod.GET,
+                "/stations{id}",
+                Collections.emptyMap(),
+                id
+        ).jsonPath();
     }
 }
