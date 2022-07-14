@@ -66,7 +66,7 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
 
         // then
         final List<String> respondedNames = response.body().jsonPath().getList("name", String.class);
-        respondedNames.containsAll(stationNamesToInsert);
+        assertThat(respondedNames).containsAll(stationNamesToInsert);
         assertThat(respondedNames).hasSize(stationNamesToInsert.size());
     }
 
@@ -120,15 +120,6 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
         return testRestApi(
                 HttpMethod.GET,
                 "/stations"
-        ).jsonPath();
-    }
-
-    private JsonPath getStation(final Long id) {
-        return testRestApi(
-                HttpMethod.GET,
-                "/stations{id}",
-                Collections.emptyMap(),
-                id
         ).jsonPath();
     }
 }

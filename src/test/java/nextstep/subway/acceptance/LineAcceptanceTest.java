@@ -30,10 +30,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
                 "/lines",
                 Map.of(
                         "name", "신분당선",
-                        "color", "bg-red-600",
-                        "upStationId", 1,
-                        "downStationId", 2,
-                        "distance", 10
+                        "color", "bg-red-600"
                 )
         );
 
@@ -44,9 +41,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         final JsonPath resultPath = getAllLines();
         assertThat(resultPath.getList("name")).containsOnly("신분당선");
         assertThat(resultPath.getList("color")).containsOnly("bg-red-600");
-        assertThat(resultPath.getList("upStationId")).containsOnly(1);
-        assertThat(resultPath.getList("downStationId")).containsOnly(2);
-        assertThat(resultPath.getList("distance")).containsOnly(10);
+        assertThat(resultPath.getList("stations")).containsOnly(Collections.emptyList());
     }
 
     /**
@@ -60,17 +55,11 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         // given
         createLine(Map.of(
                 "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
+                "color", "bg-red-600"
         ));
         createLine(Map.of(
                 "name", "분당선",
-                "color", "bg-yellow-660",
-                "upStationId", 1,
-                "downStationId", 3,
-                "distance", 15
+                "color", "bg-yellow-660"
         ));
 
         // when
@@ -86,9 +75,8 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         final JsonPath resultPath = response.jsonPath();
         assertThat(resultPath.getList("name")).hasSize(2).containsOnly("신분당선", "분당선");
         assertThat(resultPath.getList("color")).hasSize(2).containsOnly("bg-red-600", "bg-yellow-660");
-        assertThat(resultPath.getList("upStationId")).hasSize(2).containsOnly(1);
-        assertThat(resultPath.getList("downStationId")).hasSize(2).containsOnly(2, 3);
-        assertThat(resultPath.getList("distance")).hasSize(2).containsOnly(10, 15);
+        assertThat(resultPath.getList("stations"))
+                .hasSize(2).containsOnly(Collections.emptyList(), Collections.emptyList());
     }
 
     /**
@@ -100,19 +88,13 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
     @Test
     void testGetLine() {
         // given
-        final ExtractableResponse<Response> newBundangLineResponse = createLine(Map.of(
+        final JsonPath newBundangLinePath = createLine(Map.of(
                 "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
+                "color", "bg-red-600"
         ));
         createLine(Map.of(
                 "name", "분당선",
-                "color", "bg-yellow-660",
-                "upStationId", 1,
-                "downStationId", 3,
-                "distance", 15
+                "color", "bg-yellow-660"
         ));
 
         // when
@@ -120,7 +102,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
                 HttpMethod.GET,
                 "/lines/{id}",
                 Collections.emptyMap(),
-                newBundangLineResponse.jsonPath().getLong("id")
+                newBundangLinePath.getLong("id")
         );
 
         // then
@@ -128,12 +110,9 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
 
         // then
         final JsonPath resultPath = response.jsonPath();
-        final JsonPath newBundangLinePath = newBundangLineResponse.jsonPath();
         assertThat(resultPath.getString("name")).isEqualTo(newBundangLinePath.getString("name"));
         assertThat(resultPath.getString("color")).isEqualTo(newBundangLinePath.getString("color"));
-        assertThat(resultPath.getString("upStationId")).isEqualTo(newBundangLinePath.getString("upStationId"));
-        assertThat(resultPath.getString("downStationId")).isEqualTo(newBundangLinePath.getString("downStationId"));
-        assertThat(resultPath.getString("distance")).isEqualTo(newBundangLinePath.getString("distance"));
+        assertThat(resultPath.getList("stations")).isEmpty();
 
     }
 
@@ -146,14 +125,11 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
     @Test
     void testUpdateLine() {
         // when
-        final ExtractableResponse<Response> response = createLine(Map.of(
+        final JsonPath path = createLine(Map.of(
                 "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
+                "color", "bg-red-600"
         ));
-        final Long targetId = response.jsonPath().getLong("id");
+        final Long targetId = path.getLong("id");
 
         // when
         final ExtractableResponse<Response> result = testRestApi(
@@ -186,18 +162,12 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
         // given
         final JsonPath pathNotToBeDeleted = createLine(Map.of(
                 "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1,
-                "downStationId", 2,
-                "distance", 10
-        )).jsonPath();
+                "color", "bg-red-600"
+        ));
         final JsonPath pathToBeDeleted = createLine(Map.of(
                 "name", "분당선",
-                "color", "bg-yellow-660",
-                "upStationId", 1,
-                "downStationId", 3,
-                "distance", 15
-        )).jsonPath();
+                "color", "bg-yellow-660"
+        ));
 
         // when
         final ExtractableResponse<Response> deleteResponse = testRestApi(
@@ -234,7 +204,7 @@ public class LineAcceptanceTest extends AcceptanceBaseTest {
     private JsonPath getLine(final Long id) {
         return testRestApi(
                 HttpMethod.GET,
-                "/lines{id}",
+                "/lines/{id}",
                 Collections.emptyMap(),
                 id
         ).jsonPath();

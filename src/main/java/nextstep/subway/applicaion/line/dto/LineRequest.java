@@ -20,9 +20,6 @@ public class LineRequest {
                 .id(id)
                 .name(this.name)
                 .color(this.color)
-                .upStationId(this.upStationId)
-                .downStationId(this.downStationId)
-                .distance(this.distance)
                 .build();
     }
 }

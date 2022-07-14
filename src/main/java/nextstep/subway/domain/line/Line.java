@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.line.dto.LineResponse;
+import nextstep.subway.domain.station.Station;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -25,20 +25,15 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
-
-    private Long downStationId;
-
-    private Integer distance;
+    @OneToMany(mappedBy = "id")
+    private List<Station> stations = new ArrayList<>();
 
     public LineResponse toResponse() {
         return LineResponse.builder()
                 .id(id)
                 .name(name)
                 .color(color)
-                .upStationId(upStationId)
-                .downStationId(downStationId)
-                .distance(distance)
+                .stations(stations)
                 .build();
     }
 }
