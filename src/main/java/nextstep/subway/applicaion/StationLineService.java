@@ -28,32 +28,30 @@ public class StationLineService {
 
     @Transactional
     public StationLineResponse createStationLine(StationLineRequest request) {
-        Station upStation = findStationById(request.getUpStationId());
-        Station downStation = findStationById(request.getDownStationId());
-        StationLine stationLine = stationLineMapper.of(request, upStation, downStation);
+        StationLine stationLine = stationLineMapper.of(request);
         StationLine savedStationLine = stationLineRepository.save(stationLine);
-        return stationLineMapper.of(savedStationLine);
+        Station upStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getUpStationId());
+        return stationLineMapper.of(savedStationLine, upStation, downStation);
     }
 
     @Transactional(readOnly = true)
     public List<StationLineResponse> getStationLines() {
         List<StationLine> stationLines = stationLineRepository.findAll();
         return stationLines.stream()
-                .map(stationLineMapper::of)
+                .map(savedStationLine -> stationLineMapper.of(savedStationLine, findLineStations(savedStationLine)))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public StationLineResponse getStationLine(Long lineId) {
-        StationLine stationLine = stationLineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
-        return stationLineMapper.of(stationLine);
+        StationLine stationLine = findLineById(lineId);
+        return stationLineMapper.of(stationLine, findLineStations(stationLine));
     }
 
     @Transactional
     public void updateStationLine(Long lineId, StationLineRequest request) {
-        StationLine stationLine = stationLineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
+        StationLine stationLine = findLineById(lineId);
         stationLine.changeNameAndColor(request.getName(), request.getColor());
     }
 
@@ -65,5 +63,14 @@ public class StationLineService {
     private Station findStationById(Long request) {
         return stationRepository.findById(request)
                 .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
+    }
+
+    protected StationLine findLineById(Long lineId) {
+        return stationLineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
+    }
+
+    private List<Station> findLineStations(StationLine stationLine) {
+        return stationRepository.findByIdIn(stationLine.getStationIds());
     }
 }

@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -48,5 +49,9 @@ public class StationLine {
 
     public void addSection(StationSection stationSection) {
         stationSections.addSection(this, stationSection);
+    }
+
+    public List<Long> getStationIds(){
+        return stationSections.getStationIds();
     }
 }
