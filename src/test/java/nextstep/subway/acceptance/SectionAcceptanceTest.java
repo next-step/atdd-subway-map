@@ -83,7 +83,7 @@ public class SectionAcceptanceTest {
 
         
         // then - 기등록된 구간의 하행 종점역과 다르므로 새로운 구간 등록에 실패한다
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        지하철_구간_등록_실패됨(response);
     }
 
     /**
@@ -101,7 +101,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 하행역, 신규역, 8);
 
         // then - 신규 구간의 하행역은 해당 노선에 등록되어 있는 역인 경우, 잘못된 요청이다
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        지하철_구간_등록_실패됨(response);
     }
 
     /**
@@ -139,7 +139,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 상행역);
 
         // then - 삭제 요청한 지하철 역이 하행 종점역이 아니므로 오류 처리된다
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        지하철_구간_삭제_실패됨(response);
     }
 
     /**
@@ -153,7 +153,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 하행역);
         
         // then - 한 개의 구간만 잇는 경우, 잘못된 요청 오류가 발생한다
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        지하철_구간_삭제_실패됨(response);
     }
     
     private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long 신분당선, Long 신규역) {
@@ -180,5 +180,13 @@ public class SectionAcceptanceTest {
         params.put("distance", String.valueOf(distance));
 
         return params;
+    }
+
+    private void 지하철_구간_등록_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void 지하철_구간_삭제_실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
