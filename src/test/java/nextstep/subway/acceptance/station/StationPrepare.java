@@ -1,18 +1,24 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.station;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.StationRequest;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class StationPrepare {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static String params;
+
     public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
+        try {
+            params = objectMapper.writeValueAsString(new StationRequest(name));
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
 
         return RestAssured.given().log().all()
                 .body(params)
