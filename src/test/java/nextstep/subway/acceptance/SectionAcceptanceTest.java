@@ -49,15 +49,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
 
         // then
-        assertAll(() -> {
-            assertThat(조회한_8호선.getName()).isEqualTo("8호선");
-            assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
-            assertThat(조회한_8호선.getStationResponses()).containsExactly(
-                    new StationResponse(1L, "모란역"),
-                    new StationResponse(2L, "암사역"),
-                    new StationResponse(3L, "한성백제역")
-            );
-        });
+        assertThat(조회한_8호선.getStationResponses()).containsExactly(
+                new StationResponse(1L, "모란역"),
+                new StationResponse(2L, "암사역"),
+                new StationResponse(3L, "한성백제역")
+        );
     }
 
     /**
@@ -76,16 +72,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         // then
         var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
-
-        // then
-        assertAll(() -> {
-            assertThat(조회한_8호선.getName()).isEqualTo("8호선");
-            assertThat(조회한_8호선.getColor()).isEqualTo("bg-pink-500");
-            assertThat(조회한_8호선.getStationResponses()).containsExactly(
-                    new StationResponse(1L, "모란역"),
-                    new StationResponse(2L, "암사역")
-            );
-        });
+        assertThat(조회한_8호선.getStationResponses()).doesNotContain(
+                new StationResponse(3L, "한성백제역")
+        );
     }
 
     /**
@@ -130,7 +119,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(지하철역_이름_목록).containsExactly("모란역", "암사역", "한성백제역", "문정역");
 
     }
-
 
 
     private ExtractableResponse<Response> 구간을_만들다(Long id, Long upStationId, Long downStationId, Long distance) {

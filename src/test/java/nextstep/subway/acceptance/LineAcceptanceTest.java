@@ -108,10 +108,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertAll(() -> {
             assertThat(_2호선.getName()).isEqualTo("2호선");
             assertThat(_2호선.getColor()).isEqualTo("bg-lime-300");
-            assertThat(_2호선.getStationResponses()).containsExactly(
-                    new StationResponse(1L, "모란역"),
-                    new StationResponse(2L, "암사역")
-            );
         });
     }
 
