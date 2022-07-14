@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import static nextstep.subway.acceptance.LineAcceptanceTest.노선을_만들다;
 import static nextstep.subway.acceptance.LineAcceptanceTest.노선을_조회한다;
 import static nextstep.subway.acceptance.StationAcceptanceTest.역을_만들다;
-import static nextstep.subway.acceptance.StationAcceptanceTest.지하철역_목록을_조회한다;
 import static nextstep.subway.acceptance.common.RestAssuredTemplate.deleteRequestWithParameter;
 import static nextstep.subway.acceptance.common.RestAssuredTemplate.postRequestWithParameterAndRequestBody;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,15 +44,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
 
         // when
-        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
+        var 조회한_8호선_구간 = 노선을_조회한다(_8호선).as(LineResponse.class).getStationResponses();
 
         // then
-        assertThat(조회한_8호선.getStationResponses()).containsExactly(
+        assertThat(조회한_8호선_구간).containsExactly(
                 new StationResponse(1L, "모란역"),
                 new StationResponse(2L, "암사역"),
                 new StationResponse(3L, "한성백제역")
         );
-
     }
 
     /**
@@ -71,10 +69,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         구간을_만들다(_8호선, 한성백제역, 문정역, 10L);
 
         // when
-        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
+        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class).getStationResponses();
 
         // then
-        assertThat(조회한_8호선.getStationResponses()).containsExactly(
+        assertThat(조회한_8호선).containsExactly(
                 new StationResponse(1L, "모란역"),
                 new StationResponse(2L, "암사역"),
                 new StationResponse(3L, "한성백제역"),
@@ -97,8 +95,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         구간을_삭제한다(_8호선, 한성백제역);
 
         // then
-        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
-        assertThat(조회한_8호선.getStationResponses()).doesNotContain(
+        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class).getStationResponses();
+        assertThat(조회한_8호선).doesNotContain(
                 new StationResponse(3L, "한성백제역")
         );
     }
