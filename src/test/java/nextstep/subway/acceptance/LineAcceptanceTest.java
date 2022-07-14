@@ -217,7 +217,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("마지막 구간이 아닌 구간 제거시 예외 발생 테스트")
 	@Test
-	void checkLastSectionTest() throws Exception {
+	void checkLastSectionTest() {
 
 		//given
 		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
