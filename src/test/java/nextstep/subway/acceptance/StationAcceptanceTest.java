@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -86,7 +85,7 @@ public class StationAcceptanceTest {
         deleteStationById(1);
 
         // then
-        assertThat(filterStationByName(findAllStations().jsonPath().getList("name"), "강남역")).isEmpty();
+        assertThat(findAllStations().jsonPath().getList("name")).doesNotContain("강남역");
     }
 
     private ExtractableResponse<Response> createStations(String stationName) {
@@ -111,8 +110,5 @@ public class StationAcceptanceTest {
                 .then().log().all().extract();
     }
 
-    private List<String> filterStationByName(List<String> stationNames, String stationName) {
-        return stationNames.stream().filter(n -> n.equals(stationName)).collect(Collectors.toList());
-    }
 
 }
