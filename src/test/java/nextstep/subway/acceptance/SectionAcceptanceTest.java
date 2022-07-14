@@ -32,6 +32,7 @@ public class SectionAcceptanceTest {
 
     private Long 상행역;
     private Long 하행역;
+    private Long 신규역;
     private Long 신분당선;
 
     @BeforeEach
@@ -57,14 +58,33 @@ public class SectionAcceptanceTest {
     @Test
     void createSection() {
         // given - 지하철 역을 생성한다
-        상행역 = 지하철역_생성_요청("언주역").jsonPath().getLong("id");
-        하행역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
+        신규역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
 
-        // when - 지하철 구간을 등록한
-        ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 상행역, 하행역, 8);
+        // when - 지하철 구간을 등록한다
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 하행역, 신규역, 8);
 
-        // then
+        // then - 지하철 노선 목록 조회 시 생성한 구간을 찾을 수 있다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    /**
+     * Given 지하철 구간을 등록하고
+     * When 새로운 구간을 등록하면
+     * Then 기등록된 구간의 하행 종점역과 다르므로 새로운 구간 등록에 실패한다
+     */
+    @DisplayName("새로운 구간을 등록하는 경우 상행역이 해당 노선에 기등록되어있는 하행 종점역과 다르다.")
+    @Test
+    void addNewUpStationNotMatchedPreviouslyDownStation() {
+        // given -  지하철 구간을 등록한다
+        지하철_구간_등록_요청(신분당선, 상행역, 하행역, 2);
+
+        // when - 새로운 지하철 구간을 등록한다
+        신규역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 상행역, 신규역, 8);
+
+        
+        // then - 기등록된 구간의 하행 종점역과 다르므로 새로운 구간 등록에 실패한다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private ExtractableResponse<Response> 지하철_구간_등록_요청(Long 신분당선, Long 상행역, Long 하행역, int distance) {
