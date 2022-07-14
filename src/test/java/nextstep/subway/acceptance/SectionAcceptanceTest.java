@@ -123,6 +123,25 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * Given 지하철 구간이 등록되고
+     * When 지하철 역을 삭재하면
+     * Then 하행 종점역이 아닌 경우, 잘못된 요청 처리가 된다
+     */
+    @DisplayName("삭제 요청된 역이 지하철 노선의 하행 종점역이 아닌 경우, 오류가 발생한다.")
+    @Test
+    void deleteSectionException() {
+        // given - 지하철 구간을 등록한다
+        신규역 = 지하철역_생성_요청("선정릉역").jsonPath().getLong("id");
+        지하철_구간_등록_요청(신분당선, 하행역, 신규역, 8);
+
+        // when - 지하철 역을 삭제요청 한다
+        ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 상행역);
+
+        // then - 삭제 요청한 지하철 역이 하행 종점역이 아니므로 오류 처리된다
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private ExtractableResponse<Response> 지하철_구간_삭제_요청(Long 신분당선, Long 신규역) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
