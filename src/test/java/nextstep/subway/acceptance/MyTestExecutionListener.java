@@ -20,7 +20,7 @@ public class MyTestExecutionListener extends AbstractTestExecutionListener {
     }
 
     @Override
-    public void afterTestExecution(final TestContext testContext) {
+    public void afterTestMethod(final TestContext testContext) {
         final JdbcTemplate jdbcTemplate = getJdbcTemplate(testContext);
         final List<String> truncateQueries = getTruncateQueries(jdbcTemplate);
         truncateTables(jdbcTemplate, truncateQueries);
