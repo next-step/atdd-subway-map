@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 
@@ -55,5 +57,15 @@ public class StationSections {
 
     private int getLastIndex() {
         return stationSections.size() - 1;
+    }
+
+    public List<Long> getStationIds() {
+        List<Long> upStationIds = stationSections.stream()
+                .map(StationSection::getUpStationId)
+                .collect(Collectors.toList());
+        Long downStationId = getLastSection().getDownStationId();
+        List<Long> stationIds = new ArrayList<>(upStationIds);
+        stationIds.add(downStationId);
+        return stationIds;
     }
 }
