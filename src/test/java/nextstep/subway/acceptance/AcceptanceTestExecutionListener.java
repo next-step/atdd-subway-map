@@ -7,7 +7,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 import java.util.List;
 
-public class MyTestExecutionListener extends AbstractTestExecutionListener {
+public class AcceptanceTestExecutionListener extends AbstractTestExecutionListener {
 
     @Override
     public void beforeTestMethod(final TestContext testContext) {
