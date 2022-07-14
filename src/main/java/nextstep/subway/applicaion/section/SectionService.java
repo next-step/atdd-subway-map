@@ -18,32 +18,18 @@ public class SectionService {
     private final StationRepository stationRepository;
 
     public Section createInitialSection(Long lineId, SectionCreationRequest request) {
-        var upStation = getStation(request.getUpStationId());
-        var downStation = getStation(request.getDownStationId());
-        var firstSection = sectionRepository.save(new Section(lineId, upStation));
-        var secondSection = sectionRepository.save(new Section(lineId, downStation));
-        firstSection.setNextSection(secondSection, request.getDistance());
-        secondSection.setPrevSection(firstSection);
+        var firstSection = createSection(lineId, request.getUpStationId());
+        var secondSection = createSection(lineId, request.getDownStationId());
+        linkSections(firstSection, secondSection, request.getDistance());
         return firstSection;
     }
 
     public void addSection(Long lineId, SectionCreationRequest request) {
         var upStation = getStation(request.getUpStationId());
-        var downStation = getStation(request.getDownStationId());
         var section = sectionRepository.findByLineIdAndStation(lineId, upStation)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선이거나 노선에 상행역이 없습니다."));
-
-        if (section.getNextSection() != null) {
-            throw new IllegalStateException("종점이 아닌 역에 구간을 추가할 수 없습니다.");
-        }
-
-        if (isExistSection(lineId, downStation)) {
-            throw new IllegalStateException("이미 노선에 존재하는 역입니다.");
-        }
-
-        var nextSection = sectionRepository.save(new Section(lineId, downStation));
-        section.setNextSection(nextSection, request.getDistance());
-        nextSection.setPrevSection(section);
+        var nextSection = createSection(lineId, request.getDownStationId());
+        linkSections(section, nextSection, request.getDistance());
     }
 
     public void deleteSection(Long lineId, Long stationId) {
@@ -71,7 +57,25 @@ public class SectionService {
                 .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 역 ID 입니다."));
     }
 
+    private Section createSection(Long lineId, Long stationId) {
+        var station = getStation(stationId);
+        if (isExistSection(lineId, station)) {
+            throw new IllegalStateException("이미 노선에 존재하는 역입니다.");
+        }
+
+        return sectionRepository.save(new Section(lineId, station));
+    }
+
     private boolean isExistSection(Long lineId, Station station) {
         return sectionRepository.findByLineIdAndStation(lineId, station).isPresent();
+    }
+
+    private void linkSections(Section upSection, Section downSection, Long distance) {
+        if (upSection.getNextSection() != null) {
+            throw new IllegalStateException("종점이 아닌 역에 구간을 추가할 수 없습니다.");
+        }
+
+        upSection.setNextSection(downSection, distance);
+        downSection.setPrevSection(upSection);
     }
 }
