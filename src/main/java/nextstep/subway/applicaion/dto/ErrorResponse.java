@@ -1,4 +1,4 @@
-package nextstep.subway.exception;
+package nextstep.subway.applicaion.dto;
 
 import lombok.Getter;
 import lombok.Setter;
