@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class Line {
     @Column(nullable = false)
     private Integer distance;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
 
@@ -53,14 +54,40 @@ public class Line {
                 .collect(Collectors.toSet());
     }
 
-    public boolean inValidSectionDelete() {
-        return this.sections.size() < 2;
-    }
-
     public Line updateNameAndColor(final String name, final String color) {
         this.name = name;
         this.color = color;
 
         return this;
     }
+
+    public void addSection(Section section) {
+        this.sections.add(
+                section.toBuilder()
+                        .line(this)
+                        .build());
+    }
+
+    public void deleteStation(Station station) {
+        if (inValidSectionDelete()) {
+            throw new BadRequestException("section can not delete");
+        }
+
+        Station lastStation = sections.get(getLastIndex()).getDownStation();
+
+        if (!station.equals(lastStation)) {
+            throw new BadRequestException("section can not delete");
+        }
+
+        sections.remove(getLastIndex());
+    }
+
+    private int getLastIndex() {
+        return sections.size() - 1;
+    }
+
+    private boolean inValidSectionDelete() {
+        return this.sections.size() < 2;
+    }
+
 }

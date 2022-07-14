@@ -29,7 +29,7 @@ public class Section {
     @JoinColumn(name = "down_station_id")
     private Station downStation;
 
-    @Builder
+    @Builder(toBuilder = true)
     public Section(Line line, Station upStation, Station downStation) {
         this.line = line;
         this.upStation = upStation;

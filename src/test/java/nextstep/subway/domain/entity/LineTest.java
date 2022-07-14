@@ -70,36 +70,6 @@ class LineTest extends BaseSpringBootTest {
         assertThat(getLine.getStations()).hasSize(2);
     }
 
-    @Test
-    @DisplayName("구간이 2개 이하일경우에는 삭제 유효성 체크시 false 가 외에는 true가 나타난다.")
-    @Transactional
-    void inValidSectionDeleteTest() {
-        Line line = lineRepository.save(createMockLine());
-        Station station1 = stationRepository.save(Station.builder().name("남태령역").build());
-        Station station2 = stationRepository.save(Station.builder().name("사당역").build());
-
-        sectionRepository.saveAndFlush(Section.builder()
-                .line(line)
-                .upStation(station1)
-                .downStation(station2)
-                .build());
-
-        Line invalidSectionDeleteLine = lineRepository.getById(line.getId());
-        assertThat(invalidSectionDeleteLine.inValidSectionDelete()).isTrue();
-
-
-        Station station3 = stationRepository.save(Station.builder().name("총신대입구역").build());
-        sectionRepository.save(Section.builder()
-                .line(line)
-                .upStation(station2)
-                .downStation(station3)
-                .build());
-
-        entityManager.clear();
-        Line validSectionDeleteLine = lineRepository.getById(line.getId());
-        assertThat(validSectionDeleteLine.inValidSectionDelete()).isFalse();
-
-    }
 
     private Line createMockLine() {
         return createMockLine(null);

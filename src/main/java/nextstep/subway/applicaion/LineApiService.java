@@ -22,25 +22,22 @@ import java.util.stream.Collectors;
 public class LineApiService {
 
     private final LineService lineService;
-    private final SectionService sectionService;
     private final StationService stationService;
 
 
     @Transactional
-    public long createLine(final LineCreateDto lineDto) {
+    public LineDto createLine(final LineCreateDto lineDto) {
         Line line = lineService.save(lineDto.toDomain());
 
         Station upStation = stationService.findStation(lineDto.getUpStationId());
         Station downStation = stationService.findStation(lineDto.getDownStationId());
 
-        sectionService.save(
-                Section.builder()
-                        .upStation(upStation)
-                        .downStation(downStation)
-                        .line(line)
-                        .build());
+        line.addSection(Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .build());
 
-        return line.getId();
+        return LineDto.of(line);
     }
 
     public List<LineDto> getLines() {
@@ -68,9 +65,6 @@ public class LineApiService {
     @Transactional
     public void deleteLine(Long id) {
         Line line = lineService.findLine(id);
-        List<Section> sections = sectionService.findByLine(line);
-
-        sectionService.deleteAll(sections);
         lineService.delete(line);
     }
 }

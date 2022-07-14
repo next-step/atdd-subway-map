@@ -1,12 +1,11 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.dto.SectionDto;
 import nextstep.subway.domain.entity.Line;
-import nextstep.subway.domain.service.LineService;
 import nextstep.subway.domain.entity.Section;
-import nextstep.subway.domain.service.SectionService;
 import nextstep.subway.domain.entity.Station;
+import nextstep.subway.domain.service.LineService;
+import nextstep.subway.domain.service.SectionService;
 import nextstep.subway.domain.service.StationService;
 import nextstep.subway.exception.BadRequestException;
 import nextstep.subway.ui.dto.SectionRequest;
@@ -23,7 +22,7 @@ public class SectionApiService {
     private final StationService stationService;
 
     @Transactional
-    public SectionDto createSection(Long lineId, SectionRequest sectionRequest) {
+    public void createSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineService.findLine(lineId);
 
         Station newUpStation = stationService.findStation(sectionRequest.getUpStationId());
@@ -47,33 +46,18 @@ public class SectionApiService {
             throw new BadRequestException("downStation is already connected");
         }
 
-        Section section = sectionService.save(
+        line.addSection(
                 Section.builder()
                         .upStation(newUpStation)
                         .downStation(newDownStation)
-                        .line(line)
-                        .build()
-        );
-
-        return SectionDto.of(section);
+                        .build());
     }
 
     @Transactional
-    public void deleteSection(Long lineId, Long sectionId) {
+    public void deleteSection(Long lineId, Long stationId) {
         Line line = lineService.findLine(lineId);
+        Station station = stationService.findStation(stationId);
 
-        if (line.inValidSectionDelete()) {
-            throw new BadRequestException("section can not delete");
-        }
-
-        Section section = sectionService.findSection(sectionId);
-
-        boolean isConnectStation = sectionService.existsByLineAndUpStation(line, section.getDownStation());
-
-        if (isConnectStation) {
-            throw new BadRequestException("section can not delete");
-        }
-
-        sectionService.delete(section);
+        line.deleteStation(station);
     }
 }

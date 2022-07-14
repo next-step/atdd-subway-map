@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.LineAcceptanceTest.createLine;
@@ -100,12 +101,14 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
         long lineId = createLineAndGetId(1, 2);
 
         // given
-        long sectionId = createSectionAndGetId(lineId, 2, 3);
+        createSection(lineId, 2, 3, 10);
         ExtractableResponse<Response> afterCreateLineResponse = getLine(lineId);
         assertThat(afterCreateLineResponse.jsonPath().getList("stations")).hasSize(3);
 
+
+        List<Long> stationIds = afterCreateLineResponse.jsonPath().getList("stations.id", Long.class);
         // when
-        ExtractableResponse<Response> response = deleteSection(lineId, sectionId);
+        ExtractableResponse<Response> response = deleteSection(lineId, getLastStationId(stationIds));
 
         // then
         checkResponseStatus(response, HttpStatus.NO_CONTENT);
@@ -140,12 +143,6 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
                 .getLong("id");
     }
 
-    private long createSectionAndGetId(long lineId, long upStationId, long downStationId) {
-        return createSection(lineId, upStationId, downStationId, 10)
-                .jsonPath()
-                .getLong("id");
-    }
-
     private ExtractableResponse<Response> createSection(long lineId, long upStationId, long downStationId, int distance) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -159,11 +156,16 @@ public class LineSectionAcceptanceTest extends BaseAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> deleteSection(long lineId, long sectionId) {
+    private ExtractableResponse<Response> deleteSection(long lineId, long stationId) {
         return RestAssured.given().log().all()
-                .when().delete("/lines/{lineId}/sections/{sectionId}", lineId, sectionId)
+                .param("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
+    }
+
+    private Long getLastStationId(List<Long> stationIds) {
+        return stationIds.get(stationIds.size() - 1);
     }
 
 }
