@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.station;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -9,12 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 
-import static nextstep.subway.acceptance.StationPrepare.*;
+import static nextstep.subway.acceptance.station.StationPrepare.지하철역_생성_요청;
+import static nextstep.subway.acceptance.station.StationPrepare.지하철역_조회_요청;
+import static nextstep.subway.acceptance.station.StationPrepare.지하철역_삭제_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Sql("classpath:/database-init.sql")
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationAcceptanceTest {
