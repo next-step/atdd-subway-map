@@ -56,13 +56,13 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철역을 제거한다.")
     @Test()
     void deleteStation() {
-        String StationRootPath = SubwayRequestPath.STATION.getValue();
-        ValidatableResponse 지하철역_등록결과 = stationRestAssured.postRequest(StationRootPath, new Station("사당역"));
+        String stationRootPath = SubwayRequestPath.STATION.getValue();
+        ValidatableResponse 지하철역_등록결과 = stationRestAssured.postRequest(stationRootPath, new Station("사당역"));
 
         String nextLocation = 지하철역_등록결과.extract().header("Location");
         stationRestAssured.deleteRequest(nextLocation);
 
-        stationRestAssured.getRequest(StationRootPath).body("id", hasSize(0));
+        stationRestAssured.getRequest(stationRootPath).body("id", hasSize(0));
     }
 
 }
