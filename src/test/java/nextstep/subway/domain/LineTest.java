@@ -4,6 +4,8 @@ import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -13,7 +15,8 @@ class LineTest {
     @Test
     void changeLine() {
         //given
-        Line line = new Line("name", "color", null);
+        List<Station> stations = List.of(new Station("역삼역"));
+        Line line = new Line("name", "color", stations);
 
         //when
         Line changedLine = line.changeFrom(new LineUpdateRequest("new name", "new color"));
