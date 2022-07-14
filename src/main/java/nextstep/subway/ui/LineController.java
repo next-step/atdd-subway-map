@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.*;
-import nextstep.subway.domain.exception.InvalidMatchEndStationException;
-import nextstep.subway.domain.exception.NotFoundLineException;
-import nextstep.subway.domain.exception.NotFoundStationException;
-import nextstep.subway.domain.exception.StationAlreadyExistsException;
+import nextstep.subway.domain.exception.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -57,6 +54,23 @@ public class LineController {
             LineResponse line = lineService.addSection(id, sectionRequest);
             return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
         } catch (InvalidMatchEndStationException | StationAlreadyExistsException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (NotFoundLineException | NotFoundStationException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping(value = "/lines/{id}/sections")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id, @RequestParam Long stationId) {
+        try {
+            lineService.deleteSection(id, stationId);
+            return ResponseEntity.noContent().build();
+        } catch (SectionDeleteException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         } catch (NotFoundLineException | NotFoundStationException e) {

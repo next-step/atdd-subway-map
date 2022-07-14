@@ -68,4 +68,11 @@ public class LineService {
         line.addSection(section);
         return LineResponse.from(line);
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLine(lineId);
+        Station station = stationService.findStation(stationId);
+        line.deleteSection(station);
+    }
 }
