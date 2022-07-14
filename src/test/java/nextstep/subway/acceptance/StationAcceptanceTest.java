@@ -3,33 +3,22 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
+import nextstep.subway.domain.line.LineRepository;
+import nextstep.subway.domain.station.StationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
-
+public class StationAcceptanceTest extends AcceptanceTest {
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -41,30 +30,13 @@ public class StationAcceptanceTest {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-
-        ExtractableResponse<Response> response = createStation(params);
+        ExtractableResponse<Response> response = create(params, "/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        assertThat(getStations("name")).containsAnyOf("강남역");
-    }
-
-    private ExtractableResponse<Response> createStation(Map params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<String> getStations(String variable) {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList(variable, String.class);
+        assertThat(getList("name", "/stations")).containsAnyOf("강남역");
     }
 
     /**
@@ -78,18 +50,11 @@ public class StationAcceptanceTest {
     void getStations() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        createStation(params);
+        create(params, "/stations");
         params.put("name", "역삼역");
-        createStation(params);
+        create(params, "/stations");
 
-        RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().statusCode(200)
-                .assertThat().body("size()", is(2));
-
-        List<String> stationNames = getStations("name");
-        assertThat(stationNames).hasSize(2);
+        List<String> stationNames = getList("name", "/stations");
         assertThat(stationNames).containsExactly("강남역", "역삼역");
     }
 
@@ -105,14 +70,14 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        ExtractableResponse<Response> response = createStation(params);
+        ExtractableResponse<Response> response = create(params, "/stations");
         String createdId = response.jsonPath().getString("id");
 
         // then
-        List<String> stationNames = getStations("name");
+        List<String> stationNames = getList("name", "/stations");
         assertThat(stationNames).hasSize(1);
         assertThat(stationNames).containsExactly("강남역");
-        List<String> stationIds = getStations("id");
+        List<String> stationIds = getList("id", "/stations");
         assertThat(stationIds).containsExactly("1");
 
         // when
@@ -122,7 +87,7 @@ public class StationAcceptanceTest {
                 .then().statusCode(204);
 
         // then
-        stationNames = getStations("name");
+        stationNames = getList("name", "/stations");
         assertThat(stationNames).hasSize(0);
     }
 }
