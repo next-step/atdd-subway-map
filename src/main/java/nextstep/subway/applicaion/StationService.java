@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class StationService {
     private final StationRepository stationRepository;
 
@@ -25,6 +24,7 @@ public class StationService {
         return createStationResponse(station);
     }
 
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
             .map(this::createStationResponse)

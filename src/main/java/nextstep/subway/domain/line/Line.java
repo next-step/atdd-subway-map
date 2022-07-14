@@ -9,7 +9,7 @@ public class Line {
     private static final int MINIMUM_NAME_SIZE = 2;
     private static final int MINIMUM_COLOR_SIZE = 4;
     @Id
-    @JoinColumn(name="line_id")
+    @Column(name = "line_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
@@ -20,7 +20,6 @@ public class Line {
     protected Line() {/*no-op*/}
 
     public Line(Long id, String name, String color, Section section) {
-
         if (name == null || name.isBlank() || name.length() < MINIMUM_NAME_SIZE) {
             throw new IllegalArgumentException("이름이 공백이거나 2글자 이하일 수 없습니다.");
         }
