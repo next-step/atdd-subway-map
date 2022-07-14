@@ -3,7 +3,6 @@ package nextstep.subway.applicaion.dto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
 

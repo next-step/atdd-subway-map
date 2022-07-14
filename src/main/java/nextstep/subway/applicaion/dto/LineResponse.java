@@ -3,7 +3,6 @@ package nextstep.subway.applicaion.dto;
 import lombok.Getter;
 import lombok.Setter;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;

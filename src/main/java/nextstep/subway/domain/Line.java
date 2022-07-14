@@ -2,9 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import lombok.ToString;
-import nextstep.subway.exception.BusinessException;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -12,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @ToString

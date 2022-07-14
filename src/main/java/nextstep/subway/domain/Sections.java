@@ -1,7 +1,5 @@
 package nextstep.subway.domain;
 
-import org.aspectj.weaver.ast.Test;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -17,8 +15,6 @@ import java.util.stream.Collectors;
  */
 @Embeddable
 public class Sections {
-
-    private final static int LIMIT_SECTIONS_SIZE = 1;
 
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
     private final List<Section> sections = new ArrayList<>();
