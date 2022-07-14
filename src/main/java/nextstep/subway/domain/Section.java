@@ -52,10 +52,6 @@ public class Section {
         return id;
     }
 
-    public Distance distance() {
-        return distance;
-    }
-
     public Station upStation() {
         return upStation;
     }
