@@ -18,7 +18,6 @@ import static nextstep.subway.acceptance.StationAcceptanceTest.지하철역_목�
 import static nextstep.subway.acceptance.common.RestAssuredTemplate.deleteRequestWithParameter;
 import static nextstep.subway.acceptance.common.RestAssuredTemplate.postRequestWithParameterAndRequestBody;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 구간 관련 기능")
 public class SectionAcceptanceTest extends AcceptanceTest {
@@ -36,11 +35,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
     /**
      * Given 지하철역 구간을 생성하고
-     * When 노선을 조회하면
-     * Then 지하철 노선의 정보에서 해당 구간을 찾을 수 있다.
+     * When 지하철역 노선 조회 시
+     * Then 추가 된 구간을 조회할 수 있다.
      */
     @Test
-    void 지하철역_구간을_조회한다() {
+    void 지하철역_구간을_생성한다() {
         // given
         var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
         구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
@@ -53,6 +52,33 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 new StationResponse(1L, "모란역"),
                 new StationResponse(2L, "암사역"),
                 new StationResponse(3L, "한성백제역")
+        );
+
+    }
+
+    /**
+     * Given 지하철역 구간을 2개 생성하고
+     * When 지하철역 노선 조회 시
+     * Then 추가 된 구간을 조회할 수 있다.
+     */
+    @Test
+    void 지하철역_구간을_2개_생성한다() {
+        // given
+        var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
+        구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
+
+        var 문정역 = 역을_만들다("문정역").as(StationResponse.class).getId();
+        구간을_만들다(_8호선, 한성백제역, 문정역, 10L);
+
+        // when
+        var 조회한_8호선 = 노선을_조회한다(_8호선).as(LineResponse.class);
+
+        // then
+        assertThat(조회한_8호선.getStationResponses()).containsExactly(
+                new StationResponse(1L, "모란역"),
+                new StationResponse(2L, "암사역"),
+                new StationResponse(3L, "한성백제역"),
+                new StationResponse(4L, "문정역")
         );
     }
 
@@ -76,50 +102,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 new StationResponse(3L, "한성백제역")
         );
     }
-
-    /**
-     * Given 지하철역 구간을 생성하고
-     * When 지하철역 노선 목록 조회 시
-     * Then 지하철 노선 목록 조회 시 추가 된 구간을 조회할 수 있다.
-     */
-    @Test
-    void 지하철역_구간을_생성한다() {
-        // given
-        var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
-        구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
-
-        // when
-        var 지하철역_목록 = 지하철역_목록을_조회한다();
-
-        // then
-        var 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name");
-        assertThat(지하철역_이름_목록).containsExactly("모란역", "암사역", "한성백제역");
-
-    }
-
-    /**
-     * Given 지하철역 구간을 2개 생성하고
-     * When 지하철역 노선 목록 조회 시
-     * Then 지하철 노선 목록 조회 시 추가 된 구간을 조회할 수 있다.
-     */
-    @Test
-    void 지하철역_구간을_2개_생성한다() {
-        // given
-        var 한성백제역 = 역을_만들다("한성백제역").as(StationResponse.class).getId();
-        구간을_만들다(_8호선, 암사역, 한성백제역, 10L);
-
-        var 문정역 = 역을_만들다("문정역").as(StationResponse.class).getId();
-        구간을_만들다(_8호선, 한성백제역, 문정역, 10L);
-
-        // when
-        var 지하철역_목록 = 지하철역_목록을_조회한다();
-
-        // then
-        var 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name");
-        assertThat(지하철역_이름_목록).containsExactly("모란역", "암사역", "한성백제역", "문정역");
-
-    }
-
 
     private ExtractableResponse<Response> 구간을_만들다(Long id, Long upStationId, Long downStationId, Long distance) {
         var sectionRequest = new SectionRequest(upStationId, downStationId, distance);
