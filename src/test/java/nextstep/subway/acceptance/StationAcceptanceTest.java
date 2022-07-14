@@ -1,8 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import nextstep.SpringBootTestConfig;
 import nextstep.subway.acceptance.client.SubwayRestAssured;
@@ -11,12 +8,13 @@ import nextstep.subway.enums.SubwayRequestPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("지하철역 관련 기능")
+@Sql("/truncate.sql")
 class StationAcceptanceTest extends SpringBootTestConfig {
-
     private final SubwayRestAssured<Station> stationRestAssured = new SubwayRestAssured<>();
 
     /**

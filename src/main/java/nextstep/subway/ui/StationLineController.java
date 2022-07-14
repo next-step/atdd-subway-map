@@ -13,7 +13,7 @@ import java.util.List;
 import static nextstep.subway.applicaion.dto.StationLineRequest.*;
 
 @RestController
-@RequestMapping("/station/line")
+@RequestMapping("/lines")
 @RequiredArgsConstructor
 public class StationLineController {
 

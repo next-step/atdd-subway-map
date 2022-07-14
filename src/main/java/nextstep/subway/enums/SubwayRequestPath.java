@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum SubwayRequestPath {
     STATION("/stations", "/{id}"),
-    LINE("/station/line", "/{id}");
+    LINE("/lines", "/{id}");
 
     private final String value;
     private final String pathParam;
