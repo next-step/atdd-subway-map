@@ -12,7 +12,6 @@ import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.BusinessException;
@@ -23,12 +22,10 @@ import nextstep.subway.exception.ErrorCode;
 public class LineService {
 	private final LineRepository lineRepository;
 	private final StationRepository stationRepository;
-	private final SectionRepository sectionRepository;
 
-	public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
 		this.lineRepository = lineRepository;
 		this.stationRepository = stationRepository;
-		this.sectionRepository = sectionRepository;
 	}
 
 	@Transactional
