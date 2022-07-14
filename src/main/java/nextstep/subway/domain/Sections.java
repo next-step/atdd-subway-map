@@ -20,7 +20,7 @@ public class Sections {
     private static final int ONE = 1;
     private static final long EMPTY_VALUE = 0L;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> values = new ArrayList<>();
 
     public static Sections create() {

@@ -125,6 +125,26 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         assertThat(신분당선_지하철_목록).containsOnly(상행역_ID, 하행역_ID);
     }
 
+    /**
+     * `Given` 구간을 등록하고
+     * `When` 마지막 구간을 제거하면
+     * `Then` 구간을 삭제한 노선을 조회 시 해당 구간을 찾을 수 없다.
+     */
+    @Test
+    @DisplayName("구간 제거")
+    void deleteSection() {
+        // given
+        Long 신규역_ID = 지하철역_생성("신규역");
+        구간_등록(신규역_ID);
+
+        // when
+        구간_제거_요청(_2호선_ID, 신규역_ID, HttpStatus.NO_CONTENT);
+
+        // then
+        List<Long> _2호선_지하철_목록 = 노선_지하철_목록_조회(_2호선_ID);
+        assertThat(_2호선_지하철_목록).doesNotContain(신규역_ID);
+    }
+
     private ExtractableResponse<Response> 구간_등록_요청(long id, long upStationId, long downStationId, int distance, HttpStatus httpStatus) {
         final Map<String, Object> params = new HashMap<>();
         params.put("downStationId", downStationId);
