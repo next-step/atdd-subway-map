@@ -1,4 +1,4 @@
-package nextstep.subway.enums;
+package nextstep.subway.acceptance.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

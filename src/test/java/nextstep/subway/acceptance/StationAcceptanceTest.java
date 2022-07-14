@@ -4,7 +4,7 @@ import io.restassured.response.ValidatableResponse;
 import nextstep.SpringBootTestConfig;
 import nextstep.subway.acceptance.client.SubwayRestAssured;
 import nextstep.subway.domain.Station;
-import nextstep.subway.enums.SubwayRequestPath;
+import nextstep.subway.acceptance.enums.SubwayRequestPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

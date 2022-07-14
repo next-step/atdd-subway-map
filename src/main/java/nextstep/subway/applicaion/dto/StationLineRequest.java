@@ -26,11 +26,11 @@ public class StationLineRequest {
 
         public Line toEntity() {
             return Line.builder()
-                        .name(name).
-                        color(color)
-                        .upStationId(upStationId)
-                        .distance(distance)
-                        .build();
+                       .name(name)
+                       .color(color)
+                       .upStationId(upStationId)
+                       .distance(distance)
+                       .build();
         }
     }
 
