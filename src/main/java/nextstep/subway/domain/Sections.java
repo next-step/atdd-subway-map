@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 @Embeddable
 public class Sections {
     private final static int LIMIT_SECTIONS_SIZE = 1;
+    private final static int VALIDATION_SECTIONS_SIZE = 0;
 
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
     private final List<Section> sections = new ArrayList<>();
@@ -24,7 +25,7 @@ public class Sections {
     }
 
     private void addSectionValidation(Section section) {
-        if(sections.size() > 0) {
+        if (sections.size() > VALIDATION_SECTIONS_SIZE) {
             isContains(section);
             matchDownStation(section);
             matchStation(section);
