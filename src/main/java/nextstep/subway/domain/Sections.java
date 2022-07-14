@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import nextstep.subway.exception.BusinessException;
 import nextstep.subway.exception.ErrorCode;
@@ -16,6 +17,7 @@ public class Sections {
 	private final static int MINIMUM_SECTION_SIZE = 1;
 
 	@OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy("id asc")
 	private final List<Section> sections = new ArrayList<>();
 
 	protected Sections() {
