@@ -5,7 +5,7 @@ import nextstep.subway.applicaion.dto.section.SectionRequest;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.exception.AlreadyRegisterException;
-import nextstep.subway.exception.ErrorMessage;
+import nextstep.subway.exception.ErrorCode;
 import nextstep.subway.exception.SameUpStationException;
 import nextstep.subway.repository.SectionRepository;
 import nextstep.subway.repository.SubwayLineRepository;
@@ -27,11 +27,11 @@ public class SectionService {
 		Section section = request.toSection();
 
 		if (hasSameStation(subwayLine, section)) {
-			throw new AlreadyRegisterException(ErrorMessage.ALREADY_REGISTER_SECTION.value());
+			throw new AlreadyRegisterException(ErrorCode.ALREADY_REGISTER_SECTION.getMessage());
 		}
 
 		if (isSameUpStation(subwayLine.getUpStationId(), section.getUpStationId())) {
-			throw new SameUpStationException(ErrorMessage.CANNOT_REGISTER_WITH_UPSTATION.value());
+			throw new SameUpStationException(ErrorCode.CANNOT_REGISTER_WITH_UP_STATION.getMessage());
 		}
 
 		sectionRepository.save(section);

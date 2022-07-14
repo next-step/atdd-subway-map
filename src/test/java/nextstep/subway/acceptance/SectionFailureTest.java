@@ -48,8 +48,8 @@ public class SectionFailureTest {
 
 		//then
 		assertAll(
-				() -> assertThat(registerUpStation.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value()),
-				() -> assertThat(registerDownStation.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value())
+				() -> assertThat(registerUpStation.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+				() -> assertThat(registerDownStation.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
 		);
 	}
 
@@ -67,7 +67,7 @@ public class SectionFailureTest {
 		ExtractableResponse<Response> registerWithUpStation = SectionUtils.지하철_구간을_등록한다(subwayLineId, upStationId, otherStationId, 10);
 
 		//then
-		assertThat(registerWithUpStation.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		assertThat(registerWithUpStation.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
 	/**
