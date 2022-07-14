@@ -39,6 +39,10 @@ public class Line {
         section.setLine(this);
     }
 
+    public void deleteSection(Station station) {
+        sections.delete(station);
+    }
+
     public void changeNameAndColor(String name, String color) {
         if (!this.name.equals(name)) {
             this.name = name;

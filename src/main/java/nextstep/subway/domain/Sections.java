@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import nextstep.subway.domain.exception.InvalidMatchEndStationException;
+import nextstep.subway.domain.exception.SectionDeleteException;
 import nextstep.subway.domain.exception.StationAlreadyExistsException;
 
 import javax.persistence.*;
@@ -50,6 +51,17 @@ public class Sections {
                 .count() > EMPTY_VALUE;
     }
 
+    public void delete(Station station) {
+        Section lastSection = findLastSection();
+        if (this.hasOnlyOneSection()) {
+            throw new SectionDeleteException();
+        }
+        if (!lastSection.isMatchDownStation(station)) {
+            throw new SectionDeleteException(station.id());
+        }
+        values.remove(lastSection);
+    }
+
     private Section findLastSection() {
         if (lastIndex() < 0) {
             return null;
@@ -59,6 +71,10 @@ public class Sections {
 
     private int lastIndex() {
         return values.size() - ONE;
+    }
+
+    private boolean hasOnlyOneSection() {
+        return values.size() == ONE;
     }
 
     public List<Station> stations() {
