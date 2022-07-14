@@ -43,7 +43,7 @@ public class StationLineController {
 
     @PutMapping("/lines/{lineId}")
     public ResponseEntity updateStationLine(@PathVariable Long lineId,
-                                                                 @RequestBody StationLineRequest request) {
+                                            @RequestBody StationLineRequest request) {
         stationLineService.updateStationLine(lineId, request);
         return ResponseEntity.ok().build();
     }
@@ -53,5 +53,4 @@ public class StationLineController {
         stationLineService.deleteStationLine(lineId);
         return ResponseEntity.noContent().build();
     }
-
 }

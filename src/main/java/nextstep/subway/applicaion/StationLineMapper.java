@@ -18,7 +18,9 @@ public class StationLineMapper {
         StationLine stationLine = new StationLine(
                 request.getName(),
                 request.getColor());
-        StationSection stationSection = new StationSection(request.getUpStationId(), request.getDownStationId(),
+        StationSection stationSection = new StationSection(
+                request.getUpStationId(),
+                request.getDownStationId(),
                 request.getDistance());
         stationLine.addSection(stationSection);
         return stationLine;
@@ -31,7 +33,9 @@ public class StationLineMapper {
                 new StationResponse(upStation.getId(), upStation.getName()),
                 new StationResponse(downStation.getId(), downStation.getName()));
         return new StationLineResponse(
-                savedStationLine.getId(), savedStationLine.getName(), savedStationLine.getColor(), stationResponses
+                savedStationLine.getId(),
+                savedStationLine.getName(),
+                savedStationLine.getColor(), stationResponses
         );
     }
 
@@ -40,7 +44,9 @@ public class StationLineMapper {
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toList());
         return new StationLineResponse(
-                savedStationLine.getId(), savedStationLine.getName(), savedStationLine.getColor(), stationResponses
+                savedStationLine.getId(),
+                savedStationLine.getName(),
+                savedStationLine.getColor(), stationResponses
         );
     }
 }

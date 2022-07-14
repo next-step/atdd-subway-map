@@ -18,15 +18,7 @@ public class StationSectionResponse {
         return id;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
     public Long getDownStationId() {
         return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
     }
 }
