@@ -19,7 +19,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     private static final String 신도림역 = "신도림역";
     private static final String STATION_NAME = "name";
     private static final String STATION_ID = "id";
-    
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다

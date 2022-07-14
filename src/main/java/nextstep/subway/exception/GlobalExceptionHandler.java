@@ -11,7 +11,13 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(DataNotFoundException.class)
-    public ResponseEntity<Void> handle(DataNotFoundException exception) {
+    public ResponseEntity<Void> handleDataNotFoundException(DataNotFoundException exception) {
+        log.info("Not found exception : {}", exception.getMessage());
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity<Void> handleArgumentException(Exception exception) {
         log.info("Not found exception : {}", exception.getMessage());
         return ResponseEntity.badRequest().build();
     }

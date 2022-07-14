@@ -38,7 +38,7 @@ public class Sections {
         return sections.add(addSection);
     }
 
-    public Section deleteSection(Long downStationId) {
+    public void deleteSection(Long downStationId) {
         if (getSections().size() == 1) {
             throw new IllegalStateException("노선 안에 구간이 하나 뿐입니다.");
         }
@@ -46,6 +46,7 @@ public class Sections {
         if (!getSections().get(sections.size() - 1).getDownStationId().equals(downStationId)) {
             throw new IllegalArgumentException("하행 종점역만 삭제할 수 있습니다.");
         }
-        return sections.remove(sections.size() - 1);
+
+        sections.remove(sections.size() - 1);
     }
 }

@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nextstep.subway.acceptance.station.StationRestAssuredTemplate.지하철역_생성;
-
 public class SectionAcceptanceTemplate {
 
     public static ExtractableResponse<Response> 구간_등록(String lineId, String downStationId, String upStationId, int distance) {
@@ -21,7 +19,14 @@ public class SectionAcceptanceTemplate {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(params)
-            .when().post("/lines/"+lineId+"/sections")
+            .when().post("/lines/" + lineId + "/sections")
+            .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 구간_제거(String lineId, String downStationId) {
+        return RestAssured.given().log().all()
+            .queryParam("stationId", downStationId)
+            .when().delete("/lines/" + lineId + "/sections")
             .then().log().all().extract();
     }
 
