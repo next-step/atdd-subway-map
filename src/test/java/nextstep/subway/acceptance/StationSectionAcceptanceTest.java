@@ -72,14 +72,14 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> 지하철구간_등록 = 지하철구간_등록(lineUrl, 삼성역, 선릉역, 7);
 
         //then
-        assertThat(지하철구간_등록.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(지하철구간_등록.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
      * When 노선에 등록되어 있는 기존 역을 새로운 구간의 하행역으로 등록될 경우
      * Then 400에러가 발생한다.
      */
-    @DisplayName("새로운 구간 상행선이 기존 하행 종점역이 아닐때 예외발생")
+    @DisplayName("새로운 구간의 하행역이 기존의 등록되어 있는 역일 경우 예외발생")
     @Test
     void createBadRequestCase2() {
         //when
@@ -88,7 +88,7 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> 지하철구간_등록 = 지하철구간_등록(lineUrl, 역삼역, 강남역, 7);
 
         //then
-        assertThat(지하철구간_등록.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(지하철구간_등록.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -107,7 +107,7 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> 지하철구간_등록 = 지하철구간_등록(lineUrl, 역삼역, 대림역, 7);
 
         //then
-        assertThat(지하철구간_등록.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(지하철구간_등록.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**

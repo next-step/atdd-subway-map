@@ -23,7 +23,6 @@ public class SubwayApiCaller {
                 .when()
                     .post("/lines")
                 .then()
-                    .statusCode(201)
                     .log().all()
                     .extract();
 
