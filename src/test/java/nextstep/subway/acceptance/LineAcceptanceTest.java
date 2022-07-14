@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import static nextstep.subway.acceptance.LineAcceptanceStatic.*;
 import static nextstep.subway.acceptance.StationAcceptanceStatic.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
@@ -82,9 +83,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 	void getLineTest() {
 
 		//given
-		Long 신분당선_상행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
-		Long 신분당선_하행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
-		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 신분당선_상행종점역_번호, 신분당선_하행종점역_번호, 10);
+		Long 신분당선_노선_번호 = 신분당선_노선_생성되어_있음();
 
 		//when
 		ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(신분당선_노선_번호);
@@ -103,9 +102,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 	void deleteLintTest() {
 
 		//given
-		Long 신분당선_상행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
-		Long 신분당선_하행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
-		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 신분당선_상행종점역_번호, 신분당선_하행종점역_번호, 10);
+		Long 신분당선_노선_번호 = 신분당선_노선_생성되어_있음();
 
 		//when
 		ExtractableResponse<Response> deleteLineResponse = 지하철_노선_삭제_요청(신분당선_노선_번호);
@@ -124,9 +121,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 	void updateLineTest() {
 
 		//given
-		Long 신분당선_상행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
-		Long 신분당선_하행종점역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
-		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 신분당선_상행종점역_번호, 신분당선_하행종점역_번호, 10);
+		Long 신분당선_노선_번호 = 신분당선_노선_생성되어_있음();
 
 		Map<String, Object> 노선_수정_요청값 = Map.of("name", "신분당선_수정", "color", "bg_blue_200");
 
@@ -137,4 +132,155 @@ class LineAcceptanceTest extends AcceptanceTest {
 		assertThat(updateLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 	}
 
+	/**
+	 * given 지하철 역, 노선을 생성하고
+	 * when 노선에 새로운 구간을 등록하면
+	 * then 노선 조회시 구간이 조회된다.
+	 */
+	@DisplayName("구간 등록 기능 테스트")
+	@Test
+	void addSectionTest() {
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+
+		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의숲역"));
+		Map<String, Object> 구간_등록_요청값 = Map.of("upStationId", 판교역_번호, "downStationId", 양재시민의_숲역_번호, "distance", 10);
+
+		//when
+		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
+		ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(신분당선_노선_번호);
+
+		//then
+		assertAll(
+			() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+			() -> assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+			() -> assertThat(getLineResponse.jsonPath().getList("stations.id", Long.class))
+				.contains(정자역_번호, 판교역_번호, 양재시민의_숲역_번호)
+		);
+
+	}
+
+	/**
+	 * given 신분당선 노선을 생성함 (신분당선의 하행 종점은 판교역)
+	 * when 상행 논현역, 하행 신사역 구간을 신분당선에 등록 요청함
+	 * then 새로운 구간의 상행이 하행 종점과 일치하지 않으므로 에러 발생
+	 */
+	@DisplayName("새로운 구간의 상행역이 노선의 하행종점이 아닐경우 에러 발생 테스트")
+	@Test
+	void upStationDownStationTest() throws Exception {
+		//given
+		Long 신분당선_노선_번호 = 신분당선_노선_생성되어_있음();
+
+		Long 신사역_번호 = 지하철역_생성되어_있음(Map.of("name", "신사역"));
+		Long 논현역_번호 = 지하철역_생성되어_있음(Map.of("name", "논현역"));
+		Map<String, Object> 구간_등록_요청값 = Map.of("upStationId", 논현역_번호, "downStationId", 신사역_번호, "distance", 10);
+
+		//when
+		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
+
+		//then
+		하행종점_상행역_불일치_에러가_발생함(response);
+	}
+
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역)
+	 * when [판교역 - 정자역] 구간을 등록 요청
+	 * then 새로운 구간의 하행(정자역)이 신분당선노선에 이미 등록되어 있으므로 에러 발생!
+	 */
+	@DisplayName("새로운 구간의 하행이 이미 노선에 등록되어있을 경우 에러 발생")
+	@Test
+	void alreadyRegisteredSection() {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+
+		Map<String, Object> 구간_등록_요청값 = Map.of("upStationId", 판교역_번호, "downStationId", 정자역_번호, "distance", 15);
+
+		//when
+		ExtractableResponse<Response> response = 구간_등록_요청(신분당선_노선_번호, 구간_등록_요청값);
+
+		//then
+		이미_추가된_노선_추가_에러가_발생함(response);
+
+	}
+
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역 - 양재시민의 숲역 - 양재역)
+	 * when 판교역 - 양재시민의 숲역을 제거한다.
+	 * then 마지막 구간이 아니므로 예외가 발생한다.
+	 */
+	@DisplayName("마지막 구간이 아닌 구간 제거시 예외 발생 테스트")
+	@Test
+	void checkLastSectionTest() {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의 숲역"));
+		Long 양재역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재역"));
+
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+		구간_등록_요청(신분당선_노선_번호, Map.of("upStationId", 판교역_번호, "downStationId", 양재시민의_숲역_번호, "distance", 10));
+		구간_등록_요청(신분당선_노선_번호, Map.of("upStationId", 양재시민의_숲역_번호, "downStationId", 양재역_번호, "distance", 10));
+
+		//when
+		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 양재시민의_숲역_번호);
+
+		//then
+		마지막_구간이_아닌구가_제거_에러가_발생함(response);
+	}
+
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역)
+	 * when 판교역을 제거한다.
+	 * then 노선에 구간이 하나뿐이므로 예외가 발생한다.
+	 */
+	@DisplayName("구간이 1개인 경우 삭제 요청시 에러 발생")
+	@Test
+	void deleteOnlySectionTest() {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+
+		//when
+		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 판교역_번호);
+
+		//then
+		한개_뿐인_구간삭제_에러가_발생함(response);
+	}
+
+	/**
+	 * given 신분당선 노선이 생성되어 있음(정자역 - 판교역 - 양재시민의 숲역 - 양재역)
+	 * when 양재역을 제거한다.
+	 * then 노선의 구간이 2개이상이고 양재역이 하행 종점이므로 삭제가 가능하다.
+	 * then 노선의 모든 구간 조회시 삭제된 역이 조회되지 않는다.
+	 */
+	@DisplayName("노선의 구간 삭제 테스트")
+	@Test
+	void deleteSectionTest() {
+
+		//given
+		Long 정자역_번호 = 지하철역_생성되어_있음(Map.of("name", "정자역"));
+		Long 판교역_번호 = 지하철역_생성되어_있음(Map.of("name", "판교역"));
+		Long 양재시민의_숲역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재시민의 숲역"));
+		Long 양재역_번호 = 지하철역_생성되어_있음(Map.of("name", "양재역"));
+
+		Long 신분당선_노선_번호 = 지하철_노선_생성되어_있음("신분당선", "red", 정자역_번호, 판교역_번호, 10);
+		구간_등록_요청(신분당선_노선_번호, Map.of("upStationId", 판교역_번호, "downStationId", 양재시민의_숲역_번호, "distance", 10));
+		구간_등록_요청(신분당선_노선_번호, Map.of("upStationId", 양재시민의_숲역_번호, "downStationId", 양재역_번호, "distance", 10));
+
+		//when
+		ExtractableResponse<Response> response = 구간_삭제_요청(신분당선_노선_번호, 양재역_번호);
+		ExtractableResponse<Response> getLineResponse = 지하철_노선_조회_요청(신분당선_노선_번호);
+
+		//then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+		assertThat(getLineResponse.jsonPath().getList("stations.id", Long.class)).doesNotContain(양재역_번호);
+	}
 }

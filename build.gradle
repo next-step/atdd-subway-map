@@ -16,7 +16,7 @@ dependencies {
     // spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
+    implementation group: 'com.github.gavlyukovskiy', name: 'p6spy-spring-boot-starter', version: '1.5.8'
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
     // log

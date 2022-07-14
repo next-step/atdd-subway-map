@@ -23,8 +23,7 @@ public class LineResponse {
 	}
 
 	public static LineResponse from(Line line) {
-		return new LineResponse(line.getId(), line.getName(), line.getColor(), StationResponse.fromList(List.of(line.getUpStation(),
-			line.getDownStation())));
+		return new LineResponse(line.getId(), line.getName(), line.getColor(), StationResponse.fromList(line.getStations()));
 	}
 
 	public static List<LineResponse> fromList(List<Line> lineList) {
@@ -37,10 +36,6 @@ public class LineResponse {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getColor() {
-		return color;
 	}
 
 	public List<StationResponse> getStations() {
