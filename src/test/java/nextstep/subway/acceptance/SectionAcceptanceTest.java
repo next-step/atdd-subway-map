@@ -41,8 +41,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         Long 신규역_ID = 지하철역_생성("신규역");
 
         // when
-        ExtractableResponse<Response> 구간_생성_요청_결과 =
-                구간_등록_요청(_2호선_ID, 상행역_ID, 신규역_ID, 5, HttpStatus.BAD_REQUEST);
+        구간_등록_요청(_2호선_ID, 상행역_ID, 신규역_ID, 5, HttpStatus.BAD_REQUEST);
 
         // then
         List<Long> _2호선_지하철_목록 = 노선_지하철_목록_조회(_2호선_ID);
@@ -61,8 +60,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         Long 신규역_ID = 지하철역_생성("신규역");
 
         // when
-        ExtractableResponse<Response> 구간_생성_요청_결과 =
-                구간_등록_요청(_2호선_ID, 하행역_ID, 상행역_ID, 5, HttpStatus.BAD_REQUEST);
+        구간_등록_요청(_2호선_ID, 하행역_ID, 상행역_ID, 5, HttpStatus.BAD_REQUEST);
 
         // then
         List<Long> _2호선_지하철_목록 = 노선_지하철_목록_조회(_2호선_ID);
@@ -88,6 +86,26 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         assertThat(_2호선_지하철_목록).contains(신규역_ID);
     }
 
+    /**
+     * `Given` 구간을 등록하고
+     * `When` 마지막 구간이 아닌 다른 구간을 제거하면
+     * `Then` 400 에러 코드를 응답받고 구간이 그대로 남아있다.
+     */
+    @Test
+    @DisplayName("구간 제거 - 마지막 구간이 아닌 경우")
+    void deleteSection() {
+        // given
+        Long 신규역_ID = 지하철역_생성("신규역");
+        구간_등록(신규역_ID);
+
+        // when
+        구간_제거_요청(_2호선_ID, 하행역_ID, HttpStatus.BAD_REQUEST);
+
+        // then
+        List<Long> _2호선_지하철_목록 = 노선_지하철_목록_조회(_2호선_ID);
+        assertThat(_2호선_지하철_목록).contains(신규역_ID);
+    }
+
     private ExtractableResponse<Response> 구간_등록_요청(long id, long upStationId, long downStationId, int distance, HttpStatus httpStatus) {
         final Map<String, Object> params = new HashMap<>();
         params.put("downStationId", downStationId);
@@ -98,6 +116,16 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/{id}/sections", id)
+                .then().log().all()
+                .extract();
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+        return response;
+    }
+
+    private ExtractableResponse<Response> 구간_제거_요청(long id, long stationId, HttpStatus httpStatus) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .param("stationId", stationId)
+                .when().delete("/lines/{id}/sections", id)
                 .then().log().all()
                 .extract();
         assertThat(response.statusCode()).isEqualTo(httpStatus.value());
@@ -120,5 +148,9 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
         return LineAcceptanceTest.노선_조회_요청(id)
                 .jsonPath()
                 .getList("stations.id", Long.class);
+    }
+
+    private void 구간_등록(Long downStationId) {
+        구간_등록_요청(_2호선_ID, 하행역_ID, downStationId, 10, HttpStatus.CREATED);
     }
 }
