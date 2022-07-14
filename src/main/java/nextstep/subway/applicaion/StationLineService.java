@@ -31,7 +31,7 @@ public class StationLineService {
         StationLine stationLine = stationLineMapper.of(request);
         StationLine savedStationLine = stationLineRepository.save(stationLine);
         Station upStation = findStationById(request.getUpStationId());
-        Station downStation = findStationById(request.getUpStationId());
+        Station downStation = findStationById(request.getDownStationId());
         return stationLineMapper.of(savedStationLine, upStation, downStation);
     }
 

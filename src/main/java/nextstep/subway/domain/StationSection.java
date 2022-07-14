@@ -19,6 +19,9 @@ public class StationSection {
     @ManyToOne(fetch = FetchType.LAZY)
     private StationLine stationLine;
 
+    public StationSection() {
+    }
+
     public StationSection(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;

@@ -19,8 +19,7 @@ public class StationLine {
     private String color;
 
     @Embedded
-    private StationSections stationSections;
-
+    private StationSections stationSections = new StationSections();
 
     protected StationLine() {
     }
