@@ -9,7 +9,6 @@ import org.assertj.core.api.AbstractLongAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -24,17 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AcceptanceTest
 class SectionAcceptanceTest {
 
-    @LocalServerPort
-    int port;
-
     private Long 상행역;
     private Long 하행역;
     private Long 신분당선;
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-
         상행역 = 역을생성함("상행역");
         하행역 = 역을생성함("하행역");
         신분당선 = 신분당선을생성함();

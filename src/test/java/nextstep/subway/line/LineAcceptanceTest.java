@@ -8,7 +8,6 @@ import nextstep.subway.acceptance.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -24,16 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AcceptanceTest
 public class LineAcceptanceTest {
 
-    @LocalServerPort
-    int port;
-
     private Long upStationId;
     private Long downStationId;
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-
         upStationId = createStation("강남역");
         downStationId = createStation("양재역");
     }
