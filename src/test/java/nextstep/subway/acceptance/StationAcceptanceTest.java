@@ -127,8 +127,7 @@ class StationAcceptanceTest {
 
 	private void deleteStation(String id) {
 		RestAssured.given().log().all()
-			.when()
-			.delete("stations/" + id)
+			.when().delete("/stations/" + id)
 			.then().log().all()
 			.extract();
 	}
