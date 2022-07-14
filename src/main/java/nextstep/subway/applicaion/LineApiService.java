@@ -59,9 +59,10 @@ public class LineApiService {
 
     @Transactional
     public void updateLine(Long id, LineUpdateDto lineUpdateDto) {
-        Line line = lineService.findLine(id);
+        Line line = lineService.findLine(id)
+                .updateNameAndColor(lineUpdateDto.getName(), lineUpdateDto.getColor());
 
-        lineService.save(lineUpdateDto.toDomain(line));
+        lineService.save(line);
     }
 
     @Transactional

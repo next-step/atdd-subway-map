@@ -56,4 +56,11 @@ public class Line {
     public boolean inValidSectionDelete() {
         return this.sections.size() < 2;
     }
+
+    public Line updateNameAndColor(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+
+        return this;
+    }
 }
