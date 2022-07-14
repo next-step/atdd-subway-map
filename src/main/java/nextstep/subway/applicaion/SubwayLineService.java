@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
+import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
+import nextstep.subway.repository.SectionRepository;
 import nextstep.subway.repository.StationRepository;
 import nextstep.subway.domain.SubwayLine;
 import nextstep.subway.repository.SubwayLineRepository;
@@ -22,10 +24,12 @@ public class SubwayLineService {
 
 	private final SubwayLineRepository lineRepository;
 	private final StationRepository stationRepository;
+	private final SectionRepository sectionRepository;
 
 	@Transactional
 	public SubwayLineResponse createSubwayLine(SubwayLineRequest request) {
-		SubwayLine savedLine = lineRepository.save(request.toEntity());
+		Section section = sectionRepository.save(new Section(request.getUpStationId(), request.getDownStationId(), request.getDistance()));
+		SubwayLine savedLine = lineRepository.save(request.toEntity(section));
 		List<Station> upAndDownStation = getUpAndDownStation(request.getUpStationId(), request.getDownStationId());
 		return new SubwayLineResponse(savedLine, upAndDownStation);
 	}

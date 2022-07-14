@@ -92,10 +92,10 @@ public class SectionFailureTest {
 	@DisplayName("구간이 1개인 경우에 역을 제거하려면 오류가 발생한다")
 	@Test
 	void deleteFailure() {
-		//given
-
 		//when
+		ExtractableResponse<Response> deleteUpStationWhenSizeOne = 지하철_구간을_삭제한다(subwayLineId, downStationId);
 
 		//then
+		assertThat(deleteUpStationWhenSizeOne.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 }

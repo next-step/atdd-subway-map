@@ -28,8 +28,9 @@ public class SubwayLine {
 	private Long downStationId;
 	private Integer distance;
 
-	public SubwayLine(Long id, String name, String color, Long upStationId, Long downStationId, Integer distance) {
+	public SubwayLine(Long id, Section section, String name, String color, Long upStationId, Long downStationId, Integer distance) {
 		this.id = id;
+		saveSection(section);
 		this.name = name;
 		this.color = color;
 		this.upStationId = upStationId;
