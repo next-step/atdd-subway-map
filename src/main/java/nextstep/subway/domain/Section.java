@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.util.List;
 
 /**
@@ -26,10 +27,10 @@ public class Section {
     @ManyToOne
     private Line line;
 
-    @ManyToOne
+    @OneToOne
     public Station upStation;
 
-    @ManyToOne
+    @OneToOne
     public Station downStation;
 
     private Integer distance;
