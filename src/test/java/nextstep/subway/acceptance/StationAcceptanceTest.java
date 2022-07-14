@@ -81,7 +81,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철역 생성 시 같은 이름을 가질 경우 예외")
     @Test
-    void throwsIfEqualsStationName() {
+    void InternalServerErrorIfEqualsStationName() {
 
         //given
         ExtractableResponse<Response> createResponseOne = createStation("강남역");

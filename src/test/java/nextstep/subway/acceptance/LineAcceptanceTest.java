@@ -117,7 +117,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선 생성 시 distance가 0보다 작거나 같을 때 예외")
     @Test
-    void throwsIfCreateLineByDistanceZeroAndNegative() {
+    void InternalServerErrorIfCreateLineByDistanceZeroAndNegative() {
 
         //given(지하철역을 생성한다)
         final String 시청역 = "시청역";
@@ -131,7 +131,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철 노선 생성 시 상행과 하행이 같을 때 예외")
     @Test
-    void throwsIfCreateLineByStationEquals() {
+    void InternalServerErrorIfCreateLineByStationEquals() {
 
         //given
         final String 시청역 = "시청역";

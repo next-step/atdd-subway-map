@@ -60,7 +60,7 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    private Line findById(Long lineId) {
+    public Line findById(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotExistException("지하철 노선을 찾을 수 없습니다. id = " + lineId));
     }
