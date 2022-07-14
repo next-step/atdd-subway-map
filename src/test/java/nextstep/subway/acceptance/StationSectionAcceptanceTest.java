@@ -27,13 +27,11 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
     private Long 선릉역;
 
     @BeforeEach
-    public void setUp() {
+    void init() {
         강남역 = 지하철역_등록("강남역").as(StationResponse.class).getId();
         역삼역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
-        선릉역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
-
+        선릉역 = 지하철역_등록("선릉역").as(StationResponse.class).getId();
         신분당선 = 지하철역_노선_등록("신분당선", "bg-red-600", 강남역, 역삼역, 10);
-
     }
 
     /**

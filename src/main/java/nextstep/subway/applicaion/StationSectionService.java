@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion;
 
+import javax.transaction.Transactional;
 import nextstep.subway.applicaion.dto.StationSectionRequest;
 import nextstep.subway.applicaion.dto.StationSectionResponse;
 import nextstep.subway.domain.StationLine;
@@ -22,6 +23,7 @@ public class StationSectionService {
         this.stationSectionMapper = stationSectionMapper;
     }
 
+    @Transactional
     public StationSectionResponse createStationSection(StationSectionRequest request, Long lineId) {
         StationSection stationSection = stationSectionMapper.of(request);
         StationLine stationLine = stationLineService.findLineById(lineId);
