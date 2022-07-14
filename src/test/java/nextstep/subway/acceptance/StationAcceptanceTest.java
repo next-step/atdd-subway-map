@@ -25,12 +25,12 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        String defaultPath = SubwayRequestPath.STATION.getValue();
-        ValidatableResponse 강남역 = stationRestAssured.postRequest(defaultPath, new Station("강남역"));
+        String stationRootPath = SubwayRequestPath.STATION.getValue();
+        ValidatableResponse 강남역 = stationRestAssured.postRequest(stationRootPath, new Station("강남역"));
 
         강남역.statusCode(HttpStatus.CREATED.value());
 
-        stationRestAssured.getRequest(defaultPath).body("name", contains("강남역"));
+        stationRestAssured.getRequest(stationRootPath).body("name", contains("강남역"));
     }
 
     /**
@@ -41,11 +41,11 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철역 목록을 조회한다.")
     @Test()
     void getStations() {
-        String defaultPath = SubwayRequestPath.STATION.getValue();
-        stationRestAssured.postRequest(defaultPath, new Station("선릉역"));
-        stationRestAssured.postRequest(defaultPath, new Station("영통역"));
+        String stationRootPath = SubwayRequestPath.STATION.getValue();
+        stationRestAssured.postRequest(stationRootPath, new Station("선릉역"));
+        stationRestAssured.postRequest(stationRootPath, new Station("영통역"));
 
-        stationRestAssured.getRequest(defaultPath).body("name", contains("선릉역", "영통역"));
+        stationRestAssured.getRequest(stationRootPath).body("name", contains("선릉역", "영통역"));
     }
 
     /**
@@ -56,13 +56,13 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철역을 제거한다.")
     @Test()
     void deleteStation() {
-        String defaultPath = SubwayRequestPath.STATION.getValue();
-        ValidatableResponse postResponse = stationRestAssured.postRequest(defaultPath, new Station("사당역"));
+        String StationRootPath = SubwayRequestPath.STATION.getValue();
+        ValidatableResponse 지하철역_등록결과 = stationRestAssured.postRequest(StationRootPath, new Station("사당역"));
 
-        Station 사당역 = postResponse.extract().as(Station.class);
-        stationRestAssured.deleteRequest(SubwayRequestPath.STATION.addPathParam(), 사당역.getId());
+        String nextLocation = 지하철역_등록결과.extract().header("Location");
+        stationRestAssured.deleteRequest(nextLocation);
 
-        stationRestAssured.getRequest(defaultPath).body("id", hasSize(0));
+        stationRestAssured.getRequest(StationRootPath).body("id", hasSize(0));
     }
 
 }

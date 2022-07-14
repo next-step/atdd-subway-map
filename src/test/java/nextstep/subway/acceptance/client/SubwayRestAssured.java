@@ -14,14 +14,6 @@ public class SubwayRestAssured<T> {
                           .then().log().all();
     }
 
-    public ValidatableResponse getRequest(String path, Long id) {
-        return RestAssured.given().log().all()
-                          .pathParam("id", id)
-                          .when().log().all()
-                          .get(path)
-                          .then().log().all();
-    }
-
     public ValidatableResponse postRequest(String path, T body) {
         return RestAssured.given().log().all()
                           .body(body)
@@ -31,10 +23,8 @@ public class SubwayRestAssured<T> {
                           .then().log().all();
     }
 
-    public void putRequest(String path, Long id, T body) {
+    public void putRequest(String path, T body) {
          RestAssured.given().log().all()
-                          .pathParam("id", id)
-                          .and()
                           .body(body)
                           .contentType(MediaType.APPLICATION_JSON_VALUE)
                           .when().log().all()
@@ -42,9 +32,8 @@ public class SubwayRestAssured<T> {
                           .then().log().all();
     }
 
-    public ValidatableResponse deleteRequest(String path, Long id) {
+    public ValidatableResponse deleteRequest(String path) {
         return RestAssured.given().log().all()
-                          .pathParam("id", id)
                           .when().log().all()
                           .delete(path)
                           .then().log().all();
