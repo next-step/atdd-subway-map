@@ -25,11 +25,17 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(lineRequest.toDomain());
-
+        Line line = lineRepository.save(toLine(lineRequest));
         return new LineResponse(line.getId(), line.getName(), line.getColor(),
                 List.of(stationService.findStation(line.getUpStationId()),
                         stationService.findStation(line.getDownStationId())));
+    }
+
+    private Line toLine(LineRequest lineRequest) {
+        Long upStationId = lineRequest.getUpStationId();
+        Long downStationId = lineRequest.getDownStationId();
+        return new Line(lineRequest.getName(), lineRequest.getColor(), stationService.findStation(upStationId),
+                stationService.findStation(downStationId), lineRequest.getDistance());
     }
 
     public List<LineResponse> findAllLines() {
