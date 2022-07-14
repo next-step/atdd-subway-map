@@ -3,16 +3,15 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.StationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -23,9 +22,12 @@ public class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    StationClient stationClient;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        stationClient = new StationClient();
     }
 
     /**
@@ -37,13 +39,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStations("강남역");
+        ExtractableResponse<Response> response = stationClient.create("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = findAllStations().jsonPath().getList("name", String.class);
+        List<String> stationNames = stationClient.findAll().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -56,11 +58,11 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        createStations("강남역");
-        createStations("선릉역");
+        stationClient.create("강남역");
+        stationClient.create("선릉역");
 
         //when
-        final var response = findAllStations();
+        final var response = stationClient.findAll();
 
         //then
         assertAll(
@@ -79,36 +81,13 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        createStations("강남역");
+        stationClient.create("강남역");
 
         // when
-        deleteStationById(1);
+        stationClient.deleteById(1);
 
         // then
-        assertThat(findAllStations().jsonPath().getList("name")).doesNotContain("강남역");
+        assertThat(stationClient.findAll().jsonPath().getList("name")).doesNotContain("강남역");
     }
-
-    private ExtractableResponse<Response> createStations(String stationName) {
-        return RestAssured.given().log().all()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> findAllStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> deleteStationById(long id) {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/" + id)
-                .then().log().all().extract();
-    }
-
 
 }

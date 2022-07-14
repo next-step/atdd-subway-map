@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.StationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,19 +26,15 @@ class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    StationClient stationClient;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-        createStation("지하철역");
-        createStation("새로운지하철역");
-        createStation("또다른지하철역");
-    }
-
-    private void createStation(String stationName) {
-        RestAssured.given()
-                .body(Map.of("name", stationName))
-                .contentType(APPLICATION_JSON_VALUE)
-                .when().post("/stations");
+        stationClient = new StationClient();
+        stationClient.create("지하철역");
+        stationClient.create("새로운지하철역");
+        stationClient.create("또다른지하철역");
     }
 
     /**
