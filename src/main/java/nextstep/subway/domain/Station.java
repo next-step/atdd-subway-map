@@ -20,12 +20,24 @@ public class Station {
         this.name = name;
     }
 
+    public Station(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSameStationId(final Long id) {
+        if (!Objects.equals(this.id, id)) {
+            throw new IllegalStateException("하행역과 새로운 상행역이 맞지 않습니다.");
+        }
+        return true;
     }
 
     @Override
