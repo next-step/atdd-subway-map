@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import nextstep.subway.domain.exception.InvalidMatchEndStationException;
+import nextstep.subway.domain.exception.NotFoundSectionException;
 import nextstep.subway.domain.exception.SectionDeleteException;
 import nextstep.subway.domain.exception.StationAlreadyExistsException;
 
@@ -46,13 +47,14 @@ public class Sections {
     }
 
     private boolean hasStation(Station station) {
-        return values.stream()
-                .filter(section -> section.hasStation(station))
-                .count() > EMPTY_VALUE;
+        return values.stream().anyMatch(section -> section.hasStation(station));
     }
 
     public void delete(Station station) {
         Section lastSection = findLastSection();
+        if (lastSection == null) {
+            throw new NotFoundSectionException();
+        }
         if (this.hasOnlyOneSection()) {
             throw new SectionDeleteException();
         }
