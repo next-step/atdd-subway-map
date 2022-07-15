@@ -34,7 +34,7 @@ public class BaseAcceptance {
     }
 
     protected long 지하철_노선_생성(final String upStation, final String downStation,
-        final String lineName) {
+        final String lineName, final String color) {
         final ExtractableResponse<Response> upStationResponse = createStation(upStation);
         final ExtractableResponse<Response> downStationResponse = createStation(downStation);
 
@@ -42,7 +42,7 @@ public class BaseAcceptance {
         final long downStationId = downStationResponse.jsonPath().getLong("id");
 
         final ExtractableResponse<Response> lineResponse = createSubwayLine(lineName,
-            "bg-red-600", upStationId, downStationId, 10);
+            color, upStationId, downStationId, 10);
         return lineResponse.jsonPath().getLong("id");
     }
 

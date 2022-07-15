@@ -32,7 +32,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @DisplayName("지하철 노선 생성")
     void createLines() {
         //when
-        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선");
+        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선", "red");
 
         //then
         final ExtractableResponse<Response> lineResponse = findApplicableLine(id);
@@ -49,8 +49,8 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     @DisplayName("지하철 노선 목록 조회")
     void getLines() {
-        지하철_노선_생성("강남역", "양재역", "신분당선");
-        지하철_노선_생성("까치울역", "온수역", "7호선");
+        지하철_노선_생성("강남역", "양재역", "신분당선", "red");
+        지하철_노선_생성("까치울역", "온수역", "7호선", "green");
 
         //when
         final ExtractableResponse<Response> getLinesResponse = findAllLines();
@@ -90,7 +90,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @DisplayName("지하철 노선 조회")
     void getOneLine() {
         //given
-        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선");
+        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선", "red");
 
         //when
         final ExtractableResponse<Response> getLinesResponse = findApplicableLine(id);
@@ -115,7 +115,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @Test
     @DisplayName("지하철 노선 수정")
     void updateLines() {
-        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선");
+        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선", "red");
 
         //when
         modifyLine();
@@ -144,7 +144,7 @@ class LineAcceptanceTest extends BaseAcceptance {
     @DisplayName("지하철 노선 삭제")
     void removeLines() {
         //given
-        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선");
+        final long id = 지하철_노선_생성("강남역", "양재역", "신분당선", "red");
 
         //when
         final ExtractableResponse<Response> removeResponse = removeLine(id);
