@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class Sections {
 
     private static final int ONE = 1;
-    private static final long EMPTY_VALUE = 0L;
+    private static final int EMPTY_VALUE = 0;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> values = new ArrayList<>();
@@ -65,7 +65,7 @@ public class Sections {
     }
 
     private Section findLastSection() {
-        if (lastIndex() < 0) {
+        if (lastIndex() < EMPTY_VALUE) {
             return null;
         }
         return values.get(lastIndex());
