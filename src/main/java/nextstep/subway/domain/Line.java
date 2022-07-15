@@ -51,9 +51,11 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Section section) {
+    public void addSection(Station upStation, Station downStation) {
         this.sections.add(
-                section.toBuilder()
+                Section.builder()
+                        .upStation(upStation)
+                        .downStation(downStation)
                         .line(this)
                         .build());
     }

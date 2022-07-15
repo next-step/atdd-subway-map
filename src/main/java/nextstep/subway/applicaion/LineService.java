@@ -32,10 +32,7 @@ public class LineService {
         Station upStation = findStation(lineDto.getUpStationId());
         Station downStation = findStation(lineDto.getDownStationId());
 
-        line.addSection(Section.builder()
-                .upStation(upStation)
-                .downStation(downStation)
-                .build());
+        line.addSection(upStation, downStation);
 
         return LineDto.of(line);
     }
