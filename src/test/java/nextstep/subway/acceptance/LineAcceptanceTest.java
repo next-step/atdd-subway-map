@@ -85,9 +85,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
-        assertThat(response.jsonPath().getList("name"))
-                .isEqualTo(Arrays.asList(LINE_5.get("name"), LINE_2.get("name")));
-
+        assertThat(response.jsonPath().getList("name")).containsExactly(LINE_5.get("name"), LINE_2.get("name"));
     }
 
     /**
