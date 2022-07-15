@@ -16,9 +16,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 @RequiredArgsConstructor
 public class SpringBootTestConfig {
 
-    protected final SubwayRestAssured<Station> stationRestAssured = new SubwayRestAssured<>();
-    protected final SubwayRestAssured<Section> sectionRestAssured = new SubwayRestAssured<>();
-    protected final SubwayRestAssured<Line> lineRestAssured = new SubwayRestAssured<>();
 
     @LocalServerPort
     int port;

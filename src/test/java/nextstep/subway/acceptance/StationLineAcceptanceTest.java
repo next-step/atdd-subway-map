@@ -6,6 +6,7 @@ import nextstep.subway.acceptance.client.SubwayRestAssured;
 import nextstep.subway.acceptance.factory.LineFactory;
 import nextstep.subway.domain.Line;
 import nextstep.subway.acceptance.enums.SubwayRequestPath;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("지하철 노선 관련 기능")
 @Sql("/truncate.sql")
 class StationLineAcceptanceTest extends SpringBootTestConfig {
-
+    protected final SubwayRestAssured<Line> lineRestAssured = new SubwayRestAssured<>();
     /**
      * given 노선을 생성하면
      * when 노선이 생성된다.
