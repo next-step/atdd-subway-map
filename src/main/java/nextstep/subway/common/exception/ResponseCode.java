@@ -10,7 +10,9 @@ public enum ResponseCode {
     LINE_NOT_FOUND (2000, "노선이 존재하지 않습니다."),
     LINE_STATION_DUPLICATE(2001, "노선에 이미 존재하는 역입니다."),
 
-    STATION_NOT_FOUND(3000, "지하철역이 존재하지 않습니다.");
+    STATION_NOT_FOUND(3000, "지하철역이 존재하지 않습니다."),
+
+    SECTION_NOT_MATCH(4000, "구간 상행선과 노선 하행선과 일치하지 않습니다.");
 
     private final int code;
 

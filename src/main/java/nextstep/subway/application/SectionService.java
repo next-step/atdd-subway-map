@@ -23,11 +23,12 @@ public class SectionService {
     private final LineRepository lineRepository;
 
     public SectionResponse createSection(long lineId, CreateSectionRequest request) {
-        Line line = lineRepository.findById(lineId)
-                                  .orElseThrow(() -> new CustomException(ResponseCode.LINE_NOT_FOUND));
+        Line line = findLine(lineId);
+        Station upStation = findStation(request.getUpStationId());
+        Station downStation = findStation(request.getDownStationId());
 
-        if(line.getDownStation().getId() != request.getUpStationId()){
-            throw new CustomException(ResponseCode.LINE_NOT_FOUND);
+        if(!line.getDownStation().getId().equals(request.getUpStationId())){
+            throw new CustomException(ResponseCode.SECTION_NOT_MATCH);
         }
 
         List<Section> sections = line.getStations();
@@ -40,11 +41,22 @@ public class SectionService {
             }
         }
 
-        Station upStation = stationRepository.findById(request.getUpStationId())
-                                             .orElseThrow(() -> new CustomException(ResponseCode.STATION_NOT_FOUND));
-        Station downStation = stationRepository.findById(request.getUpStationId())
-                                             .orElseThrow(() -> new CustomException(ResponseCode.STATION_NOT_FOUND));
-        Section section = Section.builder().build();
+        Section section = Section.builder()
+            .upStation(line.getUpStation())
+            .downStation(downStation)
+            .distance(request.getDistance())
+            .line(line).build();
+        sectionRepository.save(section);
         return SectionResponse.of(section);
+    }
+
+    private Station findStation(long stationId) {
+        return stationRepository.findById(stationId)
+                                .orElseThrow(() -> new CustomException(ResponseCode.STATION_NOT_FOUND));
+    }
+
+    private Line findLine(final Long lineId) {
+        return lineRepository.findById(lineId)
+                             .orElseThrow(() -> new CustomException(ResponseCode.LINE_NOT_FOUND));
     }
 }

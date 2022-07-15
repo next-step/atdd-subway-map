@@ -21,7 +21,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {CustomException.class})
     public ResponseEntity<Object> handleCustomException(CustomException ex) {
         ResponseCode responseCode = ex.getResponseCode();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseCode);
+        CommonResponse<Object> response = new CommonResponse<>(responseCode);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<String> fieldErrorMessage = getFieldErrorMessage(e.getFieldErrors());
         CommonResponse<Object> response = new CommonResponse<>(ResponseCode.PARAM_INVALID, fieldErrorMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

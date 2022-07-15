@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -34,7 +35,7 @@ public class Line {
     private Integer distance;
 
     @OneToMany(mappedBy = "line")
-    private List<Section> stations;
+    private List<Section> stations = new ArrayList<>();
 
     public Line(final String name,
                 final String color,

@@ -5,8 +5,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.testsupport.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -28,7 +28,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
          * Then 등록된 노선의 상행역, 하행역을 확인한다.
          */
         @Test
-        void 새로운_구간_등록(){
+        void 새로운_구간_등록() {
             // given
             long aId = 지하철역_생성_요청("A").jsonPath().getLong("id");
             long bId = 지하철역_생성_요청("B").jsonPath().getLong("id");
@@ -42,9 +42,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
             // then
             assertAll(
-                ()->assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                ()->assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(aId),
-                ()->assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(cId)
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(aId),
+                () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(cId)
                      );
         }
 
@@ -67,7 +67,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 구간_등록_요청(lineId, bId, aId, 10);
 
             // then
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(2001)
+                     );
         }
 
         /**
@@ -88,15 +91,18 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", aId, bId, 10).jsonPath().getLong("id");
 
             // when
-            final ExtractableResponse<Response> response = 구간_등록_요청(lineId, cId, dId, 10);
+            final ExtractableResponse<Response> response = 구간_등록_요청(lineId, dId, cId, 10);
 
             // then
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(4000)
+                     );
         }
     }
 
 
-    private ExtractableResponse<Response> 구간_등록_요청(long registLineId, long downStationId, long upStationId, int distance) {
+    private ExtractableResponse<Response> 구간_등록_요청(long registLineId, long upStationId, long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
         params.put("downStationId", String.valueOf(downStationId));
         params.put("upStationId", String.valueOf(upStationId));

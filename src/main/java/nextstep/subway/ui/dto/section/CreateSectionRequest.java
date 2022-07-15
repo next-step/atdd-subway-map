@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CreateSectionRequest {
-    private long downStationId;
-    private long upStationId;
-    private int distance;
+    private Long downStationId;
+    private Long upStationId;
+    private Integer distance;
 }
