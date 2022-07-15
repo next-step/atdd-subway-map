@@ -1,4 +1,4 @@
-package nextstep.subway.domain.entity;
+package nextstep.subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,9 @@
-package nextstep.subway.domain.entity;
+package nextstep.subway.domain;
 
-import lombok.RequiredArgsConstructor;
 import nextstep.subway.BaseSpringBootTest;
 import nextstep.subway.infra.LineRepository;
 import nextstep.subway.infra.SectionRepository;
 import nextstep.subway.infra.StationRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

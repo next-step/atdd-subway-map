@@ -1,11 +1,11 @@
-package nextstep.subway.domain.entity;
+package nextstep.subway.domain;
 
 import nextstep.subway.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.domain.entity.StationTest.getMockStation;
+import static nextstep.subway.domain.StationTest.getMockStation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreateDto;
 import nextstep.subway.applicaion.dto.LineDto;
 import nextstep.subway.applicaion.dto.LineUpdateDto;
-import nextstep.subway.domain.entity.Line;
-import nextstep.subway.domain.entity.Section;
-import nextstep.subway.domain.service.LineService;
-import nextstep.subway.domain.service.SectionService;
-import nextstep.subway.domain.entity.Station;
-import nextstep.subway.domain.service.StationService;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Station;
+import nextstep.subway.exception.NotFoundException;
+import nextstep.subway.infra.LineRepository;
+import nextstep.subway.infra.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +19,18 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class LineApiService {
+public class LineService {
 
-    private final LineService lineService;
-    private final StationService stationService;
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
 
     @Transactional
     public LineDto createLine(final LineCreateDto lineDto) {
-        Line line = lineService.save(lineDto.toDomain());
+        Line line = lineRepository.save(lineDto.toDomain());
 
-        Station upStation = stationService.findStation(lineDto.getUpStationId());
-        Station downStation = stationService.findStation(lineDto.getDownStationId());
+        Station upStation = findStation(lineDto.getUpStationId());
+        Station downStation = findStation(lineDto.getDownStationId());
 
         line.addSection(Section.builder()
                 .upStation(upStation)
@@ -41,7 +41,7 @@ public class LineApiService {
     }
 
     public List<LineDto> getLines() {
-        List<Line> lines = lineService.findAll();
+        List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
                 .map(LineDto::of)
@@ -49,20 +49,30 @@ public class LineApiService {
     }
 
     public LineDto getLine(Long id) {
-        Line line = lineService.findLine(id);
+        Line line = findLine(id);
 
         return LineDto.of(line);
     }
 
     @Transactional
     public void updateLine(Long id, LineUpdateDto lineUpdateDto) {
-        Line line = lineService.findLine(id);
+        Line line = findLine(id);
         line.updateNameAndColor(lineUpdateDto.getName(), lineUpdateDto.getColor());
     }
 
     @Transactional
     public void deleteLine(Long id) {
-        Line line = lineService.findLine(id);
-        lineService.delete(line);
+        Line line = findLine(id);
+        lineRepository.delete(line);
+    }
+
+    public Line findLine(final Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("line is not found"));
+    }
+
+    public Station findStation(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("station is not found"));
     }
 }

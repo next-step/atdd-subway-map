@@ -1,4 +1,4 @@
-package nextstep.subway.domain.entity;
+package nextstep.subway.domain;
 
 import lombok.Builder;
 

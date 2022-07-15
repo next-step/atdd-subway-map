@@ -1,7 +1,5 @@
-package nextstep.subway.domain.entity;
+package nextstep.subway.domain;
 
-import nextstep.subway.domain.entity.Section;
-import nextstep.subway.domain.entity.Station;
 import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.CascadeType;

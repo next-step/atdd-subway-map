@@ -3,7 +3,7 @@ package nextstep.subway.applicaion.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.domain.entity.Line;
+import nextstep.subway.domain.Line;
 
 @Getter
 @Builder
