@@ -95,7 +95,21 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 구간을 제거한다.")
     @Test
     void 지하철_구간_제거() {
+        // given
+        ExtractableResponse<Response> response1 = 지하철_구간_등록됨(신분당선, 역삼역, 판교역, 10);
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.OK.value());
 
+        // when
+        ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("lines/"+신분당선+"/sections?stationId="+판교역)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        List<Long> 구간_목록 = 구간_목록_조회();
+        assertThat(구간_목록).isNotIn(판교역);
     }
 
     /**

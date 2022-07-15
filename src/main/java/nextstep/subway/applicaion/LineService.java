@@ -73,12 +73,19 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse addSections(Long lineId, SectionRequest request) {
+    public LineResponse addSection(Long lineId, SectionRequest request) {
         Line line = findLineById(lineId);
         Station upStation = stationService.findStationById(request.getUpStationId());
         Station downStation = stationService.findStationById(request.getDownStationId());
 
         line.addSection(new Section(line, upStation, downStation, request.getDistance()));
         return LineResponse.of(line, line.getAllStations());
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        Station station = stationService.findStationById(stationId);
+        line.deleteSection(station);
     }
 }

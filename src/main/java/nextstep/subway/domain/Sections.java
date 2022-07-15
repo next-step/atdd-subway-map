@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Sections {
+    private final static int MINIMUM_SIZE = 1;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id asc")
@@ -55,5 +56,21 @@ public class Sections {
                 .flatMap(List::stream)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    public void delete(Station station) {
+        validateDeleteSection(station);
+        sections.remove(getLastSection());
+    }
+
+    private Section getLastSection() {
+        return sections.get(sections.size()-1);
+    }
+
+    private void validateDeleteSection(Station station) {
+        // 마지막 구간인지 아닌지
+
+        // 구간이 1개인지 아닌지
+
     }
 }
