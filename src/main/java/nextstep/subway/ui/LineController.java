@@ -51,4 +51,9 @@ public class LineController {
     public ResponseEntity<LineResponse> addSections(@PathVariable Long id, @RequestBody SectionRequest request) {
         return ResponseEntity.ok().body(lineService.addSections(id, request));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Void> illegalArgumentExceptionHandler(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().build();
+    }
 }

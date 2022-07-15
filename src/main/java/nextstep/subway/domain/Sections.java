@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id asc")
     private final List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {
@@ -28,6 +30,17 @@ public class Sections {
         // 이미 등록된 하행역인지
 
         // 상행역이 하행종점역이 아닌지
+        if (!isDownTerminal(newSection.getUpStation())) {
+            throw new IllegalArgumentException(String.format("상행역은 하행종점역이어야 합니다. Station: %s", newSection.getUpStation()));
+        }
+    }
+
+    private boolean isDownTerminal(Station station) {
+        return !station.equals(getDownTerminal());
+    }
+
+    private Station getDownTerminal() {
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
     public List<Station> getAllStations() {

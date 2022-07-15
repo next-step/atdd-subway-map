@@ -59,7 +59,11 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("새로운 구간의 상행역이 등록되어있는 하행 종점역이 아니면 등록할 수 없다.")
     @Test
     void 지하철_구간_등록_상행역_에러() {
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 판교역, 강남역, 10);
 
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
