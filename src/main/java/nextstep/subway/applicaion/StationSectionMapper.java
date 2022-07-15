@@ -2,7 +2,6 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.StationSectionRequest;
 import nextstep.subway.applicaion.dto.StationSectionResponse;
-import nextstep.subway.domain.StationLine;
 import nextstep.subway.domain.StationSection;
 import org.springframework.stereotype.Component;
 

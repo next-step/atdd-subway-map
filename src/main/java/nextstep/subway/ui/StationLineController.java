@@ -5,6 +5,8 @@ import java.util.List;
 import nextstep.subway.applicaion.StationLineService;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
+import nextstep.subway.applicaion.dto.StationSectionRequest;
+import nextstep.subway.applicaion.dto.StationSectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,7 +46,7 @@ public class StationLineController {
 
     @PutMapping("/lines/{lineId}")
     public ResponseEntity<Void> updateStationLine(@PathVariable Long lineId,
-                                            @RequestBody StationLineRequest request) {
+                                                  @RequestBody StationLineRequest request) {
         stationLineService.updateStationLine(lineId, request);
         return ResponseEntity.ok().build();
     }
@@ -51,6 +54,25 @@ public class StationLineController {
     @DeleteMapping("/lines/{lineId}")
     public ResponseEntity<Void> deleteStationLine(@PathVariable Long lineId) {
         stationLineService.deleteStationLine(lineId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{lineId}/sections")
+    public ResponseEntity<StationSectionResponse> createStationSection(
+            @PathVariable Long lineId,
+            @RequestBody StationSectionRequest request
+    ) {
+        StationSectionResponse stationLine = stationLineService.createStationSection(request, lineId);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/section/" + stationLine.getId()))
+                .body(stationLine);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteStationSection(
+            @PathVariable Long lineId,
+            @RequestParam Long stationId
+    ) {
+        stationLineService.deleteStationSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

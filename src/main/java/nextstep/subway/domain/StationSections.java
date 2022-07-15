@@ -58,7 +58,7 @@ public class StationSections {
     }
 
     private boolean isNoneSameLastUpStationAndDownStation(StationSection stationSection) {
-        if(stationSections.isEmpty()){
+        if (stationSections.isEmpty()) {
             return false;
         }
         return getLastSection().isNoneSameDownStationId(stationSection.getUpStationId());

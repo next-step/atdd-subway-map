@@ -50,7 +50,7 @@ public class StationLine {
         stationSections.addSection(this, stationSection);
     }
 
-    public List<Long> getStationIds(){
+    public List<Long> getStationIds() {
         return stationSections.getStationIds();
     }
 
