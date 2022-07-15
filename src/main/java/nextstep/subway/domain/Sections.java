@@ -73,5 +73,8 @@ public class Sections {
         if (!section.getDownStation().equals(station)) {
             throw new IllegalArgumentException(String.format("마지막 구간이 아닙니다. Section: %s", section));
         }
+        if (sections.size() == MINIMUM_SIZE) {
+            throw new IllegalArgumentException("구간이 1개일 때는 구간 제거가 불가능합니다.");
+        }
     }
 }

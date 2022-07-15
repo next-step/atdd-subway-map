@@ -135,7 +135,12 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("구간이 1개일 때 제거할 수 없다.")
     @Test
     void 지하철_구간_제거_구간_개수_에러() {
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(신분당선, 역삼역);
 
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("구간이 1개일 때는 구간 제거가 불가능합니다.");
     }
 
 
