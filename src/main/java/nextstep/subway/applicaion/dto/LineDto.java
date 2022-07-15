@@ -17,7 +17,6 @@ public class LineDto {
     private final Long id;
     private final String name;
     private final String color;
-    private final Integer distance;
 
     private final List<StationDto> stations;
 
@@ -26,7 +25,6 @@ public class LineDto {
                 .id(line.getId())
                 .name(line.getName())
                 .color(line.getColor())
-                .distance(line.getDistance())
                 .stations(
                         line.getStations().stream()
                                 .map(StationDto::of)

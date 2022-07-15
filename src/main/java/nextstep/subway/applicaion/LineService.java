@@ -5,7 +5,6 @@ import nextstep.subway.applicaion.dto.LineCreateDto;
 import nextstep.subway.applicaion.dto.LineDto;
 import nextstep.subway.applicaion.dto.LineUpdateDto;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
 import nextstep.subway.exception.NotFoundException;
 import nextstep.subway.infra.LineRepository;
@@ -32,7 +31,7 @@ public class LineService {
         Station upStation = findStation(lineDto.getUpStationId());
         Station downStation = findStation(lineDto.getDownStationId());
 
-        line.addSection(upStation, downStation);
+        line.addSection(upStation, downStation, lineDto.getDistance());
 
         return LineDto.of(line);
     }

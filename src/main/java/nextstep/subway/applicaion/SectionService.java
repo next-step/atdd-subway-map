@@ -25,7 +25,7 @@ public class SectionService {
         Station newUpStation = findStation(sectionRequest.getUpStationId());
         Station newDownStation = findStation(sectionRequest.getDownStationId());
 
-        line.addSection(newUpStation, newDownStation);
+        line.addSection(newUpStation, newDownStation, sectionRequest.getDistance());
     }
 
     @Transactional

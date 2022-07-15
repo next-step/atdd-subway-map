@@ -20,10 +20,6 @@ public class LineAcceptanceTest extends BaseAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-
-//        createStation(Map.of(NAME, "남태령역"));
-//        createStation(Map.of(NAME, "사당역"));
-//        createStation(Map.of(NAME, "총신대입구역"));
     }
 
     /**

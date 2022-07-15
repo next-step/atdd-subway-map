@@ -23,23 +23,18 @@ public class Line {
     private String name;
     @Column(nullable = false)
     private String color;
-    @Column(nullable = false)
-    private Integer distance;
-
     @Embedded
     private Sections sections = new Sections();
 
 
     @Builder(toBuilder = true)
-    protected Line(Long id, String name, String color, Integer distance) {
+    protected Line(Long id, String name, String color) {
         requireNonNull(name, "name is required");
         requireNonNull(color, "color is required");
-        requireNonNull(distance, "distance is required");
 
         this.id = id;
         this.name = name;
         this.color = color;
-        this.distance = distance;
     }
 
     public List<Station> getStations() {
@@ -51,11 +46,12 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Station upStation, Station downStation) {
+    public void addSection(Station upStation, Station downStation, Integer distance) {
         this.sections.add(
                 Section.builder()
                         .upStation(upStation)
                         .downStation(downStation)
+                        .distance(distance)
                         .line(this)
                         .build());
     }

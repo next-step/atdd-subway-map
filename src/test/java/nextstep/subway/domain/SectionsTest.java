@@ -17,13 +17,13 @@ class SectionsTest {
 
     @BeforeEach
     void setUp() {
-        line = LineFactory.getMockLine(1L, "4호선", "blue", 5);
+        line = LineFactory.getMockLine(1L, "4호선", "blue");
 
         upStation = StationTest.getMockStation(1L, "사당역");
         downStation = StationTest.getMockStation(2L, "신논현역");
 
         sections = new Sections();
-        sections.add(new Section(line, upStation, downStation));
+        sections.add(new Section(line, upStation, downStation, 10));
     }
 
     @Test
@@ -31,7 +31,7 @@ class SectionsTest {
     void addTest() {
 
         Station newStation = StationTest.getMockStation(3L, "금정역");
-        sections.add(new Section(line, downStation, newStation));
+        sections.add(new Section(line, downStation, newStation, 10));
         assertThat(sections.getStations()).hasSize(3);
     }
 
@@ -42,29 +42,29 @@ class SectionsTest {
         Station newDownStation = StationTest.getMockStation(4L, "금정역");
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> sections.add(new Section(line, newUpStation, newDownStation)));
+                .isThrownBy(() -> sections.add(new Section(line, newUpStation, newDownStation, 10)));
     }
 
     @Test
     @DisplayName("신규 상행선이 다른 하행선과 연결되어 있는 선이면 에러가 발생한다.")
     void addException2Test() {
         Station newUpStation = StationTest.getMockStation(3L, "강남역");
-        sections.add(new Section(line, downStation, newUpStation));
+        sections.add(new Section(line, downStation, newUpStation, 10));
 
         Station newDownStation = StationTest.getMockStation(4L, "금정역");
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> sections.add(new Section(line, downStation, newDownStation)));
+                .isThrownBy(() -> sections.add(new Section(line, downStation, newDownStation, 10)));
     }
 
     @Test
     @DisplayName("신규 하행선이 이미 존재하는 하행선이면 에러가 발생한다.")
     void addException3Test() {
         Station newDownStation = StationTest.getMockStation(3L, "강남역");
-        sections.add(new Section(line, downStation, newDownStation));
+        sections.add(new Section(line, downStation, newDownStation, 10));
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> sections.add(new Section(line, downStation, newDownStation)));
+                .isThrownBy(() -> sections.add(new Section(line, downStation, newDownStation, 10)));
     }
 
 
@@ -79,7 +79,7 @@ class SectionsTest {
     @DisplayName("역이 3개 이상인 경우, 삭제할 수 있다.")
     void deleteTest() {
         Station deleteStation = StationTest.getMockStation(3L, "강남역");
-        sections.add(new Section(line, downStation, deleteStation));
+        sections.add(new Section(line, downStation, deleteStation, 10));
 
         sections.delete(deleteStation);
         assertThat(sections.getStations()).hasSize(2);

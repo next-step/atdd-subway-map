@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.*;
+import java.util.Objects;
+
+import static java.util.Objects.*;
 
 @Entity
 @Getter
@@ -23,22 +26,35 @@ public class Section {
 
 
     @OneToOne
-    @JoinColumn(name = "up_station_id")
+    @JoinColumn(name = "up_station_id", nullable = false)
     private Station upStation;
 
     @OneToOne
-    @JoinColumn(name = "down_station_id")
+    @JoinColumn(name = "down_station_id", nullable = false)
     private Station downStation;
 
+    @Column(nullable = false)
+    private Integer distance;
+
     @Builder(toBuilder = true)
-    public Section(Line line, Station upStation, Station downStation) {
+    public Section(Line line, Station upStation, Station downStation, Integer distance) {
+        requireNonNull(line, "line is required");
+        requireNonNull(upStation, "upStation is required");
+        requireNonNull(downStation, "downStation is required");
+        requireNonNull(distance, "distance is required");
+
         if (upStation.equals(downStation)) {
             throw new BadRequestException("upStation and downStation can not be same");
+        }
+
+        if (isNegativeNumber(distance)) {
+            throw new BadRequestException("distance required positive number");
         }
 
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
     }
 
     public boolean existAnyStation(Station station) {
@@ -55,5 +71,9 @@ public class Section {
 
     public boolean equalsDownStation(Station station) {
         return this.downStation.equals(station);
+    }
+
+    private boolean isNegativeNumber(Integer distance) {
+        return distance < 0;
     }
 }
