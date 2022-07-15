@@ -1,13 +1,7 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -41,12 +34,17 @@ class LineServiceTest {
     @Test
     void 라인을_저장한다() {
         // given
+        final LineRequest lineRequest = new LineRequest("8호선", "bg-pink-500", 1L, 2L, 17L);
+
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
-        final LineRequest lineRequest = new LineRequest("8호선", "bg-pink-500", 1L, 2L, 17L);
         given(stationRepository.findById(1L)).willReturn(Optional.of(모란역));
         given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
-        given(lineRepository.save(any())).willReturn(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역));
+
+        Line line = new Line("8호선", "bg-pink-500");
+        line.addSection(new Section(10L, 모란역, 암사역));
+        given(lineRepository.save(any())).willReturn(line);
+
         // when
         LineResponse lineResponse = lineService.saveLine(lineRequest);
 
@@ -99,8 +97,11 @@ class LineServiceTest {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
+        Line line = new Line("8호선", "bg-pink-500");
+        line.addSection(new Section(17L, 모란역, 암사역));
+
         given(lineRepository.findById(1L))
-                .willReturn(Optional.of(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역)));
+                .willReturn(Optional.of(line));
 
         // when
         LineResponse lineResponse = lineService.findLine(1L);
@@ -132,8 +133,10 @@ class LineServiceTest {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
+        Line line = new Line("8호선", "bg-pink-500");
+        line.addSection(new Section(17L, 모란역, 암사역));
         given(lineRepository.findById(1L))
-                .willReturn(Optional.of(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역)));
+                .willReturn(Optional.of(line));
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -148,12 +151,164 @@ class LineServiceTest {
         // given
         final Station 모란역 = new Station(1L, "모란역");
         final Station 암사역 = new Station(2L, "암사역");
+        Line line = new Line("8호선", "bg-pink-500");
+        line.addSection(new Section(17L, 모란역, 암사역));
         given(lineRepository.findById(1L))
-                .willReturn(Optional.of(new Line("8호선", "bg-pink-500", 17L, 모란역, 암사역)));
+                .willReturn(Optional.of(line));
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
                 lineService.updateLine(1L, new LineUpdateRequest("2호선", color))
+        );
+    }
+
+    @Test
+    void 구간을_추가한다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        final SectionRequest sectionRequest = new SectionRequest(2L, 3L, 10L);
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+
+        final Station 송파역 = new Station(3L, "송파역");
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+        given(stationRepository.findById(3L)).willReturn(Optional.of(송파역));
+
+        // when
+        LineResponse lineResponse = lineService.addSection(1L, sectionRequest);
+
+        //then
+        assertAll(() -> {
+            assertThat(lineResponse.getName()).isEqualTo("8호선");
+            assertThat(lineResponse.getColor()).isEqualTo("bg-pink-500");
+            assertThat(lineResponse.getStationResponses()).containsExactly(
+                    new StationResponse(1L, "모란역"),
+                    new StationResponse(2L, "암사역"),
+                    new StationResponse(3L, "송파역")
+            );
+        });
+    }
+
+    @Test
+    void 구간을_추가할_때_같은_구간이면_예외를_발생시킨다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        final SectionRequest sectionRequest = new SectionRequest(1L, 2L, 10L);
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+
+        given(stationRepository.findById(1L)).willReturn(Optional.of(모란역));
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.addSection(1L, sectionRequest)
+        );
+    }
+
+    @Test
+    void 새로운_구간의_상행역은_해당_노선에_등록되어있는_하행_종점역이_아니면_예외를_발생시킨다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        final SectionRequest sectionRequest = new SectionRequest(1L, 3L, 10L);
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+
+        final Station 송파역 = new Station(3L, "송파역");
+        given(stationRepository.findById(1L)).willReturn(Optional.of(모란역));
+        given(stationRepository.findById(3L)).willReturn(Optional.of(송파역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.addSection(1L, sectionRequest)
+        );
+    }
+
+    @Test
+    void 새로운_구간의_하행역은_해당_노선에_등록되어있는_역이면_예외를_발생시킨다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        final SectionRequest sectionRequest = new SectionRequest(2L, 1L, 10L);
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+        given(stationRepository.findById(1L)).willReturn(Optional.of(모란역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.addSection(1L, sectionRequest)
+        );
+    }
+
+    @Test
+    void 구간을_삭제한다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Station 송파역 = new Station(3L, "송파역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        Section section = new Section(10L, 암사역, 송파역);
+        _8호선.addSection(section);
+
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+        given(stationRepository.findById(3L)).willReturn(Optional.of(송파역));
+
+        // then
+        assertThatNoException().isThrownBy(() ->
+                lineService.deleteSection(1L, 3L)
+        );
+    }
+
+    @Test
+    void 구간을_삭제할_때_마지막_역이_아니면_예외를_발생시킨다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Station 송파역 = new Station(3L, "송파역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        Section section = new Section(10L, 암사역, 송파역);
+        _8호선.addSection(section);
+
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.deleteSection(1L, 2L)
+        );
+    }
+
+    @Test
+    void 구간이_하나_남았을때는_삭제할_수_없다() {
+        // given
+        final Station 모란역 = new Station(1L, "모란역");
+        final Station 암사역 = new Station(2L, "암사역");
+        final Line _8호선 = new Line("8호선", "bg-pink-500");
+        _8호선.addSection(new Section(17L, 모란역, 암사역));
+
+        given(lineRepository.findById(1L)).willReturn(Optional.of(_8호선));
+        given(stationRepository.findById(2L)).willReturn(Optional.of(암사역));
+
+        // then
+        assertThatIllegalArgumentException().isThrownBy(() ->
+                lineService.deleteSection(1L, 2L)
         );
     }
 

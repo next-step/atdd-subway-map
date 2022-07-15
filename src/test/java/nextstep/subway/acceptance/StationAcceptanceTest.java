@@ -26,9 +26,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void 지하철역을_생성한다() {
         // when
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
@@ -58,19 +57,18 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("지하철역을 조회한다.")
     @Test
-    void getStations() {
+    void 지하철역을_조회한다() {
         // given
         역을_만들다("잠실역");
         역을_만들다("한성백제역");
 
         // when
-        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
+        var 지하철역_목록 = 지하철역_목록을_조회한다();
 
         // then
-        List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).containsExactly("잠실역", "한성백제역");
+        var 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name");
+        assertThat(지하철역_이름_목록).containsExactly("잠실역", "한성백제역");
 
     }
 
@@ -79,37 +77,36 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역을 제거한다.")
     @Test
-    void deleteStation() {
+    void 지하철역을_제거한다() {
         // given
-        StationResponse 잠실역 = 역을_만들다("잠실역").as(StationResponse.class);
+        var 잠실역 = 역을_만들다("잠실역").as(StationResponse.class).getId();
 
         // when
-        역을_삭제한다(잠실역.getId());
+        역을_삭제한다(잠실역);
 
         // then
-        ExtractableResponse<Response> response = 지하철역_목록을_조회한다();
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).isEmpty();
+        var 지하철역_목록 = 지하철역_목록을_조회한다();
+        var 지하철역_이름_목록 = 지하철역_목록.jsonPath().getList("name", String.class);
+        assertThat(지하철역_이름_목록).isEmpty();
     }
 
 
     public static ExtractableResponse<Response> 역을_만들다(String name) {
-        StationRequest stationRequest = new StationRequest(name);
-        ExtractableResponse<Response> response = postRequestWithRequestBody("/stations", stationRequest);
+        var stationRequest = new StationRequest(name);
+        var response = postRequestWithRequestBody("/stations", stationRequest);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response;
     }
 
-    private ExtractableResponse<Response> 지하철역_목록을_조회한다() {
-        ExtractableResponse<Response> response = getRequest("/stations");
+    public static ExtractableResponse<Response> 지하철역_목록을_조회한다() {
+        var response = getRequest("/stations");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     private void 역을_삭제한다(Long id) {
-        ExtractableResponse<Response> response = deleteRequestWithParameter("/stations/{id}", id);
+        var response = deleteRequestWithParameter("/stations/{id}", id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 

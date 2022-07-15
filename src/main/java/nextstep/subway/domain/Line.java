@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -8,17 +9,37 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String name;
+
+    @Column
     private String color;
+
     @Embedded
-    private Distance distance;
-    @Embedded
-    private Stations stations;
+    private Sections sections;
+
+    protected Line() {
+    }
+
+    public Line(String name, String color) {
+        validation(name, color);
+        this.name = name;
+        this.color = color;
+        this.sections = new Sections();
+    }
 
     public void changeInfo(String name, String color) {
         validation(name, color);
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.addSection(this, section);
+    }
+
+    public void removeSection(Station station) {
+        sections.removeSection(station);
     }
 
     private void validation(String name, String color) {
@@ -29,17 +50,6 @@ public class Line {
         if (color == null || color.isBlank()) {
             throw new IllegalArgumentException("색상을 넣어 주세요");
         }
-    }
-
-    protected Line() {
-    }
-
-    public Line(String name, String color, long distance, Station upStation, Station downStation) {
-        validation(name, color);
-        this.name = name;
-        this.color = color;
-        this.distance = new Distance(distance);
-        this.stations = new Stations(upStation, downStation);
     }
 
     public Long getId() {
@@ -54,13 +64,7 @@ public class Line {
         return color;
     }
 
-    public Distance getDistance() {
-        return distance;
+    public List<Station> getStations() {
+        return sections.getStation();
     }
-
-    public Stations getStations() {
-        return stations;
-    }
-
-
 }

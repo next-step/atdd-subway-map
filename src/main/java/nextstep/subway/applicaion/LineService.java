@@ -3,10 +3,8 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +30,31 @@ public class LineService {
         Station upStation = findStation(lineRequest.getUpStationId());
         Station downStation = findStation(lineRequest.getDownStationId());
 
-        final Line line = new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), upStation, downStation);
-        final Line newLine = lineRepository.save(line);
+        final Line line = new Line(lineRequest.getName(), lineRequest.getColor());
+        final Section section = new Section(lineRequest.getDistance(), upStation, downStation);
+        line.addSection(section);
 
+        final Line newLine = lineRepository.save(line);
         return LineResponse.of(newLine);
     }
 
-    private Station findStation(Long upStationId) {
-        return stationRepository.findById(upStationId).orElseThrow(() -> new IllegalArgumentException("역이 없습니다."));
+    @Transactional
+    public LineResponse addSection(Long id, SectionRequest sectionRequest) {
+        validationStations(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+
+        Line line = findLind(id);
+        Station upStation = findStation(sectionRequest.getUpStationId());
+        Station downStation = findStation(sectionRequest.getDownStationId());
+        Section section = new Section(sectionRequest.getDistance(), upStation, downStation);
+        line.addSection(section);
+
+        return LineResponse.of(line);
+    }
+
+    private Station findStation(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(() ->
+                new IllegalArgumentException("역이 없습니다.")
+        );
     }
 
     private void validationStations(Long upStationId, Long downStationId) {
@@ -49,8 +64,14 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+        Line line = findLind(id);
         return LineResponse.of(line);
+    }
+
+    private Line findLind(Long id) {
+        return lineRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("노선이 존재하지 않습니다")
+        );
     }
 
     public List<LineResponse> findLines() {
@@ -60,13 +81,20 @@ public class LineService {
 
     @Transactional
     public void updateLine(Long id, LineUpdateRequest request) {
-        Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("노선이 존재하지 않습니다"));
+        Line line = findLind(id);
         line.changeInfo(request.getName(), request.getColor());
     }
 
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLind(lineId);
+        Station station = findStation(stationId);
+        line.removeSection(station);
     }
 
 }
