@@ -2,13 +2,13 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.exceptions.NoSuchLineException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,12 +43,13 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(Long id) {
+        findLineOrElseThrow(id);
         lineRepository.deleteById(id);
     }
 
     private Line findLineOrElseThrow(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new NoSuchLineException("해당 id의 지하철 노선이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 지하철 노선이 존재하지 않습니다."));
     }
 
     private LineResponse createLineResponse(Line line) {
