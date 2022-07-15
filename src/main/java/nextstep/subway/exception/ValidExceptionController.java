@@ -22,11 +22,17 @@ public class ValidExceptionController {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request){
-        ErrorResponse errorResponse = makeErrorResponse(e.getBindingResult());
+        ErrorResponse errorResponse = makeErrorResponse(e.getBindingResult(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    private ErrorResponse makeErrorResponse(BindingResult bindingResult){
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> badRequestException(BadRequestException e, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    private ErrorResponse makeErrorResponse(BindingResult bindingResult, int httpStatus){
         String message = "";
 
         //에러가 있다면
@@ -36,6 +42,6 @@ public class ValidExceptionController {
 
         }
 
-        return new ErrorResponse(message);
+        return new ErrorResponse(message, httpStatus);
     }
 }

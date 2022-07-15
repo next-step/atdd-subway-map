@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import lombok.ToString;
+import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +41,7 @@ public class Section {
 
     public Section(Integer distance, Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new IllegalArgumentException("상행종점역과 하행종점역의 아이디는 같을 수 없습니다.");
+            throw new BadRequestException("상행종점역과 하행종점역의 아이디는 같을 수 없습니다.");
         }
         this.distance = distance;
         this.upStation = upStation;

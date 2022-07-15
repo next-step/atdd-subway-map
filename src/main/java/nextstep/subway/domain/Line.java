@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import lombok.ToString;
+import nextstep.subway.exception.BadRequestException;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Embedded;
@@ -49,17 +50,17 @@ public class Line {
 
     public void nameAndColorValidation(String name, String color){
         if(!StringUtils.hasText(name)){
-            throw new IllegalArgumentException("name을 입력하여 주십시오.");
+            throw new BadRequestException("name을 입력하여 주십시오.");
         }
         if(!StringUtils.hasText(color)){
-            throw new IllegalArgumentException("color을 입력하여 주십시오.");
+            throw new BadRequestException("color을 입력하여 주십시오.");
         }
     }
 
     public void vlidationSectionStation(Long reqUpstationId, Long reqDownStationId){
         Station lastStation = sections.getLastStation();
         if(!Objects.equals(lastStation.getId(), reqUpstationId))
-            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다");
+            throw new BadRequestException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다");
     }
 
     public void addSection(Section section) {

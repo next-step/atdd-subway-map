@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import lombok.Getter;
+import nextstep.subway.exception.BadRequestException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -55,7 +56,7 @@ public class Sections {
                                 currentStation -> currentStation.getId().equals(section.getDownStation().getId())
                         );
         if(checkDownStation){
-            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.");
+            throw new BadRequestException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.");
         }
     }
 
@@ -63,10 +64,10 @@ public class Sections {
         Section lastSection = getLastSection();
 
         if(!Objects.equals(lastSection.getDownStation().getId(), stationId))
-            throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.");
+            throw new BadRequestException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.");
 
         if(sectionList.size() < 2)
-            throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.");
+            throw new BadRequestException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.");
 
         removeSection(lastSection);
     }

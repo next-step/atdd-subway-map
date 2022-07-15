@@ -24,12 +24,12 @@ public class LineTestMethod {
         params.put("distance", distance);
 
         return RestAssured
-                .given()
+                .given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
-                .then()
+                .then().log().all()
                 .extract();
     }
 

@@ -13,10 +13,12 @@ import lombok.Setter;
 public class ErrorResponse {
 
     private String message;
+    private int httpStatus;
 
 
-    public ErrorResponse( String message) {
+    public ErrorResponse( String message, int httpStatus) {
         this.message = message;
+        this.httpStatus = httpStatus;
     }
 
 }

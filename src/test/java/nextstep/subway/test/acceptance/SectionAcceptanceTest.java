@@ -1,6 +1,5 @@
 package nextstep.subway.test.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,12 +55,9 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         Long 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
         구간_생성(새로운구간_종착ID, 구간생성테스트_종착역ID, 초록선_라인ID);
 
-        assertAll(
-                () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath().getLong("downStationId")).isEqualTo(구간생성테스트_종착역ID),
-                () -> assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath()
+                assertThat(지하철노선_단일조회(초록선_라인ID).jsonPath()
                         .getList("stations.name"))
-                        .contains("신도림역","문래역","합정역","홍대입구역")
-        );
+                        .contains("신도림역","문래역","합정역","홍대입구역");
 
 
     }
@@ -88,6 +84,12 @@ public class SectionAcceptanceTest extends AcceptanceTest{
                         .doesNotContain("홍대입구역");
     }
 
+    /**
+     * given 초록선 노선을 생성한다.
+     * given 초록선 노선에 구간을 생성한다.
+     * when  구간을 조회하면
+     * then  해당 구간의 목록을 확인 할 수 있다.
+     */
     @Test
     @DisplayName("구간을 조회한다")
     public void getSections(){
@@ -108,7 +110,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
      * then  구간을 생성 할 수 없다.
      */
     @Test
-    @DisplayName("구간생성을 실패한다.")
+    @DisplayName("구간생성 실패 테스트 첫번째 - 노선의 종점역이 아닌 역을 상행역으로 요청")
     void failCreateSection(){
         //given
         Long 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
@@ -117,7 +119,11 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         ExtractableResponse<Response> response = 구간_생성(초록선_시작ID, 구간생성테스트_종착역ID, 초록선_라인ID);
         //새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다
         // then 실패한다.
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("message"))
+                        .isEqualTo("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다")
+        );
     }
 
     /**
@@ -127,16 +133,20 @@ public class SectionAcceptanceTest extends AcceptanceTest{
      * then  구간을 생성 할 수 없다.
      */
     @Test
-    @DisplayName("구간생성을 실패한다 두번째 시나리오.")
+    @DisplayName("구간생성 실패 테스트 두번째 - 구간에 이미 등록되어 있는 역을 새로운 하행역으로 구간생성 요청")
     void failCreateSection2(){
-        // given
-        Long 구간생성테스트_종착역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
+        // given 노선, 구간 생성.
 
         // when
         ExtractableResponse<Response> response = 구간_생성(새로운구간_종착ID, 초록선_시작ID, 초록선_라인ID);
         //새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
         // then 실패한다.
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("message"))
+                        .isEqualTo("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+        );
+
     }
 
     /**
@@ -146,7 +156,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
      * then  구간을 제거할 수 없다.
      */
     @Test
-    @DisplayName("구간을 제거한다_실페 케이스")
+    @DisplayName("구간제거 실패 테스트 - 마지막 구간이 아닌 구간삭제 요청")
     void failDeleteSection(){
         //given
         Long 구간제거테스트_종작역ID = 지하철역_생성("홍대입구역").jsonPath().getLong("id");
@@ -157,7 +167,11 @@ public class SectionAcceptanceTest extends AcceptanceTest{
 
         //지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
         // then 실패한다.
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("message"))
+                        .isEqualTo("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.")
+        );
 
     }
 
