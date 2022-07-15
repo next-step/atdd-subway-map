@@ -43,13 +43,13 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_등록() {
         // when
-        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 역삼역, 강남역, 10);
+        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 역삼역, 판교역, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<Long> 구간_목록 = 구간_목록_조회();
-        assertThat(구간_목록).contains(역삼역, 강남역);
+        assertThat(구간_목록).contains(역삼역, 판교역);
     }
 
     /**
@@ -64,6 +64,7 @@ class SectionAcceptanceTest extends AcceptanceTest{
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("상행역은 하행종점역이어야 합니다.");
     }
 
     /**
@@ -73,7 +74,12 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 구간은 등록되어있는 역은 등록할 수 없다.")
     @Test
     void 지하철_구간_등록_하행역_에러() {
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 역삼역, 삼성역, 10);
 
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("이미 등록된 역입니다.");
     }
 
 //    지하철 노선에 구간을 제거하는 기능 구현

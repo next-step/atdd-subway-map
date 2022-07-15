@@ -27,16 +27,22 @@ public class Sections {
     }
 
     private void validateAddSection(Section newSection) {
-        // 이미 등록된 하행역인지
-
         // 상행역이 하행종점역이 아닌지
         if (!isDownTerminal(newSection.getUpStation())) {
             throw new IllegalArgumentException(String.format("상행역은 하행종점역이어야 합니다. Station: %s", newSection.getUpStation()));
         }
+        // 이미 등록된 하행역인지
+        if (isContainsStation(newSection.getDownStation())) {
+            throw new IllegalArgumentException(String.format("이미 등록된 역입니다. Station: %s", newSection.getDownStation()));
+        }
+    }
+
+    private boolean isContainsStation(Station downStation) {
+        return getAllStations().contains(downStation);
     }
 
     private boolean isDownTerminal(Station station) {
-        return !station.equals(getDownTerminal());
+        return station.equals(getDownTerminal());
     }
 
     private Station getDownTerminal() {
