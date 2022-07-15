@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,55 +14,52 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    private String color;
-
-    private Long upStationId;
-
-    private Long downStationId;
+    @Embedded
+    private LineContent lineContent;
 
     @Embedded
-    private Distance distance;
+    private Sections sections;
 
     protected Line() {
     }
 
-    public Line(final String name, final String color, final Long upStationId, final Long downStationId, final Distance distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public Line(final LineContent lineContent, final Section section) {
+        this.lineContent = lineContent;
+        this.sections = new Sections();
+        addSection(section);
+    }
+
+    private void addSection(Section section) {
+        sections.add(section);
+        section.setLine(this);
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String name() {
+        return lineContent.name();
     }
 
-    public String getColor() {
-        return color;
+    public String color() {
+        return lineContent.color();
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public LineContent getLineContent() {
+        return lineContent;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Sections getSections() {
+        return sections;
     }
 
-    public Distance getDistance() {
-        return distance;
+    public List<Station> stations() {
+        return sections.stations();
     }
 
     public void updateNameAndColor(final String name, final String color) {
-        this.name = name;
-        this.color = color;
+        this.lineContent = new LineContent(name, color);
     }
 
 }
