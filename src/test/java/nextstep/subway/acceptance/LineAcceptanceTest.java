@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,6 +108,25 @@ public class LineAcceptanceTest {
         // then
         assertThat(response.jsonPath().get("name").equals(LINE_5.get("name"))).isTrue();
         assertThat(response.jsonPath().get("color").equals(LINE_5.get("color"))).isTrue();
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성되지 않은 지하철 노선을 조회하면
+     * Then NoSuchElementException 와 ErrorResponse 를 응답받을 수 있다.
+     */
+    @DisplayName("존재하지 않는 지하철 노선을 조회한다.")
+    @Test
+    void findLineNoSuchElementException() {
+        // given
+        지하철_노선_생성(LINE_5);
+
+        // when
+        ExtractableResponse<Response> response = 지하철_노선_조회(2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorName")).isEqualTo(NoSuchElementException.class.getName());
     }
 
     /**
