@@ -7,6 +7,7 @@ import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철�
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_수정을_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_조회를_요청한다;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -112,10 +113,12 @@ public class LineAcceptanceTest {
 
         ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(lineId);
         String lineName = lineResponse.jsonPath().getObject("name", String.class);
-        assertThat(lineName).containsAnyOf("2호선");
-
         String lineColor = lineResponse.jsonPath().getObject("color", String.class);
-        assertThat(lineColor).containsAnyOf("bg-green-600");
+
+        assertAll(
+                () -> assertThat(lineName).containsAnyOf("2호선"),
+                () -> assertThat(lineColor).containsAnyOf("bg-green-600")
+        );
     }
 
     /**
