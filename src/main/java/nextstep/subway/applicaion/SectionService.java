@@ -8,6 +8,7 @@ import nextstep.subway.domain.Distance;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SectionRepository;
+import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,5 +49,16 @@ public class SectionService {
             savedSection.getStations().toList().stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toList()));
+    }
+
+    @Transactional
+    public void removeSections(Long id, long stationId) {
+        Line line = lineService.findById(id);
+
+        Sections sections = line.getSections();
+
+        sections.removeLastSection(stationId);
+
+//        sectionRepository.deleteById(removeSectionId);
     }
 }
