@@ -20,17 +20,18 @@ public class StationTestMethod {
         params.put("name", stationName);
 
         return RestAssured
-                .given().log().all()
+                .given()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
-                .then().log().all()
+                .then()
                 .extract();
     }
 
     public static List<String> 지하철목록조회(){
-        return RestAssured.given().log().all()
+        return RestAssured
+                .given().log().all()
                 .when()
                 .get("/stations")
                 .then().log().all()

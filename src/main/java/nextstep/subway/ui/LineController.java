@@ -3,8 +3,8 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@Valid @RequestBody LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -56,4 +57,23 @@ public class LineController {
         lineService.deleteLineById(lineId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping(value = "/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineResponse line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @DeleteMapping(value = "/{lineId}/sections/{deleteStationId}")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @PathVariable Long deleteStationId) {
+        lineService.deleteSection(lineId, deleteStationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/sections")
+    public ResponseEntity<List<SectionResponse>> getLineSection() {
+        List<SectionResponse> line = lineService.findAllSection();
+        return ResponseEntity.ok().body(line);
+    }
+
 }

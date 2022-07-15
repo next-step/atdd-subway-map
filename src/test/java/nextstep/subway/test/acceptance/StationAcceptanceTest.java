@@ -69,11 +69,11 @@ public class StationAcceptanceTest extends AcceptanceTest{
                 .jsonPath().getLong("id");
         ExtractableResponse<Response> response =
                 RestAssured
-                        .given().log().all()
+                        .given()
                         .pathParam("id", stationId)
                         .when()
                         .delete("/stations/{id}")
-                        .then().log().all()
+                        .then()
                         .extract();
         List<String> stationNames = 지하철목록조회();
 

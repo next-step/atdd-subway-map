@@ -3,9 +3,9 @@ package nextstep.subway.applicaion.dto;
 import lombok.Getter;
 import lombok.Setter;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -21,7 +21,14 @@ public class LineResponse {
         this.color = color;
         this.stations = stations;
     }
-    public static LineResponse of(Line line, List<StationResponse> stations) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+    public static LineResponse of(Line line) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                line.getStations()
+                        .stream().map(StationResponse::of)
+                        .collect(Collectors.toList())
+        );
     }
 }

@@ -23,22 +23,23 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  */
 public class LineAcceptanceTest extends AcceptanceTest{
 
-    public String 파랑선_시작ID;
-    public String 파랑선_종착ID;
-    public String 초록선_시작ID;
-    public String 초록선_종착ID;
+    public Long 파랑선_시작ID;
+    public Long 파랑선_종착ID;
+    public Long 초록선_시작ID;
+    public Long 초록선_종착ID;
 
     public Long 초록선_라인ID;
 
+
     @BeforeEach
     public void lineTestSetUp() {
-        파랑선_시작ID = 지하철역_생성("구일역").jsonPath().getString("id");
-        파랑선_종착ID = 지하철역_생성("구로역").jsonPath().getString("id");;
-        초록선_시작ID = 지하철역_생성("신도립역").jsonPath().getString("id");;
-        초록선_종착ID = 지하철역_생성("문래역").jsonPath().getString("id");;
+        파랑선_시작ID = 지하철역_생성("구일역").jsonPath().getLong("id");
+        파랑선_종착ID = 지하철역_생성("구로역").jsonPath().getLong("id");;
+        초록선_시작ID = 지하철역_생성("신도립역").jsonPath().getLong("id");;
+        초록선_종착ID = 지하철역_생성("문래역").jsonPath().getLong("id");;
 
-        지하철노선_생성("파랑선", 파랑선_시작ID, 파랑선_종착ID, "blue", "10");
-        초록선_라인ID = 지하철노선_생성("초록선", 초록선_시작ID, 초록선_종착ID, "green", "10")
+        지하철노선_생성("파랑선", 파랑선_시작ID, 파랑선_종착ID, "blue", DEFAULT_DISTANCE);
+        초록선_라인ID = 지하철노선_생성("초록선", 초록선_시작ID, 초록선_종착ID, "green", DEFAULT_DISTANCE)
                 .jsonPath().getLong("id");
     }
     /**
@@ -49,11 +50,11 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철노선을 생성한다")
     void createLine(){
 
-        String 보라선_시작ID = 지하철역_생성("목동역").jsonPath().getString("id");
-        String 보라선_종착ID = 지하철역_생성("오목교").jsonPath().getString("id");
+        Long 보라선_시작ID = 지하철역_생성("목동역").jsonPath().getLong("id");
+        Long 보라선_종착ID = 지하철역_생성("오목교").jsonPath().getLong("id");
 
         ExtractableResponse<Response> response =
-                지하철노선_생성("보라선", 보라선_시작ID, 보라선_종착ID, "purple", "10");
+                지하철노선_생성("보라선", 보라선_시작ID, 보라선_종착ID, "purple", DEFAULT_DISTANCE );
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getLong("id")).isNotNull(),
@@ -105,7 +106,7 @@ public class LineAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철조선 수정")
     void modifyLine(){
 
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("name", "노랑선");
         params.put("color", "yellow");
 
