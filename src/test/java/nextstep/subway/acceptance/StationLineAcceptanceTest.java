@@ -3,9 +3,9 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ValidatableResponse;
 import nextstep.SpringBootTestConfig;
 import nextstep.subway.acceptance.client.SubwayRestAssured;
+import nextstep.subway.acceptance.factory.LineFactory;
 import nextstep.subway.domain.Line;
 import nextstep.subway.acceptance.enums.SubwayRequestPath;
-import nextstep.subway.factory.LineFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @Test
     void createLine() {
         String lineRootPath = SubwayRequestPath.LINE.getValue();
-        ValidatableResponse postResponse = lineRestAssured.postRequest(lineRootPath, LineFactory.mock("신분당선", "red"));
+        ValidatableResponse postResponse = lineRestAssured.postRequest(lineRootPath, LineFactory.신분당선());
 
         postResponse.statusCode(equalTo(HttpStatus.CREATED.value()));
 
@@ -44,8 +44,8 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @Test
     void getLines() {
         String lineRootPath = SubwayRequestPath.LINE.getValue();
-        lineRestAssured.postRequest(lineRootPath, LineFactory.mock("경의중앙선", "blue"));
-        lineRestAssured.postRequest(lineRootPath, LineFactory.mock("분당선", "yellow"));
+        lineRestAssured.postRequest(lineRootPath, LineFactory.경의중앙선());
+        lineRestAssured.postRequest(lineRootPath, LineFactory.분당선());
 
         lineRestAssured.getRequest(lineRootPath)
                        .assertThat().body("name", contains("경의중앙선", "분당선"));
@@ -60,7 +60,7 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @Test
     void getLine() {
         ValidatableResponse 노선_등록결과 = lineRestAssured.postRequest(
-                SubwayRequestPath.LINE.getValue(), LineFactory.mock("우이신설", "blue"));
+                SubwayRequestPath.LINE.getValue(), LineFactory.우이신설());
 
         String nextLocation = 노선_등록결과.extract().header("Location");
 
@@ -76,14 +76,16 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     @Test
     void updateLine() {
         ValidatableResponse 노선_등록결과 =
-                lineRestAssured.postRequest(SubwayRequestPath.LINE.getValue(), LineFactory.mock("경춘선", "green"));
+                lineRestAssured.postRequest(SubwayRequestPath.LINE.getValue(), LineFactory.경춘선());
 
+        String lineName = "춘경선";
+        String color = "red";
         String nextLocation = 노선_등록결과.extract().header("Location");
-        lineRestAssured.putRequest(nextLocation, LineFactory.mock("춘경선", "red"));
+        lineRestAssured.putRequest(nextLocation, LineFactory.mock(lineName, color));
 
         ValidatableResponse 변경된_노선_조회결과 = lineRestAssured.getRequest(nextLocation);
-        변경된_노선_조회결과.body("name", equalTo("춘경선"));
-        변경된_노선_조회결과.body("color", equalTo("red"));
+        변경된_노선_조회결과.body("name", equalTo(lineName));
+        변경된_노선_조회결과.body("color", equalTo(color));
     }
 
 
@@ -97,7 +99,7 @@ class StationLineAcceptanceTest extends SpringBootTestConfig {
     void deleteLine() {
         String lineRootPath = SubwayRequestPath.LINE.getValue();
         ValidatableResponse 노선_등록결과 =
-                lineRestAssured.postRequest(lineRootPath, LineFactory.mock("경춘선", "green"));
+                lineRestAssured.postRequest(lineRootPath, LineFactory.경춘선());
 
         String nextLocation = 노선_등록결과.extract().header("Location");
         lineRestAssured.deleteRequest(nextLocation).statusCode(HttpStatus.NO_CONTENT.value());
