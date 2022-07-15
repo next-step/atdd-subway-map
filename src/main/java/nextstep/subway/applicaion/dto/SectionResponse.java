@@ -5,18 +5,18 @@ import java.util.List;
 public class SectionResponse {
 
     private Long lineId;
-    private List<StationResponse> stationResponses;
+    private List<StationResponse> stations;
 
-    public SectionResponse(Long lineId, List<StationResponse> stationResponses) {
+    public SectionResponse(Long lineId, List<StationResponse> stations) {
         this.lineId = lineId;
-        this.stationResponses = stationResponses;
+        this.stations = stations;
     }
 
     public Long getLineId() {
         return lineId;
     }
 
-    public List<StationResponse> getStationResponses() {
-        return stationResponses;
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }

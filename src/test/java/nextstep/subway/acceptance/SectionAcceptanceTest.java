@@ -1,11 +1,13 @@
 package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,15 @@ public class SectionAcceptanceTest extends BaseAcceptance {
 
         ExtractableResponse<Response> extract = 새로운_구간_등록(lineId, newDownStationId);
 
-        assertThat(extract.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long actualLineId = extract.jsonPath().getLong("lineId");
+        String upStationName = extract.jsonPath().getString("stations[0].name");
+        String downStationName = extract.jsonPath().getString("stations[1].name");
+
+        assertAll(
+            () -> assertThat(actualLineId).isEqualTo(lineId),
+            () -> assertThat(upStationName).isEqualTo("양재역"),
+            () -> assertThat(downStationName).isEqualTo("대림역")
+        );
     }
 
     private ExtractableResponse<Response> 새로운_구간_등록(long lineId,
