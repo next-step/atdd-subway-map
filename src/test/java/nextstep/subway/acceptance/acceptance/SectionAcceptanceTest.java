@@ -1,12 +1,23 @@
 package nextstep.subway.acceptance.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
+
+import java.util.List;
+
+import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노선을_생성한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_조회를_요청한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_생성을_요청한다;
+import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하철구간_등록을_요청한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,10 +40,18 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간_등록성공() {
         // when
+        long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10).jsonPath().getLong("id");
 
         // then
+        long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        지하철구간_등록을_요청한다(newStationId, downStationId, 10);
 
         // then
+        ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(lineId);
+        List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+        assertThat(lineNames).containsOnly("강남역", "신논현역", "양재역");
     }
 
     /**
