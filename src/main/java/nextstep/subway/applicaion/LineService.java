@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineSaveRequest;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Distance;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineContent;
@@ -63,7 +62,7 @@ public class LineService {
         line.updateNameAndColor(request.getName(), request.getColor());
     }
 
-    private Line findById(final Long id) {
+    public Line findById(final Long id) {
         return lineRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("해당하는 노선을 찾을 수 없습니다."));
     }

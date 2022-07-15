@@ -29,7 +29,7 @@ public class Line {
         addSection(section);
     }
 
-    private void addSection(Section section) {
+    public void addSection(Section section) {
         sections.add(section);
         section.setLine(this);
     }
@@ -56,6 +56,11 @@ public class Line {
 
     public List<Station> stations() {
         return sections.stations();
+    }
+
+    public Station beforeDownStation() {
+        List<Station> stations = stations();
+        return stations.get(stations.size() - 1);
     }
 
     public void updateNameAndColor(final String name, final String color) {
