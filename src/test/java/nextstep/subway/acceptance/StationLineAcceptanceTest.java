@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("지하철 노선 관련 기능")
 @Sql("/truncate.sql")
 class StationLineAcceptanceTest extends SpringBootTestConfig {
-    private final SubwayRestAssured<Line> lineRestAssured = new SubwayRestAssured<>();
 
     /**
      * given 노선을 생성하면

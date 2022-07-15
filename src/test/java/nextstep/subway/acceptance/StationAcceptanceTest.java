@@ -15,8 +15,6 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("지하철역 관련 기능")
 @Sql("/truncate.sql")
 class StationAcceptanceTest extends SpringBootTestConfig {
-    private final SubwayRestAssured<Station> stationRestAssured = new SubwayRestAssured<>();
-
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
