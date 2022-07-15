@@ -1,9 +1,10 @@
 package nextstep.subway.line.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.section.domain.Section;
+import nextstep.subway.section.domain.Sections;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -13,11 +14,27 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+
+    @Embedded
+    private final Sections sections = new Sections();
 
     protected Line() {
+    }
+
+    public Line(final Long id, final String name, final String color) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+    }
+
+    public void modify(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public void addSection(final Section section) {
+        sections.addSection(section);
+        section.setLine(this);
     }
 
     public Long getId() {
@@ -32,34 +49,26 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public boolean isConnectable(final Section section) {
+        return sections.isConnectable(section);
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public boolean hasCircularSection(final Section section) {
+        return sections.hasCircularSection(section);
     }
 
-    public Long getDistance() {
-        return distance;
+    public void removeStation(final Long stationId) {
+        sections.removeLastSection(stationId);
     }
 
-    public Line(final Long id, final String name, final String color, final Long upStationId, final Long downStationId, final Long distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public List<Long> getFirstAndLastStationId() {
+        return List.of(sections.getFirstUpStationId(), sections.getLastDownStationId());
     }
 
     public static class LineBuilder {
         private Long id;
         private String name;
         private String color;
-        private Long upStationId;
-        private Long downStationId;
-        private Long distance;
 
         public Line.LineBuilder id(final Long id) {
             this.id = id;
@@ -74,27 +83,10 @@ public class Line {
         public Line.LineBuilder color(final String color) {
             this.color = color;
             return this;
-
-        }
-        public Line.LineBuilder upStationId(final Long upStationId) {
-            this.upStationId = upStationId;
-            return this;
-
-        }
-
-        public Line.LineBuilder downStationId(final Long downStationId) {
-            this.downStationId = downStationId;
-            return this;
-
-        }
-
-        public Line.LineBuilder distance(final Long distance) {
-            this.distance = distance;
-            return this;
         }
 
         public Line build() {
-            return new Line(id, name, color, upStationId, downStationId, distance);
+            return new Line(id, name, color);
         }
 
     }

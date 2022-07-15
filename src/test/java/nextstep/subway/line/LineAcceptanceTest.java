@@ -1,45 +1,31 @@
 package nextstep.subway.line;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
+import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static nextstep.subway.acceptance.AcceptanceTestBase.assertStatusCode;
 import static nextstep.subway.acceptance.ResponseParser.*;
-import static nextstep.subway.station.StationAcceptanceTest.createStationRequest;
+import static nextstep.subway.line.LineRestAssuredTestSource.*;
+import static nextstep.subway.station.StationRestAssuredTestSource.역을생성함;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선 관련 기능")
 @AcceptanceTest
-class LineAcceptanceTest {
+public class LineAcceptanceTest {
 
-    @LocalServerPort
-    int port;
-
-    private Long upStationId;
-    private Long downStationId;
+    private Long 상행역;
+    private Long 하행역;
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-
-        upStationId = createStation("강남역");
-        downStationId = createStation("양재역");
-    }
-
-    private Long createStation(final String stationName) {
-        return getIdFromResponse(createStationRequest(stationName));
+        상행역 = 역을생성함("상행역");
+        하행역 = 역을생성함("하행역");
     }
 
     /**
@@ -54,13 +40,11 @@ class LineAcceptanceTest {
         final String 신분당선 = "신분당선";
 
         // when
-        final ExtractableResponse<Response> createLineResponse = createLineRequest(신분당선);
+        final ExtractableResponse<Response> 노선생성결과 = 노선생성(신분당선, 상행역, 하행역);
 
         // then
-        assertStatusCode(createLineResponse, HttpStatus.CREATED);
-
-        final List<Long> stationIdList = createLineResponse.jsonPath().getList("stations.id", Long.class);
-        assertThat(stationIdList).contains(upStationId, downStationId);
+        노선생성에성공함(노선생성결과);
+        노선목록에노선이등록됨(신분당선);
     }
 
     /**
@@ -74,16 +58,16 @@ class LineAcceptanceTest {
     void getLine() {
         // given
         final String 신분당선 = "신분당선";
-        final Long id = getIdFromResponse(createLineRequest(신분당선));
+        final Long id = 노선ID조회(노선생성(신분당선, 상행역, 하행역));
 
         // when
-        final ExtractableResponse<Response> response = getLineRequest(id);
+        final ExtractableResponse<Response> 노선조회결과 = 노선조회(id);
 
         // then
-        assertStatusCode(response, HttpStatus.OK);
-
-        assertThat(getNameFromResponse(response)).contains(신분당선);
+        노선조회에성공함(노선조회결과);
+        노선이존재함(노선조회결과, 신분당선);
     }
+
 
     /**
      * Given 2개의 지하철 노선을 생성하고
@@ -96,19 +80,18 @@ class LineAcceptanceTest {
     void getLines() {
         // given
         final String 신분당선 = "신분당선";
-        createLineRequest(신분당선);
+        노선생성(신분당선, 상행역, 하행역);
 
         final String 신신분당선 = "신신분당선";
-        createLineRequest(신신분당선);
+        노선생성(신신분당선, 상행역, 하행역);
 
         // when
-        final ExtractableResponse<Response> response = getLinesRequest();
+        final ExtractableResponse<Response> 노선목록조회결과 = 노선목록조회();
 
         // then
-        assertStatusCode(response, HttpStatus.OK);
-
-        final List<String> lineNames = getNamesFromResponse(response);
-        assertThat(lineNames).containsExactly(신분당선, 신신분당선);
+        노선조회에성공함(노선목록조회결과);
+        노선목록에노선이존재함(노선목록조회결과, 신분당선);
+        노선목록에노선이존재함(노선목록조회결과, 신신분당선);
     }
 
     /**
@@ -122,19 +105,19 @@ class LineAcceptanceTest {
     void modifyLines() {
         // given
         final String 신분당선 = "신분당선";
-        final Long id = getIdFromResponse(createLineRequest(신분당선));
+        final Long id = 노선ID조회(노선생성(신분당선, 상행역, 하행역));
 
         final String 신신분당선 = "신신분당선";
 
         // when
-        final ExtractableResponse<Response> modifyResponse = modifyLineRequest(id, 신신분당선);
+        final ExtractableResponse<Response> 노선수정결과 = 노선수정(id, 신신분당선, 상행역, 하행역);
 
         // then
-        assertStatusCode(modifyResponse, HttpStatus.OK);
+        노선수정에성공함(노선수정결과);
 
-        final List<String> lineNames = getNamesFromResponse(getLinesRequest());
-        assertThat(lineNames).contains(신신분당선);
-        assertThat(lineNames).doesNotContain(신분당선);
+        final ExtractableResponse<Response> 노선목록조회결과 = 노선목록조회();
+        노선목록에노선이존재함(노선목록조회결과, 신신분당선);
+        노선목록에노선이존재하지않음(노선목록조회결과, 신분당선);
     }
 
     /**
@@ -148,65 +131,53 @@ class LineAcceptanceTest {
     void deleteLine() {
         // given
         final String 신분당선 = "신분당선";
-        final Long id = getIdFromResponse(createLineRequest(신분당선));
+        final Long id = 노선ID조회(노선생성(신분당선, 상행역, 하행역));
 
         // when
-        final ExtractableResponse<Response> response = deleteLineRequest(id);
+        final ExtractableResponse<Response> 노선삭제결과 = 노선삭제(id);
 
         // then
+        노선삭제에성공함(노선삭제결과);
+
+        final ExtractableResponse<Response> 노선목록조회결과 = 노선목록조회();
+        노선목록에노선이존재하지않음(노선목록조회결과, 신분당선);
+    }
+
+
+    private ListAssert<String> 노선목록에노선이등록됨(final String 노선) {
+        return assertThat(getNamesFromResponse(노선목록조회())).contains(노선);
+    }
+
+    private void 노선생성에성공함(final ExtractableResponse<Response> createLineResponse) {
+        assertStatusCode(createLineResponse, HttpStatus.CREATED);
+    }
+
+    private void 노선이존재함(final ExtractableResponse<Response> response, final String 노선) {
+        assertThat(getNameFromResponse(response)).contains(노선);
+    }
+
+    private void 노선목록에노선이존재함(final ExtractableResponse<Response> response, final String 노선) {
+        assertThat(getNamesFromResponse(response)).contains(노선);
+    }
+
+    private void 노선목록에노선이존재하지않음(final ExtractableResponse<Response> response, final String 노선) {
+        assertThat(getNamesFromResponse(response)).doesNotContain(노선);
+    }
+
+    private void 노선조회에성공함(final ExtractableResponse<Response> response) {
+        assertStatusCode(response, HttpStatus.OK);
+    }
+
+    private void 노선수정에성공함(final ExtractableResponse<Response> response) {
+        assertStatusCode(response, HttpStatus.OK);
+    }
+
+    private Long 노선ID조회(final ExtractableResponse<Response> 노선생성결과) {
+        return getIdFromResponse(노선생성결과);
+    }
+
+    private void 노선삭제에성공함(final ExtractableResponse<Response> response) {
         assertStatusCode(response, HttpStatus.NO_CONTENT);
-
-        final List<String> lineNames = getNamesFromResponse(getLinesRequest());
-        assertThat(lineNames).doesNotContain(신분당선);
     }
 
-    private ExtractableResponse<Response> modifyLineRequest(final Long id, final String lineName) {
-        return RestAssured
-                .given().log().all().body(createLineParams(lineName)).contentType(ContentType.JSON)
-                .when().put("/lines/{id}", id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> createLineRequest(final String lineName) {
-        return RestAssured
-                .given().log().all()
-                .body(createLineParams(lineName))
-                .contentType(ContentType.JSON)
-                .when().post("/lines")
-                .then().log().all().extract();
-    }
-
-    private Map<String, Object> createLineParams(final String lineName) {
-        final Map<String, Object> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", "bg-red-600");
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", 10);
-        return params;
-    }
-
-    private ExtractableResponse<Response> getLineRequest(final Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/{idd}", id)
-                .then().log().all()
-                .extract();
-    }
-
-
-    private ExtractableResponse<Response> getLinesRequest() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> deleteLineRequest(final Long id) {
-        return RestAssured
-                .given().log().all()
-                .when().delete("/lines/{id}", id)
-                .then().log().all()
-                .extract();
-    }
 }

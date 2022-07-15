@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static nextstep.subway.line.LineTestSource.lineRequest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -113,13 +114,4 @@ class LineControllerTest {
         result.andExpect(status().isNoContent());
     }
 
-    private LineRequest lineRequest() {
-        return LineRequest.builder()
-                .name("lineName")
-                .color("bg-red-600")
-                .upStationId(1L)
-                .downStationId(2L)
-                .distance(10L)
-                .build();
-    }
 }

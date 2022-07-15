@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-public class LineController {
+class LineController {
 
     private final LineService lineService;
 
