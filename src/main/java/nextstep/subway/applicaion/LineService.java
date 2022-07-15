@@ -84,16 +84,14 @@ public class LineService {
         Station downStation = findStationById(sectionRequest.getDownStationId());
         Section section = new Section(sectionRequest.getDistance(), upStation, downStation);
         line.addSection(section);
-        line.modifyDownStationId(sectionRequest.getDownStationId());
 
         return LineResponse.of(line);
     }
 
     public void deleteSection(Long lineId, Long stationId) {
         Line line = findLineOne(lineId);
-        Section lastSection = line.validationAndSectionDelete(line, stationId);
-        stationRepository.delete(lastSection.getDownStation());
-        line.modifyDownStationId(lastSection.getUpStation().getId());
+        line.validationAndSectionDelete( stationId);
+        stationRepository.deleteById(stationId);
     }
 
     @Transactional(readOnly = true)

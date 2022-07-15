@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @ToString
@@ -23,8 +24,6 @@ public class Line {
     private String name;
     private String color;
 
-    private Long upStationId;
-    private Long downStationId;
     @Embedded
     private Sections sections;
 
@@ -35,8 +34,6 @@ public class Line {
         nameAndColorValidation(name, color);
         this.name = name;
         this.color = color;
-        this.upStationId = upStation.getId();
-        this.downStationId = downStation.getId();
         this.sections = new Sections(this, distance, upStation, downStation);
     }
 
@@ -60,21 +57,21 @@ public class Line {
     }
 
     public void vlidationSectionStation(Long reqUpstationId, Long reqDownStationId){
-        if(this.downStationId != reqUpstationId)
+        Station lastStation = sections.getLastStation();
+        if(!Objects.equals(lastStation.getId(), reqUpstationId))
             throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다");
-
-    }
-
-    public void modifyDownStationId(Long reqUpstationId){
-        this.downStationId = reqUpstationId;
     }
 
     public void addSection(Section section) {
         sections.addSection(this,section);
     }
 
-    public Section validationAndSectionDelete(Line line, Long stationId){
-        return sections.validationAndSectionDelete(line, stationId);
+    public void validationAndSectionDelete(Long stationId){
+        sections.validationAndSectionDelete(stationId);
+    }
+
+    public Section getLastSection(){
+        return sections.getLastSection();
     }
 
     public List<Section> getSectionList(){

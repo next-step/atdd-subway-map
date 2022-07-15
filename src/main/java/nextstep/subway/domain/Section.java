@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import java.util.List;
@@ -29,11 +28,9 @@ public class Section {
     private Line line;
 
     @OneToOne
-    @JoinColumn(nullable = false)
     public Station upStation;
 
     @OneToOne
-    @JoinColumn(nullable = false)
     public Station downStation;
 
     private Integer distance;

@@ -8,6 +8,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -58,8 +59,8 @@ public class Sections {
         }
     }
 
-    public Section validationAndSectionDelete(Line line, Long stationId){
-        Section lastSection = sectionList.get(sectionList.size()-1);
+    public void validationAndSectionDelete(Long stationId){
+        Section lastSection = getLastSection();
 
         if(!Objects.equals(lastSection.getDownStation().getId(), stationId))
             throw new IllegalArgumentException("지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.");
@@ -67,8 +68,22 @@ public class Sections {
         if(sectionList.size() < 2)
             throw new IllegalArgumentException("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.");
 
-        sectionList.remove(lastSection);
-        return lastSection;
+        removeSection(lastSection);
+    }
+
+    public Section getLastSection(){
+        if(sectionList.size() < 1){
+            throw new NoSuchElementException("저장 된 section정보가 없습니다.");
+        }
+        return sectionList.get(sectionList.size()-1);
+
+    }
+    public void removeSection(Section section){
+        sectionList.remove(section);
+    }
+
+    public Station getLastStation(){
+        return getLastSection().getDownStation();
     }
 
 }

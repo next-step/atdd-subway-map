@@ -84,8 +84,8 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         ExtractableResponse<Response> response = 지하철노선_단일조회(초록선_라인ID);
 
         assertThat(response.jsonPath()
-                        .getList("stations.id"))
-                        .doesNotContain(구간제거테스트_종작역ID);
+                        .getList("stations.name"))
+                        .doesNotContain("홍대입구역");
     }
 
     @Test
