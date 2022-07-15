@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,7 +14,7 @@ import javax.persistence.OneToMany;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private Set<Section> sections = new HashSet<>();
+    private Set<Section> sections = new LinkedHashSet<>();
 
     protected Sections() {
     }
@@ -27,5 +29,28 @@ public class Sections {
             .flatMap(List::stream)
             .distinct()
             .collect(Collectors.toUnmodifiableList());
+    }
+
+
+    public void removeLastSection(final long stationId) {
+        sizeValidation();
+
+        Section lastSection = Collections.max(sections,
+            Comparator.comparingInt(o -> o.getId().intValue()));
+
+        lastSection.isEqualTo(stationId);
+
+        sections.remove(lastSection);
+        lastSection.removeLine();
+    }
+
+    private void sizeValidation() {
+        if (isOnlyOneSection()) {
+            throw new IllegalStateException("구간이 한개밖에 존재하지 않습니다.");
+        }
+    }
+
+    private boolean isOnlyOneSection() {
+        return sections.size() == 1;
     }
 }

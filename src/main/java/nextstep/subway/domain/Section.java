@@ -56,7 +56,22 @@ public class Section {
         this.line = line;
     }
 
+    public void removeLine() {
+        this.line = null;
+    }
+
     public List<Station> stations() {
         return stations.toList();
+    }
+
+    private Station lastDownStation() {
+        return stations.getDownStation();
+    }
+
+    public boolean isEqualTo(final long stationId) {
+        if (!lastDownStation().getId().equals(stationId)) {
+            throw new IllegalArgumentException("마지막 지하철역 id가 맞지 않습니다.");
+        }
+        return true;
     }
 }
