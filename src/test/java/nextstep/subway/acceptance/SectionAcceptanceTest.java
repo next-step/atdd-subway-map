@@ -100,11 +100,7 @@ class SectionAcceptanceTest extends AcceptanceTest{
         assertThat(response1.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // when
-        ExtractableResponse<Response> response2 = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("lines/"+신분당선+"/sections?stationId="+판교역)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response2 = 지하철_구간_삭제(신분당선, 판교역);
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -177,14 +173,12 @@ class SectionAcceptanceTest extends AcceptanceTest{
         params.put("downStationId", String.valueOf(downStationId));
         params.put("distance", String.valueOf(distance));
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("lines/"+신분당선+"/sections")
                 .then().log().all()
                 .extract();
-
-        return response;
     }
 
     private List<Long> 구간_목록_조회() {
@@ -192,5 +186,13 @@ class SectionAcceptanceTest extends AcceptanceTest{
                 .when().get("/lines/" + 신분당선)
                 .then().log().all()
                 .extract().jsonPath().getList("stations.id", Long.class);
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_삭제(long lineId, long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("lines/"+lineId+"/sections?stationId="+stationId)
+                .then().log().all()
+                .extract();
     }
 }
