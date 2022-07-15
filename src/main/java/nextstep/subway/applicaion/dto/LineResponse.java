@@ -3,6 +3,7 @@ package nextstep.subway.applicaion.dto;
 import java.util.ArrayList;
 import java.util.List;
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Section;
 
 public class LineResponse {
     private final Long id;
@@ -33,10 +34,10 @@ public class LineResponse {
         return stations;
     }
 
-    public static LineResponse convertedByEntity(Line line) {
+    public static LineResponse convertedByEntity(Line line, Section section) {
         List<StationResponse> stationResponses = new ArrayList<>();
-        stationResponses.add(StationResponse.convertedByEntity(line.getUpEndpoint()));
-        stationResponses.add(StationResponse.convertedByEntity(line.getDownEndpoint()));
+        stationResponses.add(StationResponse.convertedByEntity(section.getUpStation()));
+        stationResponses.add(StationResponse.convertedByEntity(section.getDownStation()));
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 

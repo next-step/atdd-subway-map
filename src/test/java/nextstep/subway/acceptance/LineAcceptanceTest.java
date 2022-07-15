@@ -15,11 +15,12 @@ import org.springframework.test.context.jdbc.Sql;
 
 @DisplayName("지하철 노선 관련 기능")
 @Sql(scripts = {"classpath:sql/truncate.sql","classpath:sql/createStations.sql"})
-public class LineAcceptanceTest extends BaseAcceptanceTest {
+class LineAcceptanceTest extends BaseAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * Then 지하철 노선의 상행 종점역과 하행 종점역이 구간으로 등록된다.
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
      * Then 지하철 노선의 구간목록의 첫 번째 구간의 상행역과 하행역이 노선의 상행 종점역과 하행 종점역이다.
      */
     @Test

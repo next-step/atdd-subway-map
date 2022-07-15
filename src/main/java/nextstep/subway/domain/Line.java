@@ -18,15 +18,6 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToOne
-    @JoinColumn(name = "UP_ENDPOINT_STATION_ID")
-    private Station upEndpoint;
-
-    @OneToOne
-    @JoinColumn(name = "DOWN_ENDPOINT_STATION_ID")
-    private Station downEndpoint;
-
-
     public Line() {
     }
 
@@ -52,25 +43,9 @@ public class Line {
     public String getColor() {
         return color;
     }
-    public Station getUpEndpoint() {
-        return upEndpoint;
-    }
-
-    public Station getDownEndpoint() {
-        return downEndpoint;
-    }
 
     public void changeNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
-    }
-
-    public void addEndpointStation(Station upStation, Station downStation) {
-        this.upEndpoint = upStation;
-        this.downEndpoint = downStation;
-    }
-
-    public void modifyDownEndpoint(Station downEndpoint) {
-        this.downEndpoint = downEndpoint;
     }
 }
