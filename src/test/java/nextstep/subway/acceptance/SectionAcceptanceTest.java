@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,11 +74,23 @@ public class SectionAcceptanceTest extends BaseAcceptance {
 
         long 하행_종점역_id = 마지막_구간_등록_응답.jsonPath().getLong("stations[1].id");
 
-        ExtractableResponse<Response> removeResponse = 지하철_구간_삭제(lineId, 하행_종점역_id);
+        지하철_구간_삭제(lineId, 하행_종점역_id);
 
-        assertThat(removeResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        ExtractableResponse<Response> getLinesResponse = findAllLines();
 
-        findAllLines();
+        //then
+        final List<String> name = getLinesResponse.jsonPath().getList("name", String.class);
+        final List<List> stations = getLinesResponse.jsonPath().getList("stations", List.class);
+        assertAll(
+            () -> assertThat(name).hasSize(1)
+                .containsExactly("신분당선"),
+
+            () -> assertThat(stations.get(0)).isEqualTo(List.of(
+                Map.of("id", 1, "name", "강남역"),
+                Map.of("id", 2, "name", "양재역"),
+                Map.of("id", 3, "name", "판교역")
+            ))
+        );
     }
 
     private ExtractableResponse<Response> 지하철_구간_삭제(long lineId,
