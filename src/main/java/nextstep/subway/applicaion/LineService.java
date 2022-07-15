@@ -40,7 +40,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findLineOrElseThrow(id);
-        lineRepository.save(line.update(lineRequest));
+        lineRepository.save(lineRequest.toLine(line));
     }
 
     @Transactional
