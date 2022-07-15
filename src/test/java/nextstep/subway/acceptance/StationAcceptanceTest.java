@@ -29,7 +29,7 @@ class StationAcceptanceTest extends BaseAcceptance {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> response = createSubwayStation("강남역");
+        final ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -52,8 +52,8 @@ class StationAcceptanceTest extends BaseAcceptance {
     @DisplayName("지하철역을 조회한다.")
     void getStations() {
         //given
-        createSubwayStation("잠실역");
-        createSubwayStation("대림역");
+        createStation("잠실역");
+        createStation("대림역");
 
         //when
         final List<String> stationNames = RestAssured.given()
@@ -77,7 +77,7 @@ class StationAcceptanceTest extends BaseAcceptance {
     @DisplayName("지하철역을 제거한다.")
     void deleteStation() {
         //given
-        createSubwayStation("잠실역");
+        createStation("잠실역");
 
         //when
         final ExtractableResponse<Response> deleteExtract = RestAssured.given().log().all()

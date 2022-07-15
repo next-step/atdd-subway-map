@@ -153,8 +153,8 @@ class LineAcceptanceTest extends BaseAcceptance {
     }
 
     private long 지하철_노선_생성(final String upStation, final String downStation, final String lineName) {
-        final ExtractableResponse<Response> upStationResponse = createSubwayStation(upStation);
-        final ExtractableResponse<Response> downStationResponse = createSubwayStation(downStation);
+        final ExtractableResponse<Response> upStationResponse = createStation(upStation);
+        final ExtractableResponse<Response> downStationResponse = createStation(downStation);
 
         final long upStationId = upStationResponse.jsonPath().getLong("id");
         final long downStationId = downStationResponse.jsonPath().getLong("id");

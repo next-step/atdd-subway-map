@@ -22,7 +22,7 @@ public class BaseAcceptance {
     @Autowired
     protected DataBaseCleaner dataBaseCleaner;
 
-    protected ExtractableResponse<Response> createSubwayStation(final String station) {
+    protected ExtractableResponse<Response> createStation(final String station) {
         return RestAssured.given().log().all()
             .body(Map.of("name", station))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
