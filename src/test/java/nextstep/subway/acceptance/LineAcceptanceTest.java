@@ -74,7 +74,7 @@ class LineAcceptanceTest extends BaseAcceptance {
         );
     }
 
-    private ExtractableResponse<Response> findAllLines() {
+    public ExtractableResponse<Response> findAllLines() {
         return RestAssured.given().log().all()
             .when().get("/lines")
             .then().log().all()

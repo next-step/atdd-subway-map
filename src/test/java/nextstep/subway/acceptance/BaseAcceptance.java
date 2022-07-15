@@ -24,7 +24,7 @@ public class BaseAcceptance {
     @Autowired
     protected DataBaseCleaner dataBaseCleaner;
 
-    protected ExtractableResponse<Response> createStation(final String station) {
+    protected ExtractableResponse<Response> 지하철_역_생성(final String station) {
         return RestAssured.given().log().all()
             .body(Map.of("name", station))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -35,8 +35,8 @@ public class BaseAcceptance {
 
     protected long 지하철_노선_생성(final String upStation, final String downStation,
         final String lineName, final String color) {
-        final ExtractableResponse<Response> upStationResponse = createStation(upStation);
-        final ExtractableResponse<Response> downStationResponse = createStation(downStation);
+        final ExtractableResponse<Response> upStationResponse = 지하철_역_생성(upStation);
+        final ExtractableResponse<Response> downStationResponse = 지하철_역_생성(downStation);
 
         final long upStationId = upStationResponse.jsonPath().getLong("id");
         final long downStationId = downStationResponse.jsonPath().getLong("id");
