@@ -27,12 +27,12 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @BeforeEach
     public void setUp() {
         super.setUp();
-        삼성역 = 지하철역_추가("삼성역").jsonPath().getLong("id");
-        역삼역 = 지하철역_추가("역삼역").jsonPath().getLong("id");
-        강남역 = 지하철역_추가("강남역").jsonPath().getLong("id");
-        판교역 = 지하철역_추가("판교역").jsonPath().getLong("id");
+        삼성역 = 지하철역_추가됨("삼성역");
+        역삼역 = 지하철역_추가됨("역삼역");
+        강남역 = 지하철역_추가됨("강남역");
+        판교역 = 지하철역_추가됨("판교역");
 
-        신분당선 = 지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10).jsonPath().getLong("id");
+        신분당선 = 지하철_노선_추가됨("신분당선","bg-red-600", 삼성역, 역삼역,10);
     }
 
     /**
@@ -43,44 +43,13 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_등록() {
         // when
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("lineId", String.valueOf(신분당선));
-        params1.put("upStationId", String.valueOf(역삼역));
-        params1.put("downStationId", String.valueOf(강남역));
-        params1.put("distance", String.valueOf(10));
-
-        ExtractableResponse<Response> response1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("lines/"+신분당선+"/sections")
-                .then().log().all()
-                .extract();
-
-        assertThat(response1.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        // when
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("lineId", String.valueOf(신분당선));
-        params2.put("upStationId", String.valueOf(강남역));
-        params2.put("downStationId", String.valueOf(판교역));
-        params2.put("distance", String.valueOf(7));
-
-        ExtractableResponse<Response> response2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("lines/"+신분당선+"/sections")
-                .then().log().all()
-                .extract();
-
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 역삼역, 강남역, 10);
 
         // then
-        List<Long> 구간_목록 = RestAssured.given().log().all()
-                .when().get("/lines/" + 신분당선)
-                .then().log().all()
-                .extract().jsonPath().getList("stations.id", Long.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        assertThat(구간_목록).contains(역삼역, 강남역, 판교역);
+        List<Long> 구간_목록 = 구간_목록_조회();
+        assertThat(구간_목록).contains(역삼역, 강남역);
     }
 
     /**
@@ -141,7 +110,7 @@ class SectionAcceptanceTest extends AcceptanceTest{
     }
 
 
-    private ExtractableResponse<Response> 지하철역_추가(String name){
+    private long 지하철역_추가됨(String name){
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -154,10 +123,10 @@ class SectionAcceptanceTest extends AcceptanceTest{
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        return response;
+        return response.jsonPath().getLong("id");
     }
 
-    private ExtractableResponse<Response> 지하철_노선_추가(String name, String color, long upStationId, long downStationId, long distance) {
+    private long 지하철_노선_추가됨(String name, String color, long upStationId, long downStationId, long distance) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -165,11 +134,39 @@ class SectionAcceptanceTest extends AcceptanceTest{
         params.put("downStationId", String.valueOf(downStationId));
         params.put("distance", String.valueOf(distance));
 
-        return RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        return response.jsonPath().getLong("id");
+    }
+
+    private ExtractableResponse<Response> 지하철_구간_등록됨(long lineId, long upStationId, long downStationId, long distance) {
+        Map<String, String> params = new HashMap<>();
+        params.put("lineId", String.valueOf(lineId));
+        params.put("upStationId", String.valueOf(upStationId));
+        params.put("downStationId", String.valueOf(downStationId));
+        params.put("distance", String.valueOf(distance));
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("lines/"+신분당선+"/sections")
+                .then().log().all()
+                .extract();
+
+        return response;
+    }
+
+    private List<Long> 구간_목록_조회() {
+        return RestAssured.given().log().all()
+                .when().get("/lines/" + 신분당선)
+                .then().log().all()
+                .extract().jsonPath().getList("stations.id", Long.class);
     }
 }
