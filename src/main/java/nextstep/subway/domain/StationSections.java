@@ -37,6 +37,15 @@ public class StationSections {
                 .collect(Collectors.toList());
     }
 
+    public StationSection findByDownStationId(Long stationId) {
+        validateDeleteCondition(stationId);
+        return getLastSection();
+    }
+
+    public void delete(StationSection section) {
+        stationSections.remove(section);
+    }
+
     private boolean isExistStation(StationSection stationSection) {
         return stationSections.stream()
                 .anyMatch(section -> findStation(section, stationSection));
@@ -65,16 +74,9 @@ public class StationSections {
     }
 
     private StationSection getLastSection() {
-        return stationSections.get(getLastIndex());
-    }
-
-    private int getLastIndex() {
-        return stationSections.size() - 1;
-    }
-
-    public StationSection findByDownStationId(Long stationId) {
-        validateDeleteCondition(stationId);
-        return getLastSection();
+        return stationSections.stream()
+            .reduce((prev, next) -> next)
+            .orElseThrow(() -> new IllegalArgumentException("해당 노선은 지하철 역이 존재하지 않습니다."));
     }
 
     private void validateDeleteCondition(Long stationId) {
@@ -92,9 +94,5 @@ public class StationSections {
 
     private boolean isNoneLastSectionDownStation(Long stationId) {
         return getLastSection().isNoneSameDownStationId(stationId);
-    }
-
-    public void delete(StationSection section) {
-        stationSections.remove(section);
     }
 }
