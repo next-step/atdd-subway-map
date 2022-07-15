@@ -26,18 +26,19 @@ class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    StationClient stationClient;
+
     LineClient lineClient;
 
-    StationClient stationClient;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-        lineClient = new LineClient();
+
         stationClient = new StationClient();
-        stationClient.create("지하철역");
-        stationClient.create("새로운지하철역");
-        stationClient.create("또다른지하철역");
+        stationClient.create("지하철역", "새로운지하철역", "또다른지하철역");
+
+        lineClient = new LineClient();
     }
 
     /**

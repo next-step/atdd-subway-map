@@ -1,11 +1,15 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import nextstep.subway.LineClient;
+import nextstep.subway.StationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+
+import java.util.Map;
 
 @DisplayName("지하철 구간 관리 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -14,9 +18,29 @@ class SectionAcceptanceTest {
     @LocalServerPort
     int port;
 
+    StationClient stationClient;
+
+    LineClient lineClient;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+
+        stationClient = new StationClient();
+        stationClient.create("지하철역", "새로운지하철역", "또다른지하철역");
+
+        lineClient = new LineClient();
+        lineClient.create(params());
+    }
+
+    private Map<String, Object> params() {
+        return Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 10L
+        );
     }
 
     /**

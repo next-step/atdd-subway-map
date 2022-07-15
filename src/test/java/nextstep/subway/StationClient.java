@@ -5,19 +5,33 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class StationClient {
+
+    private static final String KEY = "name";
 
     private static final String PATH = "/stations";
 
     public ExtractableResponse<Response> create(String stationName) {
         return RestAssured.given().log().all()
-                .body(Map.of("name", stationName))
+                .body(Map.of(KEY, stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post(PATH)
                 .then().log().all()
                 .extract();
+    }
+
+    public void create(String... stationNames) {
+        Arrays.stream(stationNames)
+                .forEach(stationName -> RestAssured.given().log().all()
+                        .body(Map.of("name", stationName))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post(PATH)
+                        .then().log().all()
+                        .extract()
+                );
     }
 
     public ExtractableResponse<Response> findAll() {
