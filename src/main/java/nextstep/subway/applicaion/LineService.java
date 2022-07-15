@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class LineService {
+
+    private static final String LINE_NOTFOUND_MESSAGE = "해당 id의 지하철 노선이 존재하지 않습니다.";
     private LineRepository lineRepository;
 
     public LineService(LineRepository lineRepository) {
@@ -49,7 +51,7 @@ public class LineService {
 
     private Line findLineOrElseThrow(Long id) {
         return lineRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 지하철 노선이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException(LINE_NOTFOUND_MESSAGE));
     }
 
     private LineResponse createLineResponse(Line line) {

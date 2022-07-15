@@ -27,16 +27,21 @@ public class LineAcceptanceTest {
     private static final Map<String, Object> LINE_5 = new HashMap<>();
     private static final Map<String, Object> LINE_2 = new HashMap<>();
 
+    private static final String LINE_NAME_5 = "5호선";
+    private static final String LINE_COLOR_5 = "#996CAC";
+    private static final String LINE_NAME_9 = "9호선";
+    private static final String LINE_COLOR_9 = "#BDB092";
+
 
     public LineAcceptanceTest() {
-        LINE_5.put("name", "5호선");
-        LINE_5.put("color", "#996CAC");
+        LINE_5.put("name", LINE_NAME_5);
+        LINE_5.put("color", LINE_COLOR_5);
         LINE_5.put("upStationId", 1);
         LINE_5.put("downStationId", 2);
         LINE_5.put("distance", 48);
 
-        LINE_2.put("name", "9호선");
-        LINE_2.put("color", "#BDB092");
+        LINE_2.put("name", LINE_NAME_9);
+        LINE_2.put("color", LINE_COLOR_9);
         LINE_2.put("upStationId", 2);
         LINE_2.put("downStationId", 4);
         LINE_2.put("distance", 37);
@@ -60,12 +65,12 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.jsonPath().get("name").equals("5호선")).isTrue();
+        assertThat(response.jsonPath().get("name").equals(LINE_NAME_5)).isTrue();
 
         // then
         List<String> lineNames = 지하철_노선_목록_조회()
                 .jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsAnyOf("5호선");
+        assertThat(lineNames).containsAnyOf(LINE_NAME_5);
     }
 
     /**
