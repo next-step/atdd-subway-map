@@ -74,13 +74,6 @@ class LineAcceptanceTest extends BaseAcceptance {
         );
     }
 
-    public ExtractableResponse<Response> findAllLines() {
-        return RestAssured.given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
     /*
     Given 지하철 노선을 생성하고
     When 생성한 지하철 노선을 조회하면

@@ -63,4 +63,11 @@ public class BaseAcceptance {
             .then().log().all()
             .extract();
     }
+
+    protected ExtractableResponse<Response> findAllLines() {
+        return RestAssured.given().log().all()
+            .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
 }
