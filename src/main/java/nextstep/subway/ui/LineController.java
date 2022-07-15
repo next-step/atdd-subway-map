@@ -50,35 +50,13 @@ public class LineController {
 
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody @Validated SectionRequest sectionRequest) {
-        try {
-            LineResponse line = lineService.addSection(id, sectionRequest);
-            return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
-        } catch (InvalidMatchEndStationException | StationAlreadyExistsException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
-        } catch (NotFoundLineException | NotFoundStationException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        LineResponse line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @DeleteMapping(value = "/lines/{id}/sections")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id, @RequestParam Long stationId) {
-        try {
-            lineService.deleteSection(id, stationId);
-            return ResponseEntity.noContent().build();
-        } catch (SectionDeleteException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
-        } catch (NotFoundLineException | NotFoundStationException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 }
