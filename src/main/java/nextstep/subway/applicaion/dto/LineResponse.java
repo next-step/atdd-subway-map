@@ -3,8 +3,10 @@ package nextstep.subway.applicaion.dto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Station;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LineResponse {
@@ -36,12 +38,12 @@ public class LineResponse {
         return stations;
     }
 
-    public static LineResponse of(Line line, List<StationResponse> stations) {
+    public static LineResponse of(Line line, List<Station> stations) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stations
+                stations.stream().map(StationResponse::of).collect(Collectors.toList())
         );
     }
 }

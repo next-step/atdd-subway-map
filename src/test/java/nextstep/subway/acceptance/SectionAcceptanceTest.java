@@ -10,18 +10,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
-public class SectionAcceptanceTest extends AcceptanceTest{
+class SectionAcceptanceTest extends AcceptanceTest{
 
     private long 삼성역;
     private long 역삼역;
     private long 강남역;
+    private long 판교역;
     private long 신분당선;
-    private long 분당선;
 
     @BeforeEach
     public void setUp() {
@@ -29,6 +30,7 @@ public class SectionAcceptanceTest extends AcceptanceTest{
         삼성역 = 지하철역_추가("삼성역").jsonPath().getLong("id");
         역삼역 = 지하철역_추가("역삼역").jsonPath().getLong("id");
         강남역 = 지하철역_추가("강남역").jsonPath().getLong("id");
+        판교역 = 지하철역_추가("판교역").jsonPath().getLong("id");
 
         신분당선 = 지하철_노선_추가("신분당선","bg-red-600", 삼성역, 역삼역,10).jsonPath().getLong("id");
     }
@@ -40,16 +42,45 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("지하철 구간을 등록한다.")
     @Test
     void 지하철_구간_등록() {
-    }
+        // when
+        Map<String, String> params1 = new HashMap<>();
+        params1.put("lineId", String.valueOf(신분당선));
+        params1.put("upStationId", String.valueOf(역삼역));
+        params1.put("downStationId", String.valueOf(강남역));
+        params1.put("distance", String.valueOf(10));
 
-    /**
-     * When 지하철 구간을 2개 생성하고
-     * Then 지하철 구간목록 조회시 등록한 2개의 구간을 조회 할 수 있다
-     */
-    @DisplayName("지하철구간 목록을 조회한다.")
-    @Test
-    void 지하철_구간_목록() {
+        ExtractableResponse<Response> response1 = RestAssured.given().log().all()
+                .body(params1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("lines/"+신분당선+"/sections")
+                .then().log().all()
+                .extract();
 
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // when
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("lineId", String.valueOf(신분당선));
+        params2.put("upStationId", String.valueOf(강남역));
+        params2.put("downStationId", String.valueOf(판교역));
+        params2.put("distance", String.valueOf(7));
+
+        ExtractableResponse<Response> response2 = RestAssured.given().log().all()
+                .body(params2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("lines/"+신분당선+"/sections")
+                .then().log().all()
+                .extract();
+
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        List<Long> 구간_목록 = RestAssured.given().log().all()
+                .when().get("/lines/" + 신분당선)
+                .then().log().all()
+                .extract().jsonPath().getList("stations.id", Long.class);
+
+        assertThat(구간_목록).contains(역삼역, 강남역, 판교역);
     }
 
     /**
