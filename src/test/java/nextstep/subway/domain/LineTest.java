@@ -1,6 +1,5 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +18,7 @@ class LineTest {
         Line line = new Line("name", "color", stations);
 
         //when
-        Line changedLine = line.changeBy(new LineUpdateRequest("new name", "new color"));
+        Line changedLine = line.changeBy("new name", "new color");
 
         //then
         assertAll(

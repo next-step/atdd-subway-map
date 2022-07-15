@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.LineClient;
 import nextstep.subway.StationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,11 +26,14 @@ class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    LineClient lineClient;
+
     StationClient stationClient;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        lineClient = new LineClient();
         stationClient = new StationClient();
         stationClient.create("지하철역");
         stationClient.create("새로운지하철역");
@@ -48,13 +51,13 @@ class LineAcceptanceTest {
         // when
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
-        ExtractableResponse<Response> response = createLines(params);
+        ExtractableResponse<Response> response = lineClient.create(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> lineNames = findAllLines().jsonPath().getList("name", String.class);
+        List<String> lineNames = lineClient.findAll().jsonPath().getList("name", String.class);
 
         assertThat(lineNames).containsAnyOf("신분당선");
 
@@ -74,11 +77,11 @@ class LineAcceptanceTest {
         Map<String, Object> params1 = params("신분당선", "bg-red-600", 1L, 2L, 10L);
         Map<String, Object> params2 = params("분당선", "bg-yellow-600", 1L, 3L, 20L);
 
-        createLines(params1);
-        createLines(params2);
+        lineClient.create(params1);
+        lineClient.create(params2);
 
         // when
-        List<String> lineNames = findAllLines().jsonPath().getList("name", String.class);
+        List<String> lineNames = lineClient.findAll().jsonPath().getList("name", String.class);
 
         // then
         assertThat(lineNames).containsExactly("신분당선", "분당선");
@@ -96,10 +99,10 @@ class LineAcceptanceTest {
         // given
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
-        createLines(params);
+        lineClient.create(params);
 
         // when
-        ExtractableResponse<Response> response = findLineById(1L);
+        ExtractableResponse<Response> response = lineClient.findById(1L);
 
         // then
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
@@ -117,15 +120,15 @@ class LineAcceptanceTest {
         // given
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
-        createLines(params);
+        lineClient.create(params);
 
         // when
-        putLineById(1L, Map.of("name", "5호선", "color", "bg-purple-600"));
+        lineClient.putById(1L, Map.of("name", "5호선", "color", "bg-purple-600"));
 
         // then
         assertAll(
-                () -> assertThat(findLineById(1L).jsonPath().getString("name")).isEqualTo("5호선"),
-                () -> assertThat(findLineById(1L).jsonPath().getString("color")).isEqualTo("bg-purple-600")
+                () -> assertThat(lineClient.findById(1L).jsonPath().getString("name")).isEqualTo("5호선"),
+                () -> assertThat(lineClient.findById(1L).jsonPath().getString("color")).isEqualTo("bg-purple-600")
         );
     }
 
@@ -141,15 +144,15 @@ class LineAcceptanceTest {
         // given
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
 
-        createLines(params);
+        lineClient.create(params);
 
         // when
-        deleteLineById(1L);
+        lineClient.deleteById(1L);
 
         // then
         assertAll(
-                () -> assertThat(findLineById(1L).jsonPath().getString("name")).isNullOrEmpty(),
-                () -> assertThat(findLineById(1L).jsonPath().getString("color")).isNullOrEmpty()
+                () -> assertThat(lineClient.findById(1L).jsonPath().getString("name")).isNullOrEmpty(),
+                () -> assertThat(lineClient.findById(1L).jsonPath().getString("color")).isNullOrEmpty()
         );
     }
 
@@ -161,41 +164,6 @@ class LineAcceptanceTest {
                 "downStationId", downStationId,
                 "distance", distance
         );
-    }
-
-    private ExtractableResponse<Response> createLines(Map<String, Object> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> findAllLines() {
-        return RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all().extract();
-    }
-
-    private ExtractableResponse<Response> findLineById(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/" + id)
-                .then().log().all().extract();
-    }
-
-    private void putLineById(Long id, Map<String, String> params) {
-        RestAssured.given().log().all()
-                .headers("Content-Type", "application/json; charset=UTF-8")
-                .body(params)
-                .when().put("/lines/" + id)
-                .then().log().all();
-    }
-
-    private void deleteLineById(Long id) {
-        RestAssured.given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all();
     }
 
 }
