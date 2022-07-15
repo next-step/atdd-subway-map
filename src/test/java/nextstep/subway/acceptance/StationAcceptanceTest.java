@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.isolation.TestIsolationUtil;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -28,9 +30,13 @@ class StationAcceptanceTest {
 	@LocalServerPort
 	int port;
 
+	@Autowired
+	TestIsolationUtil testIsolationUtil;
+
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
+		testIsolationUtil.clean();
 	}
 
 	/**
