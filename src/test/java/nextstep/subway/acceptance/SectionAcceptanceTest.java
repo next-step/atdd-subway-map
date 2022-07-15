@@ -116,7 +116,16 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @DisplayName("마지막 구간이 아닌 구간은 제거할 수 없다.")
     @Test
     void 지하철_구간_제거_마지막_구간_에러() {
+        // given
+        지하철_구간_등록됨(신분당선, 역삼역, 판교역, 10);
+        지하철_구간_등록됨(신분당선, 판교역, 강남역, 10);
 
+        // when
+        ExtractableResponse<Response> response = 지하철_구간_삭제(신분당선, 판교역);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
     }
 
     /**

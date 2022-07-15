@@ -69,8 +69,9 @@ public class Sections {
 
     private void validateDeleteSection(Station station) {
         // 마지막 구간인지 아닌지
-
-        // 구간이 1개인지 아닌지
-
+        Section section = getLastSection();
+        if (!section.getDownStation().equals(station)) {
+            throw new IllegalArgumentException(String.format("마지막 구간이 아닙니다. Section: %s", section));
+        }
     }
 }
