@@ -8,7 +8,10 @@ import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Distance;
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.LineContent;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Station;
 import nextstep.subway.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +30,15 @@ public class LineService {
 
     @Transactional
     public LineResponse createLines(final LineSaveRequest request) {
-        final List<StationResponse> endStations = stationService.findBothEndStations(List.of(request.getUpStationId(), request.getDownStationId()));
 
-        final Line savedLine = lineRepository.save(new Line(request.getName(),
-            request.getColor(), request.getUpStationId(), request.getDownStationId(), new Distance(request.getDistance())));
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
 
-        return new LineResponse(savedLine.getId(), savedLine.getName(), savedLine.getColor(), endStations);
+        Section section = new Section(upStation, downStation, new Distance(request.getDistance()));
+
+        Line savedLine = lineRepository.save(new Line(new LineContent(request.getName(), request.getColor()), section));
+
+        return new LineResponse(savedLine.getId(), savedLine.name(), savedLine.color(), savedLine.stations());
     }
 
     public List<LineResponse> getLines() {
@@ -40,17 +46,14 @@ public class LineService {
 
         return linesList.stream()
             .map(line -> new LineResponse(
-                line.getId(), line.getName(), line.getColor(),
-                stationService.findBothEndStations(List.of(line.getUpStationId(), line.getDownStationId())))
-            ).collect(Collectors.toList());
+                line.getId(), line.name(), line.color(),
+                line.stations())).collect(Collectors.toList());
     }
 
     public LineResponse getOneLine(final Long id) {
         final Line line = findById(id);
 
-        return new LineResponse(
-            line.getId(), line.getName(), line.getColor(),
-            stationService.findBothEndStations(List.of(line.getUpStationId(), line.getDownStationId())));
+        return new LineResponse(line.getId(), line.name(), line.color(), line.stations());
     }
 
     @Transactional
