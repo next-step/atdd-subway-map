@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import nextstep.subway.applicaion.dto.StationLineResponse;
+import nextstep.subway.applicaion.dto.StationSectionRequest;
+import nextstep.subway.applicaion.dto.StationSectionResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationLine;
 import nextstep.subway.domain.StationLineRepository;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.StationSection;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,45 +17,46 @@ import org.springframework.transaction.annotation.Transactional;
 public class StationLineService {
 
     private final StationLineRepository stationLineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
     private final StationLineMapper stationLineMapper;
+    private final StationSectionMapper stationSectionMapper;
 
     public StationLineService(StationLineRepository stationLineRepository,
-                              StationRepository stationRepository,
-                              StationLineMapper stationLineMapper) {
+                              StationService stationService,
+                              StationLineMapper stationLineMapper,
+                              StationSectionMapper stationSectionMapper) {
         this.stationLineRepository = stationLineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
         this.stationLineMapper = stationLineMapper;
+        this.stationSectionMapper = stationSectionMapper;
     }
 
     @Transactional
     public StationLineResponse createStationLine(StationLineRequest request) {
-        Station upStation = findStationById(request.getUpStationId());
-        Station downStation = findStationById(request.getDownStationId());
-        StationLine stationLine = stationLineMapper.of(request, upStation, downStation);
+        StationLine stationLine = stationLineMapper.of(request);
         StationLine savedStationLine = stationLineRepository.save(stationLine);
-        return stationLineMapper.of(savedStationLine);
+        Station upStation = stationService.findStationById(request.getUpStationId());
+        Station downStation = stationService.findStationById(request.getDownStationId());
+        return stationLineMapper.of(savedStationLine, upStation, downStation);
     }
 
     @Transactional(readOnly = true)
     public List<StationLineResponse> getStationLines() {
         List<StationLine> stationLines = stationLineRepository.findAll();
         return stationLines.stream()
-                .map(stationLineMapper::of)
+                .map(savedStationLine -> stationLineMapper.of(savedStationLine, findLineStations(savedStationLine)))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public StationLineResponse getStationLine(Long lineId) {
-        StationLine stationLine = stationLineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
-        return stationLineMapper.of(stationLine);
+        StationLine stationLine = findLineById(lineId);
+        return stationLineMapper.of(stationLine, findLineStations(stationLine));
     }
 
     @Transactional
     public void updateStationLine(Long lineId, StationLineRequest request) {
-        StationLine stationLine = stationLineRepository.findById(lineId)
-                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
+        StationLine stationLine = findLineById(lineId);
         stationLine.changeNameAndColor(request.getName(), request.getColor());
     }
 
@@ -62,8 +65,33 @@ public class StationLineService {
         stationLineRepository.deleteById(lineId);
     }
 
-    private Station findStationById(Long request) {
-        return stationRepository.findById(request)
-                .orElseThrow(() -> new IllegalArgumentException("지하철역이 존재하지 않습니다."));
+    @Transactional
+    public StationSectionResponse createStationSection(StationSectionRequest request, Long lineId) {
+        validateNoneExistStation(request);
+        StationSection stationSection = stationSectionMapper.of(request);
+        StationLine stationLine = findLineById(lineId);
+        stationLine.addSection(stationSection);
+        return stationSectionMapper.of(stationSection);
+    }
+
+    @Transactional
+    public void deleteStationSection(Long lineId, Long stationId) {
+        StationLine stationLine = findLineById(lineId);
+        StationSection section = stationLine.findSectionByDownStationId(stationId);
+        stationLine.deleteSection(section);
+    }
+
+    private void validateNoneExistStation(StationSectionRequest request) {
+        stationService.findStationById(request.getDownStationId());
+        stationService.findStationById(request.getUpStationId());
+    }
+
+    protected StationLine findLineById(Long lineId) {
+        return stationLineRepository.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("지하철노선이 존재하지 않습니다."));
+    }
+
+    private List<Station> findLineStations(StationLine stationLine) {
+        return stationService.findByIdIn(stationLine.getStationIds());
     }
 }

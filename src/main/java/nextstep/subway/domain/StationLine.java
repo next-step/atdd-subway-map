@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,19 +18,15 @@ public class StationLine {
 
     private String color;
 
-    private int distance;
-
     @Embedded
-    private Stations stations;
+    private StationSections stationSections = new StationSections();
 
     protected StationLine() {
     }
 
-    public StationLine(String name, String color, int distance, Stations stations) {
+    public StationLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.stations = stations;
     }
 
     public String getName() {
@@ -40,10 +37,6 @@ public class StationLine {
         return color;
     }
 
-    public Stations getStations() {
-        return stations;
-    }
-
     public Long getId() {
         return id;
     }
@@ -51,5 +44,21 @@ public class StationLine {
     public void changeNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(StationSection stationSection) {
+        stationSections.addSection(this, stationSection);
+    }
+
+    public List<Long> getStationIds() {
+        return stationSections.getStationIds();
+    }
+
+    public StationSection findSectionByDownStationId(Long stationId) {
+        return stationSections.findByDownStationId(stationId);
+    }
+
+    public void deleteSection(StationSection section) {
+        stationSections.delete(section);
     }
 }
