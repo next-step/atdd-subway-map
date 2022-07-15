@@ -75,8 +75,8 @@ public class StationSections {
 
     private StationSection getLastSection() {
         return stationSections.stream()
-            .reduce((prev, next) -> next)
-            .orElseThrow(() -> new IllegalArgumentException("해당 노선은 지하철 역이 존재하지 않습니다."));
+                .reduce((prev, next) -> next)
+                .orElseThrow(() -> new IllegalArgumentException("해당 노선은 지하철 역이 존재하지 않습니다."));
     }
 
     private void validateDeleteCondition(Long stationId) {
@@ -84,7 +84,7 @@ public class StationSections {
             throw new IllegalArgumentException("마지막 구간만 제거할 수 있습니다.");
         }
         if (hasMinSize()) {
-            throw new IllegalStateException("노선에 구간이 1개일 경우 삭제할 수 없습니다.");
+            throw new IllegalArgumentException("노선에 구간이 1개일 경우 삭제할 수 없습니다.");
         }
     }
 

@@ -145,20 +145,15 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteBadRequestCase() {
         //given
+        Long 대림역 = 지하철역_등록("역삼역").as(StationResponse.class).getId();
         String lineUrl = 신분당선.header("Location");
-        Long 지하철구간 = 지하철구간_등록(lineUrl, 역삼역, 선릉역, 7)
-                .as(StationSectionResponse.class).getDownStationId();
+        지하철구간_등록(lineUrl, 역삼역, 선릉역, 7);
 
         //when
-        지하철구간_삭제(lineUrl, 지하철구간);
+        ExtractableResponse<Response> response = 지하철구간_삭제(lineUrl, 대림역);
 
         //then
-        StationLineResponse stationLineResponses = 지하철노선_조회(lineUrl);
-
-        assertThat(stationLineResponses.getName()).isEqualTo("신분당선");
-        assertThat(stationLineResponses.getStations()).containsExactly(
-                new StationResponse(강남역,"강남역"),
-                new StationResponse(역삼역,"역삼역"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
@@ -171,18 +166,12 @@ public class StationSectionAcceptanceTest extends BaseAcceptanceTest {
     void deleteBadRequestCase2() {
         //given
         String lineUrl = 신분당선.header("Location");
-        Long 지하철구간 = 지하철구간_등록(lineUrl, 역삼역, 선릉역, 7)
-                .as(StationSectionResponse.class).getDownStationId();
+        Long 신분당선_하행역 = 신분당선.jsonPath().getLong("stations[1].id");
 
         //when
-        지하철구간_삭제(lineUrl, 지하철구간);
+        ExtractableResponse<Response> response = 지하철구간_삭제(lineUrl, 신분당선_하행역);
 
         //then
-        StationLineResponse stationLineResponses = 지하철노선_조회(lineUrl);
-
-        assertThat(stationLineResponses.getName()).isEqualTo("신분당선");
-        assertThat(stationLineResponses.getStations()).containsExactly(
-                new StationResponse(강남역,"강남역"),
-                new StationResponse(역삼역,"역삼역"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
