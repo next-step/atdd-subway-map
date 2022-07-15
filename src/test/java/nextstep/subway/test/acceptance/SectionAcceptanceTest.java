@@ -93,9 +93,9 @@ public class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     @DisplayName("구간을 조회한다")
     public void getSections(){
-
+       // when
        ExtractableResponse<Response> response = 구간목록을_조회한다();
-
+       //then
        assertAll(
                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                () -> assertThat(response.jsonPath().getList("id").size()).isEqualTo(3)
