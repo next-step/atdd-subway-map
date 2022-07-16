@@ -83,7 +83,7 @@ class LineAcceptanceTest {
 		ExtractableResponse<Response> 지하철_노선_목록 = 지하철_노선_목록_조회_성공();
 
 		// Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-		assertThat(노선_이름_추출(지하철_노선_목록)).containsExactly(신분당선, 분당선);
+		assertThat(노선_이름_목록_추출(지하철_노선_목록)).containsExactly(신분당선, 분당선);
 	}
 
 	/*
@@ -102,7 +102,7 @@ class LineAcceptanceTest {
 		ExtractableResponse<Response> response = 지하철_노선_조회_성공(지하철_노선_Id);
 
 		// Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-		assertThat(노선_이름_추출(response)).containsExactly(신분당선);
+		assertThat(노선_이름_추출(response)).isEqualTo(신분당선);
 	}
 
 	/*
@@ -122,8 +122,8 @@ class LineAcceptanceTest {
 
 		// Then 해당 지하철 노선 정보는 수정된다
 		ExtractableResponse<Response> response = 지하철_노선_조회_성공(지하철_노선_Id);
-		assertThat(노선_이름_추출(response)).containsExactly(다른_분당선);
-		assertThat(노선_COLOR_추출(response)).containsExactly(다른_분당선_COLOR);
+		assertThat(노선_이름_추출(response)).isEqualTo(다른_분당선);
+		assertThat(노선_COLOR_추출(response)).isEqualTo(다른_분당선_COLOR);
 	}
 
 	/*

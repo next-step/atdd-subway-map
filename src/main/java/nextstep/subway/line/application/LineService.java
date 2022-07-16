@@ -41,7 +41,8 @@ public class LineService {
 	}
 
 	public LineResponse getLine(Long id) {
-		return null;
+		Line line = lineRepository.findById(id).orElseThrow();
+		return lineResponse(line);
 	}
 
 	public ModifyLineResponse modifyLine(Long id, ModifyLineRequest request) {
