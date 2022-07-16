@@ -1,4 +1,4 @@
-package nextstep.subway.domain.exception.exception;
+package nextstep.subway.domain.exception;
 
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String message) {

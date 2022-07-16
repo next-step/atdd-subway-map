@@ -1,12 +1,12 @@
-package nextstep.subway.domain.exception.handler;
+package nextstep.subway.ui;
 
-import nextstep.subway.domain.exception.exception.EntityNotFoundException;
+import nextstep.subway.domain.exception.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class CommonAdvisor {
+public class ExHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Void> exception(EntityNotFoundException e) {
