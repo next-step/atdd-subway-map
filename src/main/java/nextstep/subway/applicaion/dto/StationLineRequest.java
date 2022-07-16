@@ -1,6 +1,5 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.domain.Section;
 import nextstep.subway.domain.StationLine;
 
 public class StationLineRequest {
@@ -30,11 +29,7 @@ public class StationLineRequest {
         return distance;
     }
 
-    public Section toSection(StationLine stationLine){
-        return new Section(this.distance, this.upStationId, this.downStationId, stationLine);
-    }
-
-    public StationLine toEntity(){
+    public StationLine toEntity() {
         return new StationLine(this.name, this.color);
     }
 }

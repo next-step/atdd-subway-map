@@ -396,10 +396,15 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
-        return RestAssured.given().log().all()
+        return RestAssured.given()
+                .log()
+                .all()
                 .param("stationId", stationId)
-                .when().delete("/lines/{lineId}/sections",lineId)
-                .then().log().all()
+                .when()
+                .delete("/lines/{lineId}/sections", lineId)
+                .then()
+                .log()
+                .all()
                 .extract();
     }
 

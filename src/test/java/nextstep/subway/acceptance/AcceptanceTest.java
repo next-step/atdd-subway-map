@@ -20,7 +20,7 @@ public abstract class AcceptanceTest {
     private DatabaseCleanup databaseCleanup;
 
     @BeforeEach
-    public void clearRepository(){
+    public void clearRepository() {
         databaseCleanup.execute();
     }
 }

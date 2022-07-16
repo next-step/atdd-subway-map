@@ -3,10 +3,7 @@ package nextstep.subway.domain;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class StationLine {
@@ -16,8 +13,8 @@ public class StationLine {
     private String name;
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stationLine", orphanRemoval = true)
-    List<Section> sections = new LinkedList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public StationLine() {
     }
@@ -39,12 +36,22 @@ public class StationLine {
         return color;
     }
 
-    public List<Section> getSections() {
-        return sections;
+    public Sections getSections() {
+        return this.sections;
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+        section.setStationLine(this);
+    }
+
+    public void deleteSection(Section section) {
+        this.sections.getSections()
+                .remove(section);
     }
 
     public void updateByStationLineRequest(StationLineRequest stationLineRequest) {
-        if (stationLineRequest.getName() != null){
+        if (stationLineRequest.getName() != null) {
             this.name = stationLineRequest.getName();
         }
         if (stationLineRequest.getColor() != null) {
@@ -52,15 +59,7 @@ public class StationLine {
         }
     }
 
-    public Set<Long> getStationIdsIncluded() {
-        Set<Long> stations = new HashSet<>();
-        List<Section> sections = this.getSections();
-
-        for (Section section : sections){
-            stations.add(section.getUpStationId());
-            stations.add(section.getDownStationId());
-        }
-
-        return stations;
+    public List<Station> getStationsIncluded() {
+        return this.sections.getStationsIncludedInLine();
     }
 }
