@@ -36,24 +36,37 @@ public class Sections {
         if (!getLast().getDownStation().getId().equals(upStation.getId())) {
             throw new DomainException(DomainExceptionType.DONT_MATCH_STATION_BETWEEN_SECTIONS);
         }
+        if (isExistStation(downStation)) {
+            throw new DomainException(DomainExceptionType.CAN_NOT_ADD_DUPLICATE_STATION);
+        }
         this.sectionList.add(new Section(line, upStation, downStation, distance));
     }
 
     public void delete(Long stationId) {
-        if (!getLast().getUpStation().getId().equals(stationId)) {
+        if (!getLast().getDownStation().getId().equals(stationId)) {
             throw new DomainException(DomainExceptionType.CAN_NOT_REMOVE_SECTION_IN_MIDDLE);
         }
+        if (sectionList.size() == 1) {
+            throw new DomainException(DomainExceptionType.CAN_NOT_REMOVE_LAST_SECTION);
+        }
+        sectionList.remove(getLast());
     }
 
     public List<Station> getStations() {
-        return this.sectionList.stream()
-                .map(Section::getDownStation)
+        var stations = this.sectionList.stream()
+                .map(Section::getUpStation)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        stations.add(getLast().getDownStation());
+        return stations;
     }
 
     private Section getLast() {
         return sectionList.get(sectionList.size() - 1);
+    }
+
+    private boolean isExistStation(Station station) {
+        return getStations().contains(station);
     }
 
 }
