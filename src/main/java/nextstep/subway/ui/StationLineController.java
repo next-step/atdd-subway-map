@@ -2,6 +2,8 @@ package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.StationLineService;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +49,13 @@ public class StationLineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         stationLineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> createSection(@PathVariable Long id,
+                                                             @Valid @RequestBody SectionRequest.PostRequest request) {
+        SectionResponse response = stationLineService.addSection(id, request);
+        return ResponseEntity.created(URI.create("/lines/" +id)).body(response);
     }
 
 }

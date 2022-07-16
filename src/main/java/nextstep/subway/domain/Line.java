@@ -2,10 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,6 +13,9 @@ public class Line {
     private String name;
     private String color;
 
+    @Embedded
+    private Sections sections;
+
     public Line(String name, String color) {
         this(0L, name, color);
     }
@@ -24,5 +24,9 @@ public class Line {
         this.id = id;
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        sections.add(section);
     }
 }
