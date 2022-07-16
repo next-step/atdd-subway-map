@@ -1,8 +1,8 @@
 package nextstep.subway.acceptance;
 
-import static nextstep.subway.acceptance.SubwayTestUtils.createLine;
-import static nextstep.subway.acceptance.SubwayTestUtils.createStationWithName;
-import static nextstep.subway.acceptance.SubwayTestUtils.getLine;
+import static nextstep.subway.acceptance.util.StationTestUtils.createStationWithName;
+import static nextstep.subway.acceptance.util.LineTestUtils.createLine;
+import static nextstep.subway.acceptance.util.LineTestUtils.getLine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
