@@ -3,13 +3,19 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import nextstep.subway.LineClient;
 import nextstep.subway.StationClient;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관리 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,22 +31,8 @@ class SectionAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-
         stationClient = new StationClient();
-        stationClient.create("지하철역", "새로운지하철역", "또다른지하철역");
-
-        lineClient = new LineClient();
-        lineClient.create(params());
-    }
-
-    private Map<String, Object> params() {
-        return Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10L
-        );
+        stationClient.create("지하철역", "새로운지하철역", "또다른지하철역", "또또다른지하철역");
     }
 
     /**
@@ -52,8 +44,27 @@ class SectionAcceptanceTest {
     @Test
     void createSection() {
         // given
+        lineClient = new LineClient();
+        lineClient.create(params());
+
         // when
+        final var params = Map.of(
+                "downStationId", "4",
+                "upStationId", "2",
+                "distance", 10L
+        );
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/" + 1 + "/sections")
+                .then().log().all()
+                .extract();
+
         // then
+        List<LineResponse> lineResponses = lineClient.findAll().jsonPath().getList("", LineResponse.class);
+        assertThat(lineResponses.get(0).getStationResponse().stream().map(StationResponse::getName))
+                .containsExactly("지하철역", "새로운지하철역", "또또다른지하철역");
     }
 
     /**
@@ -120,6 +131,16 @@ class SectionAcceptanceTest {
         // given
         // when
         // then
+    }
+
+    private Map<String, Object> params() {
+        return Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 7L
+        );
     }
 
 
