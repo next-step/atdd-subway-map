@@ -29,4 +29,8 @@ public class Line {
     public void addSection(Section section) {
         sections.add(section);
     }
+
+    public Section findLastSection() {
+        return getSections().getLastSection();
+    }
 }

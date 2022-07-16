@@ -50,8 +50,9 @@ public class StationLineService {
         Line line = findLineById(lineId);
         line.addSection(section);
         repository.save(line);
-        return SectionResponse.form(section);
+        return SectionResponse.form(line.findLastSection());
     }
+
 
     private Line findLineById(Long lineId) {
         return repository.findById(lineId).orElseThrow(() -> new LineNotFoundException("등록되지 않은 노선 입니다."));

@@ -23,8 +23,16 @@ public class Sections {
         list.add(section);
     }
 
+    public Section get(int index) {
+        return list.get(index);
+    }
+
     public int getLastIndex() {
         return list.size() - 1;
+    }
+
+    public Section getLastSection() {
+        return list.get(getLastIndex());
     }
 
     private void validate(Section section) {
