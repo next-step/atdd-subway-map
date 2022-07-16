@@ -1,24 +1,18 @@
 package nextstep.subway.domain.section;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.station.Station;
 
-@Table(uniqueConstraints = {
-        @UniqueConstraint(name = "line_station_constraint", columnNames = {"lineId", "station_id"})
-})
 @Getter
 @Entity
 @ToString
@@ -29,28 +23,25 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private Long lineId;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prev_section_id")
-    private Section prevSection;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "next_section_id")
-    private Section nextSection;
-
-    @NotNull
     @ManyToOne
-    @JoinColumn(name = "station_id")
-    private Station station;
+    @JoinColumn(name = "line_id")
+    private Line line;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "upstation_id")
+    private Station upStation;
+
+    @ManyToOne
+    @JoinColumn(name = "downstation_id")
+    private Station downStation;
+
+    @Min(1)
     private Long distance;
 
-    public Section(Long lineId, Station station) {
-        this.lineId = lineId;
-        this.station = station;
-        this.distance = 0L;
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
     }
 }
