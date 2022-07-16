@@ -31,7 +31,6 @@ public class LineAcceptanceTest {
 	private static final String UP_STATION_NAME = "강남역";
 	private static final String DOWN_STATION_NAME = "양재역";
 	private ExtractableResponse<Response> responseOfLine;
-	private Long upStationId;
 	private Long downStationId;
 	private Long lineId;
 
@@ -46,7 +45,7 @@ public class LineAcceptanceTest {
 		RestAssured.port = port;
 
 		// given 지하철 역 생성
-		upStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(UP_STATION_NAME));
+		Long upStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(UP_STATION_NAME));
 		downStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(DOWN_STATION_NAME));
 
 		// given 지하철 노선 생성
@@ -141,7 +140,7 @@ public class LineAcceptanceTest {
 		assertThat(지하철노선_목록_조회_파싱_name(지하철노선_목록_조회())).doesNotContain(LINE_NAME);
 	}
 
-	private ExtractableResponse<Response> 지하철노선_생성(String name, String color, Long upStationId, Long downStationId,
+	ExtractableResponse<Response> 지하철노선_생성(String name, String color, Long upStationId, Long downStationId,
 		Long distance) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("name", name);
@@ -170,14 +169,14 @@ public class LineAcceptanceTest {
 			.jsonPath().getList("name", String.class);
 	}
 
-	private ExtractableResponse<Response> 지하철노선_조회(Long id) {
+	ExtractableResponse<Response> 지하철노선_조회(Long id) {
 		return RestAssured.given().log().all()
 			.when().get("/lines/" + id)
 			.then().log().all()
 			.extract();
 	}
 
-	private String 지하철노선_조회_파싱_name(ExtractableResponse<Response> response) {
+	String 지하철노선_조회_파싱_name(ExtractableResponse<Response> response) {
 		return response
 			.jsonPath().getString("name");
 	}
