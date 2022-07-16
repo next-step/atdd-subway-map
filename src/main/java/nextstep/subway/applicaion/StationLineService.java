@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.dto.StationLineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Section;
-import nextstep.subway.domain.StationLineRepository;
+import nextstep.subway.domain.*;
 import nextstep.subway.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,17 +17,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StationLineService {
 
-    private final StationLineRepository repository;
+    private final StationLineRepository lineRepository;
+    private final StationSectionRepository sectionRepository;
 
     public StationLineResponse save(Line line) {
-        return StationLineResponse.form(repository.save(line));
+        return StationLineResponse.form(lineRepository.save(line));
     }
 
     public List<StationLineResponse> findAllStationLines() {
-        return repository.findAll()
-                         .stream()
-                         .map(StationLineResponse::form)
-                         .collect(Collectors.toList());
+        return lineRepository.findAll()
+                             .stream()
+                             .map(StationLineResponse::form)
+                             .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -38,23 +37,29 @@ public class StationLineService {
     }
 
     public void update(Line line) {
-        StationLineResponse.form(repository.save(line));
+        StationLineResponse.form(lineRepository.save(line));
     }
 
     public void deleteLineById(Long id) {
-        repository.deleteById(id);
+        lineRepository.deleteById(id);
     }
 
     public SectionResponse addSection(Long lineId, SectionRequest.PostRequest request) {
-        Section section = request.toEntity();
         Line line = findLineById(lineId);
+        Section section = sectionRepository.save(request.toEntity());
         line.addSection(section);
-        repository.save(line);
         return SectionResponse.form(line.findLastSection());
+    }
+
+    public void deleteSection(Long lineId, Long stationsId) {
+        Line line = findLineById(lineId);
+        Sections sections = line.getSections();
+        sections.deleteSection(stationsId);
     }
 
 
     private Line findLineById(Long lineId) {
-        return repository.findById(lineId).orElseThrow(() -> new LineNotFoundException("등록되지 않은 노선 입니다."));
+        return lineRepository.findById(lineId).orElseThrow(() -> new LineNotFoundException("등록되지 않은 노선 입니다."));
     }
+
 }

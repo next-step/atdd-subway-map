@@ -44,6 +44,9 @@ public class Section {
                 || this.upStationId.equals(downStationId);
     }
 
+    public void deleteDownStation() {
+        this.downStationId = null;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -57,4 +60,5 @@ public class Section {
     public int hashCode() {
         return Objects.hash(upStationId, downStationId);
     }
+
 }
