@@ -1,11 +1,10 @@
 package nextstep.subway.acceptance.station;
 
+import static nextstep.subway.acceptance.station.StationRestAssuredProvider.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -26,6 +24,8 @@ import nextstep.subway.acceptance.isolation.TestIsolationUtil;
 class StationAcceptanceTest {
 
 	private static final int CREATED = HttpStatus.CREATED.value();
+	private static final String 강남역 = "강남역";
+	private static final String 역삼역 = "역삼역";
 
 	@LocalServerPort
 	int port;
@@ -48,15 +48,13 @@ class StationAcceptanceTest {
 	@Test
 	void createStation() {
 		// When 지하철역을 생성하면
-		String stationName = "강남역";
-		ExtractableResponse<Response> response = createStation(stationName);
+		ExtractableResponse<Response> response = 지하철역_생성(강남역);
 
 		// Then 지하철역이 생성된다
 		assertThat(response.statusCode()).isEqualTo(CREATED);
 
 		// Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-		List<String> allStationNames = getAllStationNames();
-		assertThat(allStationNames).containsAnyOf(stationName);
+		assertThat(지하철역_이름_목록_조회()).containsAnyOf(강남역);
 	}
 
 	/**
@@ -64,24 +62,22 @@ class StationAcceptanceTest {
 	 * When 지하철역 목록을 조회하면
 	 * Then 2개의 지하철역을 응답 받는다
 	 */
-	@DisplayName("지하철역을 조회한다.")
+	@DisplayName("지하철역 목록을 조회한다.")
 	@Test
 	void getStations() {
 
 		// Given 2개의 지하철역을 생성하고
-		String stationFirst = "강남역";
-		String stationSecond = "역삼역";
-		createStation(stationFirst);
-		createStation(stationSecond);
+		지하철역_생성(강남역);
+		지하철역_생성(역삼역);
 
 		// When 지하철역 목록을 조회하면
-		List<String> allStationNames = getAllStationNames();
+		List<String> 지하철역_이름_목록 = 지하철역_이름_목록_조회();
 
 		// Then 2개의 지하철역을 응답 받는다
 		assertAll(
-			() -> assertThat(allStationNames).hasSize(2),
-			() -> assertThat(allStationNames).containsAnyOf(stationFirst),
-			() -> assertThat(allStationNames).containsAnyOf(stationSecond)
+			() -> assertThat(지하철역_이름_목록).hasSize(2),
+			() -> assertThat(지하철역_이름_목록).containsAnyOf(강남역),
+			() -> assertThat(지하철역_이름_목록).containsAnyOf(역삼역)
 		);
 
 	}
@@ -95,47 +91,22 @@ class StationAcceptanceTest {
 	@Test
 	void deleteStation() {
 		// Given 지하철역을 생성하고
-		String stationName = "강남역";
-		ExtractableResponse<Response> createResponse = createStation(stationName);
+		ExtractableResponse<Response> response = 지하철역_생성(강남역);
 
 		// When 그 지하철역을 삭제하면
-		deleteStation(createResponse.jsonPath().getString("id"));
+		지하철역_삭제(Id_추출(response));
 
 		// Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-		List<String> allStationNames = getAllStationNames();
-		assertThat(allStationNames).isEmpty();
+		assertThat(지하철역_이름_목록_조회()).isEmpty();
 	}
 
-	private ExtractableResponse<Response> createStation(String stationName) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
-
-		return RestAssured.given().log().all()
-			.body(params)
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when().post("/stations")
-			.then().log().all()
-			.extract();
-	}
-
-	private ExtractableResponse<Response> getAllStations() {
-		return RestAssured.given().log().all()
-			.when().get("/stations")
-			.then().log().all()
-			.extract();
-	}
-
-	private List<String> getAllStationNames() {
-		return getAllStations()
+	private List<String> 지하철역_이름_목록_조회() {
+		return 지하철역_목록_조회()
 			.jsonPath()
 			.getList("name", String.class);
 	}
 
-	private void deleteStation(String id) {
-		RestAssured.given().log().all()
-			.when().delete("/stations/" + id)
-			.then().log().all()
-			.extract();
+	private String Id_추출(ExtractableResponse<Response> response) {
+		return response.jsonPath().getString("id");
 	}
-
 }
