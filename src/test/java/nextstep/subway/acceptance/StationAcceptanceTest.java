@@ -6,25 +6,30 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
+@ActiveProfiles("acceptance")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    DbCleanup dbCleanup;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        dbCleanup.execute();
     }
 
     /**
@@ -36,14 +41,13 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> createStationResponse = createStation("강남역");
+        ExtractableResponse<Response> 강남역 = TestSetupUtils.buildStation("강남역");
 
-        // then
-        assertThat(createStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         ExtractableResponse<Response> stationsResponse = stationsResponse();
-        assertThat(stationsResponse.jsonPath().getList("name")).containsAnyOf("강남역");
+        assertThat(stationsResponse.jsonPath().getList("name")).contains("강남역");
     }
 
     /**
@@ -55,15 +59,18 @@ class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        createStation("강남역");
-        createStation("교대역");
+        ExtractableResponse<Response> 강남역 = TestSetupUtils.buildStation("강남역");
+        ExtractableResponse<Response> 교대역 = TestSetupUtils.buildStation("교대역");
+
+        assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(교대역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
         ExtractableResponse<Response> stationsResponse = stationsResponse();
 
         // then
         assertThat(stationsResponse.jsonPath().getList("name", String.class))
-                .containsExactlyInAnyOrder("강남역", "교대역");
+                .containsExactly("강남역", "교대역");
     }
 
     /**
@@ -75,11 +82,14 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createStationResponse = createStation("강남역");
+        ExtractableResponse<Response> 강남역 = TestSetupUtils.buildStation("강남역");
+
+        assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        long stationId = createStationResponse.jsonPath().getLong("id");
+        long stationId = 강남역.jsonPath().getLong("id");
         ExtractableResponse<Response> deleteStationResponse = deleteStation(stationId);
+
         assertThat(deleteStationResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
@@ -90,15 +100,6 @@ class StationAcceptanceTest {
     private ExtractableResponse<Response> stationsResponse() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> createStation(String name) {
-        return RestAssured.given().log().all()
-                .body(Map.of("name", name))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
                 .then().log().all()
                 .extract();
     }
