@@ -9,11 +9,13 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
+import nextstep.subway.exception.SectionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -112,6 +114,50 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
      * When 하행 종점의 지하철 구간을 삭제한다.
      * Then 하행 종점역이 비어있는지 확인한다.
      */
+    @Test
+    @DisplayName("지하철 구간 삭제 테스트")
+    void 지하철_구간_삭제() {
+        //given
+        String sectionsRequestPath = SubwayRequestPath.SECTION.sectionsRequestPath(line.getId());
+        Station 강남역 = new Station(1L, "강남역");
+        Station 선릉역 = new Station(2L, "선릉역");
+        Section 첫번째_구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
+        sectionRestAssured.postRequest(sectionsRequestPath, 첫번째_구간);
+
+        //when
+        sectionRestAssured.deleteRequest(sectionsRequestPath);
+
+        //then
+        Line line = lineRestAssured.getRequest(SubwayRequestPath.LINE.getValue()).extract().as(Line.class);
+        Section lastSection = line.findLastSection();
+        assertThat(lastSection.getDownStationId()).isNull();
+    }
+
+    /* Given 2개의 지하철역을 생성하고, 지하철 구간에 추가한다. 지하철 구간을 노선에 추가한다.
+     * When 하행 종점의 지하철 구간을 삭제한다.
+     * Then 구간이 하나만 등록되어있을 경우 Exception 발생
+     */
+    @Test
+    @DisplayName("구간 삭제 실패 테스트 - 구간이 하나 뿐일때는 삭제할 수 없다")
+    void 하나뿐민_구간을_삭제했을_경우() {
+        //given
+        Station 강남역 = new Station(1L, "강남역");
+        Station 선릉역 = new Station(2L, "선릉역");
+        Section 첫번째_구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
+
+        //when
+        Sections sections = new Sections(List.of(첫번째_구간));
+
+        //then
+        assertThatThrownBy(sections::deleteDownTerminus).isInstanceOf(SectionException.class);
+    }
+
+
+    /* Given 2개의 지하철역을 생성하고, 지하철 구간에 추가한다. 지하철 구간을 노선에 추가한다.
+     * When 하행 종점의 지하철 구간을 삭제한다.
+     * Then 하행 종점역이 비어있는지 확인한다.
+     */
+
 
     private Line createLine() {
       return lineRestAssured.postRequest(SubwayRequestPath.LINE.getValue(), LineFactory.경춘선())
