@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -69,23 +70,29 @@ public class Line {
     }
 
     public Station getDownStationTerminal() {
-        return sections.get(0).getDownStation();
+        return sections.get(sections.size() - 1).getDownStation();
     }
 
     public void addSection(Section newSection) {
         this.sections.stream()
-                .filter(section -> isSameSection(newSection, section))
+                .filter(section -> isSameSection(newSection, section)
+                        || isNewSectionDownStationInLine(newSection, section))
                 .findFirst()
                 .ifPresent(section -> {
-                    throw new IllegalArgumentException("새로운 구간과 기존 노선의 구간이 같으면 등록할 수 없습니다.");
+                    throw new IllegalArgumentException("구간이나 역이 중복되어 있으면 등록할 수 없습니다.");
                 });
 
         if (isNotTerminalDownStation(newSection)) {
-            throw new IllegalArgumentException("새로운 구간은 기존 노선의 하행 좀점역이어야 합니다.");
+            throw new IllegalArgumentException("새로운 구간은 기존 노선의 하행 종점역이어야 합니다.");
         }
 
         this.sections.add(newSection);
         newSection.setLine(this);
+    }
+
+    private boolean isNewSectionDownStationInLine(Section newSection, Section section) {
+        return section.getUpStation() == newSection.getDownStation()
+                || section.getDownStation() == newSection.getDownStation();
     }
 
     public List<Station> getStations() {

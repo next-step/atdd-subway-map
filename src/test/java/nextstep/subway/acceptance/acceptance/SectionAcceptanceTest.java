@@ -13,7 +13,9 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
+import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노선을_3개를_생성한다;
 import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노선을_생성한다;
+import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_목록_조회를_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_조회를_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_생성을_요청한다;
 import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하철구간_등록을_요청한다;
@@ -105,21 +107,30 @@ public class SectionAcceptanceTest {
 
 
     /**
-     * Given 2개의 구간을 가진 지하철 노선을 생성하고,
+     * Given 3개의 구간을 가진 지하철 노선을 생성하고,
      * When
      * 새로운 구간의 상행역이 기존 지하철 노선의 하행종점역이고,
      * 새로운 구간의 하행역이 기존 지하철 노선에 포함되어 있는
      * 지하철 구간을 등록하면,
      * Then 지하철 구간 등록에 실패한다.
      */
-    @DisplayName("새로운 구간의 상행역이 하행종점역이지만, 하행역이 노선에 포함되어있으면 구간 등록할수 없다.")
+    @DisplayName("새로운 구간의 상행역이 하행종점역이지만, 하행역이 노선에 포함되어있으면 구간 등록할 수 없다.")
     @Test
     void 지하철구간의_상행역이_노선의_하행종점역이지만_하행역이_노선에_포함되어있으면_등록실패() {
         // given
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 양재역 = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 15).jsonPath().getLong("id");
+        지하철구간_등록을_요청한다(신분당선, 신논현역, 양재역, 7);
 
+        지하철노선_조회를_요청한다(신분당선);
         // when
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, 양재역, 신논현역, 10);
+        지하철노선_조회를_요청한다(신분당선);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
