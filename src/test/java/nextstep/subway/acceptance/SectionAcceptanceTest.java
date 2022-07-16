@@ -2,16 +2,31 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ValidatableResponse;
 import nextstep.SpringBootTestConfig;
+import nextstep.subway.acceptance.client.SubwayRestAssured;
+import nextstep.subway.acceptance.enums.SubwayRequestPath;
+import nextstep.subway.acceptance.factory.LineFactory;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.domain.Section;
+import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-
 @DisplayName("지하철 구간 인수테스트")
 class SectionAcceptanceTest extends SpringBootTestConfig {
+
+    protected final SubwayRestAssured<Section> sectionRestAssured = new SubwayRestAssured<>();
+    protected final SubwayRestAssured<Line> lineRestAssured = new SubwayRestAssured<>();
+
+    private Line line;
+
+    @Override
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+        line = createLine();
+    }
 
     /*
      * Given 2개의 지하철역과 하나의 노선을 생성하고, 지하철 구간에 추가한다.
@@ -27,7 +42,8 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
         Section 구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
 
         //when
-        ValidatableResponse 구간등록_응답 = sectionRestAssured.postRequest("/lines/1L/sections", 구간);
+        String requestPath = SubwayRequestPath.SECTION.sectionsRequestPath(line.getId());
+        ValidatableResponse 구간등록_응답 = sectionRestAssured.postRequest(requestPath, 구간);
 
         //then
         구간등록_응답.statusCode(HttpStatus.CREATED.value());
@@ -40,6 +56,9 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
      */
 
 
-
+    private Line createLine() {
+      return lineRestAssured.postRequest(SubwayRequestPath.LINE.getValue(), LineFactory.경춘선())
+              .extract().as(Line.class);
+    }
 
 }
