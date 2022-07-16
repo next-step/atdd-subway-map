@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
@@ -39,12 +40,12 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철구간을 등록한다.")
     @Test
     void 지하철구간_등록성공() {
-        // when
+        // given
         long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
         long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
         long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10).jsonPath().getLong("id");
 
-        // then
+        // when
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
         지하철구간_등록을_요청한다(lineId, downStationId, newStationId, 10);
 
@@ -52,21 +53,6 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(lineId);
         List<String> lineNames = lineResponse.jsonPath().get("stations.name");
         assertThat(lineNames).containsExactly("강남역", "신논현역", "양재역");
-    }
-
-    /**
-     * Given 2개의 지하철 구간을 등록하고,
-     * When 지하철 노선을 조회하면,
-     * Then 생성한 2개의 지하철 구간이 포함된 지하철 노선의 정보를 응답받을 수 있다.
-     */
-    @DisplayName("지하철노선의 구간 목록을 조회한다.")
-    @Test
-    void 지하철구간_목록_조회성공() {
-        // given
-
-        // when
-
-        // then
     }
 
     /**
@@ -81,10 +67,16 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간이_지하철노선의_하행종점역이고_해당노선에_존재하지않으면_등록성공() {
         // given
+        long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10).jsonPath().getLong("id");
 
         // when
+        long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(lineId, downStationId, newStationId, 10);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
