@@ -3,34 +3,16 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@ActiveProfiles("acceptance")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StationAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    DbCleanup dbCleanup;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-        dbCleanup.execute();
-    }
+class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
