@@ -1,9 +1,9 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.station;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.station.dto.StationRequest;
+import nextstep.subway.applicaion.station.dto.StationResponse;
+import nextstep.subway.domain.station.Station;
+import nextstep.subway.domain.station.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +20,8 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
+    public StationResponse saveStation(final StationRequest stationRequest) {
+        final Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
@@ -32,11 +32,11 @@ public class StationService {
     }
 
     @Transactional
-    public void deleteStationById(Long id) {
+    public void deleteStationById(final Long id) {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    private StationResponse createStationResponse(final Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()

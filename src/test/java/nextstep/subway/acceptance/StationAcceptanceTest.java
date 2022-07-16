@@ -1,17 +1,17 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,26 +25,19 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void testCreateStation() {
         // when
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().extract();
+        final ExtractableResponse<Response> response = testRestApi(
+                HttpMethod.POST,
+                "/stations",
+                Map.of("name", "강남역")
+        );
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        final List<String> stationNames =
-                RestAssured.given()
-                        .when().get("/stations")
-                        .then().extract().jsonPath().getList("name", String.class);
+        final List<String> stationNames = getAllStations().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -55,28 +48,25 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void getStations() {
+    void testGetStations() {
         // given
         final List<String> stationNamesToInsert = List.of("선릉역", "역삼역");
-        stationNamesToInsert.forEach((stationName) -> RestAssured.given()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().extract());
+        stationNamesToInsert.forEach((stationName) -> createStation(
+                Map.of("name", stationName)
+        ));
 
         // when
-        final ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().get("/stations")
-                        .then().extract();
+        final ExtractableResponse<Response> response = testRestApi(
+                HttpMethod.GET,
+                "/stations"
+        );
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
         final List<String> respondedNames = response.body().jsonPath().getList("name", String.class);
-        respondedNames.containsAll(stationNamesToInsert);
+        assertThat(respondedNames).containsAll(stationNamesToInsert);
         assertThat(respondedNames).hasSize(stationNamesToInsert.size());
     }
 
@@ -87,42 +77,49 @@ public class StationAcceptanceTest extends AcceptanceBaseTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void testDeleteStation() {
         // given
         final String stationNameToBeDeleted = "선릉역";
         final String stationNameToBeRemained = "역삼역";
         final List<String> stationNamesToInsert = List.of(stationNameToBeDeleted, stationNameToBeRemained);
-        stationNamesToInsert.forEach((stationName) -> RestAssured.given()
-                .body(Map.of("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().extract());
 
         // given
-        // FIXME: jsonPath로 우아하게 가져올 방법 없나...
-        final List<LinkedHashMap<String, String>> respondedBody = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().extract()
-//                .jsonPath().get("$[0].name");
-                .jsonPath().get();
-        final LinkedHashMap<String, String> stationToBeDeleted = respondedBody.get(0);
+        final List<Map<Object, Object>> respondedBody = stationNamesToInsert.stream()
+                .map((stationName) -> createStation(
+                        Map.of("name", stationName)
+                ).getMap("$"))
+                .collect(Collectors.toList());
+        final Map<Object, Object> stationToBeDeleted = respondedBody.get(0);
 
         // when
-        final ExtractableResponse<Response> deleteResponse = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/{id}", stationToBeDeleted.get("id"))
-                .then().extract();
+        final ExtractableResponse<Response> deleteResponse = testRestApi(
+                HttpMethod.DELETE,
+                "/stations/{id}",
+                Collections.emptyMap(),
+                stationToBeDeleted.get("id")
+        );
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        final List<String> remainedStations = RestAssured.given()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().extract()
-                .jsonPath().getList("name");
-        assertThat(remainedStations).doesNotContain(stationToBeDeleted.get("name"));
+        final List<String> remainedStations = getAllStations().getList("name");
+        assertThat(remainedStations).doesNotContain(stationNameToBeDeleted);
+        assertThat(remainedStations).contains(stationNameToBeRemained);
+    }
+
+    private JsonPath createStation(final Map<String, Object> request) {
+        return testRestApi(
+                HttpMethod.POST,
+                "/stations",
+                request
+        ).jsonPath();
+    }
+
+    private JsonPath getAllStations() {
+        return testRestApi(
+                HttpMethod.GET,
+                "/stations"
+        ).jsonPath();
     }
 }

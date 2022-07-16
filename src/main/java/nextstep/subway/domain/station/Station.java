@@ -1,4 +1,6 @@
-package nextstep.subway.domain;
+package nextstep.subway.domain.station;
+
+import nextstep.subway.applicaion.station.dto.StationResponse;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +17,12 @@ public class Station {
     public Station() {
     }
 
-    public Station(String name) {
+    public Station(final String name) {
+        this.name = name;
+    }
+
+    public Station(final long id, final String name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -25,5 +32,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public StationResponse toResponse() {
+        return new StationResponse(id, name);
     }
 }
