@@ -1,4 +1,4 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.station.applicaion;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.station.Station;
+import nextstep.subway.station.StationRepository;
+import nextstep.subway.station.applicaion.dto.StationRequest;
+import nextstep.subway.station.applicaion.dto.StationResponse;
 
 @Service
 @Transactional(readOnly = true)
