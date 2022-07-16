@@ -7,11 +7,17 @@ import nextstep.subway.acceptance.enums.SubwayRequestPath;
 import nextstep.subway.acceptance.factory.LineFactory;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 구간 인수테스트")
 class SectionAcceptanceTest extends SpringBootTestConfig {
@@ -47,6 +53,31 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
 
         //then
         구간등록_응답.statusCode(HttpStatus.CREATED.value());
+    }
+
+    /*
+     * Given 4개의 지하철역과 지하철역 리스트를 생성한다.
+     * When 지하철역 리스트에 역을 추가한다.
+     * Then 동일한 지하철역을 추가했을 때 Exception 발생한다.
+     */
+    @Test
+    @DisplayName("지하철 구간 실패 테스트 - 이미 등록된 하행역일 경우")
+    void 지하철_구간_실패_등록된_하행역() {
+        //given
+        Station 강남역 = new Station(1L, "강남역");
+        Station 선릉역 = new Station(2L, "선릉역");
+        Section 첫번째_구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
+
+        Station 영통역 = new Station(3L, "영통역");
+        Section 두번째_구간 = new Section(영통역.getId(), 선릉역.getId(), 10);
+
+        //when
+        Sections sections = new Sections(List.of(첫번째_구간));
+
+        //then
+        assertThatThrownBy(() -> sections.add(두번째_구간))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("하행역이 이미 등록된 지하철역 입니다.");
     }
 
 
