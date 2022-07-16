@@ -1,11 +1,11 @@
 package nextstep.subway.applicaion;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -38,10 +38,10 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station downStation = getStation(lineRequest.getDownStationId());
         Station upStation = getStation(lineRequest.getUpStationId());
+        Station downStation = getStation(lineRequest.getDownStationId());
 
-        Section section = Section.createSection(downStation, upStation, lineRequest.getDistance());
+        Section section = Section.createSection(upStation, downStation, lineRequest.getDistance());
         sectionRepository.save(section);
 
         Line line = Line.createLine(lineRequest.getName(), lineRequest.getColor(), section);
@@ -65,6 +65,18 @@ public class LineService {
         lineRepository.delete(line);
     }
 
+    @Transactional
+    public void addSection(Long id, SectionRequest sectionRequest) {
+        Line line = getLine(id);
+        Station upStation = getStation(sectionRequest.getUpStationId());
+        Station downStation = getStation(sectionRequest.getDownStationId());
+
+        Section section = Section.createSection(upStation, downStation, sectionRequest.getDistance());
+        sectionRepository.save(section);
+
+        line.addSection(section);
+    }
+
     private Line getLine(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 노선이 없습니다."));
@@ -76,8 +88,7 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses =
-                createStationResponses(line.getDownStationTerminal(), line.getUpStationTerminal());
+        List<StationResponse> stationResponses = createStationsResponse(line);
 
         return LineResponse.builder()
                 .id(line.getId())
@@ -87,17 +98,10 @@ public class LineService {
                 .build();
     }
 
-    private StationResponse createStationResponse(Station station) {
-        return StationResponse.builder()
-                .id(station.getId())
-                .name(station.getName())
-                .build();
+    private List<StationResponse> createStationsResponse(Line line) {
+        return line.getStations().stream()
+                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .collect(Collectors.toList());
     }
 
-    private List<StationResponse> createStationResponses(Station downStation, Station upStation) {
-        return Arrays.asList(
-                createStationResponse(downStation),
-                createStationResponse(upStation)
-        );
-    }
 }

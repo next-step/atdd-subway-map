@@ -1,7 +1,9 @@
 package nextstep.subway.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -69,8 +71,36 @@ public class Line {
         return sections.get(0).getDownStation();
     }
 
-    private void addSection(Section section) {
-        sections.add(section);
-        section.setLine(this);
+    public void addSection(Section newSection) {
+        this.sections.stream()
+                .filter(section -> section.getUpStation() == newSection.getUpStation()
+                        && section.getDownStation() == newSection.getDownStation())
+                .findFirst()
+                .ifPresent(section -> {
+                    throw new IllegalArgumentException();
+                });
+
+        this.sections.add(newSection);
+        newSection.setLine(this);
+    }
+
+    public List<Station> getStations() {
+        if (this.sections.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Station> stations = this.sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toList());
+
+        for (Station station : stations) {
+            System.out.println(station.getId()  + station.getName());
+        }
+
+        System.out.println(stations);
+        stations.add(0, this.getUpStationTerminal());
+        System.out.println(stations);
+
+        return stations;
     }
 }

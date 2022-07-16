@@ -46,12 +46,12 @@ public class SectionAcceptanceTest {
 
         // then
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
-        지하철구간_등록을_요청한다(newStationId, downStationId, 10);
+        지하철구간_등록을_요청한다(lineId, downStationId, newStationId, 10);
 
         // then
         ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(lineId);
         List<String> lineNames = lineResponse.jsonPath().get("stations.name");
-        assertThat(lineNames).containsOnly("강남역", "신논현역", "양재역");
+        assertThat(lineNames).containsExactly("강남역", "신논현역", "양재역");
     }
 
     /**
