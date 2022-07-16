@@ -52,12 +52,4 @@ public class SubwayTestUtils {
                 .then()
                     .extract();
     }
-
-    public enum STATIONS {
-        광교역,
-        광교중앙역,
-        상현역,
-        성복역,
-        수지구청역;
-    }
 }

@@ -10,11 +10,9 @@ import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import nextstep.subway.acceptance.SubwayTestUtils.STATIONS;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.SectionCreationRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -27,15 +25,28 @@ import org.springframework.http.MediaType;
 @DisplayName("구간관리 관련 기능")
 class SectionAcceptanceTest extends AcceptanceTest {
 
-    private Map<STATIONS, Long> stationIds = new HashMap<>();
+    private final Map<String, Long> stationIds = new HashMap<>();
+    private final List<String> preparedStationNames = List.of(
+            "광교역", "광교중앙역", "상현역", "성복역"
+    );
+    private final String defaultUpStation = "광교역";
+    private final String defaultDownStation = "광교중앙역";
+    private Long lineId;
 
     @BeforeEach
     void setUpStations() {
-        List.of(STATIONS.광교역, STATIONS.광교중앙역, STATIONS.상현역, STATIONS.성복역).forEach(station -> {
-            var stationId = createStationWithName(station.name()).jsonPath().getLong("id");
-            stationIds.put(station, stationId);
+        preparedStationNames.forEach(name -> {
+            var stationId = createStationWithName(name).jsonPath().getLong("id");
+            stationIds.put(name, stationId);
             }
         );
+
+        lineId = createLineWith(
+                "신분당선",
+                "red",
+                stationIds.get(defaultUpStation),
+                stationIds.get(defaultDownStation),
+                10L);
     }
 
     @AfterEach
@@ -51,17 +62,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간 등록")
     @Test
     void canFindSectionOfLineWhichCreated() {
-        // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-
         // when
-        var sectionCreationResponse = createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
+        var newStation = "상현역";
+        var sectionCreationResponse = createSection(lineId, defaultDownStation, newStation, 3L);
 
         // then
         var stationNames = getLine(lineId)
@@ -70,8 +73,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 () -> assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(stationNames).isEqualTo(List.of(
-                        STATIONS.광교역.name(), STATIONS.광교중앙역.name(), STATIONS.상현역.name()))
+                () -> assertThat(stationNames).isEqualTo(List.of(defaultUpStation, defaultDownStation, newStation))
         );
     }
 
@@ -83,17 +85,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("하행역이 노선에 포함된 구간 등록 불가")
     @Test
     void canNotCreateSectionWithDownStationAlreadyInLineSections() {
-        // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-
         // when
-        var sectionCreationResponse = createSection(lineId, STATIONS.광교중앙역, STATIONS.광교역, 3L);
+        var sectionCreationResponse = createSection(lineId, defaultDownStation, defaultUpStation, 3L);
 
         // then
         assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -107,17 +100,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간의 상행역이 노선의 하행 종점역이 아닐때 등록 불가")
     @Test
     void canNotCreateSectionWithUpStationWhichIsNotLinesLastStation() {
-        // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-
         // when
-        var sectionCreationResponse = createSection(lineId, STATIONS.광교역, STATIONS.상현역, 3L);
+        var newStation = "상현역";
+        var sectionCreationResponse = createSection(lineId, defaultUpStation, newStation, 3L);
 
         // then
         assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -131,17 +116,9 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("존재하지 않는 역을 포함한 구간 등록 불가")
     @Test
     void canNotCreateSectionWithStationWhichIsNotExist() {
-        // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-
         // when
-        var sectionCreationResponse = createSection(lineId, STATIONS.광교중앙역, STATIONS.수지구청역, 3L);
+        var stationNotExist = "수지구청역";
+        var sectionCreationResponse = createSection(lineId, defaultDownStation, stationNotExist, 3L);
 
         // then
         assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -155,19 +132,13 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("노선의 마지막 구간 삭제")
     @Test
     void canDeleteLastSectionFromLine() {
-        // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-        createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
-        createSection(lineId, STATIONS.상현역, STATIONS.성복역, 4L);
+        var thirdStation = "상현역";
+        var fourthStation = "성복역";
+        createSection(lineId, defaultDownStation, thirdStation, 3L);
+        createSection(lineId, thirdStation, fourthStation, 4L);
 
         // when
-        var deleteResponse = deleteSection(lineId, STATIONS.성복역);
+        var deleteResponse = deleteSection(lineId, fourthStation);
 
         // then
         var stationNames = getLine(lineId).jsonPath()
@@ -176,7 +147,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(stationNames).containsExactly(
-                        STATIONS.광교역.name(), STATIONS.광교중앙역.name(), STATIONS.상현역.name()
+                        defaultUpStation, defaultDownStation, thirdStation
                 )
         );
     }
@@ -189,17 +160,8 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @DisplayName("상/하행 좀점만 남은 경우 구간 삭제 불가")
     @Test
     void canNotDeleteLastRemainSection() {
-        // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-
         // when
-        var deleteResponse = deleteSection(lineId, STATIONS.광교중앙역);
+        var deleteResponse = deleteSection(lineId, defaultDownStation);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -210,21 +172,15 @@ class SectionAcceptanceTest extends AcceptanceTest {
      * When 하행종점역이 아닌 역을 제거하면
      * Then 에러가 발생한다
      */
-    @DisplayName("하행 좀정역이 아닌 역 제거 불가")
+    @DisplayName("하행 종정역이 아닌 역 제거 불가")
     @Test
     void canNotDeleteNotLastStationFromLine() {
         // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-        createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
+        var lastStation = "상현역";
+        createSection(lineId, defaultDownStation, lastStation, 3L);
 
         // when
-        var deleteResponse = deleteSection(lineId, STATIONS.광교중앙역);
+        var deleteResponse = deleteSection(lineId, defaultDownStation);
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -239,24 +195,18 @@ class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void canNotDeleteStationNotInLine() {
         // given
-        var lineCreationRequest = new LineCreationRequest(
-                "신분당선",
-                "bg-red-600",
-                stationIds.get(STATIONS.광교역),
-                stationIds.get(STATIONS.광교중앙역),
-                10L);
-        var lineId = createLine(lineCreationRequest).jsonPath().getLong("id");
-        createSection(lineId, STATIONS.광교중앙역, STATIONS.상현역, 3L);
+        var lastStation = "상현역";
+        createSection(lineId, defaultDownStation, lastStation, 3L);
 
         // when
-        var deleteResponse = deleteSection(lineId, STATIONS.성복역);
+        var deleteResponse = deleteSection(lineId, "성복역");
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 
-    private ExtractableResponse<Response> createSection(Long lineId, STATIONS upStation, STATIONS downStation, Long distance) {
+    private ExtractableResponse<Response> createSection(Long lineId, String upStation, String downStation, Long distance) {
         var sectionCreationRequest = new SectionCreationRequest(
                 stationIds.get(downStation),
                 stationIds.get(upStation),
@@ -272,7 +222,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
                     .extract();
     }
 
-    private ExtractableResponse<Response> deleteSection(Long lineId, STATIONS station) {
+    private ExtractableResponse<Response> deleteSection(Long lineId, String station) {
         return RestAssured
                 .given()
                     .pathParam("lineId", lineId)
@@ -281,5 +231,15 @@ class SectionAcceptanceTest extends AcceptanceTest {
                     .delete("/lines/{lineId}/sections")
                 .then().log().all()
                     .extract();
+    }
+
+    private Long createLineWith(String name, String color, Long upStationId, Long downStationId, Long distance) {
+        var lineCreationRequest = new LineCreationRequest(
+                name,
+                color,
+                upStationId,
+                downStationId,
+                10L);
+        return createLine(lineCreationRequest).jsonPath().getLong("id");
     }
 }
