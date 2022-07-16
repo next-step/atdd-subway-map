@@ -2,6 +2,8 @@ package nextstep.subway.domain;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import nextstep.subway.exception.ErrorCode;
+import nextstep.subway.exception.SectionException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -29,10 +31,10 @@ public class Sections {
 
     private void validateAddSection(Section newSection) {
         if (isNotDownTerminal(newSection.getUpStation())) {
-            throw new IllegalArgumentException(String.format("상행역은 하행종점역이어야 합니다. Station: %s", newSection.getUpStation()));
+            throw new SectionException(ErrorCode.INVALID_UP_STATION_EXCEPTION);
         }
         if (isContainsStation(newSection.getDownStation())) {
-            throw new IllegalArgumentException(String.format("이미 등록된 역입니다. Station: %s", newSection.getDownStation()));
+            throw new SectionException(ErrorCode.ALREADY_CONTAINS_STATION_EXCEPTION);
         }
     }
 
@@ -68,10 +70,10 @@ public class Sections {
     private void validateDeleteSection(Station station) {
         Section section = getLastSection();
         if (!section.getDownStation().equals(station)) {
-            throw new IllegalArgumentException(String.format("마지막 구간이 아닙니다. Section: %s", section));
+            throw new SectionException(ErrorCode.DELETE_SECTION_DENIED_EXCEPTION);
         }
         if (sections.size() == MINIMUM_SIZE) {
-            throw new IllegalArgumentException("구간이 1개일 때는 구간 제거가 불가능합니다.");
+            throw new SectionException(ErrorCode.INVALID_SIZE_SECTION_EXCEPTION);
         }
     }
 }
