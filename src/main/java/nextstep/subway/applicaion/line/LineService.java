@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.section.SectionService;
+import nextstep.subway.applicaion.dto.SectionCreationRequest;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
 import org.springframework.stereotype.Service;
@@ -16,12 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final SectionService sectionService;
 
     public LineResponse create(LineCreationRequest request) {
-        var line = lineRepository.save(new Line(request.getName(), request.getColor()));
-        var startSection = sectionService.createInitialSection(line.getId(), request.getSectionCreationRequest());
-        line.setStartSection(startSection);
+        var line = lineRepository.save(new Line(
+                request.getName(),
+                request.getColor(),
+                request.getUpStationId(),
+                request.getDownStationId()
+        ));
+
         return LineResponse.fromLine(line);
     }
 
@@ -34,7 +37,18 @@ public class LineService {
 
     public void remove(Long lineId) {
         lineRepository.deleteById(lineId);
-        sectionService.removeSections(lineId);
+    }
+
+    public void addSection(Long lineId, SectionCreationRequest request) {
+        getLine(lineId).addSection(
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance()
+        );
+    }
+
+    public void deleteSection(Long lineId, Long stationId) {
+        getLine(lineId).deleteSection(stationId);
     }
 
     private Line getLine(Long lineId) {

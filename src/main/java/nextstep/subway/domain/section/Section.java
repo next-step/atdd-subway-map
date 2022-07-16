@@ -53,30 +53,4 @@ public class Section {
         this.station = station;
         this.distance = 0L;
     }
-
-    public void linkNextSection(Section nextSection, Long distance) {
-        if (this.getNextSection() != null) {
-            throw new IllegalStateException("종점이 아닌 역에 구간을 추가할 수 없습니다.");
-        }
-        this.nextSection = nextSection;
-        this.distance = distance;
-        nextSection.setPrevSection(this);
-    }
-
-    public void setPrevSection(Section prevSection) {
-        this.prevSection = prevSection;
-    }
-
-    public void resetNextSection() {
-        this.nextSection = null;
-        this.distance = 0L;
-    }
-
-    public boolean isLastSection() {
-        return nextSection == null;
-    }
-
-    public boolean isFirstSection() {
-        return prevSection == null;
-    }
 }

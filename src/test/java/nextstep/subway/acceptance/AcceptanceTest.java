@@ -2,7 +2,6 @@ package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
 import nextstep.subway.domain.line.LineRepository;
-import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.StationRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,9 +20,6 @@ public abstract class AcceptanceTest {
     private LineRepository lineRepository;
 
     @Autowired
-    private SectionRepository sectionRepository;
-
-    @Autowired
     private StationRepository stationRepository;
 
     @BeforeEach
@@ -34,7 +30,6 @@ public abstract class AcceptanceTest {
     @AfterEach
     void cleanUp() {
         lineRepository.deleteAll();
-        sectionRepository.deleteAll();
         stationRepository.deleteAll();
     }
 }

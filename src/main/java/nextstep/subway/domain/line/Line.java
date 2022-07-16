@@ -1,16 +1,13 @@
 package nextstep.subway.domain.line;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
-import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
 
 @Getter
@@ -24,13 +21,9 @@ public class Line {
     @NotBlank
     private String color;
 
-    @OneToOne
-    @JoinColumn(name = "start_section_id")
-    private Section startSection;
-
     public Line() {}
 
-    public Line(String name, String color) {
+    public Line(String name, String color, Long upStationId, Long downStationId) {
         this.name = name;
         this.color = color;
     }
@@ -40,17 +33,14 @@ public class Line {
         this.color = color;
     }
 
-    public void setStartSection(Section section) {
-        this.startSection = section;
+    public void addSection(Long upStationId, Long downStationId, Long distance) {
+    }
+
+    public void deleteSection(Long stationId) {
+
     }
 
     public List<Station> getStations() {
-        var stations = new ArrayList<Station>();
-        var currentSection = startSection;
-        while (currentSection != null) {
-            stations.add(currentSection.getStation());
-            currentSection = currentSection.getNextSection();
-        }
-        return stations;
+        return Collections.emptyList();
     }
 }
