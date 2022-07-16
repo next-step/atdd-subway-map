@@ -1,6 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
-import nextstep.subway.domain.line.Line;
+import nextstep.subway.domain.Line;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

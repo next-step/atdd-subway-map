@@ -1,4 +1,6 @@
-package nextstep.subway.domain.station;
+package nextstep.subway.domain;
+
+import lombok.Builder;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +18,9 @@ public class Station {
     public Station() {
     }
 
-    public Station(String name) {
+    @Builder
+    public Station(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 

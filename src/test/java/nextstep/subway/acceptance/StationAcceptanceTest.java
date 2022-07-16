@@ -91,6 +91,12 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
     }
 
 
+    public static long createStationAndGetId(Map<String, String> params) {
+        return createStation(params)
+                .jsonPath()
+                .getLong("id");
+    }
+
     public static ExtractableResponse<Response> createStation(Map<String, String> params) {
         return RestAssured.given().log().all()
                 .body(params)
