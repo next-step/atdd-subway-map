@@ -11,9 +11,9 @@ import io.restassured.response.Response;
 
 public class StationRestAssuredProvider {
 
-	public static ExtractableResponse<Response> 지하철역_생성(String stationName) {
+	public static ExtractableResponse<Response> 지하철역_생성(String 역이름) {
 		Map<String, String> params = new HashMap<>();
-		params.put("name", stationName);
+		params.put("name", 역이름);
 
 		return RestAssured.given().log().all()
 			.body(params)
@@ -32,7 +32,7 @@ public class StationRestAssuredProvider {
 
 	public static ExtractableResponse<Response> 지하철역_제거(String id) {
 		return RestAssured.given().log().all()
-			.when().delete("/stations/" + id)
+			.when().delete("/stations/", id)
 			.then().log().all()
 			.extract();
 	}

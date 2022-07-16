@@ -23,13 +23,16 @@ public class StationProvider {
 		return response;
 	}
 
-	public static ExtractableResponse<Response> 지하철역_제거_성공(String id) {
+	public static void 지하철역_제거_성공(String id) {
 		ExtractableResponse<Response> response = 지하철역_제거(id);
 		응답코드_검증(response, NO_CONTENT);
-		return response;
 	}
 
 	private static void 응답코드_검증(ExtractableResponse<Response> response, HttpStatus httpStatus) {
 		assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+	}
+
+	public static String 지하철역_Id_추출(ExtractableResponse<Response> response) {
+		return response.jsonPath().getString("id");
 	}
 }
