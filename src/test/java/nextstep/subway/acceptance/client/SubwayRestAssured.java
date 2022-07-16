@@ -38,4 +38,12 @@ public class SubwayRestAssured<T> {
                           .delete(path)
                           .then().log().all();
     }
+
+    public ValidatableResponse deleteRequest(String path, String query, Object queryParam) {
+        return RestAssured.given().log().all()
+                          .when().log().all()
+                          .queryParam(query, queryParam)
+                          .delete(path)
+                          .then().log().all();
+    }
 }
