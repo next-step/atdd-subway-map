@@ -30,6 +30,7 @@ public class LineRestAssuredProvider {
 
 	public static ExtractableResponse<Response> 지하철_노선_목록_조회() {
 		return RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().get("/lines")
 			.then().log().all()
 			.extract();
@@ -37,6 +38,7 @@ public class LineRestAssuredProvider {
 
 	public static ExtractableResponse<Response> 지하철_노선_조회(String id) {
 		return RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().get("/lines/{id}", id)
 			.then().log().all()
 			.extract();
@@ -49,6 +51,7 @@ public class LineRestAssuredProvider {
 
 		return RestAssured.given().log().all()
 			.body(params)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().put("/lines/{id}", id)
 			.then().log().all()
 			.extract();
@@ -56,6 +59,7 @@ public class LineRestAssuredProvider {
 
 	public static ExtractableResponse<Response> 지하철_노선_제거(String id) {
 		return RestAssured.given().log().all()
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when().delete("/lines/{id}", id)
 			.then().log().all()
 			.extract();
