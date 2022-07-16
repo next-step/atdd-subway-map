@@ -18,8 +18,8 @@ public class LineRequestTemplate {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 지하철노선을_생성을_요청한다(String name, String color, Long downStationId,
-                                                                Long upStationId, Long distance) {
+    public static ExtractableResponse<Response> 지하철노선을_생성을_요청한다(String name, String color, Long upStationId,
+                                                                Long downStationId, Long distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);

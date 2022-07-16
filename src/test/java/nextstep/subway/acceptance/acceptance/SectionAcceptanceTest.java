@@ -43,7 +43,7 @@ public class SectionAcceptanceTest {
         // given
         long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
         long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
-        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10).jsonPath().getLong("id");
+        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", upStationId, downStationId, (long) 10).jsonPath().getLong("id");
 
         // when
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
@@ -69,7 +69,7 @@ public class SectionAcceptanceTest {
         // given
         long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
         long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
-        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", downStationId, upStationId, (long) 10).jsonPath().getLong("id");
+        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", upStationId, downStationId, (long) 10).jsonPath().getLong("id");
 
         // when
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
