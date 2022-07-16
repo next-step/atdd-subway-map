@@ -208,17 +208,17 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
     private ExtractableResponse<Response> createSection(Long lineId, String upStation, String downStation, Long distance) {
         var sectionCreationRequest = new SectionCreationRequest(
-                stationIds.get(downStation),
-                stationIds.get(upStation),
+                stationIds.getOrDefault(downStation, -1L),
+                stationIds.getOrDefault(upStation, -1L),
                 distance);
         return RestAssured
                 .given()
                     .pathParam("lineId", lineId)
                     .body(sectionCreationRequest, ObjectMapperType.JACKSON_2)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
+                .when().log().all()
                     .post("/lines/{lineId}/sections")
-                .then()
+                .then().log().all()
                     .extract();
     }
 

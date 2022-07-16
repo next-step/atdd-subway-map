@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.station.StationService;
 import nextstep.subway.applicaion.dto.StationRequest;
@@ -19,7 +20,7 @@ public class StationController {
     private final StationService stationService;
 
     @PostMapping
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
+    public ResponseEntity<StationResponse> createStation(@RequestBody @Valid StationRequest stationRequest) {
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }

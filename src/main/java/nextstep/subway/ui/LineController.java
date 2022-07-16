@@ -2,6 +2,7 @@ package nextstep.subway.ui;
 
 import java.net.URI;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
@@ -40,7 +41,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreationRequest request) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineCreationRequest request) {
         var line = lineService.create(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -48,7 +49,7 @@ public class LineController {
     @PutMapping("/{lineId}")
     public ResponseEntity<Void> modifyLine(
             @PathVariable("lineId") Long lineId,
-            @RequestBody LineModificationRequest request
+            @RequestBody @Valid LineModificationRequest request
     ) {
         lineService.modify(lineId, request);
         return ResponseEntity.ok().build();
@@ -63,7 +64,7 @@ public class LineController {
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<Void> createSection(
             @PathVariable("lineId") Long lineId,
-            @RequestBody SectionCreationRequest request
+            @RequestBody @Valid SectionCreationRequest request
     ) {
         lineService.addSection(lineId, request);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "?stationId=" + request.getDownStationId())).build();
