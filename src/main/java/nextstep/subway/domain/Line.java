@@ -39,7 +39,8 @@ public class Line {
     public Line(String name, String color, Section section) {
         this.name = name;
         this.color = color;
-        this.addSection(section);
+        this.sections.add(section);
+        section.setLine(this);
     }
 
     public static Line createLine(String name, String color, Section section) {
@@ -73,12 +74,15 @@ public class Line {
 
     public void addSection(Section newSection) {
         this.sections.stream()
-                .filter(section -> section.getUpStation() == newSection.getUpStation()
-                        && section.getDownStation() == newSection.getDownStation())
+                .filter(section -> isSameSection(newSection, section))
                 .findFirst()
                 .ifPresent(section -> {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("새로운 구간과 기존 노선의 구간이 같으면 등록할 수 없습니다.");
                 });
+
+        if (isNotTerminalDownStation(newSection)) {
+            throw new IllegalArgumentException("새로운 구간은 기존 노선의 하행 좀점역이어야 합니다.");
+        }
 
         this.sections.add(newSection);
         newSection.setLine(this);
@@ -92,15 +96,17 @@ public class Line {
         List<Station> stations = this.sections.stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toList());
-
-        for (Station station : stations) {
-            System.out.println(station.getId()  + station.getName());
-        }
-
-        System.out.println(stations);
         stations.add(0, this.getUpStationTerminal());
-        System.out.println(stations);
 
         return stations;
+    }
+
+    private boolean isNotTerminalDownStation(Section newSection) {
+        return getDownStationTerminal() != newSection.getUpStation();
+    }
+
+    private boolean isSameSection(Section newSection, Section section) {
+        return section.getUpStation() == newSection.getUpStation()
+                && section.getDownStation() == newSection.getDownStation();
     }
 }

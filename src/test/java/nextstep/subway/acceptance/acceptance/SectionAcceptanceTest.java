@@ -90,10 +90,17 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간의_상행역이_하행종점역이_아닐경우_등록실패() {
         // given
+        long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", upStationId, downStationId, (long) 10).jsonPath().getLong("id");
 
         // when
+        long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        long failStationId = 지하철역_생성을_요청한다("수원역").jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(lineId, failStationId, newStationId, 10);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 
