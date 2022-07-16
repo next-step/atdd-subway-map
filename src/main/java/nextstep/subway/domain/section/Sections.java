@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import nextstep.subway.domain.exception.DomainException;
 import nextstep.subway.domain.exception.DomainExceptionType;
 import nextstep.subway.domain.line.Line;
@@ -16,6 +17,7 @@ import nextstep.subway.domain.station.Station;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OrderBy("id")
     private List<Section> sectionList;
 
     public Sections() {
