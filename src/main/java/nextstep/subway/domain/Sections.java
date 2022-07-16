@@ -28,7 +28,7 @@ public class Sections {
     }
 
     private void validateAddSection(Section newSection) {
-        if (!isDownTerminal(newSection.getUpStation())) {
+        if (isNotDownTerminal(newSection.getUpStation())) {
             throw new IllegalArgumentException(String.format("상행역은 하행종점역이어야 합니다. Station: %s", newSection.getUpStation()));
         }
         if (isContainsStation(newSection.getDownStation())) {
@@ -40,12 +40,12 @@ public class Sections {
         return getAllStations().contains(downStation);
     }
 
-    private boolean isDownTerminal(Station station) {
-        return station.equals(getDownTerminal());
+    private boolean isNotDownTerminal(Station station) {
+        return !station.equals(getDownTerminal());
     }
 
     private Station getDownTerminal() {
-        return sections.get(sections.size() - 1).getDownStation();
+        return getLastSection().getDownStation();
     }
 
     public List<Station> getAllStations() {

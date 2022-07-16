@@ -37,21 +37,17 @@ public class LineService {
                     .build()
         );
 
-        return LineResponse.of(line, line.getAllStations());
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                .map(line -> LineResponse.of(
-                        line,
-                        line.getAllStations()))
+                .map(line -> LineResponse.of(line))
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException(String.format("존재하지 않는 노선입니다. id : %d", id)));
-        return LineResponse.of(line, line.getAllStations());
+        return LineResponse.of(findLineById(id));
     }
 
     private Line findLineById(Long lineId) {
@@ -64,7 +60,7 @@ public class LineService {
                 new IllegalArgumentException(String.format("존재하지 않는 노선입니다. id : %d", id)));
         line.update(request);
 
-        return LineResponse.of(line, line.getAllStations());
+        return LineResponse.of(line);
     }
 
     @Transactional
@@ -79,7 +75,7 @@ public class LineService {
         Station downStation = stationService.findStationById(request.getDownStationId());
 
         line.addSection(new Section(line, upStation, downStation, request.getDistance()));
-        return LineResponse.of(line, line.getAllStations());
+        return LineResponse.of(line);
     }
 
     @Transactional
