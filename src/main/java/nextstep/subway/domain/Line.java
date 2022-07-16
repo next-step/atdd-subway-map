@@ -1,15 +1,17 @@
 package nextstep.subway.domain;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Entity
 public class Line {
 
@@ -19,7 +21,7 @@ public class Line {
 
   private String name;
 
-  @Enumerated(value = EnumType.STRING)
+  @Embedded
   private Color color;
 
   @OneToOne(fetch = FetchType.LAZY)
@@ -34,6 +36,7 @@ public class Line {
 
   public Line() {}
 
+  @Builder
   public Line(String name, Color color, Station upStation, Station downStation, int distance) {
     this.name = name;
     this.color = color;
@@ -48,29 +51,5 @@ public class Line {
 
   public void changeColor(Color color) {
     this.color = color;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Color getColor() {
-    return color;
-  }
-
-  public Station getUpStation() {
-    return upStation;
-  }
-
-  public Station getDownStation() {
-    return downStation;
-  }
-
-  public int getDistance() {
-    return distance;
   }
 }

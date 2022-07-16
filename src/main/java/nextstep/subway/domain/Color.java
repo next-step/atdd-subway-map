@@ -1,19 +1,25 @@
 package nextstep.subway.domain;
 
-public enum Color {
-  BLUE(1),
-  GREEN(2),
-  ORANGE(3),
-  SKY(4)
-  ;
+import javax.persistence.Embeddable;
+import lombok.Getter;
 
-  private int value;
+@Getter
+@Embeddable
+public class Color {
 
-  Color(int value) {
-    this.value = value;
+  private String color;
+
+  public Color() {}
+
+  public Color(String color) {
+    this.color = color;
   }
 
-  public int getValue() {
-    return this.value;
+  public void changeColor(String color) {
+    this.color = color;
+  }
+
+  private void setColor(String color) {
+    this.color = color;
   }
 }

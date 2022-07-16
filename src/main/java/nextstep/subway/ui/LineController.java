@@ -2,6 +2,8 @@ package nextstep.subway.ui;
 
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.LineQueryService;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -15,14 +17,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 public class LineController {
 
   private final LineService lineService;
-
-  public LineController(LineService lineService) {
-    this.lineService = lineService;
-  }
+  private final LineQueryService lineQueryService;
 
   @PostMapping("/lines")
   public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
@@ -32,12 +32,12 @@ public class LineController {
 
   @GetMapping("/lines")
   public ResponseEntity<List<LineResponse>> getAllLine() {
-    return ResponseEntity.ok().body(lineService.getAllLine());
+    return ResponseEntity.ok().body(lineQueryService.getAllLine());
   }
 
   @GetMapping("/lines/{id}")
   public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-    return ResponseEntity.ok().body(lineService.getLine(id));
+    return ResponseEntity.ok().body(lineQueryService.getLine(id));
   }
 
   @PutMapping("/lines/{id}")

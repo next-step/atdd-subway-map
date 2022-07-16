@@ -1,20 +1,33 @@
 package nextstep.subway.common;
 
 import io.restassured.RestAssured;
+import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.springframework.http.MediaType;
 
 public class StationRestAssured {
 
+  public StationRestAssured() {}
+
+  public List<StationResponse> saveAllStation(List<String> names) {
+    List<StationResponse> stationResponses = new ArrayList<>();
+    for (String name : names) {
+      stationResponses.add(saveStation(name).as(StationResponse.class));
+    }
+
+    return stationResponses;
+  }
+
   public ExtractableResponse<Response> saveStation(String name) {
-    Map<String, String> params = new HashMap<>();
-    params.put("name", name);
+    StationRequest stationRequest = new StationRequest(name);
 
     return RestAssured.given().log().all()
-        .body(params)
+        .body(stationRequest, ObjectMapperType.JACKSON_2)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/stations")
         .then().log().all()

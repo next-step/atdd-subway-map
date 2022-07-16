@@ -1,18 +1,19 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Getter;
 import nextstep.subway.domain.Color;
 
+@Getter
 public class LineUpdateRequest {
 
   private String name;
 
   private Color color;
 
-  public String getName() {
-    return name;
-  }
+  public LineUpdateRequest() {}
 
-  public Color getColor() {
-    return color;
+  public LineUpdateRequest(String name, Color color) {
+    this.name = name;
+    this.color = color;
   }
 }

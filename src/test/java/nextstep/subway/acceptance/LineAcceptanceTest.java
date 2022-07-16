@@ -2,45 +2,29 @@ package nextstep.subway.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
 import java.util.List;
+import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.common.LineRestAssured;
-import nextstep.subway.common.StationRestAssured;
 import nextstep.subway.domain.Color;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql("/subway.sql")
 @DisplayName("지하철역 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends BasicAcceptanceTest {
 
   private static final String donongStation = "도농역";
   private static final String gooriStation = "구리역";
-  private static final String ducksoStation = "구리역";
+  private static final String ducksoStation = "덕소역";
 
   private static final String firstLine = "1호선";
   private static final String secondLine = "2호선";
   private static final String thirdLine = "3호선";
-
-  @LocalServerPort
-  int port;
-
-  private final StationRestAssured stationRestAssured = new StationRestAssured();
-  private final LineRestAssured lineRestAssured = new LineRestAssured();
-
-  @BeforeEach
-  public void setUp() {
-    RestAssured.port = port;
-  }
 
   /**
    * When 지하철 노선을 생성하면
@@ -49,20 +33,20 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_생성() {
-    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
-    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
-    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
-    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
 
-    saveLine(secondLine, donongStation, gooriStation);
+    saveLine(secondLine, stationResponses.get(0), stationResponses.get(1));
 
     ExtractableResponse<Response> response = lineRestAssured.findAllLine();
 
     List<String> names = response.jsonPath().getList("name", String.class);
-    assertThat(names).containsAnyOf("1호선");
+    assertThat(names).containsAnyOf("2호선");
 
     List<String> colors = response.jsonPath().getList("color", String.class);
-    assertThat(colors).containsAnyOf(Color.BLUE.name());
+    assertThat(colors).containsAnyOf("blue");
+
+    List<List<LineResponse>> lineResponses = response.jsonPath().getList("stations");
+    assertThat(lineResponses.get(0).size()).isEqualTo(2);
   }
 
   /**
@@ -72,15 +56,10 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_목록_조회() {
-    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
-    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
-    ExtractableResponse<Response> ducksoStationResponse = stationRestAssured.saveStation(ducksoStation);
-    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
-    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
-    StationResponse ducksoStation = ducksoStationResponse.as(StationResponse.class);
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
 
-    saveLine(firstLine, donongStation, gooriStation);
-    saveLine(secondLine, donongStation, ducksoStation);
+    saveLine(firstLine, stationResponses.get(0), stationResponses.get(1));
+    saveLine(secondLine, stationResponses.get(0), stationResponses.get(2));
 
     ExtractableResponse<Response> response = lineRestAssured.findAllLine();
 
@@ -88,7 +67,10 @@ public class LineAcceptanceTest {
     assertThat(names).containsAnyOf(firstLine, secondLine);
 
     List<String> colors = response.jsonPath().getList("color", String.class);
-    assertThat(colors).containsAnyOf(Color.BLUE.name(), Color.GREEN.name());
+    assertThat(colors).containsAnyOf("blue", "green");
+
+    List<List<LineResponse>> lineResponses = response.jsonPath().getList("stations");
+    assertThat(lineResponses.get(0).size()).isEqualTo(2);
   }
 
   /**
@@ -98,12 +80,9 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_조회() {
-    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
-    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
-    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
-    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
 
-    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStation, gooriStation);
+    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, stationResponses.get(0), stationResponses.get(1));
 
     ExtractableResponse<Response> response = lineRestAssured.findLine(donongGooriLine.jsonPath().getLong("id"));
 
@@ -111,7 +90,10 @@ public class LineAcceptanceTest {
     assertThat(names).isEqualTo(firstLine);
 
     String colors = response.jsonPath().getString("color");
-    assertThat(colors).isEqualTo(Color.BLUE.name());
+    assertThat(colors).isEqualTo("blue");
+
+    List<LineResponse> lineResponses = response.jsonPath().getList("stations");
+    assertThat(lineResponses.size()).isEqualTo(2);
   }
 
   /**
@@ -121,14 +103,11 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_수정() {
-    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
-    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
-    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
-    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
 
-    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStation, gooriStation);
+    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, stationResponses.get(0), stationResponses.get(1));
 
-    ExtractableResponse<Response> updateDonongGooriLine = lineRestAssured.updateLine(donongGooriLine.jsonPath().getLong("id"), thirdLine, Color.ORANGE);
+    ExtractableResponse<Response> updateDonongGooriLine = lineRestAssured.updateLine(donongGooriLine.jsonPath().getLong("id"), thirdLine, new Color("orange"));
     assertThat(updateDonongGooriLine.statusCode()).isEqualTo(HttpStatus.OK.value());
   }
 
@@ -139,21 +118,18 @@ public class LineAcceptanceTest {
    */
   @Test
   void 지하철_노선_삭제() {
-    ExtractableResponse<Response> donongStationResponse = stationRestAssured.saveStation(donongStation);
-    ExtractableResponse<Response> gooriStationResponse = stationRestAssured.saveStation(gooriStation);
-    StationResponse donongStation = donongStationResponse.as(StationResponse.class);
-    StationResponse gooriStation = gooriStationResponse.as(StationResponse.class);
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
 
-    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStation, gooriStation);
+    ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, stationResponses.get(0), stationResponses.get(1));
 
     ExtractableResponse<Response> deleteDonongGooriLine = lineRestAssured.deleteLine(donongGooriLine.jsonPath().getLong("id"));
     assertThat(deleteDonongGooriLine.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
-  private ExtractableResponse<Response> saveLine(String name, StationResponse upStationResponse, StationResponse downeStationResponse1) {
-    ExtractableResponse<Response> donongGooriLine = lineRestAssured.saveLine(name, upStationResponse, downeStationResponse1);
-    assertThat(donongGooriLine.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+  private ExtractableResponse<Response> saveLine(String name, StationResponse upStationResponse, StationResponse downeStationResponse) {
+    ExtractableResponse<Response> response = lineRestAssured.saveLine(name, upStationResponse, downeStationResponse);
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-    return donongGooriLine;
+    return response;
   }
 }

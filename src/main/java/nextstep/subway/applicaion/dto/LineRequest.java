@@ -1,9 +1,11 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Getter;
 import nextstep.subway.domain.Color;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
 
+@Getter
 public class LineRequest {
 
   private String name;
@@ -16,27 +18,23 @@ public class LineRequest {
 
   private int distance;
 
+  public LineRequest() {}
+
+  public LineRequest(String name, Color color, Long upStationId, Long downStationId, int distance) {
+    this.name = name;
+    this.color = color;
+    this.upStationId = upStationId;
+    this.downStationId = downStationId;
+    this.distance = distance;
+  }
+
   public static Line createLine(LineRequest request, Station upStation, Station downStation) {
-    return new Line(request.getName(), request.getColor(), upStation, downStation, request.distance);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Color getColor() {
-    return color;
-  }
-
-  public Long getUpStationId() {
-    return upStationId;
-  }
-
-  public Long getDownStationId() {
-    return downStationId;
-  }
-
-  public int getDistance() {
-    return distance;
+    return Line.builder()
+        .name(request.getName())
+        .color(request.getColor())
+        .upStation(upStation)
+        .downStation(downStation)
+        .distance(request.distance)
+        .build();
   }
 }
