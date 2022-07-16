@@ -54,9 +54,9 @@ public class LineService {
 		line.modifyLine(request.getName(), request.getColor());
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public void deleteLine(Long id) {
-
+		lineRepository.deleteById(id);
 	}
 
 	private CreateLineResponse createLineResponse(Line line) {

@@ -143,6 +143,6 @@ class LineAcceptanceTest {
 
 		// Then 해당 지하철 노선 정보는 삭제된다
 		ExtractableResponse<Response> response = 지하철_노선_목록_조회_성공();
-		assertThat(노선_이름_추출(response)).doesNotContain(신분당선);
+		assertThat(노선_이름_목록_추출(response)).doesNotContain(신분당선);
 	}
 }
