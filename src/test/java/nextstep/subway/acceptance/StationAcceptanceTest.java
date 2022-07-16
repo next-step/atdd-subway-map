@@ -69,6 +69,25 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // Given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "역삼역");
+        params.put("name2", "정자역");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+        // When
+        List<String> stationNames = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        // Then
+        assertThat(stationNames).containsAnyOf("역삼역", "정자역");
     }
 
     /**
@@ -80,6 +99,24 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // Given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "미금역");
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+
+        // When
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/1")
+                .then().log().all()
+                .extract();
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(204);
     }
 
 }
