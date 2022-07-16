@@ -22,14 +22,18 @@ public class Section {
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @Embedded
-    private Stations stations;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station upStation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station downStation;
 
     @Embedded
     private Distance distance;
 
-    private Section(Stations stations, Distance distance) {
-        this.stations = stations;
+    private Section(Station upStation, Station downStation, Distance distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -37,14 +41,34 @@ public class Section {
         if (upStation.equals(downStation)) {
             throw new InvalidUpDownStationException();
         }
-        return new Section(new Stations(upStation, downStation), new Distance(distance));
+        return new Section(upStation, downStation, new Distance(distance));
     }
 
     public void setLine(Line line) {
         this.line = line;
     }
 
+    public Long id() {
+        return id;
+    }
+
+    public Station upStation() {
+        return upStation;
+    }
+
+    public Station downStation() {
+        return downStation;
+    }
+
+    public boolean hasStation(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
     public List<Station> stations() {
-        return stations.toList();
+        return List.of(upStation, downStation);
+    }
+
+    public boolean isMatchDownStation(Station station) {
+        return downStation.equals(station);
     }
 }

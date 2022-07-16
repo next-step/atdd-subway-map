@@ -24,8 +24,8 @@ public class LineResponse {
         }
         return LineResponse.builder()
                 .id(line.id())
-                .name(line.content().name())
-                .color(line.content().color())
+                .name(line.name())
+                .color(line.color())
                 .stations(stationResponses)
                 .build();
     }

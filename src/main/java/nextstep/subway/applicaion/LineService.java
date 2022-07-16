@@ -1,9 +1,7 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.dto.LineModifyRequest;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.*;
 import nextstep.subway.domain.exception.NotFoundLineException;
 import org.springframework.stereotype.Service;
@@ -47,7 +45,7 @@ public class LineService {
     @Transactional
     public void update(Long id, LineModifyRequest lineModifyRequest) {
         Line line = findLine(id);
-        line.changeContent(lineModifyRequest.toLineContent());
+        line.changeNameAndColor(lineModifyRequest.getName(), lineModifyRequest.getColor());
     }
 
     private Line findLine(Long id) {
@@ -58,5 +56,23 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.findById(id).ifPresent(lineRepository::delete);
+    }
+
+    @Transactional
+    public LineResponse addSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = findLine(lineId);
+
+        Station upStation = stationService.findStation(sectionRequest.getUpStationId());
+        Station downStation = stationService.findStation(sectionRequest.getDownStationId());
+        Section section = Section.create(upStation, downStation, sectionRequest.getDistance());
+        line.addSection(section);
+        return LineResponse.from(line);
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = findLine(lineId);
+        Station station = stationService.findStation(stationId);
+        line.deleteSection(station);
     }
 }

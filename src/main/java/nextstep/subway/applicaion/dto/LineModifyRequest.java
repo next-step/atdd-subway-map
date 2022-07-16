@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion.dto;
 
 import lombok.Getter;
-import nextstep.subway.domain.LineContent;
 
 import javax.validation.constraints.NotBlank;
 
@@ -12,8 +11,4 @@ public class LineModifyRequest {
     private String name;
     @NotBlank
     private String color;
-
-    public LineContent toLineContent() {
-        return LineContent.create(name, color);
-    }
 }

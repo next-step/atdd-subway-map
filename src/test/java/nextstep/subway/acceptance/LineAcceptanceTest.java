@@ -3,13 +3,9 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.util.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,20 +16,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LineAcceptanceTest {
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
+public class LineAcceptanceTest extends BaseAcceptanceTest {
 
     @BeforeEach
-    void setup() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
-
+    void dataSetUp() {
         StationAcceptanceTest.지하철역_등록_요청("강남역");
         StationAcceptanceTest.지하철역_등록_요청("역삼역");
         StationAcceptanceTest.지하철역_등록_요청("판교역");
@@ -142,7 +128,7 @@ public class LineAcceptanceTest {
         assertThat(노선_이름_목록).doesNotContain("신분당선");
     }
 
-    private ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
+    public static ExtractableResponse<Response> 노선_생성_요청(String name, String color, long upStationId, long downStationId, int distance) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
@@ -160,7 +146,7 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 노선_목록_조회_요청() {
+    public static ExtractableResponse<Response> 노선_목록_조회_요청() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
@@ -169,7 +155,7 @@ public class LineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> 노선_조회_요청(Long id) {
+    public static ExtractableResponse<Response> 노선_조회_요청(Long id) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when().get("/lines/{id}", id)
                 .then().log().all()

@@ -1,10 +1,10 @@
 package nextstep.subway.ui;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineModifyRequest;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.domain.exception.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class LineController {
 
     private final LineService lineService;
@@ -44,6 +45,18 @@ public class LineController {
     @DeleteMapping(value = "/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestBody @Validated SectionRequest sectionRequest) {
+        LineResponse line = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
+    }
+
+    @DeleteMapping(value = "/lines/{id}/sections")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSection(id, stationId);
         return ResponseEntity.noContent().build();
     }
 }

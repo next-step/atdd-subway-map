@@ -22,8 +22,4 @@ public class Distance {
         }
         this.value = value;
     }
-
-    public int value() {
-        return value;
-    }
 }

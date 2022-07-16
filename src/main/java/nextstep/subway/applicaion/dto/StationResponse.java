@@ -12,8 +12,8 @@ public class StationResponse {
 
     public static StationResponse from(Station station) {
         return StationResponse.builder()
-                .id(station.getId())
-                .name(station.getName())
+                .id(station.id())
+                .name(station.name())
                 .build();
     }
 }
