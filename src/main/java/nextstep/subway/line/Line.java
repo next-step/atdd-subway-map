@@ -53,7 +53,8 @@ public class Line {
 		return downStationId;
 	}
 
-	public int getDistance() {
-		return distance;
+	public void modifyLine(String name, String color) {
+		this.name = name;
+		this.color = color;
 	}
 }
