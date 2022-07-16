@@ -9,14 +9,14 @@ import java.util.Map;
 
 public class TestSetupUtils {
 
-    public static ExtractableResponse<Response> buildLine(String name, String color,
+    public static ExtractableResponse<Response> 지하철_노선_생성(String name, String color,
                                                           String upStationName, String downStationName) {
 
-        long upStationId = buildStation(upStationName)
+        long upStationId = 지하철_역_생성(upStationName)
                 .jsonPath()
                 .getLong("id");
 
-        long downStationId = buildStation(downStationName)
+        long downStationId = 지하철_역_생성(downStationName)
                 .jsonPath()
                 .getLong("id");
 
@@ -33,7 +33,7 @@ public class TestSetupUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> buildStation(String name) {
+    public static ExtractableResponse<Response> 지하철_역_생성(String name) {
         return RestAssured.given().log().all()
                 .body(Map.of("name", name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
