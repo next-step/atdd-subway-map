@@ -1,37 +1,26 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import nextstep.subway.applicaion.dto.StationLineRequest;
-import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static nextstep.subway.api.ApiCall.*;
 
 @DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationLineAcceptanceTest {
-
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
-    @LocalServerPort
-    int port;
+public class StationLineAcceptanceTest extends AcceptionceTest {
 
     @BeforeEach
-    public void steup() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
+    public void createMockData() {
+        지하철역_생성("강남역");  // 1L
+        지하철역_생성("역삼역");  // 2L
+        지하철역_생성("수원역");  // 3L
+        지하철역_생성("세류역");  // 4L
     }
 
     /**
@@ -42,16 +31,12 @@ public class StationLineAcceptanceTest {
     @Test
     void createStationLine() {
         // when 지하철 노선 생성
-        ExtractableResponse<Response> createStationLine = createStationLineAndValidate("2호선",
-                "bg-red-600",
-                createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"));
+        지하철_노선_생성("2호선", "bg-green-600", 1L, 2L, 10);
 
-        // when 지하철 노선 목록 조회
-        ExtractableResponse<Response> response = findAllStationLineAndValidate();
+        // 전체 지하철 노선 목록 조회
+        List<String> stationList = 지하철_노선_목록_조회();
 
-        assertThat(response.jsonPath().getList("id", Long.class))
-                .contains(createStationLine.jsonPath().getLong("id"));
+        StationAcceptanceTest.지하철역이_존재하는지_체크(stationList, "2호선");
     }
 
     /**
@@ -63,20 +48,13 @@ public class StationLineAcceptanceTest {
     @Test
     void findAllStationLineTest() {
         // given 2개의 지하철 노선 생성
-        createStationLineAndValidate("1호선",
-                "bg-blue-600",
-                createStationAndValidate("수원역"),
-                createStationAndValidate("세류역"));
-
-        createStationLineAndValidate("2호선",
-                "bg-red-600",
-                createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"));
+        지하철_노선_생성("2호선", "bg-green-600", 1L, 2L, 5);
+        지하철_노선_생성("1호선", "bg-blue-600", 3L, 4L, 10);
 
         //  when 지하철 노선 목록을 조회
-        ExtractableResponse<Response> response = findAllStationLineAndValidate();
+        List<String> stationLineList = 지하철_노선_목록_조회();
 
-        assertThat(response.jsonPath().getList("$")).hasSize(2);
+        지하철_노선_사이즈_체크(stationLineList, 2);
     }
 
     /**
@@ -87,17 +65,12 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철노선 조회")
     @Test
     void findByStationLineByIdTest() {
-        // given 지하철 노선 생성
-        Long createStationLineId = createStationLineAndValidate("2호선",
-                "bg-red-600",
-                createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"))
-                .jsonPath().getLong("id");
+        지하철_노선_생성("2호선", "bg-green-600", 1L, 2L, 5);
 
-        // when 생성한 지하철 노선 조회
-        ExtractableResponse<Response> response = findByStationLineId(createStationLineId);
+        // when
+        String name = 지하철_노선_조회(1L).jsonPath().getString("name");
 
-        validateHttpStatus(response, HttpStatus.OK);
+        동일한_값_인지_검증(name, "2호선");
     }
 
     /**
@@ -108,28 +81,20 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철노선 수정")
     @Test
     void updateByStationLine() {
-        // given 지하철 노선 생성
-        Long stationLineId = createStationLineAndValidate("2호선",
-                "bg-red-600",
-                createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"))
-                .jsonPath().getLong("id");
+        지하철_노선_생성("2호선", "bg-green-600", 1L, 2L, 5);
+        StationLineRequest 업데이트_내용 = StationLineRequest.builder()
+            .name("신분당선")
+            .color("bg-yellow-300")
+            .build();
 
-        StationLineRequest stationLineRequest = StationLineRequest.builder()
-                .name("신분당선")
-                .color("bg-yellow-300")
-                .build();
+        // when -
+        지하철_노선_업데이트(1L, 업데이트_내용);
 
-        // when 지하철 노선 수정
-        updateByStationLineIdAndValidate(stationLineId, stationLineRequest);
+        String name = 지하철_노선_조회(1L)
+            .jsonPath().getString("name");
 
-        ExtractableResponse<Response> response = findByStationLineId(stationLineId);
-
-        assertThat(response.jsonPath().getString("name")).isEqualTo(stationLineRequest.getName());
-        assertThat(response.jsonPath().getString("color")).isEqualTo(stationLineRequest.getColor());
+        동일한_값_인지_검증(name, "신분당선");
     }
-
-
 
     /**
      * Given 지하철 노선을 생성하고
@@ -139,100 +104,21 @@ public class StationLineAcceptanceTest {
     @DisplayName("지하철 노선 삭제")
     @Test
     void deleteByStationLine() {
-        // given 지하철 노선 생성
-        Long stationLineId = createStationLineAndValidate("2호선",
-                "bg-red-600",
-                createStationAndValidate("강남역"),
-                createStationAndValidate("역삼역"))
-                .jsonPath().getLong("id");
+        지하철_노선_생성("2호선", "bg-green-600", 1L, 2L, 5);
 
-        // when 지하철 노선 삭제
-        deleteByStationLineIdAndValidate(stationLineId);
+        지하철_노선_삭제(1L);
 
-        ExtractableResponse<Response> response = findAllStationLineAndValidate();
-        assertThat(response.jsonPath().getList("id", Long.class)).doesNotContain(stationLineId);
+        List<String> stationList = 지하철_노선_목록_조회();
+
+        StationAcceptanceTest.값이_포함되지_않는지_검증(stationList, "2호선");
     }
 
-    private ExtractableResponse<Response> createStationLineAndValidate(String stationLineName,
-                                                                       String color,
-                                                                       Long upStationId,
-                                                                       Long downStationId) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(StationLineRequest.builder()
-                        .name(stationLineName)
-                        .color(color)
-                        .upStationId(upStationId)
-                        .downStationId(downStationId)
-                        .distance(10)
-                        .build())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-
-        validateHttpStatus(response, HttpStatus.CREATED);
-        return response;
+    private void 지하철_노선_사이즈_체크(List<String> stationLineList, int size) {
+        assertThat(stationLineList).hasSize(size);
     }
 
-    private Long createStationAndValidate(String name) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(Collections.singletonMap("name", name))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-        validateHttpStatus(response, HttpStatus.CREATED);
-
-        return response.jsonPath().getLong("id");
-    }
-
-    private void validateHttpStatus(ExtractableResponse<Response> response, HttpStatus httpStatus) {
-        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
-    }
-
-    private ExtractableResponse<Response> findAllStationLineAndValidate() {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-
-        validateHttpStatus(response, HttpStatus.OK);
-        return response;
-    }
-
-    private ExtractableResponse<Response> findByStationLineId(Long stationLineId) {
-        return RestAssured
-                .given().log().all()
-                .when().get("/lines/{id}", stationLineId)
-                .then().log().all()
-                .extract();
-    }
-
-    private void updateByStationLineIdAndValidate(Long stationLineId,
-                                                  StationLineRequest stationLineRequest) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(stationLineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}", stationLineId)
-                .then().log().all()
-                .extract();
-
-        validateHttpStatus(response, HttpStatus.OK);
-    }
-
-    private void deleteByStationLineIdAndValidate(Long stationLineId) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/{id}", stationLineId)
-                .then().log().all()
-                .extract();
-
-        validateHttpStatus(response, HttpStatus.NO_CONTENT);
+    private void 동일한_값_인지_검증(String stationName, String name) {
+        assertThat(stationName).isEqualTo(name);
     }
 
 }

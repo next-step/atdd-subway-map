@@ -1,43 +1,13 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import nextstep.subway.domain.StationRepository;
-import nextstep.subway.utils.DatabaseCleanup;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
-
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+import static nextstep.subway.api.ApiCall.*;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-        databaseCleanup.execute();
-    }
+public class StationAcceptanceTest extends AcceptionceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -47,13 +17,12 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        List<String> stations = List.of("강남역");
+        // when 지하철역 생성
+        지하철역_생성("강남역");
 
-        // when - 지하철역 생성
-        getIdOfcreateAndValidate(stations);
+        List<String> stationList = 지하철역_목록_조회();
 
-        // then - 목록 조회 후, 역을 찾을 수 있다.
-        stationNameExists(stations, getStationNameOfselectStationsAndValidate(stations));
+        지하철역이_존재하는지_체크(stationList, "강남역");
     }
 
     /**
@@ -66,13 +35,12 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // when - 지하철역 생성
-        List<String> stations = List.of("선릉역", "역삼역");
-        getIdOfcreateAndValidate(stations);
+        지하철역_생성("강남역");
+        지하철역_생성("선릉역");
 
-        // then - 2개의 지하철역 응답 받기
-        List<String> stationNames = getStationNameOfselectStationsAndValidate(stations);
-        assertThat(stationNames).hasSize(2);
-        stationNameExists(stations, stationNames);
+        List<String> stationList = 지하철역_목록_조회();
+
+        목록개수_확인(stationList, 2);
     }
 
     /**
@@ -84,60 +52,27 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
-        List<String> stations = List.of("강남역");
+        Long id = 지하철역_생성("강남역");
 
-        // when - 지하철역 생성 및 삭제
-        deleteStationAndValidate(getIdOfcreateAndValidate(stations));
+        // when
+        지하철역_삭제(id);
 
         // then - 지하철 목록을 찾을 수 없는지 확인
-        List<String> stationNames = getStationNameOfselectStationsAndValidate(stations);
-        assertThat(stationNames).doesNotContain(stations.toArray(String[]::new));
+        List<String> stationList = 지하철역_목록_조회();
+
+        값이_포함되지_않는지_검증(stationList, "강남역");
     }
 
-    private void deleteStationAndValidate(List<Long> ids) {
-        ids.stream()
-                .map(id -> RestAssured
-                        .given().log().all()
-                        .when().delete("/stations/{id}", id)
-                        .then().log().all()
-                        .extract())
-                .forEach(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()));
+    public static void 지하철역이_존재하는지_체크(List<String> stationList, String name) {
+        assertThat(stationList).containsExactly(name);
     }
 
-    private  List<Long> getIdOfcreateAndValidate(List<String> stations) {
-        return createAndValidate(stations).stream()
-                .map(response -> response.jsonPath().getLong("id"))
-                .collect(Collectors.toList());
+    public static void 목록개수_확인(List<String> stationList, int size) {
+        assertThat(stationList).hasSize(size);
     }
 
-    private List<ExtractableResponse<Response>> createAndValidate(List<String> stations) {
-        return stations.stream()
-                .map(name -> RestAssured
-                        .given().log().all()
-                        .body(Collections.singletonMap("name", name))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract()
-                )
-                .peek(response -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()))
-                .collect(Collectors.toList());
+    public static void 값이_포함되지_않는지_검증(List<String> stationList, String name) {
+        assertThat(stationList).doesNotContain(name);
     }
-
-    private void stationNameExists(List<String> stations, List<String> stationNames) {
-        assertThat(stations).containsExactly(stationNames.toArray(String[]::new));
-    }
-
-    private List<String> getStationNameOfselectStationsAndValidate(List<String> stations) {
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return response.jsonPath().getList("name", String.class);
-    }
-
 
 }
