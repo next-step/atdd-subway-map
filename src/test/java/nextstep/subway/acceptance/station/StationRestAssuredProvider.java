@@ -30,8 +30,8 @@ public class StationRestAssuredProvider {
 			.extract();
 	}
 
-	public static void 지하철역_삭제(String id) {
-		RestAssured.given().log().all()
+	public static ExtractableResponse<Response> 지하철역_제거(String id) {
+		return RestAssured.given().log().all()
 			.when().delete("/stations/" + id)
 			.then().log().all()
 			.extract();
