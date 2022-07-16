@@ -32,7 +32,7 @@ public class StationRestAssuredProvider {
 
 	public static ExtractableResponse<Response> 지하철역_제거(String id) {
 		return RestAssured.given().log().all()
-			.when().delete("/stations/", id)
+			.when().delete("/stations/{id}", id)
 			.then().log().all()
 			.extract();
 	}

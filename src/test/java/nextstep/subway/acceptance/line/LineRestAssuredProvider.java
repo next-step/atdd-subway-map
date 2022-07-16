@@ -37,7 +37,7 @@ public class LineRestAssuredProvider {
 
 	public static ExtractableResponse<Response> 지하철_노선_조회(String id) {
 		return RestAssured.given().log().all()
-			.when().get("/lines/", id)
+			.when().get("/lines/{id}", id)
 			.then().log().all()
 			.extract();
 	}
@@ -49,14 +49,14 @@ public class LineRestAssuredProvider {
 
 		return RestAssured.given().log().all()
 			.body(params)
-			.when().put("/lines/" + id)
+			.when().put("/lines/{id}", id)
 			.then().log().all()
 			.extract();
 	}
 
 	public static ExtractableResponse<Response> 지하철_노선_제거(String id) {
 		return RestAssured.given().log().all()
-			.when().delete("/lines/" + id)
+			.when().delete("/lines/{id}", id)
 			.then().log().all()
 			.extract();
 	}

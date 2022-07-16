@@ -88,7 +88,7 @@ class StationAcceptanceTest {
 		ExtractableResponse<Response> response = 지하철역_생성_성공(강남역);
 
 		// When 그 지하철역을 삭제하면
-		지하철역_제거_성공(Id_추출(response));
+		지하철역_제거_성공(지하철역_Id_추출(response));
 
 		// Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
 		assertThat(지하철역_이름_목록_조회()).isEmpty();
@@ -98,9 +98,5 @@ class StationAcceptanceTest {
 		return 지하철역_목록_조회_성공()
 			.jsonPath()
 			.getList("name", String.class);
-	}
-
-	private String Id_추출(ExtractableResponse<Response> response) {
-		return response.jsonPath().getString("id");
 	}
 }
