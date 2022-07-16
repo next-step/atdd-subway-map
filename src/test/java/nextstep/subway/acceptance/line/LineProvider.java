@@ -33,10 +33,9 @@ public class LineProvider {
 		return response;
 	}
 
-	public static ExtractableResponse<Response> 지하철_노선_수정_성공(String id, String name, String color) {
+	public static void 지하철_노선_수정_성공(String id, String name, String color) {
 		ExtractableResponse<Response> response = 지하철_노선_수정(id, name, color);
 		응답코드_검증(response, OK);
-		return response;
 	}
 
 	public static void 지하철_노선_제거_성공(String id) {
@@ -52,12 +51,16 @@ public class LineProvider {
 		return response.jsonPath().getString("id");
 	}
 
-	public static List<String> 노선_이름_추출(ExtractableResponse<Response> response) {
+	public static String 노선_이름_추출(ExtractableResponse<Response> response) {
+		return response.jsonPath().getString("name");
+	}
+
+	public static List<String> 노선_이름_목록_추출(ExtractableResponse<Response> response) {
 		return response.jsonPath().getList("name", String.class);
 	}
 
-	public static List<String> 노선_COLOR_추출(ExtractableResponse<Response> response) {
-		return response.jsonPath().getList("color", String.class);
+	public static String 노선_COLOR_추출(ExtractableResponse<Response> response) {
+		return response.jsonPath().getString("color");
 	}
 
 }
