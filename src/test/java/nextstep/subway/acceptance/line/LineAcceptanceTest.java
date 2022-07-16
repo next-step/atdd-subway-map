@@ -118,9 +118,10 @@ class LineAcceptanceTest {
 		String 지하철_노선_Id = 지하철_노선_Id_추출(지하철_노선_생성_성공(신분당선, 신분당선_COLOR, 지하철역_A_ID, 지하철역_B_ID, 10));
 
 		// When 생성한 지하철 노선을 수정하면
-		ExtractableResponse<Response> response = 지하철_노선_수정_성공(지하철_노선_Id, 다른_분당선, 다른_분당선_COLOR);
+		지하철_노선_수정_성공(지하철_노선_Id, 다른_분당선, 다른_분당선_COLOR);
 
 		// Then 해당 지하철 노선 정보는 수정된다
+		ExtractableResponse<Response> response = 지하철_노선_조회_성공(지하철_노선_Id);
 		assertThat(노선_이름_추출(response)).containsExactly(다른_분당선);
 		assertThat(노선_COLOR_추출(response)).containsExactly(다른_분당선_COLOR);
 	}
