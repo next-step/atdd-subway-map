@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.*;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.common.ProviderBase;
+import nextstep.subway.section.SectionErrorCode;
 
 public class SectionProvider extends ProviderBase {
 
@@ -31,5 +32,10 @@ public class SectionProvider extends ProviderBase {
 		ExtractableResponse<Response> response = 지하철_구간_삭제(lineId, stationId);
 		응답코드_검증(response, BAD_REQUEST);
 		return response;
+	}
+
+	public static SectionErrorCode 에러코드_추출(ExtractableResponse<Response> response) {
+		String code = response.jsonPath().getString("code");
+		return SectionErrorCode.valueOf(code);
 	}
 }

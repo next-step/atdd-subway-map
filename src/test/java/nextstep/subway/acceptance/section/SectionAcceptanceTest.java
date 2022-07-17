@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance.section;
 
-import static nextstep.subway.acceptance.line.LineProvider.에러코드_추출;
 import static nextstep.subway.acceptance.line.LineProvider.*;
 import static nextstep.subway.acceptance.section.SectionProvider.*;
 import static nextstep.subway.acceptance.station.StationProvider.*;
