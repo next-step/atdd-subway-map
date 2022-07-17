@@ -3,14 +3,15 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,20 +42,13 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createSubwayLine() throws Exception {
         // when
-        final Map<String, Object> params = createParams(
-                List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("신분당선", "bg-red-600", 1, 2, 10));
-        final ExtractableResponse<Response> response = createSubwayLineRequest(params);
+        final String 생성할_지하철노선_이름 = "신분당선";
+        final ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청(생성할_지하철노선_이름);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(CREATED.value());
-        final List<Object> stations = response.jsonPath().getList("stations");
-        assertThat(stations.size()).isEqualTo(2);
-
-        final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
-        final List<String> subwayLineNames = getSubwayLinesResponse.jsonPath().getList("name", String.class);
-        assertThat(subwayLineNames).hasSize(1);
-        assertThat(subwayLineNames).contains(String.valueOf(params.get("name")));
+        요청이_정상적으로_이루어졌는지_확인(지하철노선_생성_응답, CREATED);
+        지하철노선이_정상적으로_생성되었는지_확인(지하철노선_생성_응답);
+        지하철노선_목록에_생성한_지하철노선이_있는지_확인(생성할_지하철노선_이름);
     }
 
     /**
@@ -66,24 +60,15 @@ public class SubwayLineAcceptanceTest {
     @Test
     void getSubwayLines() throws Exception {
         // given
-        final Map<String, Object> params1 = createParams(
-                List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("신분당선", "bg-red-600", 1, 2, 10));
-        final Map<String, Object> params2 = createParams(
-                List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("분당선", "bg-green-600", 1, 3, 10));
-        final List<Map<String, Object>> paramsList = List.of(params1, params2);
-        final List<String> createdSubwayLineNames = createSubwayLineRequest(paramsList);
+        final List<String> 생성할_지하철노선들_이름 = Lists.newArrayList("신분당선", "분당선");
+        지하철노선_생성_요청(생성할_지하철노선들_이름);
 
         // when
-        final ExtractableResponse<Response> response = getSubwayLinesRequest();
+        final ExtractableResponse<Response> 지하철노선_목록_조회_응답 = 지하철노선_목록_조회_요청();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(OK.value());
-
-        final List<String> subwayLineNames = response.jsonPath().getList("name", String.class);
-        assertThat(subwayLineNames).hasSize(paramsList.size());
-        assertThat(subwayLineNames).containsAll(createdSubwayLineNames);
+        요청이_정상적으로_이루어졌는지_확인(지하철노선_목록_조회_응답, OK);
+        지하철노선_목록에_생성한_지하철노선이_있는지_확인(생성할_지하철노선들_이름);
     }
 
     /**
@@ -95,19 +80,16 @@ public class SubwayLineAcceptanceTest {
     @Test
     void getSubwayLine() throws Exception {
         // given
-        final Map<String, Object> params = createParams(
-                List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("신분당선", "bg-red-600", 1, 2, 10));
-        final ExtractableResponse<Response> createSubwayLineResponse = createSubwayLineRequest(params);
-        final long createdSubwayLineId = createSubwayLineResponse.jsonPath().getLong("id");
+        final String 생성할_지하철노선_이름 = "신분당선";
+        final ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청(생성할_지하철노선_이름);
+        final long 생성된_지하철노선_아이디 = 지하철노선_생성_응답.jsonPath().getLong("id");
 
         // when
-        final ExtractableResponse<Response> response = getSubwayLineRequest(createdSubwayLineId);
+        final ExtractableResponse<Response> 지하철노선_상세_정보_조회_응답 = 지하철노선_상세_정보_조회_요청(생성된_지하철노선_아이디);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(OK.value());
-        final long getSubwayLineId = response.jsonPath().getLong("id");
-        assertThat(getSubwayLineId).isEqualTo(createdSubwayLineId);
+        요청이_정상적으로_이루어졌는지_확인(지하철노선_상세_정보_조회_응답, OK);
+        조회한_지하철노선이_생성한_지하철노선인지_확인(생성된_지하철노선_아이디, 지하철노선_상세_정보_조회_응답);
     }
 
     /**
@@ -119,26 +101,22 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateSubwayLine() throws Exception {
         // given
-        final Map<String, Object> params = createParams(
-                List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("신분당선", "bg-red-600", 1, 2, 10));
-        final ExtractableResponse<Response> createSubwayLineResponse = createSubwayLineRequest(params);
-        final long createdSubwayLineId = createSubwayLineResponse.jsonPath().getLong("id");
+        final ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청("신분당선");
+        final long 생성된_지하철노선_아이디 = 지하철노선_생성_응답.jsonPath().getLong("id");
 
-        final Map<String, Object> updateParams = createParams(
+        final Map<String, Object> 변경될_지하철노선_정보 = 요청보낼_파라미터_생성(
                 List.of("name", "color"),
                 List.of("다른분당선", "bg-green-600")
         );
 
         // when
-        final ExtractableResponse<Response> response = updateSubwayLineRequest(createdSubwayLineId, updateParams);
+        final ExtractableResponse<Response> 지하철노선_정보_변경_응답 = 지하철노선_정보_변경_요청(생성된_지하철노선_아이디, 변경될_지하철노선_정보);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(OK.value());
+        요청이_정상적으로_이루어졌는지_확인(지하철노선_정보_변경_응답, OK);
 
-        final ExtractableResponse<Response> getSubwayLineResponse = getSubwayLineRequest(createdSubwayLineId);
-        assertThat(getSubwayLineResponse.jsonPath().getString("name")).isEqualTo(updateParams.get("name"));
-        assertThat(getSubwayLineResponse.jsonPath().getString("color")).isEqualTo(updateParams.get("color"));
+        final ExtractableResponse<Response> 지하철노선_상세_정보_조회_응답 = 지하철노선_상세_정보_조회_요청(생성된_지하철노선_아이디);
+        지하철노선_변경이_잘_이루어졌는지_확인(변경될_지하철노선_정보, 지하철노선_상세_정보_조회_응답);
     }
 
     /**
@@ -150,24 +128,18 @@ public class SubwayLineAcceptanceTest {
     @Test
     void deleteSubwayLine() throws Exception {
         // given
-        final Map<String, Object> params = createParams(
-                List.of("name", "color", "upStationId", "downStationId", "distance"),
-                List.of("신분당선", "bg-red-600", 1, 2, 10));
-        final ExtractableResponse<Response> createSubwayLineResponse = createSubwayLineRequest(params);
-        final long createdSubwayLineId = createSubwayLineResponse.jsonPath().getLong("id");
+        final ExtractableResponse<Response> 지하철노선_생성_응답 = 지하철노선_생성_요청("신분당선");
+        final long createdSubwayLineId = 지하철노선_생성_응답.jsonPath().getLong("id");
 
         // when
-        final ExtractableResponse<Response> response = deleteSubwayLineRequest(createdSubwayLineId);
+        final ExtractableResponse<Response> 지하철노선_삭제_응답 = 지하철노선_삭제_요청(createdSubwayLineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
-
-        final ExtractableResponse<Response> getSubwayLinesResponse = getSubwayLinesRequest();
-        final List<Object> subwayLineIdList = getSubwayLinesResponse.jsonPath().getList("id");
-        assertThat(subwayLineIdList).hasSize(0);
+        요청이_정상적으로_이루어졌는지_확인(지하철노선_삭제_응답, NO_CONTENT);
+        지하철노선이_정상적으로_삭제되었는지_확인();
     }
 
-    private Map<String, Object> createParams(List<String> keys, List<Object> values) {
+    private Map<String, Object> 요청보낼_파라미터_생성(List<String> keys, List<Object> values) {
         if (keys.size() != values.size()) {
             throw new RuntimeException("생성하려는 key 와 value 의 length 가 같아야 합니다.");
         }
@@ -180,7 +152,10 @@ public class SubwayLineAcceptanceTest {
         return params;
     }
 
-    private ExtractableResponse<Response> createSubwayLineRequest(Map<String, Object> params) {
+    private ExtractableResponse<Response> 지하철노선_생성_요청(String subwayLineName) {
+        final Map<String, Object> params = 요청보낼_파라미터_생성(
+                List.of("name", "color", "upStationId", "downStationId", "distance"),
+                List.of(subwayLineName, "bg-red-600", 1, 2, 10));
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -192,19 +167,13 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private List<String> createSubwayLineRequest(List<Map<String, Object>> paramsList) {
-        final List<String> subwayLineNames = new ArrayList<>();
-        for (final Map<String, Object> params : paramsList) {
-            final ExtractableResponse<Response> response = createSubwayLineRequest(params);
-
-            final String subwayLineName = response.jsonPath().getString("name");
-            subwayLineNames.add(subwayLineName);
+    private void 지하철노선_생성_요청(List<String> subwayLineNames) {
+        for (final String subwayLineName : subwayLineNames) {
+            지하철노선_생성_요청(subwayLineName);
         }
-
-        return subwayLineNames;
     }
 
-    private ExtractableResponse<Response> getSubwayLinesRequest() {
+    private ExtractableResponse<Response> 지하철노선_목록_조회_요청() {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -215,7 +184,7 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> getSubwayLineRequest(Long subwayLineId) {
+    private ExtractableResponse<Response> 지하철노선_상세_정보_조회_요청(Long subwayLineId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().get("/subway-lines/{subwayLineId}", subwayLineId)
@@ -225,7 +194,7 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> updateSubwayLineRequest(Long subwayLineId, Map<String, Object> params) {
+    private ExtractableResponse<Response> 지하철노선_정보_변경_요청(Long subwayLineId, Map<String, Object> params) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -237,7 +206,7 @@ public class SubwayLineAcceptanceTest {
         return response;
     }
 
-    private ExtractableResponse<Response> deleteSubwayLineRequest(Long subwayLineId) {
+    private ExtractableResponse<Response> 지하철노선_삭제_요청(Long subwayLineId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().delete("/subway-lines/{subwayLineId}", subwayLineId)
@@ -245,5 +214,42 @@ public class SubwayLineAcceptanceTest {
                 .extract();
 
         return response;
+    }
+
+    private void 요청이_정상적으로_이루어졌는지_확인(ExtractableResponse<Response> response, HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
+    }
+
+    private void 지하철노선이_정상적으로_생성되었는지_확인(ExtractableResponse<Response> response) {
+        final List<Object> stations = response.jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(2);
+    }
+
+    private void 지하철노선_목록에_생성한_지하철노선이_있는지_확인(String createdSubwayLineName) {
+        final ExtractableResponse<Response> getSubwayLinesResponse = 지하철노선_목록_조회_요청();
+        final List<String> subwayLineNames = getSubwayLinesResponse.jsonPath().getList("name", String.class);
+        assertThat(subwayLineNames).contains(createdSubwayLineName);
+    }
+
+    private void 지하철노선_목록에_생성한_지하철노선이_있는지_확인(List<String> createdSubwayLineNames) {
+        final ExtractableResponse<Response> getSubwayLinesResponse = 지하철노선_목록_조회_요청();
+        final List<String> subwayLineNames = getSubwayLinesResponse.jsonPath().getList("name", String.class);
+        assertThat(subwayLineNames).containsAll(createdSubwayLineNames);
+    }
+
+    private void 조회한_지하철노선이_생성한_지하철노선인지_확인(Long 생성된_지하철노선_아이디, ExtractableResponse<Response> 지하철노선_상세_정보_조회_응답) {
+        final long 조회한_지하철노선_고유_번호 = 지하철노선_상세_정보_조회_응답.jsonPath().getLong("id");
+        assertThat(조회한_지하철노선_고유_번호).isEqualTo(생성된_지하철노선_아이디);
+    }
+
+    private void 지하철노선_변경이_잘_이루어졌는지_확인(Map<String, Object> 변경될_지하철노선_정보, ExtractableResponse<Response> 지하철노선_상세_정보_조회_응답) {
+        assertThat(지하철노선_상세_정보_조회_응답.jsonPath().getString("name")).isEqualTo(변경될_지하철노선_정보.get("name"));
+        assertThat(지하철노선_상세_정보_조회_응답.jsonPath().getString("color")).isEqualTo(변경될_지하철노선_정보.get("color"));
+    }
+
+    private void 지하철노선이_정상적으로_삭제되었는지_확인() {
+        final ExtractableResponse<Response> 지하철노선_목록_조회_응답 = 지하철노선_목록_조회_요청();
+        final List<Object> subwayLineIdList = 지하철노선_목록_조회_응답.jsonPath().getList("id");
+        assertThat(subwayLineIdList).hasSize(0);
     }
 }
