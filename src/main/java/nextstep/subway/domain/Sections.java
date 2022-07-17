@@ -68,12 +68,16 @@ public class Sections {
     }
 
     private void validateDeleteSection(Station station) {
-        Section section = getLastSection();
-        if (!section.getDownStation().equals(station)) {
+        if (isNotLastSection(station)) {
             throw new SectionException(ErrorCode.DELETE_SECTION_DENIED_EXCEPTION);
         }
         if (sections.size() == MINIMUM_SIZE) {
             throw new SectionException(ErrorCode.INVALID_SIZE_SECTION_EXCEPTION);
         }
+    }
+
+    private boolean isNotLastSection(Station station) {
+        Section section = getLastSection();
+        return !section.getDownStation().equals(station);
     }
 }
