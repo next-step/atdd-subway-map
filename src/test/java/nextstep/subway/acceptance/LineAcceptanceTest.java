@@ -70,7 +70,7 @@ public class LineAcceptanceTest {
     }
 
     @AfterEach
-    void tableClear(){
+    void tableClear() {
         databaseTruncator.cleanTable();
     }
 
@@ -109,11 +109,8 @@ public class LineAcceptanceTest {
         restUtil.createEntityData(line2, "/lines");
 
         //when
-        List<String> names = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> names = restUtil.getResponseData("/lines")
+                .jsonPath().getList("name", String.class);
 
         //then
         assertThat(names).containsAnyOf(line1.get("name").toString(), line2.get("name").toString());
@@ -128,12 +125,7 @@ public class LineAcceptanceTest {
         Long id = restUtil.createEntityData(line1, "/lines");
 
         //when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().get("/lines/{id}", id)
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = restUtil.getResponseDataById("/lines/{id}", id);
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
@@ -176,12 +168,7 @@ public class LineAcceptanceTest {
         Long id = restUtil.createEntityData(line1, "/lines");
 
         //when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().delete("/lines/{id}", id)
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = restUtil.deleteEntityDataById("/lines/{id}", id);
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
