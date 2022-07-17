@@ -17,6 +17,6 @@ public class SubwayLineRequest {
 	private Integer distance;
 
 	public SubwayLine toEntity(Section section) {
-		return new SubwayLine(id, section, name, color, upStationId, downStationId, distance);
+		return new SubwayLine(id, section, name, color);
 	}
 }

@@ -25,18 +25,12 @@ public class SubwayLine {
 
 	private String name;
 	private String color;
-	private Long upStationId;
-	private Long downStationId;
-	private Integer distance;
 
-	public SubwayLine(Long id, Section section, String  name, String color, Long upStationId, Long downStationId, Integer distance) {
+	public SubwayLine(Long id, Section section, String  name, String color) {
 		this.id = id;
 		saveSection(section);
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
-		this.distance = distance;
 	}
 
 	public void modify(SubwayLineModifyRequest request) {
@@ -47,7 +41,6 @@ public class SubwayLine {
 	public void saveSection(Section section) {
 		sectionList.add(section);
 		section.addSubwayLine(this);
-		this.downStationId = section.getDownStationId();
 	}
 
 	public Section deleteSection(Long stationId) {
@@ -56,7 +49,6 @@ public class SubwayLine {
 				.findAny()
 				.orElseThrow(NoSuchElementException::new);
 
-		this.downStationId = section.getUpStationId();
 		sectionList.remove(section);
 		return section;
 	}
@@ -82,12 +74,12 @@ public class SubwayLine {
 	}
 
 	private boolean hasSameStation(Section section) {
-		return this.getDownStationId().equals(section.getDownStationId()) ||
-				this.getUpStationId().equals(section.getDownStationId());
+		return downStationIdOfLastSection().equals(section.getDownStationId()) ||
+				upStationIdOfLastSection().equals(section.getDownStationId());
 	}
 
 	private boolean isSameUpStation(Section section) {
-		return this.upStationId.equals(section.getUpStationId());
+		return upStationIdOfLastSection().equals(section.getUpStationId());
 	}
 
 	private boolean isSectionSizeEqualsOne() {
@@ -95,6 +87,18 @@ public class SubwayLine {
 	}
 
 	private boolean isNotSameDownStationId(Long stationId) {
-		return !this.getDownStationId().equals(stationId);
+		return !downStationIdOfLastSection().equals(stationId);
+	}
+
+	private Long downStationIdOfLastSection() {
+		return lastSection().getDownStationId();
+	}
+
+	private Long upStationIdOfLastSection() {
+		return lastSection().getUpStationId();
+	}
+
+	private Section lastSection() {
+		return this.getSectionList().get(sectionList.size() - 1);
 	}
 }
