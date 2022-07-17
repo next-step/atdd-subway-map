@@ -1,8 +1,8 @@
 package nextstep.subway.acceptance;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
-import static nextstep.subway.acceptance.SubwayLineCommon.지하철_노선_등록_요청;
-import static nextstep.subway.acceptance.SubwayLineCommon.지하철_노선_조회_요청;
+import static nextstep.subway.acceptance.LineCommon.지하철_노선_등록_요청;
+import static nextstep.subway.acceptance.LineCommon.지하철_노선_조회_요청;
 import static nextstep.subway.acceptance.SubwayStationCommon.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 

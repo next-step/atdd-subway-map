@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.MediaType;
 
-public class SubwayLineCommon {
+public class LineCommon {
     public static ExtractableResponse<Response> 지하철_노선_등록_요청(String name, String color, Long upStationId,
                                                        Long downStationId, int distance) {
         return RestAssured.given().log().all()
