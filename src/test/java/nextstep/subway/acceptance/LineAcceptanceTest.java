@@ -21,9 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
-
-    @LocalServerPort
-    int port;
     private static final String LINE_NAME_5 = "5호선";
     private static final String LINE_COLOR_5 = "#996CAC";
     private static final String LINE_NAME_5_UP = "5호선 상행선";
@@ -35,6 +32,11 @@ public class LineAcceptanceTest {
             LINE_NAME_5, LINE_COLOR_5, 1L, 3L, 48L);
     private static final LineRequest LINE_2 = new LineRequest(
             LINE_NAME_9, LINE_COLOR_9, 2L, 4L, 37L);
+
+    private final LineAcceptanceTestUtils utils = new LineAcceptanceTestUtils();
+
+    @LocalServerPort
+    int port;
 
     @BeforeEach
     public void setUp() {
@@ -50,14 +52,14 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = 지하철_노선_생성(LINE_5);
+        ExtractableResponse<Response> response = utils.지하철_노선_생성(LINE_5);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.jsonPath().get("name").equals(LINE_NAME_5)).isTrue();
 
         // then
-        List<String> lineNames = 지하철_노선_목록_조회()
+        List<String> lineNames = utils.지하철_노선_목록_조회()
                 .jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf(LINE_NAME_5);
     }
@@ -71,11 +73,11 @@ public class LineAcceptanceTest {
     @Test
     void showAllLines() {
         // given
-        지하철_노선_생성(LINE_5);
-        지하철_노선_생성(LINE_2);
+        utils.지하철_노선_생성(LINE_5);
+        utils.지하철_노선_생성(LINE_2);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_목록_조회();
+        ExtractableResponse<Response> response = utils.지하철_노선_목록_조회();
 
         // then
         assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
@@ -91,11 +93,11 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        지하철_노선_생성(LINE_2);
+        int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        utils.지하철_노선_생성(LINE_2);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회(id);
+        ExtractableResponse<Response> response = utils.지하철_노선_조회(id);
 
         // then
         assertThat(response.jsonPath().get("name").equals(LINE_5.getName())).isTrue();
@@ -111,10 +113,10 @@ public class LineAcceptanceTest {
     @Test
     void findLineNoSuchElementException() {
         // given
-        지하철_노선_생성(LINE_5);
+        utils.지하철_노선_생성(LINE_5);
 
         // when
-        ExtractableResponse<Response> response = 지하철_노선_조회(2);
+        ExtractableResponse<Response> response = utils.지하철_노선_조회(2);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -130,15 +132,15 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
         LineRequest request = LineRequest.builder()
                 .name(LINE_NAME_5_UP)
                 .color(LINE_COLOR_5_UP)
                 .build();
 
         // when
-        ExtractableResponse<Response> updatedResponse = 지하철_노선_수정(id, request);
-        ExtractableResponse<Response> response = 지하철_노선_조회(id);
+        ExtractableResponse<Response> updatedResponse = utils.지하철_노선_수정(id, request);
+        ExtractableResponse<Response> response = utils.지하철_노선_조회(id);
 
         // then
         assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -156,58 +158,17 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        지하철_노선_생성(LINE_2);
+        int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        utils.지하철_노선_생성(LINE_2);
 
         // when
-        지하철_노선_삭제(id);
+        utils.지하철_노선_삭제(id);
 
         // then
-        List<Integer> ids = 지하철_노선_목록_조회().jsonPath().getList("id");
+        List<Integer> ids = utils.지하철_노선_목록_조회().jsonPath().getList("id");
         assertThat(ids.stream()
                 .filter(lineId -> lineId == id)
                 .count())
                 .isEqualTo(0);
-    }
-
-    private void 지하철_노선_삭제(int id) {
-        RestAssured.given().log().all()
-                .when().delete("/lines/" + id)
-                .then().log().all();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_수정(int id, LineRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/" + id)
-                .then().log().all()
-                .extract();
-    }
-
-
-    private ExtractableResponse<Response> 지하철_노선_조회(int id) {
-        return RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + id)
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_목록_조회() {
-        return RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_생성(LineRequest request) {
-        return RestAssured.given().log().all()
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
     }
 }
