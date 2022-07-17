@@ -46,13 +46,13 @@ public class SubwayLineService {
 	public List<SubwayLineResponse> findAll() {
 		return lineRepository.findAll().stream()
 				.map(line -> new SubwayLineResponse(
-						line, getUpAndDownStation(line.getUpStationId(), line.getDownStationId())))
+						line, findAllStations(line)))
 				.collect(Collectors.toList());
 	}
 
 	public SubwayLineResponse findById(Long id) {
 		SubwayLine subwayLine = findSubwayLineById(id);
-		return new SubwayLineResponse(subwayLine, getUpAndDownStation(subwayLine.getUpStationId(), subwayLine.getDownStationId()));
+		return new SubwayLineResponse(subwayLine, findAllStations(subwayLine));
 	}
 
 	private List<Station> findAllStations(SubwayLine subwayLine) {
@@ -72,10 +72,6 @@ public class SubwayLineService {
 
 	private Section lastSection(List<Section> sectionList) {
 		return sectionList.get(sectionList.size() - 1);
-	}
-
-	private List<Station> getUpAndDownStation(Long upStationId, Long downStationId) {
-		return stationRepository.findAllById(List.of(upStationId, downStationId));
 	}
 
 	private SubwayLine findSubwayLineById(Long id) {

@@ -62,7 +62,7 @@ public class SectionAcceptanceTest {
 				() -> assertThat(response.statusCode()).isEqualTo(OK.value()),
 				() -> {
 					List<String> stationList = 지하철_노선_하나를_조회한다(subwayLineId).jsonPath().getList("stations.name");
-					assertThat(stationList).containsExactly("광교역", "상현역");
+					assertThat(stationList).containsExactly("광교역", "광교중앙역", "상현역");
 				}
 		);
 	}
