@@ -47,7 +47,7 @@ public class Line {
 		for (Section section : sections) {
 			stations.add(section.getUpStation());
 		}
-		stations.add(sections.get(sections.size() - 1).getDownStation());
+		stations.add(getLastStation());
 		return stations;
 	}
 
@@ -57,10 +57,26 @@ public class Line {
 	}
 
 	public void addSection(Section section) {
-		Station lastStation = sections.get(sections.size() - 1).getDownStation();
+		Station lastStation = getLastStation();
 		if (!lastStation.equals(section.getUpStation())) {
 			throw new RuntimeException();
 		}
 		sections.add(section);
+	}
+
+	public Section deleteSectionOf(Station station) {
+		Station lastStation = getLastStation();
+
+		if (!lastStation.equals(station)) {
+			throw new RuntimeException();
+		}
+
+		Section lastSection = sections.get(sections.size() - 1);
+		sections.remove(lastSection);
+		return lastSection;
+	}
+
+	private Station getLastStation() {
+		return sections.get(sections.size() - 1).getDownStation();
 	}
 }
