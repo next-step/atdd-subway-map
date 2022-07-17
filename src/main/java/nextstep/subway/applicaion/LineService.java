@@ -3,10 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,28 +14,34 @@ import java.util.List;
 public class LineService {
 	private final StationRepository stationRepository;
 	private final LineRepository lineRepository;
+	private final SectionRepository sectionRepository;
 
-	public LineService(StationRepository stationRepository, LineRepository lineRepository) {
+	public LineService(StationRepository stationRepository, LineRepository lineRepository, SectionRepository sectionRepository) {
 		this.stationRepository = stationRepository;
 		this.lineRepository = lineRepository;
+		this.sectionRepository = sectionRepository;
 	}
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
+		Section section = saveSection(lineRequest);
+
+		Line line = lineRepository.save(
+				new Line(lineRequest.getName(), lineRequest.getColor(), section)
+		);
+		return LineResponse.of(line);
+	}
+
+	private Section saveSection(LineRequest lineRequest) {
 		Station upStation = stationRepository.findById(lineRequest.getUpStationId())
 				.orElseThrow(RuntimeException::new);
+
 		Station downStation = stationRepository.findById(lineRequest.getDownStationId())
 				.orElseThrow(RuntimeException::new);
 
-		Line line = lineRepository.save(
-				new Line(
-						lineRequest.getName(),
-						lineRequest.getColor(),
-						upStation,
-						downStation
-				)
+		return sectionRepository.save(
+				new Section(upStation, downStation, lineRequest.getDistance())
 		);
-		return LineResponse.of(line);
 	}
 
 	public List<LineResponse> findAllLines() {

@@ -10,28 +10,24 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 public class Line {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private String color;
 
-	@ManyToOne(fetch = LAZY)
-	@JoinColumn(name = "up_station_id")
-	private Station upStation;
-
-	@ManyToOne(fetch = LAZY)
-	@JoinColumn(name = "down_station_id")
-	private Station downStation;
+	@OneToMany(fetch = LAZY)
+	@JoinColumn
+	private List<Section> sections = new ArrayList<>();
 
 	protected Line() {
 	}
 
-	public Line(String name, String color, Station upStation, Station downStation) {
+	public Line(String name, String color, Section section) {
 		this.name = name;
 		this.color = color;
-		this.upStation = upStation;
-		this.downStation = downStation;
+		this.sections.add(section);
 	}
 
 	public Long getId() {
@@ -46,18 +42,13 @@ public class Line {
 		return color;
 	}
 
-	public Station getUpStation() {
-		return upStation;
-	}
-
-	public Station getDownStation() {
-		return downStation;
-	}
 
 	public List<Station> getStations() {
 		List<Station> stations = new ArrayList<>();
-		stations.add(upStation);
-		stations.add(downStation);
+		for (Section section : sections) {
+			stations.add(section.getUpStation());
+		}
+		stations.add(sections.get(sections.size() - 1).getDownStation());
 		return stations;
 	}
 

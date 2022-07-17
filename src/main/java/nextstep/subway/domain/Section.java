@@ -11,20 +11,34 @@ public class Section {
 	private Long id;
 
 	@OneToOne(fetch = LAZY)
-	@JoinColumn(name = "next_station_id")
-	private Station nextStation;
+	@JoinColumn(name = "up_station_id")
+	private Station upStation;
+
+	@OneToOne(fetch = LAZY)
+	@JoinColumn(name = "_station_id")
+	private Station downStation;
+
 	private Integer distance;
 
 	public Section() {
 	}
 
-	public Section(Station nextStation, Integer distance) {
-		this.nextStation = nextStation;
+	public Section(Station upStation, Station downStation, Integer distance) {
+		this.upStation = upStation;
+		this.downStation = downStation;
 		this.distance = distance;
 	}
 
-	public Station getNextStation() {
-		return nextStation;
+	public Long getId() {
+		return id;
+	}
+
+	public Station getUpStation() {
+		return upStation;
+	}
+
+	public Station getDownStation() {
+		return downStation;
 	}
 
 	public Integer getDistance() {
