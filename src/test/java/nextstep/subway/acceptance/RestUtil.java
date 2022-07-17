@@ -21,8 +21,43 @@ public class RestUtil {
                         .then().log().all()
                         .extract();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        String location = response.header("Location");
-        String[] args = location.split("/");
-        return Long.parseLong(args[args.length-1]);
+        return ((Number)response.jsonPath().get("id")).longValue();
     }
+    public Long registEntityData(Map<String, Object> params, String requestUrl){
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post(requestUrl)
+                        .then().log().all()
+                        .extract();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return ((Number)response.jsonPath().get("id")).longValue();
+    }
+
+    public ExtractableResponse<Response> getResponseData(String requestUrl){
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(requestUrl)
+                .then().log().all()
+                .extract();
+    }
+
+    public ExtractableResponse<Response> getResponseDataById(String requestUrl, Long id){
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(requestUrl, id)
+                .then().log().all()
+                .extract();
+    }
+
+    public ExtractableResponse<Response> deleteEntityDataById(String requestUrl, Long id){
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(requestUrl, id)
+                .then().log().all()
+                .extract();
+    }
+
+
 }
