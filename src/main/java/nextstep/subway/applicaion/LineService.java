@@ -8,7 +8,7 @@ import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
+import javax.persistence.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,10 +57,14 @@ public class LineService {
 
     @Transactional
     public void updateLine(Long id, LineUpdateRequest updateDto) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("manager");
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+
+        tx.begin();
         Line line = findLine(id);
         line.updateLine(updateDto.getName(), updateDto.getColor());
-
-        lineRepository.save(line);
+        tx.commit();
     }
 
     @Transactional
