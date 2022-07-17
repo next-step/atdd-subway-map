@@ -148,6 +148,7 @@ public class SectionAcceptanceTest {
     }
 
     /**
+     * Given 상행 종점역과 하행 종점역(구간 1개)를 등록하고
      * When 지하철 역을 삭제하면
      * Then 상행 종점역과 하행 종점역만 있는 경우, 잘못된 요청 처리가 된다
      */
@@ -157,7 +158,7 @@ public class SectionAcceptanceTest {
         // when - 지하철 역 삭제 요청을 한다
         ExtractableResponse<Response> response = 지하철_구간_삭제_요청(신분당선, 하행역);
         
-        // then - 한 개의 구간만 잇는 경우, 잘못된 요청 오류가 발생한다
+        // then - 잘못된 요청 오류가 발생한다
         지하철_구간_삭제_실패됨(response);
     }
     
