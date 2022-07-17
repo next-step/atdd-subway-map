@@ -23,10 +23,9 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_역_생성_인수테스트() {
         // when
-        var 강남역 = 지하철_역_생성("강남역");
+        지하철_역_생성("강남역");
 
         // then
-        assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         지하철_역이_존재한다("강남역");
     }
 
@@ -38,11 +37,8 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_역_목록_조회_인수테스트() {
         // given
-        var 강남역 = 지하철_역_생성("강남역");
-        var 교대역 = 지하철_역_생성("교대역");
-
-        assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(교대역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_역_생성("강남역");
+        지하철_역_생성("교대역");
 
         // when + then
         지하철_역이_존재한다("강남역", "교대역");
@@ -61,13 +57,10 @@ class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_역_제거_인수테스트() {
         // given
-        var 강남역 = 지하철_역_생성("강남역");
-
-        assertThat(강남역.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        long 강남역 = 지하철_역_생성("강남역");
 
         // when
-        long 강남역_id = 강남역.jsonPath().getLong("id");
-        var 지하철_역_제거 = 지하철_역을_제거한다(강남역_id);
+        var 지하철_역_제거 = 지하철_역을_제거한다(강남역);
 
         assertThat(지하철_역_제거.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 

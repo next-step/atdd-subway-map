@@ -24,7 +24,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_생성_인수테스트() {
         // when
-        지하철_노선_생성("신분당선", "red", "강남역", "교대역");
+        지하철_노선_생성("신분당선", "red", "강남역", "교대역", 10);
 
         // then
         지하철_노선들이_존재한다("신분당선");
@@ -38,8 +38,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록조회_인수테스트() {
         // given
-        지하철_노선_생성("신분당선", "red", "강남역", "교대역");
-        지하철_노선_생성("2호선", "green", "역삼역", "선릉역");
+        지하철_노선_생성("신분당선", "red", "강남역", "교대역", 10);
+        지하철_노선_생성("2호선", "green", "역삼역", "선릉역", 10);
 
         // when + then
         지하철_노선들이_존재한다("신분당선", "2호선");
@@ -64,11 +64,10 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회_인수테스트() {
         // given
-        var 신분당선 = 지하철_노선_생성("신분당선", "red", "강남역", "교대역");
-        long 신분당선_id = 신분당선.jsonPath().getLong("id");
+        long 신분당선 = 지하철_노선_생성("신분당선", "red", "강남역", "교대역", 10);
 
         // when + then
-        지하철_노선이_존재한다(신분당선_id);
+        지하철_노선이_존재한다(신분당선);
     }
 
     private void 지하철_노선이_존재한다(Long stationId) {
@@ -83,14 +82,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정_인수테스트() {
         // given
-        var 신분당선 = 지하철_노선_생성("신분당선", "red", "강남역", "교대역");
-        var 신분당선_id = 신분당선.jsonPath().getLong("id");
+        long 신분당선 = 지하철_노선_생성("신분당선", "red", "강남역", "교대역", 10);
 
         // when
-        자하철_노선을_수정한다(신분당선_id, "다른분당선", "orange");
+        자하철_노선을_수정한다(신분당선, "다른분당선", "orange");
 
         // then
-        지하철_노선_정보가_일치한다(신분당선_id, "다른분당선", "orange");
+        지하철_노선_정보가_일치한다(신분당선, "다른분당선", "orange");
     }
 
     private void 자하철_노선을_수정한다(long lineId, String name, String color) {
@@ -118,14 +116,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제_인수테스트() {
         // given
-        var 신분당선 = 지하철_노선_생성("신분당선", "red", "강남역", "교대역");
-        long 신분당선_id = 신분당선.jsonPath().getLong("id");
+        long 신분당선 = 지하철_노선_생성("신분당선", "red", "강남역", "교대역", 10);
 
         // when
-        지하철_노선을_삭제한다(신분당선_id);
+        지하철_노선을_삭제한다(신분당선);
 
         // then
-        지하철_노선이_존재하지_않는다(신분당선_id);
+        지하철_노선이_존재하지_않는다(신분당선);
     }
 
     private void 지하철_노선을_삭제한다(long lineId) {
