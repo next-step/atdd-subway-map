@@ -147,12 +147,68 @@ public class SectionAcceptanceTest extends BasicAcceptanceTest {
     assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
     ExtractableResponse<Response> response = RestAssured.given().log().all()
-        .body(param)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .delete("/lines/" + lineId + "/sections?stationId=" + stationResponses.get(2).getId())
         .then().log().all()
         .extract();
     assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
+
+  /**
+   * Given 지하철 구간을 생성하고
+   * When 생성한 지하철 구간을 삭제할 때 마지막 구간(종점역)이 아니면
+   * Then 예외 발생
+   */
+  @Test
+  void 지하철_하행_종점역_아닌_다른_역제거_오류() {
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
+
+    long lineId = lineRestAssured.saveLine(firstLine, stationResponses.get(0), stationResponses.get(1)).jsonPath().getLong("id");
+
+    Map<String, Object> param = new HashMap<>();
+    param.put("downStationId", stationResponses.get(2).getId());
+    param.put("upStationId", stationResponses.get(1).getId());
+    param.put("distance", 10);
+
+    ExtractableResponse<Response> saveSectionResponse = RestAssured.given().log().all()
+        .body(param)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/lines/" + lineId + "/sections")
+        .then().log().all()
+        .extract();
+    assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+    ExtractableResponse<Response> response = RestAssured.given().log().all()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .delete("/lines/" + lineId + "/sections?stationId=" + stationResponses.get(1).getId())
+        .then().log().all()
+        .extract();
+
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    assertThat(response.jsonPath().getString("message")).isEqualTo(ErrorMessage.SECTION_NO_LAST_DELETE);
+  }
+
+  /**
+   * Given 지하철 구간을 생성하고
+   * When 생성한 지하철 구간을 삭제할 때 구간이 1개라면 삭제시
+   * Then 예외 발생
+   */
+  @Test
+  void 지하철_구간_오직_1개일_경우_삭제_오류() {
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
+
+    long lineId = lineRestAssured.saveLine(firstLine, stationResponses.get(0), stationResponses.get(1)).jsonPath().getLong("id");
+
+    ExtractableResponse<Response> response = RestAssured.given().log().all()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .delete("/lines/" + lineId + "/sections?stationId=" + stationResponses.get(1).getId())
+        .then().log().all()
+        .extract();
+
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    assertThat(response.jsonPath().getString("message")).isEqualTo(ErrorMessage.SECTION_ONE_NO_DELETE);
   }
 }
