@@ -42,7 +42,7 @@ public class StationService {
                 .orElseThrow(() -> new EntityNotFoundException(upStationId + "번 id로 조회되는 역이 없습니다."));
 
         StationResponse downStationResponse = stationRepository.findById(downStationId).map(StationResponse::new)
-                .orElseThrow(() -> new EntityNotFoundException(upStationId + "번 id로 조회되는 역이 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(downStationId + "번 id로 조회되는 역이 없습니다."));
 
         List<StationResponse> stationResponses = new ArrayList<>();
 
