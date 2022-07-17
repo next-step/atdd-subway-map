@@ -83,4 +83,9 @@ public class LineService {
     return stationRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.STATION_NOT_FOUND));
   }
+
+  public void deleteSection(long lineId, long stationId) {
+    Station station = findStation(stationId);
+    sectionRepository.deleteByDownStation(station);
+  }
 }

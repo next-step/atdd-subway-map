@@ -8,4 +8,6 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
   List<Section> findByLineOrderByIdAsc(Line line);
 
   void deleteByLine(Line line);
+
+  void deleteByDownStation(Station station);
 }
