@@ -21,9 +21,9 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 
 	@BeforeEach
 	public void setUp() {
-		지하철_역_생성("지하철역");
-		지하철_역_생성("새로운지하철역");
-		지하철_역_생성("또다른지하철역");
+		지하철_역_생성("논현역");
+		지하철_역_생성("신논현역");
+		지하철_역_생성("강남역");
 	}
 
 	/**
@@ -121,34 +121,6 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 		List<Long> lineIds =
 				지하철_노선_목록_조회().jsonPath().getList("id");
 		assertThat(lineIds).isEmpty();
-	}
-
-	private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("name", name);
-		params.put("color", color);
-		params.put("upStationId", upStationId);
-		params.put("downStationId", downStationId);
-
-		return 지하철_노선_생성(params);
-	}
-
-	private ExtractableResponse<Response> 지하철_노선_생성(Map<String, Object> params) {
-		 return RestAssured
-				.given().log().all()
-				.body(params)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines")
-				.then().log().all()
-				.extract();
-	}
-
-	private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
-		return RestAssured
-				.given().log().all()
-				.when().get("/lines/{lineId}", id)
-				.then().log().all()
-				.extract();
 	}
 
 	private ExtractableResponse<Response> 지하철_노선_목록_조회() {
