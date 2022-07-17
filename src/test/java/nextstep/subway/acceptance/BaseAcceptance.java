@@ -64,7 +64,7 @@ public class BaseAcceptance {
             .extract();
     }
 
-    protected ExtractableResponse<Response> findAllLines() {
+    protected ExtractableResponse<Response> 전체_노선_조회() {
         return RestAssured.given().log().all()
             .when().get("/lines")
             .then().log().all()

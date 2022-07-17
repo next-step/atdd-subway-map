@@ -57,6 +57,7 @@ public class Section {
     }
 
     public void removeLine() {
+        line.removeSection(this);
         this.line = null;
     }
 
@@ -68,10 +69,9 @@ public class Section {
         return stations.getDownStation();
     }
 
-    public boolean isEqualTo(final long stationId) {
+    public void isEqualTo(final long stationId) {
         if (!lastDownStation().getId().equals(stationId)) {
             throw new IllegalArgumentException("마지막 지하철역 id가 맞지 않습니다.");
         }
-        return true;
     }
 }

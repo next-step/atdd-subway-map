@@ -53,7 +53,7 @@ class LineAcceptanceTest extends BaseAcceptance {
         지하철_노선_생성("까치울역", "온수역", "7호선", "green");
 
         //when
-        final ExtractableResponse<Response> getLinesResponse = findAllLines();
+        final ExtractableResponse<Response> getLinesResponse = 전체_노선_조회();
 
         //then
         final List<String> name = getLinesResponse.jsonPath().getList("name", String.class);

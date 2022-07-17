@@ -17,7 +17,7 @@ public class Station {
     }
 
     public Station(String name) {
-        this.name = name;
+        this(null, name);
     }
 
     public Station(Long id, String name) {
@@ -33,11 +33,10 @@ public class Station {
         return name;
     }
 
-    public boolean isSameStationId(final Long id) {
+    public void isSameStationId(final Long id) {
         if (!Objects.equals(this.id, id)) {
             throw new IllegalStateException("하행역과 새로운 상행역이 맞지 않습니다.");
         }
-        return true;
     }
 
     @Override

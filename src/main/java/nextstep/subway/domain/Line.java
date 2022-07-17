@@ -58,13 +58,24 @@ public class Line {
         return sections.stations();
     }
 
-    public Station beforeDownStation() {
+    public Station beforeDownStation(final Long newUpStationId) {
         List<Station> stations = stations();
-        return stations.get(stations.size() - 1);
+        final Station station = stations.get(stations.size() - 1);
+        station.isSameStationId(newUpStationId);
+
+        return station;
     }
 
     public void updateNameAndColor(final String name, final String color) {
         this.lineContent = new LineContent(name, color);
+    }
+
+    public void removeLastSection(final long stationId) {
+        sections.removeLastSection(stationId);
+    }
+
+    public void removeSection(final Section section) {
+        sections.removeSection(section);
     }
 
 }

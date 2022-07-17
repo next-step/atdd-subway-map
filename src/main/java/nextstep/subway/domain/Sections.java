@@ -54,4 +54,8 @@ public class Sections {
     private boolean isOnlyOneSection() {
         return sections.size() == 1;
     }
+
+    public void removeSection(final Section section) {
+        sections.remove(section);
+    }
 }
