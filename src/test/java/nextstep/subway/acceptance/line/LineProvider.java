@@ -1,17 +1,15 @@
 package nextstep.subway.acceptance.line;
 
 import static nextstep.subway.acceptance.line.LineRestAssuredProvider.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.common.ProviderBase;
 
-public class LineProvider {
+public class LineProvider extends ProviderBase {
 
 	public static ExtractableResponse<Response> 지하철_노선_생성_성공(String name, String color, String upStationId,
 		String downStationId, int distance) {
@@ -41,10 +39,6 @@ public class LineProvider {
 	public static void 지하철_노선_제거_성공(String id) {
 		ExtractableResponse<Response> response = 지하철_노선_제거(id);
 		응답코드_검증(response, NO_CONTENT);
-	}
-
-	private static void 응답코드_검증(ExtractableResponse<Response> response, HttpStatus httpStatus) {
-		assertThat(response.statusCode()).isEqualTo(httpStatus.value());
 	}
 
 	public static String 지하철_노선_Id_추출(ExtractableResponse<Response> response) {

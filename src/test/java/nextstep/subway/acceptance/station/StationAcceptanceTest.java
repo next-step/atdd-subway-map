@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.AcceptanceTestBase;
+import nextstep.subway.acceptance.common.AcceptanceTestBase;
 
 @DisplayName("지하철역 인수테스트")
 class StationAcceptanceTest extends AcceptanceTestBase {

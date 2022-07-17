@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.AcceptanceTestBase;
+import nextstep.subway.acceptance.common.AcceptanceTestBase;
 
 @DisplayName("노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTestBase {

@@ -3,7 +3,7 @@ package nextstep.subway.acceptance.section;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import nextstep.subway.acceptance.AcceptanceTestBase;
+import nextstep.subway.acceptance.common.AcceptanceTestBase;
 
 @DisplayName("구간 관리 인수테스트")
 class SectionAcceptanceTest extends AcceptanceTestBase {
