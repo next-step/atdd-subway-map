@@ -49,19 +49,14 @@ public class LineService {
 	public List<LineResponse> getLines() {
 		return lineRepository.findAll()
 			.stream()
-			.map(line -> this.getLine(line.getId()))
+			.map(this::lineResponse)
 			.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
 	public LineResponse getLine(Long lineId) {
 		Line line = lineRepository.findById(lineId).orElseThrow();
-
-		Sections sections = new Sections(sectionRepository.findAllByLineId(lineId));
-
-		List<Station> stations = stationRepository.findAllById(sections.getStationIds());
-
-		return new LineResponse(line, stations);
+		return lineResponse(line);
 	}
 
 	@Transactional
@@ -73,5 +68,11 @@ public class LineService {
 	@Transactional
 	public void deleteLine(Long id) {
 		lineRepository.deleteById(id);
+	}
+
+	private LineResponse lineResponse(Line line) {
+		Sections sections = new Sections(sectionRepository.findAllByLineId(line.getId()));
+		List<Station> stations = stationRepository.findAllById(sections.getStationIds());
+		return new LineResponse(line, stations);
 	}
 }
