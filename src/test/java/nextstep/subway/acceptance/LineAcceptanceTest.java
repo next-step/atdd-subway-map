@@ -1,17 +1,14 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static nextstep.subway.acceptance.LineTestFixtures.*;
+import static nextstep.subway.acceptance.StationTestFixtures.generateStation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선도 관련 기능")
@@ -24,45 +21,16 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void createSubwayLine() {
         //given
-        Map<String, String> upStation = new HashMap<>();
-        upStation.put("name", "강남역");
+        String upStationId = generateStation("강남역").jsonPath().getString("id");
+        String downStationId = generateStation("양재역").jsonPath().getString("id");
 
-        String upStationId = RestAssured.given().log().all()
-                .body(upStation)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> downStation = new HashMap<>();
-        downStation.put("name", "양재역");
-
-        String downStationId = RestAssured.given().log().all()
-                .body(downStation)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> lineParams = new HashMap<>();
-        lineParams.put("name", "신분당선");
-        lineParams.put("color", "bg-red-600");
-        lineParams.put("upStationId", upStationId);
-        lineParams.put("downStationId", downStationId);
-        lineParams.put("distance", "10");
-
-        ExtractableResponse<Response> extract = RestAssured
-                .given().log().all()
-                .body(lineParams).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = generateLine("신분당선", "bg-red-600", upStationId, downStationId, "10");
 
         Assertions.assertAll(
-                () -> assertThat(extract.jsonPath().getList("stations.name")).containsExactly("강남역", "양재역"),
-                () -> assertThat(extract.jsonPath().getString("name")).contains("신분당선"),
-                () -> assertThat(extract.jsonPath().getList("stations.id")).contains(Integer.valueOf(upStationId), Integer.valueOf(downStationId)),
-                () -> assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value())
+                () -> assertThat(response.jsonPath().getList("stations.name")).containsExactly("강남역", "양재역"),
+                () -> assertThat(response.jsonPath().getString("name")).contains("신분당선"),
+                () -> assertThat(response.jsonPath().getList("stations.id")).contains(Integer.valueOf(upStationId), Integer.valueOf(downStationId)),
+                () -> assertThat(response.response().statusCode()).isEqualTo(HttpStatus.CREATED.value())
         );
 
     }
@@ -75,84 +43,22 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 목록 조회")
     @Test
     void getSubwayLines() {
-        Map<String, String> upSinbundangParam = new HashMap<>();
-        upSinbundangParam.put("name", "강남역");
+        String upSinbundagStationId = generateStation("강남역").jsonPath().getString("id");
+        String downSinbundangStationId = generateStation("양재역").jsonPath().getString("id");
 
-        String upSinbundagStationId = RestAssured.given().log().all()
-                .body(upSinbundangParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
+        generateLine("신분당선", "bg-red-600", upSinbundagStationId, downSinbundangStationId, "10");
 
-        Map<String, String> downSingbundangParam = new HashMap<>();
-        downSingbundangParam.put("name", "양재역");
+        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
+        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
 
-        String downSinbundangStationId = RestAssured.given().log().all()
-                .body(downSingbundangParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
+        generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20");
 
-        Map<String, String> sinbundangLine = new HashMap<>();
-        sinbundangLine.put("name", "신분당선");
-        sinbundangLine.put("color", "bg-red-600");
-        sinbundangLine.put("upStationId", upSinbundagStationId);
-        sinbundangLine.put("downStationId", downSinbundangStationId);
-        sinbundangLine.put("distance", "10");
-
-        RestAssured
-                .given().log().all()
-                .body(sinbundangLine).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all();
-
-
-
-
-        Map<String, String> upSinlimParam = new HashMap<>();
-        upSinlimParam.put("name", "신림역");
-
-        String upSinlimStationId = RestAssured.given().log().all()
-                .body(upSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> downSinlimParam = new HashMap<>();
-        downSinlimParam.put("name", "당곡역");
-
-        String downSinlimStationId = RestAssured.given().log().all()
-                .body(downSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> sinlimLine = new HashMap<>();
-        sinlimLine.put("name", "신림선");
-        sinlimLine.put("color", "bg-red-600");
-        sinlimLine.put("upStationId", upSinlimStationId);
-        sinlimLine.put("downStationId", downSinlimStationId);
-        sinlimLine.put("distance", "10");
-
-        RestAssured
-                .given().log().all()
-                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all();
-
-        ExtractableResponse<Response> extract = RestAssured
-                .given().log().all()
-                .when().get("/lines")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = showLine();
 
         Assertions.assertAll(
-                () -> assertThat(extract.jsonPath().getList("name")).contains("신분당선", "신림선"),
-                () -> assertThat(extract.jsonPath().getList("station").size()).isEqualTo(2),
-                () -> assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.OK.value())
+                () -> assertThat(response.jsonPath().getList("name")).contains("신분당선", "신림선"),
+                () -> assertThat(response.jsonPath().getList("station").size()).isEqualTo(2),
+                () -> assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value())
         );
     }
 
@@ -164,43 +70,15 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 조회")
     @Test
     void getSubwayLine() {
-        Map<String, String> upSinlimParam = new HashMap<>();
-        upSinlimParam.put("name", "신림역");
+        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
+        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
 
-        String upSinlimStationId = RestAssured.given().log().all()
-                .body(upSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
+        String id =
+                generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20")
+                        .jsonPath()
+                        .getString("id");
 
-        Map<String, String> downSinlimParam = new HashMap<>();
-        downSinlimParam.put("name", "당곡역");
-
-        String downSinlimStationId = RestAssured.given().log().all()
-                .body(downSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> sinlimLine = new HashMap<>();
-        sinlimLine.put("name", "신림선");
-        sinlimLine.put("color", "bg-red-600");
-        sinlimLine.put("upStationId", upSinlimStationId);
-        sinlimLine.put("downStationId", downSinlimStationId);
-        sinlimLine.put("distance", "10");
-
-        String id = RestAssured
-                .given().log().all()
-                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract().jsonPath().getString("id");
-
-        ExtractableResponse<Response> extract = RestAssured
-                .given().log().all().pathParam("id", id)
-                .when().get("/lines/{id}")
-                .then().log().all().extract();
+        ExtractableResponse<Response> extract = showLine(id);
 
         Assertions.assertAll(
                 () -> assertThat(extract.jsonPath().getString("name")).isEqualTo("신림선"),
@@ -217,57 +95,21 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 수정")
     @Test
     void updateSubwayLine() {
-        Map<String, String> upSinlimParam = new HashMap<>();
-        upSinlimParam.put("name", "신림역");
+        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
+        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
 
-        String upSinlimStationId = RestAssured.given().log().all()
-                .body(upSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
+        String id =
+                generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20")
+                    .jsonPath()
+                    .getString("id");
 
-        Map<String, String> downSinlimParam = new HashMap<>();
-        downSinlimParam.put("name", "당곡역");
-
-        String downSinlimStationId = RestAssured.given().log().all()
-                .body(downSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> sinlimLine = new HashMap<>();
-        sinlimLine.put("name", "신림선");
-        sinlimLine.put("color", "bg-red-600");
-        sinlimLine.put("upStationId", upSinlimStationId);
-        sinlimLine.put("downStationId", downSinlimStationId);
-        sinlimLine.put("distance", "10");
-
-        //저장
-        String id = RestAssured
-                .given().log().all()
-                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract().jsonPath().getString("id");
-
-        Map<String, String> updateParam = new HashMap<>();
-        updateParam.put("name", "구미선");
-        updateParam.put("color", "bg-blue-30000");
-
-        //수정
-        ExtractableResponse<Response> putExtract = RestAssured
-                .given().log().all().pathParam("id",id).body(updateParam).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/lines/{id}")
-                .then().log().all().extract();
+        updateLine("구미선", "bg-white-200", id);
 
         //수정된 데이터 출력
-        ExtractableResponse<Response> getExtract = RestAssured
-                .given().log().all().pathParam("id", id)
-                .when().get("/lines/{id}")
-                .then().log().all().extract();
-        assertThat(getExtract.jsonPath().getString("name")).isEqualTo("구미선");
-        assertThat(getExtract.response().statusCode()).isEqualTo(HttpStatus.OK.value());
+        ExtractableResponse<Response> response = showLine(id);
+
+        assertThat(response.jsonPath().getString("name")).isEqualTo("구미선");
+        assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     /**
@@ -278,44 +120,16 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteSubwayLine() {
-        Map<String, String> upSinlimParam = new HashMap<>();
-        upSinlimParam.put("name", "신림역");
+        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
 
-        String upSinlimStationId = RestAssured.given().log().all()
-                .body(upSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
+        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
 
-        Map<String, String> downSinlimParam = new HashMap<>();
-        downSinlimParam.put("name", "당곡역");
+        String id =
+                generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20")
+                    .jsonPath()
+                    .getString("id");
 
-        String downSinlimStationId = RestAssured.given().log().all()
-                .body(downSinlimParam)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getString("id");
-
-        Map<String, String> sinlimLine = new HashMap<>();
-        sinlimLine.put("name", "신림선");
-        sinlimLine.put("color", "bg-red-600");
-        sinlimLine.put("upStationId", upSinlimStationId);
-        sinlimLine.put("downStationId", downSinlimStationId);
-        sinlimLine.put("distance", "10");
-
-        //저장
-        String id = RestAssured
-                .given().log().all()
-                .body(sinlimLine).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all().extract().jsonPath().getString("id");
-
-        ExtractableResponse<Response> extract = RestAssured
-                .given().log().all().pathParam("id", id)
-                .when().delete("/lines/{id}")
-                .then().log().all().extract();
+        ExtractableResponse<Response> extract = deleteLine(id);
 
         assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
