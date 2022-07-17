@@ -28,6 +28,7 @@ public class Sections {
             .map(Section::stations)
             .flatMap(List::stream)
             .distinct()
+            .sorted(Comparator.comparingLong(Station::getId))
             .collect(Collectors.toUnmodifiableList());
     }
 
