@@ -43,13 +43,11 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_등록() {
         // when
-        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 역삼역, 판교역, 10);
+        ExtractableResponse<Response> response = 지하철_구간_등록(신분당선, 역삼역, 판교역, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        List<Long> 구간_목록 = 구간_목록_조회();
-        assertThat(구간_목록).contains(역삼역, 판교역);
+        지하철_구간_등록됨(판교역);
     }
 
     /**
@@ -60,11 +58,10 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_등록_상행역_에러() {
         // when
-        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 판교역, 강남역, 10);
+        ExtractableResponse<Response> response = 지하철_구간_등록(신분당선, 판교역, 강남역, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("errorMessage")).contains("상행역은 하행종점역이어야 합니다.");
+        상행역이_하행종점역이_아니면_예외_발생(response);
     }
 
     /**
@@ -75,11 +72,10 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_등록_하행역_에러() {
         // when
-        ExtractableResponse<Response> response = 지하철_구간_등록됨(신분당선, 역삼역, 삼성역, 10);
+        ExtractableResponse<Response> response = 지하철_구간_등록(신분당선, 역삼역, 삼성역, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("errorMessage")).contains("이미 등록된 역입니다.");
+        이미_등록된_역이면_예외_발생(response);
     }
 
     /**
@@ -91,7 +87,7 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_제거() {
         // given
-        ExtractableResponse<Response> response1 = 지하철_구간_등록됨(신분당선, 역삼역, 판교역, 10);
+        ExtractableResponse<Response> response1 = 지하철_구간_등록(신분당선, 역삼역, 판교역, 10);
         assertThat(response1.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // when
@@ -99,8 +95,7 @@ class SectionAcceptanceTest extends AcceptanceTest{
 
         // then
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        List<Long> 구간_목록 = 구간_목록_조회();
-        assertThat(구간_목록).isNotIn(판교역);
+        지하철_구간_삭제됨(판교역);
     }
 
     /**
@@ -112,15 +107,14 @@ class SectionAcceptanceTest extends AcceptanceTest{
     @Test
     void 지하철_구간_제거_마지막_구간_에러() {
         // given
-        지하철_구간_등록됨(신분당선, 역삼역, 판교역, 10);
-        지하철_구간_등록됨(신분당선, 판교역, 강남역, 10);
+        지하철_구간_등록(신분당선, 역삼역, 판교역, 10);
+        지하철_구간_등록(신분당선, 판교역, 강남역, 10);
 
         // when
         ExtractableResponse<Response> response = 지하철_구간_삭제(신분당선, 판교역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
+        마지막_구간이_아니면_예외_발생(response);
     }
 
     /**
@@ -134,10 +128,8 @@ class SectionAcceptanceTest extends AcceptanceTest{
         ExtractableResponse<Response> response = 지하철_구간_삭제(신분당선, 역삼역);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("errorMessage")).contains("구간이 1개일 때는 구간 제거가 불가능합니다.");
+        구간_1개면_예외_발생(response);
     }
-
 
     private long 지하철역_추가됨(String name){
         Map<String, String> params = new HashMap<>();
@@ -175,19 +167,21 @@ class SectionAcceptanceTest extends AcceptanceTest{
         return response.jsonPath().getLong("id");
     }
 
-    private ExtractableResponse<Response> 지하철_구간_등록됨(long lineId, long upStationId, long downStationId, long distance) {
+    private ExtractableResponse<Response> 지하철_구간_등록(long lineId, long upStationId, long downStationId, long distance) {
         Map<String, String> params = new HashMap<>();
         params.put("lineId", String.valueOf(lineId));
         params.put("upStationId", String.valueOf(upStationId));
         params.put("downStationId", String.valueOf(downStationId));
         params.put("distance", String.valueOf(distance));
 
-        return RestAssured.given().log().all()
+        ExtractableResponse<Response> response =  RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("lines/"+신분당선+"/sections")
                 .then().log().all()
                 .extract();
+
+        return response;
     }
 
     private List<Long> 구간_목록_조회() {
@@ -198,10 +192,44 @@ class SectionAcceptanceTest extends AcceptanceTest{
     }
 
     private ExtractableResponse<Response> 지하철_구간_삭제(long lineId, long stationId) {
-        return RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("lines/"+lineId+"/sections?stationId="+stationId)
                 .then().log().all()
                 .extract();
+
+        return response;
+    }
+
+    private void 지하철_구간_삭제됨(long stationId) {
+        List<Long> 구간_목록 = 구간_목록_조회();
+        assertThat(구간_목록).isNotIn(stationId);
+    }
+
+
+    private void 지하철_구간_등록됨(long stationId) {
+        List<Long> 구간_목록 = 구간_목록_조회();
+        assertThat(구간_목록).contains(stationId);
+    }
+
+    private void 마지막_구간이_아니면_예외_발생(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("마지막 구간이 아닙니다.");
+    }
+
+    private void 구간_1개면_예외_발생(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("구간이 1개일 때는 구간 제거가 불가능합니다.");
+    }
+
+
+    private void 이미_등록된_역이면_예외_발생(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("이미 등록된 역입니다.");
+    }
+
+    private void 상행역이_하행종점역이_아니면_예외_발생(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("errorMessage")).contains("상행역은 하행종점역이어야 합니다.");
     }
 }
