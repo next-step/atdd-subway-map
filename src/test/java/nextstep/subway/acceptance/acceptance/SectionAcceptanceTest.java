@@ -1,21 +1,5 @@
 package nextstep.subway.acceptance.acceptance;
 
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-
-import java.util.List;
-
-import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노선을_3개를_생성한다;
-import static nextstep.subway.acceptance.sample.LineSampleData.신분당선_노선을_생성한다;
-import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_목록_조회를_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_조회를_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_생성을_요청한다;
 import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하철구간_등록을_요청한다;
@@ -23,16 +7,31 @@ import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하�
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import java.util.List;
+import nextstep.subway.acceptance.utils.DatabaseCleanup;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class SectionAcceptanceTest {
     @LocalServerPort
     int port;
+    @Autowired
+    DatabaseCleanup databaseCleanup;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        databaseCleanup.execute();
     }
 
     /**
@@ -93,14 +92,14 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간의_상행역이_하행종점역이_아닐경우_등록실패() {
         // given
-        long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
-        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", upStationId, downStationId, (long) 10).jsonPath().getLong("id");
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 10).jsonPath().getLong("id");
 
         // when
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
         long failStationId = 지하철역_생성을_요청한다("수원역").jsonPath().getLong("id");
-        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(lineId, failStationId, newStationId, 10);
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, failStationId, newStationId, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
