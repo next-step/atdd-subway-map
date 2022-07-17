@@ -278,10 +278,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", 5);
 
         //when
-        ExtractableResponse<Response> addSectionResponse = post(url, params);
+        ExtractableResponse<Response> 구간등록_응답 = post(url, params);
 
         //then
-        assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(구간등록_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
@@ -325,10 +325,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", 5);
 
         //when
-        ExtractableResponse<Response> addSectionResponse = post(url, params);
+        ExtractableResponse<Response> 구간등록_응답 = post(url, params);
 
         //then
-        assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(구간등록_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**
@@ -367,12 +367,95 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", 5);
 
         //when
-        ExtractableResponse<Response> addSectionResponse = post(url, params);
+        ExtractableResponse<Response> 구간등록_응답 = post(url, params);
 
         //then
-        assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(구간등록_응답.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    /**
+     * given : 지하철역을 생성한다.
+     * given : 지하철 노선을 생성한다.
+     * given : 지하철 구간을 등록한다.
+     * when : 등록된 구간을 제거한다.
+     * then : 지하철 노선에 구간이 1개 존재한다.
+     */
+    @DisplayName("지하철 노선에 구간을 제거하는 기능")
+    @Test
+    void removeSection() {
+
+        final String 신분당선 = "신분당선";
+        final String 강남역 = "강남역";
+        final String 시청역 = "시청역";
+        final String 구로디지털단지역 = "구로디지털단지역";
+        final String color = "red";
+        final int distance = 10;
+
+        //given
+        ExtractableResponse<Response> 강남역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(강남역);
+        long 강남역_아이디 = 강남역_응답.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 시청역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(시청역);
+        long 시청역_아이디 = 시청역_응답.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 구로디지털단지역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(구로디지털단지역);
+        long 구로디지털단지역_아이디 = 구로디지털단지역_응답.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 신분당선_응답 = 지하철노선_생성_요청_응답(신분당선, 강남역_아이디, 시청역_아이디, color, distance);
+        long 신분당선_아이디 = 신분당선_응답.jsonPath().getLong("id");
+
+        final String url = "/lines/" + 신분당선_아이디 + "/sections";
+        Map<String, Object> params = new HashMap<>();
+        params.put("downStationId", 구로디지털단지역_아이디); // 구로디지털단지역
+        params.put("upStationId", 시청역_아이디); // 시청역
+        params.put("distance", 5);
+
+        ExtractableResponse<Response> 구간등록_응답 = post(url, params);
+        assertThat(구간등록_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        //when
+        ExtractableResponse<Response> 제거_응답 = delete("/lines/" + 신분당선_아이디 + "/sections?stationId=" + 구로디지털단지역_아이디);
+
+        //then
+        assertThat(제거_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    /**
+     * given : 지하철역을 생성한다.
+     * given : 지하철 노선을 생성한다.
+     * when : 지하철 구간을 제거한다.
+     * then : 예외가 발생한다.
+     */
+    @DisplayName("지하철 노선에 존재하는 구간이 1개일경우 삭제할 수 없다.")
+    @Test
+    void notRemoveSectionIfSectionOnce() {
+
+        final String 신분당선 = "신분당선";
+        final String 강남역 = "강남역";
+        final String 시청역 = "시청역";
+        final String 구로디지털단지역 = "구로디지털단지역";
+        final String color = "red";
+        final int distance = 10;
+
+        //given
+        ExtractableResponse<Response> 강남역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(강남역);
+        long 강남역_아이디 = 강남역_응답.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 시청역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(시청역);
+        long 시청역_아이디 = 시청역_응답.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 구로디지털단지역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(구로디지털단지역);
+        long 구로디지털단지역_아이디 = 구로디지털단지역_응답.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 신분당선_응답 = 지하철노선_생성_요청_응답(신분당선, 강남역_아이디, 시청역_아이디, color, distance);
+        long 신분당선_아이디 = 신분당선_응답.jsonPath().getLong("id");
+
+        //when
+        ExtractableResponse<Response> 제거_응답 = delete("/lines/" + 신분당선_아이디 + "/sections?stationId=" + 시청역_아이디);
+
+        //then
+        assertThat(제거_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
 
 
 }
