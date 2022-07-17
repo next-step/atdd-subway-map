@@ -1,7 +1,9 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Builder;
 import nextstep.subway.domain.Line;
 
+@Builder
 public class LineRequest {
 
     private String name;

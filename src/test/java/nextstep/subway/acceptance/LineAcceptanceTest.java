@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.LineRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,29 +24,17 @@ public class LineAcceptanceTest {
 
     @LocalServerPort
     int port;
-
-    private static final Map<String, Object> LINE_5 = new HashMap<>();
-    private static final Map<String, Object> LINE_2 = new HashMap<>();
-
     private static final String LINE_NAME_5 = "5호선";
     private static final String LINE_COLOR_5 = "#996CAC";
+    private static final String LINE_NAME_5_UP = "5호선 상행선";
+    private static final String LINE_COLOR_5_UP = "#996CAD";
     private static final String LINE_NAME_9 = "9호선";
     private static final String LINE_COLOR_9 = "#BDB092";
 
-
-    public LineAcceptanceTest() {
-        LINE_5.put("name", LINE_NAME_5);
-        LINE_5.put("color", LINE_COLOR_5);
-        LINE_5.put("upStationId", 1);
-        LINE_5.put("downStationId", 2);
-        LINE_5.put("distance", 48);
-
-        LINE_2.put("name", LINE_NAME_9);
-        LINE_2.put("color", LINE_COLOR_9);
-        LINE_2.put("upStationId", 2);
-        LINE_2.put("downStationId", 4);
-        LINE_2.put("distance", 37);
-    }
+    private static final LineRequest LINE_5 = new LineRequest(
+            LINE_NAME_5, LINE_COLOR_5, 1L, 3L, 48L);
+    private static final LineRequest LINE_2 = new LineRequest(
+            LINE_NAME_9, LINE_COLOR_9, 2L, 4L, 37L);
 
     @BeforeEach
     public void setUp() {
@@ -90,7 +79,7 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
-        assertThat(response.jsonPath().getList("name")).containsExactly(LINE_5.get("name"), LINE_2.get("name"));
+        assertThat(response.jsonPath().getList("name")).containsExactly(LINE_5.getName(), LINE_2.getName());
     }
 
     /**
@@ -109,8 +98,8 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> response = 지하철_노선_조회(id);
 
         // then
-        assertThat(response.jsonPath().get("name").equals(LINE_5.get("name"))).isTrue();
-        assertThat(response.jsonPath().get("color").equals(LINE_5.get("color"))).isTrue();
+        assertThat(response.jsonPath().get("name").equals(LINE_5.getName())).isTrue();
+        assertThat(response.jsonPath().get("color").equals(LINE_5.getColor())).isTrue();
     }
 
     /**
@@ -142,19 +131,20 @@ public class LineAcceptanceTest {
     void updateLine() {
         // given
         int id = 지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        Map<String, String> updateParams = new HashMap<>();
-        updateParams.put("name", "5호선 상행선");
-        updateParams.put("color", "#996CAC");
+        LineRequest request = LineRequest.builder()
+                .name(LINE_NAME_5_UP)
+                .color(LINE_COLOR_5_UP)
+                .build();
 
         // when
-        ExtractableResponse<Response> updatedResponse = 지하철_노선_수정(id, updateParams);
+        ExtractableResponse<Response> updatedResponse = 지하철_노선_수정(id, request);
         ExtractableResponse<Response> response = 지하철_노선_조회(id);
 
         // then
         assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().get("name").equals(updateParams.get("name"))).isTrue();
-        assertThat(response.jsonPath().get("color").equals(updateParams.get("color"))).isTrue();
-        assertThat(response.jsonPath().getInt("distance")).isEqualTo(LINE_5.get("distance"));
+        assertThat(response.jsonPath().get("name").equals(request.getName())).isTrue();
+        assertThat(response.jsonPath().get("color").equals(request.getColor())).isTrue();
+        assertThat(response.jsonPath().getInt("distance")).isEqualTo(LINE_5.getDistance().intValue());
     }
 
     /**
@@ -186,9 +176,9 @@ public class LineAcceptanceTest {
                 .then().log().all();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정(int id, Map<String, String> updateParams) {
+    private ExtractableResponse<Response> 지하철_노선_수정(int id, LineRequest request) {
         return RestAssured.given().log().all()
-                .body(updateParams)
+                .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/" + id)
                 .then().log().all()
@@ -212,9 +202,9 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_노선_생성(Map<String, Object> params) {
+    private ExtractableResponse<Response> 지하철_노선_생성(LineRequest request) {
         return RestAssured.given().log().all()
-                .body(params)
+                .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
