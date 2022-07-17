@@ -157,7 +157,7 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given 1개의 구간을 가진 지하철 노선을 생성하고,
+     * Given 2개의 구간을 가진 지하철 노선을 생성하고,
      * When 지하철 하행 종점역이 아닌 역을 제거하면,
      * Then 지하철 구간 삭제 요청은 실패한다.
      */
@@ -165,10 +165,17 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간의_상행역이_하행종점역이_아닐경우_삭제실패() {
         // given
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 양재역 = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 15).jsonPath().getLong("id");
+        지하철구간_등록을_요청한다(신분당선, 신논현역, 양재역, 7);
 
         // when
+        ExtractableResponse<Response> response = 지하철구간_삭제를_요청한다(신분당선, 강남역);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
