@@ -9,10 +9,6 @@ public class Station {
     private Long id;
     private String name;
 
-    @OneToOne()
-    @JoinColumn(name = "section_id")
-    private Section section;
-
     protected Station() {
     }
 
@@ -26,13 +22,5 @@ public class Station {
 
     public String getName() {
         return name;
-    }
-
-	public void addSection(Station downStation, Integer distance) {
-        this.section = new Section(downStation, distance);
-	}
-
-    public Section getSection() {
-        return section;
     }
 }
