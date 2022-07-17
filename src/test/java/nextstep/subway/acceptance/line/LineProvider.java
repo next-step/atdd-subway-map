@@ -57,4 +57,8 @@ public class LineProvider extends ProviderBase {
 		return response.jsonPath().getString("color");
 	}
 
+	public static String 하행_종점역_Id_추출(ExtractableResponse<Response> response) {
+		return response.jsonPath().getString("$.stations[-1:0].id");
+	}
+
 }

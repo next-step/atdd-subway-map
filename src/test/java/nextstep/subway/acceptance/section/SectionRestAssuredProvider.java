@@ -11,7 +11,7 @@ import io.restassured.response.Response;
 
 public class SectionRestAssuredProvider {
 
-	public static ExtractableResponse<Response> 지하철_구간_추가(Long lineId, Long upStationId, Long downStationId,
+	public static ExtractableResponse<Response> 지하철_구간_추가(String lineId, String upStationId, String downStationId,
 		int distance) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("upStationId", upStationId);

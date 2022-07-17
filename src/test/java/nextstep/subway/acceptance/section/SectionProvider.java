@@ -9,7 +9,7 @@ import nextstep.subway.acceptance.common.ProviderBase;
 
 public class SectionProvider extends ProviderBase {
 
-	public static ExtractableResponse<Response> 지하철_구간_추가_성공(Long lineId, Long upStationId, Long downStationId,
+	public static ExtractableResponse<Response> 지하철_구간_추가_성공(String lineId, String upStationId, String downStationId,
 		int distance) {
 		ExtractableResponse<Response> response = 지하철_구간_추가(lineId, upStationId, downStationId, distance);
 		응답코드_검증(response, CREATED);
