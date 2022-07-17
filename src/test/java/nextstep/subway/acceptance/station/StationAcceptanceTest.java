@@ -6,7 +6,6 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -26,20 +25,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_생성_테스트() {
         // when 지하철역을 생성하면
-        ExtractableResponse<Response> response = 지하철역_생성(GANGNAM_STATION);
-        assertAll(
-                // then 지하철역이 생성된다
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-                () -> assertThat(지하철역_목록_조회().jsonPath().getList("name")).containsAnyOf(GANGNAM_STATION)
-        );
-    }
-
-    private ExtractableResponse<Response> 지하철역_목록_조회() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_생성(GANGNAM_STATION_NAME);
+        StationSteps.노선_생성_검증(response);
     }
 
     /**
@@ -51,8 +38,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_목록_조회_테스트() {
         // given 2개의 지하철역을 생성하고
-        지하철역_생성(GANGNAM_STATION);
-        지하철역_생성(YUKSAM_STATION);
+        지하철역_생성(GANGNAM_STATION_NAME);
+        지하철역_생성(YUKSAM_STATION_NAME);
 
         // when 지하철역 목록을 조회하면
         List<String> stationNames = 지하철역_목록_조회().jsonPath().getList("name");
@@ -62,8 +49,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
                 // then 지하철역이 생성된다
                 () -> assertThat(stationNames.size()).isEqualTo(2),
                 // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-                () -> assertThat(stationNames).containsAnyOf(GANGNAM_STATION),
-                () -> assertThat(stationNames).containsAnyOf(YUKSAM_STATION)
+                () -> assertThat(stationNames).containsAnyOf(GANGNAM_STATION_NAME),
+                () -> assertThat(stationNames).containsAnyOf(YUKSAM_STATION_NAME)
         );
     }
 
@@ -76,12 +63,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철역_삭제_테스트() {
         // 지하철역 생성
-        ExtractableResponse<Response> createResponse = 지하철역_생성(GANGNAM_STATION);
+        ExtractableResponse<Response> createResponse = 지하철역_생성(GANGNAM_STATION_NAME);
         // 지하철역 삭제
         ExtractableResponse<Response> deleteResponse = 지하철역_삭제(createResponse.jsonPath().get("id"));
         // 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-        List<String> stationNames = 지하철역_목록_조회().jsonPath().getList("name");
-        assertThat(stationNames).doesNotContain(GANGNAM_STATION);
+        역_삭제_검증();
     }
 
     private ExtractableResponse<Response> 지하철역_삭제(int id) {
