@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 
 public class LineAcceptanceTestUtils {
 
-    void 지하철_노선_삭제(int id) {
+    void 지하철_노선_삭제(Long id) {
         RestAssured.given().log().all()
                 .when().delete("/lines/" + id)
                 .then().log().all();
     }
 
-    ExtractableResponse<Response> 지하철_노선_수정(int id, LineRequest request) {
+    ExtractableResponse<Response> 지하철_노선_수정(Long id, LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -24,7 +24,7 @@ public class LineAcceptanceTestUtils {
     }
 
 
-    ExtractableResponse<Response> 지하철_노선_조회(int id) {
+    ExtractableResponse<Response> 지하철_노선_조회(Long id) {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/" + id)
