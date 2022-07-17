@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/lines")
 public class LineController {
 	private final LineService lineService;
 
@@ -19,29 +20,29 @@ public class LineController {
 		this.lineService = lineService;
 	}
 
-	@PostMapping("/lines")
+	@PostMapping("")
 	public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
 		LineResponse line = lineService.saveLine(lineRequest);
 		return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
 	}
 
-	@GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LineResponse>> showLines() {
 		return ResponseEntity.ok().body(lineService.findAllLines());
 	}
 
-	@GetMapping("/lines/{lineId}")
+	@GetMapping("/{lineId}")
 	public ResponseEntity<LineResponse> showLine(@PathVariable Long lineId) {
 		return ResponseEntity.ok().body(lineService.findLineById(lineId));
 	}
 
-	@PutMapping("/lines/{lineId}")
+	@PutMapping("/{lineId}")
 	public ResponseEntity<Void> updateLine(@PathVariable Long lineId, @RequestBody LineUpdateRequest lineUpdateRequest) {
 		lineService.updateLine(lineId, lineUpdateRequest);
 		return ResponseEntity.noContent().build();
 	}
 
-	@DeleteMapping("/lines/{lineId}")
+	@DeleteMapping("/{lineId}")
 	public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
 		lineService.deleteLineById(lineId);
 		return ResponseEntity.noContent().build();
