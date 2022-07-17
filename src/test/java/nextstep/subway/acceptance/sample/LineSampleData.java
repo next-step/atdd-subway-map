@@ -1,7 +1,6 @@
 package nextstep.subway.acceptance.sample;
 
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_생성을_요청한다;
-import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하철구간_등록을_요청한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 
 import io.restassured.response.ExtractableResponse;
@@ -20,6 +19,5 @@ public class LineSampleData {
         long downStationId = 지하철역_생성을_요청한다("신도림역").jsonPath().getLong("id");
 
         return 지하철노선을_생성을_요청한다("1호선", "bg-blue-600", upStationId, downStationId, (long) 15);
-    }
     }
 }

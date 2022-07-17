@@ -43,16 +43,16 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간_등록성공() {
         // given
-        long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
-        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", upStationId, downStationId, (long) 10).jsonPath().getLong("id");
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 10).jsonPath().getLong("id");
 
         // when
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
-        지하철구간_등록을_요청한다(lineId, downStationId, newStationId, 10);
+        지하철구간_등록을_요청한다(신분당선, 신논현역, newStationId, 10);
 
         // then
-        ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(lineId);
+        ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
         List<String> lineNames = lineResponse.jsonPath().get("stations.name");
         assertThat(lineNames).containsExactly("강남역", "신논현역", "양재역");
     }
@@ -69,13 +69,13 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철구간이_지하철노선의_하행종점역이고_해당노선에_존재하지않으면_등록성공() {
         // given
-        long upStationId = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
-        long downStationId = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
-        long lineId = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", upStationId, downStationId, (long) 10).jsonPath().getLong("id");
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 10).jsonPath().getLong("id");
 
         // when
         long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
-        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(lineId, downStationId, newStationId, 10);
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, 신논현역, newStationId, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
