@@ -36,7 +36,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 	@Test
 	void addSection(){
 		// when
-		지하철_구간_등록(1L, 2L, 4L, 10);
+		지하철_구간_등록(1L, 2L, 3L, 10);
 		List<String> stations = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
 		// then
 		assertThat(stations).containsAll(List.of("논현역", "신논현역", "강남역"));
@@ -69,7 +69,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 				.given().log().all()
 				.body(params)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/lines/{lineId}/sections", lineId)
+				.when().delete("/lines/{lineId}/sections", lineId)
 				.then().log().all()
 				.extract();
 	}
