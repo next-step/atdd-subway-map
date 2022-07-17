@@ -26,7 +26,6 @@ public class SectionService {
 
 		subwayLine.validate(section);
 
-		sectionRepository.save(section);
 		subwayLine.saveSection(section);
 	}
 

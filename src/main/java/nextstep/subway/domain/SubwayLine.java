@@ -22,7 +22,7 @@ public class SubwayLine {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany(mappedBy = "subwayLine")
+	@OneToMany(mappedBy = "subwayLine", cascade = CascadeType.ALL)
 	private List<Section> sectionList = new ArrayList<>();
 
 	private String name;
@@ -31,7 +31,7 @@ public class SubwayLine {
 	private Long downStationId;
 	private Integer distance;
 
-	public SubwayLine(Long id, Section section, String name, String color, Long upStationId, Long downStationId, Integer distance) {
+	public SubwayLine(Long id, Section section, String  name, String color, Long upStationId, Long downStationId, Integer distance) {
 		this.id = id;
 		saveSection(section);
 		this.name = name;
