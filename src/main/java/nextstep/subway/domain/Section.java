@@ -50,4 +50,12 @@ public class Section {
   public List<Station> getSectionInStation() {
     return Arrays.asList(downStation, upStation);
   }
+
+  public long getUpStationId() {
+    return this.upStation.getId();
+  }
+
+  public long getDownStationId() {
+    return this.downStation.getId();
+  }
 }

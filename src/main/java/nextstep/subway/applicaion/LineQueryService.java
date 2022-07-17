@@ -7,7 +7,7 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.common.ErrorMessage;
+import nextstep.subway.common.exception.ErrorMessage;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
@@ -29,7 +29,7 @@ public class LineQueryService {
 
     List<Line> lines = lineRepository.findAll();
     for (Line line : lines) {
-      List<Station> stations = getSectionInStations(sectionRepository.findByLine(line));
+      List<Station> stations = getSectionInStations(sectionRepository.findByLineOrderByIdAsc(line));
       lineResponses.add(LineResponse.createResponse(line, stations));
     }
     return lineResponses;
@@ -37,7 +37,7 @@ public class LineQueryService {
 
   public LineResponse getLine(Long id) {
     Line line = findLine(id);
-    List<Section> sections = sectionRepository.findByLine(line);
+    List<Section> sections = sectionRepository.findByLineOrderByIdAsc(line);
     List<Station> stations = getSectionInStations(sections);
     return LineResponse.createResponse(line, stations);
   }

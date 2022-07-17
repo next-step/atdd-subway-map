@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
-  List<Section> findByLine(Line line);
+  List<Section> findByLineOrderByIdAsc(Line line);
 
   void deleteByLine(Line line);
 }
