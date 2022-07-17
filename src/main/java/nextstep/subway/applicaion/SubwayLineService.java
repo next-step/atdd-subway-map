@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
+import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
-import nextstep.subway.repository.StationRepository;
 import nextstep.subway.domain.SubwayLine;
+import nextstep.subway.repository.StationRepository;
 import nextstep.subway.repository.SubwayLineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +26,9 @@ public class SubwayLineService {
 
 	@Transactional
 	public SubwayLineResponse createSubwayLine(SubwayLineRequest request) {
-		SubwayLine savedLine = lineRepository.save(request.toEntity());
-		List<Station> upAndDownStation = getUpAndDownStation(request.getUpStationId(), request.getDownStationId());
-		return new SubwayLineResponse(savedLine, upAndDownStation);
+		Section section = new Section(request.getUpStationId(), request.getDownStationId(), request.getDistance());
+		SubwayLine savedLine = lineRepository.save(request.toEntity(section));
+		return new SubwayLineResponse(savedLine, findAllStations(savedLine));
 	}
 
 	@Transactional
@@ -45,17 +46,32 @@ public class SubwayLineService {
 	public List<SubwayLineResponse> findAll() {
 		return lineRepository.findAll().stream()
 				.map(line -> new SubwayLineResponse(
-						line, getUpAndDownStation(line.getUpStationId(), line.getDownStationId())))
+						line, findAllStations(line)))
 				.collect(Collectors.toList());
 	}
 
 	public SubwayLineResponse findById(Long id) {
 		SubwayLine subwayLine = findSubwayLineById(id);
-		return new SubwayLineResponse(subwayLine, getUpAndDownStation(subwayLine.getUpStationId(), subwayLine.getDownStationId()));
+		return new SubwayLineResponse(subwayLine, findAllStations(subwayLine));
 	}
 
-	private List<Station> getUpAndDownStation(Long upStationId, Long downStationId) {
-		return stationRepository.findAllById(List.of(upStationId, downStationId));
+	private List<Station> findAllStations(SubwayLine subwayLine) {
+		List<Section> sectionList = subwayLine.getSectionList();
+		List<Long> stationIdList = sectionList.stream()
+				.map(Section::getUpStationId)
+				.collect(Collectors.toList());
+
+		stationIdList.add(lastSection(sectionList).getDownStationId());
+
+		return stationIdList.stream()
+				.map(
+						id -> stationRepository.findById(id).orElseThrow(NoSuchElementException::new)
+				)
+				.collect(Collectors.toList());
+	}
+
+	private Section lastSection(List<Section> sectionList) {
+		return sectionList.get(sectionList.size() - 1);
 	}
 
 	private SubwayLine findSubwayLineById(Long id) {

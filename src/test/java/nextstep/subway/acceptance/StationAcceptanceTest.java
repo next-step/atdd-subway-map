@@ -3,16 +3,18 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static nextstep.subway.acceptance.StationUtils.*;
+import static nextstep.subway.acceptance.utils.StationUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -22,9 +24,13 @@ public class StationAcceptanceTest {
 	@LocalServerPort
 	int port;
 
+	@Autowired
+	DatabaseCleanup databaseCleanup;
+
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
+		databaseCleanup.execute();
 	}
 
 	/**
