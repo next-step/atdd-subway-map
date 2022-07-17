@@ -6,9 +6,8 @@ import nextstep.subway.applicaion.dto.subwayline.SubwayLineRequest;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineResponse;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Station;
-import nextstep.subway.repository.SectionRepository;
-import nextstep.subway.repository.StationRepository;
 import nextstep.subway.domain.SubwayLine;
+import nextstep.subway.repository.StationRepository;
 import nextstep.subway.repository.SubwayLineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +23,10 @@ public class SubwayLineService {
 
 	private final SubwayLineRepository lineRepository;
 	private final StationRepository stationRepository;
-	private final SectionRepository sectionRepository;
 
 	@Transactional
 	public SubwayLineResponse createSubwayLine(SubwayLineRequest request) {
-		Section section = sectionRepository.save(new Section(request.getUpStationId(), request.getDownStationId(), request.getDistance()));
+		Section section = new Section(request.getUpStationId(), request.getDownStationId(), request.getDistance());
 		SubwayLine savedLine = lineRepository.save(request.toEntity(section));
 		List<Station> upAndDownStation = getUpAndDownStation(request.getUpStationId(), request.getDownStationId());
 		return new SubwayLineResponse(savedLine, upAndDownStation);
