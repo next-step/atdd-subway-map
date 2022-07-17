@@ -121,4 +121,38 @@ public class SectionAcceptanceTest extends BasicAcceptanceTest {
     assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
     assertThat(saveSectionResponse.jsonPath().getString("message")).isEqualTo(ErrorMessage.LINE_CONTAINS_STATION);
   }
+
+  /**
+   * Given 지하철 구간을 생성하고
+   * When 생성한 지하철 구간을 삭제하면
+   * Then 해당 지하철 구간 정보는 삭제된다
+   */
+  @Test
+  void 지하철_구간_제거() {
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
+
+    long lineId = lineRestAssured.saveLine(firstLine, stationResponses.get(0), stationResponses.get(1)).jsonPath().getLong("id");
+
+    Map<String, Object> param = new HashMap<>();
+    param.put("downStationId", stationResponses.get(2).getId());
+    param.put("upStationId", stationResponses.get(1).getId());
+    param.put("distance", 10);
+
+    ExtractableResponse<Response> saveSectionResponse = RestAssured.given().log().all()
+        .body(param)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/lines/" + lineId + "/sections")
+        .then().log().all()
+        .extract();
+    assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+    ExtractableResponse<Response> response = RestAssured.given().log().all()
+        .body(param)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .delete("/lines/" + lineId + "/sections?stationId=" + stationResponses.get(2).getId())
+        .then().log().all()
+        .extract();
+    assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+  }
 }
