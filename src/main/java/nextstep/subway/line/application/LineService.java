@@ -12,6 +12,9 @@ import nextstep.subway.line.application.dto.CreateLineRequest;
 import nextstep.subway.line.application.dto.CreateLineResponse;
 import nextstep.subway.line.application.dto.LineResponse;
 import nextstep.subway.line.application.dto.ModifyLineRequest;
+import nextstep.subway.section.Section;
+import nextstep.subway.section.SectionRepository;
+import nextstep.subway.section.Sections;
 import nextstep.subway.station.Station;
 import nextstep.subway.station.StationRepository;
 
@@ -20,32 +23,45 @@ public class LineService {
 
 	private final LineRepository lineRepository;
 	private final StationRepository stationRepository;
+	private final SectionRepository sectionRepository;
 
-	public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+	public LineService(LineRepository lineRepository, StationRepository stationRepository,
+		SectionRepository sectionRepository) {
 		this.lineRepository = lineRepository;
 		this.stationRepository = stationRepository;
+		this.sectionRepository = sectionRepository;
 	}
 
 	@Transactional
 	public CreateLineResponse createLine(CreateLineRequest request) {
-		Line line = new Line(request.getName(), request.getColor(), request.getUpStationId(),
-			request.getDownStationId(), request.getDistance());
+		Line line = lineRepository.save(new Line(request.getName(), request.getColor()));
 
-		return createLineResponse(lineRepository.save(line));
+		Section section = sectionRepository.save(
+			new Section(line.getId(), request.getUpStationId(), request.getDownStationId(), request.getDistance()));
+
+		Station upStation = stationRepository.findById(section.getUpStationId()).orElseThrow();
+		Station downStation = stationRepository.findById(section.getDownStationId()).orElseThrow();
+
+		return new CreateLineResponse(line, upStation, downStation);
 	}
 
 	@Transactional(readOnly = true)
 	public List<LineResponse> getLines() {
 		return lineRepository.findAll()
 			.stream()
-			.map(this::lineResponse)
+			.map(line -> this.getLine(line.getId()))
 			.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
-	public LineResponse getLine(Long id) {
-		Line line = lineRepository.findById(id).orElseThrow();
-		return lineResponse(line);
+	public LineResponse getLine(Long lineId) {
+		Line line = lineRepository.findById(lineId).orElseThrow();
+
+		Sections sections = new Sections(sectionRepository.findAllByLineId(lineId));
+
+		List<Station> stations = stationRepository.findAllById(sections.getStationIds());
+
+		return new LineResponse(line, stations);
 	}
 
 	@Transactional
@@ -57,19 +73,5 @@ public class LineService {
 	@Transactional
 	public void deleteLine(Long id) {
 		lineRepository.deleteById(id);
-	}
-
-	private CreateLineResponse createLineResponse(Line line) {
-		Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow();
-		Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow();
-
-		return new CreateLineResponse(line, upStation, downStation);
-	}
-
-	private LineResponse lineResponse(Line line) {
-		Station upStation = stationRepository.findById(line.getUpStationId()).orElseThrow();
-		Station downStation = stationRepository.findById(line.getDownStationId()).orElseThrow();
-
-		return new LineResponse(line, upStation, downStation);
 	}
 }

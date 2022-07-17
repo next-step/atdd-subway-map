@@ -16,21 +16,12 @@ public class Line {
 
 	private String color;
 
-	private Long upStationId;
-
-	private Long downStationId;
-
-	private int distance;
-
 	protected Line() {
 	}
 
-	public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+	public Line(String name, String color) {
 		this.name = name;
 		this.color = color;
-		this.upStationId = upStationId;
-		this.downStationId = downStationId;
-		this.distance = distance;
 	}
 
 	public Long getId() {
@@ -43,14 +34,6 @@ public class Line {
 
 	public String getColor() {
 		return color;
-	}
-
-	public Long getUpStationId() {
-		return upStationId;
-	}
-
-	public Long getDownStationId() {
-		return downStationId;
 	}
 
 	public void modifyLine(String name, String color) {
