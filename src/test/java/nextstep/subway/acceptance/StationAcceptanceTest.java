@@ -1,21 +1,17 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.acceptance.client.StationClient;
+import nextstep.subway.acceptance.util.JsonResponseConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,12 +22,14 @@ public class StationAcceptanceTest {
     int port;
 
     @Autowired
-    StationRepository stationRepository;
+    StationClient stationClient;
+
+    @Autowired
+    JsonResponseConverter responseConverter;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-        stationRepository.deleteAll();
     }
 
     /**
@@ -41,20 +39,17 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
+    @DirtiesContext
     void createStation() {
         // given
         String stationName = "강남역";
 
         // when
-        ExtractableResponse<Response> response = createStation(stationName);
+        stationClient.createStation(stationName);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        ExtractableResponse<Response> stationsResponse = fetchStations();
-        assertThat(stationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        validateEquation(convertToNames(stationsResponse), List.of(stationName));
+        assertThat(responseConverter.convertToNames(stationClient.fetchStations()))
+                .containsExactly(stationName);
     }
 
     /**
@@ -64,15 +59,18 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
+    @DirtiesContext
     void getStations() {
         // given
         List<String> stationNames = List.of("강남역", "역삼역");
 
         // when
-        createStations(stationNames);
+        stationClient.createStations(stationNames);
 
         // then
-        validateEquation(convertToNames(fetchStations()), stationNames);
+        assertThat(responseConverter.convertToNames(stationClient.fetchStations()))
+                .hasSize(stationNames.size())
+                .containsExactly(stationNames.toArray(String[]::new));
     }
 
     /**
@@ -82,61 +80,18 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 제거한다.")
     @Test
+    @DirtiesContext
     void deleteStation() {
         // given
         String stationName = "강남역";
-        Long stationId = convertToId(createStation(stationName));
+        Long stationId = responseConverter.convertToId(stationClient.createStation(stationName));
 
         // when
-        ExtractableResponse<Response> response = deleteStation(stationId);
+        stationClient.deleteStation(stationId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(convertToNames(fetchStations())).doesNotContain(stationName);
-    }
-
-    private Long convertToId(ExtractableResponse<Response> creationResponse) {
-        return creationResponse.jsonPath()
-                        .getLong("id");
-    }
-
-    private ExtractableResponse<Response> deleteStation(Long stationId) {
-         return RestAssured.given().log().all()
-                        .when().delete("/stations/{id}", stationId)
-                        .then().log().all()
-                        .extract();
-    }
-
-    private void validateEquation(List<String> stationNames, List<String> targetStationNames) {
-        assertThat(stationNames).hasSize(targetStationNames.size())
-                .containsExactly(targetStationNames.toArray(String[]::new));
-    }
-
-    private List<String> convertToNames(ExtractableResponse<Response> response) {
-        return response.jsonPath()
-                .getList("name", String.class);
-    }
-
-    private ExtractableResponse<Response> fetchStations() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<ExtractableResponse<Response>> createStations(List<String> stationNames) {
-        return stationNames.stream()
-                .map(this::createStation)
-                .collect(Collectors.toList());
-    }
-
-    private ExtractableResponse<Response> createStation(String stationName) {
-        return RestAssured.given().log().all()
-                .body(Collections.singletonMap("name", stationName))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        assertThat(responseConverter.convertToNames(stationClient.fetchStations()))
+                .doesNotContain(stationName);
     }
 
 }
