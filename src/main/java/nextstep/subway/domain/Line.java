@@ -94,9 +94,9 @@ public class Line {
 
     }
 
-    public void updateLine(LineUpdateDto dto) {
-        this.name = dto.getName();
-        this.color = dto.getColor();
+    public void updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
     }
 
 }

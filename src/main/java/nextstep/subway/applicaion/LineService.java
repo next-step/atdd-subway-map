@@ -60,7 +60,7 @@ public class LineService {
     @Transactional
     public void updateLine(Long id, LineUpdateDto updateDto) {
         Line line = findLine(id);
-        line.updateLine(updateDto);
+        line.updateLine(updateDto.getName(), updateDto.getColor());
 
         lineRepository.save(line);
     }
