@@ -1,15 +1,12 @@
 package nextstep.subway.domain;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,24 +19,30 @@ public class Line {
 
     private String color;
 
-    private long upStationId;
-
-    private long downStationId;
-
-    @Getter(AccessLevel.NONE)
-    private long distance;
+    @Embedded
+    private Sections sections = new Sections();
 
     @Builder
-    public Line(String name, String color, long upStationId, long downStationId, long distance ) {
+    public Line(String name, String color, Station upStation, Station downStation, long distance ) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+        this.sections.add(new Section(this, upStation, downStation, distance));
     }
 
     public void update(LineUpdateRequest request) {
         this.name = request.getName();
         this.color = request.getColor();
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
+    public void deleteSection(Station station) {
+        this.sections.delete(station);
+    }
+
+    public List<Station> getAllStations() {
+        return sections.getAllStations();
     }
 }

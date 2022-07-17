@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,23 +27,34 @@ public class LineController {
     }
 
     @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LineResponse>> showStations() {
+    public ResponseEntity<List<LineResponse>> showLines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 
     @GetMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> findStationById(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findLine(id));
     }
 
     @PutMapping("/lines/{id}")
-    public ResponseEntity<LineResponse> updateStationById(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+    public ResponseEntity<LineResponse> updateLineById(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
         return ResponseEntity.ok().body(lineService.updateLine(id, request));
     }
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         lineService.deleteLineById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> addSections(@PathVariable Long id, @RequestBody SectionRequest request) {
+        return ResponseEntity.ok().body(lineService.addSection(id, request));
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> deleteStation(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.deleteSection(id, stationId);
         return ResponseEntity.noContent().build();
     }
 }

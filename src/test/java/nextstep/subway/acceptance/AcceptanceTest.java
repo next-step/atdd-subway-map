@@ -6,16 +6,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AcceptanceTest {
     @LocalServerPort
     int port;
     @Autowired
-    List<JpaRepository> repositories;
+    private DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     public void setUp() {
@@ -24,6 +23,6 @@ public class AcceptanceTest {
 
     @AfterEach
     public void clear() {
-        this.repositories.forEach(JpaRepository::deleteAllInBatch);
+        databaseCleaner.execute();
     }
 }

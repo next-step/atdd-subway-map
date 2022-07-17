@@ -1,24 +1,21 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class StationService {
-    private StationRepository stationRepository;
-
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
+    private final StationRepository stationRepository;
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
@@ -32,11 +29,9 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public List<StationResponse> findStationsById(List<Long> idList) {
-        List<Station> stations = stationRepository.findAllById(idList);
-        Assert.isTrue(idList.size() == stations.size(),
-                String.format("존재하지 않는 역이 있습니다. idList : %s", idList));
-        return stations.stream().map(StationResponse::of).collect(Collectors.toList());
+    public Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     @Transactional
