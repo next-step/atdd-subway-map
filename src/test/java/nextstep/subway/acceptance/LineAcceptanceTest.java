@@ -17,6 +17,8 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.*;
 
+import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME1;
+import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -25,15 +27,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineAcceptanceTest {
     private static final String LINE_NAME_5 = "5호선";
     private static final String LINE_COLOR_5 = "#996CAC";
+    private static final Long LINE_DISTANCE_5 = 48L;
     private static final String LINE_NAME_5_UP = "5호선 상행선";
     private static final String LINE_COLOR_5_UP = "#996CAD";
     private static final String LINE_NAME_9 = "9호선";
     private static final String LINE_COLOR_9 = "#BDB092";
+    private static final Long LINE_DISTANCE_9 = 37L;
 
-    private static final LineRequest LINE_5 = new LineRequest(
-            LINE_NAME_5, LINE_COLOR_5, 1L, 3L, 48L);
-    private static final LineRequest LINE_2 = new LineRequest(
-            LINE_NAME_9, LINE_COLOR_9, 2L, 4L, 37L);
+    private LineRequest LINE_5;
+    private LineRequest LINE_9;
+
+    private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
@@ -43,6 +47,10 @@ public class LineAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        Long upStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
+        Long downStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
+        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId, downStationId, LINE_DISTANCE_5);
+        LINE_9 = new LineRequest(LINE_NAME_9, LINE_COLOR_9, upStationId, downStationId, LINE_DISTANCE_9);
     }
 
     /**
@@ -76,14 +84,14 @@ public class LineAcceptanceTest {
     void showAllLines() {
         // given
         lineAcceptanceTestUtils.지하철_노선_생성(LINE_5);
-        lineAcceptanceTestUtils.지하철_노선_생성(LINE_2);
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_9);
 
         // when
         ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_목록_조회();
 
         // then
         assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
-        assertThat(response.jsonPath().getList("name")).containsExactly(LINE_5.getName(), LINE_2.getName());
+        assertThat(response.jsonPath().getList("name")).containsExactly(LINE_5.getName(), LINE_9.getName());
     }
 
     /**
@@ -96,7 +104,7 @@ public class LineAcceptanceTest {
     void findLine() {
         // given
         int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        lineAcceptanceTestUtils.지하철_노선_생성(LINE_2);
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_9);
 
         // when
         ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(id);
@@ -163,7 +171,7 @@ public class LineAcceptanceTest {
     void deleteLine() {
         // given
         int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        lineAcceptanceTestUtils.지하철_노선_생성(LINE_2);
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_9);
 
         // when
         lineAcceptanceTestUtils.지하철_노선_삭제(id);
