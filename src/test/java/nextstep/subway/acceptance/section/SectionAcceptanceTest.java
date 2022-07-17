@@ -1,5 +1,6 @@
 package nextstep.subway.acceptance.section;
 
+import static nextstep.subway.acceptance.line.LineProvider.에러코드_추출;
 import static nextstep.subway.acceptance.line.LineProvider.*;
 import static nextstep.subway.acceptance.section.SectionProvider.*;
 import static nextstep.subway.acceptance.station.StationProvider.*;
@@ -83,7 +84,7 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	/*
 	 * Given 1 개의 구간을 추가하고,
 	 * When 해당 노선의 하행 종점역을 하행역으로 하는 구간을 제거하면
-	 * Then 해당 노선의 하행 종점역이 삭제한 구간의 상행역으로 변경된다.
+	 * Then 해당 노선의 하행 종점역이 추가했던 구간의 상행역으로 변경된다.
 	 */
 	@Test
 	void 구간_제거_성공() {
@@ -91,12 +92,11 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 		지하철_구간_추가_성공(지하철_노선_Id, 처음_하행_종점역_ID, 새로운_하행_종점역_ID, 10);
 
 		// When 해당 노선의 하행 종점역을 하행역으로 하는 구간을 제거하면
-		ExtractableResponse<Response> 구간_추가_후_조회_결과 = 지하철_노선_조회_성공(지하철_노선_Id);
-		지하철_구간_제거_성공(지하철_노선_Id, 하행_종점역_Id_추출(구간_추가_후_조회_결과));
+		지하철_구간_제거_성공(지하철_노선_Id, 새로운_하행_종점역_ID);
 
 		// Then 해당 노선의 하행 종점역이 삭제한 구간의 상행역으로 변경된다.
 		ExtractableResponse<Response> 구간_삭제_후_조회_결과 = 지하철_노선_조회_성공(지하철_노선_Id);
-		assertThat(하행_종점역_Id_추출(구간_삭제_후_조회_결과)).isEqualTo(하행_마지막_구간의_상행역_Id_추출(구간_추가_후_조회_결과));
+		assertThat(하행_종점역_Id_추출(구간_삭제_후_조회_결과)).isEqualTo(처음_하행_종점역_ID);
 	}
 
 	/*
@@ -105,7 +105,11 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	 */
 	@Test
 	void 구간_제거_시_최소_구간_예외() {
+		// When 해당 노선의 하행 종점역을 하행역으로 하는 구간을 제거하면
+		ExtractableResponse<Response> 구간_제거_실패_응답 = 지하철_구간_제거_실패(지하철_노선_Id, 처음_하행_종점역_ID);
 
+		// Then 최소 구간 예외가 발생한다.
+		assertThat(에러코드_추출(구간_제거_실패_응답)).isEqualTo(MINIMUM_SECTION_COUNT);
 	}
 
 	/*
@@ -115,7 +119,15 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	 */
 	@Test
 	void 구간_제거_시_노선에_등록되지_않은_구간_제거_예외() {
+		// Given 1 개의 구간을 추가하고,
+		지하철_구간_추가_성공(지하철_노선_Id, 처음_하행_종점역_ID, 새로운_하행_종점역_ID, 10);
 
+		// When 해당 노선에 등록되지 않은 지하철역을 하행역으로하는 구간을 제거하면
+		String 노선에_등록되지_않은_지하철역_Id = "999";
+		ExtractableResponse<Response> 구간_제거_실패_응답 = 지하철_구간_제거_실패(지하철_노선_Id, 노선에_등록되지_않은_지하철역_Id);
+
+		// Then 노선에 등록되지 않은 구간 제거 예외가 발생한다.
+		assertThat(에러코드_추출(구간_제거_실패_응답)).isEqualTo(NOT_INCLUDED_STATION);
 	}
 
 	/*
@@ -125,6 +137,13 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	 */
 	@Test
 	void 구간_제거_시_유효하지_않은_하행역_입력_예외() {
+		// Given 1 개의 구간을 추가하고,
+		지하철_구간_추가_성공(지하철_노선_Id, 처음_하행_종점역_ID, 새로운_하행_종점역_ID, 10);
 
+		// When 해당 노선의 하행 종점역을 하행역으로 하지 않는 구간을 제거하면
+		ExtractableResponse<Response> 구간_제거_실패_응답 = 지하철_구간_제거_실패(지하철_노선_Id, 처음_하행_종점역_ID);
+
+		// Then 유효하지 않은 하행역 입력 예외가 발생한다.
+		assertThat(에러코드_추출(구간_제거_실패_응답)).isEqualTo(INVALID_DOWN_STATION);
 	}
 }
