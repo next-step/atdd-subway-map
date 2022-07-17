@@ -42,7 +42,6 @@ public class Line {
 		return color;
 	}
 
-
 	public List<Station> getStations() {
 		List<Station> stations = new ArrayList<>();
 		for (Section section : sections) {
@@ -55,5 +54,13 @@ public class Line {
 	public void update(LineUpdateRequest lineUpdateRequest) {
 		this.name = lineUpdateRequest.getName();
 		this.color = lineUpdateRequest.getColor();
+	}
+
+	public void addSection(Section section) {
+		Station lastStation = sections.get(sections.size() - 1).getDownStation();
+		if (!lastStation.equals(section.getUpStation())) {
+			throw new RuntimeException();
+		}
+		sections.add(section);
 	}
 }

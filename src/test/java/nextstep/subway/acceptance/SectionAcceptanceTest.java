@@ -57,8 +57,8 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 		지하철_구간_삭제(1L,3L);
 		List<String> stations = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
 		// then
-		assertThat(beforeDelete).containsAll(List.of("논현역", "신논현역", "강남역"));
-		assertThat(stations).containsAll(List.of("논현역", "신논현역"));
+		assertThat(beforeDelete).containsExactly("논현역", "신논현역", "강남역");
+		assertThat(stations).containsExactly("논현역", "신논현역");
 	}
 
 	private ExtractableResponse<Response> 지하철_구간_삭제(Long lineId, Long stationId) {

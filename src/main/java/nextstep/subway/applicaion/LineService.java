@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,5 +65,18 @@ public class LineService {
 	@Transactional
 	public void deleteLineById(Long lineId) {
 		lineRepository.deleteById(lineId);
+	}
+
+
+	@Transactional
+	public void addSection(Long lineId, SectionRequest sectionRequest) {
+		Line line = lineRepository.findById(lineId)
+				.orElseThrow(RuntimeException::new);
+		Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
+				.orElseThrow(RuntimeException::new);
+		Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
+				.orElseThrow(RuntimeException::new);
+		Section section = sectionRepository.save(new Section(upStation, downStation, sectionRequest.getDistance()));
+		line.addSection(section);
 	}
 }
