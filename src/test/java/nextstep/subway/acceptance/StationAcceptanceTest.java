@@ -56,12 +56,15 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStations() {
+        // given
         final String SIN_DO_RIM = "신도림역";
         final String GURO_DIGITAL_COMPLEX = "구로디지털단지역";
 
+        // when
         ExtractableResponse<Response> response1 = createStation(SIN_DO_RIM);
         ExtractableResponse<Response> response2 = createStation(GURO_DIGITAL_COMPLEX);
 
+        // then
         assertThat(response1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -77,14 +80,16 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
+        // given
         final String BU_CHEON = "부천역";
-
         ExtractableResponse<Response> createResponse = createStation(BU_CHEON);
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
+        // when
         Integer bucheonId = createResponse.body().jsonPath().get("id");
         ExtractableResponse<Response> deleteResponse = deleteStation(bucheonId);
 
+        // then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(getStationNames()).doesNotContain(BU_CHEON);
     }
