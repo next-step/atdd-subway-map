@@ -34,7 +34,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void createLine() {
 		// when
-		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L);
+		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
 		// then
 		List<String> lineNames =
 				지하철_노선_목록_조회().jsonPath().getList("name");
@@ -51,8 +51,8 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void showLines() {
 		// given
-		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L);
-		지하철_노선_생성("분당선", "bg-green-600", 1L, 3L);
+		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
+		지하철_노선_생성("분당선", "bg-green-600", 1L, 3L, 10);
 
 		// when
 		List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
@@ -71,7 +71,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	void showLine() {
 		// given
 		Long lineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().getLong("id");
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
 		String lineName =
@@ -91,7 +91,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	void updateLine() {
 		// given
 		Long LineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().getLong("id");
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
 
 		// when
 		지하철_노선_수정(LineId, "다른분당선", "bg-red-600");
@@ -112,7 +112,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	void deleteLine() {
 		// given
 		Integer lineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().get("id");
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().get("id");
 
 		// when
 		지하철_노선_삭제(lineId);

@@ -37,12 +37,13 @@ public abstract class BaseAcceptanceTest {
 				.extract();
 	}
 
-	public ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId) {
+	public ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("name", name);
 		params.put("color", color);
 		params.put("upStationId", upStationId);
 		params.put("downStationId", downStationId);
+		params.put("distance", distance);
 
 		return RestAssured
 				.given().log().all()

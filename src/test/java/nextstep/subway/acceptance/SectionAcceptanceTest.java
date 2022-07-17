@@ -24,7 +24,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 		지하철_역_생성("논현역");
 		지하철_역_생성("신논현역");
 		지하철_역_생성("강남역");
-		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L);
+		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
 	}
 
 	/**
