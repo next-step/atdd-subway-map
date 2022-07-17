@@ -30,13 +30,17 @@ public class LineService {
         Line savedLine = lineRepository.findById(line.getId())
             .orElseThrow(() -> new RuntimeException(ExceptionMessages.getNoLineExceptionMessage(line.getId())));
         Section section = saveSection(savedLine, lineRequest);
-        return LineResponse.convertedByEntity(savedLine, section);
+        return LineResponse.convertedByEntity(savedLine, section.getUpStation(),section.getDownStation());
     }
 
 
     public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
-        return lines.stream().map(LineResponse::convertedByEntity).collect(Collectors.toList());
+
+        return lines.stream().map(v->{
+            LineSections tmp = new LineSections(sectionRepository.findSectionsByLineId(v.getId()));
+            tmp.
+        })
     }
 
     public LineResponse getLine(long lineId) {
