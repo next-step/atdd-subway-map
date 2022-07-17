@@ -180,17 +180,22 @@ public class SectionAcceptanceTest {
 
     /**
      * Given 1개의 구간을 가진 지하철 노선을 생성하고,
-     * WHen 지하철 구간을 제거하면,
+     * WHen 1개인 지하철 구간을 제거하면,
      * Then 지하철 구간 삭제 요청은 실패한다.
      */
     @DisplayName("지하철 구간이 1개인 노선은 삭제할 수 없다.")
     @Test
     void 지하철구간이_1개인_노선은_삭제실패() {
         // given
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 15).jsonPath().getLong("id");
 
         // when
+        ExtractableResponse<Response> response = 지하철구간_삭제를_요청한다(신분당선, 신논현역);
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 }

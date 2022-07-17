@@ -23,6 +23,8 @@ import org.hibernate.validator.constraints.Length;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Line {
+    private static final int MIN_SECTION_SIZE = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -91,6 +93,9 @@ public class Line {
     }
 
     public Section deleteSection(Station station) {
+        if (this.sections.size() < MIN_SECTION_SIZE) {
+            throw new IllegalArgumentException("지하철 구간이 적어도 1개 이상은 있어야 삭제할 수 있습니다.");
+        }
         if (this.getDownStationTerminal() != station) {
             throw new IllegalArgumentException("하행종점역만 삭제할 수 있습니다.");
         }
