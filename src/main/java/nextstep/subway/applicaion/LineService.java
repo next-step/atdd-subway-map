@@ -85,6 +85,9 @@ public class LineService {
   }
 
   public void deleteSection(long lineId, long stationId) {
+    Line line = findLine(lineId);
+    Sections sections = new Sections(sectionRepository.findByLineOrderByIdAsc(line));
+    sections.validateDeleteSection(stationId);
     Station station = findStation(stationId);
     sectionRepository.deleteByDownStation(station);
   }

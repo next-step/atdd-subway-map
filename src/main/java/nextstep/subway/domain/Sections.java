@@ -9,6 +9,8 @@ import nextstep.subway.common.exception.SectionException;
 @Getter
 public class Sections {
 
+  private static final int MIN_SECTION_COUNT = 1;
+
   private List<Section> sections = new ArrayList<>();
 
   public Sections(List<Section> sections) {
@@ -37,6 +39,16 @@ public class Sections {
 
     if (duplicateCheck) {
       throw new SectionException(ErrorMessage.LINE_CONTAINS_STATION);
+    }
+  }
+
+  public void validateDeleteSection(long stationId) {
+    if (getLastStationId() != stationId) {
+      throw new SectionException(ErrorMessage.SECTION_NO_LAST_DELETE);
+    }
+
+    if (this.sections.size() <= MIN_SECTION_COUNT) {
+      throw new SectionException(ErrorMessage.SECTION_ONE_NO_DELETE);
     }
   }
 }
