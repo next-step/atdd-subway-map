@@ -9,25 +9,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StationTest {
 
-    @DisplayName("역의 id 가 같다면 결괏값은 true 이다.")
+    @DisplayName("id 값 전달을 통해 하행 마지막역임을 확인할 수 있다")
     @Test
-    void stationEqualsIdTrue() {
+    void isLastDownStationTrue() {
         //given
         final var station = new Station(1L, "역삼역");
         //when
-        boolean result = station.equalsId(1L);
+        boolean result = station.isLastDownStation(1L);
         //then
         assertTrue(result);
     }
 
 
-    @DisplayName("역의 id 가 같다면 결괏값은 true 이다.")
+    @DisplayName("id 값 전달을 통해 하행 마지막역이 아님을 확인할 수 있다")
     @Test
-    void stationEqualsIdFalse() {
+    void isLastDownStationFalse() {
         //given
         final var station = new Station(1L, "역삼역");
         //when
-        boolean result = station.equalsId(2L);
+        boolean result = station.isLastDownStation(2L);
         //then
         assertFalse(result);
     }

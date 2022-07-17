@@ -32,7 +32,7 @@ public class Station {
         return name;
     }
 
-    public boolean equalsId(long id) {
+    public boolean isLastDownStation(long id) {
         return this.id == id;
     }
 }
