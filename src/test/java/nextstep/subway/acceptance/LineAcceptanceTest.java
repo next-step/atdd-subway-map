@@ -46,13 +46,13 @@ public class LineAcceptanceTest {
 
         final String 신분당선 = "신분당선";
 
-
         // 생성된 지하철역 목록
         List<ExtractableResponse<Response>> stationCreationResponses = StationApiCall.createStations(강남역, 광교역);
 
         Long 강남역_아이디 = getId(stationCreationResponses.get(0));
         Long 광교역_아이디 = getId(stationCreationResponses.get(1));
 
+        // when
         ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 광교역_아이디, 10));
         assertThat(lineCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -61,6 +61,7 @@ public class LineAcceptanceTest {
         String lineName = getResponse.jsonPath().getString("[0].name");
         String lineColor = getResponse.jsonPath().getString("[0].color");
 
+        // then
         assertThat(lineName).isEqualTo(신분당선);
         assertThat(lineColor).isEqualTo("bg-red-600");
     }
@@ -89,10 +90,14 @@ public class LineAcceptanceTest {
         Long 부평구청역_아이디 = getId(stationCreationResponses.get(2));
         Long 장암역_아이디 = getId(stationCreationResponses.get(3));
 
+        // given
         LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 판교역_아이디, 10));
         LineApiCall.createLine(new LineRequest(칠호선, "bg-brown-600", 부평구청역_아이디, 장암역_아이디, 10));
 
+        // when
         List<String> lineNames = LineApiCall.getLines().jsonPath().getList("name", String.class);
+
+        // then
         assertThat(lineNames).contains("신분당선", "7호선");
     }
 
@@ -115,15 +120,18 @@ public class LineAcceptanceTest {
         Long 인천역_아이디 = getId(stationCreationResponses.get(0));
         Long 소요산역_아이디 = getId(stationCreationResponses.get(1));
 
+        // given
         ExtractableResponse<Response> createResponse = LineApiCall.createLine(new LineRequest(일호선, "bg-blue-600", 인천역_아이디, 소요산역_아이디, 10));
         Long 일호선_아이디 = createResponse.jsonPath().getLong("id");
 
         String lineName = "새로운노선";
         String lineColor = "bg-deepblue-600";
 
+        // when
         ExtractableResponse<Response> updateResponse = LineApiCall.updateLine(일호선_아이디, new LineUpdateRequest(lineName, lineColor));
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
+        // then
         List<String> lineNames = LineApiCall.getLines().jsonPath().getList("name", String.class);
         assertThat(lineNames).contains("새로운노선");
 
