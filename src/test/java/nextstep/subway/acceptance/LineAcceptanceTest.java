@@ -41,6 +41,8 @@ public class LineAcceptanceTest {
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @LocalServerPort
     int port;
 
@@ -103,7 +105,7 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        Long id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
         lineAcceptanceTestUtils.지하철_노선_생성(LINE_9);
 
         // when
@@ -126,7 +128,7 @@ public class LineAcceptanceTest {
         lineAcceptanceTestUtils.지하철_노선_생성(LINE_5);
 
         // when
-        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(2);
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(2L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -142,23 +144,26 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() throws JsonProcessingException {
         // given
-        int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        LineResponse initialResponse = objectMapper.readValue(
+                        lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).body().asString(),
+                        LineResponse.class);
+
         LineRequest request = LineRequest.builder()
                 .name(LINE_NAME_5_UP)
                 .color(LINE_COLOR_5_UP)
                 .build();
 
         // when
-        ExtractableResponse<Response> updatedResponse = lineAcceptanceTestUtils.지하철_노선_수정(id, request);
-        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(id);
+        ExtractableResponse<Response> updatedResponse
+                = lineAcceptanceTestUtils.지하철_노선_수정(initialResponse.getId(), request);
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(initialResponse.getId());
 
-        ObjectMapper objectMapper = new ObjectMapper();
         LineResponse expectedLineResponse = objectMapper.readValue(response.body().asString(), LineResponse.class);
-        LineResponse updatedLineResponse = new LineResponse(id, LINE_5, request);
+        initialResponse.updateResponse(request);
 
         // then
         assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(expectedLineResponse).isEqualTo(updatedLineResponse);
+        assertThat(expectedLineResponse).isEqualTo(initialResponse);
     }
 
     /**
@@ -170,14 +175,14 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        Long id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
         lineAcceptanceTestUtils.지하철_노선_생성(LINE_9);
 
         // when
         lineAcceptanceTestUtils.지하철_노선_삭제(id);
 
         // then
-        List<Integer> ids = lineAcceptanceTestUtils.지하철_노선_목록_조회().jsonPath().getList("id");
+        List<Long> ids = lineAcceptanceTestUtils.지하철_노선_목록_조회().jsonPath().getList("id");
         assertThat(ids.stream()
                 .filter(lineId -> lineId == id)
                 .count())

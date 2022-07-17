@@ -2,7 +2,6 @@ package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,14 +13,14 @@ public class LineResponse {
 
     private String color;
 
-    private List<Long> stations;
+    private List<StationResponse> stations;
 
     private Long distance;
 
     public LineResponse() {
     }
 
-    public LineResponse(Long id, String name, String color, List<Long> stations, Long distance) {
+    public LineResponse(Long id, String name, String color, List<StationResponse> stations, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -29,23 +28,18 @@ public class LineResponse {
         this.distance = distance;
     }
 
-    public LineResponse(Line line) {
+    public LineResponse(Line line, List<StationResponse> stations) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations = Arrays.asList(line.getUpStationId(), line.getDownStationId());
+        this.stations = stations;
         this.distance = line.getDistance();
     }
 
-    public LineResponse(int id, LineRequest line, LineRequest request) {
-        this.id = (long) id;
-        this.name = request.getName() != null ? request.getName() : line.getName();
-        this.color = request.getColor() != null ? request.getColor() : line.getColor();
-        this.distance = request.getDistance() != null ? request.getDistance() : line.getDistance();
-
-        Long upStationId = request.getUpStationId() != null ? request.getUpStationId() : line.getUpStationId();
-        Long downStationId = request.getDownStationId() != null ? request.getDownStationId() : line.getDownStationId();
-        this.stations = Arrays.asList(upStationId, downStationId);
+    public void updateResponse(LineRequest request) {
+        this.name = request.getName() != null ? request.getName() : this.name;
+        this.color = request.getColor() != null ? request.getColor() : this.color;
+        this.distance = request.getDistance() != null ? request.getDistance() : this.distance;
     }
 
     public Long getId() {
@@ -60,7 +54,7 @@ public class LineResponse {
         return color;
     }
 
-    public List<Long> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 
