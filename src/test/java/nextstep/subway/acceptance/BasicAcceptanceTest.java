@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
 import nextstep.subway.common.LineRestAssured;
+import nextstep.subway.common.SectionRestAssured;
 import nextstep.subway.common.StationRestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,8 @@ public abstract class BasicAcceptanceTest {
 
   final StationRestAssured stationRestAssured = new StationRestAssured();
   final LineRestAssured lineRestAssured = new LineRestAssured();
+
+  final SectionRestAssured sectionRestAssured = new SectionRestAssured();
 
   @LocalServerPort
   int port;
