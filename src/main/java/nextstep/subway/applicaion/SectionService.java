@@ -23,7 +23,7 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
 		Section section = request.toSection();
 
-		subwayLine.validate(section);
+		subwayLine.validateOnSave(section);
 
 		subwayLine.saveSection(section);
 	}

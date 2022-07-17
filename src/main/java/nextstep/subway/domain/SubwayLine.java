@@ -61,7 +61,7 @@ public class SubwayLine {
 		return section;
 	}
 
-	public void validate(Section section) {
+	public void validateOnSave(Section section) {
 		if (hasSameStation(section)) {
 			throw new AlreadyRegisterException(ErrorCode.ALREADY_REGISTER_SECTION.getMessage());
 		}
