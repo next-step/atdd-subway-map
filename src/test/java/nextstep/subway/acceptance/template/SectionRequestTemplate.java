@@ -26,4 +26,13 @@ public class SectionRequestTemplate {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 지하철구간_삭제를_요청한다(long lineId, long stationId) {
+        return RestAssured.given().log().all()
+                .queryParam("stationId", stationId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
 }

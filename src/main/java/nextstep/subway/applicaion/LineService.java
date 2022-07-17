@@ -77,6 +77,14 @@ public class LineService {
         line.addSection(section);
     }
 
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        Station station = getStation(stationId);
+        Section section = line.deleteSection(station);
+        sectionRepository.delete(section);
+    }
+
     private Line getLine(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 노선이 없습니다."));
@@ -103,5 +111,4 @@ public class LineService {
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toList());
     }
-
 }

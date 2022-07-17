@@ -19,6 +19,7 @@ import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철�
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선_조회를_요청한다;
 import static nextstep.subway.acceptance.template.LineRequestTemplate.지하철노선을_생성을_요청한다;
 import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하철구간_등록을_요청한다;
+import static nextstep.subway.acceptance.template.SectionRequestTemplate.지하철구간_삭제를_요청한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -124,10 +125,8 @@ public class SectionAcceptanceTest {
         long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 15).jsonPath().getLong("id");
         지하철구간_등록을_요청한다(신분당선, 신논현역, 양재역, 7);
 
-        지하철노선_조회를_요청한다(신분당선);
         // when
         ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, 양재역, 신논현역, 10);
-        지하철노선_조회를_요청한다(신분당선);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -136,16 +135,25 @@ public class SectionAcceptanceTest {
     /**
      * Given 2개의 구간을 가진 지하철 노선을 생성하고,
      * When 지하철 구간을 제거하면,
-     * Then 해당 지하철 노선에 지하철 구간 정보는 삭제된다.
+     * Then 해당 지하철 노선에 지하철 구간 정보를 조회할 수 없다.
      */
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
     void 지하철구간_삭제성공() {
         // given
+        long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
+        long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 양재역 = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 15).jsonPath().getLong("id");
+        지하철구간_등록을_요청한다(신분당선, 신논현역, 양재역, 7);
 
         // when
+        ExtractableResponse<Response> response = 지하철구간_삭제를_요청한다(신분당선, 양재역);
 
         // then
+        ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
+        List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+        assertThat(lineNames).containsExactly("강남역", "신논현역");
     }
 
     /**

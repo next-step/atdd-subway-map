@@ -3,11 +3,11 @@ package nextstep.subway.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -88,6 +88,23 @@ public class Line {
 
         this.sections.add(newSection);
         newSection.setLine(this);
+    }
+
+    public Section deleteSection(Station station) {
+        if (this.getDownStationTerminal() != station) {
+            throw new IllegalArgumentException("하행종점역만 삭제할 수 있습니다.");
+        }
+        Section section = getSectionByDownStation(station);
+
+        sections.remove(section);
+        return section;
+    }
+
+    private Section getSectionByDownStation(Station downStation) {
+        return sections.stream()
+                    .filter(e -> e.getDownStation().equals(downStation))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("해당되는 구간을 찾을 수 없습니다."));
     }
 
     private boolean isNewSectionDownStationInLine(Section newSection, Section section) {
