@@ -1,9 +1,12 @@
 package nextstep.subway.acceptance;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -130,7 +133,7 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 수정한다.")
     @Test
-    void updateLine() {
+    void updateLine() throws JsonProcessingException {
         // given
         int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
         LineRequest request = LineRequest.builder()
@@ -142,11 +145,13 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> updatedResponse = utils.지하철_노선_수정(id, request);
         ExtractableResponse<Response> response = utils.지하철_노선_조회(id);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        LineResponse expectedLineResponse = objectMapper.readValue(response.body().asString(), LineResponse.class);
+        LineResponse updatedLineResponse = new LineResponse(id, LINE_5, request);
+
         // then
         assertThat(updatedResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().get("name").equals(request.getName())).isTrue();
-        assertThat(response.jsonPath().get("color").equals(request.getColor())).isTrue();
-        assertThat(response.jsonPath().getInt("distance")).isEqualTo(LINE_5.getDistance().intValue());
+        assertThat(expectedLineResponse).isEqualTo(updatedLineResponse);
     }
 
     /**
