@@ -12,7 +12,12 @@ public class Station {
     private Long id;
     private String name;
 
-    public Station() {
+    protected Station() {
+    }
+
+    protected Station(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Station(String name) {
@@ -25,5 +30,9 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public boolean equalsId(long id) {
+        return this.id == id;
     }
 }
