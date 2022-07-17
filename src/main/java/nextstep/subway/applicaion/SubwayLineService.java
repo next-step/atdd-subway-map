@@ -28,8 +28,7 @@ public class SubwayLineService {
 	public SubwayLineResponse createSubwayLine(SubwayLineRequest request) {
 		Section section = new Section(request.getUpStationId(), request.getDownStationId(), request.getDistance());
 		SubwayLine savedLine = lineRepository.save(request.toEntity(section));
-		List<Station> upAndDownStation = getUpAndDownStation(request.getUpStationId(), request.getDownStationId());
-		return new SubwayLineResponse(savedLine, upAndDownStation);
+		return new SubwayLineResponse(savedLine, findAllStations(savedLine));
 	}
 
 	@Transactional
@@ -54,6 +53,25 @@ public class SubwayLineService {
 	public SubwayLineResponse findById(Long id) {
 		SubwayLine subwayLine = findSubwayLineById(id);
 		return new SubwayLineResponse(subwayLine, getUpAndDownStation(subwayLine.getUpStationId(), subwayLine.getDownStationId()));
+	}
+
+	private List<Station> findAllStations(SubwayLine subwayLine) {
+		List<Section> sectionList = subwayLine.getSectionList();
+		List<Long> stationIdList = sectionList.stream()
+				.map(Section::getUpStationId)
+				.collect(Collectors.toList());
+
+		stationIdList.add(lastSection(sectionList).getDownStationId());
+
+		return stationIdList.stream()
+				.map(
+						id -> stationRepository.findById(id).orElseThrow(NoSuchElementException::new)
+				)
+				.collect(Collectors.toList());
+	}
+
+	private Section lastSection(List<Section> sectionList) {
+		return sectionList.get(sectionList.size() - 1);
 	}
 
 	private List<Station> getUpAndDownStation(Long upStationId, Long downStationId) {
