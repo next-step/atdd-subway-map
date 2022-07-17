@@ -4,7 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineUpdateDto;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.springframework.http.MediaType;
 
 public class LineApiCall {
@@ -29,7 +29,7 @@ public class LineApiCall {
     }
 
     // 지하철노선 수정 요청
-    public static ExtractableResponse<Response> updateLine(Long id, LineUpdateDto updateDto) {
+    public static ExtractableResponse<Response> updateLine(Long id, LineUpdateRequest updateDto) {
         return RestAssured.given().log().all()
                 .body(updateDto)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

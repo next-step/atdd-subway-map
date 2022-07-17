@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import nextstep.subway.api.LineApiCall;
 import nextstep.subway.api.StationApiCall;
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineUpdateDto;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,9 +16,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -125,7 +123,7 @@ public class LineAcceptanceTest {
         String lineName = "새로운노선";
         String lineColor = "bg-deepblue-600";
 
-        ExtractableResponse<Response> updateResponse = LineApiCall.updateLine(일호선_아이디, new LineUpdateDto(lineName, lineColor));
+        ExtractableResponse<Response> updateResponse = LineApiCall.updateLine(일호선_아이디, new LineUpdateRequest(lineName, lineColor));
         assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         List<String> lineNames = LineApiCall.getLines().jsonPath().getList("name", String.class);

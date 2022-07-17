@@ -1,11 +1,11 @@
 package nextstep.subway.applicaion.dto;
 
-public class LineUpdateDto {
+public class LineUpdateRequest {
     
     private String name;
     private String color;
 
-    public LineUpdateDto(String name, String color) {
+    public LineUpdateRequest(String name, String color) {
         this.name = name;
         this.color = color;
     }

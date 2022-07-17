@@ -2,15 +2,13 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.LineUpdateDto;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,7 +56,7 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineUpdateDto updateDto) {
+    public void updateLine(Long id, LineUpdateRequest updateDto) {
         Line line = findLine(id);
         line.updateLine(updateDto.getName(), updateDto.getColor());
 
