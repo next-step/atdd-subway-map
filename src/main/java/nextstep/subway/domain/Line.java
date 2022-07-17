@@ -16,9 +16,7 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+
 
     public Line() {
     }
@@ -26,9 +24,6 @@ public class Line {
     public Line(LineRequest lineRequest){
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
-        this.upStationId = lineRequest.getUpStationId();
-        this.downStationId = lineRequest.getDownStationId();
-        this.distance = lineRequest.getDistance();
     }
 
     public Long getId() {
@@ -43,15 +38,4 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
 }
