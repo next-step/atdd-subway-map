@@ -9,6 +9,7 @@ import javax.persistence.Id;
 
 @Entity
 public class Line {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,44 +19,58 @@ public class Line {
     private Long downStationId;
     private int distance;
 
-    public Line() {
 
+    private Line(Builder builder) {
+        this.name = builder.name;
+        this.color = builder.color;
+        this.upStationId = builder.upStationId;
+        this.downStationId = builder.downStationId;
+        this.distance = builder.distance;
     }
 
-    public Line(String name, String color, Long upStationId, Long downStationId, int distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-    }
 
-    public Long getId() {
-        return id;
-    }
+    static public class Builder {
+        private String name;
+        private String color;
+        private Long upStationId;
+        private Long downStationId;
+        private int distance;
 
-    public String getName() {
-        return name;
-    }
 
-    public String getColor() {
-        return color;
-    }
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
+        public Builder color(String color) {
+            this.color = color;
+            return this;
+        }
 
-    public Long getDownStationId() {
-        return downStationId;
-    }
+        public Builder upStationId(Long upStationId) {
+            this.upStationId = upStationId;
+            return this;
+        }
 
-    public int getDistance() {
-        return distance;
+        public Builder downStationId(Long downStationId) {
+            this.downStationId = downStationId;
+            return this;
+        }
+
+        public Builder distance(int distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public Line build() {
+            return new Line(this);
+        }
+
     }
 
     public void updateLine(LineUpdateDto dto) {
         this.name = dto.getName();
         this.color = dto.getColor();
     }
+
 }
