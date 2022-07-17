@@ -15,4 +15,10 @@ public class ExceptionAdvice {
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(ExceptionResponse.getInstance(e.getMessage()));
   }
+
+  @ExceptionHandler(EntityNotFound.class)
+  public ResponseEntity<ExceptionResponse> notFoundException(EntityNotFound e) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(ExceptionResponse.getInstance(e.getMessage()));
+  }
 }

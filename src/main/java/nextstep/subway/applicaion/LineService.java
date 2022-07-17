@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion;
 
 import java.util.Arrays;
-import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
@@ -9,7 +8,6 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.common.exception.ErrorMessage;
-import nextstep.subway.common.exception.SectionException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
@@ -54,7 +52,6 @@ public class LineService {
 
   public void createSection(Long lineId, SectionRequest sectionRequest) {
     Line line = findLine(lineId);
-
     Sections sections = new Sections(sectionRepository.findByLineOrderByIdAsc(line));
     sections.validateAddSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
 
@@ -79,16 +76,16 @@ public class LineService {
         .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.LINE_NOT_FOUND));
   }
 
-  private Station findStation(Long id) {
-    return stationRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException(ErrorMessage.STATION_NOT_FOUND));
-  }
-
   public void deleteSection(long lineId, long stationId) {
     Line line = findLine(lineId);
     Sections sections = new Sections(sectionRepository.findByLineOrderByIdAsc(line));
     sections.validateDeleteSection(stationId);
     Station station = findStation(stationId);
     sectionRepository.deleteByDownStation(station);
+  }
+
+  private Station findStation(Long id) {
+    return stationRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException(ErrorMessage.STATION_NOT_FOUND));
   }
 }
