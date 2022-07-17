@@ -144,7 +144,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest("죽전역"));
 
         Long 수원역_아이디 = getId(stationCreationResponse1);
-        Long 죽전역_아이디 = getId(stationCreationResponse1);
+        Long 죽전역_아이디 = getId(stationCreationResponse2);
 
         ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest("분당선", "bg-yellow-600", 수원역_아이디, 죽전역_아이디, 10));
 
