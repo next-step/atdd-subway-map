@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
+import nextstep.subway.exception.AlreadyRegisterException;
+import nextstep.subway.exception.ErrorCode;
+import nextstep.subway.exception.SameUpStationException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -58,5 +61,24 @@ public class SubwayLine {
 		this.downStationId = section.getUpStationId();
 		sectionList.remove(section);
 		return section;
+	}
+
+	public void validate(Section section) {
+		if (hasSameStation(section)) {
+			throw new AlreadyRegisterException(ErrorCode.ALREADY_REGISTER_SECTION.getMessage());
+		}
+
+		if (isSameUpStation(section)) {
+			throw new SameUpStationException(ErrorCode.CANNOT_REGISTER_WITH_UP_STATION.getMessage());
+		}
+	}
+
+	private boolean hasSameStation(Section section) {
+		return this.getDownStationId().equals(section.getDownStationId()) ||
+				this.getUpStationId().equals(section.getDownStationId());
+	}
+
+	private boolean isSameUpStation(Section section) {
+		return this.upStationId.equals(section.getUpStationId());
 	}
 }

@@ -24,13 +24,7 @@ public class SectionService {
 		SubwayLine subwayLine = subwayLineRepository.findById(subwayLineId).orElseThrow(NoSuchElementException::new);
 		Section section = request.toSection();
 
-		if (hasSameStation(subwayLine, section)) {
-			throw new AlreadyRegisterException(ErrorCode.ALREADY_REGISTER_SECTION.getMessage());
-		}
-
-		if (isSameUpStation(subwayLine.getUpStationId(), section.getUpStationId())) {
-			throw new SameUpStationException(ErrorCode.CANNOT_REGISTER_WITH_UP_STATION.getMessage());
-		}
+		subwayLine.validate(section);
 
 		sectionRepository.save(section);
 		subwayLine.saveSection(section);
@@ -57,14 +51,5 @@ public class SectionService {
 
 	private boolean isNotSameDownStationId(Long stationId, SubwayLine subwayLine) {
 		return !subwayLine.getDownStationId().equals(stationId);
-	}
-
-	private boolean hasSameStation(SubwayLine subwayLine, Section section) {
-		return subwayLine.getDownStationId().equals(section.getDownStationId()) ||
-				subwayLine.getUpStationId().equals(section.getDownStationId());
-	}
-
-	private boolean isSameUpStation(Long subwayLineUpStationId, Long sectionUpStationId) {
-		return subwayLineUpStationId.equals(sectionUpStationId);
 	}
 }
