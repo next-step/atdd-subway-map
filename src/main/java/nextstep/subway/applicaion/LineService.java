@@ -25,24 +25,13 @@ public class LineService {
 
 	@Transactional
 	public LineResponse saveLine(LineRequest lineRequest) {
-		Section section = saveSection(lineRequest);
+		Section section =
+				saveSection(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
 
 		Line line = lineRepository.save(
 				new Line(lineRequest.getName(), lineRequest.getColor(), section)
 		);
 		return LineResponse.of(line);
-	}
-
-	private Section saveSection(LineRequest lineRequest) {
-		Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-				.orElseThrow(RuntimeException::new);
-
-		Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-				.orElseThrow(RuntimeException::new);
-
-		return sectionRepository.save(
-				new Section(upStation, downStation, lineRequest.getDistance())
-		);
 	}
 
 	public List<LineResponse> findAllLines() {
@@ -72,11 +61,23 @@ public class LineService {
 	public void addSection(Long lineId, SectionRequest sectionRequest) {
 		Line line = lineRepository.findById(lineId)
 				.orElseThrow(RuntimeException::new);
-		Station upStation = stationRepository.findById(sectionRequest.getUpStationId())
-				.orElseThrow(RuntimeException::new);
-		Station downStation = stationRepository.findById(sectionRequest.getDownStationId())
-				.orElseThrow(RuntimeException::new);
-		Section section = sectionRepository.save(new Section(upStation, downStation, sectionRequest.getDistance()));
+
+		Section section =
+				saveSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
+
 		line.addSection(section);
+	}
+
+
+	private Section saveSection(Long upStationId, Long downStationId, Integer distance) {
+		Station upStation = stationRepository.findById(upStationId)
+				.orElseThrow(RuntimeException::new);
+
+		Station downStation = stationRepository.findById(downStationId)
+				.orElseThrow(RuntimeException::new);
+
+		return sectionRepository.save(
+				new Section(upStation, downStation, distance)
+		);
 	}
 }
