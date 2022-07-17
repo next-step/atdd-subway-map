@@ -79,9 +79,9 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 	 * when 해당 구간을 삭제한 다음 노선을 조회하면
 	 * then 노선 안에 삭제한 구간이 없는 것을 확인할 수 있다.
 	 */
-	@DisplayName("지하철 구간 삭제")
+	@DisplayName("지하철 구간 삭제 - 성공")
 	@Test
-	void deleteSection(){
+	void deleteSectionSuccess(){
 		//given
 		지하철_구간_등록(1L, 2L, 3L, 10);
 		List<String> beforeDelete = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
@@ -91,6 +91,23 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 		// then
 		assertThat(beforeDelete).containsExactly("논현역", "신논현역", "강남역");
 		assertThat(stations).containsExactly("논현역", "신논현역");
+	}
+
+	/**
+	 * given 역과 노선을 등록하고 구간을 등록한 후
+	 * when 마지막이 아닌 역을 삭제 시도하면
+	 * then BAD_REQUEST 를 반환한다.
+	 */
+	@DisplayName("지하철 구간 삭제 - 실패(마지막이 아닌 역 삭제)")
+	@Test
+	void deleteSectionFail(){
+		//given
+		지하철_구간_등록(1L, 2L, 3L, 10);
+		List<String> beforeDelete = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
+		// when
+		ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
 	private ExtractableResponse<Response> 지하철_구간_삭제(Long lineId, Long stationId) {
