@@ -118,15 +118,14 @@ public class StationAcceptanceTest {
         Map<String, String> firstStation = new HashMap<>();
         firstStation.put("name", "신림역");
 
-        RestAssured.given().log().all()
+        ExtractableResponse<Response> extract = RestAssured.given().log().all()
                 .body(firstStation)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then().log().all();
+                .then().log().all().extract();
 
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/1")
+        RestAssured.given().log().all().pathParam("id", extract.jsonPath().getString("id"))
+                .when().delete("/stations/{id}")
                 .then().log().all();
 
         List<String> stationName =

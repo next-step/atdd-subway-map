@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,7 +76,7 @@ public class LineAcceptanceTest {
         Assertions.assertAll(
                 () -> assertThat(extract.jsonPath().getList("stations.name")).containsExactly("강남역", "양재역"),
                 () -> assertThat(extract.jsonPath().getString("name")).contains("신분당선"),
-                () -> assertThat(extract.jsonPath().getList("stations.id")).contains(1, 2),
+                () -> assertThat(extract.jsonPath().getList("stations.id")).contains(Integer.valueOf(upStationId), Integer.valueOf(downStationId)),
                 () -> assertThat(extract.response().statusCode()).isEqualTo(HttpStatus.CREATED.value())
         );
 
