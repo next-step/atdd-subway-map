@@ -53,7 +53,7 @@ public class StationAcceptanceTest {
     }
 
     @AfterEach
-    void tableClear(){
+    void tableClear() {
         databaseTruncator.cleanTable();
     }
 
@@ -105,7 +105,8 @@ public class StationAcceptanceTest {
 
 
         //when
-        List<String> names = getAllStations();
+        List<String> names = restUtil.getResponseData("/stations")
+                .jsonPath().getList("name", String.class);
 
         //then
         assertThat(names).containsAnyOf(station1.get("name").toString(), station2.get("name").toString());
@@ -125,33 +126,14 @@ public class StationAcceptanceTest {
         Long id = restUtil.createEntityData(station3, "/stations");
 
         //when
-        deleteStations(id);
+        ExtractableResponse<Response> response = restUtil.deleteEntityDataById("/stations/{id}", id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        List<String> names = getAllStations();
+        List<String> names = restUtil.getResponseData("/stations")
+                .jsonPath().getList("name", String.class);
         assertThat(names).doesNotContain(station3.get("name").toString());
 
 
     }
-
-    public List<String> getAllStations() {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
-
-    public void deleteStations(Long id) {
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().delete("/stations/{id}", id)
-                        .then().log().all()
-                        .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-
 }
