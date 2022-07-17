@@ -5,28 +5,27 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.SectionResponse;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql("classpath:truncate.sql")
+@AcceptanceTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
-
-	@LocalServerPort
-	private int port;
-
 	private static final String LINE_NAME = "신분당선";
 	private static final String UP_STATION_NAME = "강남역";
 	private static final String DOWN_STATION_NAME = "양재역";
@@ -42,8 +41,6 @@ public class LineAcceptanceTest {
 
 	@BeforeEach
 	public void setUp() {
-		RestAssured.port = port;
-
 		// given 지하철 역 생성
 		Long upStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(UP_STATION_NAME));
 		downStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(DOWN_STATION_NAME));
@@ -104,7 +101,7 @@ public class LineAcceptanceTest {
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(지하철노선_조회_파싱_name(response)).isEqualTo(LINE_NAME);
+		assertThat(지하철노선_조회_파싱_lineName(response)).contains(LINE_NAME);
 	}
 
 	/**
@@ -121,7 +118,7 @@ public class LineAcceptanceTest {
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(지하철노선_조회_파싱_name(지하철노선_조회(lineId))).isEqualTo(newLineName);
+		assertThat(지하철노선_조회_파싱_lineName(지하철노선_조회(lineId))).isEqualTo(newLineName);
 	}
 
 	/**
@@ -176,9 +173,22 @@ public class LineAcceptanceTest {
 			.extract();
 	}
 
-	String 지하철노선_조회_파싱_name(ExtractableResponse<Response> response) {
+	private String 지하철노선_조회_파싱_lineName(ExtractableResponse<Response> response) {
 		return response
 			.jsonPath().getString("name");
+	}
+
+	List<String> 지하철노선_조회_파싱_stationNames(ExtractableResponse<Response> response) {
+		List<SectionResponse> sectionResponses = response.jsonPath().getList("sections");
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<SectionResponse> sections = mapper.convertValue(sectionResponses, new TypeReference<>(){});
+
+		List<String> names = sections.stream()
+			.map(section -> section.getDownStation().getName())
+			.collect(Collectors.toList());
+		names.add(sections.get(0).getUpStation().getName());
+		return names;
 	}
 
 	private ExtractableResponse<Response> 지하철노선_수정(Long lineId, String name, String color) {

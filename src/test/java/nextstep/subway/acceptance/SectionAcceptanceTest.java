@@ -13,24 +13,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import lombok.RequiredArgsConstructor;
 
-@DisplayName("지하철노선 관련 기능")
-@Sql("classpath:truncate.sql")
-@RequiredArgsConstructor
+@DisplayName("지하철노선 구간 관련 기능")
+@AcceptanceTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest {
-	@LocalServerPort
-	private int port;
-
 	private static final String LINE_NAME = "신분당선";
 	private static final String NEW_STATION_NAME = "양재시민의숲";
 	private ExtractableResponse<Response> responseOfSection;
@@ -43,10 +36,14 @@ public class SectionAcceptanceTest {
 	private final StationAcceptanceTest stationAcceptanceTest;
 	private final LineAcceptanceTest lineAcceptanceTest;
 
+	public SectionAcceptanceTest() {
+		this.stationAcceptanceTest = new StationAcceptanceTest();
+		this.lineAcceptanceTest = new LineAcceptanceTest();
+	}
+
+
 	@BeforeEach
 	public void setUp() {
-		RestAssured.port = port;
-
 		// 지하철 노선 생성
 		upStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성("강남역"));
 		downStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성("양재역"));
@@ -75,7 +72,7 @@ public class SectionAcceptanceTest {
 
 		// then
 		assertThat(responseOfSection.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(lineAcceptanceTest.지하철노선_조회_파싱_name(lineAcceptanceTest.지하철노선_조회(lineId))).contains(NEW_STATION_NAME);
+		assertThat(lineAcceptanceTest.지하철노선_조회_파싱_stationNames(lineAcceptanceTest.지하철노선_조회(lineId))).contains(NEW_STATION_NAME);
 	}
 
 	/**
@@ -116,7 +113,7 @@ public class SectionAcceptanceTest {
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-		assertThat(lineAcceptanceTest.지하철노선_조회_파싱_name(lineAcceptanceTest.지하철노선_조회(lineId))).doesNotContain(NEW_STATION_NAME);
+		assertThat(lineAcceptanceTest.지하철노선_조회_파싱_stationNames(lineAcceptanceTest.지하철노선_조회(lineId))).doesNotContain(NEW_STATION_NAME);
 	}
 
 	/**
@@ -175,4 +172,5 @@ public class SectionAcceptanceTest {
 			.then().log().all()
 			.extract();
 	}
+
 }

@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,6 +11,5 @@ public class LineResponse {
 	private Long id;
 	private String name;
 	private String color;
-	private StationResponse upStation;
-	private StationResponse downStation;
+	private List<SectionResponse> sections;
 }
