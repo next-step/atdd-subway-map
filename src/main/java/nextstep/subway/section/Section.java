@@ -33,13 +33,13 @@ public class Section {
 	}
 
 	public void validateAppendUpStationId(Long appendUpStationId) {
-		if (!this.id.equals(appendUpStationId)) {
+		if (!this.downStationId.equals(appendUpStationId)) {
 			throw new CustomException(SectionErrorCode.INVALID_UP_STATION);
 		}
 	}
 
 	public void validateAppendDownStationId(Long appendDownStationId) {
-		if (this.id.equals(appendDownStationId)) {
+		if (this.upStationId.equals(appendDownStationId)) {
 			throw new CustomException(SectionErrorCode.INVALID_DOWN_STATION);
 		}
 	}
@@ -49,8 +49,16 @@ public class Section {
 	}
 
 	public void validateDeleteStationId(Long deleteStationId) {
-		if (!this.id.equals(deleteStationId)) {
+		if (!this.downStationId.equals(deleteStationId)) {
 			throw new CustomException(SectionErrorCode.INVALID_DOWN_STATION);
 		}
+	}
+
+	public Long getUpStationId() {
+		return upStationId;
+	}
+
+	public Long getDownStationId() {
+		return downStationId;
 	}
 }

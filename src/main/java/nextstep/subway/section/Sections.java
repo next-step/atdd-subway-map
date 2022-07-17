@@ -2,12 +2,13 @@ package nextstep.subway.section;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nextstep.subway.exception.CustomException;
 
 public class Sections {
 
-	private static final int MIN_SIZE = 2;
+	private static final int MIN_SIZE = 1;
 
 	private final List<Section> values = new ArrayList<>();
 
@@ -19,11 +20,11 @@ public class Sections {
 	}
 
 	public void validateAppendUpStationId(Long appendUpStationId) {
-		currentDownStation().validateAppendUpStationId(appendUpStationId);
+		currentLastSection().validateAppendUpStationId(appendUpStationId);
 	}
 
 	public void validateAppendDownStationId(Long downStationId) {
-		currentUpStation().validateAppendDownStationId(downStationId);
+		currentFirstSection().validateAppendDownStationId(downStationId);
 	}
 
 	public void validateMinimumSize() {
@@ -34,21 +35,23 @@ public class Sections {
 
 	public void validateDeleteStationId(Long stationId) {
 		validateExistence(stationId);
-		currentDownStation().validateDeleteStationId(stationId);
+		currentLastSection().validateDeleteStationId(stationId);
 	}
 
 	private void validateExistence(Long stationId) {
-		values.stream()
-			.filter(section -> section.isIncludedStation(stationId))
-			.findAny()
-			.orElseThrow(() -> new CustomException(SectionErrorCode.NOT_INCLUDED_STATION));
+		boolean exist = values.stream()
+			.anyMatch(section -> section.isIncludedStation(stationId));
+
+		if (!exist) {
+			throw new CustomException(SectionErrorCode.NOT_INCLUDED_STATION);
+		}
 	}
 
-	private Section currentUpStation() {
+	private Section currentFirstSection() {
 		return values.get(0);
 	}
 
-	private Section currentDownStation() {
+	public Section currentLastSection() {
 		return values.get(lastIndex());
 	}
 
@@ -56,4 +59,16 @@ public class Sections {
 		return this.values.size() - 1;
 	}
 
+	public List<Long> getStationIds() {
+		List<Long> result = new ArrayList<>();
+
+		result.add(currentFirstSection().getUpStationId());
+
+		List<Long> downStations = values.stream()
+			.map(Section::getDownStationId)
+			.collect(Collectors.toList());
+		result.addAll(downStations);
+
+		return result;
+	}
 }

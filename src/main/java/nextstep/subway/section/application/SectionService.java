@@ -33,5 +33,6 @@ public class SectionService {
 		Sections sections = new Sections(sectionRepository.findAllByLineId(lineId));
 		sections.validateMinimumSize();
 		sections.validateDeleteStationId(stationId);
+		sectionRepository.delete(sections.currentLastSection());
 	}
 }
