@@ -1,5 +1,6 @@
 package nextstep.subway.domain.section;
 
+import nextstep.subway.domain.Line.Line;
 import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
@@ -9,14 +10,19 @@ public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "section_id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
+
+    @OneToOne()
+    @JoinColumn(name = "up_station_id", referencedColumnName = "station_id")
     private Station upStation;
 
-    @OneToOne
-    @JoinColumn
+    @OneToOne()
+    @JoinColumn(name = "down_station_id", referencedColumnName = "station_id")
     private Station downStation;
 
     private Long distance;
@@ -25,7 +31,8 @@ public class Section {
 
     }
 
-    public Section(Station upStation, Station downStation, Long distance) {
+    public Section(Line line, Station upStation, Station downStation, Long distance) {
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
@@ -45,5 +52,9 @@ public class Section {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public Line getLine() {
+        return line;
     }
 }

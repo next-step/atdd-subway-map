@@ -1,43 +1,54 @@
 package nextstep.subway.domain.Line;
 
+import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_id")
     private Long id;
     private String name;
     private String color;
 
-    @OneToOne
-    @JoinColumn
-    private Station upStation;
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    private Set<Section> sections = new HashSet<>();
 
-    @OneToOne
-    @JoinColumn
-    private Station downStation;
-
-    private Long distance;
+    public Line(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 
     public Line() {
 
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
-        this.name = name;
-        this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+    public Station upStation() {
+        return this.sections.stream().findFirst().get().getUpStation();
+    }
+
+    public Station downStation() {
+        return this.sections.size() > 0 ? this.sections.stream().reduce((first, second) -> second)
+                .orElseThrow(null).getDownStation() : null;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+    }
+
+    public Long distance() {
+        return sections.stream().mapToLong(Section::getDistance).sum();
     }
 
     public Long getId() {
@@ -52,15 +63,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public Set<Section> sections() {
+        return this.sections;
     }
 
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
 }
