@@ -59,11 +59,11 @@ public class SectionAcceptanceTest extends BasicAcceptanceTest {
 
     ExtractableResponse<Response> findAllLineResponse = lineRestAssured.findAllLine();
 
-    String name = findAllLineResponse.jsonPath().getString("name");
-    assertThat(name).isEqualTo(firstLine);
+    List<String> names = findAllLineResponse.jsonPath().getList("name", String.class);
+    assertThat(names).containsAnyOf(firstLine);
 
-    String color = findAllLineResponse.jsonPath().getString("color");
-    assertThat(color).isEqualTo(blue);
+    List<String> colors = findAllLineResponse.jsonPath().getList("color", String.class);
+    assertThat(colors).containsAnyOf(blue);
 
     List<List<LineResponse>> lineResponses = findAllLineResponse.jsonPath().getList("stations");
     assertThat(lineResponses.get(0).size()).isEqualTo(3);

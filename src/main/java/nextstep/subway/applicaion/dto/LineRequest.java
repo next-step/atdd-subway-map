@@ -3,7 +3,6 @@ package nextstep.subway.applicaion.dto;
 import lombok.Getter;
 import nextstep.subway.domain.Color;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 
 @Getter
 public class LineRequest {
@@ -28,12 +27,10 @@ public class LineRequest {
     this.distance = distance;
   }
 
-  public static Line createLine(LineRequest request, Station upStation, Station downStation) {
+  public static Line createLine(LineRequest request) {
     return Line.builder()
         .name(request.getName())
         .color(request.getColor())
-        .upStation(upStation)
-        .downStation(downStation)
         .distance(request.distance)
         .build();
   }
