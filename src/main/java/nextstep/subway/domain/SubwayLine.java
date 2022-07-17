@@ -4,9 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.subwayline.SubwayLineModifyRequest;
-import nextstep.subway.exception.AlreadyRegisterException;
-import nextstep.subway.exception.ErrorCode;
-import nextstep.subway.exception.SameUpStationException;
+import nextstep.subway.exception.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -73,6 +71,16 @@ public class SubwayLine {
 		}
 	}
 
+	public void validateOnDelete(Long stationId) {
+		if (isSectionSizeEqualsOne()) {
+			throw new CannotDeleteUniqueSectionException(ErrorCode.CANNOT_DELETE_UNIQUE_SECTION.getMessage());
+		}
+
+		if (isNotSameDownStationId(stationId)) {
+			throw new CannotDeleteException(ErrorCode.CANNOT_DELETE_WITH_NOT_SAME_DOWN_STATION.getMessage());
+		}
+	}
+
 	private boolean hasSameStation(Section section) {
 		return this.getDownStationId().equals(section.getDownStationId()) ||
 				this.getUpStationId().equals(section.getDownStationId());
@@ -80,5 +88,13 @@ public class SubwayLine {
 
 	private boolean isSameUpStation(Section section) {
 		return this.upStationId.equals(section.getUpStationId());
+	}
+
+	private boolean isSectionSizeEqualsOne() {
+		return this.getSectionList().size() == 1;
+	}
+
+	private boolean isNotSameDownStationId(Long stationId) {
+		return !this.getDownStationId().equals(stationId);
 	}
 }
