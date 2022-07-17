@@ -30,7 +30,7 @@ public class SectionRestAssuredProvider {
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.queryParam("stationId", stationId)
-			.when().delete("/lines/{id}/sections", lineId)
+			.when().delete("/lines/{lineId}/sections", lineId)
 			.then().log().all()
 			.extract();
 	}
