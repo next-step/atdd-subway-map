@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -24,6 +27,7 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 		지하철_역_생성("논현역");
 		지하철_역_생성("신논현역");
 		지하철_역_생성("강남역");
+		지하철_역_생성("양재역");
 		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
 	}
 
@@ -32,14 +36,42 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 	 * when 해당 노선에 구간을 등록한 후 노선을 조회하면
 	 * then 노선 안에 등록한 구간이 포함된 것을 확인할 수 있다.
 	 */
-	@DisplayName("지하철 구간 등록")
+	@DisplayName("지하철 구간 등록 - 성공")
 	@Test
-	void addSection(){
+	void addSectionSuccess(){
 		// when
 		지하철_구간_등록(1L, 2L, 3L, 10);
 		List<String> stations = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
 		// then
 		assertThat(stations).containsAll(List.of("논현역", "신논현역", "강남역"));
+	}
+
+	/**
+	 * given 역과 노선을 등록하고
+	 * when 하행 종점역과 다른 새로운 구간의 상행역을 등록하면
+	 * then BAD_REQUEST 를 반환한다.
+	 */
+	@DisplayName("지하철 구간 등록 - 실패(종점과 다른 상행역)")
+	@Test
+	void addSectionFail1(){
+		// when
+		ExtractableResponse<Response> response = 지하철_구간_등록(1L, 3L, 4L, 8);
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+	}
+
+	/**
+	 * given 역과 노선을 등록하고
+	 * when 노선에 이미 포함된 역이 하행역인 구간을 등록하면
+	 * then BAD_REQUEST 를 반환한다.
+	 */
+	@DisplayName("지하철 구간 등록 - 실패(이미 노선에 포함된 역)")
+	@Test
+	void addSectionFail2(){
+		// when
+		ExtractableResponse<Response> response = 지하철_구간_등록(1L, 2L, 1L, 8);
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
 	/**
