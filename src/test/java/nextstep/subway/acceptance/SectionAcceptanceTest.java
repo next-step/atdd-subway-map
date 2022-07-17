@@ -21,7 +21,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@DisplayName("지하철 구관 관리 관련 기능")
+@DisplayName("지하철 구간 관리 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class SectionAcceptanceTest {
     @LocalServerPort
