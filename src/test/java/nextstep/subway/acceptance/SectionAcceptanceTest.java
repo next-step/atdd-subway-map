@@ -100,10 +100,24 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest {
 	 */
 	@DisplayName("지하철 구간 삭제 - 실패(마지막이 아닌 역 삭제)")
 	@Test
-	void deleteSectionFail(){
+	void deleteSectionFail1(){
 		//given
 		지하철_구간_등록(1L, 2L, 3L, 10);
 		List<String> beforeDelete = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
+		// when
+		ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+	}
+
+	/**
+	 * given 역과 노선을 등록하고 구간을 등록한 후
+	 * when 구간이 1개인 경우 삭제를 시도하면
+	 * then BAD_REQUEST 를 반환한다.
+	 */
+	@DisplayName("지하철 구간 삭제 - 실패(구간이 1개인 경우 삭제)")
+	@Test
+	void deleteSectionFail2(){
 		// when
 		ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
 		// then
