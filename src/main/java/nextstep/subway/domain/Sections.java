@@ -12,7 +12,6 @@ import nextstep.subway.exception.StationAlreadyExistInSectionException;
 
 @Embeddable
 public class Sections {
-    private static final int ONE_SECTION = 1;
 
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
@@ -57,7 +56,7 @@ public class Sections {
 
     public void deleteSection(Long stationId) {
         Section downEndStation = getDownEndStation();
-        if(sections.size() <= ONE_SECTION) {
+        if(sections.size() <= 1) {
             throw new OneSectionDeleteException();
         }
 
