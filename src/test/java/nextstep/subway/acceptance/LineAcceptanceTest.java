@@ -30,10 +30,20 @@ class LineAcceptanceTest extends AcceptanceTest {
 
     LineApiCaller lineApiCaller = new LineApiCaller();
 
-    static final String FIRST_LINE_NAME = "신분당선";
-    static final String SECOND_LINE_NAME = "분당선";
-    static final String FIRST_LINE_COLOR = "bg-red-600";
-    static final String SECOND_LINE_COLOR = "bg-green-600";
+    static final Map<String, Object> FIRST_LINE_PARAMS = Map.of(
+            "name", "신분당선",
+            "color", "bg-red-600",
+            "upStationId", 1,
+            "downStationId", 2,
+            "distance", 10
+    );
+    static final Map<String, Object> SECOND_LINE_PARAMS = Map.of(
+            "name", "분당선",
+            "color", "bg-green-600",
+            "upStationId", 1,
+            "downStationId", 3,
+            "distance", 9
+    );
 
     @BeforeEach
     public void setUp() {
@@ -50,11 +60,11 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_등록_테스트() {
         // when
-        지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10);
+        지하철_노선_생성(FIRST_LINE_PARAMS);
 
         // then
         List<String> subwayLineNames = 지하철_노선_목록_조회();
-        assertThat(subwayLineNames).containsAnyOf(FIRST_LINE_NAME);
+        assertThat(subwayLineNames).containsAnyOf((String) FIRST_LINE_PARAMS.get("name"));
     }
 
     /**
@@ -65,8 +75,8 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_목록_조회_테스트() {
         // given
-        지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10);
-        지하철_노선_생성(SECOND_LINE_NAME, SECOND_LINE_COLOR, 1, 3, 9);
+        지하철_노선_생성(FIRST_LINE_PARAMS);
+        지하철_노선_생성(SECOND_LINE_PARAMS);
 
         // when
         List<String> subwayLineNames = 지하철_노선_목록_조회();
@@ -74,7 +84,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(subwayLineNames)
                 .hasSize(2)
-                .contains(FIRST_LINE_NAME, SECOND_LINE_NAME);
+                .contains((String) FIRST_LINE_PARAMS.get("name"), (String) SECOND_LINE_PARAMS.get("name"));
     }
 
     /**
@@ -85,15 +95,15 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_조회_테스트() {
         // given
-        long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
+        long id = 지하철_노선_생성(FIRST_LINE_PARAMS).jsonPath().getLong("id");
 
         // when
         Map<String, String> response = 지하철_노선_조회_성공(id);
 
         // then
         assertThat(response)
-                .containsEntry("name", FIRST_LINE_NAME)
-                .containsEntry("color", FIRST_LINE_COLOR);
+                .containsEntry("name", (String) FIRST_LINE_PARAMS.get("name"))
+                .containsEntry("color", (String) FIRST_LINE_PARAMS.get("color"));
     }
 
     /**
@@ -104,7 +114,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_수정_테스트() {
         // given
-        long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
+        long id = 지하철_노선_생성(FIRST_LINE_PARAMS).jsonPath().getLong("id");
         String newLineName = "다른분당선";
         String newLineColor = "bg-blue-600";
 
@@ -126,7 +136,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void 지하철_노선_삭제_테스트() {
         // given
-        long id = 지하철_노선_생성(FIRST_LINE_NAME, FIRST_LINE_COLOR, 1, 2, 10).jsonPath().getLong("id");
+        long id = 지하철_노선_생성(FIRST_LINE_PARAMS).jsonPath().getLong("id");
 
         // when
         지하철_노선_삭제(id);
@@ -134,7 +144,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         지하철_노선_조회_실패(id);
         List<String> lineNames = 지하철_노선_목록_조회();
-        assertThat(lineNames).doesNotContain(FIRST_LINE_NAME);
+        assertThat(lineNames).doesNotContain((String) FIRST_LINE_PARAMS.get("name"));
     }
 
     void 지하철_역_생성() {
@@ -143,14 +153,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         stationApiCaller.createStation(Map.of("name", "또다른지하철역"));
     }
 
-    ExtractableResponse<Response> 지하철_노선_생성(String name, String color, long upStationId, long downStationId, long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
+    ExtractableResponse<Response> 지하철_노선_생성(Map<String, Object> params) {
         ExtractableResponse<Response> response = lineApiCaller.createLine(params);
 
         지하철_API_응답_확인(response.statusCode(), HttpStatus.CREATED);

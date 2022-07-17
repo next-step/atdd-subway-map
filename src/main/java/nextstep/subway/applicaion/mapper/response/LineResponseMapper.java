@@ -19,7 +19,7 @@ public class LineResponseMapper implements ResponseMapper<Line, LineResponse> {
 
     @Override
     public LineResponse map(Line line) {
-        List<Station> stations = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
+        List<Station> stations = stationRepository.findAllById(line.getAllStationIds());
 
         return LineResponse.builder()
                 .id(line.getId())

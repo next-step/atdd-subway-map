@@ -9,12 +9,7 @@ public class SectionMapper implements DomainMapper<SectionRequest, Section> {
 
     @Override
     public Section map(SectionRequest sectionRequest) {
-        return this.map(null, sectionRequest);
-    }
-
-    public Section map(Long lineId, SectionRequest sectionRequest) {
         return Section.builder()
-                .lineId(lineId)
                 .upStationId(sectionRequest.getUpStationId())
                 .downStationId(sectionRequest.getDownStationId())
                 .distance(sectionRequest.getDistance())

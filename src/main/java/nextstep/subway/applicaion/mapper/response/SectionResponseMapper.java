@@ -11,7 +11,7 @@ public class SectionResponseMapper implements ResponseMapper<Section, SectionRes
     public SectionResponse map(Section section) {
         return SectionResponse.builder()
                 .id(section.getId())
-                .lineId(section.getLineId())
+                .lineId(section.getLine().getId())
                 .upStationId(section.getUpStationId())
                 .downStationId(section.getDownStationId())
                 .distance(section.getDistance())

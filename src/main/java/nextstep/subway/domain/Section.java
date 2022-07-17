@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -21,11 +18,16 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long lineId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Line line;
 
     private Long upStationId;
 
     private Long downStationId;
 
     private Long distance;
+
+    public void setLine(Line line) {
+        this.line = line;
+    }
 }

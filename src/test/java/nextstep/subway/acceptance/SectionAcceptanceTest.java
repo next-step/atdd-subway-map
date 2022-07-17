@@ -48,7 +48,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         // when
         final long upStationId = 3;
         final long downStationId = 2;
-        지하철_구간_생성(LINE_ID, upStationId, downStationId, 3);
+        지하철_구간_생성(LINE_ID, upStationId, downStationId, 3, true);
 
         // then
         Map<String, List<Long>> response = 지하철_구간_조회_성공(LINE_ID);
@@ -57,17 +57,43 @@ class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    void 지하철_노선_구간_등록_실패_테스트() {
+        // when
+        final long upStationId = 4;
+        final long downStationId = 2;
+        지하철_구간_생성(LINE_ID, upStationId, downStationId, 3, false);
+
+        // then
+        Map<String, List<Long>> response = 지하철_구간_조회_성공(LINE_ID);
+        assertThat(response.get("upStationId")).doesNotContain(upStationId);
+        assertThat(response.get("downStationId")).doesNotContain(downStationId);
+    }
+
+    @Test
     void 지하철_노선_구간_삭제_성공_테스트() {
         // given
         long deleteStationId = 2;
-        지하철_구간_생성(LINE_ID, 3, deleteStationId, 10);
+        지하철_구간_생성(LINE_ID, 3, deleteStationId, 10, true);
 
         // when
-        지하철_구간_삭제(LINE_ID, deleteStationId);
+        지하철_구간_삭제(LINE_ID, deleteStationId, true);
 
         // then
         Map<String, List<Long>> response = 지하철_구간_조회_성공(LINE_ID);
         assertThat(response.get("downStationId")).doesNotContain(deleteStationId);
+    }
+
+    @Test
+    void 지하철_노선_구간_삭제_실패_테스트() {
+        // given
+        long deleteStationId = 3;
+
+        // when
+        지하철_구간_삭제(LINE_ID, deleteStationId, false);
+
+        // then
+        Map<String, List<Long>> response = 지하철_구간_조회_성공(LINE_ID);
+        assertThat(response.get("downStationId")).contains(deleteStationId);
     }
 
     void 지하철_역_생성() {
@@ -89,7 +115,7 @@ class SectionAcceptanceTest extends AcceptanceTest {
         sectionApiCaller.createLineSectionById(LINE_ID, params);
     }
 
-    void 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance) {
+    void 지하철_구간_생성(long lineId, long upStationId, long downStationId, long distance, boolean isSuccess) {
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", upStationId);
         params.put("downStationId", downStationId);
@@ -97,13 +123,21 @@ class SectionAcceptanceTest extends AcceptanceTest {
 
         ExtractableResponse<Response> response = sectionApiCaller.createLineSectionById(lineId, params);
 
-        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
+        if (isSuccess) {
+            지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
+        } else {
+            지하철_API_응답_확인(response.statusCode(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    void 지하철_구간_삭제(long lineId, long stationId) {
+    void 지하철_구간_삭제(long lineId, long stationId, boolean isSuccess) {
         ExtractableResponse<Response> response = sectionApiCaller.deleteLineSectionById(lineId, stationId);
 
-        지하철_API_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
+        if (isSuccess) {
+            지하철_API_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
+        } else {
+            지하철_API_응답_확인(response.statusCode(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     Map<String, List<Long>> 지하철_구간_조회_성공(long lineId) {

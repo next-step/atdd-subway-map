@@ -12,9 +12,6 @@ public class LineMapper implements DomainMapper<LineRequest, Line> {
         return Line.builder()
                 .name(lineRequest.getName())
                 .color(lineRequest.getColor())
-                .upStationId(lineRequest.getUpStationId())
-                .downStationId(lineRequest.getDownStationId())
-                .distance(lineRequest.getDistance())
                 .build();
     }
 }

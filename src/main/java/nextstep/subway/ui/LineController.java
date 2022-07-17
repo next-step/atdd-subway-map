@@ -4,7 +4,12 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
+import nextstep.subway.exception.AlreadyRegisteredException;
+import nextstep.subway.exception.NotDownStationException;
 import nextstep.subway.exception.NotFoundException;
+import nextstep.subway.exception.OnlyOneSectionException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,5 +57,30 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        try {
+            lineService.createSection(id, sectionRequest);
+            return ResponseEntity.ok().build();
+        } catch (NotDownStationException | AlreadyRegisteredException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        try {
+            lineService.deleteSection(id, stationId);
+            return ResponseEntity.noContent().build();
+        } catch (NotDownStationException | OnlyOneSectionException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{id}/sections")
+    public ResponseEntity<List<SectionResponse>> getSections(@PathVariable Long id) {
+        return ResponseEntity.ok().body(lineService.findSectionsById(id));
     }
 }
