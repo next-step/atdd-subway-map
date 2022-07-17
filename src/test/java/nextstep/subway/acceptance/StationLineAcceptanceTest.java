@@ -4,12 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -21,23 +17,7 @@ import static nextstep.subway.acceptance.StaticMethodUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationLineAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
-
-    @BeforeEach
-    public void clearRepository(){
-        databaseCleanup.execute();
-    }
+public class StationLineAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -198,6 +178,234 @@ public class StationLineAcceptanceTest {
         List<Long> ids = extractIdsInListTypeResponse(getAllStationLines());
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(ids).doesNotContain(createdStationLineId);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선에 올바른 조건의 구간을 등록하고
+     * When 해당 지하철 노선을 조회하면
+     * Then 해당 지하철 노선에 추가된 구간이 조회된다.
+     */
+    @DisplayName("지하철 구간을 등록한다.")
+    @Test
+    void success_createSection() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        String newStationName = "연결될지하철역";
+        Long newStationId = extractIdInResponse(createStationWithName(newStationName));
+        Long distance = 10L;
+
+        ExtractableResponse<Response> response = createSection(createdStationLineId, downStationId, newStationId, distance);
+
+        // When
+        ExtractableResponse<Response> stationLineWithId = getStationLineWithId(createdStationLineId);
+
+        // Then
+        List<Long> stationIdIncludedSection = stationLineWithId.jsonPath()
+                .getList("stations.id", Long.class);
+        Long newDownStationId = stationIdIncludedSection.get(stationIdIncludedSection.size() - 1);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(newDownStationId).isEqualTo(newStationId);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 새로운 구간의 상행역이 해당 노선에 등록된 하행 종점역이 아닌 상태로 구간을 등록하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("지하철 구간을 등록하나 새로운 구간 상행역이 노선에 등록된 하행종점역이 아니여서 실패한다.")
+    @Test
+    void fail_createSection_새로운구간상행역이_노선에등록된_하행종점역이_아닌경우() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        String newStationName = "연결될지하철역";
+        Long newStationId = extractIdInResponse(createStationWithName(newStationName));
+        Long distance = 10L;
+
+        ExtractableResponse<Response> response = createSection(createdStationLineId, upStationId, newStationId, distance);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 새로운 구간 하행역이 해당 노선에 이미 등록되어있는 구간을 등록하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("지하철 구간을 등록하나 새로운 구간 하행역이 해당 노선에 이미 등록되어있는 역이여서 실패한다.")
+    @Test
+    void fail_createSection_새로운구간하행역이_노선에_이미등록되어있는역인경우() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        Long distance = 10L;
+        ExtractableResponse<Response> response = createSection(createdStationLineId, downStationId, upStationId, distance);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고, 생성한 지하철 노선에 올바른 조건의 구간을 등록하고
+     * When 해당 지하철 노선에 등록된 하행 종점역을 제거하면
+     * Then 해당 지하철 노선 조회시, 삭제한 역이 구간에 존재하지 않는다.
+     */
+    @DisplayName("지하철 구간을 제거한다.")
+    @Test
+    void success_deleteSection() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        String newStationName = "연결될지하철역";
+        Long newStationId = extractIdInResponse(createStationWithName(newStationName));
+        Long distance = 10L;
+
+        createSection(createdStationLineId, downStationId, newStationId, distance);
+
+        // When
+        ExtractableResponse<Response> response = deleteSection(createdStationLineId, newStationId);
+
+        // Then
+        List<Long> stationIdIncludedInSection = getStationLineWithId(createdStationLineId).jsonPath()
+                .getList("stations.id", Long.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(stationIdIncludedInSection).doesNotContain(newStationId);
+
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고, 생성한 지하철 노선에 올바른 조건의 구간을 등록하고
+     * When 해당 지하철 노선에 등록되었으나 하행종점역이 아닌 역을 삭제하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("지하철 구간을 제거하나 하행 종점역이 아니여서 실패한다.")
+    @Test
+    void fail_deleteSection_하행종점역이아닌경우() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        String newStationName = "연결될지하철역";
+        Long newStationId = extractIdInResponse(createStationWithName(newStationName));
+        Long distance = 10L;
+
+        createSection(createdStationLineId, downStationId, newStationId, distance);
+
+        // When
+        ExtractableResponse<Response> response = deleteSection(createdStationLineId, upStationId);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given 상행 종점역과 하행 종점역만 있는 지하철 노선을 생성하고
+     * When 해당 지하철 노선을 삭제하면
+     * Then 에러가 발생한다.
+     */
+    @DisplayName("지하철 구간을 제거하나 구간이 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우)여서 실패한다.")
+    @Test
+    void fail_deleteSection_상행종점역과_하행종점역만_있는경우() {
+        // Given
+        String stationLineName = "신분당선";
+        String stationLineColor = "bg-red-600";
+
+        String upStationName = "지하철역";
+        String downStationName = "새로운지하철역";
+
+        Long upStationId = extractIdInResponse(createStationWithName(upStationName));
+        Long downStationId = extractIdInResponse(createStationWithName(downStationName));
+
+        Long createdStationLineId = extractIdInResponse(createStationLine(stationLineName, stationLineColor, upStationId, downStationId));
+
+        // When
+        ExtractableResponse<Response> response = deleteSection(createdStationLineId, downStationId);
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private ExtractableResponse<Response> createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return RestAssured.given()
+                .log()
+                .all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{lineId}/sections", lineId)
+                .then()
+                .log()
+                .all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured.given()
+                .log()
+                .all()
+                .param("stationId", stationId)
+                .when()
+                .delete("/lines/{lineId}/sections", lineId)
+                .then()
+                .log()
+                .all()
+                .extract();
     }
 
     private ExtractableResponse<Response> createStationLine(String stationLineName, String stationLineColor, Long upStationId, Long downStationId

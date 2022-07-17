@@ -1,10 +1,9 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Objects;
+import nextstep.subway.applicaion.dto.StationLineRequest;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class StationLine {
@@ -13,28 +12,16 @@ public class StationLine {
     private Long id;
     private String name;
     private String color;
-    private Long distance;
-    private Long upStationId;
-    private Long downStationId;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     public StationLine() {
     }
 
-    public StationLine(String name, String color, Long distance, Long upStationId, Long downStationId) {
-        this.name = name;
-        this.distance = distance;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-    }
-
-    public StationLine(Long id, String name, String color, Long distance, Long upStationId, Long downStationId) {
-        this.id = id;
+    public StationLine(String name, String color) {
         this.name = name;
         this.color = color;
-        this.distance = distance;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
     }
 
     public Long getId() {
@@ -49,28 +36,30 @@ public class StationLine {
         return color;
     }
 
-    public Long getDistance() {
-        return distance;
+    public Sections getSections() {
+        return this.sections;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+        section.setStationLine(this);
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public void deleteSection(Section section) {
+        this.sections.getSections()
+                .remove(section);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StationLine that = (StationLine) o;
-        return Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(distance, that.distance) && Objects.equals(upStationId, that.upStationId) && Objects.equals(downStationId, that.downStationId);
+    public void updateByStationLineRequest(StationLineRequest stationLineRequest) {
+        if (stationLineRequest.getName() != null) {
+            this.name = stationLineRequest.getName();
+        }
+        if (stationLineRequest.getColor() != null) {
+            this.color = stationLineRequest.getColor();
+        }
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, color, distance, upStationId, downStationId);
+    public List<Station> getStationsIncluded() {
+        return this.sections.getStationsIncludedInLine();
     }
 }
