@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.*;
@@ -36,7 +35,7 @@ public class LineAcceptanceTest {
     private static final LineRequest LINE_2 = new LineRequest(
             LINE_NAME_9, LINE_COLOR_9, 2L, 4L, 37L);
 
-    private final LineAcceptanceTestUtils utils = new LineAcceptanceTestUtils();
+    private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
     @LocalServerPort
     int port;
@@ -55,14 +54,14 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = utils.지하철_노선_생성(LINE_5);
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.jsonPath().get("name").equals(LINE_NAME_5)).isTrue();
 
         // then
-        List<String> lineNames = utils.지하철_노선_목록_조회()
+        List<String> lineNames = lineAcceptanceTestUtils.지하철_노선_목록_조회()
                 .jsonPath().getList("name", String.class);
         assertThat(lineNames).containsAnyOf(LINE_NAME_5);
     }
@@ -76,11 +75,11 @@ public class LineAcceptanceTest {
     @Test
     void showAllLines() {
         // given
-        utils.지하철_노선_생성(LINE_5);
-        utils.지하철_노선_생성(LINE_2);
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_5);
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_2);
 
         // when
-        ExtractableResponse<Response> response = utils.지하철_노선_목록_조회();
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_목록_조회();
 
         // then
         assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
@@ -96,11 +95,11 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         // given
-        int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        utils.지하철_노선_생성(LINE_2);
+        int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_2);
 
         // when
-        ExtractableResponse<Response> response = utils.지하철_노선_조회(id);
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(id);
 
         // then
         assertThat(response.jsonPath().get("name").equals(LINE_5.getName())).isTrue();
@@ -116,10 +115,10 @@ public class LineAcceptanceTest {
     @Test
     void findLineNoSuchElementException() {
         // given
-        utils.지하철_노선_생성(LINE_5);
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_5);
 
         // when
-        ExtractableResponse<Response> response = utils.지하철_노선_조회(2);
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(2);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -135,15 +134,15 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() throws JsonProcessingException {
         // given
-        int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
         LineRequest request = LineRequest.builder()
                 .name(LINE_NAME_5_UP)
                 .color(LINE_COLOR_5_UP)
                 .build();
 
         // when
-        ExtractableResponse<Response> updatedResponse = utils.지하철_노선_수정(id, request);
-        ExtractableResponse<Response> response = utils.지하철_노선_조회(id);
+        ExtractableResponse<Response> updatedResponse = lineAcceptanceTestUtils.지하철_노선_수정(id, request);
+        ExtractableResponse<Response> response = lineAcceptanceTestUtils.지하철_노선_조회(id);
 
         ObjectMapper objectMapper = new ObjectMapper();
         LineResponse expectedLineResponse = objectMapper.readValue(response.body().asString(), LineResponse.class);
@@ -163,14 +162,14 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        int id = utils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
-        utils.지하철_노선_생성(LINE_2);
+        int id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getInt("id");
+        lineAcceptanceTestUtils.지하철_노선_생성(LINE_2);
 
         // when
-        utils.지하철_노선_삭제(id);
+        lineAcceptanceTestUtils.지하철_노선_삭제(id);
 
         // then
-        List<Integer> ids = utils.지하철_노선_목록_조회().jsonPath().getList("id");
+        List<Integer> ids = lineAcceptanceTestUtils.지하철_노선_목록_조회().jsonPath().getList("id");
         assertThat(ids.stream()
                 .filter(lineId -> lineId == id)
                 .count())
