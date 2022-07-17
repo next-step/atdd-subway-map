@@ -3,6 +3,7 @@ package nextstep.subway.ui;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.SectionDeleteRequest;
 import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.exception.SubwayException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,11 @@ public class SectionController {
 
 	@PostMapping("lines/{lineId}/sections")
 	public ResponseEntity<Void> addSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
-		lineService.addSection(lineId, sectionRequest);
+		try {
+			lineService.addSection(lineId, sectionRequest);
+		} catch(SubwayException e) {
+			return ResponseEntity.badRequest().build();
+		}
 		return ResponseEntity.noContent().build();
 	}
 

@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
+import nextstep.subway.exception.SubwayException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -59,7 +60,11 @@ public class Line {
 	public void addSection(Section section) {
 		Station lastStation = getLastStation();
 		if (!lastStation.equals(section.getUpStation())) {
-			throw new RuntimeException();
+			throw new SubwayException();
+		}
+		List<Station> stations = getStations();
+		if (stations.contains(section.getDownStation())) {
+			throw new SubwayException();
 		}
 		sections.add(section);
 	}
@@ -68,7 +73,7 @@ public class Line {
 		Station lastStation = getLastStation();
 
 		if (!lastStation.equals(station)) {
-			throw new RuntimeException();
+			throw new SubwayException();
 		}
 
 		Section lastSection = sections.get(sections.size() - 1);
