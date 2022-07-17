@@ -5,6 +5,7 @@ import static nextstep.subway.acceptance.LineCommon.지하철_노선_등록_요�
 import static nextstep.subway.acceptance.LineCommon.지하철_노선_조회_요청;
 import static nextstep.subway.acceptance.SubwayStationCommon.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -126,6 +127,12 @@ public class SectionAcceptanceTest {
 
         // then - 삭제 요청한 지하철 역이 하행 종점역이므로 정상적으로 삭제된다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> findResponse = 지하철_노선_조회_요청(1L);
+        assertAll(
+                () -> assertThat(findResponse.jsonPath().getList("stations.name")).containsExactly("신논현역", "언주역"),
+                () -> assertThat(findResponse.jsonPath().getList("stations.name")).doesNotContain("선정릉역")
+        );
     }
 
     /**

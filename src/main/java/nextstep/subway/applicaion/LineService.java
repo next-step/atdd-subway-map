@@ -76,6 +76,7 @@ public class LineService {
                 , sectionRequest.getDistance());
     }
 
+    @Transactional
     public void deleteSectionFromLine(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(EntityNotFoundException::new);
         line.deleteSection(stationId);
