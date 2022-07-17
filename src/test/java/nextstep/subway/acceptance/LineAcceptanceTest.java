@@ -45,11 +45,12 @@ public class LineAcceptanceTest {
 
         final String 신분당선 = "신분당선";
 
-        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest(강남역));
-        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest(광교역));
 
-        Long 강남역_아이디 = getId(stationCreationResponse1);
-        Long 광교역_아이디 = getId(stationCreationResponse2);
+        // 생성된 지하철역 목록
+        List<ExtractableResponse<Response>> stationCreationResponses = StationApiCall.createStations(강남역, 광교역);
+
+        Long 강남역_아이디 = getId(stationCreationResponses.get(0));
+        Long 광교역_아이디 = getId(stationCreationResponses.get(1));
 
         ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 광교역_아이디, 10));
         assertThat(lineCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -80,15 +81,12 @@ public class LineAcceptanceTest {
         final String 신분당선 = "신분당선";
         final String 칠호선 = "7호선";
 
-        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest(강남역));
-        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest(판교역));
-        ExtractableResponse<Response> stationCreationResponse3 = StationApiCall.createStation(new StationRequest(부평구청역));
-        ExtractableResponse<Response> stationCreationResponse4 = StationApiCall.createStation(new StationRequest(장암역));
+        List<ExtractableResponse<Response>> stationCreationResponses = StationApiCall.createStations(강남역, 판교역, 부평구청역, 장암역);
 
-        Long 강남역_아이디 = getId(stationCreationResponse1);
-        Long 판교역_아이디 = getId(stationCreationResponse2);
-        Long 부평구청역_아이디 = getId(stationCreationResponse3);
-        Long 장암역_아이디 = getId(stationCreationResponse4);
+        Long 강남역_아이디 = getId(stationCreationResponses.get(0));
+        Long 판교역_아이디 = getId(stationCreationResponses.get(1));
+        Long 부평구청역_아이디 = getId(stationCreationResponses.get(2));
+        Long 장암역_아이디 = getId(stationCreationResponses.get(3));
 
         LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 판교역_아이디, 10));
         LineApiCall.createLine(new LineRequest(칠호선, "bg-brown-600", 부평구청역_아이디, 장암역_아이디, 10));

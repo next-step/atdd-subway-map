@@ -17,7 +17,6 @@ public class LineApiCall {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
-
     }
 
     // 지하철노선 조회 요청
