@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.common.exception.ErrorMessage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -39,14 +40,13 @@ public class SectionAcceptanceTest extends BasicAcceptanceTest {
    */
   @Test
   void 지하철_구간_생성() {
-    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(
-        Arrays.asList(donongStation, gooriStation, ducksoStation));
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
 
     long lineId = lineRestAssured.saveLine(firstLine, stationResponses.get(0), stationResponses.get(1)).jsonPath().getLong("id");
 
     Map<String, Object> param = new HashMap<>();
     param.put("downStationId", stationResponses.get(2).getId());
-    param.put("upStationId", stationResponses.get(0).getId());
+    param.put("upStationId", stationResponses.get(1).getId());
     param.put("distance", 10);
 
     ExtractableResponse<Response> saveSectionResponse = RestAssured.given().log().all()
@@ -67,5 +67,58 @@ public class SectionAcceptanceTest extends BasicAcceptanceTest {
 
     List<List<LineResponse>> lineResponses = findAllLineResponse.jsonPath().getList("stations");
     assertThat(lineResponses.get(0).size()).isEqualTo(3);
+  }
+
+  /**
+   * Given 지하철 구간을 생성하면
+   * When 새로운 구간의 상행역이 기존 하행 종점역이 아닐 경우
+   * Then 예외 발생
+   */
+  @Test
+  void 새로운_구간_상행역_기존_하행_종점역_아니면_오류() {
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
+
+    long lineId = lineRestAssured.saveLine(firstLine, stationResponses.get(0), stationResponses.get(1)).jsonPath().getLong("id");
+
+    Map<String, Object> param = new HashMap<>();
+    param.put("downStationId", stationResponses.get(2).getId());
+    param.put("upStationId", stationResponses.get(0).getId());
+    param.put("distance", 10);
+
+    ExtractableResponse<Response> saveSectionResponse = RestAssured.given().log().all()
+        .body(param)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/lines/" + lineId + "/sections")
+        .then().log().all()
+        .extract();
+
+    assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    assertThat(saveSectionResponse.jsonPath().getString("message")).isEqualTo(ErrorMessage.INVALID_STATION);
+  }
+
+  /**
+   * Given 지하철 구간을 생성하면
+   * When 새로운 구간의 하행역이 기존 노선에 존재하면
+   * Then 예외 발생
+   */
+  @Test
+  void 새로운_구간_하행역_기존_노선_존재하면_오류() {
+    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
+
+    long lineId = lineRestAssured.saveLine(firstLine, stationResponses.get(0), stationResponses.get(1)).jsonPath().getLong("id");
+    Map<String, Object> param = new HashMap<>();
+    param.put("downStationId", stationResponses.get(0).getId());
+    param.put("upStationId", stationResponses.get(1).getId());
+    param.put("distance", 10);
+
+    ExtractableResponse<Response> saveSectionResponse = RestAssured.given().log().all()
+        .body(param)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/lines/" + lineId + "/sections")
+        .then().log().all()
+        .extract();
+
+    assertThat(saveSectionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
+    assertThat(saveSectionResponse.jsonPath().getString("message")).isEqualTo(ErrorMessage.LINE_CONTAINS_STATION);
   }
 }
