@@ -30,7 +30,11 @@ public class SectionController {
 
 	@DeleteMapping("lines/{lineId}/sections")
 	public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestBody SectionDeleteRequest sectionDeleteRequest) {
-		lineService.deleteSection(lineId, sectionDeleteRequest);
+		try {
+			lineService.deleteSection(lineId, sectionDeleteRequest);
+		} catch (SubwayException e) {
+			return ResponseEntity.badRequest().build();
+		}
 		return ResponseEntity.noContent().build();
 	}
 }

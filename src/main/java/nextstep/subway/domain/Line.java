@@ -76,6 +76,10 @@ public class Line {
 			throw new SubwayException();
 		}
 
+		if (sections.size() == 1) {
+			throw new SubwayException();
+		}
+
 		Section lastSection = sections.get(sections.size() - 1);
 		sections.remove(lastSection);
 		return lastSection;
