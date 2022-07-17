@@ -1,15 +1,17 @@
 package nextstep.subway.acceptance;
 
+import static nextstep.subway.acceptance.util.StationTestUtils.createStationWithName;
+import static nextstep.subway.acceptance.util.LineTestUtils.createLine;
+import static nextstep.subway.acceptance.util.LineTestUtils.getAllLines;
+import static nextstep.subway.acceptance.util.LineTestUtils.getLine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.restassured.RestAssured;
 import io.restassured.mapper.ObjectMapperType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,10 +20,18 @@ import org.springframework.http.MediaType;
 @DisplayName("노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTest {
 
-    private final LineCreationRequest sinbundangLineCreationRequest = new LineCreationRequest(
-            "신분당선", "bg-red-600", 1L, 2L, 10L);
-    private final LineCreationRequest bundangLineCreationRequest = new LineCreationRequest(
-            "분당선", "bg-green-600", 1L, 3L, 20L);
+    private LineCreationRequest sinbundangLineRequest;
+    private LineCreationRequest bundangLineRequest;
+
+    @BeforeEach
+    void setStations() {
+        var firstStationId = createStationWithName("광교역").jsonPath().getLong("id");
+        var secondStationId = createStationWithName("광교중앙역").jsonPath().getLong("id");
+        var thirdStationId = createStationWithName("상현역").jsonPath().getLong("id");
+
+        sinbundangLineRequest = new LineCreationRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10L);
+        bundangLineRequest = new LineCreationRequest("분당선", "bg-green-600", firstStationId, thirdStationId, 20L);
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -31,18 +41,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindTheLineCreatedWhenLineWasCreated() {
         // when
-        var creationResponse = createLine(sinbundangLineCreationRequest);
+        var creationResponse = createLine(sinbundangLineRequest);
 
         // then
-        var lineNames = RestAssured
-                .when()
-                    .get("/lines")
-                .then()
-                    .extract().jsonPath().getList("name", String.class);
+        var lineNames = getAllLines().jsonPath().getList("name", String.class);
 
         assertAll(
                 () -> assertThat(creationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(lineNames).containsExactlyInAnyOrder(sinbundangLineCreationRequest.getName())
+                () -> assertThat(lineNames).containsExactlyInAnyOrder(sinbundangLineRequest.getName())
         );
     }
 
@@ -55,23 +61,19 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canFindSameNumberOfLinesWhenLinesWereCreated() {
         // given
-        createLine(sinbundangLineCreationRequest);
-        createLine(bundangLineCreationRequest);
+        createLine(sinbundangLineRequest);
+        createLine(bundangLineRequest);
 
         // when
-        var lineQueryResponse = RestAssured
-                .when()
-                    .get("/lines")
-                .then()
-                    .extract();
+        var lineQueryResponse = getAllLines();
         var lineNames = lineQueryResponse.jsonPath().getList("name");
 
         // then
         assertAll(
                 () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(lineNames).containsExactlyInAnyOrder(
-                        sinbundangLineCreationRequest.getName(),
-                        bundangLineCreationRequest.getName()
+                        sinbundangLineRequest.getName(),
+                        bundangLineRequest.getName()
                 )
         );
     }
@@ -85,7 +87,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canGetResponseOfLineInformationByLineId() {
         // given
-        var creationResponse = createLine(bundangLineCreationRequest);
+        var creationResponse = createLine(bundangLineRequest);
         var createdLineId = creationResponse.body().jsonPath().getLong("id");
 
         // when
@@ -99,8 +101,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(id).isEqualTo(createdLineId),
-                () -> assertThat(name).isEqualTo(bundangLineCreationRequest.getName()),
-                () -> assertThat(color).isEqualTo(bundangLineCreationRequest.getColor())
+                () -> assertThat(name).isEqualTo(bundangLineRequest.getName()),
+                () -> assertThat(color).isEqualTo(bundangLineRequest.getColor())
         );
     }
 
@@ -113,7 +115,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void canModifyLineInformationWhichCreated() {
         // given
-        var creationResponse = createLine(sinbundangLineCreationRequest);
+        var creationResponse = createLine(sinbundangLineRequest);
         var createdLineId = creationResponse.jsonPath().getLong("id");
 
         // when
@@ -149,7 +151,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void removeCreatedLine() {
         // given
-        var creationResponse = createLine(bundangLineCreationRequest);
+        var creationResponse = createLine(bundangLineRequest);
         var createdLineId = creationResponse.jsonPath().getLong("id");
 
         // when
@@ -168,26 +170,5 @@ class LineAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(lineQueryResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
         );
-    }
-
-    private ExtractableResponse<Response> createLine(LineCreationRequest creationRequest) {
-        return RestAssured
-                .given()
-                    .body(creationRequest, ObjectMapperType.JACKSON_2)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/lines")
-                .then()
-                    .extract();
-    }
-
-    private ExtractableResponse<Response> getLine(Long lineId) {
-        return RestAssured
-                .given()
-                    .pathParam("lineId", lineId)
-                .when()
-                    .get("/lines/{lineId}")
-                .then()
-                    .extract();
     }
 }

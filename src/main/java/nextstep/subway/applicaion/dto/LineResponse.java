@@ -1,7 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import nextstep.subway.domain.line.Line;
 
@@ -24,7 +24,10 @@ public class LineResponse {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                Collections.emptyList()
+                line.getStations()
+                        .stream()
+                        .map(StationResponse::fromStation)
+                        .collect(Collectors.toList())
         );
     }
 }

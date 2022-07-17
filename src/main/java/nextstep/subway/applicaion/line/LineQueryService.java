@@ -3,8 +3,6 @@ package nextstep.subway.applicaion.line;
 import java.util.List;
 import java.util.stream.Collectors;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.exception.DomainException;
-import nextstep.subway.domain.exception.DomainExceptionType;
 import nextstep.subway.domain.line.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +27,6 @@ public class LineQueryService {
     public LineResponse getLineById(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::fromLine)
-                .orElseThrow(() -> new DomainException(DomainExceptionType.LINE_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 노선 ID 입니다."));
     }
 }
