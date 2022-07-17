@@ -3,12 +3,15 @@ package nextstep.subway.acceptance.section;
 import static nextstep.subway.acceptance.line.LineProvider.*;
 import static nextstep.subway.acceptance.section.SectionProvider.*;
 import static nextstep.subway.acceptance.station.StationProvider.*;
+import static nextstep.subway.section.SectionErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.acceptance.common.AcceptanceTestBase;
 
 @DisplayName("구간 관리 인수테스트")
@@ -57,7 +60,11 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	 */
 	@Test
 	void 구간_추가_시_유효하지_않은_상행역_입력_예외() {
+		// When 해당 노선의 하행 종점역을 상행역으로 하지 않는 새로운 구간을 추가하면
+		ExtractableResponse<Response> response = 지하철_구간_추가_실패(지하철_노선_Id, 처음_상행_종점역_ID, 새로운_하행_종점역_ID, 10);
 
+		// Then 상행역 입력이 유효하지 않다는 예외가 발생한다.
+		assertThat(에러코드_추출(response)).isEqualTo(INVALID_UP_STATION);
 	}
 
 	/*
@@ -66,7 +73,11 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	 */
 	@Test
 	void 구간_추가_시_유효하지_않은_하행역_입력_예외() {
+		// When 해당 노선의 상행 종점역을 하행역으로 하는 새로운 구간을 추가하면
+		ExtractableResponse<Response> response = 지하철_구간_추가_실패(지하철_노선_Id, 처음_하행_종점역_ID, 처음_상행_종점역_ID, 10);
 
+		// Then 하행역 입력이 유효하지 않다는 예외가 발생한다.
+		assertThat(에러코드_추출(response)).isEqualTo(INVALID_DOWN_STATION);
 	}
 
 	/*
