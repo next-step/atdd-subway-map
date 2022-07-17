@@ -41,11 +41,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", distance);
 
         //when(지하철 노선을 생성한다.)
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params).post("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = post("/lines", params);
 
         return createResponse;
     }
@@ -71,31 +67,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", distance);
 
         //when(지하철 노선을 생성한다.)
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params).post("/lines")
-                .then().log().all()
-                .extract();
 
+        ExtractableResponse<Response> createResponse = post("/lines", params);
         return createResponse;
     }
 
     public ExtractableResponse<Response> gets() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = get("/lines");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
 
     public ExtractableResponse<Response> get(long lineId) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = get("/lines/" + lineId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
@@ -200,8 +184,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         //지하철 노선명 확인
         assertThat(getResponse.jsonPath().getString("name")).isEqualTo(신분당선);
-        
-
     }
 
     @DisplayName("지하철 노선 수정")
@@ -224,12 +206,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         Map<String, Object> params = new HashMap<>();
         params.put("name", 일호선);
         params.put("color", updateColor);
-
-        ExtractableResponse<Response> updateResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params).put("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> updateResponse = put("/lines/" + lineId, params);
 
         //then(수정된 지하철 노선을 확인한다.)
         
@@ -261,10 +238,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         long lineId = createResponse.jsonPath().getLong("id");
 
         //when(생성한 지하철 노선을 삭제한다.)
-        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
-                .when().delete("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> deleteResponse = delete("/lines/" + lineId);
 
         //then(삭제가 되었는지 확인한다.)
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -296,10 +270,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", 5);
 
         //when
-        ExtractableResponse<Response> addSectionResponse = RestAssured.given().log().all()
-                .body(params).post("/lines/" + lineId + "sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> addSectionResponse = post("/lines/" + lineId + "/sections", params);
 
         //then
         assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -331,10 +302,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("distance", 5);
 
         //when
-        ExtractableResponse<Response> addSectionResponse = RestAssured.given().log().all()
-                .body(params).post("/lines/" + lineId + "sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> addSectionResponse = post("/lines/" + lineId + "/sections", params);
 
         //then
         assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());

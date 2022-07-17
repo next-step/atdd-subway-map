@@ -35,27 +35,14 @@ public class StationAcceptanceTest extends AcceptanceTest {
      * @param stationName
      */
     public ExtractableResponse<Response> createStation(String stationName) {
-
         final String url = "/stations";
-        final Map<String, String> params = new HashMap<>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("name", stationName);
-
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(url)
-                .then().log().all()
-                .extract();
-
-        return response;
+        return post(url, params);
     }
 
     public ExtractableResponse<Response> gets() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> response = get("/stations");
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response;
     }
@@ -137,10 +124,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         long id = createResponse.body().jsonPath().getLong("id");
 
         //when
-        RestAssured.given().log().all()
-                .when().delete("/stations/" + id)
-                .then().log().all()
-                .extract();
+        delete("/stations/" + id);
 
         //then
         List<String> names = gets().jsonPath().getList("name", String.class);

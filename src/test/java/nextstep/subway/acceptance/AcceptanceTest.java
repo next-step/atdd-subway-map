@@ -36,7 +36,8 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> post(String url, Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params).post(url)
+                .body(params)
+                .when().post(url)
                 .then().log().all()
                 .extract();
     }
@@ -44,7 +45,8 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> put(String url, Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params).put(url)
+                .body(params)
+                .when().put(url)
                 .then().log().all()
                 .extract();
     }
