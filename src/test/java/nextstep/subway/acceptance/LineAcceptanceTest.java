@@ -270,4 +270,73 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    /**
+     * given : 지하철 노선의 상행과 하행역(지하철역)을 생성한다.
+     * given : 지하철 노선을 생성한다.
+     * when : 지하철 노선에 구간(새로운구간의 상행이 지하철 노선의 하행)을 등록 요청하면
+     * then : 지하철 노선에 구간이 등록된다.
+     */
+    @DisplayName("지하철 노선에 구간을 등록한다. (새로운 구간의 상행이 지하철 노선의 하행과 동일)")
+    @Test
+    void addSectionOfUpStationEqualsDownStation() {
+
+        final String 신분당선 = "신분당선";
+        final String 강남역 = "강남역";
+        final String 시청역 = "시청역";
+        final String color = "bg-red-600";
+        final int distance = 10;
+
+        //given
+        ExtractableResponse<Response> createLineResponse = createLine(신분당선, 강남역, 시청역, color, distance);
+        long lineId = createLineResponse.jsonPath().getLong("id");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("downStationId", 4);
+        params.put("upStationId", 2); //시청역
+        params.put("distance", 5);
+
+        //when
+        ExtractableResponse<Response> addSectionResponse = RestAssured.given().log().all()
+                .body(params).post("/lines/" + lineId + "sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    /**
+     * given : 지하철 노선의 상행과 하행역(지하철역)을 생성한다.
+     * given : 지하철 노선을 생성한다.
+     * when : 지하철 노선에 구간(새로운구간의 하행이 지하철 노선의 상행)을 등록 요청하면
+     * then : 지하철 노선에 구간이 등록된다.
+     */
+    @DisplayName("지하철 노선에 구간을 등록한다. (새로운 구간의 상행이 지하철 노선의 하행과 동일)")
+    @Test
+    void addSectionOfDownStationEqualsUpStation() {
+
+        final String 신분당선 = "신분당선";
+        final String 강남역 = "강남역";
+        final String 시청역 = "시청역";
+        final String color = "bg-red-600";
+        final int distance = 10;
+
+        //given
+        ExtractableResponse<Response> createLineResponse = createLine(신분당선, 강남역, 시청역, color, distance);
+        long lineId = createLineResponse.jsonPath().getLong("id");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("downStationId", 4);
+        params.put("upStationId", 2); //시청역
+        params.put("distance", 5);
+
+        //when
+        ExtractableResponse<Response> addSectionResponse = RestAssured.given().log().all()
+                .body(params).post("/lines/" + lineId + "sections")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 }

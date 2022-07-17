@@ -3,7 +3,6 @@ package nextstep.subway.acceptance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class Cleanup {
+public class DatabaseCleanup {
 
     @Autowired
     private DataSource dataSource;
