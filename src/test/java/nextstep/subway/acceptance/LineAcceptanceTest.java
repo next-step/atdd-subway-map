@@ -182,7 +182,7 @@ public class LineAcceptanceTest {
         lineAcceptanceTestUtils.지하철_노선_삭제(id);
 
         // then
-        List<Long> ids = lineAcceptanceTestUtils.지하철_노선_목록_조회().jsonPath().getList("id");
+        List<Long> ids = lineAcceptanceTestUtils.지하철_노선_목록_조회().jsonPath().getList("id", Long.class);
         assertThat(ids.stream()
                 .filter(lineId -> lineId == id)
                 .count())
