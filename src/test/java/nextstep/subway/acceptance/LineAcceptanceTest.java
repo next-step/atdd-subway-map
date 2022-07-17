@@ -19,6 +19,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철노선 관련 기능")
 @Sql({"classpath:subway_truncate.sql"})
@@ -109,11 +110,10 @@ public class LineAcceptanceTest {
 
         final String 일호선 = "1호선";
 
-        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest(인천역));
-        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest(소요산역));
+        List<ExtractableResponse<Response>> stationCreationResponses = StationApiCall.createStations(인천역, 소요산역);
 
-        Long 인천역_아이디 = getId(stationCreationResponse1);
-        Long 소요산역_아이디 = getId(stationCreationResponse2);
+        Long 인천역_아이디 = getId(stationCreationResponses.get(0));
+        Long 소요산역_아이디 = getId(stationCreationResponses.get(1));
 
         ExtractableResponse<Response> createResponse = LineApiCall.createLine(new LineRequest(일호선, "bg-blue-600", 인천역_아이디, 소요산역_아이디, 10));
         Long 일호선_아이디 = createResponse.jsonPath().getLong("id");
@@ -138,17 +138,24 @@ public class LineAcceptanceTest {
     @Test
     void deleteLines() {
 
-        ExtractableResponse<Response> stationCreationResponse1 = StationApiCall.createStation(new StationRequest("수원역"));
-        ExtractableResponse<Response> stationCreationResponse2 = StationApiCall.createStation(new StationRequest("죽전역"));
+        final String 수원역 = "수원역";
+        final String 죽전역 = "죽전역";
 
-        Long 수원역_아이디 = getId(stationCreationResponse1);
-        Long 죽전역_아이디 = getId(stationCreationResponse2);
+        final String 분당선 = "분당선";
 
-        ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest("분당선", "bg-yellow-600", 수원역_아이디, 죽전역_아이디, 10));
+        List<ExtractableResponse<Response>> stationCreationResponses = StationApiCall.createStations(수원역, 죽전역);
 
+        Long 수원역_아이디 = getId(stationCreationResponses.get(0));
+        Long 죽전역_아이디 = getId(stationCreationResponses.get(1));
+
+        // given
+        ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest(분당선, "bg-yellow-600", 수원역_아이디, 죽전역_아이디, 10));
         Long 분당선_아이디 = lineCreationResponse.jsonPath().getLong("id");
 
+        // when
         ExtractableResponse<Response> lineDeletionResponse = LineApiCall.deleteLine(분당선_아이디);
+
+        // then
         assertThat(lineDeletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
