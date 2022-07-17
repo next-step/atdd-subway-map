@@ -20,6 +20,34 @@ public class Line {
     private int distance;
 
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public Line() {
+
+    }
+
     private Line(Builder builder) {
         this.name = builder.name;
         this.color = builder.color;
@@ -28,14 +56,12 @@ public class Line {
         this.distance = builder.distance;
     }
 
-
-    static public class Builder {
+    public static class Builder {
         private String name;
         private String color;
         private Long upStationId;
         private Long downStationId;
         private int distance;
-
 
         public Builder name(String name) {
             this.name = name;

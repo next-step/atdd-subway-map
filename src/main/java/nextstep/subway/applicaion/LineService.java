@@ -27,23 +27,23 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
-        LineResponse lineResponse = createLineResponse(line);
+        Line line = lineRepository.save(new Line.Builder()
+                                        .name(lineRequest.getName())
+                                        .color(lineRequest.getColor())
+                                        .upStationId(lineRequest.getUpStationId())
+                                        .downStationId(lineRequest.getDownStationId())
+                                        .build());
 
-        return lineResponse;
+        return createLineResponse(line);
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stationResponses = new ArrayList<>();
-
-        stationResponses.add(stationService.createStationResponse(line.getUpStationId()));
-        stationResponses.add(stationService.createStationResponse(line.getDownStationId()));
 
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stationResponses
+                stationService.getUpAndDownStationResponses(line.getUpStationId(), line.getDownStationId())
         );
     }
 
