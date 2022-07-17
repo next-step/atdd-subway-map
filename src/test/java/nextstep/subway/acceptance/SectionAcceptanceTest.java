@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 import static nextstep.subway.acceptance.SubwayLineCommon.지하철_노선_등록_요청;
+import static nextstep.subway.acceptance.SubwayLineCommon.지하철_노선_조회_요청;
 import static nextstep.subway.acceptance.SubwayStationCommon.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,8 +64,12 @@ public class SectionAcceptanceTest {
         // when - 지하철 구간을 등록한다
         ExtractableResponse<Response> response = 지하철_구간_등록_요청(신분당선, 하행역, 신규역, 8);
 
-        // then - 지하철 노선 목록 조회 시 생성한 구간을 찾을 수 있다
+        // then - 지하철 구간을 정상적으로 등록했다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then - 지하철 노선 목록 조회 시 생성한 구간을 찾을 수 있다
+        response = 지하철_노선_조회_요청(1L);
+        assertThat(response.jsonPath().getList("stations.name")).containsExactly("신논현역", "언주역", "선정릉역");
     }
 
     /**

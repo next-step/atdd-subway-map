@@ -70,4 +70,15 @@ public class Sections {
     private void removeDownEndSection() {
         sections.remove(getDownEndStationIndex());
     }
+
+    public List<Station> getStations() {
+        List<Station> stations = new ArrayList<>();
+        stations.add(sections.get(0).getUpStation());
+
+        for (Section section : sections) {
+            stations.add(section.getDownStation());
+        }
+
+        return stations;
+    }
 }

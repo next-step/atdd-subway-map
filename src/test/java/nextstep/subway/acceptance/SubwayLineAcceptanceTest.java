@@ -2,6 +2,7 @@ package nextstep.subway.acceptance;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
 import static nextstep.subway.acceptance.SubwayLineCommon.지하철_노선_등록_요청;
+import static nextstep.subway.acceptance.SubwayLineCommon.지하철_노선_조회_요청;
 import static nextstep.subway.acceptance.SubwayStationCommon.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -164,13 +165,6 @@ public class SubwayLineAcceptanceTest {
     private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }

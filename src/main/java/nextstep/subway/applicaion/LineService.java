@@ -26,9 +26,7 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(toLine(lineRequest));
-        return new LineResponse(line.getId(), line.getName(), line.getColor(),
-                List.of(stationService.findStation(line.getUpStationId()),
-                        stationService.findStation(line.getDownStationId())));
+        return LineResponse.of(line);
     }
 
     private Line toLine(LineRequest lineRequest) {
@@ -45,20 +43,12 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                List.of(stationService.findStation(line.getUpStationId()),
-                        stationService.findStation(line.getDownStationId()))
-        );
+        return LineResponse.of(line);
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        return new LineResponse(line.getId(), line.getName(), line.getColor(),
-                List.of(stationService.findStation(line.getUpStationId()),
-                        stationService.findStation(line.getDownStationId())));
+        return LineResponse.of(line);
     }
 
     @Transactional

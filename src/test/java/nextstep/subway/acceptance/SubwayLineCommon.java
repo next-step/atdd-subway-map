@@ -29,4 +29,11 @@ public class SubwayLineCommon {
 
         return params;
     }
+
+    public static ExtractableResponse<Response> 지하철_노선_조회_요청(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/{id}", id)
+                .then().log().all()
+                .extract();
+    }
 }
