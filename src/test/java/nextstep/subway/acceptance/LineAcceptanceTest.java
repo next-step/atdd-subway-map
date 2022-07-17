@@ -26,6 +26,9 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
   private static final String secondLine = "2호선";
   private static final String thirdLine = "3호선";
 
+  private static final String blue = "blue";
+  private static final String green = "green";
+
   /**
    * When 지하철 노선을 생성하면
    * Then 지하철역이 생성된다
@@ -40,10 +43,10 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
     ExtractableResponse<Response> response = lineRestAssured.findAllLine();
 
     List<String> names = response.jsonPath().getList("name", String.class);
-    assertThat(names).containsAnyOf("2호선");
+    assertThat(names).containsAnyOf(secondLine);
 
     List<String> colors = response.jsonPath().getList("color", String.class);
-    assertThat(colors).containsAnyOf("blue");
+    assertThat(colors).containsAnyOf(blue);
 
     List<List<LineResponse>> lineResponses = response.jsonPath().getList("stations");
     assertThat(lineResponses.get(0).size()).isEqualTo(2);
@@ -67,7 +70,7 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
     assertThat(names).containsAnyOf(firstLine, secondLine);
 
     List<String> colors = response.jsonPath().getList("color", String.class);
-    assertThat(colors).containsAnyOf("blue", "green");
+    assertThat(colors).containsAnyOf(blue, green);
 
     List<List<LineResponse>> lineResponses = response.jsonPath().getList("stations");
     assertThat(lineResponses.get(0).size()).isEqualTo(2);
@@ -90,7 +93,7 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
     assertThat(names).isEqualTo(firstLine);
 
     String colors = response.jsonPath().getString("color");
-    assertThat(colors).isEqualTo("blue");
+    assertThat(colors).isEqualTo(blue);
 
     List<LineResponse> lineResponses = response.jsonPath().getList("stations");
     assertThat(lineResponses.size()).isEqualTo(2);

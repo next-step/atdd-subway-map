@@ -12,10 +12,12 @@ import org.springframework.http.MediaType;
 
 public class LineRestAssured {
 
+  private static final String blue = "blue";
+
   public LineRestAssured() {}
 
   public ExtractableResponse<Response> saveLine(String name, StationResponse upStation, StationResponse downStation) {
-    LineRequest lineRequest = new LineRequest(name, new Color("blue"), upStation.getId(), downStation.getId(), 10);
+    LineRequest lineRequest = new LineRequest(name, new Color(blue), upStation.getId(), downStation.getId(), 10);
 
     return RestAssured.given().log().all()
         .body(lineRequest, ObjectMapperType.JACKSON_2)
