@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.domain.*;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import nextstep.subway.domain.exception.LineNotFoundException;
 import nextstep.subway.domain.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +30,6 @@ public class LineService {
 
         Station upStation = stationRepository.findById(upStationId)
                 .orElseThrow(() -> new StationNotFoundException(upStationId));
-
         Station downStation = stationRepository.findById(downStationId)
                 .orElseThrow(() -> new StationNotFoundException(downStationId));
 
@@ -54,14 +55,8 @@ public class LineService {
     @Transactional
     public void updateLine(Long lineId, LineUpdateRequest updateRequest) {
         Line line = findById(lineId);
-
-        if (StringUtils.hasText(updateRequest.getName())) {
-            line.updateName(updateRequest.getName());
-        }
-
-        if (StringUtils.hasText(updateRequest.getColor())) {
-            line.updateColor(updateRequest.getColor());
-        }
+        line.updateName(updateRequest.getName());
+        line.updateColor(updateRequest.getColor());
     }
 
     private Line findById(Long lineId) {

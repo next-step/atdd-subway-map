@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class LineController {
 
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -35,7 +36,7 @@ public class LineController {
     }
 
     @PutMapping("/lines/{lineId}")
-    public void updateLine(@PathVariable Long lineId, @RequestBody LineUpdateRequest updateRequest) {
+    public void updateLine(@PathVariable Long lineId, @RequestBody @Valid LineUpdateRequest updateRequest) {
         lineService.updateLine(lineId, updateRequest);
     }
 
