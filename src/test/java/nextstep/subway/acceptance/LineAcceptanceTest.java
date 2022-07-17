@@ -8,30 +8,35 @@ import nextstep.subway.api.StationApiCall;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.util.DatabaseUitl;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql({"classpath:subway_truncate.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    DatabaseUitl databaseUitl;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        databaseUitl.tableClear();
     }
+
 
     /**
      * When 지하철 노선을 생성하면
