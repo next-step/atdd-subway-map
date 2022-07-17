@@ -70,8 +70,8 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void showLine() {
 		// given
-		Integer lineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().get("id");
+		Long lineId =
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().getLong("id");
 
 		// when
 		String lineName =
@@ -90,8 +90,8 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 	@Test
 	void updateLine() {
 		// given
-		Integer LineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().get("id");
+		Long LineId =
+				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L).jsonPath().getLong("id");
 
 		// when
 		지하철_노선_수정(LineId, "다른분당선", "bg-red-600");
@@ -123,18 +123,6 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 		assertThat(lineIds).isEmpty();
 	}
 
-	private ExtractableResponse<Response> 지하철_역_생성(String name) {
-		Map<String, String> station = new HashMap<>();
-		station.put("name", name);
-
-		return RestAssured.given().log().all()
-				.body(station)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.when().post("/stations")
-				.then().log().all()
-				.extract();
-	}
-
 	private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("name", name);
@@ -155,7 +143,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 				.extract();
 	}
 
-	private ExtractableResponse<Response> 지하철_노선_조회(Integer id) {
+	private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
 		return RestAssured
 				.given().log().all()
 				.when().get("/lines/{lineId}", id)
@@ -171,7 +159,7 @@ public class LineAcceptanceTest extends BaseAcceptanceTest{
 				.extract();
 	}
 
-	private ExtractableResponse<Response> 지하철_노선_수정(Integer LineId, String name, String color) {
+	private ExtractableResponse<Response> 지하철_노선_수정(Long LineId, String name, String color) {
 		Map<String, String> line = new HashMap<>();
 		line.put("name", name);
 		line.put("color", color);
