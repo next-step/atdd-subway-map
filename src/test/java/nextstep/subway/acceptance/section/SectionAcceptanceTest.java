@@ -87,7 +87,16 @@ class SectionAcceptanceTest extends AcceptanceTestBase {
 	 */
 	@Test
 	void 구간_제거_성공() {
+		// Given 1 개의 구간을 추가하고,
+		지하철_구간_추가_성공(지하철_노선_Id, 처음_하행_종점역_ID, 새로운_하행_종점역_ID, 10);
 
+		// When 해당 노선의 하행 종점역을 하행역으로 하는 구간을 제거하면
+		ExtractableResponse<Response> 구간_추가_후_조회_결과 = 지하철_노선_조회_성공(지하철_노선_Id);
+		지하철_구간_제거_성공(지하철_노선_Id, 하행_종점역_Id_추출(구간_추가_후_조회_결과));
+
+		// Then 해당 노선의 하행 종점역이 삭제한 구간의 상행역으로 변경된다.
+		ExtractableResponse<Response> 구간_삭제_후_조회_결과 = 지하철_노선_조회_성공(지하철_노선_Id);
+		assertThat(하행_종점역_Id_추출(구간_삭제_후_조회_결과)).isEqualTo(하행_마지막_구간의_상행역_Id_추출(구간_추가_후_조회_결과));
 	}
 
 	/*

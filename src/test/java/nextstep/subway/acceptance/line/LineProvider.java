@@ -61,4 +61,8 @@ public class LineProvider extends ProviderBase {
 		return response.jsonPath().getString("$.stations[-1:0].id");
 	}
 
+	public static String 하행_마지막_구간의_상행역_Id_추출(ExtractableResponse<Response> response) {
+		return response.jsonPath().getString("$.stations[-2:-1].id");
+	}
+
 }

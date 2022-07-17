@@ -23,7 +23,7 @@ public class SectionProvider extends ProviderBase {
 		return response;
 	}
 
-	public static void 지하철_노선_제거_성공(Long lineId, Long stationId) {
+	public static void 지하철_구간_제거_성공(String lineId, String stationId) {
 		ExtractableResponse<Response> response = 지하철_구간_삭제(lineId, stationId);
 		응답코드_검증(response, NO_CONTENT);
 	}

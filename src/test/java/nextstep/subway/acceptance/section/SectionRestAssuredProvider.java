@@ -26,7 +26,7 @@ public class SectionRestAssuredProvider {
 			.extract();
 	}
 
-	public static ExtractableResponse<Response> 지하철_구간_삭제(Long lineId, Long stationId) {
+	public static ExtractableResponse<Response> 지하철_구간_삭제(String lineId, String stationId) {
 		return RestAssured.given().log().all()
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.queryParam("stationId", stationId)
