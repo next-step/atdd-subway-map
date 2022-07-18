@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationTestFixtures {
-    public static ExtractableResponse<Response> generateStation(String stationName) {
+    public static String 역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -20,7 +20,7 @@ public class StationTestFixtures {
                 .when()
                 .post("/stations")
                 .then().log().all()
-                .extract();
+                .extract().jsonPath().getString("id");
     }
 
     public static ExtractableResponse<Response> showStations() {

@@ -22,7 +22,7 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = generateStation("강남역");
+        ExtractableResponse<Response> response = 역_생성("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -46,8 +46,8 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void getStation() {
         //given
-        generateStation("신림역");
-        generateStation("봉천역");
+        역_생성("신림역");
+        역_생성("봉천역");
 
         //when
         List<String> stations =
@@ -72,7 +72,7 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void deleteStation() {
         //given
-        ExtractableResponse<Response> response = generateStation("신림역");
+        ExtractableResponse<Response> response = 역_생성("신림역");
 
         //when
         removeStation(response.jsonPath().getString("id"));
