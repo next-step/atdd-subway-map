@@ -3,13 +3,13 @@ package nextstep.subway.acceptance.station;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.common.CommonSteps.생성_성공_응답;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -19,7 +19,6 @@ public class StationSteps {
     public static final String YUKSAM_STATION_NAME = "역삼역";
     public static final String NONHYUN_STATION_NAME = "논현역";
     public static final String SHIN_NONHYUN_STATION_NAME = "신논현역";
-
 
     public static ExtractableResponse<Response> 지하철역_생성(String stationName) {
         Map<String, String> param = new HashMap<>();
@@ -50,9 +49,9 @@ public class StationSteps {
     public static void 노선_생성_검증(ExtractableResponse<Response> response) {
         assertAll(
                 // then 지하철역이 생성된다
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> 생성_성공_응답(response),
                 // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-                () -> assertThat(지하철역_목록_조회().jsonPath().getList("name")).containsAnyOf(GANGNAM_STATION_NAME)
+                () -> assertThat(지하철역_목록_조회().jsonPath().getList("name")).containsAnyOf(response.jsonPath().getString("name"))
         );
     }
 

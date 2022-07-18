@@ -26,7 +26,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void 지하철역_생성_테스트() {
         // when 지하철역을 생성하면
         ExtractableResponse<Response> response = 지하철역_생성(GANGNAM_STATION_NAME);
-        StationSteps.노선_생성_검증(response);
+        노선_생성_검증(response);
     }
 
     /**
