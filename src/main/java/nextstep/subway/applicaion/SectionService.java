@@ -29,10 +29,7 @@ public class SectionService {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노션입니다."));
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
-        line.validAddSection(upStation, downStation);
-        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
-        line.addSection(section);
-        return createLineResponse(section);
+        return createLineResponse(line.addSection(line, upStation, downStation, sectionRequest.getDistance()));
     }
 
     private SectionResponse createLineResponse(Section section) {
@@ -46,10 +43,10 @@ public class SectionService {
         deleteSection(line, downStation);
     }
 
-    private void deleteSection(Line line, Station sectionDownStationId) {
-        for (Section section : line.sections()) {
-            if (Objects.equals(section.getDownStation().getId(), sectionDownStationId)) {
-                sectionRepository.deleteById(section.getId());
+    private void deleteSection(Line line, Station downStation) {
+        for (Section section : line.getSections().getSections()) {
+            if (Objects.equals(section, downStation)) {
+                sectionRepository.delete(section);
             }
         }
     }

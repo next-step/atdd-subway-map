@@ -5,7 +5,6 @@ import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line.Line;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +23,8 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
-    @GetMapping(value = "/lines", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Line>> showLines() {
+    @GetMapping(value = "/lines")
+    public ResponseEntity<List<Line>> lines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 

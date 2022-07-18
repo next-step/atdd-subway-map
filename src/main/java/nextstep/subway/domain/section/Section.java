@@ -1,5 +1,6 @@
 package nextstep.subway.domain.section;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line.Line;
@@ -17,6 +18,7 @@ public class Section {
     @Column(name = "section_id")
     private Long id;
 
+    @JsonIgnoreProperties(value = {"sections"})
     @ManyToOne
     @JoinColumn(name = "line_id")
     private Line line;
