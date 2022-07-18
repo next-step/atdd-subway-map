@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 
 import javax.validation.constraints.Min;
@@ -23,6 +24,10 @@ public class SectionRequest {
 
         public Section toEntity() {
             return new Section(downStationId, upStationId, distance);
+        }
+
+        public Section toEntity(Line line) {
+            return new Section(line, upStationId, downStationId, distance);
         }
     }
 
