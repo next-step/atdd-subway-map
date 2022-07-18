@@ -68,10 +68,6 @@ public class Line {
         return sections.getDownStationTerminal();
     }
 
-    public int getTotalDistance() {
-        return sections.getTotalDistance();
-    }
-
     public List<Station> getStations() {
         return sections.getStations();
     }
