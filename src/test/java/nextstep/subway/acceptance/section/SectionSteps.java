@@ -35,7 +35,7 @@ public class SectionSteps {
                 // then 지하철 구간 등록 성공 응답받는다.
                 () -> 생성_성공_응답(구간),
                 // then 구간의 상행역은 해당 노선의 하행 종점역이어야 한다.
-                () -> assertThat(구간.jsonPath().getLong("upStationId")).isEqualTo(LineSteps.노선_하행역_ID),
+                () -> assertThat(구간.jsonPath().getLong("upStationId")).isEqualTo(노선_하행역_ID),
                 // then 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
                 () -> assertThat(노선_역_목록_ID(노선)).doesNotContain(구간.jsonPath().getLong("downStationId"))
         );
