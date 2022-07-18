@@ -20,20 +20,15 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@Sql("classpath:truncate.sql")
+@AcceptanceTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
-	@LocalServerPort
-	int port;
-
 	private static final String STATION_NAME = "강남역";
 
 	private ExtractableResponse<Response> responseOfCreate;
 
 	@BeforeEach
 	public void setUp() {
-		RestAssured.port = port;
-
 		// given
 		responseOfCreate = 지하철역_생성(STATION_NAME);
 	}

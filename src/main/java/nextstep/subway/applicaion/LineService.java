@@ -1,7 +1,6 @@
 package nextstep.subway.applicaion;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -10,8 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Section;
 import nextstep.subway.repository.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.repository.StationRepository;
@@ -45,15 +46,14 @@ public class LineService {
 	}
 
 	public LineResponse findLine(Long id) {
-		Line line = lineRepository.findById(id).orElseThrow(()-> new SubwayException("no subway"));
+		Line line = lineRepository.findById(id).orElseThrow(() -> new SubwayException("no subway"));
 		return createLineResponse(line);
 	}
 
 	@Transactional
 	public void updateLine(Long id, String name, String color) {
-		Line line = lineRepository.findById(id).orElseThrow(()-> new SubwayException("no subway"));
+		Line line = lineRepository.findById(id).orElseThrow(() -> new SubwayException("no subway"));
 		line.update(name, color);
-		lineRepository.save(line);
 	}
 
 	@Transactional
@@ -62,17 +62,25 @@ public class LineService {
 	}
 
 	private LineResponse createLineResponse(Line line) {
-		Optional<Station> upStation = stationRepository.findById(line.getUpStationId());
-		Optional<Station> downStation = stationRepository.findById(line.getDownStationId());
-		StationResponse upStationResponse = stationService.createStationResponse(upStation.orElseThrow(() -> new SubwayException("no station")));
-		StationResponse downStationResponse = stationService.createStationResponse(downStation.orElseThrow(() -> new SubwayException("no station")));
-
 		return LineResponse.builder()
 			.id(line.getId())
 			.name(line.getName())
 			.color(line.getColor())
-			.upStation(upStationResponse)
-			.downStation(downStationResponse)
+			.sections(createSectionsResponse(line.getSections()))
 			.build();
+	}
+
+	private List<SectionResponse> createSectionsResponse(List<Section> sections) {
+		return sections.stream()
+			.map((section -> {
+				Station upStation = stationRepository.findById(section.getUpStationId())
+					.orElseThrow(() -> new SubwayException("no subway"));
+				Station downStation = stationRepository.findById(section.getDownStationId())
+					.orElseThrow(() -> new SubwayException("no subway"));
+
+				return new SectionResponse(stationService.createStationResponse(upStation),
+					stationService.createStationResponse(downStation),
+					section.getDistance());
+			})).collect(Collectors.toList());
 	}
 }

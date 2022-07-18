@@ -5,33 +5,31 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.applicaion.dto.SectionResponse;
 
 @DisplayName("지하철노선 관련 기능")
-@Sql("classpath:truncate.sql")
+@AcceptanceTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
-
-	@LocalServerPort
-	private int port;
-
 	private static final String LINE_NAME = "신분당선";
 	private static final String UP_STATION_NAME = "강남역";
 	private static final String DOWN_STATION_NAME = "양재역";
 	private ExtractableResponse<Response> responseOfLine;
-	private Long upStationId;
 	private Long downStationId;
 	private Long lineId;
 
@@ -43,10 +41,8 @@ public class LineAcceptanceTest {
 
 	@BeforeEach
 	public void setUp() {
-		RestAssured.port = port;
-
 		// given 지하철 역 생성
-		upStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(UP_STATION_NAME));
+		Long upStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(UP_STATION_NAME));
 		downStationId = stationAcceptanceTest.지하철역_생성_파싱_id(stationAcceptanceTest.지하철역_생성(DOWN_STATION_NAME));
 
 		// given 지하철 노선 생성
@@ -105,7 +101,7 @@ public class LineAcceptanceTest {
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(지하철노선_조회_파싱_name(response)).isEqualTo(LINE_NAME);
+		assertThat(지하철노선_조회_파싱_lineName(response)).contains(LINE_NAME);
 	}
 
 	/**
@@ -122,7 +118,7 @@ public class LineAcceptanceTest {
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-		assertThat(지하철노선_조회_파싱_name(지하철노선_조회(lineId))).isEqualTo(newLineName);
+		assertThat(지하철노선_조회_파싱_lineName(지하철노선_조회(lineId))).isEqualTo(newLineName);
 	}
 
 	/**
@@ -141,7 +137,7 @@ public class LineAcceptanceTest {
 		assertThat(지하철노선_목록_조회_파싱_name(지하철노선_목록_조회())).doesNotContain(LINE_NAME);
 	}
 
-	private ExtractableResponse<Response> 지하철노선_생성(String name, String color, Long upStationId, Long downStationId,
+	ExtractableResponse<Response> 지하철노선_생성(String name, String color, Long upStationId, Long downStationId,
 		Long distance) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("name", name);
@@ -170,16 +166,29 @@ public class LineAcceptanceTest {
 			.jsonPath().getList("name", String.class);
 	}
 
-	private ExtractableResponse<Response> 지하철노선_조회(Long id) {
+	ExtractableResponse<Response> 지하철노선_조회(Long id) {
 		return RestAssured.given().log().all()
 			.when().get("/lines/" + id)
 			.then().log().all()
 			.extract();
 	}
 
-	private String 지하철노선_조회_파싱_name(ExtractableResponse<Response> response) {
+	private String 지하철노선_조회_파싱_lineName(ExtractableResponse<Response> response) {
 		return response
 			.jsonPath().getString("name");
+	}
+
+	List<String> 지하철노선_조회_파싱_stationNames(ExtractableResponse<Response> response) {
+		List<SectionResponse> sectionResponses = response.jsonPath().getList("sections");
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<SectionResponse> sections = mapper.convertValue(sectionResponses, new TypeReference<>(){});
+
+		List<String> names = sections.stream()
+			.map(section -> section.getDownStation().getName())
+			.collect(Collectors.toList());
+		names.add(sections.get(0).getUpStation().getName());
+		return names;
 	}
 
 	private ExtractableResponse<Response> 지하철노선_수정(Long lineId, String name, String color) {
