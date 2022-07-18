@@ -43,7 +43,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             // then
             assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(aId),
+                () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(bId),
                 () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(cId)
                      );
         }

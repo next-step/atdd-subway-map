@@ -7,6 +7,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SectionRepository;
+import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.dto.line.CreateLineRequest;
@@ -30,29 +31,28 @@ public class LineService {
         Station upStation = findStation(request.getUpStationId());
         Station downStation = findStation(request.getDownStationId());
 
-        Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
+        Section section = Section.builder()
+                                 .upStation(upStation)
+                                 .downStation(downStation)
+                                 .distance(request.getDistance()).build();
+        sectionRepository.save(section);
+
+        Line line = new Line(request.getName(), request.getColor(), request.getDistance(), section);
         lineRepository.save(line);
 
-        sectionRepository.save(Section.builder()
-                                   .upStation(upStation)
-                                   .downStation(downStation)
-                                   .distance(request.getDistance())
-                                   .line(line).build());
-
-        return LineResponse.of(line, List.of(upStation, downStation));
+        return LineResponse.of(line);
     }
 
-    public List<LineResponse> findAllLine() {
+    public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                             .map(line -> LineResponse.of(line, List.of(line.getUpStation(), line.getDownStation())))
+                             .map(LineResponse::of)
                              .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long lineId) {
         Line line = findLine(lineId);
-        List<Station> stations = List.of(line.getUpStation(), line.getDownStation());
-        return LineResponse.of(line, stations);
+        return LineResponse.of(line);
     }
 
     public void updateLine(Long lineId, UpdateLineRequest request) {

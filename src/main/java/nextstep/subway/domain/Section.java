@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.util.List;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Section {
     @Id
@@ -41,5 +44,11 @@ public class Section {
         this.line = line;
     }
 
-    protected Section(){}
+    public List<Station> getAllStation(){
+        return List.of(upStation, downStation);
+    }
+
+    public void setLine(final Line line) {
+        this.line = line;
+    }
 }

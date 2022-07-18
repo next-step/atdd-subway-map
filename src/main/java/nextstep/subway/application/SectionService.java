@@ -13,8 +13,6 @@ import nextstep.subway.ui.dto.section.CreateSectionRequest;
 import nextstep.subway.ui.dto.section.SectionResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Service
 public class SectionService {
@@ -27,26 +25,13 @@ public class SectionService {
         Station upStation = findStation(request.getUpStationId());
         Station downStation = findStation(request.getDownStationId());
 
-        if(!line.getDownStation().getId().equals(request.getUpStationId())){
-            throw new CustomException(ResponseCode.SECTION_NOT_MATCH);
-        }
-
-        List<Section> sections = line.getStations();
-        for(Section section : sections){
-            long downstationId = request.getDownStationId();
-            long sectionDownstaionId = section.getDownStation().getId();
-            long sectionUpstationId = section.getUpStation().getId();
-            if(downstationId == sectionDownstaionId || downstationId == sectionUpstationId){
-                throw new CustomException(ResponseCode.LINE_STATION_DUPLICATE);
-            }
-        }
-
         Section section = Section.builder()
-            .upStation(line.getUpStation())
-            .downStation(downStation)
-            .distance(request.getDistance())
-            .line(line).build();
+                                 .upStation(upStation)
+                                 .downStation(downStation)
+                                 .distance(request.getDistance()).build();
+        line.addSection(section);
         sectionRepository.save(section);
+
         return SectionResponse.of(section);
     }
 

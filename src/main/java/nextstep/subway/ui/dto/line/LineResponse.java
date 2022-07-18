@@ -14,13 +14,6 @@ public class LineResponse {
     private final String color;
     private final List<LineStation> stations;
 
-    public static LineResponse of(Line line, List<Station> createStations) {
-        List<LineStation> stations = createStations.stream()
-                                                   .map((station) -> new LineStation(station.getId(), station.getName()))
-                                                   .collect(Collectors.toList());
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
-    }
-
     private LineResponse(final Long id,
                          final String name,
                          final String color,
@@ -31,21 +24,25 @@ public class LineResponse {
         this.stations = stations;
     }
 
+    public static LineResponse of(Line line) {
+        List<LineStation> stations = line.getSections().getStations().stream()
+                                         .map(LineStation::of)
+                                         .collect(Collectors.toList());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+    }
+
+    @Getter
     private static class LineStation {
         private final Long id;
         private final String name;
 
-        public LineStation(final Long id, final String name) {
+        private LineStation(final Long id, final String name) {
             this.id = id;
             this.name = name;
         }
 
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
+        public static LineStation of(Station station){
+            return new LineStation(station.getId(), station.getName());
         }
     }
 }
