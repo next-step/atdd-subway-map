@@ -113,4 +113,11 @@ public class LineService {
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(toList());
     }
+
+    @Transactional
+    public void deleteSection(Long id, Long stationId) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
+        line.deleteStation(stationId);
+    }
 }

@@ -115,8 +115,17 @@ class SectionAcceptanceTest {
     @Test
     void deleteStationInSection() {
         // given
+        lineClient = new LineClient();
+        lineClient.create(params());
+        lineClient.addSection("4", "2", 10, 1);
+
         // when
+        lineClient.deleteSection(1L, 4L);
         // then
+        final var root = "";
+        final var lineResponses = lineClient.findById(1L).jsonPath().getObject(root, LineResponse.class);
+        final var stations = lineResponses.getStationResponse();
+        assertThat(stations.stream().map(StationResponse::getName)).containsExactly("지하철역", "새로운지하철역");
     }
 
     /**

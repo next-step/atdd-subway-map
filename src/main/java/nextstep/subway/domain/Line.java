@@ -19,13 +19,12 @@ public class Line {
 
     private String color;
 
+    // FIXME 역간 거리를 관리하도록 List 로 변경
     private int distance;
 
     @OneToMany
     @JoinColumn(name = "line_id")
     private List<Station> stations;
-
-    private int lastStationId;
 
     protected Line() {
     }
@@ -35,7 +34,6 @@ public class Line {
         this.color = color;
         this.stations = stations;
         this.distance = distance;
-        this.lastStationId = stations.size();
     }
 
     public Line changeBy(String name, String color) {
@@ -62,7 +60,6 @@ public class Line {
 
     public Line addSection(Station newStation, int distance) {
         stations.add(newStation);
-        lastStationId = stations.size();
         this.distance = distance;
         return this;
     }
@@ -84,12 +81,16 @@ public class Line {
     }
 
     private void validateDeleteStation(Long stationId) {
-        if (lastStationId != stationId) {
+        if (!lastStationId().equals(stationId)) {
             throw new DeleteStationException("하행역만 삭제할 수 있습니다.");
         }
 
-        if (lastStationId == 1) {
+        if (stations.size() == 1) {
             throw new DeleteStationException("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
         }
+    }
+
+    private Long lastStationId() {
+        return lastStation().getId();
     }
 }
