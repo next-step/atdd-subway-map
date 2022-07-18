@@ -71,14 +71,6 @@ public class Sections {
         return stations;
     }
 
-    protected int getTotalDistance() {
-        int totalDistance = 0;
-        for (Section section : sections) {
-            totalDistance += section.getDistance();
-        }
-        return totalDistance;
-    }
-
     protected Station getUpStationTerminal() {
         return getUpSectionTerminal().getUpStation();
     }
