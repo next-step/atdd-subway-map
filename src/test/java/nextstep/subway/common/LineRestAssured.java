@@ -6,7 +6,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Color;
 import org.springframework.http.MediaType;
 
@@ -16,8 +15,8 @@ public class LineRestAssured {
 
   public LineRestAssured() {}
 
-  public ExtractableResponse<Response> saveLine(String name, StationResponse upStation, StationResponse downStation) {
-    LineRequest lineRequest = new LineRequest(name, new Color(blue), upStation.getId(), downStation.getId(), 10);
+  public ExtractableResponse<Response> saveLine(String name, long upStationId, long downStationId) {
+    LineRequest lineRequest = new LineRequest(name, new Color(blue), upStationId, downStationId, 10);
 
     return RestAssured.given().log().all()
         .body(lineRequest, ObjectMapperType.JACKSON_2)
