@@ -53,7 +53,7 @@ public class LineApi {
         sectionRequest.put("downStationId", downStationId);
         sectionRequest.put("distance", distance);
 
-        ExtractableResponse<Response> addSectionResponse = RestAssured
+        return RestAssured
                 .given().log().all()
                 .pathParam("id", lineId)
                 .body(sectionRequest)
@@ -61,9 +61,5 @@ public class LineApi {
                 .when().post("/lines/{id}/sections")
                 .then().log().all()
                 .extract();
-
-        assertThat(addSectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        return addSectionResponse;
     }
 }

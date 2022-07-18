@@ -5,12 +5,12 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.api.LineApi;
 import nextstep.subway.api.StationApi;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -29,6 +29,7 @@ public class SectionAcceptanceTest {
     private ExtractableResponse<Response> 강남역;
     private ExtractableResponse<Response> 신논현역;
     private ExtractableResponse<Response> 정자역;
+    private ExtractableResponse<Response> 판교역;
 
     @BeforeEach
     void setUp() {
@@ -36,6 +37,7 @@ public class SectionAcceptanceTest {
         강남역 = StationApi.createStationApi("강남역");
         신논현역 = StationApi.createStationApi("신논현역");
         정자역 = StationApi.createStationApi("정자역");
+        판교역 = StationApi.createStationApi("판교역");
     }
 
     /**
@@ -71,12 +73,30 @@ public class SectionAcceptanceTest {
     /**
      * Given 지하철 노선을 생성하고
      * When 기존 노선의 종점역과 새로운 노선의 상행성이 일치하지 않도록 추가하면
-     * Then 지하철 노선은 정상적으로 추가되지 않는다.
+     * Then 지하철 구간 등록은 예외를 발생시킨다.
      */
     @DisplayName("지하철 구간 등록 예외(하행역과 상행역)")
     @Test
     void addSectionExceptionUnmatchedException() {
+        // given
+        long 강남역_번호 = 강남역.jsonPath().getLong("id");
+        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
 
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+
+        // when
+        long 정자역_번호 = 정자역.jsonPath().getLong("id");
+        long 판교역_번호 = 판교역.jsonPath().getLong("id");
+        long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 구간_등록_응답 = LineApi.addSectionApi(신분당선_번호, 정자역_번호, 판교역_번호, 5);
+
+        // then
+        String exceptionMessage = 구간_등록_응답.jsonPath().getString("message");
+        assertAll(
+                () -> assertThat(구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(exceptionMessage).isEqualTo("기존 노선의 종점역과 신규 노선의 상행역이 일치하지 않습니다.")
+        );
     }
 
     /**
