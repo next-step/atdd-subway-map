@@ -26,6 +26,16 @@ public class Sections {
     }
 
     protected void addSection(Line line, Section newSection) {
+        checkDuplicationSectionOrStation(newSection);
+
+        if (isNotTerminalDownStation(newSection)) {
+            throw new IllegalArgumentException("새로운 구간은 기존 노선의 하행 종점역이어야 합니다.");
+        }
+        sections.add(newSection);
+        newSection.setLine(line);
+    }
+
+    private void checkDuplicationSectionOrStation(Section newSection) {
         this.sections.stream()
                 .filter(section -> isSameSection(newSection, section)
                         || isNewSectionDownStationInLine(newSection, section))
@@ -33,12 +43,6 @@ public class Sections {
                 .ifPresent(section -> {
                     throw new IllegalArgumentException("구간이나 역이 중복되어 있으면 등록할 수 없습니다.");
                 });
-
-        if (isNotTerminalDownStation(newSection)) {
-            throw new IllegalArgumentException("새로운 구간은 기존 노선의 하행 종점역이어야 합니다.");
-        }
-        sections.add(newSection);
-        newSection.setLine(line);
     }
 
     protected Section deleteSection(Station station) {
