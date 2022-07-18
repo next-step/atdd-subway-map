@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineChangeRequest;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.LineNotFoundException;
 import nextstep.subway.exception.StationNotFoundException;
@@ -58,6 +59,18 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        Line findLine = findLineById(lineId);
+
+        Station findUpStation = findStationById(sectionRequest.getUpStationId());
+        Station findDownStation = findStationById(sectionRequest.getDownStationId());
+
+        Section section = Section.of(findUpStation, findDownStation, sectionRequest.getDistance());
+
+        findLine.addSection(section);
     }
 
     private Station findStationById(Long stationId) {
