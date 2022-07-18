@@ -133,16 +133,23 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
         Station 선릉역 = new Station(2L, "선릉역");
         stationRestAssured.postRequest(stationRootPath, 강남역, 선릉역);
 
+        Station 정자역 = new Station(2L, "강남역");
+        Station 판교역 = new Station(4L, "선릉역");
+        stationRestAssured.postRequest(stationRootPath, 정자역, 판교역);
+
+
         Section 첫번째_구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
         sectionRestAssured.postRequest(sectionsRequestPath, 첫번째_구간);
 
+        Section 두번째_구간 = new Section(정자역.getId(), 판교역.getId(), 10);
+        sectionRestAssured.postRequest(sectionsRequestPath, 두번째_구간);
 
         //when
-        sectionRestAssured.deleteRequest(sectionsRequestPath, "stationId", 첫번째_구간.getDownStationId());
+        sectionRestAssured.deleteRequest(sectionsRequestPath, "stationId", 두번째_구간.getDownStationId());
 
         //then
-        List<Long> sectionIds = sectionRestAssured.getRequest(lineRootPath).extract().jsonPath().getList("sections.id");
-        assertThat(sectionIds).doesNotContain(첫번째_구간.getDownStationId()).isEmpty();
+        List<Section> sectionIds = sectionRestAssured.getRequest(lineRootPath).extract().jsonPath().get("sections");
+        assertThat(sectionIds).hasSize(1);
     }
 
     /* Given 2개의 지하철역을 생성하고, 지하철 구간에 추가한다. 지하철 구간을 노선에 추가한다.
