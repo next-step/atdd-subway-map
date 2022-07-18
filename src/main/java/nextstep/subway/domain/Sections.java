@@ -45,7 +45,7 @@ public class Sections {
         if (!isDownTerminus(stationId)) {
             throw new IllegalArgumentException("하행 종점역만 제거할 수 있습니다.");
         }
-        getLastSection().deleteDownStation();
+        list.remove(lastIndex());
     }
 
     private void validate(Section section) {
