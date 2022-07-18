@@ -10,7 +10,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -23,7 +25,7 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public Sections(final List<Section> sections) {
-        this.sections = sections;
+        this.sections = new ArrayList<>(sections);
     }
 
     public void add(final Section section){
@@ -35,17 +37,15 @@ public class Sections {
     }
 
     private void checkSectionMatch(final Section section) {
-        if(!getDownEndStation().getId().equals(section.getUpStation().getId())){
+        if(!getDownEndStation().equals(section.getUpStation())){
             throw new CustomException(ResponseCode.SECTION_NOT_MATCH);
         }
     }
 
     private void checkStationDuplicate(final Section section) {
-        for(Section s : sections){
-            long downstationId = section.getDownStation().getId();
-            if(downstationId == s.getDownStation().getId() || downstationId == s.getUpStation().getId()){
-                throw new CustomException(ResponseCode.LINE_STATION_DUPLICATE);
-            }
+        Set<Station> stations = new HashSet<>(getStations());
+        if(stations.contains(section.getDownStation())){
+            throw new CustomException(ResponseCode.LINE_STATION_DUPLICATE);
         }
     }
 
@@ -54,7 +54,7 @@ public class Sections {
             .map(Section::getAllStation)
             .flatMap(List::stream)
             .distinct()
-            .collect(Collectors.toList());
+            .collect(Collectors.toUnmodifiableList());
     }
 
     public Station getUpEndStation(){
