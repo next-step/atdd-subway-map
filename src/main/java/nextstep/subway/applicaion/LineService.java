@@ -41,13 +41,6 @@ public class LineService {
         return createLineResponse(lineRepository.save(line));
     }
 
-    private Set<Station> createStations(Station upStation, Station downStation) {
-        Set<Station> stations = new HashSet<>();
-        stations.add(upStation);
-        stations.add(downStation);
-        return stations;
-    }
-
     public List<Line> findAllLines() {
         return lineRepository.findAll();
     }
