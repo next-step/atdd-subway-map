@@ -45,11 +45,11 @@ public class SectionAcceptanceTest {
         // given
         long 강남역 = 지하철역_생성을_요청한다("강남역").jsonPath().getLong("id");
         long 신논현역 = 지하철역_생성을_요청한다("신논현역").jsonPath().getLong("id");
+        long 양재역 = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
         long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 10).jsonPath().getLong("id");
 
         // when
-        long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
-        지하철구간_등록을_요청한다(신분당선, 신논현역, newStationId, 10);
+        지하철구간_등록을_요청한다(신분당선, 신논현역, 양재역, 10);
 
         // then
         ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
@@ -74,8 +74,8 @@ public class SectionAcceptanceTest {
         long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 10).jsonPath().getLong("id");
 
         // when
-        long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
-        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, 신논현역, newStationId, 10);
+        long 양재역 = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, 신논현역, 양재역, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -97,9 +97,9 @@ public class SectionAcceptanceTest {
         long 신분당선 = 지하철노선을_생성을_요청한다("신분당선", "bg-red-600", 강남역, 신논현역, (long) 10).jsonPath().getLong("id");
 
         // when
-        long newStationId = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
-        long failStationId = 지하철역_생성을_요청한다("수원역").jsonPath().getLong("id");
-        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, failStationId, newStationId, 10);
+        long 양재역 = 지하철역_생성을_요청한다("양재역").jsonPath().getLong("id");
+        long 수원역 = 지하철역_생성을_요청한다("수원역").jsonPath().getLong("id");
+        ExtractableResponse<Response> response = 지하철구간_등록을_요청한다(신분당선, 수원역, 양재역, 10);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
