@@ -1,6 +1,7 @@
 package nextstep.subway.ui;
 
-import nextstep.subway.applicaion.StationService;
+import nextstep.subway.applicaion.StationCommandService;
+import nextstep.subway.applicaion.StationQueryService;
 import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import org.springframework.http.MediaType;
@@ -12,26 +13,29 @@ import java.util.List;
 
 @RestController
 public class StationController {
-    private StationService stationService;
+    private final StationQueryService stationQueryService;
 
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
+    private final StationCommandService stationCommandService;
+
+    public StationController(StationQueryService stationQueryService, StationCommandService stationCommandService) {
+        this.stationQueryService = stationQueryService;
+        this.stationCommandService = stationCommandService;
     }
 
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+        StationResponse station = stationCommandService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
     @GetMapping(value = "/stations", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStations());
+        return ResponseEntity.ok().body(stationQueryService.findAllStations());
     }
 
     @DeleteMapping("/stations/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
-        stationService.deleteStationById(id);
+        stationCommandService.deleteStationById(id);
         return ResponseEntity.noContent().build();
     }
 }

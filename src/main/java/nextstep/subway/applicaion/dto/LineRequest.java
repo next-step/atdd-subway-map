@@ -44,13 +44,13 @@ public class LineRequest {
         return distance;
     }
 
-    public Line toLine(Line line) {
+    public Line toLine(LineResponse line) {
         return new Line(
                 line.getId(),
                 this.name != null ? this.name : line.getName(),
                 this.color != null ? this.color : line.getColor(),
-                this.upStationId != null ? this.upStationId : line.getUpStationId(),
-                this.downStationId != null ? this.downStationId : line.getDownStationId(),
+                this.upStationId != null ? this.upStationId : line.upStationId(),
+                this.downStationId != null ? this.downStationId : line.downStationId(),
                 this.distance != null ? this.distance : line.getDistance()
         );
     }
