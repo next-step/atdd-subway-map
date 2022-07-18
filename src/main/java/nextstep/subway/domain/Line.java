@@ -33,6 +33,10 @@ public class Line {
         sections.addSection(section);
     }
 
+    public void removeSection(Station findStation) {
+        sections.removeSection(findStation);
+    }
+
     public void change(String name, String color) {
         this.name = name;
         this.color = color;

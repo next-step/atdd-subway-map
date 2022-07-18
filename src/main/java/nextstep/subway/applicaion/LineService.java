@@ -73,6 +73,15 @@ public class LineService {
         findLine.addSection(section);
     }
 
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+        Line findLine = findLineById(lineId);
+
+        Station findStation = findStationById(stationId);
+
+        findLine.removeSection(findStation);
+    }
+
     private Station findStationById(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new StationNotFoundException("존재하지 않는 지하철역입니다."));

@@ -1,7 +1,7 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.DuplicateStationException;
-import nextstep.subway.exception.UnmatchedLastStationAndNewUpStationException;
+import nextstep.subway.exception.DeleteSectionException;
+import nextstep.subway.exception.AddSectionException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.*;
-import static java.util.stream.Collectors.*;
 
 @Embeddable
 public class Sections {
@@ -33,10 +32,10 @@ public class Sections {
     }
 
     private void matchLastStationAndNewUpStation(Station upStation) {
-        Station lastStation = value.get(lastSection()).getDownStation();
+        Station lastStation = lastSection().getDownStation();
 
         if (!lastStation.equals(upStation)) {
-            throw new UnmatchedLastStationAndNewUpStationException("기존 노선의 종점역과 신규 노선의 상행역이 일치하지 않습니다.");
+            throw new AddSectionException("기존 노선의 종점역과 신규 노선의 상행역이 일치하지 않습니다.");
         }
     }
 
@@ -47,12 +46,12 @@ public class Sections {
                 .findAny();
 
         if (findStation.isPresent()) {
-            throw new DuplicateStationException("신규 구간의 하행역이 기존 노선의 역에 이미 등록되어 있습니다.");
+            throw new AddSectionException("신규 구간의 하행역이 기존 노선의 역에 이미 등록되어 있습니다.");
         }
     }
 
-    private int lastSection() {
-        return value.size() - 1;
+    private Section lastSection() {
+        return value.get(value.size() - 1);
     }
 
     public List<Station> allStations() {
@@ -71,4 +70,15 @@ public class Sections {
         return unmodifiableList(stations);
     }
 
+    public void removeSection(Station deleteStation) {
+        if (value.size() == 1) {
+            throw new DeleteSectionException("구간이 1개인 노선은 구간 삭제를 진행할 수 없습니다.");
+        }
+
+        if (!lastSection().getDownStation().equals(deleteStation)) {
+            throw new DeleteSectionException("삭제하려는 역이 노선에 등록되지 않은 역이거나, 마지막 구간의 역이 아닙니다.");
+        }
+
+        value.remove(lastSection());
+    }
 }
