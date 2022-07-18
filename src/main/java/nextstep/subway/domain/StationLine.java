@@ -63,22 +63,22 @@ public class StationLine {
         return sections.add(section);
     }
 
-    public void updateDownStation(Station downStation) {
+    private void updateDownStation(Station downStation) {
         this.downStationId = downStation.getId();
     }
 
-    public void plusDistance(Integer distance) {
+    private void plusDistance(Integer distance) {
         this.distance += distance;
     }
 
-    public void minusDistance(Integer distance) {
+    private void minusDistance(Integer distance) {
         this.distance -= distance;
     }
 
     public Section removeSection(Long stationId) {
         validateDownStation(stationId);
 
-        Section section = sections.remove(stationId);
+        Section section = sections.remove();
         Section lastSection = sections.getLastSection();
 
         updateDownStation(lastSection.getDownStation());
