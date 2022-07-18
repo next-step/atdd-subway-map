@@ -7,23 +7,26 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME1;
 import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class LineAcceptanceTest {
     private static final String LINE_NAME_5 = "5호선";
     private static final String LINE_COLOR_5 = "#996CAC";
@@ -34,14 +37,18 @@ public class LineAcceptanceTest {
     private static final String LINE_COLOR_9 = "#BDB092";
     private static final Long LINE_DISTANCE_9 = 37L;
 
-    private LineRequest LINE_5;
-    private LineRequest LINE_9;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private DatabaseInitializer databaseInitializer;
 
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private LineRequest LINE_5;
+    private LineRequest LINE_9;
 
     @LocalServerPort
     int port;
@@ -53,6 +60,11 @@ public class LineAcceptanceTest {
         Long downStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
         LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId, downStationId, LINE_DISTANCE_5);
         LINE_9 = new LineRequest(LINE_NAME_9, LINE_COLOR_9, upStationId, downStationId, LINE_DISTANCE_9);
+    }
+
+    @AfterEach
+    public void initializeTables() {
+        databaseInitializer.execute();
     }
 
     /**
