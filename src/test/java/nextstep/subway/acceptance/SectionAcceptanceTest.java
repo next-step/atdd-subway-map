@@ -9,8 +9,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static nextstep.subway.api.ApiCall.*;
+import static nextstep.subway.validate.HttpStatusValidate.*;
+import static nextstep.subway.api.StationApi.*;
+import static nextstep.subway.api.StationLineApi.*;
+import static nextstep.subway.api.SectionApi.*;
+import static nextstep.subway.validate.HttpStatusValidate.*;
 
 @DisplayName("지하철 관리")
 public class SectionAcceptanceTest extends AcceptionceTest{
@@ -34,7 +37,7 @@ public class SectionAcceptanceTest extends AcceptionceTest{
         지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
 
         ExtractableResponse<Response> 지하철구간_생성 = 지하철_구간_생성(1L, 2L, 3L, 4);
-        assertThat(지하철구간_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_체크(지하철구간_생성, HttpStatus.CREATED);
 
         ExtractableResponse<Response> response = 지하철_노선_조회(1L);
         하행선값_검증(response, "선릉역");
@@ -46,8 +49,9 @@ public class SectionAcceptanceTest extends AcceptionceTest{
         지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
 
         ExtractableResponse<Response> exceptionResponse = 지하철_구간_생성(1L, 1L, 2L, 4);
-        assertThat(exceptionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(exceptionResponse.jsonPath().getString("message")).isEqualTo("하행선만 등록 가능합니다.");
+
+        상태코드_체크(exceptionResponse, HttpStatus.CONFLICT);
+        에러메시지_체크(exceptionResponse, "하행선만 등록 가능합니다.");
     }
 
     @DisplayName("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
@@ -56,8 +60,9 @@ public class SectionAcceptanceTest extends AcceptionceTest{
         지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
 
         ExtractableResponse<Response> exceptionResponse = 지하철_구간_생성(1L, 2L, 1L, 4);
-        assertThat(exceptionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(exceptionResponse.jsonPath().getString("message")).isEqualTo("이미 등록된 역입니다.");
+
+        상태코드_체크(exceptionResponse, HttpStatus.CONFLICT);
+        에러메시지_체크(exceptionResponse, "이미 등록된 역입니다.");
     }
 
 
@@ -73,10 +78,10 @@ public class SectionAcceptanceTest extends AcceptionceTest{
         지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
 
         ExtractableResponse<Response> createSection = 지하철_구간_생성(1L, 2L, 3L, 4);
-        assertThat(createSection.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_체크(createSection, HttpStatus.CREATED);
 
         ExtractableResponse<Response> deleteSection = 지하철_구간_삭제(1L, 3L);
-        assertThat(deleteSection.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        상태코드_체크(deleteSection, HttpStatus.NO_CONTENT);
 
         ExtractableResponse<Response> response = 지하철_노선_조회(1L);
         하행선값_검증(response, "역삼역");
@@ -88,11 +93,12 @@ public class SectionAcceptanceTest extends AcceptionceTest{
         지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
 
         ExtractableResponse<Response> createSection = 지하철_구간_생성(1L, 2L, 3L, 4);
-        assertThat(createSection.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        상태코드_체크(createSection, HttpStatus.CREATED);
 
         ExtractableResponse<Response> exceptionResponse = 지하철_구간_삭제(1L, 2L);
-        assertThat(exceptionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(exceptionResponse.jsonPath().getString("message")).isEqualTo("하행선만 삭제 가능합니다.");
+
+        상태코드_체크(exceptionResponse, HttpStatus.CONFLICT);
+        에러메시지_체크(exceptionResponse, "하행선만 삭제 가능합니다.");
     }
 
     @DisplayName("(구간이 1개인 경우) 역을 삭제할 수 없다.")
@@ -101,15 +107,16 @@ public class SectionAcceptanceTest extends AcceptionceTest{
         지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
 
         ExtractableResponse<Response> exceptionResponse = 지하철_구간_삭제(1L, 2L);
-        assertThat(exceptionResponse.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
-        assertThat(exceptionResponse.jsonPath().getString("message")).isEqualTo("구간이 1개여서 삭제할 수 없습니다.");
+
+        상태코드_체크(exceptionResponse, HttpStatus.CONFLICT);
+        에러메시지_체크(exceptionResponse, "구간이 1개여서 삭제할 수 없습니다.");
     }
 
     private void 하행선값_검증(ExtractableResponse<Response> response, String name) {
         List<StationResponse> stationList = response.jsonPath().getList("stations", StationResponse.class);
         String downStationName = stationList.get(stationList.size()-1).getName();
 
-        assertThat(downStationName).isEqualTo(name);
+        동일한_값_인지_검증(downStationName, name);
     }
 
 }

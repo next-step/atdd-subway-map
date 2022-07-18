@@ -1,16 +1,14 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.List;
 import nextstep.subway.applicaion.dto.StationLineRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static nextstep.subway.api.ApiCall.*;
+import static nextstep.subway.validate.HttpStatusValidate.*;
+import static nextstep.subway.api.StationApi.*;
+import static nextstep.subway.api.SectionApi.*;
 
 @DisplayName("지하철노선 관련 기능")
 public class StationLineAcceptanceTest extends AcceptionceTest {
@@ -36,7 +34,7 @@ public class StationLineAcceptanceTest extends AcceptionceTest {
         // 전체 지하철 노선 목록 조회
         List<String> stationList = 지하철_노선_목록_조회();
 
-        StationAcceptanceTest.지하철역이_존재하는지_체크(stationList, "2호선");
+        지하철역이_존재하는지_체크(stationList, "2호선");
     }
 
     /**
@@ -110,15 +108,7 @@ public class StationLineAcceptanceTest extends AcceptionceTest {
 
         List<String> stationList = 지하철_노선_목록_조회();
 
-        StationAcceptanceTest.값이_포함되지_않는지_검증(stationList, "2호선");
-    }
-
-    private void 지하철_노선_사이즈_체크(List<String> stationLineList, int size) {
-        assertThat(stationLineList).hasSize(size);
-    }
-
-    private void 동일한_값_인지_검증(String stationName, String name) {
-        assertThat(stationName).isEqualTo(name);
+        값이_포함되지_않는지_검증(stationList, "2호선");
     }
 
 }

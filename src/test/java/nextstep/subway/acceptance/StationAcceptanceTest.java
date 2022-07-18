@@ -3,8 +3,8 @@ package nextstep.subway.acceptance;
 import org.junit.jupiter.api.*;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static nextstep.subway.api.ApiCall.*;
+import static nextstep.subway.validate.HttpStatusValidate.*;
+import static nextstep.subway.api.StationApi.*;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptionceTest {
@@ -61,18 +61,6 @@ public class StationAcceptanceTest extends AcceptionceTest {
         List<String> stationList = 지하철역_목록_조회();
 
         값이_포함되지_않는지_검증(stationList, "강남역");
-    }
-
-    public static void 지하철역이_존재하는지_체크(List<String> stationList, String name) {
-        assertThat(stationList).containsExactly(name);
-    }
-
-    public static void 목록개수_확인(List<String> stationList, int size) {
-        assertThat(stationList).hasSize(size);
-    }
-
-    public static void 값이_포함되지_않는지_검증(List<String> stationList, String name) {
-        assertThat(stationList).doesNotContain(name);
     }
 
 }
