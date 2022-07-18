@@ -88,18 +88,17 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest{
     }
 
     /**
-     * Given    지하철 노선의 상행 종점역에 새로운 구간을 등록하고
-     * When     삭제할 구간이 하행 종점역이 아니면
+     * When    지하철 노선의 상행 종점역에 새로운 구간을 등록하면
      * Then     에러처리한다.
      */
     @Test
     @DisplayName("지하철 노선의 하행 종점역이 아닌 역의 구간을 제거한다.")
     void removeIllegalDownStationSectionTest() {
-        //given
+        //when
         Map<String, Object> requestBody = getRequestBody("2","3",10);
         createSection(requestBody);
 
-        //when
+        //then
         ExtractableResponse<Response> response = deleteSection(1, 2);
         assertThat(response.jsonPath().getString("message"))
             .isEqualTo(ExceptionMessages.getNotEndpointInputExceptionMessage(2,3));
