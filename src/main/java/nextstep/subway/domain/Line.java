@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -9,31 +10,36 @@ public class Line {
     @Column(name = "line_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
+
+    @Embedded
+    private Sections sections = new Sections();
 
     protected Line() {
     }
 
-    private Line(String name, String color, Long upStationId, Long downStationId, int distance) {
+    private Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
-    public static Line of(String name, String color, Long upStationId, Long downStationId, int distance) {
-        return new Line(name, color, upStationId, downStationId, distance);
+    public static Line of(String name, String color) {
+        return new Line(name, color);
+    }
+
+    public void addSection(Section section) {
+        section.line(this);
+        sections.addSection(section);
     }
 
     public void change(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public List<Station> allStations() {
+        return sections.allStations();
     }
 
     public Long getId() {
@@ -46,13 +52,5 @@ public class Line {
 
     public String getColor() {
         return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
     }
 }
