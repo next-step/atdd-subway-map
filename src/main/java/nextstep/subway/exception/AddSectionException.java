@@ -1,8 +1,8 @@
 package nextstep.subway.exception;
 
-public class DuplicateStationException extends RuntimeException{
+public class AddSectionException extends RuntimeException{
 
-    public DuplicateStationException(String message) {
+    public AddSectionException(String message) {
         super(message);
     }
 }
