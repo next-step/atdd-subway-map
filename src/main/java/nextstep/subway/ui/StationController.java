@@ -28,6 +28,12 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StationResponse> showStations(@PathVariable Long id) {
+        StationResponse station = stationService.findById(id);
+        return ResponseEntity.ok().body(station);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStationById(id);
