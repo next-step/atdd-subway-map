@@ -7,12 +7,15 @@ import nextstep.subway.domain.Station;
 import nextstep.subway.acceptance.enums.SubwayRequestPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("지하철역 관련 기능")
+@ActiveProfiles("test")
 class StationAcceptanceTest extends SpringBootTestConfig {
     protected final SubwayRestAssured<Station> stationRestAssured = new SubwayRestAssured<>();
 

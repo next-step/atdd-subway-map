@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 구간 인수테스트")
+@ActiveProfiles("test")
 class SectionAcceptanceTest extends SpringBootTestConfig {
 
     protected final SubwayRestAssured<Section> sectionRestAssured = new SubwayRestAssured<>();
