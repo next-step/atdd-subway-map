@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Map;
@@ -38,7 +37,7 @@ class SectionAcceptanceTest {
     /**
      * Given 지하철 노선을 생성하고
      * When 지하철 노선에 구간을 등록하면
-     * Then 지하철 노선 구간 조회 시 생성한 구간을 찾을 수 있다
+     * Then 지하철 노선 구간 조회 시 생성한 역을 찾을 수 있다
      */
     @DisplayName("지하철 노선에 구간을 생성한다.")
     @Test
@@ -49,23 +48,13 @@ class SectionAcceptanceTest {
         lineClient.create(params());
 
         // when
-        final var params = Map.of(
-                "downStationId", "4",
-                "upStationId", "2",
-                "distance", 10L
-        );
-
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/" + 1 + "/sections")
-                .then().log().all()
-                .extract();
+        lineClient.addSection("4", "2", 10, 1);
 
         // then
         final var root = "";
         final var lineResponses = lineClient.findAll().jsonPath().getList(root, LineResponse.class);
-        assertThat(lineResponses.get(0).getStationResponse().stream().map(StationResponse::getName))
+        final var stations = lineResponses.get(0).getStationResponse();
+        assertThat(stations.stream().map(StationResponse::getName))
                 .containsExactly("지하철역", "새로운지하철역", "또또다른지하철역");
     }
 
