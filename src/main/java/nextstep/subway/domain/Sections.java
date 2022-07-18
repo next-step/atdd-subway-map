@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.DuplicateStationException;
 import nextstep.subway.exception.UnmatchedLastStationAndNewUpStationException;
 
 import javax.persistence.CascadeType;
@@ -8,8 +9,10 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.*;
+import static java.util.stream.Collectors.*;
 
 @Embeddable
 public class Sections {
@@ -24,6 +27,7 @@ public class Sections {
         }
 
         matchLastStationAndNewUpStation(section.getUpStation());
+        duplicateStation(section.getDownStation());
 
         this.value.add(section);
     }
@@ -33,6 +37,17 @@ public class Sections {
 
         if (!lastStation.equals(upStation)) {
             throw new UnmatchedLastStationAndNewUpStationException("기존 노선의 종점역과 신규 노선의 상행역이 일치하지 않습니다.");
+        }
+    }
+
+    private void duplicateStation(Station downStation) {
+        Optional<Station> findStation = value.stream()
+                .map(Section::getUpStation)
+                .filter(upStation -> upStation.equals(downStation))
+                .findAny();
+
+        if (findStation.isPresent()) {
+            throw new DuplicateStationException("신규 구간의 하행역이 기존 노선의 역에 이미 등록되어 있습니다.");
         }
     }
 
