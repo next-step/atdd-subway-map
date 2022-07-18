@@ -5,7 +5,9 @@ import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -65,6 +67,25 @@ public class Line {
 
     public Set<Section> sections() {
         return this.sections;
+    }
+
+    public void validAddSection(Station upStation, Station downStation) {
+        validUpStation(upStation);
+        validDownStation(downStation);
+    }
+
+    public void validUpStation(Station sectionUpStation) {
+        if (!Objects.equals(this.downStation().getId(), sectionUpStation.getId())) {
+            throw new IllegalArgumentException("section.upStation.line.downStation");
+        }
+    }
+
+    private void validDownStation(Station downStation) {
+        Set<Long> sectionIds = this.sections().stream().map(section -> section.getUpStation().getId()).collect(Collectors.toSet());
+        this.sections().stream().map(section -> section.getDownStation().getId()).forEach(sectionIds::add);
+        if (sectionIds.contains(downStation.getId())) {
+            throw new IllegalArgumentException("section.downStation.line.duplicate");
+        }
     }
 
 }

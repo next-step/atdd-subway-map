@@ -35,26 +35,9 @@ public class SectionService {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노션입니다."));
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
-        validSectionStation(line, upStation, downStation);
+        line.validAddSection(upStation, downStation);
         Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
         return createLineResponse(sectionRepository.save(section));
-    }
-
-    private void validSectionStation(Line line, Station sectionUpStation, Station sectionDownStation) {
-        validSectionUpStation(line, sectionUpStation);
-        validSectionDownStation(line, sectionDownStation);
-    }
-
-    private void validSectionDownStation(Line line, Station sectionDownStation) {
-        Set<Long> sectionIds = new HashSet<>();
-        for (Section section : line.sections()) {
-            Long id = section.getUpStation().getId();
-            sectionIds.add(id);
-        }
-        line.sections().stream().map(section -> section.getDownStation().getId()).forEach(sectionIds::add);
-        if (sectionIds.contains(sectionDownStation.getId())) {
-            throw new IllegalArgumentException("section.downStation.line.duplicate");
-        }
     }
 
     private boolean isLineDownStationDuplicate(Station lineDownStation, Station sectionDownStation) {
