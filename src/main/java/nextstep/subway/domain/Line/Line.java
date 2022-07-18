@@ -51,6 +51,10 @@ public class Line {
         return color;
     }
 
+    public Set<Section> sections () {
+        return this.sections.sections();
+    }
+
     public Long distance () {
         return this.sections.distance();
     }
@@ -82,4 +86,18 @@ public class Line {
         }
     }
 
+    public void validDeleteUpStation(Station downStation) {
+        this.sections.validDeleteUpStation(downStation);
+    }
+
+    public void validSectionCount() {
+        if (this.sections.sections().size() < 2) {
+            throw new IllegalArgumentException("section.count.less");
+        }
+    }
+
+    public void validDeleteDownstation(Station downStation) {
+        validDeleteUpStation(downStation);
+        validSectionCount();
+    }
 }

@@ -6,6 +6,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Embeddable
@@ -39,4 +40,11 @@ public class Sections {
         this.sections.add(section);
     }
 
+    public void validDeleteUpStation(Station downStation) {
+        for (Section section : this.sections) {
+            if (Objects.equals(section.getUpStation().getId(), downStation.getId())) {
+                throw new IllegalArgumentException("section.upStation.not.delete");
+            }
+        }
+    }
 }

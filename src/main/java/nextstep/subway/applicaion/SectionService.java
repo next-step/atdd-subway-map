@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,34 +43,14 @@ public class SectionService {
     }
 
     public void delete(Long lineId, Long sectionDownStationId) {
-        Set<Section> sections = sectionRepository.findAllByLine_Id(lineId);
-        validSection(lineId, sectionDownStationId, sections);
-        deleteSection(sectionDownStationId, sections);
+        Station downStation = stationRepository.findById(sectionDownStationId).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("line.not.found"));
+        line.validDeleteDownstation(downStation);
+        deleteSection(line, downStation);
     }
 
-    private void validSection(Long lineId, Long sectionDownStationId, Set<Section> sections) {
-        lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("line.not.found"));
-        stationRepository.findById(sectionDownStationId).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
-        validIfDeleteUpStation(sectionDownStationId, sections);
-        validIfExistSectionCount(sectionDownStationId, sections);
-    }
-
-    private void validIfExistSectionCount(Long sectionDownStationId, Set<Section> sections) {
-        if (sections.size() < 2) {
-            throw new IllegalArgumentException("section.count.less");
-        }
-    }
-
-    private void validIfDeleteUpStation(Long sectionDownStationId, Set<Section> sections) {
-        for (Section section : sections) {
-            if (Objects.equals(section.getUpStation().getId(), sectionDownStationId)) {
-                throw new IllegalArgumentException("section.upStation.not.delete");
-            }
-        }
-    }
-
-    private void deleteSection(Long sectionDownStationId, Set<Section> sections) {
-        for (Section section : sections) {
+    private void deleteSection(Line line, Station sectionDownStationId) {
+        for (Section section : line.sections()) {
             if (Objects.equals(section.getDownStation().getId(), sectionDownStationId)) {
                 sectionRepository.deleteById(section.getId());
             }
