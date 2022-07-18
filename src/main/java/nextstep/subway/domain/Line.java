@@ -18,7 +18,7 @@ public class Line {
     private String color;
 
     @Embedded
-    private Sections sections;
+    private Sections sections = new Sections();
 
     public Line(String name, String color) {
         this(0L, name, color);
@@ -35,7 +35,7 @@ public class Line {
     }
 
     public Section findLastSection() {
-        return getSections().getLastSection();
+        return getSections().lastSection();
     }
 
     public List<Section> findSectionList() {
