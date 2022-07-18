@@ -20,6 +20,9 @@ dependencies {
     // log
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 
+    // 쿼리 파라미터 출력
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.7.1'
+
     // Guava
     implementation 'com.google.guava:guava:31.1-jre'
 
