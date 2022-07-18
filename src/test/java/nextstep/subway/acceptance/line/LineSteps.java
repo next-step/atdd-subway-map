@@ -39,8 +39,6 @@ public class LineSteps {
 
     public static final Long DISTANCE = 5L;
     public static final Long 노선_거리 = 5L;
-//
-//    public static final String 노선명 = "논현역";
 
     public static Long 노선_상행역_ID = null;
     public static Long 노선_하행역_ID = null;

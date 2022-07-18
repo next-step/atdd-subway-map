@@ -3,18 +3,17 @@ package nextstep.subway.acceptance.section;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.common.CommonSteps;
 import nextstep.subway.acceptance.line.LineSteps;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
+import static nextstep.subway.acceptance.common.CommonSteps.삭제_성공_응답;
+import static nextstep.subway.acceptance.common.CommonSteps.서버_에러_응답;
 import static nextstep.subway.acceptance.line.LineSteps.*;
 import static nextstep.subway.acceptance.section.SectionSteps.*;
 import static nextstep.subway.acceptance.station.StationSteps.GANGNAM_STATION_NAME;
 import static nextstep.subway.acceptance.station.StationSteps.지하철역_생성;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -69,7 +68,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 // 서버 에러를 응답 받는다.
-                () -> assertThat(구간.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                () -> 서버_에러_응답(구간),
                 // Then 구간의 상행역은 노선의 하향 종점역이어야 합니다. exception 발생
                 () -> assertEquals("section.upStation.line.downStation", exception.getMessage())
         );
@@ -99,7 +98,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 //서버 에러를 응답 받는다.
-                () -> assertThat(구간.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                () -> 서버_에러_응답(구간),
                 //Then 구간의 상행역은 노선의 하향 종점역이어야 합니다. exception 발생
                 () -> assertEquals("section.downStation.line.duplicate", exception.getMessage())
         );
@@ -121,7 +120,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //When 구간을 삭제한다.
         ExtractableResponse<Response> 구간_삭제_응답 = 구간_삭제(노선_ID, 구간_하행역_ID);
         //When 구간 삭제에 성공한다.
-        CommonSteps.삭제_성공_응답(구간_삭제_응답);
+        삭제_성공_응답(구간_삭제_응답);
     }
 
     /**
@@ -145,7 +144,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         });
         assertAll(
                 // Then 서버 에러를 응답 받는다.
-                () -> assertThat(구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                () -> 서버_에러_응답(구간_삭제_응답),
                 // Then 구간의 삭제는 하행역만 가능합니다.
                 () -> assertEquals("section.upStation.not.delete", exception.getMessage())
         );
@@ -169,9 +168,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Throwable exception = Assertions.assertThrows((Throwable.class), () -> {
             throw new IllegalArgumentException("section.count.less");
         });
+
         assertAll(
                 // Then 서버 에러를 응답 받는다.
-                () -> assertThat(구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                () -> 서버_에러_응답(구간_삭제_응답),
                 // Then 구간의 삭제는 하행역만 가능합니다.
                 () -> assertEquals("section.count.less", exception.getMessage())
         );

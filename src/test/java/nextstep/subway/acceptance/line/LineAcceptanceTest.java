@@ -5,11 +5,11 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static nextstep.subway.acceptance.common.CommonSteps.삭제_성공_응답;
 import static nextstep.subway.acceptance.line.LineSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -98,7 +98,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // When 지하철_노선_삭제
         ExtractableResponse<Response> deleteLineResponse = LineSteps.지하철_노선_삭제(노선_ID);
         // Then 해당 지하철 노선 정보를 찾을 수 없다
-        assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        삭제_성공_응답(deleteLineResponse);
     }
 
 }

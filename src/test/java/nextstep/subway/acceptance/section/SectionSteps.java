@@ -4,12 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.line.LineSteps;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static nextstep.subway.acceptance.common.CommonSteps.생성_성공_응답;
 import static nextstep.subway.acceptance.line.LineSteps.*;
 import static nextstep.subway.acceptance.station.StationSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +33,7 @@ public class SectionSteps {
     static void 구간_등록_검증(ExtractableResponse<Response> 노선, ExtractableResponse<Response> 구간) {
         assertAll(
                 // then 지하철 구간 등록 성공 응답받는다.
-                () -> assertThat(구간.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> 생성_성공_응답(구간),
                 // then 구간의 상행역은 해당 노선의 하행 종점역이어야 한다.
                 () -> assertThat(구간.jsonPath().getLong("upStationId")).isEqualTo(LineSteps.노선_하행역_ID),
                 // then 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.

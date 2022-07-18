@@ -63,8 +63,8 @@ public class StationSteps {
                 .extract();
     }
 
-    public static void 역_삭제_검증() {
+    public static void 역_삭제_검증(String stationName) {
         List<String> stationNames = 지하철역_목록_조회().jsonPath().getList("name");
-        assertThat(stationNames).doesNotContain(GANGNAM_STATION_NAME);
+        assertThat(stationNames).doesNotContain(stationName);
     }
 }
