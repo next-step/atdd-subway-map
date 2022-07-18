@@ -1,7 +1,9 @@
 package nextstep.subway.acceptance;
 
 import static io.restassured.RestAssured.UNDEFINED_PORT;
-import static nextstep.subway.acceptance.SubwayStationCommon.createdStation;
+import static nextstep.subway.acceptance.LineCommon.지하철_노선_등록_요청;
+import static nextstep.subway.acceptance.LineCommon.지하철_노선_조회_요청;
+import static nextstep.subway.acceptance.SubwayStationCommon.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -25,7 +27,7 @@ import org.springframework.http.MediaType;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class SubwayLineAcceptanceTest {
+public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
@@ -41,11 +43,11 @@ public class SubwayLineAcceptanceTest {
 
         databaseCleanUp.execute();
 
-        createdStation("사평역");
-        createdStation("신논현");
-        createdStation("언주역");
-        createdStation("강남역");
-        createdStation("양재역");
+        지하철역_생성_요청("사평역");
+        지하철역_생성_요청("신논현");
+        지하철역_생성_요청("언주역");
+        지하철역_생성_요청("강남역");
+        지하철역_생성_요청("양재역");
     }
 
     /**
@@ -56,10 +58,16 @@ public class SubwayLineAcceptanceTest {
     @Test
     void createLine() {
         // when - 지하철 노선을 생성한다
-        ExtractableResponse<Response> response = createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
+        ExtractableResponse<Response> response = 지하철_노선_등록_요청("9호선", "bg-brown-600", 1L, 2L, 10);
 
         // then - 지하철 목록 조회 시 생성한 노선을 찾을 수 있다
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // then
+        List<String> lineNames = 지하철_노선_목록_조회_요청()
+                .jsonPath()
+                .getList("name", String.class);
+        assertThat(lineNames).containsAnyOf("9호선");
     }
 
     /**
@@ -71,11 +79,11 @@ public class SubwayLineAcceptanceTest {
     @Test
     void getLineList() {
         // given - 지하철 노선을 생성한다
-        createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
-        createdSubwayLine("신분당선", "bg-red-600", 4L, 5L, 10);
+        지하철_노선_등록_요청("9호선", "bg-brown-600", 1L, 2L, 10);
+        지하철_노선_등록_요청("신분당선", "bg-red-600", 4L, 5L, 10);
 
         // when - 지하철 노선을 조회한다
-        ExtractableResponse<Response> response = getSubwayLines();
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
 
         // then - 지하철 2개의 노선을 조회할 수 있다
         List<String> names = response.jsonPath().getList("name", String.class);
@@ -95,10 +103,10 @@ public class SubwayLineAcceptanceTest {
     @Test
     void getLine() {
         // given - 지하철 노선을 생성한다
-        createdSubwayLine("신분당선", "bg-red-600", 4L, 5L, 10);
+        지하철_노선_등록_요청("신분당선", "bg-red-600", 4L, 5L, 10);
 
         // when - 지하철 노선을 조회한다
-        ExtractableResponse<Response> response = getSubwayLine(1L);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
 
         // then - 지하철 노선의 정보를 응답받을 수 있다
         JsonPath jsonPath = response.jsonPath();
@@ -119,13 +127,13 @@ public class SubwayLineAcceptanceTest {
     @Test
     void updateLine() {
         // given - 지하철 노선을 생성한다
-        createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
+        지하철_노선_등록_요청("9호선", "bg-brown-600", 1L, 2L, 10);
 
         // when - 생성한 지하철 노선을 수정한다
-        updateSubwayLine(1L, "수정된9호선", "bg-yellow-600");
+        지하철_노선_정보_수정_요청(1L, "수정된9호선", "bg-yellow-600");
 
         // then - 해당 지하철 노선 정보는 수정된다
-        ExtractableResponse<Response> response = getSubwayLine(1L);
+        ExtractableResponse<Response> response = 지하철_노선_조회_요청(1L);
         JsonPath jsonPath = response.jsonPath();
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -139,67 +147,38 @@ public class SubwayLineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    @DisplayName("재하철 노선을 삭제한다.")
+    @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
         // given - 지하철 노선을 생성한다
-        createdSubwayLine("9호선", "bg-brown-600", 1L, 2L, 10);
+        지하철_노선_등록_요청("9호선", "bg-brown-600", 1L, 2L, 10);
 
         // when - 지하철 노선을 삭제한다
-        deleteSubwayLine(1L);
+        지하철_노선_삭제_요청(1L);
 
         // then - 지하철 노선 정보가 삭제된다
-        ExtractableResponse<Response> response = getSubwayLines();
+        ExtractableResponse<Response> response = 지하철_노선_목록_조회_요청();
         List<String> names = response.jsonPath().getList("name", String.class);
         assertThat(names).doesNotContain("9호선");
     }
 
-    private ExtractableResponse<Response> createdSubwayLine(String name, String color, Long upStationId,
-                                                            Long downStationId, int distance) {
-        return RestAssured.given().log().all()
-                .body(createSubwayLineParams(name, color, upStationId, downStationId, distance))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
-    }
-
-    private Map<String, String> createSubwayLineParams(String name, String color, Long upStationId, Long downStationId,
-                                                       int distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        params.put("distance", String.valueOf(distance));
-
-        return params;
-    }
-
-    private ExtractableResponse<Response> getSubwayLines() {
+    private ExtractableResponse<Response> 지하철_노선_목록_조회_요청() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
 
-    private ExtractableResponse<Response> getSubwayLine(Long id) {
-        return RestAssured.given().log().all()
-                .when().get("/lines/{id}", id)
-                .then().log().all()
-                .extract();
-    }
-
-    private void updateSubwayLine(Long id, String updateName, String updateColor) {
+    private void 지하철_노선_정보_수정_요청(Long id, String updateName, String updateColor) {
         RestAssured.given().log().all()
-                .body(updateSubwayLineParams(updateName, updateColor))
+                .body(지하철_노선_정보_수정_파라미터_생성(updateName, updateColor))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
 
-    private Map<String, String> updateSubwayLineParams(String updateName, String updateColor) {
+    private Map<String, String> 지하철_노선_정보_수정_파라미터_생성(String updateName, String updateColor) {
         Map<String, String> params = new HashMap<>();
         params.put("name", updateName);
         params.put("color", updateColor);
@@ -207,7 +186,7 @@ public class SubwayLineAcceptanceTest {
         return params;
     }
 
-    private void deleteSubwayLine(long id) {
+    private void 지하철_노선_삭제_요청(long id) {
         RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/lines/{id}", id)
