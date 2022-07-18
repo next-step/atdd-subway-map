@@ -17,8 +17,17 @@ public class ExceptionController {
         return new ResponseEntity<>(makeErrorResponse(e.getBindingResult()), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(SubwayException.class)
+    public ResponseEntity<ErrorResponse> subwayException(SubwayException e) {
+        return new ResponseEntity<>(makeErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
     private ErrorResponse makeErrorResponse(BindingResult bindingResult) {
         String detail = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), detail);
+    }
+
+    private ErrorResponse makeErrorResponse(String message) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
     }
 }
