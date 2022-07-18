@@ -67,7 +67,7 @@ public class SectionAcceptanceTest {
          * 새로운 구간의 상행역이 기존 지하철 노선의 하행종점역이고,
          * 새로운 구간의 하행역이 기존 지하철 노선에 포함되어 있지 않은
          * 지하철 구간을 등록하면,
-         * Then 지하철 구간 등록에 성공한다.
+         * Then 지하철 구간 등록에 성공하고, 등록된 구간을 조회할 수 있다.
          */
         @DisplayName("새로운 구간의 상행역이 하행종점역이고, 노선에 없으면 구간 등록할 수 있다.")
         @Test
@@ -83,6 +83,10 @@ public class SectionAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+            ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
+            List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+            assertThat(lineNames).containsExactly("강남역", "신논현역", "양재역");
         }
 
         /**
@@ -90,7 +94,7 @@ public class SectionAcceptanceTest {
          * When
          * 새로운 구간의 상행역이 기존 지하철 노선의 하행종점역이 아닌
          * 지하철 구간을 추가하면,
-         * Then 지하철 구간 등록에 실패한다.
+         * Then 지하철 구간 등록에 실패하고, 2개의 구간을 가진 기존 지하철 노선만 조회된다.
          */
         @DisplayName("새로운 구간의 상행역이 노선의 하행종점역이 아니면 구간을 등록할 수 없다.")
         @Test
@@ -107,6 +111,10 @@ public class SectionAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+            ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
+            List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+            assertThat(lineNames).containsExactly("강남역", "신논현역");
         }
 
 
@@ -116,7 +124,7 @@ public class SectionAcceptanceTest {
          * 새로운 구간의 상행역이 기존 지하철 노선의 하행종점역이고,
          * 새로운 구간의 하행역이 기존 지하철 노선에 포함되어 있는
          * 지하철 구간을 등록하면,
-         * Then 지하철 구간 등록에 실패한다.
+         * Then 지하철 구간 등록에 실패하고, 3개의 구간을 가진 기존 지하철 노선만 조회된다.
          */
         @DisplayName("새로운 구간의 상행역이 하행종점역이지만, 하행역이 노선에 포함되어있으면 구간 등록할 수 없다.")
         @Test
@@ -133,6 +141,10 @@ public class SectionAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+            ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
+            List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+            assertThat(lineNames).containsExactly("강남역", "신논현역", "양재역");
         }
     }
 
@@ -143,7 +155,7 @@ public class SectionAcceptanceTest {
         /**
          * Given 2개의 구간을 가진 지하철 노선을 생성하고,
          * When 지하철 구간을 제거하면,
-         * Then 해당 지하철 노선에 지하철 구간 정보를 조회할 수 없다.
+         * Then 해당 지하철 노선에 삭제한 구간 정보를 조회할 수 없다.
          */
         @DisplayName("지하철 구간을 삭제한다.")
         @Test
@@ -159,6 +171,8 @@ public class SectionAcceptanceTest {
             ExtractableResponse<Response> response = 지하철구간_삭제를_요청한다(신분당선, 양재역);
 
             // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
             ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
             List<String> lineNames = lineResponse.jsonPath().get("stations.name");
             assertThat(lineNames).containsExactly("강남역", "신논현역");
@@ -167,7 +181,7 @@ public class SectionAcceptanceTest {
         /**
          * Given 2개의 구간을 가진 지하철 노선을 생성하고,
          * When 지하철 하행 종점역이 아닌 역을 제거하면,
-         * Then 지하철 구간 삭제 요청은 실패한다.
+         * Then 지하철 구간 삭제 요청은 실패하고, 2개의 구간을 가진 기존 지하철 노선만 조회된다.
          */
         @DisplayName("삭제하는 지하철구간이 하행종점역 구간이 아니면 삭제할 수 없다.")
         @Test
@@ -184,12 +198,16 @@ public class SectionAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+            ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
+            List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+            assertThat(lineNames).containsExactly("강남역", "신논현역", "양재역");
         }
 
         /**
          * Given 1개의 구간을 가진 지하철 노선을 생성하고,
          * WHen 1개인 지하철 구간을 제거하면,
-         * Then 지하철 구간 삭제 요청은 실패한다.
+         * Then 지하철 구간 삭제 요청은 실패하고, 1개의 구간을 가진 기존 지하철 노선만 조회된다.
          */
         @DisplayName("지하철 구간이 1개인 노선은 삭제할 수 없다.")
         @Test
@@ -204,6 +222,10 @@ public class SectionAcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+            ExtractableResponse<Response> lineResponse = 지하철노선_조회를_요청한다(신분당선);
+            List<String> lineNames = lineResponse.jsonPath().get("stations.name");
+            assertThat(lineNames).containsExactly("강남역", "신논현역");
         }
     }
 }
