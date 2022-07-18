@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LineTestFixtures {
-    public static ExtractableResponse<Response> generateLine(String name, String color, String upStationId, String downStationId, String distance) {
+    public static ExtractableResponse<Response> 노선_생성(String name, String color, String upStationId, String downStationId, String distance) {
         Map<String, String> lineParams = new HashMap<>();
         lineParams.put("name", name);
         lineParams.put("color", color);
