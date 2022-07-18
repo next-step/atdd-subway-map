@@ -12,7 +12,6 @@ import nextstep.subway.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -38,20 +37,6 @@ public class SectionService {
         line.validAddSection(upStation, downStation);
         Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
         return createLineResponse(sectionRepository.save(section));
-    }
-
-    private boolean isLineDownStationDuplicate(Station lineDownStation, Station sectionDownStation) {
-        return Objects.equals(lineDownStation.getId(), sectionDownStation.getId());
-    }
-
-    private boolean isLineUpStationDuplicated(Station lineUpStation, Station sectionDownStation) {
-        return Objects.equals(lineUpStation.getId(), sectionDownStation.getId());
-    }
-
-    private void validSectionUpStation(Line line, Station sectionUpStation) {
-        if (!Objects.equals(line.downStation().getId(), sectionUpStation.getId())) {
-            throw new IllegalArgumentException("section.upStation.line.downStation");
-        }
     }
 
     private SectionResponse createLineResponse(Section section) {

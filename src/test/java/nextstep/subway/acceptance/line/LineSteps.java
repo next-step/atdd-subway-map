@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.common.CommonSteps.생성_성공_응답;
-import static nextstep.subway.acceptance.station.StationSteps.지하철역_생성;
 import static nextstep.subway.acceptance.station.StationSteps.지하철역_생성_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -31,18 +30,11 @@ public class LineSteps {
     public static final String BUNDANG_LINE_COLOR = "bg-green-600";
     public static final String BUNDANG_UP_STATION_NAME = "분당노선상행역";
     public static final String BUNDANG_DOWN_STATION_NAME = "분당노선하행역";
-
-    public static Long SHIN_BUNDANG_LINE_UP_STATION_ID = null;
-    public static Long SHIN_BUNDANG_LINE_DOWN_STATION_ID = null;
-
-    public static Long SHIN_BUNDANG_LINE_ID = null;
-
     public static final Long DISTANCE = 5L;
-    public static final Long 노선_거리 = 5L;
-
     public static Long 노선_상행역_ID = null;
     public static Long 노선_하행역_ID = null;
     public static Long 노선_ID = null;
+
     static List<Long> 노선_역_목록_ID = new ArrayList<>();
 
     public static ExtractableResponse<Response> 노선_생성_요청(String 노선명, String 노선색, String 구간_상행역명, String 구간_하행역명, Long distance) {
@@ -52,14 +44,6 @@ public class LineSteps {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
-    }
-
-    private static ExtractableResponse<Response> 노선_상행역_생성(String 노선_상행역_명) {
-        return 지하철역_생성(노선_상행역_명);
-    }
-
-    private static ExtractableResponse<Response> 노선_하행역_생성(String 노선_하행역_명) {
-        return 지하철역_생성(노선_하행역_명);
     }
 
     public static List<Long> 노선_역_목록_ID(ExtractableResponse<Response> 노선_생성) {
