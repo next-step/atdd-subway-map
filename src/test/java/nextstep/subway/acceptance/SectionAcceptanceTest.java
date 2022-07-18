@@ -142,7 +142,7 @@ class SectionAcceptanceTest {
         lineClient.addSection("4", "2", 10, 1);
 
         // when
-        ExtractableResponse<Response> response = lineClient.deleteSection(1L, 3L);
+        ExtractableResponse<Response> response = lineClient.deleteSection(1L, 2L);
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
@@ -153,7 +153,7 @@ class SectionAcceptanceTest {
 
 
     /**
-     * Given 구간을 등록하고
+     * Given 지하철 노선을 등록하고, 하행역을 삭제한 후
      * When 구간에 등록된 상행 종점역과 하행 종점역만 있는 경우 삭제 시
      * Then 에러가 발생한다
      */
@@ -161,8 +161,17 @@ class SectionAcceptanceTest {
     @Test
     void deleteStationInOnlyOneStationSectionException() {
         // given
+        lineClient = new LineClient();
+        lineClient.create(params());
+        lineClient.deleteSection(1L, 2L);
         // when
+        ExtractableResponse<Response> response = lineClient.deleteSection(1L, 1L);
         // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("errorMessage"))
+                        .isEqualTo("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.")
+        );
     }
 
     private Map<String, Object> params() {
