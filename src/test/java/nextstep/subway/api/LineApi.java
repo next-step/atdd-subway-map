@@ -34,6 +34,18 @@ public class LineApi {
         return createLineResponse;
     }
 
+    public static ExtractableResponse<Response> getAllLinesApi() {
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return response;
+    }
+
     public static ExtractableResponse<Response> getLineByIdApi(Long lineId) {
         ExtractableResponse<Response> getLineResponse = RestAssured
                 .given().log().all()
@@ -45,6 +57,37 @@ public class LineApi {
         assertThat(getLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return getLineResponse;
+    }
+
+    public static ExtractableResponse<Response> changeLineByIdApi(Long lineId, String name, String color) {
+        Map<String, String> lineChangeRequest = new HashMap<>();
+        lineChangeRequest.put("name", name);
+        lineChangeRequest.put("color", color);
+
+        ExtractableResponse<Response> changeLineResponse = RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .body(lineChangeRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{id}")
+                .then().log().all()
+                .extract();
+        assertThat(changeLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return changeLineResponse;
+    }
+
+    public static ExtractableResponse<Response> deleteLineByIdApi(Long lineId) {
+        ExtractableResponse<Response> deleteLineResponse = RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .when().delete("/lines/{id}")
+                .then().log().all()
+                .extract();
+        assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        return deleteLineResponse;
     }
 
     public static ExtractableResponse<Response> addSectionApi(Long lineId, Long upStationId, Long downStationId, int distance) {
