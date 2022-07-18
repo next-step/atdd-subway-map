@@ -1,6 +1,6 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.NotLastStationException;
+import nextstep.subway.exception.DeleteStationException;
 import nextstep.subway.exception.StationNotRegisteredException;
 
 import javax.persistence.*;
@@ -77,10 +77,19 @@ public class Line {
     }
 
     public void deleteStation(Long stationId) {
-        if (lastStationId != stationId) {
-            throw new NotLastStationException("하행역만 삭제할 수 있습니다.");
-        }
-        stations = stations.stream().filter(station -> !station.equalsId(stationId))
+        validateDeleteStation(stationId);
+        stations = stations.stream()
+                .filter(station -> !station.equalsId(stationId))
                 .collect(Collectors.toList());
+    }
+
+    private void validateDeleteStation(Long stationId) {
+        if (lastStationId != stationId) {
+            throw new DeleteStationException("하행역만 삭제할 수 있습니다.");
+        }
+
+        if (lastStationId == 1) {
+            throw new DeleteStationException("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
+        }
     }
 }

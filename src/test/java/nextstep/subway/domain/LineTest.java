@@ -1,6 +1,6 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.exception.NotLastStationException;
+import nextstep.subway.exception.DeleteStationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -82,7 +82,7 @@ class LineTest {
         assertThat(line.getStations()).hasSize(2);
     }
 
-    @DisplayName("역의 id 가 하행역이 아니면 삭제 시 익셉션이 발생한다.")
+    @DisplayName("역의 id 가 하행역이 아니면 삭제할 수 없다.")
     @Test
     void deleteStationNotDownStationException() {
         //given
@@ -95,8 +95,23 @@ class LineTest {
 
         //when, then
         assertThatThrownBy(() -> line.deleteStation(2L))
-                .isInstanceOf(NotLastStationException.class)
+                .isInstanceOf(DeleteStationException.class)
                 .hasMessage("하행역만 삭제할 수 있습니다.");
+    }
+
+    @DisplayName("상행역과 하행역만이 존재하는 경우 삭제할 수 없다.")
+    @Test
+    void deleteStationOnlyOneStationException() {
+        //given
+        final var stations = List.of(
+                new Station(1L, "선릉역")
+        );
+        final var line = new Line("2호선", "bg-green-600", stations, 20);
+
+        //when, then
+        assertThatThrownBy(() -> line.deleteStation(1L))
+                .isInstanceOf(DeleteStationException.class)
+                .hasMessage("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
     }
 
 }
