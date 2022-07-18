@@ -62,4 +62,14 @@ public class LineApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteSectionApi(Long lineId, Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .queryParams("stationId", stationId)
+                .when().delete("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+    }
 }

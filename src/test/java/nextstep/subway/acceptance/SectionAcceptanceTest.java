@@ -125,4 +125,39 @@ public class SectionAcceptanceTest {
                 () -> assertThat(exceptionMessage).isEqualTo("신규 구간의 하행역이 기존 노선의 역에 이미 등록되어 있습니다.")
         );
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * Given 지하철 구간을 추가하고
+     * When 노선의 마지막 구간을 제거하면
+     * Then 지하철 노선 조회시 해당 구간 정보는 삭제된다.
+     */
+    @DisplayName("지하철 구간 삭제")
+    @Test
+    void deleteSection() {
+        // given
+        long 강남역_번호 = 강남역.jsonPath().getLong("id");
+        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+
+        // given
+        long 정자역_번호 = 정자역.jsonPath().getLong("id");
+        long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
+
+        LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 정자역_번호, 5);
+
+        // when
+        LineApi.deleteSectionApi(신분당선_번호, 정자역_번호);
+
+        // then
+        ExtractableResponse<Response> 신분당선_조회_응답 = LineApi.getLineByIdApi(신분당선_번호);
+
+        List<String> stationNames = 신분당선_조회_응답.jsonPath().getList("stations.name", String.class);
+
+        assertAll(
+                () -> assertThat(stationNames).hasSize(2),
+                () -> assertThat(stationNames).containsAnyOf("강남역", "신논현역")
+        );
+    }
 }
