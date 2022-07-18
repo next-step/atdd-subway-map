@@ -1,7 +1,16 @@
 package nextstep.subway.acceptance;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static nextstep.subway.acceptance.LineTestFixtures.노선_생성;
+import static nextstep.subway.acceptance.LineTestFixtures.노선_조회;
+import static nextstep.subway.acceptance.SectionTestFixtures.구간_생성;
+import static nextstep.subway.acceptance.StationTestFixtures.역_생성;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 구간 관리")
 public class StationSectionAcceptanceTest extends AbstractAcceptanceTest{
@@ -15,6 +24,20 @@ public class StationSectionAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철 구간 등록")
     @Test
     void createStationSection() {
-        
+        String 신림역 = 역_생성("신림역");
+        String 당곡역 = 역_생성("당곡역");
+
+        String 노선_아이디 = 노선_생성("신림선", "bg-blue-300", 신림역, 당곡역, "10")
+                                    .jsonPath()
+                                    .getString("id");
+
+        String 보라매역 = 역_생성("보라매역");
+
+        구간_생성(노선_아이디, 당곡역, 보라매역, "5");
+        ExtractableResponse<Response> 노선_조회_결과 = 노선_조회("1");
+
+        Assertions.assertAll(() -> {
+            assertThat(노선_조회_결과.jsonPath().getList("stations.name").size()).isEqualTo(3);
+        });
     }
 }

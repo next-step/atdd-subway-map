@@ -53,7 +53,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
 
         노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20");
 
-        ExtractableResponse<Response> response = showLine();
+        ExtractableResponse<Response> response = 노선_조회();
 
         Assertions.assertAll(
                 () -> assertThat(response.jsonPath().getList("name")).contains("신분당선", "신림선"),
@@ -78,7 +78,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
                         .jsonPath()
                         .getString("id");
 
-        ExtractableResponse<Response> extract = showLine(id);
+        ExtractableResponse<Response> extract = 노선_조회(id);
 
         Assertions.assertAll(
                 () -> assertThat(extract.jsonPath().getString("name")).isEqualTo("신림선"),
@@ -106,7 +106,7 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
         updateLine("구미선", "bg-white-200", id);
 
         //수정된 데이터 출력
-        ExtractableResponse<Response> response = showLine(id);
+        ExtractableResponse<Response> response = 노선_조회(id);
 
         assertThat(response.jsonPath().getString("name")).isEqualTo("구미선");
         assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value());

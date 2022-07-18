@@ -27,7 +27,7 @@ public class LineTestFixtures {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> showLine() {
+    public static ExtractableResponse<Response> 노선_조회() {
         return RestAssured
                     .given().log().all()
                     .when()
@@ -36,7 +36,7 @@ public class LineTestFixtures {
                     .extract();
     }
 
-    public static ExtractableResponse<Response> showLine(String id) {
+    public static ExtractableResponse<Response> 노선_조회(String id) {
         return RestAssured
                     .given().log().all()
                     .pathParam("id", id)
