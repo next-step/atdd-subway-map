@@ -1,32 +1,28 @@
 package nextstep.subway.applicaion.dto;
 
-
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StationLineResponse {
     private Long id;
     private String name;
     private String color;
     private List<SectionResponse> sections;
 
-    public StationLineResponse(Long id, String name, String color) {
-        this(id, name, color, Collections.emptyList());
-    }
-
     public static StationLineResponse form(Line line) {
-        return new StationLineResponse(line.getId(), line.getName(), line.getColor());
+        List<SectionResponse> sectionResponses = line.findSectionList()
+                                            .stream().map(SectionResponse::form)
+                                            .collect(Collectors.toList());
+        return new StationLineResponse(line.getId(), line.getName(), line.getColor(), sectionResponses);
     }
-
-    public static StationLineResponse of(Line line, List<SectionResponse> sections) {
-        return new StationLineResponse(line.getId(), line.getName(), line.getColor(), sections);
-    }
-
 
 }

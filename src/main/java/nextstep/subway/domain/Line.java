@@ -1,8 +1,12 @@
 package nextstep.subway.domain;
 
 import lombok.*;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,5 +36,29 @@ public class Line {
 
     public Section findLastSection() {
         return getSections().getLastSection();
+    }
+
+    public List<Section> findSectionList() {
+        if (emptySections()) {
+            return new ArrayList<>();
+        }
+        return getSections().getList();
+    }
+
+    private boolean emptySections() {
+        return ObjectUtils.isEmpty(getSections());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Line line = (Line) o;
+        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, color, sections);
     }
 }

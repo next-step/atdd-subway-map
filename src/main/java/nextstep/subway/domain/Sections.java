@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import nextstep.subway.exception.SubwayException;
 
@@ -10,11 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Embeddable @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> list = new ArrayList<>();
+
+    @JsonCreator
+    public Sections(List<Section> list) {
+        this.list = list;
+    }
 
     public void add(Section section) {
         validate(section);

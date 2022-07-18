@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class StationLineService {
 
     private final StationLineRepository lineRepository;
-    private final StationSectionRepository sectionRepository;
+    private final StationRepository stationRepository;
 
     public StationLineResponse save(Line line) {
         return StationLineResponse.form(lineRepository.save(line));
@@ -46,9 +46,9 @@ public class StationLineService {
     }
 
     public SectionResponse addSection(Long lineId, SectionRequest.PostRequest request) {
+        checkSectionStations(request.getUpStationId(), request.getDownStationId());
         Line line = findLineById(lineId);
-        Section section = sectionRepository.save(request.toEntity());
-        line.addSection(section);
+        line.addSection(request.toEntity(line));
         return SectionResponse.form(line.findLastSection());
     }
 
@@ -63,4 +63,15 @@ public class StationLineService {
         return lineRepository.findById(lineId).orElseThrow(() -> new SubwayException("등록되지 않은 노선 입니다."));
     }
 
+    private void checkSectionStations(Long upStationId, Long downStationId) {
+        if (existStations(upStationId, downStationId)) {
+            return;
+        }
+        throw new SubwayException("등록되지 않은 지하철 역 입니다.", upStationId, downStationId);
+    }
+
+    private boolean existStations(Long upStationId, Long downStationId) {
+        return stationRepository.existsById(upStationId) ||
+                stationRepository.existsById(downStationId);
+    }
 }
