@@ -137,8 +137,18 @@ class SectionAcceptanceTest {
     @Test
     void deleteStationDownTerminalStationException() {
         // given
+        lineClient = new LineClient();
+        lineClient.create(params());
+        lineClient.addSection("4", "2", 10, 1);
+
         // when
+        ExtractableResponse<Response> response = lineClient.deleteSection(1L, 3L);
         // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("errorMessage"))
+                        .isEqualTo("하행역만 삭제할 수 있습니다.")
+        );
     }
 
 

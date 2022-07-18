@@ -61,8 +61,8 @@ public class LineClient {
                 .extract();
     }
 
-    public void deleteSection(Long lineId, Long stationId) {
-        RestAssured.given().log().all()
+    public ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
                 .param("stationId", stationId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/lines/" + lineId + "/sections")
