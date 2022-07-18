@@ -53,7 +53,7 @@ public class Sections {
             .ifPresent(station -> { throw new IllegalUpdatingStateException( Message.IS_EXIST_STATION.getValue()); });
     }
 
-    public Section remove(Long stationId) {
+    public Section remove() {
         validateRemove();
         return sections.remove(sections.size() - 1);
     }
