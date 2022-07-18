@@ -16,21 +16,15 @@ public class SectionController {
     }
 
     @PostMapping("/lines/{id}/sections")
-    public ResponseEntity<SectionResponse> registSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        boolean preCondition = sectionService.checkRegistPreCodition(id, sectionRequest);
-        if(!preCondition){
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<SectionResponse> registSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) throws Exception {
+        sectionService.checkRegistPreCodition(id, sectionRequest);
         SectionResponse response = sectionService.saveSection(id, sectionRequest);
         return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/lines/{id}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
-        boolean preCondition = sectionService.checkDeletePreCondition(id, stationId);
-        if(!preCondition){
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) throws Exception {
+        sectionService.checkDeletePreCondition(id, stationId);
         sectionService.deleteByStationId(stationId);
         return ResponseEntity.noContent().build();
     }

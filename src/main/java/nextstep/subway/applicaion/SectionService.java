@@ -22,34 +22,34 @@ public class SectionService {
         this.stationService = stationService;
     }
 
-    public boolean checkRegistPreCodition(Long id, SectionRequest sectionRequest) {
+    public boolean checkRegistPreCodition(Long id, SectionRequest sectionRequest) throws Exception {
         //최근 등록된 구간 확인
         Section recentSection = sectionRepository.findTop1ByLineIdOrderByIdDesc(id);
 
         if (!recentSection.getDownStationId().equals(sectionRequest.getUpStationId())) {
-            return false;
+            throw new Exception("DID_NOT_MATCH_STATION");
         }
 
         //해당 노선에 등록여부 확인
         Section alreadyRegistSection = sectionRepository.findByLineIdByStationId(id, sectionRequest.getDownStationId());
         if (alreadyRegistSection != null) {
-            return false;
+            throw new Exception("ALREADY_REGIST");
         }
         return true;
     }
 
-    public boolean checkDeletePreCondition(Long id, Long stationId){
+    public boolean checkDeletePreCondition(Long id, Long stationId) throws Exception {
         //최근 등록된 구간 확인
         Section recentSection = sectionRepository.findTop1ByLineIdOrderByIdDesc(id);
 
         if(!recentSection.getUpStationId().equals(stationId)){
-            return false;
+            throw new Exception("STATION_IS_NOT_DOWN_STATION");
         }
 
         //해당 노선의 구간개수 확인
         List<SectionResponse> sections = findAllByLineId(id);
         if(sections.size() <=1){
-            return false;
+            throw new Exception("SIZE_IS_ONE");
         }
         return true;
     }
