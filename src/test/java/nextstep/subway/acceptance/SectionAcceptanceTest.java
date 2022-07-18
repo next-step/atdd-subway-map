@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 구간 관리 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class SectionAcceptanceTest {
 
     @LocalServerPort
@@ -45,7 +46,6 @@ class SectionAcceptanceTest {
      */
     @DisplayName("지하철 노선에 구간을 생성한다.")
     @Test
-    @DirtiesContext
     void createSection() {
         // given
         lineClient = new LineClient();
@@ -93,8 +93,17 @@ class SectionAcceptanceTest {
     @Test
     void createSectionAlreadyExistStationException() {
         // given
+        lineClient = new LineClient();
+        lineClient.create(params());
+
         // when
+        ExtractableResponse<Response> response = lineClient.addSection("1", "2", 10, 1);
         // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("errorMessage"))
+                        .isEqualTo("이미 존재하는 역입니다.")
+        );
     }
 
     /**

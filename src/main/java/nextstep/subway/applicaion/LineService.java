@@ -12,6 +12,7 @@ import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.AlreadyExistStationException;
 import nextstep.subway.exception.LineNotFoundException;
 import nextstep.subway.exception.SectionStationMismatchException;
+import nextstep.subway.exception.StationNotRegisteredException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,18 +76,23 @@ public class LineService {
         String upStationId = sectionRequest.getUpStationId();
         int distance = sectionRequest.getDistance();
 
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
-
+        Line line = lineFrom(id);
         validateSection(downStationId, upStationId, line);
-
-        Station newStation = stationRepository.findById(Long.valueOf(downStationId))
-                .orElseThrow(IllegalStateException::new);
-        Line sectionAddedLine = line.addSection(newStation, distance);
+        Line sectionAddedLine = line.addSection(stationFrom(downStationId), distance);
 
         return new LineResponse(sectionAddedLine.getId(), sectionAddedLine.getName(),
                 sectionAddedLine.getColor(), stationResponses(sectionAddedLine));
 
+    }
+
+    private Line lineFrom(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
+    }
+
+    private Station stationFrom(String downStationId) {
+        return stationRepository.findById(Long.valueOf(downStationId))
+                .orElseThrow(() -> new StationNotRegisteredException("역을 찾을 수 없습니다. : " + downStationId));
     }
 
 

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ControllerAdvice {
 
-    @ExceptionHandler(SectionStationMismatchException.class)
-    public ResponseEntity<ErrorResponse> sectionStationMismatchException(SectionStationMismatchException e) {
+    @ExceptionHandler(value = {SectionStationMismatchException.class, AlreadyExistStationException.class})
+    public ResponseEntity<ErrorResponse> validateSectionException(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponse(e.getMessage()));
