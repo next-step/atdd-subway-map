@@ -107,6 +107,22 @@ public class SectionAcceptanceTest {
     @DisplayName("지하철 구간 등록 예외(이미 존재하는 역 등록)")
     @Test
     void addSectionExceptionAlreadyExistsStationException() {
+        // given
+        long 강남역_번호 = 강남역.jsonPath().getLong("id");
+        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
 
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+
+        // when
+        long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 구간_등록_응답 = LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 강남역_번호, 5);
+
+        // then
+        String exceptionMessage = 구간_등록_응답.jsonPath().getString("message");
+        assertAll(
+                () -> assertThat(구간_등록_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(exceptionMessage).isEqualTo("신규 구간의 하행역이 기존 노선의 역에 이미 등록되어 있습니다.")
+        );
     }
 }
