@@ -31,10 +31,13 @@ public class Sections {
     }
 
     public int lastIndex() {
+        if (list.isEmpty()) {
+            throw new SubwayException("등록된 구간이 없습니다.");
+        }
         return list.size() - 1;
     }
 
-    public Section getLastSection() {
+    public Section lastSection() {
         return list.get(lastIndex());
     }
 
