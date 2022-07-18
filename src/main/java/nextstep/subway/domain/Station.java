@@ -1,18 +1,27 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 public class Station {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "station_id")
     private Long id;
+
+    @Column(name = "name")
     private String name;
 
-    public Station() {
+    @OneToMany(mappedBy = "station", fetch = LAZY)
+    private final List<StationToSubwayLine> subwayLines = new ArrayList<>();
+
+    protected Station() {
     }
 
     public Station(String name) {
@@ -25,5 +34,13 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public void updateSubwayLine(StationToSubwayLine stationToSubwayLine) {
+        this.subwayLines.add(stationToSubwayLine);
+    }
+
+    public void removeSubwayLine(StationToSubwayLine stationToSubwayLine) {
+        this.subwayLines.remove(stationToSubwayLine);
     }
 }

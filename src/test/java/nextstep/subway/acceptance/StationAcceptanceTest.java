@@ -3,7 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.repository.StationRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,10 +49,8 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        final ExtractableResponse<Response> response = createStationRequest(params);
+        final Map<String, String> param = createParam("강남역");
+        final ExtractableResponse<Response> response = createStationRequest(param);
 
         // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
@@ -61,8 +59,8 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames.size()).isEqualTo(params.size());
-        assertThat(stationNames).containsAll(params.values());
+        assertThat(stationNames).hasSize(param.size());
+        assertThat(stationNames).containsAll(param.values());
     }
 
     /**
@@ -70,25 +68,12 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회합니다.")
     @Test
     void getStations() throws Exception {
         // given
-        // 생성할 역 이름 리스트
-        final List<String> stations = new ArrayList<>();
-        stations.add("강남역");
-        stations.add("역삼역");
-
-        // 생성해야할 리스트의 길이만큼 반복문을 돌며 역을 생성합니다
-        for (final String station : stations) {
-            final HashMap<String, String> param = new HashMap<>();
-            param.put("name", station);
-
-            final ExtractableResponse<Response> createStationResponse = createStationRequest(param);
-
-            assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
-        }
+        final List<Map<String, String>> params = createParam(List.of("강남역", "역삼역"));
+        final List<String> createdStationNames = createStationRequest(params);
 
         // when
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
@@ -98,8 +83,8 @@ public class StationAcceptanceTest {
 
         // then
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).contains("강남역", "역삼역");
+        assertThat(stationNames).hasSize(2);
+        assertThat(stationNames).containsAll(createdStationNames);
     }
 
     /**
@@ -107,20 +92,13 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 삭제합니다.")
     @Test
     void deleteStations() throws Exception {
         // given
-        final HashMap<String, String> param = new HashMap<>();
-        param.put("name", "강남역");
-
+        final Map<String, String> param = createParam("강남역");
         final ExtractableResponse<Response> createStationResponse = createStationRequest(param);
-
-        assertThat(createStationResponse.statusCode()).isEqualTo(CREATED.value());
-
-        // 저장된 지하철 역의 ID
-        final String savedStationId = createStationResponse.jsonPath().getString("id");
+        final Long savedStationId = createStationResponse.jsonPath().getLong("id");
 
         // when
         final ExtractableResponse<Response> deleteStationResponse = deleteStationRequest(savedStationId);
@@ -132,19 +110,52 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames.size()).isEqualTo(0);
+        assertThat(stationNames).hasSize(0);
     }
 
-    private ExtractableResponse<Response> createStationRequest(Map<String, String> body) {
+    private Map<String, String> createParam(String stationName) {
+        final Map<String, String> param = new HashMap<>();
+        param.put("name", stationName);
+
+        return param;
+    }
+
+    private List<Map<String, String>> createParam(List<String> stationNames) {
+        final List<Map<String, String>> params = new ArrayList<>();
+        for (final String stationName : stationNames) {
+            final Map<String, String> param = createParam(stationName);
+            params.add(param);
+        }
+
+        return params;
+    }
+
+    private ExtractableResponse<Response> createStationRequest(Map<String, String> param) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .body(body)
+                .body(param)
                 .contentType(APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then()
+                .then().log().all()
                 .extract();
 
         return response;
+    }
+
+    private List<String> createStationRequest(List<Map<String, String>> params) {
+        final ArrayList<String> stationNames = new ArrayList<>();
+        for (Map<String, String> param : params) {
+            final ExtractableResponse<Response> response = RestAssured
+                    .given().log().all()
+                    .body(param)
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .when().post("/stations")
+                    .then().log().all()
+                    .extract();
+            stationNames.add(response.jsonPath().getString("name"));
+        }
+
+        return stationNames;
     }
 
     private ExtractableResponse<Response> getStationsRequest() {
@@ -160,7 +171,7 @@ public class StationAcceptanceTest {
     private ExtractableResponse<Response> deleteStationRequest(Long stationId) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/stations/" + stationId)
+                .when().delete("/stations/{stationId}", stationId)
                 .then().log().all()
                 .extract();
 
