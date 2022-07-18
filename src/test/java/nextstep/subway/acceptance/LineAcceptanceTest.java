@@ -2,18 +2,15 @@ package nextstep.subway.acceptance;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -25,9 +22,8 @@ import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class LineAcceptanceTest {
+public class LineAcceptanceTest extends BaseTest {
     private static final String LINE_NAME_5 = "5호선";
     private static final String LINE_COLOR_5 = "#996CAC";
     private static final Long LINE_DISTANCE_5 = 48L;
@@ -50,12 +46,8 @@ public class LineAcceptanceTest {
     private LineRequest LINE_5;
     private LineRequest LINE_9;
 
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
-        RestAssured.port = port;
         Long upStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
         Long downStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
         LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId, downStationId, LINE_DISTANCE_5);
