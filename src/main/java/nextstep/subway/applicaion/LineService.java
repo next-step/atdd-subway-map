@@ -5,13 +5,13 @@ import nextstep.subway.applicaion.dto.line.LineResponse;
 import nextstep.subway.applicaion.dto.line.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.line.SectionRequest;
 import nextstep.subway.applicaion.dto.station.StationResponse;
-import nextstep.subway.applicaion.exception.AlreadyExistStationException;
-import nextstep.subway.applicaion.exception.LineNotFoundException;
-import nextstep.subway.applicaion.exception.NotLastDownStationException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.AlreadyExistStationException;
+import nextstep.subway.exception.LineNotFoundException;
+import nextstep.subway.exception.SectionStationMismatchException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,7 +93,7 @@ public class LineService {
     private void validateSection(String downStationId, String upStationId, Line line) {
         Station station = line.lastStation();
         if (!station.equalsId(Long.parseLong(upStationId))) {
-            throw new NotLastDownStationException("노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. 하행 마지막 역 : "
+            throw new SectionStationMismatchException("노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. 하행 마지막 역 : "
                     + station.getId() + ", 구간 상행역 : " + upStationId);
         }
 

@@ -1,6 +1,6 @@
 package nextstep.subway.domain;
 
-import nextstep.subway.applicaion.exception.StationNotRegisteredException;
+import nextstep.subway.exception.StationNotRegisteredException;
 
 import javax.persistence.*;
 import java.util.Comparator;

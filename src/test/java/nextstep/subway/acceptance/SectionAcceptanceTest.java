@@ -1,6 +1,8 @@
 package nextstep.subway.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.LineClient;
 import nextstep.subway.StationClient;
 import nextstep.subway.applicaion.dto.line.LineResponse;
@@ -10,11 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 구간 관리 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -67,8 +71,17 @@ class SectionAcceptanceTest {
     @Test
     void createSectionStationMismatchException() {
         // given
+        lineClient = new LineClient();
+        lineClient.create(params());
+
         // when
+        ExtractableResponse<Response> response = lineClient.addSection("4", "3", 10, 1);
         // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("errorMessage"))
+                        .isEqualTo("노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. 하행 마지막 역 : 2, 구간 상행역 : 3")
+        );
     }
 
     /**
