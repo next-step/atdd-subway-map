@@ -46,15 +46,13 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철 구간을 등록한다")
     void 지하철_구간등록_테스트() {
         //given
-        String stationRequestPath = SubwayRequestPath.STATION.getValue();
         Station 강남역 = new Station(1L, "강남역");
         Station 선릉역 = new Station(2L, "선릉역");
-        stationRestAssured.postRequest(stationRequestPath, 강남역, 선릉역);
+        N개의_역을_등록한다(강남역, 선릉역);
 
         //when
-        String requestPath = SubwayRequestPath.SECTION.sectionsRequestPath(lineResponse.getId());
         Section 구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
-        ValidatableResponse 구간등록_응답 = sectionRestAssured.postRequest(requestPath, 구간);
+        ValidatableResponse 구간등록_응답 = 구간을_등록한다(구간);
 
         //then
         구간등록_응답.statusCode(HttpStatus.CREATED.value());
@@ -125,32 +123,25 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
     @DisplayName("지하철 구간 삭제 테스트")
     void 지하철_구간_삭제() {
         //given
-        String sectionsRequestPath = SubwayRequestPath.SECTION.sectionsRequestPath(lineResponse.getId());
-        String stationRootPath = SubwayRequestPath.STATION.getValue();
-        String lineRootPath = SubwayRequestPath.LINE.getValue();
-
         Station 강남역 = new Station(1L, "강남역");
         Station 선릉역 = new Station(2L, "선릉역");
-        stationRestAssured.postRequest(stationRootPath, 강남역, 선릉역);
-
         Station 정자역 = new Station(2L, "강남역");
         Station 판교역 = new Station(4L, "선릉역");
-        stationRestAssured.postRequest(stationRootPath, 정자역, 판교역);
-
+        N개의_역을_등록한다(강남역, 선릉역, 정자역, 판교역);
 
         Section 첫번째_구간 = new Section(강남역.getId(), 선릉역.getId(), 10);
-        sectionRestAssured.postRequest(sectionsRequestPath, 첫번째_구간);
-
         Section 두번째_구간 = new Section(정자역.getId(), 판교역.getId(), 10);
-        sectionRestAssured.postRequest(sectionsRequestPath, 두번째_구간);
+        N개의_구간을_등록한다(첫번째_구간, 두번째_구간);
 
         //when
-        sectionRestAssured.deleteRequest(sectionsRequestPath, "stationId", 두번째_구간.getDownStationId());
+        구간을_삭제한다(두번째_구간.getDownStationId());
 
         //then
-        List<Section> sectionIds = sectionRestAssured.getRequest(lineRootPath).extract().jsonPath().get("sections");
+        List<Section> sectionIds = sectionRestAssured.getRequest(SubwayRequestPath.LINE.getValue())
+                                                     .extract().jsonPath().get("sections");
         assertThat(sectionIds).hasSize(1);
     }
+
 
     /* Given 2개의 지하철역을 생성하고, 지하철 구간에 추가한다. 지하철 구간을 노선에 추가한다.
      * When 하행 종점의 지하철 구간을 삭제한다.
@@ -201,6 +192,26 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
                 .hasMessage("하행 종점역만 제거할 수 있습니다.");
     }
 
+
+    private ValidatableResponse 구간을_등록한다(Section 구간) {
+        String requestPath = SubwayRequestPath.SECTION.sectionsRequestPath(lineResponse.getId());
+        return sectionRestAssured.postRequest(requestPath, 구간);
+    }
+
+    private void N개의_구간을_등록한다(Section ... 구간) {
+        String requestPath = SubwayRequestPath.SECTION.sectionsRequestPath(lineResponse.getId());
+        sectionRestAssured.postRequest(requestPath, 구간);
+    }
+
+    private void N개의_역을_등록한다(Station ... stations) {
+        String stationRequestPath = SubwayRequestPath.STATION.getValue();
+        stationRestAssured.postRequest(stationRequestPath, stations);
+    }
+
+    private void 구간을_삭제한다(Long sectionId) {
+        String sectionsRequestPath = SubwayRequestPath.SECTION.sectionsRequestPath(lineResponse.getId());
+        sectionRestAssured.deleteRequest(sectionsRequestPath, "stationId", sectionId);
+    }
 
     private StationLineResponse createLine() {
       return lineRestAssured.postRequest(SubwayRequestPath.LINE.getValue(), LineFactory.경춘선())
