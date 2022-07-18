@@ -3,16 +3,16 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import nextstep.subway.LineClient;
 import nextstep.subway.StationClient;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.line.LineResponse;
+import nextstep.subway.applicaion.dto.station.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +42,7 @@ class SectionAcceptanceTest {
      */
     @DisplayName("지하철 노선에 구간을 생성한다.")
     @Test
+    @DirtiesContext
     void createSection() {
         // given
         lineClient = new LineClient();
@@ -62,7 +63,8 @@ class SectionAcceptanceTest {
                 .extract();
 
         // then
-        List<LineResponse> lineResponses = lineClient.findAll().jsonPath().getList("", LineResponse.class);
+        final var root = "";
+        final var lineResponses = lineClient.findAll().jsonPath().getList(root, LineResponse.class);
         assertThat(lineResponses.get(0).getStationResponse().stream().map(StationResponse::getName))
                 .containsExactly("지하철역", "새로운지하철역", "또또다른지하철역");
     }

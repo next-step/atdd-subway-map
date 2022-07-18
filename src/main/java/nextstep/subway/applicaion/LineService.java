@@ -1,9 +1,13 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.line.LineRequest;
+import nextstep.subway.applicaion.dto.line.LineResponse;
+import nextstep.subway.applicaion.dto.line.LineUpdateRequest;
+import nextstep.subway.applicaion.dto.line.SectionRequest;
+import nextstep.subway.applicaion.dto.station.StationResponse;
+import nextstep.subway.applicaion.exception.AlreadyExistStationException;
+import nextstep.subway.applicaion.exception.LineNotFoundException;
+import nextstep.subway.applicaion.exception.NotLastDownStationException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -19,9 +23,9 @@ import static java.util.stream.Collectors.toList;
 @Transactional(readOnly = true)
 public class LineService {
 
-    private LineRepository lineRepository;
+    private final LineRepository lineRepository;
 
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
@@ -32,8 +36,9 @@ public class LineService {
     public LineResponse saveLine(LineRequest lineRequest) {
         Long upStationId = lineRequest.getUpStationId();
         Long downStationId = lineRequest.getDownStationId();
+        int distance = lineRequest.getDistance();
         List<Station> stations = stationRepository.findByIdIn(List.of(upStationId, downStationId));
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations, distance));
         return createLineResponse(line);
     }
 
@@ -51,7 +56,8 @@ public class LineService {
 
     @Transactional
     public void updateLineById(Long id, LineUpdateRequest request) {
-        lineRepository.findById(id).ifPresent(line -> lineRepository.save(line.changeBy(request.getName(), request.getColor())));
+        lineRepository.findById(id)
+                .ifPresent(line -> lineRepository.save(line.changeBy(request.getName(), request.getColor())));
     }
 
     @Transactional
@@ -63,10 +69,42 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses(line));
     }
 
+    @Transactional
+    public LineResponse addSections(Long id, SectionRequest sectionRequest) {
+        String downStationId = sectionRequest.getDownStationId();
+        String upStationId = sectionRequest.getUpStationId();
+        int distance = sectionRequest.getDistance();
+
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
+
+        validateSection(downStationId, upStationId, line);
+
+        Station newStation = stationRepository.findById(Long.valueOf(downStationId))
+                .orElseThrow(IllegalStateException::new);
+        Line sectionAddedLine = line.addSection(newStation, distance);
+
+        return new LineResponse(sectionAddedLine.getId(), sectionAddedLine.getName(),
+                sectionAddedLine.getColor(), stationResponses(sectionAddedLine));
+
+    }
+
+
+    private void validateSection(String downStationId, String upStationId, Line line) {
+        Station station = line.lastStation();
+        if (!station.equalsId(Long.parseLong(upStationId))) {
+            throw new NotLastDownStationException("노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. 하행 마지막 역 : "
+                    + station.getId() + ", 구간 상행역 : " + upStationId);
+        }
+
+        if (line.hasStation(Long.parseLong(downStationId))) {
+            throw new AlreadyExistStationException("이미 존재하는 역입니다.");
+        }
+    }
+
     private List<StationResponse> stationResponses(Line line) {
         return line.getStations().stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(toList());
     }
-
 }
