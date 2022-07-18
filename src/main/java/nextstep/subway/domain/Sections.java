@@ -80,11 +80,47 @@ public class Sections {
     }
 
     protected Station getUpStationTerminal() {
-        return sections.get(0).getUpStation();
+        return getUpSectionTerminal().getUpStation();
     }
 
     protected Station getDownStationTerminal() {
-        return sections.get(sections.size() - 1).getDownStation();
+        return getDownSectionTerminal().getDownStation();
+    }
+
+    private Section getDownSectionTerminal() {
+        List<Station> upStations = getUpStations();
+        List<Station> downStations = getDownStations();
+
+        downStations.removeAll(upStations);
+        Station downStation = downStations.get(0);
+        return sections.stream()
+                .filter(section -> section.getDownStation().equals(downStation))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    private Section getUpSectionTerminal() {
+        List<Station> upStations = getUpStations();
+        List<Station> downStations = getDownStations();
+
+        upStations.removeAll(downStations);
+        Station upStation = upStations.get(0);
+        return sections.stream()
+                .filter(section -> section.getUpStation().equals(upStation))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    private List<Station> getUpStations() {
+        return sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+    }
+
+    private List<Station> getDownStations() {
+        return sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toList());
     }
 
     private Section getSectionByDownStation(Station downStation) {
