@@ -1,5 +1,9 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.exception.ExceptionMessages;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -44,8 +48,22 @@ public class Line {
         return color;
     }
 
-    public void changeNameAndColor(String name, String color) {
-        this.name = name;
-        this.color = color;
+    public void changeNameAndColor(LineRequest lineRequest) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
+    }
+
+    public void checkRegisterEndpointId(long upStationId, long downEndpointStationId) {
+        if (upStationId != downEndpointStationId) {
+            throw new IllegalArgumentException(
+                    ExceptionMessages.getNotEndpointInputExceptionMessage(upStationId, downEndpointStationId));
+        }
+    }
+
+    public void checkRemoveEndPointId(long stationId, long downEndpointStationId) {
+        if (downEndpointStationId != stationId) {
+            throw new IllegalArgumentException(
+                    ExceptionMessages.getNotEndpointInputExceptionMessage(stationId, downEndpointStationId));
+        }
     }
 }

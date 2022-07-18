@@ -3,7 +3,6 @@ package nextstep.subway.ui;
 import java.net.URI;
 import java.util.List;
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.SectionService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
@@ -15,11 +14,9 @@ import org.springframework.web.bind.annotation.*;
 public class LineController {
 
     private final LineService lineService;
-    private final SectionService sectionService;
 
-    public LineController(LineService lineService, SectionService sectionService) {
+    public LineController(LineService lineService) {
         this.lineService = lineService;
-        this.sectionService = sectionService;
     }
 
     @PostMapping(path = "/lines")
@@ -54,7 +51,7 @@ public class LineController {
 
     @GetMapping(path = "/lines/{lineId}/sections")
     public ResponseEntity<List<SectionResponse>> getSections(@PathVariable long lineId) {
-        List<SectionResponse> sections = sectionService.getSections(lineId);
+        List<SectionResponse> sections = lineService.getSections(lineId);
         return ResponseEntity.ok().body(sections);
     }
 
@@ -62,13 +59,13 @@ public class LineController {
     public ResponseEntity<SectionResponse> registerSection(@PathVariable long lineId,
             @RequestBody SectionRequest sectionRequest) {
 
-        SectionResponse section = sectionService.registerSection(lineId, sectionRequest);
+        SectionResponse section = lineService.registerSection(lineId, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections/" + section.getId())).body(section);
     }
 
     @DeleteMapping(path = "/lines/{lineId}/sections")
     public ResponseEntity<Void> removeSection(@PathVariable long lineId, @RequestParam long stationId) {
-        sectionService.removeSection(lineId, stationId);
+        lineService.removeSection(lineId, stationId);
         return ResponseEntity.ok().body(null);
     }
 }

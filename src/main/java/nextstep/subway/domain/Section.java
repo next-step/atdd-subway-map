@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.exception.ExceptionMessages;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -55,5 +57,11 @@ public class Section {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public static void checkSectionCount(long sectionCount) {
+        if (sectionCount == 1) {
+            throw new RuntimeException(ExceptionMessages.getNeedAtLeastOneSectionExceptionMessage());
+        }
     }
 }
