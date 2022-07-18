@@ -19,6 +19,9 @@ dependencies {
 
     implementation 'com.google.guava:guava:r05'
 
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
     // log
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 

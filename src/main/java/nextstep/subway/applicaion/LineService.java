@@ -1,10 +1,10 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line.Line;
 import nextstep.subway.domain.Line.LineRepository;
-import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.exception.EntityNotFoundException;
@@ -12,19 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class LineService {
 
-    private LineRepository lineRepository;
-    private StationRepository stationRepository;
-    private SectionRepository sectionRepository;
-
-    public LineService(StationRepository stationRepository, LineRepository lineRepository) {
-        this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
-    }
+    private final LineRepository lineRepository;
+    private final StationRepository stationRepository;
 
     @Transactional
     public LineResponse save(LineRequest lineRequest) {

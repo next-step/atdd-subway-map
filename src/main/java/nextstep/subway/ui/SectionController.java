@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.SectionService;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
@@ -8,14 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+@RequiredArgsConstructor
 @RestController
 public class SectionController {
 
-    private SectionService sectionService;
-
-    public SectionController(SectionService sectionService) {
-        this.sectionService = sectionService;
-    }
+    private final SectionService sectionService;
 
     @PostMapping("/lines/{id}/sections")
     public ResponseEntity<SectionResponse> createLine(@PathVariable Long id, @RequestBody SectionRequest request) {

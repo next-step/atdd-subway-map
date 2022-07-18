@@ -1,5 +1,7 @@
 package nextstep.subway.domain.Line;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.Sections;
 import nextstep.subway.domain.station.Station;
@@ -9,6 +11,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Getter
+@NoArgsConstructor
 @Entity
 public class Line {
 
@@ -24,10 +28,6 @@ public class Line {
     @Embedded
     private Sections sections = new Sections();
 
-    public Line() {
-
-    }
-
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
         this.name = name;
         this.color = color;
@@ -39,23 +39,11 @@ public class Line {
         this.color = color;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Set<Section> sections () {
+    public Set<Section> sections() {
         return this.sections.sections();
     }
 
-    public Long distance () {
+    public Long distance() {
         return this.sections.distance();
     }
 
@@ -65,6 +53,10 @@ public class Line {
 
     public Station downStation() {
         return this.sections.downStation();
+    }
+
+    public void addSection(Section section) {
+        this.sections.addSection(section);
     }
 
     public void validAddSection(Station upStation, Station downStation) {
@@ -86,6 +78,11 @@ public class Line {
         }
     }
 
+    public void validDeleteDownStation(Station downStation) {
+        validDeleteUpStation(downStation);
+        validSectionCount();
+    }
+
     public void validDeleteUpStation(Station downStation) {
         this.sections.validDeleteUpStation(downStation);
     }
@@ -94,10 +91,5 @@ public class Line {
         if (this.sections.sections().size() < 2) {
             throw new IllegalArgumentException("section.count.less");
         }
-    }
-
-    public void validDeleteDownstation(Station downStation) {
-        validDeleteUpStation(downStation);
-        validSectionCount();
     }
 }

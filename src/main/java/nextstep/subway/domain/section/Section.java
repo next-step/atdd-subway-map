@@ -1,10 +1,14 @@
 package nextstep.subway.domain.section;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line.Line;
 import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
 
+@Getter
+@NoArgsConstructor
 @Entity
 public class Section {
 
@@ -27,10 +31,6 @@ public class Section {
 
     private Long distance;
 
-    public Section() {
-
-    }
-
     public Section(Line line, Station upStation, Station downStation, Long distance) {
         this.line = line;
         this.upStation = upStation;
@@ -38,23 +38,4 @@ public class Section {
         this.distance = distance;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
-    public Line getLine() {
-        return line;
-    }
 }

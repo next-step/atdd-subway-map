@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -11,14 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 public class LineController {
 
-    private LineService lineService;
-
-    public LineController(LineService lineService) {
-        this.lineService = lineService;
-    }
+    private final LineService lineService;
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> create(@RequestBody LineRequest lineRequest) {
