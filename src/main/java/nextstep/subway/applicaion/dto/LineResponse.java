@@ -58,14 +58,6 @@ public class LineResponse {
         return stations;
     }
 
-    public Long upStationId() {
-        return this.stations.get(0).getId();
-    }
-
-    public Long downStationId() {
-        return this.stations.get(1).getId();
-    }
-
     public Long getDistance() {
         return distance;
     }

@@ -29,13 +29,20 @@ public class LineCommandService {
     }
 
     @Transactional
-    public void updateLine(LineResponse line, LineRequest lineRequest) {
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = findLineOrElseThrow(id);
         lineRepository.save(lineRequest.toLine(line));
     }
 
     @Transactional
     public void deleteLineById(Long id) {
+        findLineOrElseThrow(id);
         lineRepository.deleteById(id);
+    }
+
+    private Line findLineOrElseThrow(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(LINE_NOTFOUND_MESSAGE));
     }
 
     private LineResponse createLineResponse(Line line) {
