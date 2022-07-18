@@ -4,6 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import org.springframework.http.MediaType;
 
+import java.util.List;
+
 public class SubwayRestAssured<T> {
 
 
@@ -21,6 +23,17 @@ public class SubwayRestAssured<T> {
                           .when().log().all()
                           .post(path)
                           .then().log().all();
+    }
+
+    public void postRequest(String path, T... bodys) {
+        for (T body : bodys) {
+            RestAssured.given().log().all()
+                       .body(body)
+                       .contentType(MediaType.APPLICATION_JSON_VALUE)
+                       .when().log().all()
+                       .post(path)
+                       .then().log().all();
+        }
     }
 
     public void putRequest(String path, T body) {
