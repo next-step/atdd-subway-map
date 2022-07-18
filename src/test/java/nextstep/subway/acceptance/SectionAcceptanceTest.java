@@ -160,4 +160,40 @@ public class SectionAcceptanceTest {
                 () -> assertThat(stationNames).containsAnyOf("강남역", "신논현역")
         );
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * Given 지하철 구간을 추가하고
+     * When 구간에 존재하지 않는 역을 삭제하면
+     * Then 지하철 구간 삭제 오류가 발생한다.
+     */
+    @DisplayName("지하철 구간 삭제 예외(존재하지 않는 역 삭제)")
+    @Test
+    void deleteSectionWhenNotExistsStation() {
+// given
+        long 강남역_번호 = 강남역.jsonPath().getLong("id");
+        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+
+        // given
+        long 정자역_번호 = 정자역.jsonPath().getLong("id");
+        long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
+
+        LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 정자역_번호, 5);
+
+        // when
+        long 판교역_번호 = 판교역.jsonPath().getLong("id");
+
+        ExtractableResponse<Response> 구간_삭제_응답 = LineApi.deleteSectionApi(신분당선_번호, 판교역_번호);
+
+        // then
+        String exceptionMessage = 구간_삭제_응답.jsonPath().getString("message");
+
+        assertAll(
+                () -> assertThat(구간_삭제_응답.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(exceptionMessage).isEqualTo("삭제하려는 역이 노선에 등록되지 않은 역이거나, 마지막 구간의 역이 아닙니다.")
+        );
+    }
+
 }
