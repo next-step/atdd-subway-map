@@ -3,6 +3,8 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.api.StationApi;
+import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -38,14 +40,16 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        String station = "강남역";
-        ExtractableResponse<Response> response = createStationRequest(station);
+        String 강남역 = "강남역";
+        ExtractableResponse<Response> response = StationApi.createStationApi(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = findAllStationsRequest();
+        ExtractableResponse<Response> 모든역_조회_응답 = StationApi.getAllStationApi();
+        List<String> stationNames = 모든역_조회_응답.jsonPath().getList("name", String.class);
+
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -62,16 +66,12 @@ public class StationAcceptanceTest {
         String 강남역 = "강남역";
         String 신논현역 = "신논현역";
 
-        ExtractableResponse<Response> 강남역_생성_응답 = createStationRequest(강남역);
-        ExtractableResponse<Response> 신논현역_생성_응답 = createStationRequest(신논현역);
-
-        assertAll(
-                () -> assertThat(강남역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(신논현역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-        );
+        ExtractableResponse<Response> 강남역_생성_응답 = StationApi.createStationApi(강남역);
+        ExtractableResponse<Response> 신논현역_생성_응답 = StationApi.createStationApi(신논현역);
 
         // when
-        List<String> stationNames = findAllStationsRequest();
+        ExtractableResponse<Response> 모든역_조회_응답 = StationApi.getAllStationApi();
+        List<String> stationNames = 모든역_조회_응답.jsonPath().getList("name", String.class);
 
         // then
         assertThat(stationNames).containsAnyOf("강남역", "신논현역");
@@ -88,38 +88,16 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String 강남역 = "강남역";
-        ExtractableResponse<Response> 강남역_생성_응답 = createStationRequest(강남역);
+        ExtractableResponse<Response> 강남역_생성_응답 = StationApi.createStationApi(강남역);
         Long 강남역_고유번호 = 강남역_생성_응답.jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/stations/{id}", 강남역_고유번호)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> 강남역_삭제_응답 = StationApi.deleteStationByIdApi(강남역_고유번호);
+        assertThat(강남역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        List<String> stationNames = findAllStationsRequest();
+        ExtractableResponse<Response> 모든역_조회_응답 = StationApi.getAllStationApi();
+        List<String> stationNames = 모든역_조회_응답.jsonPath().getList("name", String.class);
         assertThat(stationNames).hasSize(0);
-    }
-
-    private ExtractableResponse<Response> createStationRequest(String stationName) {
-        Map<String, String> station = new HashMap<>();
-        station.put("name", stationName);
-
-        return RestAssured.given().log().all()
-                .body(station)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
-    private List<String> findAllStationsRequest() {
-        return RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
     }
 }

@@ -28,4 +28,24 @@ public class StationApi {
 
         return createStationResponse;
     }
+
+    public static ExtractableResponse<Response> getAllStationApi() {
+        ExtractableResponse<Response> getAllStationResponse = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(getAllStationResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        return getAllStationResponse;
+    }
+
+    public static ExtractableResponse<Response> deleteStationByIdApi(Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("id", stationId)
+                .when().delete("/stations/{id}")
+                .then().log().all()
+                .extract();
+    }
 }
