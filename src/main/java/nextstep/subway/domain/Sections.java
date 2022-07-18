@@ -1,7 +1,7 @@
 package nextstep.subway.domain;
 
 import lombok.*;
-import nextstep.subway.exception.SectionException;
+import nextstep.subway.exception.SubwayException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -35,7 +35,7 @@ public class Sections {
 
     public void deleteSection(Long stationId) {
         if (!existsMoreThanTwoSection()) {
-            throw new SectionException("2개 이상의 구간이 등록되어야 구간을 제거할 수 있습니다.");
+            throw new SubwayException("2개 이상의 구간이 등록되어야 구간을 제거할 수 있습니다.");
         }
         if (!isDownTerminus(stationId)) {
             throw new IllegalArgumentException("하행 종점역만 제거할 수 있습니다.");

@@ -6,7 +6,6 @@ import nextstep.subway.acceptance.client.SubwayRestAssured;
 import nextstep.subway.acceptance.factory.LineFactory;
 import nextstep.subway.domain.Line;
 import nextstep.subway.acceptance.enums.SubwayRequestPath;
-import nextstep.subway.domain.Station;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

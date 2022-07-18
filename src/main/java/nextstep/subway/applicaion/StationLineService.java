@@ -5,7 +5,8 @@ import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.dto.StationLineResponse;
 import nextstep.subway.domain.*;
-import nextstep.subway.exception.LineNotFoundException;
+import nextstep.subway.exception.SubwayException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +60,7 @@ public class StationLineService {
 
 
     private Line findLineById(Long lineId) {
-        return lineRepository.findById(lineId).orElseThrow(() -> new LineNotFoundException("등록되지 않은 노선 입니다."));
+        return lineRepository.findById(lineId).orElseThrow(() -> new SubwayException("등록되지 않은 노선 입니다."));
     }
 
 }

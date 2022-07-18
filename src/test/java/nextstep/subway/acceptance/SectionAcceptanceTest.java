@@ -10,7 +10,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
-import nextstep.subway.exception.SectionException;
+import nextstep.subway.exception.SubwayException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -157,7 +157,7 @@ class SectionAcceptanceTest extends SpringBootTestConfig {
 
         //then
         assertThatThrownBy(() -> sections.deleteSection(2L))
-                .isInstanceOf(SectionException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("2개 이상의 구간이 등록되어야 구간을 제거할 수 있습니다.");
     }
 
