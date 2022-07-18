@@ -35,15 +35,23 @@ public class DbCleanup {
         em.flush();
         // TRUNCATE 하기위해 참조 무결성 일시 정지
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
-        for (String tableName : tableNames) {
-            // 테이블을 순회하면서 TRUNCATE
-            em.createNativeQuery("TRUNCATE TABLE " + tableName)
-                    .executeUpdate();
-            // ID값을 1로 재설정
-            em.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN " + "ID RESTART WITH 1")
-                    .executeUpdate();
-        }
+        truncateEntities();
+        truncateEmbeddables();
         // TRUNCATE을 마치고 참조 무결성 켜주기
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
+
+    private void truncateEntities() {
+        for (String tableName : tableNames) {
+            // 테이블을 순회하면서 TRUNCATE
+            em.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
+            // ID값을 1로 재설정
+            em.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN id RESTART WITH 1").executeUpdate();
+        }
+    }
+
+    private void truncateEmbeddables() {
+        em.createNativeQuery("TRUNCATE TABLE line_section").executeUpdate();
+    }
+
 }
