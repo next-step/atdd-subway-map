@@ -1,10 +1,12 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.NotLastStationException;
 import nextstep.subway.exception.StationNotRegisteredException;
 
 import javax.persistence.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -23,6 +25,8 @@ public class Line {
     @JoinColumn(name = "line_id")
     private List<Station> stations;
 
+    private int lastStationId;
+
     protected Line() {
     }
 
@@ -31,6 +35,7 @@ public class Line {
         this.color = color;
         this.stations = stations;
         this.distance = distance;
+        this.lastStationId = stations.size();
     }
 
     public Line changeBy(String name, String color) {
@@ -57,6 +62,7 @@ public class Line {
 
     public Line addSection(Station newStation, int distance) {
         stations.add(newStation);
+        lastStationId = stations.size();
         this.distance = distance;
         return this;
     }
@@ -68,5 +74,13 @@ public class Line {
 
     public boolean hasStation(long id) {
         return stations.stream().anyMatch(station -> station.equalsId(id));
+    }
+
+    public void deleteStation(Long stationId) {
+        if (lastStationId != stationId) {
+            throw new NotLastStationException("하행역만 삭제할 수 있습니다.");
+        }
+        stations = stations.stream().filter(station -> !station.equalsId(stationId))
+                .collect(Collectors.toList());
     }
 }
