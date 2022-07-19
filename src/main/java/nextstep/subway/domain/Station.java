@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 public class Station {
 
@@ -18,9 +20,6 @@ public class Station {
     private Long id;
 
     private String name;
-
-    @OneToMany(mappedBy = "station", orphanRemoval = true)
-    private Set<Section> sections = new HashSet<>();
 
     public Station(String name) {
         this.name = name;
