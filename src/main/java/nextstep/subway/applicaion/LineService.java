@@ -1,9 +1,6 @@
 package nextstep.subway.applicaion;
 
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -65,5 +62,9 @@ public class LineService {
     public void deleteStationLine(Long id) {
         Line line = lineRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 호선은 없습니다."));
         lineRepository.deleteById(line.getId());
+    }
+
+    public LineResponse createStationSection(Long id, SectionRequest sectionRequest) {
+
     }
 }
