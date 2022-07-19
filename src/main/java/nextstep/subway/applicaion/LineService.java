@@ -40,7 +40,8 @@ public class LineService {
         Long downStationId = lineRequest.getDownStationId();
         int distance = lineRequest.getDistance();
         List<Station> stations = stationRepository.findByIdInOrderByIdAsc(List.of(upStationId, downStationId));
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations.get(0), stations.get(1), distance));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(),
+                stations.get(0), stations.get(1), distance));
         return createLineResponse(line);
     }
 

@@ -41,9 +41,10 @@ public class Sections {
         }
 
         return Stream.concat(
-                Stream.of(firstStation()),
-                sections.stream().map(Section::getDownStation)
-        ).collect(Collectors.toList());
+                        Stream.of(firstStation()),
+                        sections.stream().map(Section::getDownStation)
+                )
+                .collect(Collectors.toList());
     }
 
     public boolean hasStation(Long id) {

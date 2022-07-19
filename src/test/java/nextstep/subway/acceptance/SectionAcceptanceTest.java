@@ -7,9 +7,11 @@ import nextstep.subway.LineClient;
 import nextstep.subway.StationClient;
 import nextstep.subway.applicaion.dto.line.LineResponse;
 import nextstep.subway.applicaion.dto.station.StationResponse;
+import nextstep.subway.config.DatabaseCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,9 @@ class SectionAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    DatabaseCleaner dataBaseCleaner;
+
     StationClient stationClient;
 
     LineClient lineClient;
@@ -35,6 +40,10 @@ class SectionAcceptanceTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+
+        dataBaseCleaner.afterPropertiesSet();
+        dataBaseCleaner.clear();
+
         stationClient = new StationClient();
         stationClient.create("지하철역", "새로운지하철역", "또다른지하철역", "또또다른지하철역");
     }
