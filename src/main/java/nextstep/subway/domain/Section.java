@@ -47,7 +47,7 @@ public class Section {
         this.line = line;
     }
 
-    public List<Station> getAllStation(){
+    public List<Station> getAllStation() {
         return List.of(upStation, downStation);
     }
 

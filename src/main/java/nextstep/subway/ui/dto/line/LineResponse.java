@@ -41,7 +41,7 @@ public class LineResponse {
             this.name = name;
         }
 
-        public static LineStation of(Station station){
+        public static LineStation of(Station station) {
             return new LineStation(station.getId(), station.getName());
         }
     }

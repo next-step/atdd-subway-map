@@ -38,12 +38,12 @@ public class Line {
         addSection(section);
     }
 
-    public void update(String name, String color){
+    public void update(String name, String color) {
         this.name = StringUtils.hasText(name) ? name : this.name;
         this.color = StringUtils.hasText(color) ? color : this.color;
     }
 
-    public void addSection(Section section){
+    public void addSection(Section section) {
         this.sections.add(section);
         section.setLine(this);
     }

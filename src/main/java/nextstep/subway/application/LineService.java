@@ -7,7 +7,6 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SectionRepository;
-import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.dto.line.CreateLineRequest;
