@@ -10,11 +10,12 @@ import nextstep.subway.domain.Section;
 @AllArgsConstructor
 @Getter
 public class SectionResponse {
+    private Long id;
     private Long upStationId;
     private Long downStationId;
     private Integer distance;
 
     public static SectionResponse form(Section section) {
-        return new SectionResponse(section.getUpStationId(), section.getDownStationId(), section.getDistance());
+        return new SectionResponse(section.getId(), section.getUpStationId(), section.getDownStationId(), section.getDistance());
     }
 }
