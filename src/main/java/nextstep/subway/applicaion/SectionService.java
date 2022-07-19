@@ -30,7 +30,7 @@ public class SectionService {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노션입니다."));
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
-        line.addSection(line, upStation, downStation, sectionRequest.getDistance());
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
         SectionResponse sectionResponse = ObjectMapUtils.map(line.getSections().lastSection(), SectionResponse.class);
         sectionResponse.addStation(line.getSections().lastSection());
         return sectionResponse;

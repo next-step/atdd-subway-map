@@ -53,8 +53,8 @@ public class Line {
         sections.validDelete(downStation);
     }
 
-    public void addSection(Line line, Station upStation, Station downStation, Long distance) {
-        this.sections.addSection(line, upStation, downStation, distance);
+    public void addSection(Station upStation, Station downStation, Long distance) {
+        this.sections.addSection(this, upStation, downStation, distance);
     }
 
 }
