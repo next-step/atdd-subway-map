@@ -12,7 +12,6 @@ import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.AlreadyExistStationException;
 import nextstep.subway.exception.LineNotFoundException;
 import nextstep.subway.exception.SectionStationMismatchException;
-import nextstep.subway.exception.StationNotRegisteredException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,8 @@ public class LineService {
 
     private final StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository,
+                       StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
     }
@@ -38,8 +38,8 @@ public class LineService {
         Long upStationId = lineRequest.getUpStationId();
         Long downStationId = lineRequest.getDownStationId();
         int distance = lineRequest.getDistance();
-        List<Station> stations = stationRepository.findByIdIn(List.of(upStationId, downStationId));
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations, distance));
+        List<Station> stations = stationRepository.findByIdInOrderByIdAsc(List.of(upStationId, downStationId));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), stations.get(0), stations.get(1), distance));
         return createLineResponse(line);
     }
 
@@ -78,7 +78,9 @@ public class LineService {
 
         Line line = lineFrom(id);
         validateSection(downStationId, upStationId, line);
-        Line sectionAddedLine = line.addSection(stationFrom(downStationId), distance);
+        List<Long> stationsIds = List.of(Long.parseLong(upStationId), Long.parseLong(downStationId));
+        List<Station> stations = stationRepository.findByIdInOrderByIdAsc(stationsIds);
+        Line sectionAddedLine = line.addSection(stations, distance);
 
         return new LineResponse(sectionAddedLine.getId(), sectionAddedLine.getName(),
                 sectionAddedLine.getColor(), stationResponses(sectionAddedLine));
@@ -88,11 +90,6 @@ public class LineService {
     private Line lineFrom(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
-    }
-
-    private Station stationFrom(String downStationId) {
-        return stationRepository.findById(Long.valueOf(downStationId))
-                .orElseThrow(() -> new StationNotRegisteredException("역을 찾을 수 없습니다. : " + downStationId));
     }
 
 
@@ -109,7 +106,7 @@ public class LineService {
     }
 
     private List<StationResponse> stationResponses(Line line) {
-        return line.getStations().stream()
+        return line.allStations().stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(toList());
     }
@@ -118,6 +115,6 @@ public class LineService {
     public void deleteSection(Long id, Long stationId) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
-        line.deleteStation(stationId);
+        line.deleteSection(stationId);
     }
 }

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class LineAcceptanceTest {
 
     @LocalServerPort
@@ -47,7 +48,6 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철노선을 생성한다.")
     @Test
-    @DirtiesContext
     void createLine() {
         // when
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
@@ -72,7 +72,6 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철노선 목록을 조회한다.")
     @Test
-    @DirtiesContext
     void getLines() {
         // given
         Map<String, Object> params1 = params("신분당선", "bg-red-600", 1L, 2L, 10L);
@@ -95,7 +94,6 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철노선을 조회한다.")
     @Test
-    @DirtiesContext
     void getLine() {
         // given
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
@@ -116,7 +114,6 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철노선을 수정한다.")
     @Test
-    @DirtiesContext
     void putLine() {
         // given
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);
@@ -140,7 +137,6 @@ class LineAcceptanceTest {
      */
     @DisplayName("지하철노선을 삭제한다.")
     @Test
-    @DirtiesContext
     void deleteLine() {
         // given
         Map<String, Object> params = params("신분당선", "bg-red-600", 1L, 2L, 10L);

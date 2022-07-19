@@ -4,8 +4,6 @@ import nextstep.subway.exception.DeleteStationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,8 +14,7 @@ class LineTest {
     @Test
     void changeLine() {
         //given
-        final var stations = List.of(new Station("역삼역"));
-        final var line = new Line("name", "color", stations, 10);
+        final var line = new Line("name", "color", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when
         final var changedLine = line.changeBy("new name", "new color");
@@ -33,12 +30,7 @@ class LineTest {
     @Test
     void lastStationAtLine() {
         //given
-        final var stations = List.of(
-                new Station(3L, "강남역"),
-                new Station(1L, "선릉역"),
-                new Station(2L, "역삼역")
-        );
-        final var line = new Line("2호선", "bg-green-600", stations, 20);
+        final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when
         final var station = line.lastStation();
@@ -51,17 +43,12 @@ class LineTest {
     @Test
     void hasStation() {
         //given
-        final var stations = List.of(
-                new Station(3L, "강남역"),
-                new Station(1L, "선릉역"),
-                new Station(2L, "역삼역")
-        );
-        final var line = new Line("2호선", "bg-green-600", stations, 20);
+        final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when, then
         assertAll(
                 () -> assertTrue(line.hasStation(1L)),
-                () -> assertFalse(line.hasStation(4L))
+                () -> assertFalse(line.hasStation(3L))
         );
     }
 
@@ -69,32 +56,23 @@ class LineTest {
     @Test
     void deleteStation() {
         //given
-        final var stations = List.of(
-                new Station(3L, "강남역"),
-                new Station(1L, "선릉역"),
-                new Station(2L, "역삼역")
-        );
-        final var line = new Line("2호선", "bg-green-600", stations, 20);
+        final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when
-        line.deleteStation(3L);
+        line.deleteSection(2L);
+
         //then
-        assertThat(line.getStations()).hasSize(2);
+        assertThat(line.allStations().stream().map(Station::getId)).containsExactly(1L);
     }
 
     @DisplayName("역의 id 가 하행역이 아니면 삭제할 수 없다.")
     @Test
     void deleteStationNotDownStationException() {
         //given
-        final var stations = List.of(
-                new Station(3L, "강남역"),
-                new Station(1L, "선릉역"),
-                new Station(2L, "역삼역")
-        );
-        final var line = new Line("2호선", "bg-green-600", stations, 20);
+        final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when, then
-        assertThatThrownBy(() -> line.deleteStation(2L))
+        assertThatThrownBy(() -> line.deleteSection(1L))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("하행역만 삭제할 수 있습니다.");
     }
@@ -103,13 +81,11 @@ class LineTest {
     @Test
     void deleteStationOnlyOneStationException() {
         //given
-        final var stations = List.of(
-                new Station(1L, "선릉역")
-        );
-        final var line = new Line("2호선", "bg-green-600", stations, 20);
+        final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
+        line.deleteSection(2L);
 
         //when, then
-        assertThatThrownBy(() -> line.deleteStation(1L))
+        assertThatThrownBy(() -> line.deleteSection(1L))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
     }

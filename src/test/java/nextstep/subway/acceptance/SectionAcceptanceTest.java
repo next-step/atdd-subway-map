@@ -113,7 +113,7 @@ class SectionAcceptanceTest {
      */
     @DisplayName("지하철 노선 구간에서 지하철역을 삭제한다.")
     @Test
-    void deleteStationInSection() {
+    void deleteSectionInStation() {
         // given
         lineClient = new LineClient();
         lineClient.create(params());
