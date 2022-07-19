@@ -116,7 +116,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         Map<String, String> requestBody2 = setRequestBody("13호선", "bg-red-500");
         int createdLineId = line.jsonPath().getInt("id");
         ExtractableResponse<Response> updateResponse = updateLine(createdLineId, requestBody2);
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
         ExtractableResponse<Response> subwayLine = getLine(createdLineId);

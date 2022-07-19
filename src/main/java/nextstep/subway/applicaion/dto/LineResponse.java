@@ -35,10 +35,10 @@ public class LineResponse {
         return stations;
     }
 
-    public static LineResponse convertedByEntity(Line line, Station upStation, Station downStation) {
+    public static LineResponse convertedByEntity(Line line) {
         List<StationResponse> stationResponses = new ArrayList<>();
-        stationResponses.add(StationResponse.convertedByEntity(upStation));
-        stationResponses.add(StationResponse.convertedByEntity(downStation));
+        stationResponses.add(StationResponse.convertedByEntity(line.getUpEndpoint()));
+        stationResponses.add(StationResponse.convertedByEntity(line.getDownEndpoint()));
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 

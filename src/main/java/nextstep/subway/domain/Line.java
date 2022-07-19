@@ -1,16 +1,12 @@
 package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.exception.ExceptionMessages;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -22,16 +18,13 @@ public class Line {
     private String name;
     private String color;
 
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
+
     public Line() {
     }
 
     public Line(String name, String color) {
-        this.name = name;
-        this.color = color;
-    }
-
-    public Line(Long id, String name, String color) {
-        this.id = id;
         this.name = name;
         this.color = color;
     }
@@ -46,6 +39,14 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void addSection(Section sections) {
+        this.sections.add(sections);
     }
 
     public void changeNameAndColor(LineRequest lineRequest) {
@@ -65,5 +66,41 @@ public class Line {
             throw new IllegalArgumentException(
                     ExceptionMessages.getNotEndpointInputExceptionMessage(stationId, downEndpointStationId));
         }
+    }
+
+    public Station getUpEndpoint() {
+        List<Long> upStationIds = getUpStationIds(sections);
+        List<Long> downStationIds = getDownStationIds(sections);
+        upStationIds.removeAll(downStationIds);
+        Long upStationId = upStationIds.get(0);
+        return sections.stream()
+                .map(Section::getUpStation)
+                .filter(upStation -> upStation.getId().equals(upStationId))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    public Station getDownEndpoint() {
+        List<Long> upStationIds = getUpStationIds(sections);
+        List<Long> downStationIds = getDownStationIds(sections);
+        downStationIds.removeAll(upStationIds);
+        Long downStationId = downStationIds.get(0);
+        return sections.stream()
+                .map(Section::getDownStation)
+                .filter(downStation -> downStation.getId().equals(downStationId))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    private List<Long> getDownStationIds(List<Section> sections) {
+        return sections.stream()
+                .map(v -> v.getDownStation().getId())
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getUpStationIds(List<Section> sections) {
+        return sections.stream()
+                .map(v -> v.getUpStation().getId())
+                .collect(Collectors.toList());
     }
 }
