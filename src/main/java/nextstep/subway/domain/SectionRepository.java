@@ -9,8 +9,4 @@ import java.util.List;
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
     List<Section> findAllByLineId(Long lineId);
-
-    Long countByLineId(long lineId);
-
-    void deleteByLineIdAndDownStationId(Long lineId, Long downStationId);
 }

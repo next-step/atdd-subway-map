@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nextstep.subway.exception.NotFoundException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,8 +27,8 @@ public class Line {
     private String color;
 
     @Builder.Default
-    @OneToMany(mappedBy = "line")
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     public void modifyNameAndColor(String name, String color) {
         this.name = name;
@@ -35,33 +36,19 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        this.sections.add(section);
+        this.sections.addSection(section);
         section.setLine(this);
     }
 
+    public Section findSectionByDownStationId(Long downStationId) {
+        return this.sections.findSectionByDownStationId(downStationId);
+    }
+
     public List<Long> getAllStationIds() {
-        return this.getSections().stream()
-                .map(section -> List.of(section.getUpStationId(), section.getDownStationId()))
-                .flatMap(List::stream)
-                .distinct()
-                .collect(Collectors.toList());
+        return this.sections.getAllStationIds();
     }
 
     public Long getFinalDownStationId(Long downStationId) {
-        List<Long> upStationIds = getUpStationIds();
-        List<Long> downStationIds = getDownStationIds();
-
-        return downStationIds.stream()
-                .filter(down -> !upStationIds.contains(down))
-                .findAny()
-                .orElse(downStationId);
-    }
-
-    private List<Long> getUpStationIds() {
-        return this.sections.stream().map(Section::getUpStationId).collect(Collectors.toList());
-    }
-
-    private List<Long> getDownStationIds() {
-        return this.sections.stream().map(Section::getDownStationId).collect(Collectors.toList());
+        return this.sections.getFinalDownStationId(downStationId);
     }
 }

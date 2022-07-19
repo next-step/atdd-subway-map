@@ -68,7 +68,7 @@ public class LineService {
     public void createSection(Long id, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_LINE_MESSAGE, id)));
-        sectionService.createSection(line, sectionRequest);
+        line.addSection(sectionService.createSection(line, sectionRequest));
     }
 
     @Transactional

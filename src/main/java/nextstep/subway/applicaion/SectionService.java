@@ -21,20 +21,18 @@ public class SectionService {
 
     private final SectionRepository sectionRepository;
     private final SectionMapper sectionMapper;
-    private final SectionResponseMapper sectionResponseMapper;
     private final SectionValidator sectionValidator;
+    private final SectionResponseMapper sectionResponseMapper;
 
-    @Transactional
-    public void createSection(Line line, SectionRequest sectionRequest) {
+    public Section createSection(Line line, SectionRequest sectionRequest) {
         sectionValidator.createValidate(line, sectionRequest);
-        Section section = sectionRepository.save(sectionMapper.map(sectionRequest));
-        line.addSection(section);
+        return sectionMapper.map(sectionRequest);
     }
 
     @Transactional
     public void deleteSection(Line line, Long stationId) {
         sectionValidator.deleteValidate(line, stationId);
-        sectionRepository.deleteByLineIdAndDownStationId(line.getId(), stationId);
+        line.findSectionByDownStationId(stationId).setLine(null);
     }
 
     @Transactional(readOnly = true)

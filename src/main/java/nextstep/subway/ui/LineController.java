@@ -36,21 +36,13 @@ public class LineController {
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok().body(lineService.findLineById(id));
-        } catch (NotFoundException e) {
-            return ResponseEntity.noContent().build();
-        }
+        return ResponseEntity.ok().body(lineService.findLineById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
-        try {
-            lineService.modifyLineById(id, lineRequest);
-            return ResponseEntity.ok().build();
-        } catch (NotFoundException e) {
-            return ResponseEntity.noContent().build();
-        }
+        lineService.modifyLineById(id, lineRequest);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
@@ -61,26 +53,28 @@ public class LineController {
 
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
-        try {
-            lineService.createSection(id, sectionRequest);
-            return ResponseEntity.ok().build();
-        } catch (NotDownStationException | AlreadyRegisteredException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        lineService.createSection(id, sectionRequest);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
-        try {
-            lineService.deleteSection(id, stationId);
-            return ResponseEntity.noContent().build();
-        } catch (NotDownStationException | OnlyOneSectionException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        lineService.deleteSection(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/sections")
     public ResponseEntity<List<SectionResponse>> getSections(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findSectionsById(id));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Void> notFoundExceptionHandler() {
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler({ NotDownStationException.class, AlreadyRegisteredException.class, OnlyOneSectionException.class })
+    public ResponseEntity<Void> exceptionHandler() {
+        return ResponseEntity.badRequest().build();
     }
 }
