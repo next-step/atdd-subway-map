@@ -6,7 +6,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 
 public class SectionRestAssured {
 

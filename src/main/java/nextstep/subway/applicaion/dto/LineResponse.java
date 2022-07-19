@@ -1,13 +1,13 @@
 package nextstep.subway.applicaion.dto;
 
 import static java.util.stream.Collectors.toList;
+import static nextstep.subway.applicaion.dto.StationResponse.createStationResponse;
 
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import nextstep.subway.domain.Color;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 
 @Getter
 public class LineResponse {
@@ -30,17 +30,18 @@ public class LineResponse {
     this.stations = stations;
   }
 
-  public static LineResponse createResponse(Line line, List<Station> stations) {
-    List<StationResponse> stationResponse = stations.stream()
-        .map(station -> new StationResponse(station.getId(), station.getName()))
-        .distinct()
-        .collect(toList());
-
+  public static LineResponse createResponse(Line line) {
     return LineResponse.builder()
         .id(line.getId())
         .name(line.getName())
         .color(line.getColor())
-        .stations(stationResponse)
+        .stations(getStationResponse(line))
         .build();
+  }
+
+  private static List<StationResponse> getStationResponse(Line line) {
+    return line.getSections().getAllStations().stream()
+        .map(station -> createStationResponse(station.getId(), station.getName()))
+        .collect(toList());
   }
 }

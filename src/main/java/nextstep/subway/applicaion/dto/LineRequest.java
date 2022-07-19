@@ -31,7 +31,6 @@ public class LineRequest {
     return Line.builder()
         .name(request.getName())
         .color(request.getColor())
-        .distance(request.distance)
         .build();
   }
 }

@@ -70,8 +70,6 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
    */
   @Test
   void 지하철_노선_목록_조회() {
-    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation, ducksoStation));
-
     saveLine(firstLine, donongStationId, gooriStationId);
     saveLine(secondLine, donongStationId, ducksoStationId);
 
@@ -94,8 +92,6 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
    */
   @Test
   void 지하철_노선_조회() {
-    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
-
     ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStationId, gooriStationId);
 
     ExtractableResponse<Response> response = lineRestAssured.findLine(donongGooriLine.jsonPath().getLong("id"));
@@ -117,8 +113,6 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
    */
   @Test
   void 지하철_노선_수정() {
-    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
-
     ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStationId, gooriStationId);
 
     ExtractableResponse<Response> updateDonongGooriLine = lineRestAssured.updateLine(donongGooriLine.jsonPath().getLong("id"), thirdLine, new Color("orange"));
@@ -132,8 +126,6 @@ public class LineAcceptanceTest extends BasicAcceptanceTest {
    */
   @Test
   void 지하철_노선_삭제() {
-    List<StationResponse> stationResponses = stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
-
     ExtractableResponse<Response> donongGooriLine = saveLine(firstLine, donongStationId, gooriStationId);
 
     ExtractableResponse<Response> deleteDonongGooriLine = lineRestAssured.deleteLine(donongGooriLine.jsonPath().getLong("id"));

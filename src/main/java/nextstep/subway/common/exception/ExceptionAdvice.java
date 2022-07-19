@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvice {
 
-  @ExceptionHandler(SectionException.class)
-  public ResponseEntity<ExceptionResponse> sectionException(SectionException e) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ExceptionResponse> notFoundException(IllegalArgumentException e) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(ExceptionResponse.getInstance(e.getMessage()));
   }
 
-  @ExceptionHandler(EntityNotFound.class)
-  public ResponseEntity<ExceptionResponse> notFoundException(EntityNotFound e) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(CustomException.class)
+  public ResponseEntity<ExceptionResponse> customException(CustomException e) {
+    return ResponseEntity.status(e.getHttpStatus())
         .body(ExceptionResponse.getInstance(e.getMessage()));
   }
 }

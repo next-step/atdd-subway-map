@@ -5,10 +5,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Line {
 
@@ -21,15 +24,13 @@ public class Line {
   @Embedded
   private Color color;
 
-  private int distance;
-
-  public Line() {}
+  @Embedded
+  private final Sections sections = new Sections();
 
   @Builder
-  public Line(String name, Color color, int distance) {
+  public Line(String name, Color color) {
     this.name = name;
     this.color = color;
-    this.distance = distance;
   }
 
   public void changeName(String name) {
@@ -40,7 +41,11 @@ public class Line {
     this.color = color;
   }
 
-  public void addDistance(int distance) {
-    this.distance += distance;
+  public void addSections(Section section) {
+    this.sections.addSection(section);
+  }
+
+  public void deleteLastSection() {
+    this.sections.getSections().remove(this.sections.getSections().size()-1);
   }
 }

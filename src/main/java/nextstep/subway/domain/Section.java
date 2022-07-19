@@ -1,7 +1,5 @@
 package nextstep.subway.domain;
 
-import java.util.Arrays;
-import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,11 +22,11 @@ public class Section {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "downStation_id")
   private Station downStation;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "upStation_id")
   private Station upStation;
 
@@ -47,15 +44,16 @@ public class Section {
     this.line = line;
   }
 
-  public List<Station> getSectionInStation() {
-    return Arrays.asList(downStation, upStation);
+  public static Section createSection(Station upStation, Station downStation, int distance, Line line) {
+    return Section.builder()
+        .downStation(downStation)
+        .upStation(upStation)
+        .distance(distance)
+        .line(line)
+        .build();
   }
 
   public long getUpStationId() {
     return this.upStation.getId();
-  }
-
-  public long getDownStationId() {
-    return this.downStation.getId();
   }
 }
