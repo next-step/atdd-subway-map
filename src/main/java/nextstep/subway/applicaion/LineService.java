@@ -12,6 +12,7 @@ import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.AlreadyExistStationException;
 import nextstep.subway.exception.LineNotFoundException;
 import nextstep.subway.exception.SectionStationMismatchException;
+import nextstep.subway.exception.StationNotRegisteredException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,9 +79,9 @@ public class LineService {
 
         Line line = lineFrom(id);
         validateSection(downStationId, upStationId, line);
-        List<Long> stationsIds = List.of(Long.parseLong(upStationId), Long.parseLong(downStationId));
-        List<Station> stations = stationRepository.findByIdInOrderByIdAsc(stationsIds);
-        Line sectionAddedLine = line.addSection(stations, distance);
+        Station downStation = stationRepository.findById(Long.valueOf(downStationId))
+                .orElseThrow(() -> new StationNotRegisteredException("등록된 역이 존재하지 않습니다."));
+        Line sectionAddedLine = line.addSection(line.lastStation(), downStation, distance);
 
         return new LineResponse(sectionAddedLine.getId(), sectionAddedLine.getName(),
                 sectionAddedLine.getColor(), stationResponses(sectionAddedLine));
@@ -96,8 +97,11 @@ public class LineService {
     private void validateSection(String downStationId, String upStationId, Line line) {
         Station station = line.lastStation();
         if (!station.equalsId(Long.parseLong(upStationId))) {
-            throw new SectionStationMismatchException("노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. 하행 마지막 역 : "
-                    + station.getId() + ", 구간 상행역 : " + upStationId);
+            throw new SectionStationMismatchException(
+                    "노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. " +
+                            "하행 마지막 역 : " + station.getId()
+                            + ", 구간 상행역 : " + upStationId
+            );
         }
 
         if (line.hasStation(Long.parseLong(downStationId))) {

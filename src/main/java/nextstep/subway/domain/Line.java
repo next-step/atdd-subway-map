@@ -50,8 +50,8 @@ public class Line {
         return sections.allStations();
     }
 
-    public Line addSection(List<Station> stations, int distance) {
-        sections.add(new Section(this, stations.get(0), stations.get(1), distance));
+    public Line addSection(Station upStation, Station downStation, int distance) {
+        sections.add(new Section(this, upStation, downStation, distance));
         return this;
     }
 
