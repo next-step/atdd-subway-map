@@ -8,6 +8,7 @@ import nextstep.subway.domain.Line.LineRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.exception.EntityNotFoundException;
+import nextstep.subway.utils.ObjectMapUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +26,17 @@ public class LineService {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
-        return createLineResponse(lineRepository.save(line));
+        LineResponse lineResponse = ObjectMapUtils.looseMap(lineRepository.save(line), LineResponse.class);
+        lineResponse.sideStation(upStation, downStation);
+        return lineResponse;
     }
 
-    public List<Line> findAllLines() {
-        return lineRepository.findAll();
+    public List<LineResponse> findAllLines() {
+        return ObjectMapUtils.mapLooseAll(lineRepository.findAll(), LineResponse.class);
     }
 
     public LineResponse findLine(Long id) {
-        return createLineResponse(lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("station.not.found")));
+        return ObjectMapUtils.map(lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("station.not.found")), LineResponse.class);
     }
 
     @Transactional
@@ -44,10 +47,6 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.deleteById(id);
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), line.upStation(), line.downStation(), line.distance());
     }
 
 }

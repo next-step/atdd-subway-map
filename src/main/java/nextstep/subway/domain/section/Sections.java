@@ -7,7 +7,8 @@ import nextstep.subway.domain.station.Station;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,7 +18,11 @@ import java.util.stream.Collectors;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private Set<Section> sections = new HashSet<>();
+    private List<Section> sections = new ArrayList<>();
+
+    public Section lastSection() {
+        return this.sections.stream().reduce((first, second) -> second).orElseThrow(null);
+    }
 
     public Station upStation() {
         return this.sections.stream().findFirst().get().getUpStation();
@@ -56,12 +61,11 @@ public class Sections {
         return section;
     }
 
-    public Section addSection(Line line, Station upStation, Station downStation, Long distance) {
+    public void addSection(Line line, Station upStation, Station downStation, Long distance) {
         validAddUpStation(upStation);
         validAddDownStation(downStation);
         Section section = new Section(line, upStation, downStation, distance);
         this.sections.add(section);
-        return section;
     }
 
     public void validSectionCount() {

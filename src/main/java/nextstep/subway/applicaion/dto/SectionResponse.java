@@ -1,38 +1,25 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import nextstep.subway.domain.section.Section;
+import nextstep.subway.utils.ObjectMapUtils;
+
+@NoArgsConstructor
+@Setter
+@Getter
 public class SectionResponse {
 
     private Long id;
     private Long lineId;
-    private Long upStationId;
-    private Long downStationId;
+    private StationResponse upStation;
+    private StationResponse downStation;
     private Long distance;
 
-    public SectionResponse(Long id, Long lineId, Long upStationId, Long downStationId, Long distance) {
-        this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
-    }
+    public void addStation(Section lastSection) {
+        this.upStation = ObjectMapUtils.map(lastSection.getUpStation(), StationResponse.class);
+        this.downStation = ObjectMapUtils.map(lastSection.getDownStation(), StationResponse.class);
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Long getDistance() {
-        return distance;
-    }
-
-    public Long getLineId() {
-        return lineId;
     }
 }

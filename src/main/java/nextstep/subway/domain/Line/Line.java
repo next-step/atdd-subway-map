@@ -1,13 +1,15 @@
 package nextstep.subway.domain.Line;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.Sections;
 import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Getter
 @NoArgsConstructor
 @Entity
@@ -16,7 +18,7 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "line_id")
-    private Long id;
+    private Long lineId;
 
     private String name;
 
@@ -51,8 +53,8 @@ public class Line {
         sections.validDelete(downStation);
     }
 
-    public Section addSection(Line line, Station upStation, Station downStation, Long distance) {
-        return this.sections.addSection(line, upStation, downStation, distance);
+    public void addSection(Line line, Station upStation, Station downStation, Long distance) {
+        this.sections.addSection(line, upStation, downStation, distance);
     }
 
 }

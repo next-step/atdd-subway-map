@@ -3,7 +3,6 @@ package nextstep.subway.acceptance.section;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.AcceptanceTest;
-import nextstep.subway.acceptance.line.LineSteps;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,12 +30,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void 구간_등록_성공_테스트() {
 
         ExtractableResponse<Response> 노선 = 노선이_생성되어_있다(SHIN_BUNDANG_LINE_NAME, SHIN_BUNDANG_LINE_COLOR, SHIN_BUNDANG_UP_STATION_NAME, SHIN_BUNDANG_DOWN_STATION_NAME, DISTANCE);
-        Long 구간_상행역_ID = LineSteps.노선_하행역_ID;
+        Long 구간_상행역_ID = 노선_하행역_ID;
         Long 구간_하행역_ID = 지하철역_생성(GANGNAM_STATION_NAME).jsonPath().getLong("id");
-
         //When 지하철 구간 등록
         ExtractableResponse<Response> 구간 = 구간_등록_요청(노선_ID, 구간_상행역_ID, 구간_하행역_ID, DISTANCE);
-
         // then 지하철 구간 등록 성공 응답받는다.
         // then 구간의 상행역은 해당 노선의 하행 종점역이어야 한다.
         // then 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
@@ -114,7 +111,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     void 지하철_구간_삭제_테스트() {
         //Given 노선 생성
         노선이_생성되어_있다(SHIN_BUNDANG_LINE_NAME, SHIN_BUNDANG_LINE_COLOR, SHIN_BUNDANG_UP_STATION_NAME, SHIN_BUNDANG_DOWN_STATION_NAME, DISTANCE);
-        Long 구간_상행역_ID = LineSteps.노선_하행역_ID;
+        Long 구간_상행역_ID = 노선_하행역_ID;
         Long 구간_하행역_ID = 지하철역_생성("양재역").jsonPath().getLong("id");
         구간_등록_요청(노선_ID, 구간_상행역_ID, 구간_하행역_ID, DISTANCE);
         //When 구간을 삭제한다.

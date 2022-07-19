@@ -6,6 +6,6 @@ import java.util.Set;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
-    Set<Section> findAllByLine_Id(Long lineId);
+    Set<Section> findAllByLine_LineId(Long lineId);
 
 }

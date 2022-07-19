@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.LineService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.domain.Line.Line;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class LineController {
     }
 
     @GetMapping(value = "/lines")
-    public ResponseEntity<List<Line>> lines() {
+    public ResponseEntity<List<LineResponse>> lines() {
         return ResponseEntity.ok().body(lineService.findAllLines());
     }
 

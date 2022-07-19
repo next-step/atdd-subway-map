@@ -10,6 +10,7 @@ import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.exception.EntityNotFoundException;
+import nextstep.subway.utils.ObjectMapUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +30,10 @@ public class SectionService {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 노션입니다."));
         Station upStation = stationRepository.findById(sectionRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
         Station downStation = stationRepository.findById(sectionRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 지하철 역입니다."));
-        return createLineResponse(line.addSection(line, upStation, downStation, sectionRequest.getDistance()));
-    }
-
-    private SectionResponse createLineResponse(Section section) {
-        return new SectionResponse(section.getId(), section.getLine().getId(), section.getUpStation().getId(), section.getDownStation().getId(), section.getDistance());
+        line.addSection(line, upStation, downStation, sectionRequest.getDistance());
+        SectionResponse sectionResponse = ObjectMapUtils.map(line.getSections().lastSection(), SectionResponse.class);
+        sectionResponse.addStation(line.getSections().lastSection());
+        return sectionResponse;
     }
 
     public void delete(Long lineId, Long sectionDownStationId) {
