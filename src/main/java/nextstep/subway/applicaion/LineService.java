@@ -1,53 +1,52 @@
 package nextstep.subway.applicaion;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
-@Transactional(readOnly = true)
+@Transactional
+@RequiredArgsConstructor
 public class LineService {
 
+    private static final String NOT_EXIST_STATION = "존재하지 않는 지하철 역입니다.";
+    private static final String NOT_EXIST_LINE = "존재하지 않는 지하철 노선입니다.";
+
+    private final StationRepository stationRepository;
     private final LineRepository lineRepository;
 
-    public LineService(LineRepository lineRepository) {
-        this.lineRepository = lineRepository;
-    }
-
-    @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(lineRequest.toEntity());
+        Station upStation = findStationById(lineRequest.getUpStationId());
+        Station dowStation = findStationById(lineRequest.getDownStationId());
+
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), lineRequest.getDistance(), upStation, dowStation));
         return LineResponse.from(line);
     }
 
-    @Transactional
     public void updateLine(Long id, UpdateLineRequest updateLineRequest) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
+        Line line = findLineById(id);
         line.update(updateLineRequest.getName(), updateLineRequest.getColor());
     }
 
-    @Transactional
     public void deleteLineById(Long id) {
-        lineRepository.deleteById(id);
+        Line line = findLineById(id);
+        lineRepository.delete(line);
     }
 
-    public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
-        return LineResponse.from(line);
+    private Station findStationById(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_STATION));
     }
 
-    public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-                .map(LineResponse::from)
-                .collect(Collectors.toList());
+    private Line findLineById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_LINE));
     }
 }
