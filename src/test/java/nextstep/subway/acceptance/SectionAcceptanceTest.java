@@ -1,6 +1,5 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.testsupport.AcceptanceTest;
@@ -8,11 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
+import static nextstep.subway.acceptance.support.LineRequest.지하철노선_목록조회_요청;
+import static nextstep.subway.acceptance.support.LineRequest.지하철노선_생성_요청;
+import static nextstep.subway.acceptance.support.SectionRequest.구간_등록_요청;
+import static nextstep.subway.acceptance.support.SectionRequest.구간_삭제_요청;
+import static nextstep.subway.acceptance.support.StationRequest.지하철역_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -112,7 +114,23 @@ public class SectionAcceptanceTest extends AcceptanceTest {
          */
         @Test
         void 구간_제거_성공(){
+            // given
+            long aId = 지하철역_생성_요청("A").jsonPath().getLong("id");
+            long bId = 지하철역_생성_요청("B").jsonPath().getLong("id");
+            long cId = 지하철역_생성_요청("C").jsonPath().getLong("id");
 
+            // given
+            long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", aId, bId, 10).jsonPath().getLong("id");
+
+            // given
+            구간_등록_요청(lineId, bId, cId, 10);
+
+            // when
+            구간_삭제_요청(lineId, cId);
+
+            // then
+            List<Long> stationId = 지하철노선_목록조회_요청().jsonPath().getList("stations.id", Long.class);
+            assertThat(stationId).doesNotContain(cId);
         }
 
         /**
@@ -122,55 +140,52 @@ public class SectionAcceptanceTest extends AcceptanceTest {
          * Then 에러를 반환한다.
          */
         @Test
-        void 구간_한개인경우_에러반환(){
+        void 구간_한개인_경우_에러반환(){
+            // given
+            long aId = 지하철역_생성_요청("A").jsonPath().getLong("id");
+            long bId = 지하철역_생성_요청("B").jsonPath().getLong("id");
 
+            // given
+            long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", aId, bId, 10).jsonPath().getLong("id");
+
+            // when
+            final ExtractableResponse<Response> response = 구간_삭제_요청(lineId, bId);
+
+            // then
+            assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(4001)
+                     );
         }
-    }
 
+        /**
+         * Given A,B,C 라는 이름을 가진 3개의 지하철 역을 생성하고
+         * Given 노선(A역 상행역, B역은 하행역)을 생성하고
+         * Given 새로운 구간 (B역은 상행역 D역은 하행역)을 노선에 등록한다.
+         * When 처음 구간을 삭제하면
+         * Then 에러를 반환한다.
+         */
+        @Test
+        void 마지막_구간을_제거하지않는_경우_에러반환(){
+            // given
+            long aId = 지하철역_생성_요청("A").jsonPath().getLong("id");
+            long bId = 지하철역_생성_요청("B").jsonPath().getLong("id");
+            long cId = 지하철역_생성_요청("C").jsonPath().getLong("id");
 
-    private ExtractableResponse<Response> 구간_등록_요청(long registLineId, long upStationId, long downStationId, int distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("downStationId", String.valueOf(downStationId));
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("distance", String.valueOf(distance));
+            // given
+            long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", aId, bId, 10).jsonPath().getLong("id");
 
-        return RestAssured.given().log().all()
-                          .body(params)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when().post(String.format("/lines/%s/sections", registLineId))
-                          .then().log().all()
-                          .extract();
-    }
+            // given
+            구간_등록_요청(lineId, bId, cId, 10);
 
-    private ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
+            // when
+            final ExtractableResponse<Response> response = 구간_삭제_요청(lineId, aId);
 
-        return RestAssured.given().log().all()
-                          .body(params)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when().post("/stations")
-                          .then().log().all()
-                          .extract();
-    }
-
-    private ExtractableResponse<Response> 지하철노선_생성_요청(final String lineName,
-                                                      final String lineColor,
-                                                      final long upStationId,
-                                                      final long downStationId,
-                                                      final int distance) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", lineName);
-        params.put("color", lineColor);
-        params.put("upStationId", String.valueOf(upStationId));
-        params.put("downStationId", String.valueOf(downStationId));
-        params.put("distance", String.valueOf(distance));
-
-        return RestAssured.given().log().all()
-                          .body(params)
-                          .contentType(MediaType.APPLICATION_JSON_VALUE)
-                          .when().post("/lines")
-                          .then().log().all()
-                          .extract();
+            // then
+            assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(4001)
+                     );
+        }
     }
 }
