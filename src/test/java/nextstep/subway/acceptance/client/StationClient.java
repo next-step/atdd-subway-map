@@ -2,9 +2,9 @@ package nextstep.subway.acceptance.client;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.client.dto.StationCreationRequest;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +21,8 @@ public class StationClient {
     }
 
     public ExtractableResponse<Response> createStation(String stationName) {
-        return apiCRUD.create(STATIONS_PATH, Collections.singletonMap("name", stationName));
+        StationCreationRequest stationRequest = new StationCreationRequest(stationName);
+        return apiCRUD.create(STATIONS_PATH, stationRequest);
     }
 
     public List<ExtractableResponse<Response>> createStations(List<String> stationNames) {

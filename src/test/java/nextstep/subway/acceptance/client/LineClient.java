@@ -2,15 +2,15 @@ package nextstep.subway.acceptance.client;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.client.dto.LineCreationRequest;
+import nextstep.subway.acceptance.client.dto.LineModificationRequest;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
 
 @Component
 public class LineClient {
 
-    private static final String STATIONS_PATH = "/stations";
-    private static final String STATION_PATH = "/stations/{id}";
+    private static final String LINES_PATH = "/lines";
+    private static final String LINE_PATH = "/lines/{id}";
 
     private final ApiCRUD apiCRUD;
 
@@ -18,33 +18,25 @@ public class LineClient {
         this.apiCRUD = apiCRUD;
     }
 
-    public ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        HashMap<String, Object> jsonBody = new HashMap<>();
-        jsonBody.put("name", name);
-        jsonBody.put("color", color);
-        jsonBody.put("upStationId", upStationId);
-        jsonBody.put("downStationId", downStationId);
-        jsonBody.put("distance", distance);
-        return apiCRUD.create("/lines", jsonBody);
+    public ExtractableResponse<Response> createLine(LineCreationRequest lineRequest) {
+        return apiCRUD.create(LINES_PATH, lineRequest);
     }
 
     public ExtractableResponse<Response> fetchLines() {
-        return apiCRUD.read("/lines");
+        return apiCRUD.read(LINES_PATH);
     }
 
     public ExtractableResponse<Response> fetchLine(Long lineId) {
-        return apiCRUD.read("/lines/{id}", lineId);
+        return apiCRUD.read(LINE_PATH, lineId);
     }
 
     public ExtractableResponse<Response> modifyLine(Long lineId, String name, String color) {
-        HashMap<String, Object> jsonBody = new HashMap<>();
-        jsonBody.put("name", name);
-        jsonBody.put("color", color);
-        return apiCRUD.update("/lines/" + lineId, jsonBody);
+        LineModificationRequest lineRequest = new LineModificationRequest(name, color);
+        return apiCRUD.update(LINES_PATH+ "/" + lineId, lineRequest);
     }
 
     public ExtractableResponse<Response> deleteLine(Long lineId) {
-        return apiCRUD.delete("/lines/{id}", lineId);
+        return apiCRUD.delete(LINE_PATH, lineId);
     }
 
 }

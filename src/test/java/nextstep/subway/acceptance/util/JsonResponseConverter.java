@@ -41,4 +41,9 @@ public class JsonResponseConverter {
                 .getObject(path, type);
     }
 
+    public String convertToError(ExtractableResponse<Response> response) {
+        return response.jsonPath()
+                .getString("error");
+    }
+
 }

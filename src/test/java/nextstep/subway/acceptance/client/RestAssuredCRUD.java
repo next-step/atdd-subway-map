@@ -3,21 +3,14 @@ package nextstep.subway.acceptance.client;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.aop.ValidateCreated;
-import nextstep.subway.acceptance.aop.ValidateNoContent;
-import nextstep.subway.acceptance.aop.ValidateOk;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 public class RestAssuredCRUD implements ApiCRUD {
 
-
     @Override
-    @ValidateCreated
-    public ExtractableResponse<Response> create(String path, Map<String, Object> jsonBody) {
+    public <T> ExtractableResponse<Response> create(String path, T jsonBody) {
         return RestAssured.given().log().all()
                 .body(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +20,6 @@ public class RestAssuredCRUD implements ApiCRUD {
     }
 
     @Override
-    @ValidateOk
     public ExtractableResponse<Response> read(String path) {
         return RestAssured.given().log().all()
                 .when().get(path)
@@ -36,7 +28,6 @@ public class RestAssuredCRUD implements ApiCRUD {
     }
 
     @Override
-    @ValidateOk
     public <T> ExtractableResponse<Response> read(String path, T pathVariable) {
         return RestAssured.given().log().all()
                 .when().get(path, pathVariable)
@@ -45,8 +36,7 @@ public class RestAssuredCRUD implements ApiCRUD {
     }
 
     @Override
-    @ValidateOk
-    public ExtractableResponse<Response> update(String path, Map<String, Object> jsonBody) {
+    public <T> ExtractableResponse<Response> update(String path, T jsonBody) {
         return RestAssured.given().log().all()
                 .body(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -56,8 +46,7 @@ public class RestAssuredCRUD implements ApiCRUD {
     }
 
     @Override
-    @ValidateNoContent
-    public  <T> ExtractableResponse<Response> delete(String path, T pathVariable) {
+    public <T> ExtractableResponse<Response> delete(String path, T pathVariable) {
         return RestAssured.given().log().all()
                 .body(pathVariable)
                 .when().delete(path, pathVariable)
