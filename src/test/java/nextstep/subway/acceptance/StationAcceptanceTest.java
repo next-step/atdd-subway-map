@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("tableTruncator")
 public class StationAcceptanceTest {
+
     @LocalServerPort
     int port;
 
@@ -28,35 +30,22 @@ public class StationAcceptanceTest {
     private DatabaseTruncator databaseTruncator;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         RestAssured.port = port;
         databaseTruncator.afterPropertiesSet();
+        databaseTruncator.cleanTable();
     }
 
-    private static Map<String, Object> station1;
-    private static Map<String, Object> station2;
-    private static Map<String, Object> station3;
+    private static List<Map<String, Object>> stations;
     static RestUtil restUtil;
+    static SubwayTestHelper testHelper;
 
     @BeforeAll
     static void init() {
         restUtil = new RestUtil();
-
-        station1 = new HashMap<>();
-        station1.put("name", "마곡역");
-
-        station2 = new HashMap<>();
-        station2.put("name", "디지털미디어시티역");
-
-        station3 = new HashMap<>();
-        station3.put("name", "마곡나루역");
+        testHelper = new SubwayTestHelper();
+        stations = testHelper.makeStationList("마곡역", "디지털미디어시티역", "마곡나루역");
     }
-
-    @AfterEach
-    void tableClear(){
-        databaseTruncator.cleanTable();
-    }
-
 
     /**
      * When 지하철역을 생성하면
@@ -100,15 +89,13 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         //given
-        restUtil.createEntityData(station1, "/stations");
-        restUtil.createEntityData(station2, "/stations");
-
+        testHelper.makeGivenCondition("/stations", HttpStatus.CREATED.value(), stations.get(0), stations.get(1));
 
         //when
-        List<String> names = getAllStations();
+        List<String> names = restUtil.getResponseJsonListDataByKey("/stations", "name", String.class);
 
         //then
-        assertThat(names).containsAnyOf(station1.get("name").toString(), station2.get("name").toString());
+        assertThat(names).containsAnyOf(stations.get(0).get("name").toString(), stations.get(1).get("name").toString());
     }
 
 
@@ -122,36 +109,16 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        Long id = restUtil.createEntityData(station3, "/stations");
+        Long id = restUtil.createEntityData("/stations", HttpStatus.CREATED.value(), stations.get(2));
 
         //when
-        deleteStations(id);
+        ExtractableResponse<Response> response = restUtil.deleteEntityDataById("/stations/{id}", id);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
-        List<String> names = getAllStations();
-        assertThat(names).doesNotContain(station3.get("name").toString());
+        List<String> names = restUtil.getResponseJsonListDataByKey("/stations", "name", String.class);
+        assertThat(names).doesNotContain(stations.get(2).get("name").toString());
 
 
     }
-
-    public List<String> getAllStations() {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
-    }
-
-    public void deleteStations(Long id) {
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().delete("/stations/{id}", id)
-                        .then().log().all()
-                        .extract();
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-
 }

@@ -1,8 +1,10 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
+import nextstep.subway.applicaion.SectionService;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,14 +14,17 @@ import java.util.List;
 @RestController
 public class LineController {
     private LineService lineService;
+    private SectionService sectionService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) throws Exception {
         LineResponse line = lineService.saveLine(lineRequest);
+        line.addSection(sectionService.saveSection(line.getId(), new SectionRequest(lineRequest)));
         return ResponseEntity.created(URI.create("/lines/"+line.getId())).body(line);
     }
 
@@ -41,6 +46,7 @@ public class LineController {
 
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id){
+        sectionService.deleteAllByLineId(id);
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
