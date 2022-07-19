@@ -9,10 +9,12 @@ import nextstep.subway.domain.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -32,7 +34,13 @@ public class StationService {
 
     @Transactional
     public void deleteStationById(Long id) {
-        stationRepository.deleteById(id);
+        Station station = getStation(id);
+        stationRepository.delete(station);
+    }
+
+    private Station getStation(Long upStationId) {
+        return stationRepository.findById(upStationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 역이 없습니다."));
     }
 
     private StationResponse createStationResponse(Station station) {

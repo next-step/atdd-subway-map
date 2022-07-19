@@ -17,6 +17,13 @@ public class StationRequestTemplate {
                 .extract();
     }
 
+    public static ExtractableResponse<Response> 지하철역_생성을_요청한다(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return 지하철역_생성을_요청한다(params);
+    }
+
     public static ExtractableResponse<Response> 지하철역_목록을_조회한다() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
@@ -29,12 +36,5 @@ public class StationRequestTemplate {
                 .when().delete("/stations/" + stationId)
                 .then().log().all()
                 .extract();
-    }
-
-    public static ExtractableResponse<Response> 지하철역을_생성한다(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-
-        return 지하철역_생성을_요청한다(params);
     }
 }

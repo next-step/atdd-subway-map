@@ -2,31 +2,34 @@ package nextstep.subway.acceptance.acceptance;
 
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_목록을_조회한다;
 import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_삭제를_요청한다;
-import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역을_생성한다;
+import static nextstep.subway.acceptance.template.StationRequestTemplate.지하철역_생성을_요청한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import nextstep.subway.acceptance.utils.DatabaseCleanup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
     @LocalServerPort
     int port;
+    @Autowired
+    DatabaseCleanup databaseCleanup;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+        databaseCleanup.execute();
     }
 
     /**
@@ -38,7 +41,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_생성() {
         // when
-        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("강남역");
+        ExtractableResponse<Response> createdResponse = 지하철역_생성을_요청한다("강남역");
 
         // then
         assertThat(createdResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -59,8 +62,8 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_조회() {
         // given
-        지하철역을_생성한다("신도림역");
-        지하철역을_생성한다("건대역");
+        지하철역_생성을_요청한다("신도림역");
+        지하철역_생성을_요청한다("건대역");
 
         // when
         ExtractableResponse<Response> stationsResponse = 지하철역_목록을_조회한다();
@@ -80,7 +83,7 @@ public class StationAcceptanceTest {
     @Test
     void 지하철역_제거() {
         // given
-        ExtractableResponse<Response> createdResponse = 지하철역을_생성한다("홍대입구역");
+        ExtractableResponse<Response> createdResponse = 지하철역_생성을_요청한다("홍대입구역");
         long stationId = createdResponse.jsonPath().getLong("id");
 
         // when
