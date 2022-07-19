@@ -18,7 +18,7 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
     public Line() {
@@ -43,10 +43,6 @@ public class Line {
 
     public List<Section> getSections() {
         return sections;
-    }
-
-    public void addSection(Section sections) {
-        this.sections.add(sections);
     }
 
     public void changeNameAndColor(LineRequest lineRequest) {
@@ -102,5 +98,11 @@ public class Line {
         return sections.stream()
                 .map(v -> v.getUpStation().getId())
                 .collect(Collectors.toList());
+    }
+
+    public void checkSectionCount() {
+        if (sections.size() == 1) {
+            throw new RuntimeException(ExceptionMessages.getNeedAtLeastOneSectionExceptionMessage());
+        }
     }
 }

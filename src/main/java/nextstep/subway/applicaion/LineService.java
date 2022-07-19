@@ -17,10 +17,13 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository,
+        SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -28,7 +31,7 @@ public class LineService {
         Line line = saveLine(lineRequest.toEntity());
         Line savedLine = findLine(line.getId());
         Section section = saveSection(savedLine, lineRequest);
-        savedLine.addSection(section);
+        line.getSections().add(section);
         return LineResponse.convertedByEntity(savedLine);
     }
 
@@ -80,7 +83,7 @@ public class LineService {
     public void removeSection(long lineId, long stationId) {
         Line line = findLine(lineId);
         line.checkRemoveEndPointId(stationId, line.getDownEndpoint().getId());
-        Section.checkSectionCount(sectionRepository.count());
+        line.checkSectionCount();
         line.getSections().removeIf(v->v.getDownStation().getId()==stationId);
     }
 
@@ -88,7 +91,8 @@ public class LineService {
         Station upStation = getStation(sectionRequest.getUpStationId());
         Station downStation = getStation(sectionRequest.getDownStationId());
         Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
-        line.addSection(section);
+        section = sectionRepository.save(section);
+        line.getSections().add(section);
     }
 
     private Station getStation(long stationId) {
@@ -99,9 +103,10 @@ public class LineService {
     private Section saveSection(Line line, LineRequest lineRequest) {
         Station upStation = getStation(lineRequest.getUpStationId());
         Station downStation = getStation(lineRequest.getDownStationId());
-        Section section = new Section(line, upStation, downStation,
-                lineRequest.getDistance());
-        line.addSection(section);
+        Section section = new Section(line, upStation, downStation, lineRequest.getDistance());
+        section = sectionRepository.save(section);
+        line.getSections().add(section);
+        return line.getSections().get(line.getSections().size()-1);
     }
 
     private Line saveLine(Line line) {

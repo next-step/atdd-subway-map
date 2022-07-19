@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import javax.persistence.CascadeType;
 import nextstep.subway.applicaion.exception.ExceptionMessages;
 
 import javax.persistence.Entity;
@@ -15,15 +16,15 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "LINE_ID")
     private Line line;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "UP_STATION_ID")
     private Station upStation;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "DOWN_STATION_ID")
     private Station downStation;
 
@@ -59,9 +60,4 @@ public class Section {
         return distance;
     }
 
-    public static void checkSectionCount(long sectionCount) {
-        if (sectionCount == 1) {
-            throw new RuntimeException(ExceptionMessages.getNeedAtLeastOneSectionExceptionMessage());
-        }
-    }
 }

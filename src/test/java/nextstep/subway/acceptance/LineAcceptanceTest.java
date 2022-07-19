@@ -176,24 +176,6 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         return map;
     }
 
-    private ExtractableResponse<Response> getLines() {
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> getLine(long id) {
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines/{id}",id)
-            .then().log().all()
-            .extract();
-    }
-
     private ExtractableResponse<Response> updateLine(long id, Map<String,String> requestBody) {
         return RestAssured
             .given().log().all()

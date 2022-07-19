@@ -134,22 +134,6 @@ public class SectionAcceptanceTest extends BaseAcceptanceTest{
         return requestBody;
     }
 
-    private ExtractableResponse<Response> getLine(long lineId) {
-        return RestAssured
-            .given().log().all()
-            .when().get("/lines/{id}",lineId)
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> getLines() {
-        return RestAssured
-            .given().log().all()
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
     private ExtractableResponse<Response> deleteSection(long lineId, long stationId) {
         return RestAssured
             .given().log().all()
