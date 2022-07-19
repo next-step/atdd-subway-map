@@ -101,6 +101,32 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         }
     }
 
+    @Nested
+    class 구간제거기능 {
+        /**
+         * Given A,B,C 라는 이름을 가진 3개의 지하철 역을 생성하고
+         * Given 노선(A역 상행역, B역은 하행역)을 생성하고
+         * Given 새로운 구간 (B역은 상행역 D역은 하행역)을 노선에 등록한다.
+         * When 마지막 구간을 제거하고
+         * Then 노선 목록을 조회하여 지하철역이 제거된것을 확인한다.
+         */
+        @Test
+        void 구간_제거_성공(){
+
+        }
+
+        /**
+         * Given A,B 라는 이름을 가진 2개의 지하철 역을 생성하고
+         * Given 노선(A역 상행역, B역은 하행역)을 생성하고
+         * When 하나만 존재하는 구간을 제거하면
+         * Then 에러를 반환한다.
+         */
+        @Test
+        void 구간_한개인경우_에러반환(){
+
+        }
+    }
+
 
     private ExtractableResponse<Response> 구간_등록_요청(long registLineId, long upStationId, long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();

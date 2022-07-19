@@ -47,12 +47,4 @@ public class Line {
         this.sections.add(section);
         section.setLine(this);
     }
-
-    public Station getUpEndStation(){
-        return sections.getUpEndStation();
-    }
-
-    public Station getDownEndStation(){
-        return sections.getDownEndStation();
-    }
 }

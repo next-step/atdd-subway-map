@@ -24,10 +24,6 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Section> sections = new ArrayList<>();
 
-    public Sections(final List<Section> sections) {
-        this.sections = new ArrayList<>(sections);
-    }
-
     public void add(final Section section){
         if(!sections.isEmpty()){
             checkSectionMatch(section);
