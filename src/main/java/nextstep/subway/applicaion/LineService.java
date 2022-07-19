@@ -58,7 +58,7 @@ public class LineService {
     @Transactional
     public void updateLineById(Long id, LineUpdateRequest request) {
         lineRepository.findById(id)
-                .ifPresent(line -> lineRepository.save(line.changeBy(request.getName(), request.getColor())));
+                .ifPresent(line -> line.changeBy(request.getName(), request.getColor()));
     }
 
     @Transactional
