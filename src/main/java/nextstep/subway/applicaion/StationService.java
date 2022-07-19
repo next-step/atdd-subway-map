@@ -5,6 +5,7 @@ import nextstep.subway.applicaion.dto.StationRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.exception.SubwayException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,12 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public StationResponse findById(Long id) {
+        Station station = stationRepository.findById(id).orElseThrow(
+                () -> new SubwayException("등록되지 않은 지하철 입니다.", id));
+        return StationResponse.from(station);
+    }
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
@@ -40,4 +47,5 @@ public class StationService {
                 station.getName()
         );
     }
+
 }

@@ -3,19 +3,22 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ValidatableResponse;
 import nextstep.SpringBootTestConfig;
 import nextstep.subway.acceptance.client.SubwayRestAssured;
+import nextstep.subway.acceptance.fake.FakeStation;
 import nextstep.subway.domain.Station;
 import nextstep.subway.acceptance.enums.SubwayRequestPath;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("지하철역 관련 기능")
-@Sql("/truncate.sql")
+@ActiveProfiles("test")
 class StationAcceptanceTest extends SpringBootTestConfig {
-    private final SubwayRestAssured<Station> stationRestAssured = new SubwayRestAssured<>();
+    protected final SubwayRestAssured<Station> stationRestAssured = new SubwayRestAssured<>();
 
     /**
      * When 지하철역을 생성하면
@@ -26,7 +29,7 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @Test
     void createStation() {
         String stationRootPath = SubwayRequestPath.STATION.getValue();
-        ValidatableResponse 강남역 = stationRestAssured.postRequest(stationRootPath, new Station("강남역"));
+        ValidatableResponse 강남역 = stationRestAssured.postRequest(stationRootPath, FakeStation.강남역);
 
         강남역.statusCode(HttpStatus.CREATED.value());
 
@@ -42,10 +45,24 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @Test()
     void getStations() {
         String stationRootPath = SubwayRequestPath.STATION.getValue();
-        stationRestAssured.postRequest(stationRootPath, new Station("선릉역"));
-        stationRestAssured.postRequest(stationRootPath, new Station("영통역"));
+        stationRestAssured.postRequest(stationRootPath, FakeStation.선릉역);
+        stationRestAssured.postRequest(stationRootPath, FakeStation.영통역);
 
         stationRestAssured.getRequest(stationRootPath).body("name", contains("선릉역", "영통역"));
+    }
+
+    /**
+     * Given 지하철역을 생성하고
+     * When, Then  지하철역을 조회하면 생성한 지하철역을 응답 받는다
+     */
+    @DisplayName("지하철역을 조회한다.")
+    @Test()
+    void getStation() {
+        String stationRootPath = SubwayRequestPath.STATION.getValue();
+        ValidatableResponse 선릉역 = stationRestAssured.postRequest(stationRootPath, FakeStation.선릉역);
+
+        String 생성된_지하철역_조회_경로 = 선릉역.extract().header("Location");
+        stationRestAssured.getRequest(생성된_지하철역_조회_경로).body("name", equalTo("선릉역"));
     }
 
     /**
@@ -57,7 +74,7 @@ class StationAcceptanceTest extends SpringBootTestConfig {
     @Test()
     void deleteStation() {
         String stationRootPath = SubwayRequestPath.STATION.getValue();
-        ValidatableResponse 지하철역_등록결과 = stationRestAssured.postRequest(stationRootPath, new Station("사당역"));
+        ValidatableResponse 지하철역_등록결과 = stationRestAssured.postRequest(stationRootPath, FakeStation.판교역);
 
         String nextLocation = 지하철역_등록결과.extract().header("Location");
         stationRestAssured.deleteRequest(nextLocation);

@@ -1,9 +1,12 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
+import nextstep.subway.applicaion.dto.SectionRequest;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.dto.StationLineResponse;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.StationLineRepository;
+import nextstep.subway.domain.*;
+import nextstep.subway.exception.SubwayException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,42 +14,64 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class StationLineService {
 
-    private final StationLineRepository repository;
+    private final StationLineRepository lineRepository;
+    private final StationRepository stationRepository;
 
-    @Transactional
     public StationLineResponse save(Line line) {
-        return createLineResponse(repository.save(line));
+        return StationLineResponse.form(lineRepository.save(line));
     }
 
     public List<StationLineResponse> findAllStationLines() {
-        return repository.findAll()
-                         .stream()
-                         .map(this::createLineResponse)
-                         .collect(Collectors.toList());
+        return lineRepository.findAll()
+                             .stream()
+                             .map(StationLineResponse::form)
+                             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public StationLineResponse findById(Long id) {
-        return createLineResponse(repository.getById(id));
+       return StationLineResponse.form(findLineById(id));
     }
 
-    @Transactional
     public void update(Line line) {
-        createLineResponse(repository.save(line));
+        StationLineResponse.form(lineRepository.save(line));
     }
 
-    private StationLineResponse createLineResponse(Line line) {
-        return new StationLineResponse(
-                line.getId(), line.getName(), line.getColor(),
-                line.getUpStationId(), line.getDownStationId(), line.getDistance()
-        );
-    }
-
-    @Transactional
     public void deleteLineById(Long id) {
-        repository.deleteById(id);
+        lineRepository.deleteById(id);
+    }
+
+    public SectionResponse addSection(Long lineId, SectionRequest.PostRequest request) {
+        checkSectionStations(request.getUpStationId(), request.getDownStationId());
+        Line line = findLineById(lineId);
+        line.addSection(request.toEntity(line));
+        return SectionResponse.form(line.findLastSection());
+    }
+
+    public void deleteSection(Long lineId, Long stationsId) {
+        Line line = findLineById(lineId);
+        Sections sections = line.getSections();
+        sections.deleteSection(stationsId);
+    }
+
+
+    private Line findLineById(Long lineId) {
+        return lineRepository.findById(lineId).orElseThrow(() -> new SubwayException("등록되지 않은 노선 입니다."));
+    }
+
+    private void checkSectionStations(Long upStationId, Long downStationId) {
+        if (existStations(upStationId, downStationId)) {
+            return;
+        }
+        throw new SubwayException("등록되지 않은 지하철 역 입니다.", upStationId, downStationId);
+    }
+
+    private boolean existStations(Long upStationId, Long downStationId) {
+        return stationRepository.existsById(upStationId) ||
+                stationRepository.existsById(downStationId);
     }
 }
