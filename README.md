@@ -71,3 +71,104 @@ table이 늘어 날때 마다 sql을 작성해 줘야 한다.
 ![datacleanup](./docs/step2/datacleanup.png)
 
 그래서 Entity를 모두 조회 후, truncate를 하는 방식으로 수정 하였다.
+
+
+## step3 
+
+## 코멘트 생각하기
+
+- [x] 테스트 설정 관련 리팩토링 하기
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AcceptionceTest {
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @LocalServerPort
+    int port;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
+        databaseCleanup.execute();
+    }
+
+}
+```
+
+만들어 사용.
+
+- [x] 인수 테스트할때는 깔끔하게 작성하기 위해 필요 값은 위쪽에 만들어두기
+
+```java
+@DisplayName("구간 등록 기능 테스트")
+@Test
+void createSectionTest() {
+        지하철_노선_생성("2호선", "bg-green-600", 1L, 2L , 6);
+
+        ExtractableResponse<Response> 지하철구간_생성 = 지하철_구간_생성(1L, 2L, 3L, 4);
+        assertThat(지하철구간_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        ExtractableResponse<Response> response = 지하철_노선_조회(1L);
+        하행선값_검증(response, "선릉역");
+}
+```
+
+- [x] AccessLevel 설정하여 만들기
+
+```java
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
+public class Section {
+    
+}
+```
+
+- [x] 도메인쪽에 Applcaiton Layer 참조하지 않고 사용하기
+
+dto 에서 만들어 사용함.
+```java
+public StationLine toEntity() {
+        return StationLine.builder()
+            .name(name)
+            .color(color)
+            .upStationId(upStationId)
+            .downStationId(downStationId)
+            .distance(distance)
+            .build();
+    }
+```
+
+### 기능 정리
+
+- [x] 구간 등록 기능추가
+  - [x] (예외) 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+  - [x] (예외) 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
+
+- [x] 구간 삭제 기능 추가
+  - [x] (예외) 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있다.
+  - [x] (예외) 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.
+
+### 테스트 케이스 추가
+
+- [x] 구간 등록 테스트 작성
+- [x] 구간 하행 종점역만 등록 가능하도록 예외 테스트 작성
+- [x] 중복된 역은 추가 될수 없다.
+
+
+- [x] 구간 삭제
+- [x] 마지막 구간만 제거 되도록 테스트 코드 작성
+- [x] (구간이 1개인 경우) 역을 삭제할 수 없다 테스트 코드 작성
+
+--- 
+
+### step3 코맨트 수정
+
+- [x] API 호출 controller별 분리시키기
+- [x] 컴파일 나던것 수정
+- [x] 내부에서만 사용되는 메서드는 private로 수정
+- [x] 안쓰는 매개변수 삭제
