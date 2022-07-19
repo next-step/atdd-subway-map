@@ -20,6 +20,5 @@ public class SectionResponse {
     public void addStation(Section lastSection) {
         this.upStation = ObjectMapUtils.map(lastSection.getUpStation(), StationResponse.class);
         this.downStation = ObjectMapUtils.map(lastSection.getDownStation(), StationResponse.class);
-
     }
 }

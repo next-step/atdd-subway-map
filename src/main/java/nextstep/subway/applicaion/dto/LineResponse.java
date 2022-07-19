@@ -22,5 +22,4 @@ public class LineResponse {
         this.downStation = ObjectMapUtils.map(downStation, StationResponse.class);
     }
 
-
 }
