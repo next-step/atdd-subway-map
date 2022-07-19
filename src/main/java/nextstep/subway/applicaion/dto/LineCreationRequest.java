@@ -19,15 +19,15 @@ public class LineCreationRequest {
 
     @NotNull
     @Positive
-    private Long upStationId;
+    private long upStationId;
 
     @NotNull
     @Positive
-    private Long downStationId;
+    private long downStationId;
 
     @NotNull
     @PositiveOrZero
-    private Integer distance;
+    private int distance;
 
     public List<Long> getStationIds() {
         return List.of(upStationId, downStationId);

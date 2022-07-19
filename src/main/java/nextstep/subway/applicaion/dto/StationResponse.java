@@ -20,4 +20,8 @@ public class StationResponse {
         );
     }
 
+    public Station toEntity() {
+        return new Station(id, name);
+    }
+
 }
