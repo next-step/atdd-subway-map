@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class SectionService {
-    public static final int INVALID_REMOVE_SIZE = 1;
-
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;

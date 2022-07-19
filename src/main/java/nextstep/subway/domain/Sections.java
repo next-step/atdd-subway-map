@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static nextstep.subway.application.SectionService.INVALID_REMOVE_SIZE;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class Sections {
     public static final int FIRST_STATION_IDX = 0;
+    public static final int INVALID_REMOVE_SIZE = 1;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private final List<Section> sections = new ArrayList<>();
