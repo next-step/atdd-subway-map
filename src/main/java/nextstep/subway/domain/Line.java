@@ -1,11 +1,21 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import nextstep.subway.exception.NotFoundException;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Line {
 
     @Id
@@ -16,48 +26,29 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
+    @Builder.Default
+    @Embedded
+    private Sections sections = new Sections();
 
-    private Long downStationId;
-
-    private Long distance;
-
-    public Line() {
-    }
-
-    public Line(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public void modifyNameAndColor(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
     }
 
-    public Long getId() {
-        return id;
+    public void addSection(Section section) {
+        this.sections.addSection(section);
+        section.setLine(this);
     }
 
-    public String getName() {
-        return name;
+    public Section findSectionByDownStationId(Long downStationId) {
+        return this.sections.findSectionByDownStationId(downStationId);
     }
 
-    public String getColor() {
-        return color;
+    public List<Long> getAllStationIds() {
+        return this.sections.getAllStationIds();
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
+    public Long getFinalDownStationId(Long downStationId) {
+        return this.sections.getFinalDownStationId(downStationId);
     }
 }

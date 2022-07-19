@@ -3,10 +3,10 @@ package nextstep.subway.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
-public interface LineRepository extends JpaRepository<Line, Long> {
+public interface SectionRepository extends JpaRepository<Section, Long> {
 
-    Optional<Line> findByNameAndColor(String name, String color);
+    List<Section> findAllByLineId(Long lineId);
 }

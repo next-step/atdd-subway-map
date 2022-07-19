@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql("init.sql")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest extends AcceptanceTest {
     @LocalServerPort
     int port;
 
@@ -89,7 +89,7 @@ public class StationAcceptanceTest {
     ExtractableResponse<Response> makeStationAndVerify(Map<String, String> params) {
         ExtractableResponse<Response> response = stationApiCaller.createStation(params);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.CREATED);
 
         return response;
     }
@@ -97,7 +97,7 @@ public class StationAcceptanceTest {
     List<String> getStationNamesAndVerify() {
         ExtractableResponse<Response> response = stationApiCaller.getStations();
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.OK);
 
         return response.jsonPath().getList("name", String.class);
     }
@@ -105,6 +105,6 @@ public class StationAcceptanceTest {
     void deleteStationAndVerify(long id) {
         ExtractableResponse<Response> response = stationApiCaller.deleteStation(id);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철_API_응답_확인(response.statusCode(), HttpStatus.NO_CONTENT);
     }
 }
