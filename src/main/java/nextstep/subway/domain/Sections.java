@@ -45,7 +45,7 @@ public class Sections {
         }
     }
 
-    public Section removeByStationId(final Long stationId){
+    public Section removeLastSection(final Long stationId){
         checkInvalidRemoveSize();
         checkIsDownEndStation(stationId, getDownEndStation());
         return sections.remove(size()-1);
