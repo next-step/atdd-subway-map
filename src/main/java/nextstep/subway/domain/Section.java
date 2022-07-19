@@ -1,7 +1,6 @@
 package nextstep.subway.domain;
 
 import javax.persistence.CascadeType;
-import nextstep.subway.applicaion.exception.ExceptionMessages;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

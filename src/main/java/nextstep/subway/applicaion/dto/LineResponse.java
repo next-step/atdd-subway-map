@@ -3,8 +3,6 @@ package nextstep.subway.applicaion.dto;
 import java.util.ArrayList;
 import java.util.List;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Section;
-import nextstep.subway.domain.Station;
 
 public class LineResponse {
     private final Long id;
