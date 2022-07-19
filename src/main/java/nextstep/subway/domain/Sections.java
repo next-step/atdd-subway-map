@@ -22,7 +22,7 @@ public class Sections {
     public static final int FIRST_STATION_IDX = 0;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Section> sections = new ArrayList<>();
+    private final List<Section> sections = new ArrayList<>();
 
     public void add(final Section section) {
         if (!sections.isEmpty()) {
