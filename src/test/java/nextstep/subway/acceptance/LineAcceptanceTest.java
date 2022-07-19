@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
+
     @LocalServerPort
     int port;
 
@@ -25,97 +26,101 @@ public class LineAcceptanceTest {
         RestAssured.port = port;
     }
 
-    @DisplayName("지하철노선 생성")
+    @DisplayName("노선 생성")
     @Test
     void createLine() {
         // Given 지하철 노선을 생성하고
-        createStation("신분당선", "bg-red-600", 1, 2, 10);
+        createLine("신분당선", "bg-red-600", 1, 2, 10);
 
-      /*  // When 지하철 노선 목록 조회하면
-        List<String> stationNames = getStations();
+        // When 지하철 노선 목록 조회하면
+        List<String> lineNames = getLines();
 
         // Then 생성한 노선을 찾을 수 있다
-        assertThat(stationNames).containsAnyOf("강남역");*/
+        assertThat(lineNames).containsAnyOf("신분당선");
     }
 
-    @DisplayName("지하철노선 목록 조회")
+    @DisplayName("노선 목록")
     @Test
-    void getLines() {
+    void getLines_() {
         // Given 2개의 지하철 노선을 생성하고
-        createStation("성수역", "green", 1, 2, 10);
-        createStation("왕십리역", "green", 1, 2, 10);
+        createLine("성수역", "green", 1, 2, 10);
+        createLine("왕십리역", "green", 1, 2, 10);
 
         // When 지하철 노선 목록을 조회하면
-        List<String> stationNames = getStations();
+        List<String> lineNames = getLines();
 
         // Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
-        assertThat(stationNames).containsAnyOf("성수역");
-        assertThat(stationNames).containsAnyOf("왕십리역");
+        assertThat(lineNames).containsAnyOf("성수역");
+        assertThat(lineNames).containsAnyOf("왕십리역");
     }
 
-    @DisplayName("지하철노선 단일 조회")
+    @DisplayName("노선 조회")
     @Test
     void getLine() {
         // Given 지하철 노선을 생성하고
-        long id = createStation("강남역", null, 1, 2, 10);
+        long id = createLine("사당역", "blue", 1, 2, 10);
 
         // When 생성한 지하철 노선을 조회하면
-        Map<String, String> station = getStation(id);
+        Map<String, String> line = getLine(id);
 
         // Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-        assertThat(station).containsValue("강남역");
+        assertThat(line).containsValue("사당역");
     }
 
-    @DisplayName("지하철노선 수정")
+    @DisplayName("노선 수정")
     @Test
     void updateLine() {
         // Given 지하철 노선을 생성하고
-        long id = createStation("건대입구역", "green", 1, 2, 10);
+        long id = createLine("건대입구역", "green", 1, 2, 10);
 
         // When 생성한 지하철 노선을 수정하면
-        Map<String, String> station = updateStation(id, "건대역", "red");
+        Map<String, String> line = updateLine(id, "건대출구역", "5");
 
         // Then 해당 지하철 노선 정보는 수정된다
-        assertThat(station).containsValue("건대역");
-        assertThat(station).containsValue("red");
+        assertThat(line).containsValue("건대출구역");
+        assertThat(line).containsValue("5");
     }
 
-    @DisplayName("지하철노선 삭제")
+    @DisplayName("노선 삭제")
     @Test
     void deleteLine() {
         // Given 지하철 노선을 생성하고
-        long id = createStation("역삼역", null, 1, 2, 10);
+        long id = createLine("역삼역", null, 1, 2, 10);
 
         // When 생성한 지하철 노선을 삭제하면
-        deleteStation(id);
+        deleteLine(id);
 
         // Then 해당 지하철 노선 정보는 삭제된다
-        List<String> stationNames = getStations();
-        assertThat(stationNames).doesNotContain("역삼역");
+        List<String> lineNames = getLines();
+        assertThat(lineNames).doesNotContain("역삼역");
     }
 
-    private List<String> getStations() {
+    // 목록 api
+    private List<String> getLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
     }
 
-    private Map<String, String> getStation(long id) {
+    // 조회 api
+    private Map<String, String> getLine(long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + id)
                 .then().log().all()
                 .extract().jsonPath().get();
     }
 
-    private void deleteStation(long id) {
+    // 삭제 api
+    private void deleteLine(long id) {
         RestAssured.given().log().all()
                 .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
 
-    private long createStation(String name, String color, int upStationId, int downStationId, int distance) {
+    // 등록 api
+    private long createLine(String name, String color, int upStationId, int downStationId, int distance) {
         Map<String, Object> param = new HashMap<>();
         param.put("name", name);
         param.put("color", color);
@@ -131,7 +136,8 @@ public class LineAcceptanceTest {
 
     }
 
-    private Map<String, String> updateStation(long id, String name, String color) {
+    // 수정 api
+    private Map<String, String> updateLine(long id, String name, String color) {
         Map<String, String> param = new HashMap<>();
         param.put("id", String.valueOf(id));
         param.put("name", name);

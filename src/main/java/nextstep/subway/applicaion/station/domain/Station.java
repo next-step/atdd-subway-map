@@ -1,4 +1,4 @@
-package nextstep.subway.domain;
+package nextstep.subway.applicaion.station.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +17,10 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public Station(Long id) {
+        this.id = id;
     }
 
     public Long getId() {

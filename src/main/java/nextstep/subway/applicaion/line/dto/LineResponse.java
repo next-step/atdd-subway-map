@@ -1,21 +1,18 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.applicaion.line.dto;
 
-import nextstep.subway.domain.Station;
+import nextstep.subway.applicaion.station.dto.StationResponse;
 
+import javax.persistence.*;
 import java.util.List;
 
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    List<Station> stations;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    List<StationResponse> stations;
 
-    public LineResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public LineResponse(Long id, String name, String color, List<Station> stations) {
+    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -32,5 +29,9 @@ public class LineResponse {
 
     public String getColor() {
         return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }
