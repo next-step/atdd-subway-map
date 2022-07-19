@@ -1,24 +1,22 @@
 package nextstep.subway.acceptance.station;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.StationRequest;
+import nextstep.subway.domain.Station;
 import org.springframework.http.MediaType;
 
 import java.util.List;
 
-public class StationPrepare {
+public class StationAcceptanceStep {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static String params;
 
-    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) {
-        try {
-            params = objectMapper.writeValueAsString(new StationRequest(name));
-        } catch (Exception e) {
-            e.getStackTrace();
-        }
+    public static ExtractableResponse<Response> 지하철역_생성_요청(String name) throws JsonProcessingException {
+        params = objectMapper.writeValueAsString(new StationRequest(name));
 
         return RestAssured.given().log().all()
                 .body(params)
@@ -26,6 +24,10 @@ public class StationPrepare {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    public static Station 지하철역_생성_결과(String name) throws JsonProcessingException {
+        return 지하철역_생성_요청(name).as(Station.class);
     }
 
     public static ExtractableResponse<Response> 지하철역_삭제_요청(String path) {
@@ -36,10 +38,14 @@ public class StationPrepare {
                 .extract();
     }
 
-    public static List<String> 지하철역_조회_요청() {
+    public static ExtractableResponse<Response> 지하철역_조회_요청() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+                .extract();
+    }
+
+    public static List<String> 지하철역_조회_결과() {
+        return 지하철역_조회_요청().jsonPath().getList("name", String.class);
     }
 }
