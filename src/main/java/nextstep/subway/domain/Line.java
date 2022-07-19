@@ -1,13 +1,17 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Objects;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+
+import static lombok.AccessLevel.PROTECTED;
+
+@Getter
 @Entity
+@NoArgsConstructor(access = PROTECTED)
 public class Line {
+    private static final String NOT_ALLOWED_EQUAL_STATIONS = "상행종점역과 하행종점역은 같을 수 없습니다.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,86 +21,35 @@ public class Line {
 
     private String color;
 
-    private Long upStationId;
+    private int distance;
 
-    private Long downStationId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    public Line() {
-    }
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
-    public Line(String name, String color, Long upStationId, Long downStationId) {
-        validate(upStationId, downStationId);
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-    }
-
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId) {
-        validate(upStationId, downStationId);
+    public Line(Long id, String name, String color, int distance, Station upStation, Station downStation) {
+        this(name, color, distance, upStation, downStation);
         this.id = id;
+    }
+
+    public Line(String name, String color, int distance, Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException(NOT_ALLOWED_EQUAL_STATIONS);
+        }
+
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.distance = distance;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
-    }
-
-    private void validate(Long upStationId, Long downStationId) {
-        if (Objects.equals(upStationId, downStationId)) {
-            throw new IllegalArgumentException("상행종점역과 하행종점역은 같을 수 없습니다.");
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Line line = (Line) o;
-        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color) && Objects.equals(upStationId, line.upStationId) && Objects.equals(downStationId, line.downStationId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, color, upStationId, downStationId);
-    }
-
-    @Override
-    public String toString() {
-        return "Line{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", upStationId=" + upStationId +
-                ", downStationId=" + downStationId +
-                '}';
     }
 }
