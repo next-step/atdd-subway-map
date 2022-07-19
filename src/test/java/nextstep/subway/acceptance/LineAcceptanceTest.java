@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.testsupport.AcceptanceTest;
+import org.assertj.core.api.AbstractIntegerAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,8 +48,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // then
-        List<String> lineNames = 지하철노선_목록조회_요청().jsonPath().getList("name", String.class);
-        assertThat(lineNames).containsExactlyInAnyOrder("신분당선");
+        지하철_노선목록_조회후_생성한_노선_확인("신분당선");
     }
 
     /**
@@ -63,11 +63,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
         지하철노선_생성_요청("에버라인", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
-        // when
-        List<String> lineNames = 지하철노선_목록조회_요청().jsonPath().getList("name", String.class);
-
-        // then
-        assertThat(lineNames).containsExactlyInAnyOrder("신분당선", "에버라인");
+        // when & then
+        지하철_노선목록_조회후_생성한_노선_확인("신분당선", "에버라인");
     }
 
     /**
@@ -84,13 +81,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = 지하철노선_조회_요청(lineId);
 
-        assertAll(
-            () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId),
-            () -> assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선"),
-            () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600"),
-            () -> assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(upStationId, downStationId),
-            () -> assertThat(response.jsonPath().getList("stations.name", String.class)).containsExactly("기흥역", "신갈역")
-                 );
+        생성된_노선의_정보_확인(lineId, response);
     }
 
     /**
@@ -108,11 +99,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         지하철노선_수정_요청(lineId, "다른분당선", "bg-red-610");
 
         // then
-        final ExtractableResponse<Response> response = 지하철노선_조회_요청(lineId);
-        assertAll(
-            () -> assertThat(response.jsonPath().getString("name")).isEqualTo("다른분당선"),
-            () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-610")
-                 );
+        노선_수정여부_확인(lineId, "다른분당선", "bg-red-610");
     }
 
     /**
@@ -130,6 +117,33 @@ public class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> response = 지하철노선_삭제_요청(lineId);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        지하철노선_삭제_확인(response);
+    }
+
+    private void 지하철_노선목록_조회후_생성한_노선_확인(String... lineName) {
+        List<String> lineNames = 지하철노선_목록조회_요청().jsonPath().getList("name", String.class);
+        assertThat(lineNames).containsExactlyInAnyOrder(lineName);
+    }
+
+    private void 노선_수정여부_확인(final long lineId, final String lineName, final String color) {
+        final ExtractableResponse<Response> response = 지하철노선_조회_요청(lineId);
+        assertAll(
+            () -> assertThat(response.jsonPath().getString("name")).isEqualTo(lineName),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo(color)
+                 );
+    }
+
+    private void 생성된_노선의_정보_확인(final long lineId, final ExtractableResponse<Response> response) {
+        assertAll(
+            () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId),
+            () -> assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선"),
+            () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600"),
+            () -> assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(upStationId, downStationId),
+            () -> assertThat(response.jsonPath().getList("stations.name", String.class)).containsExactly("기흥역", "신갈역")
+                 );
+    }
+
+    private AbstractIntegerAssert<?> 지하철노선_삭제_확인(final ExtractableResponse<Response> response) {
+        return assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

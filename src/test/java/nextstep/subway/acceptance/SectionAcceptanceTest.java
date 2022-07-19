@@ -43,11 +43,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 구간_등록_요청(lineId, bId, cId, 10);
 
             // then
-            assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(bId),
-                () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(cId)
-                     );
+            등록된_노선의_상행역_하행역_확인(bId, cId, response);
         }
 
         /**
@@ -69,10 +65,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 구간_등록_요청(lineId, bId, aId, 10);
 
             // then
-            assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(2001)
-                     );
+            에러발생_확인(2001, response);
         }
 
         /**
@@ -96,9 +89,14 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 구간_등록_요청(lineId, dId, cId, 10);
 
             // then
+            에러발생_확인(4000, response);
+        }
+
+        private void 등록된_노선의_상행역_하행역_확인(final long bId, final long cId, final ExtractableResponse<Response> response) {
             assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(4000)
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.jsonPath().getLong("upStationId")).isEqualTo(bId),
+                () -> assertThat(response.jsonPath().getLong("downStationId")).isEqualTo(cId)
                      );
         }
     }
@@ -129,8 +127,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             구간_삭제_요청(lineId, cId);
 
             // then
-            List<String> stationId = 지하철노선_목록조회_요청().jsonPath().getList("stations.name", String.class);
-            assertThat(stationId).doesNotContain("C");
+            지하철목록_조회후_지하철역제거_확인("C");
         }
 
         /**
@@ -152,10 +149,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 구간_삭제_요청(lineId, bId);
 
             // then
-            assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(4001)
-                     );
+            에러발생_확인(4001, response);
         }
 
         /**
@@ -182,10 +176,19 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 구간_삭제_요청(lineId, aId);
 
             // then
-            assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(4001)
-                     );
+            에러발생_확인(4001, response);
         }
+    }
+
+    private void 지하철목록_조회후_지하철역제거_확인(String... names) {
+        List<String> stationName = 지하철노선_목록조회_요청().jsonPath().getList("stations.name", String.class);
+        assertThat(stationName).doesNotContain(names);
+    }
+
+    private void 에러발생_확인(final int code, final ExtractableResponse<Response> response) {
+        assertAll(
+            () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+            () -> assertThat(response.jsonPath().getLong("code")).isEqualTo(code)
+                 );
     }
 }

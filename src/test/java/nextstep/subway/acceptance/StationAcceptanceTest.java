@@ -31,10 +31,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철역_목록조회_요청().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsExactlyInAnyOrder("강남역");
+        지하철_목록조회후_생성한역_확인("강남역");
     }
-
 
     /**
      * Given 2개의 지하철역을 생성하고
@@ -48,13 +46,8 @@ public class StationAcceptanceTest extends AcceptanceTest {
         지하철역_생성_요청("기흥역");
         지하철역_생성_요청("신갈역");
 
-        // when
-        ExtractableResponse<Response> response = 지하철역_목록조회_요청();
-
-        // then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
-        assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsExactlyInAnyOrder("기흥역", "신갈역");
+        // when & then
+        지하철_목록조회후_생성한역_확인("기흥역", "신갈역");
     }
 
     /**
@@ -66,15 +59,23 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = 지하철역_생성_요청("기흥역");
-        long stationId = createResponse.response().jsonPath().getLong("id");
+        long stationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
 
         // when
         지하철역_삭제_요청(stationId);
 
         // then
+        지하철_목록조회후_제거된역_확인("기흥역");
+    }
+
+    private void 지하철_목록조회후_제거된역_확인(String... stationName) {
         ExtractableResponse<Response> getResponse = 지하철역_목록조회_요청();
         List<String> stationNames = getResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain("기흥역");
+        assertThat(stationNames).doesNotContain(stationName);
+    }
+
+    private void 지하철_목록조회후_생성한역_확인(String... stationName) {
+        List<String> stationNames = 지하철역_목록조회_요청().jsonPath().getList("name", String.class);
+        assertThat(stationNames).containsExactlyInAnyOrder(stationName);
     }
 }
