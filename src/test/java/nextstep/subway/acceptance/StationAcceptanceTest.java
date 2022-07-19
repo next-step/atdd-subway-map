@@ -58,7 +58,6 @@ public class StationAcceptanceTest {
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).hasSize(1);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -73,21 +72,11 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> param1 = new HashMap<>();
         param1.put("name", "성수역");
-        RestAssured.given().log().all()
-                .body(param1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        createStation(param1);
 
         Map<String, String> param2 = new HashMap<>();
         param2.put("name", "왕십리역");
-        RestAssured.given().log().all()
-                .body(param2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        createStation(param2);
 
         // when 조회
         List<String> stationNames =
@@ -98,6 +87,15 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(stationNames).hasSize(2);
+    }
+
+    private void createStation(Map<String, String> param2) {
+        RestAssured.given().log().all()
+                .body(param2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
     }
 
     /**
