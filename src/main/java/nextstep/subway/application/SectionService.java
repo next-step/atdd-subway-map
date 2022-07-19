@@ -7,15 +7,20 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
 import nextstep.subway.domain.SectionRepository;
+import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.dto.section.CreateSectionRequest;
 import nextstep.subway.ui.dto.section.SectionResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class SectionService {
+    public static final int INVALID_REMOVE_SIZE = 1;
+
     private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
@@ -33,6 +38,14 @@ public class SectionService {
         sectionRepository.save(section);
 
         return SectionResponse.of(section);
+    }
+
+    public void deleteSection(final Long lineId, final Long stationId) {
+        Sections sections = findLine(lineId).getSections();
+
+        Section removeSection = sections.removeByStationId(stationId);
+
+        sectionRepository.delete(removeSection);
     }
 
     private Station findStation(long stationId) {

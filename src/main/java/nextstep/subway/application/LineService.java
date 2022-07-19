@@ -43,6 +43,7 @@ public class LineService {
         return LineResponse.of(line);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                              .map(LineResponse::of)

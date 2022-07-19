@@ -13,7 +13,7 @@ public enum ResponseCode {
     STATION_NOT_FOUND(3000, "지하철역이 존재하지 않습니다."),
 
     SECTION_NOT_MATCH(4000, "구간 상행선과 노선 하행선과 일치하지 않습니다."),
-    SECTION_REMOVE_INVALID(4001, "구간을 삭제할 수 없는 상태입니다.");
+    SECTION_REMOVE_INVALID(4001, "구간을 삭제할 수 없습니다.");
 
     private final int code;
 

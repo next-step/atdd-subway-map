@@ -1,7 +1,6 @@
 package nextstep.subway.domain;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.common.exception.CustomException;
 import nextstep.subway.common.exception.ResponseCode;
@@ -15,7 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter
+import static nextstep.subway.application.SectionService.INVALID_REMOVE_SIZE;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class Sections {
@@ -45,6 +45,28 @@ public class Sections {
         }
     }
 
+    public Section removeByStationId(final Long stationId){
+        checkInvalidRemoveSize();
+        checkIsDownEndStation(stationId, getDownEndStation());
+        return sections.remove(size()-1);
+    }
+
+    private void checkInvalidRemoveSize() {
+        if(size() <= INVALID_REMOVE_SIZE){
+            throw new CustomException(ResponseCode.SECTION_REMOVE_INVALID);
+        }
+    }
+
+    private void checkIsDownEndStation(final Long stationId, final Station downEndStation) {
+        if(!downEndStation.getId().equals(stationId)){
+            throw new CustomException(ResponseCode.SECTION_REMOVE_INVALID);
+        }
+    }
+
+    public int size(){
+        return sections.size();
+    }
+
     public List<Station> getStations(){
         return sections.stream()
             .map(Section::getAllStation)
@@ -59,5 +81,13 @@ public class Sections {
 
     public Station getDownEndStation(){
         return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    public Section getDownEndSection(){
+        return sections.get(sections.size() - 1);
+    }
+
+    public List<Section> getSections(){
+        return new ArrayList<>(sections);
     }
 }

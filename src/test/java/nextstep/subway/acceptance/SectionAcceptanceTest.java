@@ -129,8 +129,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
             구간_삭제_요청(lineId, cId);
 
             // then
-            List<Long> stationId = 지하철노선_목록조회_요청().jsonPath().getList("stations.id", Long.class);
-            assertThat(stationId).doesNotContain(cId);
+            List<String> stationId = 지하철노선_목록조회_요청().jsonPath().getList("stations.name", String.class);
+            assertThat(stationId).doesNotContain("C");
         }
 
         /**
