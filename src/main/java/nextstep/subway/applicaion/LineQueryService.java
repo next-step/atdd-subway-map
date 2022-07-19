@@ -3,7 +3,7 @@ package nextstep.subway.applicaion;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.domain.Line;
-import nextstep.subway.repository.LineRepository;
+import nextstep.subway.domain.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
