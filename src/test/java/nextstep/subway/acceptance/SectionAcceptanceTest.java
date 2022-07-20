@@ -25,23 +25,27 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     public String 신림선_라인_아이디;
     public String 신분당선_라인_아이디;
     public String 신림선_새로운_종점_아이디;
+    public String 신분당선_새로운_종점_아이디;
 
     @BeforeEach
     void initialize() {
         신림선_시작_아이디 = 역_생성("신림역");
         신림선_종점_아이디 = 역_생성("당곡역");
+
+        신림선_라인_아이디 = 노선_생성("신림선", "bg-blue-300", 신림선_시작_아이디, 신림선_종점_아이디, "10")
+                .jsonPath()
+                .getString("id");
+
+        신림선_새로운_종점_아이디 = 역_생성("보라매역");
+
         신분당선_시작_아이디 = 역_생성("강남역");
         신분당선_종점_아이디 = 역_생성("뱅뱅사거리");
 
-        신림선_라인_아이디 = 노선_생성("신림선", "bg-blue-300", 신림선_시작_아이디, 신림선_종점_아이디, "10")
-                        .jsonPath()
-                        .getString("id");
-
         신분당선_라인_아이디 = 노선_생성("신분당선", "bg-red-100", 신분당선_시작_아이디, 신분당선_종점_아이디, "4")
-                        .jsonPath()
-                        .getString("id");
+                .jsonPath()
+                .getString("id");
 
-        신림선_새로운_종점_아이디 = 역_생성("보라매역");
+        신분당선_새로운_종점_아이디 = 역_생성("판교");
     }
     /**
      * 지하철 노선에 구간을 등록하는 기능을 구현
@@ -87,5 +91,21 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
             assertThat(구간_생성_결과.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
             assertThat(구간_생성_결과.jsonPath().getString("message")).isEqualTo(ErrorCode.ALREADY_REGISTER_STATION.getMessage());
         });
+    }
+
+    /**
+     * 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉 마지막 구간만 제거할 수 있다.
+     * 지하철 노선에상행 종점역과 하행 종점역만 있는경우 (구간이 1개인 경우) 역을 삭제 할 수 없다.
+     * 새로운 구간 제거시 위 조건에 부합하지 않으면 에러 처리한다.
+     */
+    @DisplayName("구간 제거 기능")
+    @Test
+    void deleteSection() {
+        구간_생성(신분당선_라인_아이디, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
+
+        String 신분당선_또_새로운_종점_아이디 = 역_생성("서울 숲");
+        구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4");
+
+
     }
 }

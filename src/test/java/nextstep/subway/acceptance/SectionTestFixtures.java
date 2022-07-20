@@ -23,4 +23,15 @@ public class SectionTestFixtures {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 구간_삭제(String lineId, String downStationId) {
+        return RestAssured
+                .given().log().all()
+                .pathParam("lineId", lineId)
+                .param("downStationId", downStationId)
+                .when()
+                .delete("/lines/{lineId}/sections")
+                .then().log().all()
+                .extract();
+    }
 }
