@@ -47,16 +47,16 @@ public class LineClient {
                 .then().log().all().extract();
     }
 
-    public ExtractableResponse<Response> addSection(String downStationId, String upStationId, int distance, long id) {
+    public ExtractableResponse<Response> addSection(long lineId, Long downStationId, Long upStationId, int distance) {
         final var params = Map.of(
-                "downStationId", downStationId,
-                "upStationId", upStationId,
+                "downStationId", String.valueOf(downStationId),
+                "upStationId", String.valueOf(upStationId),
                 "distance", distance
         );
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/" + id + "/sections")
+                .when().post("/lines/" + lineId + "/sections")
                 .then().log().all()
                 .extract();
     }

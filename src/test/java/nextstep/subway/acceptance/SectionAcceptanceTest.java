@@ -60,8 +60,13 @@ class SectionAcceptanceTest {
         lineClient = new LineClient();
         lineClient.create(params());
 
+        final var upStationId = 2L;
+        final var downStationId = 4L;
+        final var distance = 10;
+        final var lineId = 1L;
+
         // when
-        lineClient.addSection("4", "2", 10, 1);
+        lineClient.addSection(lineId, downStationId, upStationId, distance);
 
         // then
         final var root = "";
@@ -83,8 +88,14 @@ class SectionAcceptanceTest {
         lineClient = new LineClient();
         lineClient.create(params());
 
+        final var upStationId = 3L;
+        final var downStationId = 4L;
+        final var distance = 10;
+        final var lineId = 1L;
+
         // when
-        ExtractableResponse<Response> response = lineClient.addSection("4", "3", 10, 1);
+        ExtractableResponse<Response> response = lineClient.addSection(lineId, downStationId, upStationId, distance);
+
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
@@ -105,8 +116,14 @@ class SectionAcceptanceTest {
         lineClient = new LineClient();
         lineClient.create(params());
 
+        final var upStationId = 2L;
+        final var downStationId = 1L;
+        final var distance = 10;
+        final var lineId = 1L;
+
         // when
-        ExtractableResponse<Response> response = lineClient.addSection("1", "2", 10, 1);
+        ExtractableResponse<Response> response = lineClient.addSection(lineId, downStationId, upStationId, distance);
+
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
@@ -126,7 +143,13 @@ class SectionAcceptanceTest {
         // given
         lineClient = new LineClient();
         lineClient.create(params());
-        lineClient.addSection("4", "2", 10, 1);
+
+        final var upStationId = 2L;
+        final var downStationId = 4L;
+        final var distance = 10;
+        final var lineId = 1L;
+
+        lineClient.addSection(lineId, downStationId, upStationId, distance);
 
         // when
         lineClient.deleteSection(1L, 4L);
@@ -148,10 +171,16 @@ class SectionAcceptanceTest {
         // given
         lineClient = new LineClient();
         lineClient.create(params());
-        lineClient.addSection("4", "2", 10, 1);
+
+        final var upStationId = 2L;
+        final var downStationId = 4L;
+        final var distance = 10;
+        final var lineId = 1L;
+
+        lineClient.addSection(lineId, downStationId, upStationId, distance);
 
         // when
-        ExtractableResponse<Response> response = lineClient.deleteSection(1L, 2L);
+        ExtractableResponse<Response> response = lineClient.deleteSection(lineId, upStationId);
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
@@ -172,9 +201,14 @@ class SectionAcceptanceTest {
         // given
         lineClient = new LineClient();
         lineClient.create(params());
-        lineClient.deleteSection(1L, 2L);
+
+        final var upStationId = 1L;
+        final var downStationId = 2L;
+        final var lineId = 1L;
+
+        lineClient.deleteSection(lineId, downStationId);
         // when
-        ExtractableResponse<Response> response = lineClient.deleteSection(1L, 1L);
+        ExtractableResponse<Response> response = lineClient.deleteSection(lineId, upStationId);
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
@@ -192,6 +226,5 @@ class SectionAcceptanceTest {
                 "distance", 7L
         );
     }
-
 
 }
