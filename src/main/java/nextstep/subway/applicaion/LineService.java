@@ -1,10 +1,13 @@
 package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.*;
+import nextstep.subway.applicaion.exceptions.DataNotFoundException;
+import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
+import nextstep.subway.enums.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,16 +76,16 @@ public class LineService {
 
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
-                                .orElseThrow(() -> new IllegalArgumentException("해당 역은 없습니다."));
+                                .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_STATION));
     }
 
     private Line getLine(Long id) {
         return lineRepository.findById(id)
-                             .orElseThrow(() -> new IllegalArgumentException("해당 노선은 없습니다."));
+                             .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_LINE));
     }
 
     public void validSameReqUpStationAndReqDownStation(Station upStation, Station downStation) {
         if (Objects.equals(upStation.getName(), downStation.getName()))
-            throw new IllegalArgumentException("상행역종점역과 하행역종점역은 같을 수 없습니다.");
+            throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
     }
 }

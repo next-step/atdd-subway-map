@@ -1,6 +1,9 @@
 package nextstep.subway.domain;
 
 import lombok.Getter;
+import nextstep.subway.applicaion.exceptions.DataNotFoundException;
+import nextstep.subway.applicaion.exceptions.StationDuplicateException;
+import nextstep.subway.enums.exception.ErrorCode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -39,7 +42,7 @@ public class Sections {
 
     public Station getLastStation() {
         if (sections.isEmpty())
-            throw new ArrayIndexOutOfBoundsException("저장된 section 정보가 없습니다.");
+            throw new DataNotFoundException(ErrorCode.NOT_FOUND_SECTION);
 
         return sections.get(sections.size() - 1).getDownStation();
     }
@@ -49,7 +52,7 @@ public class Sections {
                                                         .anyMatch(station -> station.getName().equals(downStation.getName()));
 
         if (isAlreadyRegisterStation)
-            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 이미 등록되어있습니다.");
+            throw new StationDuplicateException(ErrorCode.ALREADY_REGISTER_STATION);
 
    }
 }

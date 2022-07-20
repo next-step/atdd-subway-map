@@ -2,6 +2,8 @@ package nextstep.subway.domain;
 
 
 import lombok.Getter;
+import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
+import nextstep.subway.enums.exception.ErrorCode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -47,7 +49,7 @@ public class Line {
 
     public void validSameAlreadyExistDownStationAndReqUpStation(Station upStation) {
         if (!Objects.equals(sections.getLastStation().getName(), upStation.getName())) {
-            throw new IllegalArgumentException("기존 노선의 하행종점역과 새로 등록하려는 상행역은 같아야합니다.");
+            throw new InvalidStationParameterException(ErrorCode.SAME_STATION);
         }
     }
 }
