@@ -49,11 +49,7 @@ public class LineController {
 
 	@PostMapping("{lineId}/sections")
 	public ResponseEntity<Void> addSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
-		try {
-			lineService.addSection(lineId, sectionRequest);
-		} catch(SubwayException e) {
-			return ResponseEntity.badRequest().build();
-		}
+		lineService.addSection(lineId, sectionRequest);
 		return ResponseEntity.noContent().build();
 	}
 
