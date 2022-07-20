@@ -20,11 +20,8 @@ public class AbstractAcceptanceTest {
     private DataBaseClean dataBaseClean;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        if (RestAssured.port == UNDEFINED_PORT) {
-            RestAssured.port = port;
-            dataBaseClean.afterPropertiesSet();
-        }
+    public void setUp() {
+        RestAssured.port = port;
         dataBaseClean.execute();
     }
 }
