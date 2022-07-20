@@ -38,10 +38,14 @@ public class Sections {
     }
 
     private void checkStationDuplicate(final Section section) {
-        Set<Station> stations = new HashSet<>(getStations());
-        if (stations.contains(section.getDownStation())) {
+        if (isContain(section.getDownStation())) {
             throw new CustomException(ResponseCode.LINE_STATION_DUPLICATE);
         }
+    }
+
+    public boolean isContain(Station station){
+        Set<Station> stations = new HashSet<>(getStations());
+        return stations.contains(station);
     }
 
     public Section removeLastSection(final Long stationId) {
