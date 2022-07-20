@@ -60,7 +60,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> sectionRegistrationResponse = SectionApiCall.registerSection(일호선_아이디, 구로역, 신도림역);
         assertThat(sectionRegistrationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> getLineResponse = LineApiCall.getLine(일호선아이디);
+        ExtractableResponse<Response> getLineResponse = LineApiCall.getLine(일호선_아이디);
         getLineResponse.jsonPath().getList("sections").contains("구로역", "신도림역");
 
     }

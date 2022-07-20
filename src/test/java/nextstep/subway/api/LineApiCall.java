@@ -19,7 +19,15 @@ public class LineApiCall {
                 .extract();
     }
 
-    // 지하철노선 조회 요청
+    // 지하철 노선 조회 요청
+    public static ExtractableResponse<Response> getLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/line/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    // 지하철노선 목록 조회 요청
     public static ExtractableResponse<Response> getLines() {
         return RestAssured.given().log().all()
                 .when().get("/lines")

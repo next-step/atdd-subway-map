@@ -51,7 +51,11 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public Line findLine(Long lineId) {
+    public LineResponse findLine(Long id) {
+        return lineRepository.findById(id).map(this::createLineResponse).orElseThrow(() -> new EntityNotFoundException(id + "번 id로 조회되는 노선이 없습니다."));
+    }
+
+    public Line getLine(Long lineId) {
         return lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException(lineId + "번 id로 조회되는 노선이 없습니다."));
     }
 
@@ -62,14 +66,14 @@ public class LineService {
         EntityTransaction tx = em.getTransaction();
 
         tx.begin();
-        Line line = findLine(id);
+        Line line = getLine(id);
         line.updateLine(updateDto.getName(), updateDto.getColor());
         tx.commit();
     }
 
     @Transactional
     public void deleteLine(Long id) {
-        Line line = findLine(id);
+        Line line = getLine(id);
 
         lineRepository.delete(line);
     }

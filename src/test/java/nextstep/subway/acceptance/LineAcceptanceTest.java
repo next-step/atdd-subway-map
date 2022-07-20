@@ -61,14 +61,17 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest(신분당선, "bg-red-600", 강남역_아이디, 광교역_아이디, 10));
         assertThat(lineCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
-        ExtractableResponse<Response> getResponse = LineApiCall.getLines();
+        final Long 신분당선_아이디 = lineCreationResponse.jsonPath().getLong("id");
 
-        String lineName = getResponse.jsonPath().getString("[0].name");
-        String lineColor = getResponse.jsonPath().getString("[0].color");
+        ExtractableResponse<Response> getResponse = LineApiCall.getLine(신분당선_아이디);
+
+        String lineName = getResponse.jsonPath().getString("name");
+        String lineColor = getResponse.jsonPath().getString("color");
 
         // then
         assertThat(lineName).isEqualTo(신분당선);
         assertThat(lineColor).isEqualTo("bg-red-600");
+
     }
 
     /**
