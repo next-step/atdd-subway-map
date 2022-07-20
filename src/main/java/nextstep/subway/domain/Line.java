@@ -90,8 +90,8 @@ public class Line {
         return sections.hasStation(station);
     }
 
-    public void deleteSection(Long stationId) {
-        sections.delete(stationId);
+    public void deleteSection(Station station) {
+        sections.delete(station);
     }
 
     @Override

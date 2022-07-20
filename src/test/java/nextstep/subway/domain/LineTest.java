@@ -113,7 +113,7 @@ class LineTest {
         final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when
-        line.deleteSection(2L);
+        line.deleteSection(new Station(2L, "강남역"));
 
         //then
         assertThat(line.allStations().stream().map(Station::getId)).containsExactly(1L);
@@ -126,7 +126,7 @@ class LineTest {
         final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
 
         //when, then
-        assertThatThrownBy(() -> line.deleteSection(1L))
+        assertThatThrownBy(() -> line.deleteSection(new Station(1L, "역삼역")))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("하행역만 삭제할 수 있습니다.");
     }
@@ -136,10 +136,10 @@ class LineTest {
     void deleteStationOnlyOneStationException() {
         //given
         final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
-        line.deleteSection(2L);
+        line.deleteSection(new Station(2L, "강남역"));
 
         //when, then
-        assertThatThrownBy(() -> line.deleteSection(1L))
+        assertThatThrownBy(() -> line.deleteSection(new Station(1L, "역삼역")))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
     }

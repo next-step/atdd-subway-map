@@ -10,6 +10,7 @@ import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.exception.LineNotFoundException;
+import nextstep.subway.exception.StationNotRegisteredException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +80,7 @@ public class LineService {
         List<Station> stations = stationRepository.findByIdInOrderByIdAsc(List.of(upStationId, downStationId));
         Station upStation = stations.get(0);
         Station downStation = stations.get(1);
+
         Line sectionAddedLine = line.addSection(upStation, downStation, distance);
 
         return new LineResponse(sectionAddedLine.getId(), sectionAddedLine.getName(),
@@ -99,9 +101,11 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteSection(Long id, Long stationId) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
-        line.deleteSection(stationId);
+    public void deleteSection(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId)
+                .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + lineId));
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new StationNotRegisteredException("역이 등록되어 있지 않습니다. : " + stationId));
+        line.deleteSection(station);
     }
 }

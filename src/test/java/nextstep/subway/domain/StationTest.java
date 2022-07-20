@@ -15,7 +15,7 @@ class StationTest {
         //given
         final var station = new Station(1L, "역삼역");
         //when
-        boolean result = station.equalsId(1L);
+        boolean result = station.equals(new Station(1L, "역삼역"));
         //then
         assertTrue(result);
     }
@@ -27,7 +27,7 @@ class StationTest {
         //given
         final var station = new Station(1L, "역삼역");
         //when
-        boolean result = station.equalsId(2L);
+        boolean result = station.equals(new Station(2L, "강남역"));
         //then
         assertFalse(result);
     }

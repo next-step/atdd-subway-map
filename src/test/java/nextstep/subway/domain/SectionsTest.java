@@ -130,7 +130,7 @@ class SectionsTest {
         sections.add(firstSection);
         sections.add(secondSection);
         //when
-        sections.delete(4L);
+        sections.delete(new Station(4L, "삼성역"));
 
         //then
         assertThat(sections.getSections()).hasSize(1);
@@ -149,7 +149,7 @@ class SectionsTest {
         sections.add(section);
 
         //when
-        sections.delete(2L);
+        sections.delete(new Station(2L, "선릉역"));
 
         //then
         assertAll(
@@ -174,7 +174,7 @@ class SectionsTest {
         sections.add(firstSection);
         sections.add(secondSection);
         //when, then
-        assertThatThrownBy(() -> sections.delete(2L))
+        assertThatThrownBy(() -> sections.delete(new Station(2L, "선릉역")))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("하행역만 삭제할 수 있습니다.");
     }
@@ -193,7 +193,7 @@ class SectionsTest {
         Sections sections = new Sections();
         sections.add(section);
         //when, then
-        assertThatThrownBy(() -> sections.delete(1L))
+        assertThatThrownBy(() -> sections.delete(new Station(1L, "역삼역")))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
     }

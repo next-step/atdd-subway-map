@@ -62,8 +62,8 @@ public class Sections {
         return sections.get(sections.size() - 1).getDownStation();
     }
 
-    public void delete(Long stationId) {
-        validateDelete(stationId);
+    public void delete(Station station) {
+        validateDelete(station);
         if (sections.size() == 1) {
             sections.get(0).deleteDownStation();
             return;
@@ -71,12 +71,12 @@ public class Sections {
         sections.remove(sections.get(sections.size() - 1));
     }
 
-    private void validateDelete(Long stationId) {
+    private void validateDelete(Station station) {
         if (onlyOneStationExist()) {
             throw new DeleteStationException("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
         }
 
-        if (notLastStation(stationId)) {
+        if (notLastStation(station)) {
             throw new DeleteStationException("하행역만 삭제할 수 있습니다.");
         }
     }
@@ -85,7 +85,7 @@ public class Sections {
         return sections.size() == 1 && sections.get(0).getDownStation() == null;
     }
 
-    private boolean notLastStation(Long stationId) {
-        return !sections.get(sections.size() - 1).getDownStation().equalsId(stationId);
+    private boolean notLastStation(Station station) {
+        return !sections.get(sections.size() - 1).getDownStation().equals(station);
     }
 }
