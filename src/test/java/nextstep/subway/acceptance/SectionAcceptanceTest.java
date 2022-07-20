@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.LineTestFixtures.노선_생성;
 import static nextstep.subway.acceptance.LineTestFixtures.노선_조회;
+import static nextstep.subway.acceptance.SectionTestFixtures.구간_삭제;
 import static nextstep.subway.acceptance.SectionTestFixtures.구간_생성;
 import static nextstep.subway.acceptance.StationTestFixtures.역_생성;
 import static org.assertj.core.api.Assertions.*;
@@ -104,8 +105,8 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         구간_생성(신분당선_라인_아이디, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
 
         String 신분당선_또_새로운_종점_아이디 = 역_생성("서울 숲");
-        구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4");
+        String lastStationId = 구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
 
-
+        ExtractableResponse<Response> result = 구간_삭제(신분당선_라인_아이디, lastStationId);
     }
 }

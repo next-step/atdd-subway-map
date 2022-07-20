@@ -88,4 +88,8 @@ public class LineService {
         if (Objects.equals(upStation.getName(), downStation.getName()))
             throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
     }
+
+    public void deleteSection(Long lineId, String downStationId) {
+
+    }
 }
