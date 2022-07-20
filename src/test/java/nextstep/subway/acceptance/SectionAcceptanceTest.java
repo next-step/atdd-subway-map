@@ -20,21 +20,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
-	private static final Long 신분당선 = 1L;
+	private Long 신분당선;
 
-	private static final Long 논현역 = 1L;
-	private static final Long 신논현역 = 2L;
-	private static final Long 강남역 = 3L;
-	private static final Long 양재역 = 4L;
+	private Long 논현역;
+	private Long 신논현역;
+	private Long 강남역;
+	private Long 양재역;
 
 	@BeforeEach
 	public void setUp() {
-		지하철_역_생성("논현역");
-		지하철_역_생성("신논현역");
-		지하철_역_생성("강남역");
-		지하철_역_생성("양재역");
-		지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10);
+		논현역 = 지하철_역_생성("논현역").jsonPath().getLong("id");
+		신논현역 = 지하철_역_생성("신논현역").jsonPath().getLong("id");
+		강남역 = 지하철_역_생성("강남역").jsonPath().getLong("id");
+		양재역 = 지하철_역_생성("양재역").jsonPath().getLong("id");
 
+		신분당선 = 지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10).jsonPath().getLong("id");
 	}
 
 	/**

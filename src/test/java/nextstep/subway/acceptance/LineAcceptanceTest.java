@@ -18,11 +18,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 public class LineAcceptanceTest extends CommonAcceptanceTest {
 
+	private Long 논현역;
+	private Long 신논현역;
+	private Long 강남역;
+
 	@BeforeEach
 	public void setUp() {
-		지하철_역_생성("논현역");
-		지하철_역_생성("신논현역");
-		지하철_역_생성("강남역");
+		논현역 = 지하철_역_생성("논현역").jsonPath().getLong("id");
+		신논현역 = 지하철_역_생성("신논현역").jsonPath().getLong("id");
+		강남역 = 지하철_역_생성("강남역").jsonPath().getLong("id");
 	}
 
 	/**
@@ -33,7 +37,7 @@ public class LineAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void createLine() {
 		// when
-		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
+		지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10);
 		// then
 		List<String> lineNames =
 				지하철_노선_목록_조회().jsonPath().getList("name");
@@ -50,8 +54,8 @@ public class LineAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void showLines() {
 		// given
-		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
-		지하철_노선_생성("분당선", "bg-green-600", 1L, 3L, 10);
+		지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10);
+		지하철_노선_생성("분당선", "bg-green-600", 논현역, 강남역, 10);
 
 		// when
 		List<String> lineNames = 지하철_노선_목록_조회().jsonPath().getList("name");
@@ -70,7 +74,7 @@ public class LineAcceptanceTest extends CommonAcceptanceTest {
 	void showLine() {
 		// given
 		Long lineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
+				지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10).jsonPath().getLong("id");
 
 		// when
 		String lineName =
@@ -90,7 +94,7 @@ public class LineAcceptanceTest extends CommonAcceptanceTest {
 	void updateLine() {
 		// given
 		Long LineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().getLong("id");
+				지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10).jsonPath().getLong("id");
 
 		// when
 		지하철_노선_수정(LineId, "다른분당선", "bg-red-600");
@@ -111,7 +115,7 @@ public class LineAcceptanceTest extends CommonAcceptanceTest {
 	void deleteLine() {
 		// given
 		Integer lineId =
-				지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10).jsonPath().get("id");
+				지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10).jsonPath().get("id");
 
 		// when
 		지하철_노선_삭제(lineId);
