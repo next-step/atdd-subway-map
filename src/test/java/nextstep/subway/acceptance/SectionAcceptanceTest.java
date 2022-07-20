@@ -13,7 +13,7 @@ import static nextstep.subway.acceptance.StationTestFixtures.역_생성;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 구간 관리")
-public class StationSectionAcceptanceTest extends AbstractAcceptanceTest{
+public class SectionAcceptanceTest extends AbstractAcceptanceTest{
 
     /**
      * 지하철 노선에 구간을 등록하는 기능을 구현
@@ -34,10 +34,11 @@ public class StationSectionAcceptanceTest extends AbstractAcceptanceTest{
         String 보라매역 = 역_생성("보라매역");
 
         구간_생성(노선_아이디, 당곡역, 보라매역, "5");
-        ExtractableResponse<Response> 노선_조회_결과 = 노선_조회("1");
+        ExtractableResponse<Response> 노선_조회_결과 = 노선_조회(노선_아이디);
 
         Assertions.assertAll(() -> {
             assertThat(노선_조회_결과.jsonPath().getList("stations.name").size()).isEqualTo(3);
+            assertThat(노선_조회_결과.jsonPath().getList("stations.name")).contains("신림역", "당곡역", "보라매역");
         });
     }
 }
