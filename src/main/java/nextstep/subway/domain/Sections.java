@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -31,6 +32,11 @@ public class Sections {
     public void addSection(Section section) {
         validContainAlreadyReqDownStation(section.getDownStation());
         sections.add(section);
+    }
+
+    public void deleteSection(Long downStationId) {
+        validContainReqDownStation(downStationId);
+        sections.remove(getLastStation());
     }
 
     public List<Station> getStations() {
@@ -54,5 +60,10 @@ public class Sections {
         if (isAlreadyRegisterStation)
             throw new StationDuplicateException(ErrorCode.ALREADY_REGISTER_STATION);
 
+   }
+
+   private void validContainReqDownStation(Long downStationId) {
+       if (!Objects.equals(getLastStation().getId(), downStationId))
+           throw new  DataNotFoundException(ErrorCode.NOT_FOUND_SECTION);
    }
 }

@@ -108,5 +108,8 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         String lastStationId = 구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
 
         ExtractableResponse<Response> result = 구간_삭제(신분당선_라인_아이디, lastStationId);
+
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
     }
 }

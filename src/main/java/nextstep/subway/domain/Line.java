@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
+import nextstep.subway.applicaion.exceptions.SectionArrayOutOfBoundException;
 import nextstep.subway.enums.exception.ErrorCode;
 
 import javax.persistence.*;
@@ -51,5 +52,11 @@ public class Line {
         if (!Objects.equals(sections.getLastStation().getName(), upStation.getName())) {
             throw new InvalidStationParameterException(ErrorCode.SAME_STATION);
         }
+    }
+
+    public void deleteSection(Long downStationId) {
+        if (sections.getStations().size() < 2)
+            throw new SectionArrayOutOfBoundException(ErrorCode.NOT_ENOUGH_SECTION);
+        sections.deleteSection(downStationId);
     }
 }

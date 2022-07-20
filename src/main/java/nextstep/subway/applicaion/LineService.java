@@ -74,22 +74,29 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations());
     }
 
+    public void deleteSection(Long lineId, Long downStationId) {
+        Line line = getLine(lineId);
+        deleteStation(downStationId);
+
+        line.deleteSection(downStationId);
+    }
+
     private Station getStation(Long stationId) {
         return stationRepository.findById(stationId)
-                                .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_STATION));
+                .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_STATION));
+    }
+
+    private void deleteStation(Long StationId) {
+        stationRepository.deleteById(StationId);
     }
 
     private Line getLine(Long id) {
         return lineRepository.findById(id)
-                             .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_LINE));
+                .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_LINE));
     }
 
     public void validSameReqUpStationAndReqDownStation(Station upStation, Station downStation) {
         if (Objects.equals(upStation.getName(), downStation.getName()))
             throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
-    }
-
-    public void deleteSection(Long lineId, String downStationId) {
-
     }
 }
