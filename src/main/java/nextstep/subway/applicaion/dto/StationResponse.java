@@ -1,5 +1,9 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Getter;
+import nextstep.subway.domain.Station;
+
+@Getter
 public class StationResponse {
     private Long id;
     private String name;
@@ -9,11 +13,15 @@ public class StationResponse {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public static StationResponse from(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName()
+        );
     }
 
-    public String getName() {
-        return name;
+    public Station toEntity() {
+        return new Station(id, name);
     }
+
 }
