@@ -51,7 +51,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	 */
 	@DisplayName("지하철 구간 등록 - 실패(종점과 다른 상행역)")
 	@Test
-	void addSectionFail1(){
+	void addSectionFailNotEqualUpAndDown(){
 		// when
 		ExtractableResponse<Response> response = 지하철_구간_등록(1L, 3L, 4L, 8);
 		// then
@@ -65,7 +65,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	 */
 	@DisplayName("지하철 구간 등록 - 실패(이미 노선에 포함된 역)")
 	@Test
-	void addSectionFail2(){
+	void addSectionFailAlreadyStationInLine(){
 		// when
 		ExtractableResponse<Response> response = 지하철_구간_등록(1L, 2L, 1L, 8);
 		// then
@@ -98,7 +98,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	 */
 	@DisplayName("지하철 구간 삭제 - 실패(마지막이 아닌 역 삭제)")
 	@Test
-	void deleteSectionFail1(){
+	void deleteSectionFailWhenDeleteLastStation(){
 		//given
 		지하철_구간_등록(1L, 2L, 3L, 10);
 		List<String> beforeDelete = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
@@ -115,7 +115,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	 */
 	@DisplayName("지하철 구간 삭제 - 실패(구간이 1개인 경우 삭제)")
 	@Test
-	void deleteSectionFail2(){
+	void deleteSectionFailWhenSectionIsOnlyOne(){
 		// when
 		ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
 		// then
