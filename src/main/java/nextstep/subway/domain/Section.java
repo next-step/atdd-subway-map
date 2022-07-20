@@ -53,8 +53,8 @@ public class Section {
         return downStation;
     }
 
-    public boolean hasStation(Long id) {
-        return upStation.equalsId(id) || downStation.equalsId(id);
+    public boolean hasStation(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
     }
 
     public void addDownStation(Station downStation) {

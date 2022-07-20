@@ -47,8 +47,8 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
-    public boolean hasStation(Long id) {
-        return sections.stream().anyMatch(section -> section.hasStation(id));
+    public boolean hasStation(Station station) {
+        return sections.stream().anyMatch(section -> section.hasStation(station));
     }
 
     public boolean isEmpty() {

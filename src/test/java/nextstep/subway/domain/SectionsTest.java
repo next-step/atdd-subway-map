@@ -108,10 +108,10 @@ class SectionsTest {
 
         //then
         assertAll(
-                () -> assertThat(sections.hasStation(1L)).isTrue(),
-                () -> assertThat(sections.hasStation(2L)).isTrue(),
-                () -> assertThat(sections.hasStation(4L)).isTrue(),
-                () -> assertThat(sections.hasStation(5L)).isFalse()
+                () -> assertThat(sections.hasStation(new Station(1L, "역삼역"))).isTrue(),
+                () -> assertThat(sections.hasStation(new Station(2L, "선릉역"))).isTrue(),
+                () -> assertThat(sections.hasStation(new Station(4L, "삼성역"))).isTrue(),
+                () -> assertThat(sections.hasStation(new Station(5L, "종합운동장역"))).isFalse()
         );
     }
 

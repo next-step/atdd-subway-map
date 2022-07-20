@@ -17,8 +17,8 @@ class SectionTest {
         final var section = new Section(upStation, downStation, 10);
         //when, then
         assertAll(
-                () -> assertTrue(section.hasStation(1L)),
-                () -> assertFalse(section.hasStation(3L))
+                () -> assertTrue(section.hasStation(new Station(1L, "역삼역"))),
+                () -> assertFalse(section.hasStation(new Station(3L, "서초역")))
         );
     }
 

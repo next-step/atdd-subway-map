@@ -9,10 +9,7 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
-import nextstep.subway.exception.AlreadyExistStationException;
 import nextstep.subway.exception.LineNotFoundException;
-import nextstep.subway.exception.SectionStationMismatchException;
-import nextstep.subway.exception.StationNotRegisteredException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,15 +71,15 @@ public class LineService {
 
     @Transactional
     public LineResponse addSections(Long id, SectionRequest sectionRequest) {
-        String downStationId = sectionRequest.getDownStationId();
-        String upStationId = sectionRequest.getUpStationId();
+        Long upStationId = Long.valueOf(sectionRequest.getUpStationId());
+        Long downStationId = Long.valueOf(sectionRequest.getDownStationId());
         int distance = sectionRequest.getDistance();
 
         Line line = lineFrom(id);
-        validateSection(downStationId, upStationId, line);
-        Station downStation = stationRepository.findById(Long.valueOf(downStationId))
-                .orElseThrow(() -> new StationNotRegisteredException("등록된 역이 존재하지 않습니다."));
-        Line sectionAddedLine = line.addSection(line.lastStation(), downStation, distance);
+        List<Station> stations = stationRepository.findByIdInOrderByIdAsc(List.of(upStationId, downStationId));
+        Station upStation = stations.get(0);
+        Station downStation = stations.get(1);
+        Line sectionAddedLine = line.addSection(upStation, downStation, distance);
 
         return new LineResponse(sectionAddedLine.getId(), sectionAddedLine.getName(),
                 sectionAddedLine.getColor(), stationResponses(sectionAddedLine));
@@ -94,21 +91,6 @@ public class LineService {
                 .orElseThrow(() -> new LineNotFoundException("노선을 찾을 수 없습니다. : " + id));
     }
 
-
-    private void validateSection(String downStationId, String upStationId, Line line) {
-        Station station = line.lastStation();
-        if (!station.equalsId(Long.parseLong(upStationId))) {
-            throw new SectionStationMismatchException(
-                    "노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. " +
-                            "하행 마지막 역 : " + station.getId()
-                            + ", 구간 상행역 : " + upStationId
-            );
-        }
-
-        if (line.hasStation(Long.parseLong(downStationId))) {
-            throw new AlreadyExistStationException("이미 존재하는 역입니다.");
-        }
-    }
 
     private List<StationResponse> stationResponses(Line line) {
         return line.allStations().stream()
