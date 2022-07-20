@@ -26,18 +26,18 @@ public class SectionAcceptanceTest {
     @LocalServerPort
     int port;
 
-    private ExtractableResponse<Response> 강남역;
-    private ExtractableResponse<Response> 신논현역;
-    private ExtractableResponse<Response> 정자역;
-    private ExtractableResponse<Response> 판교역;
+    private long 강남역;
+    private long 신논현역;
+    private long 정자역;
+    private long 판교역;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        강남역 = StationApi.createStationApi("강남역");
-        신논현역 = StationApi.createStationApi("신논현역");
-        정자역 = StationApi.createStationApi("정자역");
-        판교역 = StationApi.createStationApi("판교역");
+        강남역 = StationApi.createStationApi("강남역").jsonPath().getLong("id");
+        신논현역 = StationApi.createStationApi("신논현역").jsonPath().getLong("id");
+        정자역 = StationApi.createStationApi("정자역").jsonPath().getLong("id");
+        판교역 = StationApi.createStationApi("판교역").jsonPath().getLong("id");
     }
 
     /**
@@ -49,16 +49,12 @@ public class SectionAcceptanceTest {
     @Test
     void addSection() {
         // given
-        long 강남역_번호 = 강남역.jsonPath().getLong("id");
-        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // when
-        long 정자역_번호 = 정자역.jsonPath().getLong("id");
         long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
 
-        LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 정자역_번호, 5);
+        LineApi.addSectionApi(신분당선_번호, 신논현역, 정자역, 5);
 
         // then
         ExtractableResponse<Response> 신분당선_조회_응답 = LineApi.getLineByIdApi(신분당선_번호);
@@ -79,17 +75,12 @@ public class SectionAcceptanceTest {
     @Test
     void addSectionExceptionUnmatchedException() {
         // given
-        long 강남역_번호 = 강남역.jsonPath().getLong("id");
-        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // when
-        long 정자역_번호 = 정자역.jsonPath().getLong("id");
-        long 판교역_번호 = 판교역.jsonPath().getLong("id");
         long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> 구간_등록_응답 = LineApi.addSectionApi(신분당선_번호, 정자역_번호, 판교역_번호, 5);
+        ExtractableResponse<Response> 구간_등록_응답 = LineApi.addSectionApi(신분당선_번호, 정자역, 판교역, 5);
 
         // then
         String exceptionMessage = 구간_등록_응답.jsonPath().getString("message");
@@ -108,15 +99,12 @@ public class SectionAcceptanceTest {
     @Test
     void addSectionExceptionAlreadyExistsStationException() {
         // given
-        long 강남역_번호 = 강남역.jsonPath().getLong("id");
-        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // when
         long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
 
-        ExtractableResponse<Response> 구간_등록_응답 = LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 강남역_번호, 5);
+        ExtractableResponse<Response> 구간_등록_응답 = LineApi.addSectionApi(신분당선_번호, 신논현역, 강남역, 5);
 
         // then
         String exceptionMessage = 구간_등록_응답.jsonPath().getString("message");
@@ -136,19 +124,14 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSection() {
         // given
-        long 강남역_번호 = 강남역.jsonPath().getLong("id");
-        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // given
-        long 정자역_번호 = 정자역.jsonPath().getLong("id");
         long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
-
-        LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 정자역_번호, 5);
+        LineApi.addSectionApi(신분당선_번호, 신논현역, 정자역, 5);
 
         // when
-        LineApi.deleteSectionApi(신분당선_번호, 정자역_번호);
+        LineApi.deleteSectionApi(신분당선_번호, 정자역);
 
         // then
         ExtractableResponse<Response> 신분당선_조회_응답 = LineApi.getLineByIdApi(신분당선_번호);
@@ -171,21 +154,14 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionWhenNotExistsStation() {
         // given
-        long 강남역_번호 = 강남역.jsonPath().getLong("id");
-        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // given
-        long 정자역_번호 = 정자역.jsonPath().getLong("id");
         long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
-
-        LineApi.addSectionApi(신분당선_번호, 신논현역_번호, 정자역_번호, 5);
+        LineApi.addSectionApi(신분당선_번호, 신논현역, 정자역, 5);
 
         // when
-        long 판교역_번호 = 판교역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 구간_삭제_응답 = LineApi.deleteSectionApi(신분당선_번호, 판교역_번호);
+        ExtractableResponse<Response> 구간_삭제_응답 = LineApi.deleteSectionApi(신분당선_번호, 판교역);
 
         // then
         String exceptionMessage = 구간_삭제_응답.jsonPath().getString("message");
@@ -205,14 +181,11 @@ public class SectionAcceptanceTest {
     @Test
     void deleteSectionOnlyOneSectionException() {
         // given
-        long 강남역_번호 = 강남역.jsonPath().getLong("id");
-        long 신논현역_번호 = 신논현역.jsonPath().getLong("id");
-
-        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역_번호, 신논현역_번호, 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // when
         long 신분당선_번호 = 신분당선.jsonPath().getLong("id");
-        ExtractableResponse<Response> 구간_삭제_응답 = LineApi.deleteSectionApi(신분당선_번호, 신논현역_번호);
+        ExtractableResponse<Response> 구간_삭제_응답 = LineApi.deleteSectionApi(신분당선_번호, 신논현역);
 
         // then
         String exceptionMessage = 구간_삭제_응답.jsonPath().getString("message");
