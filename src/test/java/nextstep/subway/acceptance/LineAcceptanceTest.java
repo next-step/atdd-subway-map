@@ -26,9 +26,18 @@ public class LineAcceptanceTest {
     @LocalServerPort
     int port;
 
+    private long 강남역;
+    private long 신논현역;
+    private long 정자역;
+    private long 이매역;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        강남역 = StationApi.createStationApi("강남역").jsonPath().getLong("id");
+        신논현역 = StationApi.createStationApi("신논현역").jsonPath().getLong("id");
+        정자역 = StationApi.createStationApi("정자역").jsonPath().getLong("id");
+        이매역 = StationApi.createStationApi("이매역").jsonPath().getLong("id");
     }
 
     /**
