@@ -48,7 +48,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // When
-        ExtractableResponse<Response> 신분당선 = 노선_생성("신분당선", "bg-red-600", "강남역", "신논현역", 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 신논현역, 10);
 
         // Then
         ExtractableResponse<Response> 모든_노선_조회_응답 = LineApi.getAllLinesApi();
@@ -69,8 +69,8 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         // Given
-        ExtractableResponse<Response> 신분당선 = 노선_생성("신분당선", "bg-red-600", "강남역", "정자역", 10);
-        ExtractableResponse<Response> 분당선 = 노선_생성("분당선", "bg-yellow-600", "정자역", "이매역", 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 정자역, 10);
+        ExtractableResponse<Response> 분당선 = LineApi.createLineApi("분당선", "bg-yellow-600", 정자역, 이매역, 10);
 
         // When
         ExtractableResponse<Response> 모든_노선_조회_응답 = LineApi.getAllLinesApi();
@@ -96,7 +96,7 @@ public class LineAcceptanceTest {
     @Test
     void getLineById() {
         // Given
-        ExtractableResponse<Response> 신분당선 = 노선_생성("신분당선", "bg-red-600", "강남역", "정자역", 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 정자역, 10);
 
         // When
         long lineId = 신분당선.jsonPath().getLong("id");
@@ -119,7 +119,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // Given
-        ExtractableResponse<Response> 신분당선 = 노선_생성("신분당선", "bg-red-600", "강남역", "정자역", 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 정자역, 10);
 
         // When
         long lineId = 신분당선.jsonPath().getLong("id");
@@ -145,7 +145,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // Given
-        ExtractableResponse<Response> 신분당선 = 노선_생성("신분당선", "bg-red-600", "강남역", "정자역", 10);
+        ExtractableResponse<Response> 신분당선 = LineApi.createLineApi("신분당선", "bg-red-600", 강남역, 정자역, 10);
 
         // When
         long lineId = 신분당선.jsonPath().getLong("id");
@@ -155,12 +155,5 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> 모든_노선_조회_응답 = LineApi.getAllLinesApi();
         List<Long> lineIds = 모든_노선_조회_응답.jsonPath().getList("id", Long.class);
         assertThat(lineIds).hasSize(0);
-    }
-
-    private ExtractableResponse<Response> 노선_생성(String name, String color, String upStation, String downStation, int distance) {
-        long upStationId = StationApi.createStationApi(upStation).jsonPath().getLong("id");
-        long downStationId = StationApi.createStationApi(downStation).jsonPath().getLong("id");
-
-        return LineApi.createLineApi(name, color, upStationId, downStationId, distance);
     }
 }
