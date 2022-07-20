@@ -7,7 +7,6 @@ import nextstep.subway.acceptance.common.CommonAcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,13 +19,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends CommonAcceptanceTest {
 
+	private static final Long 신분당선 = 1L;
+
+	private static final Long 논현역 = 1L;
+	private static final Long 신논현역 = 2L;
+	private static final Long 강남역 = 3L;
+	private static final Long 양재역 = 4L;
+
 	@BeforeEach
 	public void setUp() {
 		지하철_역_생성("논현역");
 		지하철_역_생성("신논현역");
 		지하철_역_생성("강남역");
 		지하철_역_생성("양재역");
-		지하철_노선_생성("신분당선", "bg-red-600", 1L, 2L, 10);
+		지하철_노선_생성("신분당선", "bg-red-600", 논현역, 신논현역, 10);
+
 	}
 
 	/**
@@ -38,10 +45,10 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void addSectionSuccess(){
 		// when
-		지하철_구간_등록(1L, 2L, 3L, 10);
-		List<String> stations = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
+		지하철_구간_등록(신분당선, 신논현역, 강남역, 10);
+		List<String> stations = 지하철_노선_조회(신분당선).jsonPath().getList("stations.name");
 		// then
-		assertThat(stations).containsAll(List.of("논현역", "신논현역", "강남역"));
+		assertThat(stations).containsExactly("논현역", "신논현역", "강남역");
 	}
 
 	/**
@@ -53,7 +60,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void addSectionFailNotEqualUpAndDown(){
 		// when
-		ExtractableResponse<Response> response = 지하철_구간_등록(1L, 3L, 4L, 8);
+		ExtractableResponse<Response> response = 지하철_구간_등록(신분당선, 강남역, 양재역, 8);
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
@@ -67,7 +74,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void addSectionFailAlreadyStationInLine(){
 		// when
-		ExtractableResponse<Response> response = 지하철_구간_등록(1L, 2L, 1L, 8);
+		ExtractableResponse<Response> response = 지하철_구간_등록(신분당선, 신논현역, 논현역, 8);
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
@@ -81,11 +88,11 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void deleteSectionSuccess(){
 		//given
-		지하철_구간_등록(1L, 2L, 3L, 10);
-		List<String> beforeDelete = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
+		지하철_구간_등록(신분당선, 신논현역, 강남역, 10);
+		List<String> beforeDelete = 지하철_노선_조회(신분당선).jsonPath().getList("stations.name");
 		// when
-		지하철_구간_삭제(1L,3L);
-		List<String> stations = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
+		지하철_구간_삭제(신분당선,강남역);
+		List<String> stations = 지하철_노선_조회(신분당선).jsonPath().getList("stations.name");
 		// then
 		assertThat(beforeDelete).containsExactly("논현역", "신논현역", "강남역");
 		assertThat(stations).containsExactly("논현역", "신논현역");
@@ -100,10 +107,10 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void deleteSectionFailWhenDeleteLastStation(){
 		//given
-		지하철_구간_등록(1L, 2L, 3L, 10);
-		List<String> beforeDelete = 지하철_노선_조회(1L).jsonPath().getList("stations.name");
+		지하철_구간_등록(신분당선, 신논현역, 강남역, 10);
+		List<String> beforeDelete = 지하철_노선_조회(신분당선).jsonPath().getList("stations.name");
 		// when
-		ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
+		ExtractableResponse<Response> response = 지하철_구간_삭제(신분당선, 신논현역);
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
@@ -117,7 +124,7 @@ public class SectionAcceptanceTest extends CommonAcceptanceTest {
 	@Test
 	void deleteSectionFailWhenSectionIsOnlyOne(){
 		// when
-		ExtractableResponse<Response> response = 지하철_구간_삭제(1L, 2L);
+		ExtractableResponse<Response> response = 지하철_구간_삭제(신분당선, 신논현역);
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
