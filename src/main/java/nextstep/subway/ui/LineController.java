@@ -1,11 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.applicaion.dto.SectionRequest;
-import org.hibernate.annotations.Parameter;
+import nextstep.subway.applicaion.dto.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +58,12 @@ public class LineController {
                                                      @RequestParam Long downStationId) {
         lineService.deleteSection(lineId, downStationId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/lines/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SectionResponse>> getSections() {
+        List<SectionResponse> responses = lineService.getSections();
+        return ResponseEntity.ok().body(responses);
     }
 
 }

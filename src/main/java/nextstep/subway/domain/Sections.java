@@ -8,10 +8,7 @@ import nextstep.subway.enums.exception.ErrorCode;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -36,7 +33,7 @@ public class Sections {
 
     public void deleteSection(Long downStationId) {
         validContainReqDownStation(downStationId);
-        sections.remove(getLastStation());
+        sections.remove(getLastSection());
     }
 
     public List<Station> getStations() {
@@ -51,6 +48,14 @@ public class Sections {
             throw new DataNotFoundException(ErrorCode.NOT_FOUND_SECTION);
 
         return sections.get(sections.size() - 1).getDownStation();
+    }
+
+    public Section getLastSection(){
+        if(sections.size() < 1){
+            throw new NoSuchElementException("저장 된 section정보가 없습니다.");
+        }
+
+        return sections.get(sections.size() - 1);
     }
 
     private void validContainAlreadyReqDownStation(Station downStation) {

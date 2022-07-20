@@ -3,14 +3,13 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.applicaion.exceptions.DataNotFoundException;
 import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.*;
 import nextstep.subway.enums.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -74,11 +73,11 @@ public class LineService {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations());
     }
 
+    @Transactional
     public void deleteSection(Long lineId, Long downStationId) {
         Line line = getLine(lineId);
-        deleteStation(downStationId);
-
         line.deleteSection(downStationId);
+        deleteStation(downStationId);
     }
 
     private Station getStation(Long stationId) {
@@ -98,5 +97,20 @@ public class LineService {
     public void validSameReqUpStationAndReqDownStation(Station upStation, Station downStation) {
         if (Objects.equals(upStation.getName(), downStation.getName()))
             throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
+    }
+
+    public List<SectionResponse> getSections() {
+        List<Section> sections = new ArrayList<>();
+
+        lineRepository.findAll()
+                      .forEach(line -> sections.addAll(line.getSections()));
+
+        return sections.stream()
+                       .map(section -> new SectionResponse(section.getId(),
+                                                           section.getLine().getId(),
+                                                           section.getUpStation(),
+                                                           section.getDownStation(),
+                                                           section.getDistance()))
+                       .collect(Collectors.toList());
     }
 }

@@ -44,6 +44,10 @@ public class Line {
         sections.addSection(new Section(line, upStation, downStation, distance));
     }
 
+    public List<Section> getSections() {
+        return sections.getSections();
+    }
+
     public List<Station> getStations() {
         return sections.getStations();
     }
