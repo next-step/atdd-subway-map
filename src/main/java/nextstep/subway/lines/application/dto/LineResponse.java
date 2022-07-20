@@ -22,7 +22,7 @@ public class LineResponse {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations = Arrays.asList(new StationResponse(line.getUpStation()), new StationResponse(line.getDownStation()));
+//        this.stations = Arrays.asList(new StationResponse(line.getUpStation()), new StationResponse(line.getDownStation()));
     }
 
     public Long getId() {

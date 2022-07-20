@@ -4,6 +4,7 @@ import nextstep.subway.cmmn.exception.EntityNotExistException;
 import nextstep.subway.lines.application.dto.LineResponse;
 import nextstep.subway.lines.application.dto.LineSaveRequest;
 import nextstep.subway.lines.application.dto.LineUpdateRequest;
+import nextstep.subway.lines.application.dto.SectionRequest;
 import nextstep.subway.lines.domain.Line;
 import nextstep.subway.lines.domain.LineRepository;
 import nextstep.subway.stations.applicaion.StationService;
@@ -63,5 +64,18 @@ public class LineService {
     public Line findById(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotExistException("지하철 노선을 찾을 수 없습니다. id = " + lineId));
+    }
+
+    public void addSection(Long lineId, SectionRequest sectionRequest) {
+        Line line = findById(lineId);
+        Station upStation = stationService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationService.findById(sectionRequest.getDownStationId());
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+    }
+
+    public void removeSection(Long lineId, Long stationId) {
+        Line line = findById(lineId);
+        Station downStation = stationService.findById(stationId);
+        line.removeSection(downStation);
     }
 }

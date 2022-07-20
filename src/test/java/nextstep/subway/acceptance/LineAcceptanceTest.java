@@ -347,7 +347,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         final String color = "bg-red-600";
         final int distance = 10;
 
-        //given
+        // given
         // 지하철 노선의 상행 생성
         ExtractableResponse<Response> 강남역_응답 = StationAcceptanceTest.지하철역_생성_요청_응답(강남역);
         long 강남역_아이디 = 강남역_응답.jsonPath().getLong("id");
@@ -366,10 +366,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         params.put("upStationId", 강남역_아이디); // 강남역
         params.put("distance", 5);
 
-        //when
+        // when
         ExtractableResponse<Response> 구간등록_응답 = post(url, params);
 
-        //then
+        // then
         assertThat(구간등록_응답.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
@@ -417,7 +417,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 제거_응답 = delete("/lines/" + 신분당선_아이디 + "/sections?stationId=" + 구로디지털단지역_아이디);
 
         //then
-        assertThat(제거_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(제거_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     /**
@@ -454,7 +454,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> 제거_응답 = delete("/lines/" + 신분당선_아이디 + "/sections?stationId=" + 시청역_아이디);
 
         //then
-        assertThat(제거_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(제거_응답.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
 

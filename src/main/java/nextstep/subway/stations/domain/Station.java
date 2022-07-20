@@ -28,10 +28,6 @@ public class Station {
         return name;
     }
 
-    public boolean isSame(Station downStation) {
-        return this.equals(downStation);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
