@@ -17,18 +17,18 @@ import static java.util.Collections.*;
 public class Sections {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Section> value = new ArrayList<>();
+    private List<Section> sections = new ArrayList<>();
 
     public void addSection(Section section) {
-        if (value.isEmpty()) {
-            this.value.add(section);
+        if (sections.isEmpty()) {
+            this.sections.add(section);
             return;
         }
 
         matchLastStationAndNewUpStation(section.getUpStation());
         duplicateStation(section.getDownStation());
 
-        this.value.add(section);
+        this.sections.add(section);
     }
 
     private void matchLastStationAndNewUpStation(Station upStation) {
@@ -40,7 +40,7 @@ public class Sections {
     }
 
     private void duplicateStation(Station downStation) {
-        Optional<Station> findStation = value.stream()
+        Optional<Station> findStation = sections.stream()
                 .map(Section::getUpStation)
                 .filter(upStation -> upStation.equals(downStation))
                 .findAny();
@@ -51,19 +51,19 @@ public class Sections {
     }
 
     private Section lastSection() {
-        return value.get(value.size() - 1);
+        return sections.get(sections.size() - 1);
     }
 
     public List<Station> allStations() {
         List<Station> stations = new ArrayList<>();
 
-        if (value.isEmpty()) {
+        if (sections.isEmpty()) {
             return unmodifiableList(stations);
         }
 
-        stations.add(value.get(0).getUpStation());
+        stations.add(sections.get(0).getUpStation());
 
-        value.forEach(section -> {
+        sections.forEach(section -> {
             stations.add(section.getDownStation());
         });
 
@@ -71,7 +71,7 @@ public class Sections {
     }
 
     public void removeSection(Station deleteStation) {
-        if (value.size() == 1) {
+        if (sections.size() == 1) {
             throw new DeleteSectionException("구간이 1개인 노선은 구간 삭제를 진행할 수 없습니다.");
         }
 
@@ -79,6 +79,6 @@ public class Sections {
             throw new DeleteSectionException("삭제하려는 역이 노선에 등록되지 않은 역이거나, 마지막 구간의 역이 아닙니다.");
         }
 
-        value.remove(lastSection());
+        sections.remove(lastSection());
     }
 }
