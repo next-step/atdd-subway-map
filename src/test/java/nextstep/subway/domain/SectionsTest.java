@@ -23,53 +23,12 @@ class SectionsTest {
         final var secondSection = new Section(secondStation, thirdStation, 3);
 
         //when
-        Sections sections = new Sections();
+        final var sections = new Sections();
         sections.add(firstSection);
         sections.add(secondSection);
 
         //then
         assertThat(sections.getSections()).containsExactly(firstSection, secondSection);
-    }
-
-    @DisplayName("구간 등록을 할 수 있다.")
-    @Test
-    void addSectionWhenOnlyOneStationExist() {
-        //given
-        final var upStation = new Station(1L, "역삼역");
-        final var downStation1 = new Station(2L, "선릉역");
-        final var downStation2 = new Station(4L, "삼성역");
-
-        final var firstSection = new Section(upStation, downStation1, 10);
-        firstSection.deleteDownStation();
-
-        final var secondSection = new Section(upStation, downStation2, 3);
-        //when
-        Sections sections = new Sections();
-        sections.add(firstSection);
-        sections.add(secondSection);
-
-        //then
-        assertThat(sections.getSections()).containsExactly(firstSection);
-        assertThat(sections.allStations()).containsExactly(upStation, downStation2);
-    }
-
-    @DisplayName("구간의 첫번째 역을 찾을 수 있다.")
-    @Test
-    void findStation() {
-        //given
-        final var firstStation = new Station(1L, "역삼역");
-        final var secondStation = new Station(2L, "선릉역");
-        final var thirdStation = new Station(4L, "삼성역");
-
-        final var firstSection = new Section(firstStation, secondStation, 10);
-        final var secondSection = new Section(secondStation, thirdStation, 3);
-        //when
-        Sections sections = new Sections();
-        sections.add(firstSection);
-        sections.add(secondSection);
-
-        //then
-        assertThat(sections.firstStation()).isEqualTo(firstStation);
     }
 
     @DisplayName("구간의 모든 역을 찾을 수 있다.")
@@ -82,8 +41,9 @@ class SectionsTest {
 
         final var firstSection = new Section(firstStation, secondStation, 10);
         final var secondSection = new Section(secondStation, thirdStation, 3);
+
         //when
-        Sections sections = new Sections();
+        final var sections = new Sections();
         sections.add(firstSection);
         sections.add(secondSection);
 
@@ -101,8 +61,9 @@ class SectionsTest {
 
         final var firstSection = new Section(firstStation, secondStation, 10);
         final var secondSection = new Section(secondStation, thirdStation, 3);
+
         //when
-        Sections sections = new Sections();
+        final var sections = new Sections();
         sections.add(firstSection);
         sections.add(secondSection);
 
@@ -126,7 +87,7 @@ class SectionsTest {
         final var firstSection = new Section(firstStation, secondStation, 10);
         final var secondSection = new Section(secondStation, thirdStation, 3);
 
-        Sections sections = new Sections();
+        final var sections = new Sections();
         sections.add(firstSection);
         sections.add(secondSection);
         //when
@@ -134,29 +95,6 @@ class SectionsTest {
 
         //then
         assertThat(sections.getSections()).hasSize(1);
-    }
-
-    @DisplayName("하행역 삭제 시 구간이 한개밖에 없다면 역만 삭제한다.")
-    @Test
-    void deleteSectionWhenOnlyOneSection() {
-        //given
-        final var upStation = new Station(1L, "역삼역");
-        final var downStation = new Station(2L, "선릉역");
-
-        final var section = new Section(upStation, downStation, 10);
-
-        Sections sections = new Sections();
-        sections.add(section);
-
-        //when
-        sections.delete(new Station(2L, "선릉역"));
-
-        //then
-        assertAll(
-                () -> assertThat(sections.getSections()).hasSize(1),
-                () -> assertThat(sections.allStations()).containsExactly(upStation)
-        );
-
     }
 
     @DisplayName("삭제 시 하행역이 아니면 삭제할 수 없다")
@@ -170,7 +108,7 @@ class SectionsTest {
         final var firstSection = new Section(firstStation, secondStation, 10);
         final var secondSection = new Section(secondStation, thirdStation, 3);
 
-        Sections sections = new Sections();
+        final var sections = new Sections();
         sections.add(firstSection);
         sections.add(secondSection);
         //when, then
@@ -188,16 +126,15 @@ class SectionsTest {
         final var downStation = new Station(2L, "선릉역");
 
         final var section = new Section(upStation, downStation, 10);
-        section.deleteDownStation();
 
-        Sections sections = new Sections();
+        final var sections = new Sections();
         sections.add(section);
+
         //when, then
-        assertThatThrownBy(() -> sections.delete(new Station(1L, "역삼역")))
+        assertThatThrownBy(() -> sections.delete(new Station(2L, "선릉역")))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
     }
-
 
 
 }

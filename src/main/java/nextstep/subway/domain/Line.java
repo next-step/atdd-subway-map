@@ -70,6 +70,10 @@ public class Line {
         }
     }
 
+    boolean hasStation(Station station) {
+        return sections.hasStation(station);
+    }
+
     private void validateMismatchStations(Station upStation, Station lastStation) {
         if (!lastStation.equals(upStation)) {
             throw new SectionStationMismatchException(
@@ -85,9 +89,6 @@ public class Line {
             throw new StationNotRegisteredException("노선에 등록된 역이 없습니다.");
         }
         return sections.lastStation();
-    }
-    boolean hasStation(Station station) {
-        return sections.hasStation(station);
     }
 
     public void deleteSection(Station station) {

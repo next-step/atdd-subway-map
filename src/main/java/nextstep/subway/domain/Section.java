@@ -61,7 +61,4 @@ public class Section {
         this.downStation = downStation;
     }
 
-    public void deleteDownStation() {
-        this.downStation = null;
-    }
 }

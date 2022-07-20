@@ -24,27 +24,20 @@ public class Sections {
     }
 
     public void add(Section section) {
-        if (onlyOneStationExist()) {
-            sections.get(0).addDownStation(section.getDownStation());
-            return;
-        }
         sections.add(section);
     }
 
-    public Station firstStation() {
-        return sections.get(0).getUpStation();
-    }
-
     public List<Station> allStations() {
-        if (onlyOneStationExist()) {
-            return List.of(firstStation());
-        }
 
         return Stream.concat(
                         Stream.of(firstStation()),
                         sections.stream().map(Section::getDownStation)
                 )
                 .collect(Collectors.toList());
+    }
+
+    private Station firstStation() {
+        return sections.get(0).getUpStation();
     }
 
     public boolean hasStation(Station station) {
@@ -64,25 +57,21 @@ public class Sections {
 
     public void delete(Station station) {
         validateDelete(station);
-        if (sections.size() == 1) {
-            sections.get(0).deleteDownStation();
-            return;
-        }
         sections.remove(sections.get(sections.size() - 1));
     }
 
     private void validateDelete(Station station) {
-        if (onlyOneStationExist()) {
-            throw new DeleteStationException("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
-        }
-
         if (notLastStation(station)) {
             throw new DeleteStationException("하행역만 삭제할 수 있습니다.");
         }
+
+        if (onlyOneSectionExist()) {
+            throw new DeleteStationException("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
+        }
     }
 
-    private boolean onlyOneStationExist() {
-        return sections.size() == 1 && sections.get(0).getDownStation() == null;
+    private boolean onlyOneSectionExist() {
+        return sections.size() == 1;
     }
 
     private boolean notLastStation(Station station) {

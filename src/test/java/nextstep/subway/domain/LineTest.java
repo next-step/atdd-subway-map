@@ -105,20 +105,6 @@ class LineTest {
                 .hasMessage("노선의 하행 마지막역과 추가되는 구간의 상행역이 달라 추가될 수 없습니다. 하행 마지막 역 : 2, 구간 상행역 : 4");
 
     }
-
-    @DisplayName("역의 id 를 받아 제거할 수 있다.")
-    @Test
-    void deleteStation() {
-        //given
-        final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
-
-        //when
-        line.deleteSection(new Station(2L, "강남역"));
-
-        //then
-        assertThat(line.allStations().stream().map(Station::getId)).containsExactly(1L);
-    }
-
     @DisplayName("역의 id 가 하행역이 아니면 삭제할 수 없다.")
     @Test
     void deleteStationNotDownStationException() {
@@ -136,10 +122,9 @@ class LineTest {
     void deleteStationOnlyOneStationException() {
         //given
         final var line = new Line("2호선", "bg-green-600", new Station(1L, "역삼역"), new Station(2L, "강남역"), 1);
-        line.deleteSection(new Station(2L, "강남역"));
 
         //when, then
-        assertThatThrownBy(() -> line.deleteSection(new Station(1L, "역삼역")))
+        assertThatThrownBy(() -> line.deleteSection(new Station(2L, "강남역")))
                 .isInstanceOf(DeleteStationException.class)
                 .hasMessage("상행역과 하행역만 존재하기 때문에 삭제할 수 없습니다.");
     }

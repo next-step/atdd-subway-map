@@ -202,13 +202,11 @@ class SectionAcceptanceTest {
         lineClient = new LineClient();
         lineClient.create(params());
 
-        final var upStationId = 1L;
         final var downStationId = 2L;
         final var lineId = 1L;
 
-        lineClient.deleteSection(lineId, downStationId);
         // when
-        ExtractableResponse<Response> response = lineClient.deleteSection(lineId, upStationId);
+        ExtractableResponse<Response> response = lineClient.deleteSection(lineId, downStationId);
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
