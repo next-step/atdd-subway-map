@@ -7,30 +7,21 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-@DisplayName("지하철노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DisplayName("지하철 노선 관련 기능")
 @Sql(scripts = {"classpath:sql/truncate.sql","classpath:sql/createStations.sql"})
-public class LineAcceptanceTest {
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
+class LineAcceptanceTest extends BaseAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * Then 지하철 노선의 상행 종점역과 하행 종점역이 구간으로 등록된다.
+     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
+     * Then 지하철 노선의 구간목록의 첫 번째 구간의 상행역과 하행역이 노선의 상행 종점역과 하행 종점역이다.
      */
     @Test
     @DisplayName("지하철 노선을 생성한다.")
@@ -38,6 +29,7 @@ public class LineAcceptanceTest {
         //when
         Map<String, Object> requestBody = setRequestBody("신분당선", "bg-red-600",1,2,10);
         ExtractableResponse<Response> response = createLine(requestBody);
+        int lineId = response.jsonPath().getInt("id");
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -45,6 +37,17 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
         assertThat(response.jsonPath().getList("stations.id",Integer.class)).containsExactlyInAnyOrder(1,2);
+
+        //then
+        ExtractableResponse<Response> section = RestAssured
+            .given().log().all()
+            .when().get("/lines/{id}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        assertThat(section.jsonPath().getInt("[0].upStationId")).isEqualTo(1);
+        assertThat(section.jsonPath().getInt("[0].downStationId")).isEqualTo(2);
+        assertThat(section.jsonPath().getInt("[0].distance")).isEqualTo(10);
     }
 
     /**
@@ -113,7 +116,7 @@ public class LineAcceptanceTest {
         Map<String, String> requestBody2 = setRequestBody("13호선", "bg-red-500");
         int createdLineId = line.jsonPath().getInt("id");
         ExtractableResponse<Response> updateResponse = updateLine(createdLineId, requestBody2);
-        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         //then
         ExtractableResponse<Response> subwayLine = getLine(createdLineId);
@@ -171,24 +174,6 @@ public class LineAcceptanceTest {
         map.put("name", name);
         map.put("color", color);
         return map;
-    }
-
-    private ExtractableResponse<Response> getLines() {
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines")
-            .then().log().all()
-            .extract();
-    }
-
-    private ExtractableResponse<Response> getLine(long id) {
-        return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/lines/{id}",id)
-            .then().log().all()
-            .extract();
     }
 
     private ExtractableResponse<Response> updateLine(long id, Map<String,String> requestBody) {

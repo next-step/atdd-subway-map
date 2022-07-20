@@ -1,12 +1,12 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.exception.ExceptionMessages;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line {
@@ -18,25 +18,13 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToOne
-    @JoinColumn(name = "UP_ENDPOINT_STATION_ID")
-    private Station upEndpointStation;
-
-    @OneToOne
-    @JoinColumn(name = "DOWN_ENDPOINT_STATION_ID")
-    private Station downEndpointStation;
-
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Line() {
     }
 
     public Line(String name, String color) {
-        this.name = name;
-        this.color = color;
-    }
-
-    public Line(Long id, String name, String color) {
-        this.id = id;
         this.name = name;
         this.color = color;
     }
@@ -52,28 +40,69 @@ public class Line {
     public String getColor() {
         return color;
     }
-    public Station getUpEndpointStation() {
-        return upEndpointStation;
+
+    public List<Section> getSections() {
+        return sections;
     }
 
-    public Station getDownEndpointStation() {
-        return downEndpointStation;
+    public void changeNameAndColor(LineRequest lineRequest) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
     }
 
-    public void addUpEndpointStation(Station station) {
-        this.upEndpointStation = station;
+    public void checkRegisterEndpointId(long upStationId, long downEndpointStationId) {
+        if (upStationId != downEndpointStationId) {
+            throw new IllegalArgumentException(
+                    ExceptionMessages.getNotEndpointInputExceptionMessage(upStationId, downEndpointStationId));
+        }
     }
 
-    public void addDownEndpointStation(Station station) {
-        this.downEndpointStation = station;
+    public void checkRemoveEndPointId(long stationId, long downEndpointStationId) {
+        if (downEndpointStationId != stationId) {
+            throw new IllegalArgumentException(
+                    ExceptionMessages.getNotEndpointInputExceptionMessage(stationId, downEndpointStationId));
+        }
     }
 
-    public void changeName(String name) {
-        this.name = name;
+    public Station getUpEndpoint() {
+        List<Long> upStationIds = getUpStationIds(sections);
+        List<Long> downStationIds = getDownStationIds(sections);
+        upStationIds.removeAll(downStationIds);
+        Long upStationId = upStationIds.get(0);
+        return sections.stream()
+                .map(Section::getUpStation)
+                .filter(upStation -> upStation.getId().equals(upStationId))
+                .collect(Collectors.toList())
+                .get(0);
     }
 
-    public void changeColor(String color) {
-        this.color = color;
+    public Station getDownEndpoint() {
+        List<Long> upStationIds = getUpStationIds(sections);
+        List<Long> downStationIds = getDownStationIds(sections);
+        downStationIds.removeAll(upStationIds);
+        Long downStationId = downStationIds.get(0);
+        return sections.stream()
+                .map(Section::getDownStation)
+                .filter(downStation -> downStation.getId().equals(downStationId))
+                .collect(Collectors.toList())
+                .get(0);
     }
 
+    private List<Long> getDownStationIds(List<Section> sections) {
+        return sections.stream()
+                .map(v -> v.getDownStation().getId())
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getUpStationIds(List<Section> sections) {
+        return sections.stream()
+                .map(v -> v.getUpStation().getId())
+                .collect(Collectors.toList());
+    }
+
+    public void checkSectionCount() {
+        if (sections.size() == 1) {
+            throw new RuntimeException(ExceptionMessages.getNeedAtLeastOneSectionExceptionMessage());
+        }
+    }
 }
