@@ -1,15 +1,17 @@
 package nextstep.subway.domain;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Line {
 
@@ -19,27 +21,16 @@ public class Line {
 
   private String name;
 
-  @Enumerated(value = EnumType.STRING)
+  @Embedded
   private Color color;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "upStation_id")
-  private Station upStation;
+  @Embedded
+  private final Sections sections = new Sections();
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "downStation_id")
-  private Station downStation;
-
-  private int distance;
-
-  public Line() {}
-
-  public Line(String name, Color color, Station upStation, Station downStation, int distance) {
+  @Builder
+  public Line(String name, Color color) {
     this.name = name;
     this.color = color;
-    this.upStation = upStation;
-    this.downStation = downStation;
-    this.distance = distance;
   }
 
   public void changeName(String name) {
@@ -50,27 +41,11 @@ public class Line {
     this.color = color;
   }
 
-  public Long getId() {
-    return id;
+  public void addSections(Section section) {
+    this.sections.addSection(section);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public Color getColor() {
-    return color;
-  }
-
-  public Station getUpStation() {
-    return upStation;
-  }
-
-  public Station getDownStation() {
-    return downStation;
-  }
-
-  public int getDistance() {
-    return distance;
+  public void deleteLastSection() {
+    this.sections.getSections().remove(this.sections.getSections().size()-1);
   }
 }

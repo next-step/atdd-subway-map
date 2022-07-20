@@ -5,32 +5,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Arrays;
 import java.util.List;
-import nextstep.subway.common.StationRestAssured;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends BasicAcceptanceTest {
 
     private static final String gangnamStation = "강남역";
     private static final String donongStation = "도농역";
     private static final String gooriStation = "구리역";
-
-    @LocalServerPort
-    int port;
-
-    private StationRestAssured stationRestAssured = new StationRestAssured();
-
-    @BeforeEach
-    public void setUp() {
-        RestAssured.port = port;
-    }
 
     /**
      * When 지하철역을 생성하면
@@ -59,8 +45,7 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @Test
     void 지하철역_목록_조회() {
-        stationRestAssured.saveStation(donongStation);
-        stationRestAssured.saveStation(gooriStation);
+        stationRestAssured.saveAllStation(Arrays.asList(donongStation, gooriStation));
 
         ExtractableResponse<Response> stations = stationRestAssured.findAllStations();
         assertThat(stations.statusCode()).isEqualTo(HttpStatus.OK.value());
