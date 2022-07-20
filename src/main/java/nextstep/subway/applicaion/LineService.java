@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.*;
 import nextstep.subway.domain.*;
 import nextstep.subway.exception.SubwayException;
+import nextstep.subway.exception.SubwayExceptionMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,13 +39,13 @@ public class LineService {
 
 	public LineResponse findLineById(Long lineId) {
 		return LineResponse.of(lineRepository.findById(lineId)
-				.orElseThrow(SubwayException::new));
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_LINE)));
 	}
 
 	@Transactional
 	public void updateLine(Long lineId, LineUpdateRequest lineUpdateRequest) {
 		Line line = lineRepository.findById(lineId)
-				.orElseThrow(SubwayException::new);
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_LINE));
 
 		line.update(lineUpdateRequest);
 	}
@@ -58,7 +59,7 @@ public class LineService {
 	@Transactional
 	public void addSection(Long lineId, SectionRequest sectionRequest) {
 		Line line = lineRepository.findById(lineId)
-				.orElseThrow(SubwayException::new);
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_LINE));
 
 		Section section =
 				saveSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
@@ -69,10 +70,10 @@ public class LineService {
 
 	private Section saveSection(Long upStationId, Long downStationId, Integer distance) {
 		Station upStation = stationRepository.findById(upStationId)
-				.orElseThrow(SubwayException::new);
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_STATION));
 
 		Station downStation = stationRepository.findById(downStationId)
-				.orElseThrow(SubwayException::new);
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_STATION));
 
 		return sectionRepository.save(
 				new Section(upStation, downStation, distance)
@@ -82,9 +83,11 @@ public class LineService {
 	@Transactional
 	public void deleteSection(Long lineId, SectionDeleteRequest sectionDeleteRequest) {
 		Station station = stationRepository.findById(sectionDeleteRequest.getStationId())
-				.orElseThrow(SubwayException::new);
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_STATION));
+
 		Line line = lineRepository.findById(lineId)
-				.orElseThrow(SubwayException::new);
+				.orElseThrow(() -> new SubwayException(SubwayExceptionMessage.NOT_EXIST_LINE));
+
 		Section section = line.deleteSectionOf(station);
 		sectionRepository.delete(section);
 	}

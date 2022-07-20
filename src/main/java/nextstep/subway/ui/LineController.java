@@ -47,19 +47,15 @@ public class LineController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PostMapping("{lineId}/sections")
+	@PostMapping("/{lineId}/sections")
 	public ResponseEntity<Void> addSection(@PathVariable Long lineId, @RequestBody SectionRequest sectionRequest) {
 		lineService.addSection(lineId, sectionRequest);
 		return ResponseEntity.noContent().build();
 	}
 
-	@DeleteMapping("{lineId}/sections")
+	@DeleteMapping("/{lineId}/sections")
 	public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestBody SectionDeleteRequest sectionDeleteRequest) {
-		try {
-			lineService.deleteSection(lineId, sectionDeleteRequest);
-		} catch (SubwayException e) {
-			return ResponseEntity.badRequest().build();
-		}
+		lineService.deleteSection(lineId, sectionDeleteRequest);
 		return ResponseEntity.noContent().build();
 	}
 }
