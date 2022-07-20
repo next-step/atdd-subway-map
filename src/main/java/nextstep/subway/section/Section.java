@@ -33,15 +33,23 @@ public class Section {
 	}
 
 	public void validateAppendUpStationId(Long appendUpStationId) {
-		if (!this.downStationId.equals(appendUpStationId)) {
+		if (downStationIsNotSameWith(appendUpStationId)) {
 			throw new CustomException(SectionErrorCode.INVALID_UP_STATION);
 		}
 	}
 
+	private boolean downStationIsNotSameWith(Long appendUpStationId) {
+		return !this.downStationId.equals(appendUpStationId);
+	}
+
 	public void validateAppendDownStationId(Long appendDownStationId) {
-		if (this.upStationId.equals(appendDownStationId)) {
+		if (upStationIsSameWith(appendDownStationId)) {
 			throw new CustomException(SectionErrorCode.INVALID_DOWN_STATION);
 		}
+	}
+
+	private boolean upStationIsSameWith(Long appendDownStationId) {
+		return this.upStationId.equals(appendDownStationId);
 	}
 
 	public boolean isIncludedStation(Long stationId) {
@@ -49,7 +57,7 @@ public class Section {
 	}
 
 	public void validateDeleteStationId(Long deleteStationId) {
-		if (!this.downStationId.equals(deleteStationId)) {
+		if (downStationIsNotSameWith(deleteStationId)) {
 			throw new CustomException(SectionErrorCode.INVALID_DOWN_STATION);
 		}
 	}
