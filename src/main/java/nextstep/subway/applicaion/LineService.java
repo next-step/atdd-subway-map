@@ -72,8 +72,8 @@ public class LineService {
 
     @Transactional
     public LineResponse addSections(Long id, SectionRequest sectionRequest) {
-        Long upStationId = Long.valueOf(sectionRequest.getUpStationId());
-        Long downStationId = Long.valueOf(sectionRequest.getDownStationId());
+        Long upStationId = sectionRequest.getUpStationId();
+        Long downStationId = sectionRequest.getDownStationId();
         int distance = sectionRequest.getDistance();
 
         Line line = lineFrom(id);
