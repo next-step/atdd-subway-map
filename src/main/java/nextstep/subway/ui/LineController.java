@@ -33,13 +33,7 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineCreationRequest lineRequest) {
-        StationResponse upStation = stationQueryService.findStation(lineRequest.getUpStationId());
-        StationResponse downStation = stationQueryService.findStation(lineRequest.getDownStationId());
-        LineResponse lineResponse = lineCommandService.saveLine(
-                lineRequest,
-                upStation.toEntity(),
-                downStation.toEntity()
-        );
+        LineResponse lineResponse = lineCommandService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId()))
                 .body(lineResponse);
     }

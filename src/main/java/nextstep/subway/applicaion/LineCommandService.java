@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.LineRepository;
@@ -17,10 +18,14 @@ import javax.persistence.EntityNotFoundException;
 @RequiredArgsConstructor
 public class LineCommandService {
 
-    private static final String NO_SUCH_LINE_FORMAT = "요청한 노선은 존재하지 않는 노선입니다. (요청한 id: %d)";
+    private final LineQueryService lineQueryService;
+    private final StationQueryService stationQueryService;
     private final LineRepository lineRepository;
 
-    public LineResponse saveLine(LineCreationRequest lineRequest, Station upStation, Station downStation) {
+    public LineResponse saveLine(LineCreationRequest lineRequest) {
+        Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
+        Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
+
         Line line = lineRepository.findByName(lineRequest.getName())
                 .orElseGet(() -> lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor())));
         line.addSection(upStation, downStation, lineRequest.getDistance());
@@ -28,10 +33,7 @@ public class LineCommandService {
     }
 
     public void modifyLine(Long lineId, LineModificationRequest lineRequest) {
-        lineRepository.findById(lineId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format(NO_SUCH_LINE_FORMAT, lineId)
-                ))
+        lineQueryService.findById(lineId)
                 .updateNameAndColor(lineRequest.getName(), lineRequest.getColor());
     }
 
