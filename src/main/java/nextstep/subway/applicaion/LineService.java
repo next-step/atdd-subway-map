@@ -3,13 +3,14 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
+import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,19 +18,24 @@ import java.util.stream.Collectors;
 public class LineService {
     private LineRepository lineRepository;
     private StationService stationService;
+    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.stationRepository = stationRepository;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
+
+        Sections sections = new Sections();
+        sections.add(new Section(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance()));
+
         Line line = lineRepository.save(new Line.Builder()
                                         .name(lineRequest.getName())
                                         .color(lineRequest.getColor())
-                                        .upStationId(lineRequest.getUpStationId())
-                                        .downStationId(lineRequest.getDownStationId())
+                                        .Sections(sections)
                                         .build());
 
         return createLineResponse(line);
@@ -37,12 +43,18 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
 
+        Sections sections = line.getSections();
+
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                stationService.getUpAndDownStationResponses(line.getUpStationId(), line.getDownStationId())
+                createStationResponses(sections.getLineStationIds())
         );
+    }
+
+    private List<StationResponse> createStationResponses(Set<Long> lineStationIds) {
+        return stationRepository.findAllById(lineStationIds).stream().map(StationResponse::new).collect(Collectors.toList());
     }
 
     public List<LineResponse> findAllLines() {

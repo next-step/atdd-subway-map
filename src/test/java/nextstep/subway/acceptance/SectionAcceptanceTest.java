@@ -7,6 +7,7 @@ import io.restassured.response.Response;
 import nextstep.subway.api.LineApiCall;
 import nextstep.subway.api.StationApiCall;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.util.DatabaseUitl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,13 +56,21 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> lineCreationResponse = LineApiCall.createLine(new LineRequest(일호선, "bg-red-600",구일역_아이디, 구로역_아이디, 구일_구로_거리));
 
         final Long 일호선_아이디 = lineCreationResponse.jsonPath().getLong("id");
-        final String 신도림역 = "신도림역";
 
-        ExtractableResponse<Response> sectionRegistrationResponse = SectionApiCall.registerSection(일호선_아이디, 구로역, 신도림역);
+        final String 신도림역 = "신도림역";
+        Long 신도림역_아이디 = getId(stationCreationResponses.get(1));
+        int 구로_신도림_거리 = 15;
+
+        ExtractableResponse<Response> sectionRegistrationResponse = LineApiCall.registerSection(일호선_아이디, new SectionRequest(구로역_아이디, 신도림역_아이디, 구로_신도림_거리));
         assertThat(sectionRegistrationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         ExtractableResponse<Response> getLineResponse = LineApiCall.getLine(일호선_아이디);
-        getLineResponse.jsonPath().getList("sections").contains("구로역", "신도림역");
+        final List<String> stationNames = getLineResponse.jsonPath().getList("stations.name", String.class);
+
+        assertThat(stationNames.get(0)).isEqualTo("구일역");
+        assertThat(stationNames.get(1)).isEqualTo("구로역");
+        assertThat(stationNames.get(2)).isEqualTo("신도림역");
+
 
     }
 

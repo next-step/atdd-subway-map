@@ -1,9 +1,6 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Line {
@@ -13,10 +10,9 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
 
+    @Embedded
+    private Sections sections = new Sections();
 
     public Long getId() {
         return id;
@@ -30,16 +26,8 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public int getDistance() {
-        return distance;
+    public Sections getSections() {
+        return sections;
     }
 
     public Line() {
@@ -49,17 +37,19 @@ public class Line {
     private Line(Builder builder) {
         this.name = builder.name;
         this.color = builder.color;
-        this.upStationId = builder.upStationId;
-        this.downStationId = builder.downStationId;
-        this.distance = builder.distance;
+        this.sections = builder.sections;
     }
+
+    public void updateLine(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
 
     public static class Builder {
         private String name;
         private String color;
-        private Long upStationId;
-        private Long downStationId;
-        private int distance;
+        private Sections sections;
 
         public Builder name(String name) {
             this.name = name;
@@ -71,18 +61,8 @@ public class Line {
             return this;
         }
 
-        public Builder upStationId(Long upStationId) {
-            this.upStationId = upStationId;
-            return this;
-        }
-
-        public Builder downStationId(Long downStationId) {
-            this.downStationId = downStationId;
-            return this;
-        }
-
-        public Builder distance(int distance) {
-            this.distance = distance;
+        public Builder Sections(Sections sections) {
+            this.sections = sections;
             return this;
         }
 
@@ -90,11 +70,6 @@ public class Line {
             return new Line(this);
         }
 
-    }
-
-    public void updateLine(String name, String color) {
-        this.name = name;
-        this.color = color;
     }
 
 }

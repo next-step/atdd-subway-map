@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineUpdateRequest;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import org.springframework.http.MediaType;
 
 public class LineApiCall {
@@ -53,5 +54,13 @@ public class LineApiCall {
                 .extract();
     }
 
-
+    // 지하철노선에 구간 등록
+    public static ExtractableResponse<Response> registerSection(Long lineId, SectionRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
 }
