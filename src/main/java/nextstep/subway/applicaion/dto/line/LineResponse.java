@@ -1,6 +1,7 @@
-package nextstep.subway.applicaion.dto;
+package nextstep.subway.applicaion.dto.line;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import nextstep.subway.applicaion.dto.station.StationResponse;
 
 import java.util.List;
 

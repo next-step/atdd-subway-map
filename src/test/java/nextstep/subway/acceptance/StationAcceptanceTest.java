@@ -4,12 +4,15 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.StationClient;
+import nextstep.subway.config.DatabaseCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
@@ -18,15 +21,23 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+class StationAcceptanceTest {
     @LocalServerPort
     int port;
+
+    @Autowired
+    DatabaseCleaner dataBaseCleaner;
 
     StationClient stationClient;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
+
+        dataBaseCleaner.afterPropertiesSet();
+        dataBaseCleaner.clear();
+
         stationClient = new StationClient();
     }
 
