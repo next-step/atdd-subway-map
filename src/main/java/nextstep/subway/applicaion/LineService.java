@@ -8,11 +8,12 @@ import nextstep.subway.domain.Line.LineRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.exception.EntityNotFoundException;
-import nextstep.subway.utils.ObjectMapUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -26,17 +27,16 @@ public class LineService {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
-        LineResponse lineResponse = ObjectMapUtils.looseMap(lineRepository.save(line), LineResponse.class);
-        lineResponse.sideStation(upStation, downStation);
-        return lineResponse;
+        Line save = lineRepository.save(line);
+        return new LineResponse(save);
     }
 
     public List<LineResponse> findAllLines() {
-        return ObjectMapUtils.mapLooseAll(lineRepository.findAll(), LineResponse.class);
+        return lineRepository.findAll().stream().map(LineResponse::new).collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
-        return ObjectMapUtils.map(lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("station.not.found")), LineResponse.class);
+        return new LineResponse(lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("station.not.found")));
     }
 
     @Transactional

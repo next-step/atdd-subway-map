@@ -7,8 +7,8 @@ import nextstep.subway.domain.station.Station;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class Sections {
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Section> sections = new ArrayList<>();
+    private Set<Section> sections = new HashSet<>();
 
     public Section lastSection() {
         return this.sections.stream().reduce((first, second) -> second).orElseThrow(null);
@@ -36,9 +36,9 @@ public class Sections {
         return sections.stream().mapToLong(Section::getDistance).sum();
     }
 
-    private void validAddUpStation(Station upStation) {
-        if (!Objects.equals(downStation(), upStation)) {
-            throw new IllegalArgumentException("section.upStation.line.downStation");
+    private void validAddUpStation(Station addUpStation) {
+        if (!Objects.equals(downStation().getId(), addUpStation.getId())) {
+            throw new IllegalArgumentException("section.upStation.not.line.downStation");
         }
     }
 
@@ -48,11 +48,6 @@ public class Sections {
         if (sectionIds.contains(addSectionDownStation.getId())) {
             throw new IllegalArgumentException("section.downStation.line.duplicate");
         }
-    }
-
-    public void validDelete(Station downStation) {
-        validDeleteUpStation(downStation);
-        validSectionCount();
     }
 
     public Section createSection(Line line, Station upStation, Station downStation, Long distance) {
@@ -68,10 +63,27 @@ public class Sections {
         this.sections.add(section);
     }
 
-    public void validSectionCount() {
-        if (this.sections.size() < 2) {
-            throw new IllegalArgumentException("section.count.less");
+    public void remove(Section section) {
+        this.sections.remove(section);
+    }
+
+    public void deleteDownStation(Station downStation) {
+        validDelete(downStation);
+        deleteSection(downStation);
+    }
+
+    private void deleteSection(Station downStation) {
+        for (Iterator<Section> section = this.sections.iterator(); section.hasNext(); ) {
+            Section nextSection = section.next();
+            if (section.equals(downStation)) {
+                this.sections.remove(section);
+            }
         }
+    }
+
+    public void validDelete(Station downStation) {
+        validDeleteUpStation(downStation);
+        validSectionCount();
     }
 
     public void validDeleteUpStation(Station downStation) {
@@ -81,4 +93,11 @@ public class Sections {
             }
         }
     }
+
+    public void validSectionCount() {
+        if (this.sections.size() < 2) {
+            throw new IllegalArgumentException("section.count.less");
+        }
+    }
+
 }

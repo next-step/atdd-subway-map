@@ -11,33 +11,19 @@ import java.util.Map;
 import static nextstep.subway.acceptance.common.CommonSteps.생성_성공_응답;
 import static nextstep.subway.acceptance.line.LineSteps.*;
 import static nextstep.subway.acceptance.station.StationSteps.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class SectionSteps {
 
     public static ExtractableResponse<Response> 구간이_등록되어_있다() {
         //Given 노선 생성
-        ExtractableResponse<Response> 노선 = 노선이_생성되어_있다(SHIN_BUNDANG_LINE_NAME, SHIN_BUNDANG_LINE_COLOR, SHIN_BUNDANG_UP_STATION_NAME, SHIN_BUNDANG_DOWN_STATION_NAME, DISTANCE);
+        ExtractableResponse<Response> 노선 = 노선_생성_요청(SHIN_BUNDANG_LINE_NAME, SHIN_BUNDANG_LINE_COLOR, SHIN_BUNDANG_UP_STATION_NAME, SHIN_BUNDANG_DOWN_STATION_NAME, DISTANCE);
         Long 노선_ID = 노선.jsonPath().getLong("id");
         Long 구간_상행역_ID = 지하철역_생성(SHIN_NONHYUN_STATION_NAME).jsonPath().getLong("id");
         Long 구간_하행역_ID = 지하철역_생성(GANGNAM_STATION_NAME).jsonPath().getLong("id");
         //When 구간 등록
         ExtractableResponse<Response> 구간 = 구간_등록_요청(노선_ID, 구간_상행역_ID, 구간_하행역_ID, DISTANCE);
-        //When 구간 등록 검증
-        구간_등록_검증(노선, 구간);
+        생성_성공_응답(구간);
         return 구간;
-    }
-
-    static void 구간_등록_검증(ExtractableResponse<Response> 노선, ExtractableResponse<Response> 구간) {
-        assertAll(
-                // then 지하철 구간 등록 성공 응답받는다.
-                () -> 생성_성공_응답(구간),
-                // then 구간의 상행역은 해당 노선의 하행 종점역이어야 한다.
-                () -> assertThat(구간.jsonPath().getLong("upStation.id")).isEqualTo(노선_하행역_ID),
-                // then 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
-                () -> assertThat(노선_역_목록_ID(노선)).doesNotContain(구간.jsonPath().getLong("downStation.id"))
-        );
     }
 
     public static ExtractableResponse<Response> 구간_등록_요청(Long 노선_ID, Long 구간_상행역_ID, Long 구간_하행역_ID, Long distance) {

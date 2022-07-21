@@ -18,7 +18,7 @@ public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "line_id")
-    private Long lineId;
+    private Long id;
 
     private String name;
 
@@ -49,12 +49,12 @@ public class Line {
         return this.sections.downStation();
     }
 
-    public void validDeleteDownStation(Station downStation) {
-        sections.validDelete(downStation);
-    }
-
     public void addSection(Station upStation, Station downStation, Long distance) {
         this.sections.addSection(this, upStation, downStation, distance);
+    }
+
+    public void deleteSection(Station downStation) {
+        this.sections.deleteDownStation(downStation);
     }
 
 }

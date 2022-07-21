@@ -19,8 +19,7 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return ObjectMapUtils.map(station, StationResponse.class);
+        return new StationResponse(stationRepository.save(new Station(stationRequest.getName())));
     }
 
     public List<StationResponse> findAllStations() {

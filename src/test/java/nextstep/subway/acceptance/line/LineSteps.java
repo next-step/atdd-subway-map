@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class LineSteps {
 
-
     public static final String SHIN_BUNDANG_LINE_NAME = "신분당선";
     public static final String SHIN_BUNDANG_LINE_COLOR = "bg-red-600";
     public static final String SHIN_BUNDANG_UP_STATION_NAME = "신논현역";
@@ -31,11 +30,7 @@ public class LineSteps {
     public static final String BUNDANG_UP_STATION_NAME = "분당노선상행역";
     public static final String BUNDANG_DOWN_STATION_NAME = "분당노선하행역";
     public static final Long DISTANCE = 5L;
-    public static Long 노선_상행역_ID = null;
-    public static Long 노선_하행역_ID = null;
-    public static Long 노선_ID = null;
 
-    static List<Long> 노선_역_목록_ID = new ArrayList<>();
 
     public static ExtractableResponse<Response> 노선_생성_요청(String 노선명, String 노선색, String 구간_상행역명, String 구간_하행역명, Long distance) {
         return RestAssured.given().log().all()
@@ -44,13 +39,6 @@ public class LineSteps {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
-    }
-
-    public static List<Long> 노선_역_목록_ID(ExtractableResponse<Response> 노선_생성) {
-        List<Long> 노선_역_목록_ID = new ArrayList<>();
-        노선_역_목록_ID.add(노선_상행역_ID);
-        노선_역_목록_ID.add(노선_하행역_ID);
-        return 노선_역_목록_ID;
     }
 
     private static Map<String, String> 노선_생성_PARAM(String name, String color, Long upStationId, Long downStationId, Long distance) {
@@ -63,26 +51,15 @@ public class LineSteps {
         return param;
     }
 
-    public static ExtractableResponse<Response> 노선이_생성되어_있다(String 노선명, String 노선색, String 노선_상행역명, String 노선_하행역명, Long distance) {
-        ExtractableResponse<Response> 노선_생성_응답 = 노선_생성_요청(노선명, 노선색, 노선_상행역명, 노선_하행역명, distance);
-        노선_ID = 노선_생성_응답.jsonPath().getLong("id");
-        노선_상행역_ID = 노선_생성_응답.jsonPath().getLong("upStation.id");
-        노선_하행역_ID = 노선_생성_응답.jsonPath().getLong("downStation.id");
-        생성된_노선_확인(노선_생성_응답, 노선명, 노선색);
-        return 노선_생성_응답;
-    }
-
     public static void 생성된_노선_확인(ExtractableResponse<Response> 노선_생성_응답, String 노선명, String 노선색) {
         assertAll(
                 () -> 생성_성공_응답(노선_생성_응답),
                 () -> assertThat(노선_생성_응답.jsonPath().getString("name")).isEqualTo(노선명),
-                () -> assertThat(노선_생성_응답.jsonPath().getString("color")).isEqualTo(노선색),
-                // then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-                () -> assertThat(지하철_노선_목록_조회().jsonPath().getList("name")).containsAnyOf(노선명)
+                () -> assertThat(노선_생성_응답.jsonPath().getString("color")).isEqualTo(노선색)
         );
     }
 
-    private static ExtractableResponse<Response> 지하철_노선_목록_조회() {
+    static ExtractableResponse<Response> 지하철_노선_목록_조회() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
                 .then().log().all()
@@ -97,19 +74,11 @@ public class LineSteps {
         );
     }
 
-    static List<String> 지하철_노선명_목록_조회() {
-        return 지하철_노선_목록_조회().jsonPath().getList("name");
-    }
-
     public static ExtractableResponse<Response> 지하철_노선_조회(Long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + id)
                 .then().log().all()
                 .extract();
-    }
-
-    public static String 지하철_노선명_조회(Long id) {
-        return 지하철_노선_조회(id).jsonPath().getString("name");
     }
 
     public static ExtractableResponse<Response> 지하철_노선_수정(Long id, String name, String color) {
