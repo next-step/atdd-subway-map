@@ -25,7 +25,4 @@ public class LineResponse {
         this.distance = line.distance();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

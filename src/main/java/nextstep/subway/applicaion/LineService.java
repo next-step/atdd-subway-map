@@ -27,8 +27,7 @@ public class LineService {
         Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
         Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(() -> new EntityNotFoundException("station.not.found"));
         Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
-        Line save = lineRepository.save(line);
-        return new LineResponse(save);
+        return new LineResponse(lineRepository.save(line));
     }
 
     public List<LineResponse> findAllLines() {

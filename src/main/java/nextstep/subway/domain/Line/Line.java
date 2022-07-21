@@ -37,6 +37,7 @@ public class Line {
         this.name = name;
         this.color = color;
     }
+
     public Long distance() {
         return this.sections.distance();
     }

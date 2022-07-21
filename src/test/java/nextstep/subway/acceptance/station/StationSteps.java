@@ -31,6 +31,13 @@ public class StationSteps {
                 .extract();
     }
 
+    static ExtractableResponse<Response> 지하철역_삭제(Long id) {
+        return RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .extract();
+    }
+
     public static Long 지하철역_생성_ID(String stationName) {
         Map<String, String> param = new HashMap<>();
         param.put("name", stationName);

@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
 public class Station {
 
     @Id
@@ -19,5 +19,4 @@ public class Station {
     public Station(String name) {
         this.name = name;
     }
-
 }
