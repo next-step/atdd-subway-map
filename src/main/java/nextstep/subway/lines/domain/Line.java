@@ -4,6 +4,7 @@ import nextstep.subway.stations.domain.Station;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -14,38 +15,31 @@ public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_id")
     private Long id;
 
     private String name;
 
     private String color;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Station upStation;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Station downStation;
-
     @Embedded
-    private Distance distance;
+    private Sections sections;
 
     protected Line() {
 
     }
 
-    private Line(final String name, final String color, final Station upStation, final Station downStation, Distance distance) {
+    private Line(final String name, final String color, final Station upStation, final Station downStation, int distance) {
         this.name = name.trim();
         this.color = color.trim();
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = new Sections();
+        this.sections.addSection(upStation, downStation, distance);
     }
 
     public static Line makeLine(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
         validateName(name);
         validateColor(color);
-        validateUpAndDownStation(upStation, downStation);
-        return new Line(name, color, upStation, downStation, new Distance(distance));
+        return new Line(name, color, upStation, downStation, distance);
     }
 
     private static void validateName(final String name) {
@@ -57,12 +51,6 @@ public class Line {
     private static void validateColor(final String color) {
         if(!StringUtils.hasLength(color.trim())) {
             throw new IllegalArgumentException("지하철 노선색은 null 이거나 빈문자열이 들어올 수 없습니다. [문자열 사이에 공백불가]");
-        }
-    }
-
-    private static void validateUpAndDownStation(Station upStation, Station downStation) {
-        if(upStation.isSame(downStation)) {
-            throw new IllegalArgumentException("상행과 하행이 같습니다.");
         }
     }
 
@@ -78,12 +66,8 @@ public class Line {
         return this.color;
     }
 
-    public Station getUpStation() {
-        return this.upStation;
-    }
-
-    public Station getDownStation() {
-        return this.downStation;
+    public Sections getSections() {
+        return this.sections;
     }
 
     public void changeName(final String name) {
@@ -97,6 +81,89 @@ public class Line {
         if(Objects.nonNull(color)) {
             validateColor(color);
             this.color = color.trim();
+        }
+    }
+
+    private boolean isSectionsEmpty() {
+        return this.sections.isEmpty();
+    }
+
+    private void validateSectionsEmpty() {
+        if(isSectionsEmpty()) {
+            throw new IllegalStateException("");
+        }
+    }
+
+    private Section findUpSection() {
+
+        // 구간이 비어있을경우 예외처리
+        validateSectionsEmpty();
+        Section upSection = this.sections.findFirst();
+
+        while(upSection != null) {
+            boolean isFind = false;
+            for(Section section : sections) {
+                // 현재구간의 상행역과 다른구간의 하행역이 같은지 체크
+                if(upSection.correctUpStationFromOtherSectionDownStation(section)) {
+                    upSection = section;
+                    isFind = true;
+                    break;
+                }
+            }
+
+            if(!isFind) {
+                break;
+            }
+        }
+        return upSection;
+    }
+    private Section findDownSection() {
+
+        // 구간이 비어있을경우 예외처리
+        validateSectionsEmpty();
+        Section downSection = this.sections.findFirst();
+
+        while(downSection != null) {
+            boolean isFind = false;
+            for(Section section : sections) {
+                //현재 구간의 하행역과 다른구간의 상행역이 같은지 체크
+                if(downSection.correctDownStationFromOtherSectionUpStation(section)) {
+                    downSection = section;
+                    isFind = true;
+                    break;
+                }
+            }
+
+            if(!isFind) {
+                break;
+            }
+        }
+        return downSection;
+    }
+
+    public void addSection(Station upStation, Station downStation, int distance) {
+
+        Section upSection = findUpSection();
+        Section downSection = findDownSection();
+
+        if(upSection.isUpStation(downStation) || downSection.isDownStation(upStation)) {
+            this.sections.addSection(upStation, downStation, distance);
+            return;
+        }
+
+        throw new IllegalStateException("");
+    }
+
+    /**
+     * 구간 제거
+     * @param station
+     */
+    public void removeSection(Station station) {
+
+        Section downSection = findDownSection();
+
+        if(downSection.isDownStation(station)) {
+           this.sections.removeSection(downSection);
         }
     }
 }
