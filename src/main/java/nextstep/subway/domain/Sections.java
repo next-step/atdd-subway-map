@@ -2,6 +2,8 @@ package nextstep.subway.domain;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import nextstep.subway.exception.DuplicatedStationException;
+import nextstep.subway.exception.SectionRegistrationException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -26,6 +28,8 @@ public class Sections {
     private List<Section> sections = new LinkedList<>();
 
     public void addSection(Section section) {
+        validateNewUpStation(section);
+        validateNewDownStation(section);
         int index = sectionIndexOf(section);
         if (index == NO_INDEX) {
             return;
@@ -33,11 +37,34 @@ public class Sections {
         sections.add(index, section);
     }
 
+    private void validateNewUpStation(Section section) {
+        if (sections.isEmpty()) {
+            return;
+        }
+        Station upStation = section.getUpStation();
+        Station lastStation = sections.get(sections.size() - 1)
+                .getDownStation();
+        if (!lastStation.equals(upStation)) {
+            throw new SectionRegistrationException(lastStation, upStation);
+        }
+    }
+
+    private void validateNewDownStation(Section section) {
+        if (sections.isEmpty()) {
+            return;
+        }
+        Station downStation = section.getDownStation();
+        if (getStations().contains(downStation)) {
+            throw new DuplicatedStationException(downStation);
+        }
+    }
+
     public List<Station> getStations() {
         List<Station> stations = sections.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toList());
-        stations.add(sections.get(sections.size() - 1).getDownStation());
+        stations.add(sections.get(sections.size() - 1)
+                .getDownStation());
         return stations;
     }
 
@@ -46,17 +73,10 @@ public class Sections {
             return ZERO;
         }
         return IntStream.range(0, sections.size())
-                .filter(i -> isStationEqualTo(sections.get(i), section))
+                .filter(i -> sections.get(i)
+                        .isStationEqualTo(section))
                 .findFirst()
                 .orElse(NO_INDEX);
-    }
-
-    private boolean isStationEqualTo(Section section, Section newSection) {
-        Long sectionDownStationId = section.getDownStation()
-                .getId();
-        Long newSectionUpStationId = newSection.getUpStation()
-                .getId();
-        return sectionDownStationId.equals(newSectionUpStationId);
     }
 
 }
