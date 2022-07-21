@@ -10,24 +10,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Component
 public class HttpStatusValidator {
 
-    public ExtractableResponse<Response> validateCreated(ExtractableResponse<Response> response) {
+    public void validateCreated(ExtractableResponse<Response> response) {
         validateStatusCode(response, HttpStatus.CREATED);
-        return response;
     }
 
-    public ExtractableResponse<Response> validateOk(ExtractableResponse<Response> response) {
+    public void validateOk(ExtractableResponse<Response> response) {
         validateStatusCode(response, HttpStatus.OK);
-        return response;
     }
 
-    public ExtractableResponse<Response> validateNoContent(ExtractableResponse<Response> response) {
+    public void validateNoContent(ExtractableResponse<Response> response) {
         validateStatusCode(response, HttpStatus.NO_CONTENT);
-        return response;
     }
 
-    public ExtractableResponse<Response> validateBadRequest(ExtractableResponse<Response> response) {
+    public void validateBadRequest(ExtractableResponse<Response> response) {
         validateStatusCode(response, HttpStatus.BAD_REQUEST);
-        return response;
     }
 
 
