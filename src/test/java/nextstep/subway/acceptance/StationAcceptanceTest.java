@@ -3,21 +3,16 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.common.CommonAcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationAcceptanceTest extends BaseAcceptanceTest {
+public class StationAcceptanceTest extends CommonAcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -72,7 +67,7 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Integer stationId = 지하철_역_생성("강남역").jsonPath().get("id");
+        Long stationId = 지하철_역_생성("강남역").jsonPath().getLong("id");
 
         // when
         지하철_역_삭제(stationId);
@@ -83,20 +78,6 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
         assertThat(stationNames).isEmpty();
     }
 
-
-
-    private ExtractableResponse<Response> 지하철_역_생성(String name) {
-        Map<String, String> station = new HashMap<>();
-        station.put("name", name);
-
-        return RestAssured.given().log().all()
-                .body(station)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
     private ExtractableResponse<Response> 지하철_역_목록_조회() {
         return RestAssured
                 .given().log().all()
@@ -105,7 +86,7 @@ public class StationAcceptanceTest extends BaseAcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철_역_삭제(Integer id) {
+    private ExtractableResponse<Response> 지하철_역_삭제(Long id) {
         return RestAssured.given().log().all()
                 .when().delete("/stations/" + id)
                 .then().log().all()
