@@ -17,13 +17,11 @@ import java.util.stream.Collectors;
 public class StationCommandService {
     private final StationRepository stationRepository;
 
-    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
-    @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }

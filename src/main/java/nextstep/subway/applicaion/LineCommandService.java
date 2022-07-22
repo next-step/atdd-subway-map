@@ -21,19 +21,16 @@ public class LineCommandService {
     private final StationQueryService stationQueryService;
     private final LineRepository lineRepository;
 
-    @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(new Line(lineRequest));
         return createLineResponse(line);
     }
 
-    @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findLineOrElseThrow(id);
         lineRepository.save(lineRequest.toLine(line));
     }
 
-    @Transactional
     public void deleteLineById(Long id) {
         findLineOrElseThrow(id);
         lineRepository.deleteById(id);
