@@ -19,6 +19,10 @@ dependencies {
 
     implementation 'com.google.guava:guava:r05'
 
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.modelmapper.extensions:modelmapper-spring:2.4.4'
     // log
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 
