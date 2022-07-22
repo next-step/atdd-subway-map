@@ -3,7 +3,6 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.application.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,12 +93,12 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        StationResponse stationResponse = 지하철역_생성(교대역)
-                .body()
-                .as(StationResponse.class);
+        Long stationId = 지하철역_생성(교대역)
+                .jsonPath()
+                .getLong("id");
 
         //when
-        ExtractableResponse<Response> deleteResponse = 지하철역_제거(stationResponse.getId());
+        ExtractableResponse<Response> deleteResponse = 지하철역_제거(stationId);
 
         //then
         List<String> stationNames = 지하철역_목록_조회()
@@ -111,7 +110,7 @@ public class StationAcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> 지하철역_생성(String stationName) {
+    public ExtractableResponse<Response> 지하철역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -127,6 +126,7 @@ public class StationAcceptanceTest {
 
     private ExtractableResponse<Response> 지하철역_목록_조회() {
         return RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/stations")
                 .then()
                 .log().all()
