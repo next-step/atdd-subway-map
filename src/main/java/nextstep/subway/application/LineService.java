@@ -6,7 +6,6 @@ import nextstep.subway.common.exception.ResponseCode;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.dto.line.CreateLineRequest;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
     public LineResponse saveLine(CreateLineRequest request) {
         Station upStation = findStation(request.getUpStationId());
@@ -34,7 +32,6 @@ public class LineService {
                                  .upStation(upStation)
                                  .downStation(downStation)
                                  .distance(request.getDistance()).build();
-        sectionRepository.save(section);
 
         Line line = new Line(request.getName(), request.getColor(), request.getDistance(), section);
         lineRepository.save(line);

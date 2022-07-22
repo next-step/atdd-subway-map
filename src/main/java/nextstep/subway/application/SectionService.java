@@ -6,7 +6,6 @@ import nextstep.subway.common.exception.ResponseCode;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
-import nextstep.subway.domain.SectionRepository;
 import nextstep.subway.domain.Sections;
 import nextstep.subway.domain.Station;
 import nextstep.subway.domain.StationRepository;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class SectionService {
-    private final SectionRepository sectionRepository;
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
 
