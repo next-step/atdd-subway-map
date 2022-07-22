@@ -79,19 +79,7 @@ public class Sections {
                        .collect(Collectors.toUnmodifiableList());
     }
 
-    public Station getUpEndStation() {
-        return sections.get(FIRST_STATION_IDX).getUpStation();
-    }
-
     public Station getDownEndStation() {
         return sections.get(sections.size() - 1).getDownStation();
-    }
-
-    public Section getDownEndSection() {
-        return sections.get(sections.size() - 1);
-    }
-
-    public List<Section> getSections() {
-        return new ArrayList<>(sections);
     }
 }
