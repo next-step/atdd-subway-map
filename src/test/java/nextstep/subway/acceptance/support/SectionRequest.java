@@ -12,7 +12,7 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SectionRequest {
-    public static ExtractableResponse<Response> 구간_등록_요청(long registLineId, long upStationId, long downStationId, int distance) {
+    public static ExtractableResponse<Response> 구간_생성_요청(long registLineId, long upStationId, long downStationId, int distance) {
         Map<String, String> params = new HashMap<>();
         params.put("downStationId", String.valueOf(downStationId));
         params.put("upStationId", String.valueOf(upStationId));

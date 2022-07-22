@@ -14,9 +14,11 @@ import java.util.List;
 import static nextstep.subway.acceptance.support.LineRequest.지하철노선_목록조회_요청;
 import static nextstep.subway.acceptance.support.LineRequest.지하철노선_삭제_요청;
 import static nextstep.subway.acceptance.support.LineRequest.지하철노선_생성_요청;
+import static nextstep.subway.acceptance.support.LineRequest.지하철노선_생성_요청후_식별자반환;
 import static nextstep.subway.acceptance.support.LineRequest.지하철노선_수정_요청;
 import static nextstep.subway.acceptance.support.LineRequest.지하철노선_조회_요청;
 import static nextstep.subway.acceptance.support.StationRequest.지하철역_생성_요청;
+import static nextstep.subway.acceptance.support.StationRequest.지하철역_생성_요청후_식별자_반환;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -29,8 +31,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     public void setUp() {
-        upStationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
-        downStationId = 지하철역_생성_요청("신갈역").jsonPath().getLong("id");
+        upStationId = 지하철역_생성_요청후_식별자_반환("기흥역");
+        downStationId = 지하철역_생성_요청후_식별자_반환("신갈역");
     }
 
     /**
@@ -76,12 +78,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findLine() {
         // given
-        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE).jsonPath().getLong("id");
+        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // when
-        final ExtractableResponse<Response> response = 지하철노선_조회_요청(lineId);
+        final ExtractableResponse<Response> 지하철노선_조희_응답 = 지하철노선_조회_요청(지하철노선);
 
-        생성된_노선의_정보_확인(lineId, response);
+        생성된_노선의_정보_확인(지하철노선, 지하철노선_조희_응답);
     }
 
     /**
@@ -93,13 +95,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE).jsonPath().getLong("id");
+        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // when
-        지하철노선_수정_요청(lineId, "다른분당선", "bg-red-610");
+        지하철노선_수정_요청(지하철노선, "다른분당선", "bg-red-610");
 
         // then
-        노선_수정여부_확인(lineId, "다른분당선", "bg-red-610");
+        노선_수정여부_확인(지하철노선, "다른분당선", "bg-red-610");
     }
 
     /**
@@ -111,13 +113,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        long lineId = 지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE).jsonPath().getLong("id");
+        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // when
-        final ExtractableResponse<Response> response = 지하철노선_삭제_요청(lineId);
+        final ExtractableResponse<Response> 지하철_삭제_응답 = 지하철노선_삭제_요청(지하철노선);
 
         // then
-        지하철노선_삭제_확인(response);
+        지하철노선_삭제_확인(지하철_삭제_응답);
     }
 
     private void 지하철_노선목록_조회후_생성한_노선_확인(String... lineName) {

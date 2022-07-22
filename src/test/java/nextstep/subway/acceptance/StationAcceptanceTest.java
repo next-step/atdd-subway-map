@@ -12,6 +12,7 @@ import java.util.List;
 import static nextstep.subway.acceptance.support.StationRequest.지하철역_목록조회_요청;
 import static nextstep.subway.acceptance.support.StationRequest.지하철역_삭제_요청;
 import static nextstep.subway.acceptance.support.StationRequest.지하철역_생성_요청;
+import static nextstep.subway.acceptance.support.StationRequest.지하철역_생성_요청후_식별자_반환;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -25,10 +26,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = 지하철역_생성_요청("강남역");
+        ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(지하철역_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         지하철_목록조회후_생성한역_확인("강남역");
@@ -59,10 +60,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        long stationId = 지하철역_생성_요청("기흥역").jsonPath().getLong("id");
+        long 지하철역 = 지하철역_생성_요청후_식별자_반환("기흥역");
 
         // when
-        지하철역_삭제_요청(stationId);
+        지하철역_삭제_요청(지하철역);
 
         // then
         지하철_목록조회후_제거된역_확인("기흥역");

@@ -12,6 +12,14 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LineRequest {
+    public static long 지하철노선_생성_요청후_식별자반환(final String lineName,
+                                          final String lineColor,
+                                          final long upStationId,
+                                          final long downStationId,
+                                          final int distance) {
+        return 지하철노선_생성_요청(lineName, lineColor, upStationId, downStationId, distance).jsonPath().getLong("id");
+    }
+
     public static ExtractableResponse<Response> 지하철노선_생성_요청(final String lineName,
                                                       final String lineColor,
                                                       final long upStationId,

@@ -12,6 +12,10 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StationRequest {
+    public static long 지하철역_생성_요청후_식별자_반환(String stationName){
+        return 지하철역_생성_요청(stationName).jsonPath().getLong("id");
+    }
+
     public static ExtractableResponse<Response> 지하철역_생성_요청(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
