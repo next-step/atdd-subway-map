@@ -116,10 +116,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
         long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
 
         // when
-        final ExtractableResponse<Response> 지하철_삭제_응답 = 지하철노선_삭제_요청(지하철노선);
+        final ExtractableResponse<Response> 지하철노선_삭제_응답 = 지하철노선_삭제_요청(지하철노선);
 
         // then
-        지하철노선_삭제_확인(지하철_삭제_응답);
+        지하철노선_삭제_확인(지하철노선_삭제_응답);
     }
 
     private void 지하철_노선목록_조회후_생성한_노선_확인(String... lineName) {
