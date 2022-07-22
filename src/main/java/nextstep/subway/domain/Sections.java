@@ -3,7 +3,8 @@ package nextstep.subway.domain;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import nextstep.subway.common.exception.CustomException;
-import nextstep.subway.common.exception.ResponseCode;
+import nextstep.subway.common.exception.code.LineCode;
+import nextstep.subway.common.exception.code.SectionCode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -33,13 +34,13 @@ public class Sections {
 
     private void checkSectionMatch(final Section section) {
         if (!getDownEndStation().equals(section.getUpStation())) {
-            throw new CustomException(ResponseCode.SECTION_NOT_MATCH);
+            throw new CustomException(SectionCode.SECTION_NOT_MATCH);
         }
     }
 
     private void checkStationDuplicate(final Section section) {
         if (isContain(section.getDownStation())) {
-            throw new CustomException(ResponseCode.LINE_STATION_DUPLICATE);
+            throw new CustomException(LineCode.LINE_STATION_DUPLICATE);
         }
     }
 
@@ -56,13 +57,13 @@ public class Sections {
 
     private void checkInvalidRemoveSize() {
         if (size() <= INVALID_REMOVE_SIZE) {
-            throw new CustomException(ResponseCode.SECTION_REMOVE_INVALID);
+            throw new CustomException(SectionCode.SECTION_REMOVE_INVALID);
         }
     }
 
     private void checkIsDownEndStation(final Long stationId, final Station downEndStation) {
         if (!downEndStation.getId().equals(stationId)) {
-            throw new CustomException(ResponseCode.SECTION_REMOVE_INVALID);
+            throw new CustomException(SectionCode.SECTION_REMOVE_INVALID);
         }
     }
 

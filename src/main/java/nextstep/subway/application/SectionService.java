@@ -2,7 +2,8 @@ package nextstep.subway.application;
 
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.common.exception.CustomException;
-import nextstep.subway.common.exception.ResponseCode;
+import nextstep.subway.common.exception.code.LineCode;
+import nextstep.subway.common.exception.code.StationCode;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Section;
@@ -42,11 +43,11 @@ public class SectionService {
 
     private Station findStation(long stationId) {
         return stationRepository.findById(stationId)
-                                .orElseThrow(() -> new CustomException(ResponseCode.STATION_NOT_FOUND));
+                                .orElseThrow(() -> new CustomException(StationCode.STATION_NOT_FOUND));
     }
 
     private Line findLine(final Long lineId) {
         return lineRepository.findById(lineId)
-                             .orElseThrow(() -> new CustomException(ResponseCode.LINE_NOT_FOUND));
+                             .orElseThrow(() -> new CustomException(LineCode.LINE_NOT_FOUND));
     }
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import nextstep.subway.common.exception.ResponseCode;
+import nextstep.subway.common.exception.code.ResponseCode;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)

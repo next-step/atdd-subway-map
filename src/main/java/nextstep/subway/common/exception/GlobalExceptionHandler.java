@@ -1,6 +1,8 @@
 package nextstep.subway.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import nextstep.subway.common.exception.code.CommonCode;
+import nextstep.subway.common.exception.code.ResponseCode;
 import nextstep.subway.ui.dto.CommonResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<String> fieldErrorMessage = getFieldErrorMessage(e.getFieldErrors());
-        CommonResponse<Object> response = new CommonResponse<>(ResponseCode.PARAM_INVALID, fieldErrorMessage);
+        CommonResponse<Object> response = new CommonResponse<>(CommonCode.PARAM_INVALID, fieldErrorMessage);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -41,7 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleException(Exception ex) {
         log.error("--- 알 수 없는 오류 감지.  ", ex);
-        return ResponseEntity.ok(new CommonResponse<>(ResponseCode.ETC));
+        return ResponseEntity.ok(new CommonResponse<>(CommonCode.ETC));
     }
 
     private List<String> getFieldErrorMessage(List<FieldError> fieldErrors) {
