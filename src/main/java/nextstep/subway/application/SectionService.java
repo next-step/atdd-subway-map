@@ -39,10 +39,7 @@ public class SectionService {
 
     public void deleteSection(final Long lineId, final Long stationId) {
         Sections sections = findLine(lineId).getSections();
-
-        Section removeSection = sections.removeLastSection(stationId);
-
-        sectionRepository.delete(removeSection);
+        sections.removeLastSection(stationId);
     }
 
     private Station findStation(long stationId) {

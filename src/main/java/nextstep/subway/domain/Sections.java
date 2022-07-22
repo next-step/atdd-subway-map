@@ -20,7 +20,7 @@ public class Sections {
     public static final int FIRST_STATION_IDX = 0;
     public static final int INVALID_REMOVE_SIZE = 1;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Section> sections = new ArrayList<>();
 
     public void add(final Section section) {
