@@ -1,9 +1,6 @@
 package nextstep.subway.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Station {
@@ -11,6 +8,9 @@ public class Station {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public Station() {
     }
@@ -26,4 +26,14 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public void changeLine(Line line) {
+        this.line = line;
+        line.getStations().add(this);
+    }
+
 }
