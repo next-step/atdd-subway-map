@@ -24,7 +24,7 @@ public class DatabaseInitializer implements InitializingBean {
     private List<String> tableNames;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         entityManager.unwrap(Session.class)
                 .doWork(this::addTableNames);
     }
@@ -49,9 +49,11 @@ public class DatabaseInitializer implements InitializingBean {
 
     private void initializeTables(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
+        statement.executeUpdate("SET REFERENTIAL_INTEGRITY FALSE");
         for (String tableName : tableNames) {
             statement.executeUpdate("TRUNCATE TABLE " + tableName);
             statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1");
         }
+        statement.executeUpdate("SET REFERENTIAL_INTEGRITY TRUE");
     }
 }

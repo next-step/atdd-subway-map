@@ -2,10 +2,8 @@ package nextstep.subway.domain;
 
 import nextstep.subway.applicaion.dto.LineRequest;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -16,6 +14,9 @@ public class Line {
     private String name;
 
     private String color;
+
+    @OneToMany(mappedBy = "line")
+    private List<Station> stations;
 
     private Long upStationId;
 
