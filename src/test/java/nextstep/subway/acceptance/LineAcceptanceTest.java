@@ -28,24 +28,24 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private long 상행역;
     private long 하행역;
+    private long 신분당선;
 
     @BeforeEach
     public void setUp() {
         상행역 = 지하철역_생성_요청후_식별자_반환("기흥역");
         하행역 = 지하철역_생성_요청후_식별자_반환("신갈역");
+        신분당선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
     }
 
     /**
-     * When 지하철 노선을 생성하면
-     * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     * Given 지하철 노선을 생성하면
+     * When 지하철 노선 목록 조회하면
+     * Then 생성한 노선을 찾을 수 있다
      */
     @DisplayName("지하철노선 생성한다.")
     @Test
     void createStationLine() {
-        // when
-        지하철노선_생성_요청("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
-
-        // then
+        // when & then
         지하철_노선목록_조회후_생성한_노선_확인("신분당선");
     }
 
@@ -58,8 +58,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllLine() {
         // given
-        지하철노선_생성_요청("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
-        지하철노선_생성_요청("에버라인", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
+        지하철노선_생성_요청후_식별자반환("에버라인", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // when & then
         지하철_노선목록_조회후_생성한_노선_확인("신분당선", "에버라인");
@@ -73,13 +72,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철노선 조회")
     @Test
     void findLine() {
-        // given
-        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
-
         // when
-        final ExtractableResponse<Response> 지하철노선_조희_응답 = 지하철노선_조회_요청(지하철노선);
+        final ExtractableResponse<Response> 지하철노선_조희_응답 = 지하철노선_조회_요청(신분당선);
 
-        생성된_노선의_정보_확인(지하철노선, 지하철노선_조희_응답);
+        // then
+        생성된_노선의_정보_확인(신분당선, 지하철노선_조희_응답);
     }
 
     /**
@@ -90,14 +87,11 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철노선 수정")
     @Test
     void updateLine() {
-        // given
-        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
-
         // when
-        지하철노선_수정_요청(지하철노선, "다른분당선", "bg-red-610");
+        지하철노선_수정_요청(신분당선, "다른분당선", "bg-red-610");
 
         // then
-        노선_수정여부_확인(지하철노선, "다른분당선", "bg-red-610");
+        노선_수정여부_확인(신분당선, "다른분당선", "bg-red-610");
     }
 
     /**
@@ -108,11 +102,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteLine() {
-        // given
-        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
-
         // when
-        final ExtractableResponse<Response> 지하철노선_삭제_응답 = 지하철노선_삭제_요청(지하철노선);
+        final ExtractableResponse<Response> 지하철노선_삭제_응답 = 지하철노선_삭제_요청(신분당선);
 
         // then
         지하철노선_삭제_확인(지하철노선_삭제_응답);
