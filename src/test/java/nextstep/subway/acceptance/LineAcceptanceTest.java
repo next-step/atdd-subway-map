@@ -26,13 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 public class LineAcceptanceTest extends AcceptanceTest {
     private static final int LINE_DISTANCE = 10;
 
-    private long upStationId;
-    private long downStationId;
+    private long 상행역;
+    private long 하행역;
 
     @BeforeEach
     public void setUp() {
-        upStationId = 지하철역_생성_요청후_식별자_반환("기흥역");
-        downStationId = 지하철역_생성_요청후_식별자_반환("신갈역");
+        상행역 = 지하철역_생성_요청후_식별자_반환("기흥역");
+        하행역 = 지하철역_생성_요청후_식별자_반환("신갈역");
     }
 
     /**
@@ -42,12 +42,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철노선 생성한다.")
     @Test
     void createStationLine() {
-        // given
-        지하철역_생성_요청("기흥역");
-        지하철역_생성_요청("신갈역");
-
         // when
-        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
+        지하철노선_생성_요청("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // then
         지하철_노선목록_조회후_생성한_노선_확인("신분당선");
@@ -62,8 +58,8 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllLine() {
         // given
-        지하철노선_생성_요청("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
-        지하철노선_생성_요청("에버라인", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
+        지하철노선_생성_요청("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
+        지하철노선_생성_요청("에버라인", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // when & then
         지하철_노선목록_조회후_생성한_노선_확인("신분당선", "에버라인");
@@ -78,7 +74,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findLine() {
         // given
-        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
+        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // when
         final ExtractableResponse<Response> 지하철노선_조희_응답 = 지하철노선_조회_요청(지하철노선);
@@ -95,7 +91,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void updateLine() {
         // given
-        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
+        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // when
         지하철노선_수정_요청(지하철노선, "다른분당선", "bg-red-610");
@@ -113,7 +109,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", upStationId, downStationId, LINE_DISTANCE);
+        long 지하철노선 = 지하철노선_생성_요청후_식별자반환("신분당선", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // when
         final ExtractableResponse<Response> 지하철노선_삭제_응답 = 지하철노선_삭제_요청(지하철노선);
@@ -140,7 +136,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
             () -> assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId),
             () -> assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선"),
             () -> assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600"),
-            () -> assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(upStationId, downStationId),
+            () -> assertThat(response.jsonPath().getList("stations.id", Long.class)).containsExactly(상행역, 하행역),
             () -> assertThat(response.jsonPath().getList("stations.name", String.class)).containsExactly("기흥역", "신갈역")
                  );
     }
