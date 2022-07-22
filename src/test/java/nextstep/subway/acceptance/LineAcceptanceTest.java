@@ -58,7 +58,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllLine() {
         // given
-        지하철노선_생성_요청후_식별자반환("에버라인", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
+        지하철노선_생성_요청("에버라인", "bg-red-600", 상행역, 하행역, LINE_DISTANCE);
 
         // when & then
         지하철_노선목록_조회후_생성한_노선_확인("신분당선", "에버라인");
