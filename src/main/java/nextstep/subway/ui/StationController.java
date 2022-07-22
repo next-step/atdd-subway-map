@@ -1,5 +1,6 @@
 package nextstep.subway.ui;
 
+import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.StationCommandService;
 import nextstep.subway.applicaion.StationQueryService;
 import nextstep.subway.applicaion.dto.StationRequest;
@@ -13,15 +14,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stations")
+@RequiredArgsConstructor
 public class StationController {
     private final StationQueryService stationQueryService;
 
     private final StationCommandService stationCommandService;
-
-    public StationController(StationQueryService stationQueryService, StationCommandService stationCommandService) {
-        this.stationQueryService = stationQueryService;
-        this.stationCommandService = stationCommandService;
-    }
 
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
