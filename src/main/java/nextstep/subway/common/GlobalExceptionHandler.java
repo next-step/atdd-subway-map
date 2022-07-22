@@ -10,7 +10,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity<ErrorResponse> illegalArgumentException(IllegalArgumentException e) {
-        final ErrorResponse errorResponse = new ErrorResponse(IllegalArgumentException.class.getName(), e.getMessage());
+        final ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 }

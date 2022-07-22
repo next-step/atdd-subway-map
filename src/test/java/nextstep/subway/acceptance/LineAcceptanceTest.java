@@ -32,6 +32,8 @@ public class LineAcceptanceTest extends BaseTest {
     private static final String LINE_COLOR_9 = "#BDB092";
     private static final Long LINE_DISTANCE_9 = 37L;
 
+    private static final String LINE_NOTFOUND_MESSAGE = "해당 id의 지하철 노선이 존재하지 않습니다.";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
@@ -135,7 +137,7 @@ public class LineAcceptanceTest extends BaseTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("errorName")).isEqualTo(IllegalArgumentException.class.getName());
+        assertThat(response.jsonPath().getString("message")).isEqualTo(LINE_NOTFOUND_MESSAGE);
     }
 
     /**
