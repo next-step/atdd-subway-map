@@ -33,7 +33,6 @@ public class SectionService {
                                  .downStation(downStation)
                                  .distance(request.getDistance()).build();
         line.addSection(section);
-        sectionRepository.save(section);
 
         return SectionResponse.of(section);
     }
