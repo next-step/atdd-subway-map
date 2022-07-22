@@ -6,36 +6,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.isolation.TestIsolationUtil;
+import nextstep.subway.acceptance.common.AcceptanceTestBase;
 
 @DisplayName("지하철역 인수테스트")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StationAcceptanceTest {
+class StationAcceptanceTest extends AcceptanceTestBase {
 
 	private static final String 강남역 = "강남역";
 	private static final String 역삼역 = "역삼역";
-
-	@LocalServerPort
-	int port;
-
-	@Autowired
-	TestIsolationUtil testIsolationUtil;
-
-	@BeforeEach
-	public void setUp() {
-		RestAssured.port = port;
-		testIsolationUtil.clean();
-	}
 
 	/**
 	 * When 지하철역을 생성하면

@@ -4,24 +4,15 @@ import static nextstep.subway.acceptance.line.LineProvider.*;
 import static nextstep.subway.acceptance.station.StationProvider.*;
 import static org.assertj.core.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.isolation.TestIsolationUtil;
+import nextstep.subway.acceptance.common.AcceptanceTestBase;
 
 @DisplayName("노선 관련 기능")
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LineAcceptanceTest {
+class LineAcceptanceTest extends AcceptanceTestBase {
 
 	private static final String 신분당선 = "신분당선";
 	private static final String 신분당선_COLOR = "bg-red-600";
@@ -35,18 +26,6 @@ class LineAcceptanceTest {
 	private static final String 지하철역_A = "지하철역_A";
 	private static final String 지하철역_B = "지하철역_B";
 	private static final String 지하철역_C = "지하철역_C";
-
-	@LocalServerPort
-	int port;
-
-	@Autowired
-	TestIsolationUtil testIsolationUtil;
-
-	@BeforeEach
-	public void setUp() {
-		RestAssured.port = port;
-		testIsolationUtil.clean();
-	}
 
 	/*
 	 * When 지하철 노선을 생성하면
