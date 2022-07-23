@@ -48,6 +48,10 @@ public class Line {
         sections.addSection(new Section(this, upStation, downStation, distance));
     }
 
+    public void removeSection(Station station) {
+        sections.removeSection(station);
+    }
+
     public Long getId() {
         return id;
     }
