@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.SectionRegistrationRequest;
 import nextstep.subway.domain.Line;
-import nextstep.subway.domain.Station;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityNotFoundException;
 
 @Service
 @Transactional
@@ -26,10 +24,17 @@ public class LineCommandService {
         Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
         Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
 
-        Line line = lineRepository.findByName(lineRequest.getName())
-                .orElseGet(() -> lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor())));
+        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
         line.addSection(upStation, downStation, lineRequest.getDistance());
         return LineResponse.from(line);
+    }
+
+    public void addSection(Long lineId, SectionRegistrationRequest sectionRequest) {
+        Station upStation = stationQueryService.findById(sectionRequest.getUpStationId());
+        Station downStation = stationQueryService.findById(sectionRequest.getDownStationId());
+
+        lineQueryService.findById(lineId)
+                .addSection(upStation, downStation, sectionRequest.getDistance());
     }
 
     public void modifyLine(Long lineId, LineModificationRequest lineRequest) {
@@ -41,4 +46,9 @@ public class LineCommandService {
         lineRepository.deleteById(lineId);
     }
 
+    public void removeSection(Long lineId, Long stationId) {
+        Station station = stationQueryService.findById(stationId);
+        lineQueryService.findById(lineId)
+                .removeSection(station);
+    }
 }

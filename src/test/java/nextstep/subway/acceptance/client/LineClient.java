@@ -4,6 +4,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.client.dto.LineCreationRequest;
 import nextstep.subway.acceptance.client.dto.LineModificationRequest;
+import nextstep.subway.acceptance.client.dto.SectionRegistrationRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,6 +12,7 @@ public class LineClient {
 
     private static final String LINES_PATH = "/lines";
     private static final String LINE_PATH = "/lines/{id}";
+    private static final String SECTIONS_PATH = "/lines/{id}/sections";
 
     private final ApiCRUD apiCRUD;
 
@@ -37,6 +39,14 @@ public class LineClient {
 
     public ExtractableResponse<Response> deleteLine(Long lineId) {
         return apiCRUD.delete(LINE_PATH, lineId);
+    }
+
+    public ExtractableResponse<Response> addSection(Long lineId, SectionRegistrationRequest sectionRequest) {
+        return apiCRUD.create(LINES_PATH + "/" + lineId + "/sections", sectionRequest);
+    }
+
+    public ExtractableResponse<Response> removeSection(Long lineId, Long stationId) {
+        return apiCRUD.delete(SECTIONS_PATH + "?stationId=" + stationId, lineId);
     }
 
 }

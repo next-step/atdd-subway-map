@@ -15,8 +15,7 @@ public class StationCommandService {
     private final StationRepository stationRepository;
 
     public StationResponse saveStation(StationCreationRequest stationRequest) {
-        Station station = stationRepository.findByName(stationRequest.getName())
-                .orElseGet(() -> stationRepository.save(new Station(stationRequest.getName())));
+        Station station = stationRepository.save(new Station(stationRequest.getName()));
         return StationResponse.from(station);
     }
 

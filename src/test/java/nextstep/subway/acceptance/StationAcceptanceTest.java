@@ -52,33 +52,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
     }
 
     /**
-     * When 지하철역을 중복 생성하면
-     * Then 지하철역 목록 조회 시 생성한 역이 중복되지 않고 찾을 수 있다
-     */
-    @DisplayName("지하철역을 중복 생성한다.")
-    @Test
-    @DirtiesContext
-    void createStationTwice() {
-        // given
-        int expectedSize = 1;
-
-        // when
-        ExtractableResponse<Response> firstCreationResponse = givenUtils.강남역_생성();
-
-        // then
-        statusValidator.validateCreated(firstCreationResponse);
-
-        // when
-        ExtractableResponse<Response> duplicatedResponse = givenUtils.강남역_생성();
-
-        // then
-        statusValidator.validateCreated(duplicatedResponse);
-        assertThat(responseConverter.convertToNames(stationClient.fetchStations()))
-                .hasSize(expectedSize)
-                .containsExactly(강남역_이름);
-    }
-
-    /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
