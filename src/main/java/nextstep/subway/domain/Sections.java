@@ -16,10 +16,11 @@ public class Sections {
             orphanRemoval = true,
             cascade = { CascadeType.PERSIST, CascadeType.REMOVE }
     )
+
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section section) {
-        sections.add(section);
+        this.sections.add(section);
     }
 
     public Set<Long> getLineStationIds() {

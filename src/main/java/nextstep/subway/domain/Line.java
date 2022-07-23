@@ -14,6 +14,10 @@ public class Line {
     @Embedded
     private Sections sections = new Sections();
 
+    public Line() {
+
+    }
+
     public Long getId() {
         return id;
     }
@@ -30,9 +34,10 @@ public class Line {
         return sections;
     }
 
-    public Line() {
-
+    public void registerSection(Section section) {
+        this.sections.add(new Section(section, this));
     }
+
 
     private Line(Builder builder) {
         this.name = builder.name;

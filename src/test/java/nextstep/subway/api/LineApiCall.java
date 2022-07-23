@@ -23,7 +23,7 @@ public class LineApiCall {
     // 지하철 노선 조회 요청
     public static ExtractableResponse<Response> getLine(Long id) {
         return RestAssured.given().log().all()
-                .when().get("/line/{id}", id)
+                .when().get("/lines/{id}", id)
                 .then().log().all()
                 .extract();
     }
