@@ -29,7 +29,6 @@ public class LineService {
 
         Sections sections = new Sections();
         Section section = new Section(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
-        sections.add(section);
 
         Line line = new Line.Builder()
                     .name(lineRequest.getName())
