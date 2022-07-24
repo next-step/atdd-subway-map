@@ -43,4 +43,13 @@ public class SectionTestFixtures {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 특정_구간_조회(String lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().pathParam("id", lineId)
+                .get("lines/{id}/sections")
+                .then().log().all()
+                .extract();
+    }
 }

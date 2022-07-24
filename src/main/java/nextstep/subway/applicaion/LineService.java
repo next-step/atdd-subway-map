@@ -98,12 +98,12 @@ public class LineService {
         lineRepository.findAll()
                       .forEach(line -> sections.addAll(line.getSections()));
 
-        return sections.stream()
-                       .map(section -> new SectionResponse(section.getId(),
-                                                           section.getLine().getId(),
-                                                           section.getUpStation(),
-                                                           section.getDownStation(),
-                                                           section.getDistance()))
-                       .collect(Collectors.toList());
+        return SectionResponse.of(sections);
+    }
+
+    public List<SectionResponse> getSections(Long id) {
+        Line line = lineRepository.findById(id)
+                                  .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_LINE));
+        return SectionResponse.of(line.getSections());
     }
 }

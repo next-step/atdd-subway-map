@@ -119,4 +119,25 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         });
 
     }
+
+    @DisplayName("특정 구간 조회 기능")
+    @Test
+    void getSomeThingSection() {
+        구간_생성(신분당선_라인_아이디, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
+
+        String 신분당선_또_새로운_종점_아이디 = 역_생성("서울 숲");
+        String lastStationId = 구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
+
+        ExtractableResponse<Response> 구간_삭제_결과 = 구간_삭제(신분당선_라인_아이디, lastStationId);
+        assertThat(구간_삭제_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> 특정_구간_조회 = 특정_구간_조회(신분당선_라인_아이디);
+
+
+        Assertions.assertAll(() -> {
+            assertThat(특정_구간_조회.jsonPath().getList(".").size()).isEqualTo(2);
+            assertThat(특정_구간_조회.jsonPath().getList("upStation.name")).containsExactly("강남역", "뱅뱅사거리");
+            assertThat(특정_구간_조회.jsonPath().getString("lineId")).contains(신분당선_라인_아이디);
+        });
+    }
 }

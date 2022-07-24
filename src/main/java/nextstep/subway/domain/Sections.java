@@ -61,7 +61,7 @@ public class Sections {
 
     public void validContainAlreadyReqDownStation(Station downStation) {
         boolean isAlreadyRegisterStation = getStations().stream()
-                                                        .anyMatch(station -> station.getName().equals(downStation.getName()));
+                                                        .anyMatch(station -> station.isSameName(downStation));
 
         if (isAlreadyRegisterStation)
             throw new StationDuplicateException(ErrorCode.ALREADY_REGISTER_STATION);

@@ -66,4 +66,10 @@ public class LineController {
         return ResponseEntity.ok().body(responses);
     }
 
+    @GetMapping(value = "/lines/{id}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SectionResponse>> getSections(@PathVariable Long id) {
+        List<SectionResponse> responses = lineService.getSections(id);
+        return ResponseEntity.ok().body(responses);
+    }
+
 }

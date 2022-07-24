@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 
 import lombok.Getter;
+import nextstep.subway.applicaion.dto.SectionResponse;
 import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
 import nextstep.subway.applicaion.exceptions.SectionArrayOutOfBoundException;
 import nextstep.subway.enums.exception.ErrorCode;
