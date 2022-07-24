@@ -1,7 +1,14 @@
-package nextstep.subway.domain.line;
+package nextstep.subway.application;
 
-import nextstep.subway.domain.station.Station;
-import nextstep.subway.domain.station.StationRepository;
+import lombok.RequiredArgsConstructor;
+import nextstep.subway.common.exception.CustomException;
+import nextstep.subway.common.exception.code.LineCode;
+import nextstep.subway.common.exception.code.StationCode;
+import nextstep.subway.domain.Line;
+import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Station;
+import nextstep.subway.domain.StationRepository;
 import nextstep.subway.ui.dto.line.CreateLineRequest;
 import nextstep.subway.ui.dto.line.LineResponse;
 import nextstep.subway.ui.dto.line.UpdateLineRequest;
@@ -11,41 +18,39 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Transactional
 @Service
 public class LineService {
-    public static final String LINE_NOT_FOUND = "노선이 존재하지 않습니다.";
-    public static final String STATION_NOT_FOUND = "지하철역이 존재하지 않습니다.";
-
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-
-    public LineService(final LineRepository lineRepository, final StationRepository stationRepository) {
-        this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
-    }
 
     public LineResponse saveLine(CreateLineRequest request) {
         Station upStation = findStation(request.getUpStationId());
         Station downStation = findStation(request.getDownStationId());
 
-        Line line = new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance());
+        Section section = Section.builder()
+                                 .upStation(upStation)
+                                 .downStation(downStation)
+                                 .distance(request.getDistance()).build();
+
+        Line line = new Line(request.getName(), request.getColor(), request.getDistance(), section);
         lineRepository.save(line);
 
-        return LineResponse.of(line, List.of(upStation, downStation));
+        return LineResponse.of(line);
     }
 
-    public List<LineResponse> findAllLine() {
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
-                             .map(line -> LineResponse.of(line, List.of(line.getUpStation(), line.getDownStation())))
+                             .map(LineResponse::of)
                              .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public LineResponse findLineById(Long lineId) {
         Line line = findLine(lineId);
-        List<Station> stations = List.of(line.getUpStation(), line.getDownStation());
-        return LineResponse.of(line, stations);
+        return LineResponse.of(line);
     }
 
     public void updateLine(Long lineId, UpdateLineRequest request) {
@@ -59,11 +64,11 @@ public class LineService {
 
     private Station findStation(long stationId) {
         return stationRepository.findById(stationId)
-                                .orElseThrow(() -> new IllegalArgumentException(STATION_NOT_FOUND));
+                                .orElseThrow(() -> new CustomException(StationCode.STATION_NOT_FOUND));
     }
 
     private Line findLine(final Long lineId) {
         return lineRepository.findById(lineId)
-                             .orElseThrow(() -> new IllegalArgumentException(LINE_NOT_FOUND));
+                             .orElseThrow(() -> new CustomException(LineCode.LINE_NOT_FOUND));
     }
 }
