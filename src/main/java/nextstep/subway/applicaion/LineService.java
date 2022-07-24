@@ -65,7 +65,6 @@ public class LineService {
     public LineResponse addSection(Long id, SectionRequest sectionRequest) {
         Station upStation = getStation(sectionRequest.getUpStationId());
         Station downStation = getStation(sectionRequest.getDownStationId());
-        validSameReqUpStationAndReqDownStation(upStation, downStation);
 
         Line line = getLine(id);
         line.validSameAlreadyExistDownStationAndReqUpStation(upStation);
@@ -92,11 +91,6 @@ public class LineService {
     private Line getLine(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException(ErrorCode.NOT_FOUND_LINE));
-    }
-
-    public void validSameReqUpStationAndReqDownStation(Station upStation, Station downStation) {
-        if (Objects.equals(upStation.getName(), downStation.getName()))
-            throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
     }
 
     public List<SectionResponse> getSections() {
