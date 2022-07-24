@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.SectionRequest;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
@@ -48,4 +51,22 @@ public class Sections {
     }
 
 
+    public void remove(SectionRequest sectionRequest) {
+        if (sections.size() <= 1) {
+            throw new IllegalArgumentException("구간을 더이상 삭제할 수 없습니다.");
+        }
+
+        Section sectionToRemove = sections.stream().filter((section) -> section.getDownStationId().equals(sectionRequest.getDownStationId())
+                && section.getUpStationId().equals(sectionRequest.getUpStationId())).findFirst().orElseThrow(() -> new IllegalArgumentException("유효하지 않은 구간입니다."));
+
+        if (isLastSection(sectionToRemove)) {
+            sections.remove(sectionToRemove);
+            return;
+        }
+        throw new IllegalArgumentException("마지막 구간이 아닙니다.");
+    }
+
+    private boolean isLastSection(Section sectionToRemove) {
+        return sections.indexOf(sectionToRemove) == this.sections.size() - 1;
+    }
 }

@@ -63,4 +63,14 @@ public class LineApiCall {
                 .then().log().all()
                 .extract();
     }
+
+    // 지하철노선에서 구간 삭제
+    public static ExtractableResponse<Response> deleteSection(Long lineId, SectionRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
 }

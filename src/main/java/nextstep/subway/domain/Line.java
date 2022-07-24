@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.SectionRequest;
+
 import javax.persistence.*;
 
 @Entity
@@ -48,6 +50,10 @@ public class Line {
     public void updateLine(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void deleteSection(SectionRequest sectionRequest) {
+        this.sections.remove(sectionRequest);
     }
 
 

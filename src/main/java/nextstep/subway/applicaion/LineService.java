@@ -98,4 +98,11 @@ public class LineService {
         Section section = new Section(sectionRequest.getUpStationId(), sectionRequest.getDownStationId(), sectionRequest.getDistance());
         line.registerSection(section);
     }
+
+    @Transactional
+    public void deleteSection(Long id, SectionRequest sectionRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id + "번 id로 조회되는 노선이 없습니다."));
+        line.deleteSection(sectionRequest);
+
+    }
 }
