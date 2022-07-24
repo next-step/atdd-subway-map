@@ -37,20 +37,6 @@ public class Sections {
         this.sections.add(newSection);
     }
 
-    private boolean isSectionsEmpty() {
-        return sections.size() == 0;
-    }
-
-    public Set<Long> getLineStationIds() {
-        Set<Long> stationIds = new HashSet<>();
-        sections.forEach((section) -> {
-            stationIds.add(section.getUpStationId());
-            stationIds.add(section.getDownStationId());
-        });
-        return stationIds;
-    }
-
-
     public void remove(SectionRequest sectionRequest) {
         if (sections.size() <= 1) {
             throw new IllegalArgumentException("구간을 더이상 삭제할 수 없습니다.");
@@ -64,6 +50,19 @@ public class Sections {
             return;
         }
         throw new IllegalArgumentException("마지막 구간이 아닙니다.");
+    }
+
+    public Set<Long> getLineStationIds() {
+        Set<Long> stationIds = new HashSet<>();
+        sections.forEach((section) -> {
+            stationIds.add(section.getUpStationId());
+            stationIds.add(section.getDownStationId());
+        });
+        return stationIds;
+    }
+
+    private boolean isSectionsEmpty() {
+        return sections.size() == 0;
     }
 
     private boolean isLastSection(Section sectionToRemove) {
