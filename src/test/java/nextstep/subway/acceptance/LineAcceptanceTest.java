@@ -73,12 +73,9 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
         String 신림역 = 역_생성("신림역");
         String 당곡역 = 역_생성("당곡역");
 
-        String id =
-                노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20")
-                        .jsonPath()
-                        .getString("id");
+        ExtractableResponse<Response> 노선_생선_결과 = 노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20");
 
-        ExtractableResponse<Response> extract = 노선_조회(id);
+        ExtractableResponse<Response> extract = 노선_조회(노선_생선_결과);
 
         Assertions.assertAll(
                 () -> assertThat(extract.jsonPath().getString("name")).isEqualTo("신림선"),
@@ -98,15 +95,12 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
         String 신림역 = 역_생성("신림역");
         String 당곡역 = 역_생성("당곡역");
 
-        String id =
-                노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20")
-                    .jsonPath()
-                    .getString("id");
+        ExtractableResponse<Response> 노선_생성_결과 = 노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20");
 
-        updateLine("구미선", "bg-white-200", id);
+        updateLine("구미선", "bg-white-200", 노선_생성_결과);
 
         //수정된 데이터 출력
-        ExtractableResponse<Response> response = 노선_조회(id);
+        ExtractableResponse<Response> response = 노선_조회(노선_생성_결과);
 
         assertThat(response.jsonPath().getString("name")).isEqualTo("구미선");
         assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value());

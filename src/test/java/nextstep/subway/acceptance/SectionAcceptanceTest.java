@@ -13,6 +13,7 @@ import static nextstep.subway.acceptance.LineTestFixtures.노선_생성;
 import static nextstep.subway.acceptance.LineTestFixtures.노선_조회;
 import static nextstep.subway.acceptance.SectionTestFixtures.*;
 import static nextstep.subway.acceptance.StationTestFixtures.역_생성;
+import static nextstep.subway.assertionsfixtures.SectionAssertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 /**
@@ -28,8 +29,8 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     public String 신분당선_시작_아이디;
     public String 신분당선_종점_아이디;
 
-    public String 신림선_라인_아이디;
-    public String 신분당선_라인_아이디;
+    public ExtractableResponse<Response> 신림선_라인;
+    public ExtractableResponse<Response> 신분당선_라인;
     public String 신림선_새로운_종점_아이디;
     public String 신분당선_새로운_종점_아이디;
 
@@ -38,18 +39,14 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         신림선_시작_아이디 = 역_생성("신림역");
         신림선_종점_아이디 = 역_생성("당곡역");
 
-        신림선_라인_아이디 = 노선_생성("신림선", "bg-blue-300", 신림선_시작_아이디, 신림선_종점_아이디, "10")
-                .jsonPath()
-                .getString("id");
+        신림선_라인 = 노선_생성("신림선", "bg-blue-300", 신림선_시작_아이디, 신림선_종점_아이디, "10");
 
         신림선_새로운_종점_아이디 = 역_생성("보라매역");
 
         신분당선_시작_아이디 = 역_생성("강남역");
         신분당선_종점_아이디 = 역_생성("뱅뱅사거리");
 
-        신분당선_라인_아이디 = 노선_생성("신분당선", "bg-red-100", 신분당선_시작_아이디, 신분당선_종점_아이디, "4")
-                .jsonPath()
-                .getString("id");
+        신분당선_라인 = 노선_생성("신분당선", "bg-red-100", 신분당선_시작_아이디, 신분당선_종점_아이디, "4");
 
         신분당선_새로운_종점_아이디 = 역_생성("판교");
     }
@@ -61,13 +58,11 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철 구간 등록")
     @Test
     void createStationSection() {
-        구간_생성(신림선_라인_아이디, 신림선_종점_아이디, 신림선_새로운_종점_아이디, "5");
-        ExtractableResponse<Response> 노선_조회_결과 = 노선_조회(신림선_라인_아이디);
+        구간_생성(신림선_라인, 신림선_종점_아이디, 신림선_새로운_종점_아이디, "5");
+        ExtractableResponse<Response> 노선_조회_결과 = 노선_조회(신림선_라인);
 
-        Assertions.assertAll(() -> {
-            assertThat(노선_조회_결과.jsonPath().getList("stations.name").size()).isEqualTo(3);
-            assertThat(노선_조회_결과.jsonPath().getList("stations.name")).contains("신림역", "당곡역", "보라매역");
-        });
+        노선_조회_구간_이름_검증(노선_조회_결과, "신림역", "당곡역", "보라매역");
+        노선_조회_구간_사이즈_검증(노선_조회_결과, 3);
     }
 
     // given : 신림선의 종점 아이디가 아닌 노선을 제공하고
@@ -76,11 +71,9 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("새로운 구간 등록 시 상행역이 해당 노선에 등록된 하행 종점역이 아닐 때")
     @Test
     void whenCreateInvalidUpStationFailTest() {
-        ExtractableResponse<Response> 구간_생성_결과 = 구간_생성(신림선_라인_아이디, 신분당선_종점_아이디, 신림선_새로운_종점_아이디, "3");
-        Assertions.assertAll(() -> {
-            assertThat(구간_생성_결과.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            assertThat(구간_생성_결과.jsonPath().getString("message")).isEqualTo(ErrorCode.SAME_STATION.getMessage());
-        });
+        ExtractableResponse<Response> 구간_생성_결과 = 구간_생성(신림선_라인, 신분당선_종점_아이디, 신림선_새로운_종점_아이디, "3");
+        상태코드_검증(구간_생성_결과, HttpStatus.INTERNAL_SERVER_ERROR);
+        상태메세지_검증(구간_생성_결과, ErrorCode.SAME_STATION);
     }
 
     // when : 기존에 등록되어있는 당곡역을 다시 새로운 구간으로 추가하면
@@ -90,12 +83,9 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     void whenAlreadyRegisterStationAgainRegisterFailTest() {
         String 다시_신림역 = 역_생성("신림역");
 
-        ExtractableResponse<Response> 구간_생성_결과 = 구간_생성(신림선_라인_아이디, 신림선_종점_아이디, 다시_신림역, "3");
-
-        Assertions.assertAll(() -> {
-            assertThat(구간_생성_결과.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            assertThat(구간_생성_결과.jsonPath().getString("message")).isEqualTo(ErrorCode.ALREADY_REGISTER_STATION.getMessage());
-        });
+        ExtractableResponse<Response> 구간_생성_결과 = 구간_생성(신림선_라인, 신림선_종점_아이디, 다시_신림역, "3");
+        상태코드_검증(구간_생성_결과, HttpStatus.INTERNAL_SERVER_ERROR);
+        상태메세지_검증(구간_생성_결과, ErrorCode.ALREADY_REGISTER_STATION);
     }
 
     /**
@@ -106,22 +96,19 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("구간 제거 기능")
     @Test
     void deleteSection() {
-        구간_생성(신분당선_라인_아이디, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
+        구간_생성(신분당선_라인, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
 
         String 신분당선_또_새로운_종점_아이디 = 역_생성("서울 숲");
-        String lastStationId = 구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
+        String lastStationId = 구간_생성(신분당선_라인, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
 
-        ExtractableResponse<Response> 구간_삭제_결과 = 구간_삭제(신분당선_라인_아이디, lastStationId);
+        ExtractableResponse<Response> 구간_삭제_결과 = 구간_삭제(신분당선_라인, lastStationId);
         assertThat(구간_삭제_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> 구간_조회_결과 = 구간_조회();
-
-        Assertions.assertAll(() -> {
-            assertThat(구간_조회_결과.jsonPath().getList(".").size()).isEqualTo(3);
-            assertThat(구간_조회_결과.jsonPath().getList("upStation.name")).containsExactly("신림역","강남역", "뱅뱅사거리");
-            assertThat(구간_조회_결과.jsonPath().getList("downStation.name")).containsExactly("당곡역", "뱅뱅사거리", "판교");
-            assertThat(구간_조회_결과.statusCode()).isEqualTo(HttpStatus.OK.value());
-        });
+        ExtractableResponse<Response> 전체_구간_조회_결과 = 구간_조회();
+        전체_구간_조회_사이즈_검증(전체_구간_조회_결과, 3);
+        전체_구간_조회_상행선_구간_검증(전체_구간_조회_결과, "신림역","강남역", "뱅뱅사거리");
+        전체_구간_조회_하행선_구간_검증(전체_구간_조회_결과, "당곡역", "뱅뱅사거리", "판교");
+        상태코드_검증(전체_구간_조회_결과, HttpStatus.OK);
 
     }
 
@@ -133,21 +120,19 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("특정 구간 조회 기능")
     @Test
     void getSomeThingSection() {
-        구간_생성(신분당선_라인_아이디, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
+        구간_생성(신분당선_라인, 신분당선_종점_아이디, 신분당선_새로운_종점_아이디, "8");
 
         String 신분당선_또_새로운_종점_아이디 = 역_생성("서울 숲");
-        String lastStationId = 구간_생성(신분당선_라인_아이디, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
+        String lastStationId = 구간_생성(신분당선_라인, 신분당선_새로운_종점_아이디, 신분당선_또_새로운_종점_아이디, "4").jsonPath().getString("stations[3].id");
 
-        ExtractableResponse<Response> 구간_삭제_결과 = 구간_삭제(신분당선_라인_아이디, lastStationId);
+        ExtractableResponse<Response> 구간_삭제_결과 = 구간_삭제(신분당선_라인, lastStationId);
         assertThat(구간_삭제_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> 특정_구간_조회 = 특정_구간_조회(신분당선_라인_아이디);
+        ExtractableResponse<Response> 특정_구간_조회 = 특정_구간_조회(신분당선_라인);
 
 
-        Assertions.assertAll(() -> {
-            assertThat(특정_구간_조회.jsonPath().getList(".").size()).isEqualTo(2);
-            assertThat(특정_구간_조회.jsonPath().getList("upStation.name")).containsExactly("강남역", "뱅뱅사거리");
-            assertThat(특정_구간_조회.jsonPath().getString("lineId")).contains(신분당선_라인_아이디);
-        });
+        특정_구간_조회_사이즈_검증(특정_구간_조회, 2);
+        특정_구간_조회_구간_검증(특정_구간_조회, "강남역", "뱅뱅사거리");
+        특정_구간_조회_라인_아이디_검증(특정_구간_조회, 신분당선_라인);
     }
 }
