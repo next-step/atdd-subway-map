@@ -27,10 +27,7 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
-        List<Station> stations = stationRepository.findAllById(List.of(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
-        for (Station station : stations) {
-            station.changeLine(line);
-        }
+        line.registerStation(lineRequest.getUpStationId(), lineRequest.getDownStationId());
         return createLineResponse(line);
 
     }
@@ -42,7 +39,8 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line);
+        List<Station> stationList = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
+        return new LineResponse(line, stationList);
 
     }
 }
