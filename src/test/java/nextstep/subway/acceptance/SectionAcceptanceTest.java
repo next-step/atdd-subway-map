@@ -70,9 +70,9 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         });
     }
 
-    // given : 잘못된 종점 아이디를 제공
-    // when : 새로운 구간의 상행역은 해당 노선에 등록된 하행 종점역이어야 한다.
-    // then : IllegalArgumentException 발생
+    // given : 신림선의 종점 아이디가 아닌 노선을 제공하고
+    // when : 새로운 구간 생성 결과를 확인하면
+    // then : 새로운 구간의 상행역은 해당 노선에 등록된 하행 종점역이어야 한다. 의 에러 메세지를 받을 수 있으며, 서버에러를 확인할 수 있다.
     @DisplayName("새로운 구간 등록 시 상행역이 해당 노선에 등록된 하행 종점역이 아닐 때")
     @Test
     void whenCreateInvalidUpStationFailTest() {
@@ -83,8 +83,8 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         });
     }
 
-    // when : 기존에 등록되어있는 당곡역을 새로운 구간으로 다시 추가하면
-    // then : ALREADY_REGISTER_STATION Exception 발생
+    // when : 기존에 등록되어있는 당곡역을 다시 새로운 구간으로 추가하면
+    // then : 이미 등록되어있는 에러 응답 메세지를 받을 수 있다.
     @DisplayName("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
     @Test
     void whenAlreadyRegisterStationAgainRegisterFailTest() {
@@ -99,9 +99,9 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     }
 
     /**
-     * 지하철 노선에 등록된 역(하행 종점역)만 제거할 수 있다. 즉 마지막 구간만 제거할 수 있다.
-     * 지하철 노선에상행 종점역과 하행 종점역만 있는경우 (구간이 1개인 경우) 역을 삭제 할 수 없다.
-     * 새로운 구간 제거시 위 조건에 부합하지 않으면 에러 처리한다.
+     * given : 신림선, 신분당선 노선을 등록하고 신림역, 당곡역, 강남역, 뱅뱅사거리, 판교, 서울숲 역을 차례로 등록하고
+     * when : 신분당선 노선의 마지막 구간인 서울 숲 구간을 삭제하고 구간 목록을 조회하면
+     * then : 서울숲 구간을 제외하고 신림역, 당곡역, 강남역, 뱅뱅사거리, 판교를 응답 받을 수 있다.
      */
     @DisplayName("구간 제거 기능")
     @Test
@@ -125,6 +125,11 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
 
     }
 
+    /**
+     * given : 신분당선 노선과 강남역, 뱅뱅사거리역, 서울숲을 차례로 등록하고
+     * when : 신분당선의 마지막 역인 서울 숲을 삭제를 하고 구간 목록을 조회하면
+     * then : 신분당선의 서울 숲역 구간을 제외하고 강남역, 뱅뱅사거리를 응답 받을 수 있다.
+     */
     @DisplayName("특정 구간 조회 기능")
     @Test
     void getSomeThingSection() {
