@@ -15,6 +15,12 @@ import static nextstep.subway.acceptance.SectionTestFixtures.*;
 import static nextstep.subway.acceptance.StationTestFixtures.역_생성;
 import static org.assertj.core.api.Assertions.*;
 
+/**
+ * 지하철 노선에 구간을 등록하는 기능을 구현
+ * 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
+ * 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
+ * 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러처리한다.
+ */
 @DisplayName("지하철 구간 관리")
 public class SectionAcceptanceTest extends AbstractAcceptanceTest{
     public String 신림선_시작_아이디;
@@ -48,10 +54,9 @@ public class SectionAcceptanceTest extends AbstractAcceptanceTest{
         신분당선_새로운_종점_아이디 = 역_생성("판교");
     }
     /**
-     * 지하철 노선에 구간을 등록하는 기능을 구현
-     * 새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.
-     * 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
-     * 새로운 구간 등록시 위 조건에 부합하지 않는 경우 에러처리한다.
+     * given : 기존 신림선 노선에 보라매역 구간을 생성하고
+     * when : 신림선 노선을 조회하면
+     * then : 신림역, 당곡역, 보라매역을 찾을 수 있다.
      */
     @DisplayName("지하철 구간 등록")
     @Test
