@@ -67,7 +67,6 @@ public class LineService {
         Station downStation = getStation(sectionRequest.getDownStationId());
 
         Line line = getLine(id);
-        line.validSameAlreadyExistDownStationAndReqUpStation(upStation);
         line.addSection(line, upStation, downStation, sectionRequest.getDistance());
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getStations());
     }

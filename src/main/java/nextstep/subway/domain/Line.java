@@ -41,7 +41,8 @@ public class Line {
     }
 
     public void addSection(Line line, Station upStation, Station downStation, Integer distance) {
-        validSameReqUpStationAndReqDownStation(upStation, downStation);
+        sections.validAlreadyExistStation(upStation);
+        sections.validContainAlreadyReqDownStation(downStation);
         sections.addSection(new Section(line, upStation, downStation, distance));
     }
 
@@ -51,17 +52,6 @@ public class Line {
 
     public List<Station> getStations() {
         return sections.getStations();
-    }
-
-    public void validSameAlreadyExistDownStationAndReqUpStation(Station upStation) {
-        if (!Objects.equals(sections.getLastStation().getName(), upStation.getName())) {
-            throw new InvalidStationParameterException(ErrorCode.SAME_STATION);
-        }
-    }
-
-    public void validSameReqUpStationAndReqDownStation(Station upStation, Station downStation) {
-        if (Objects.equals(upStation.getName(), downStation.getName()))
-            throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
     }
 
     public void deleteSection(Long downStationId) {

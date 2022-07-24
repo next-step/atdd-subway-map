@@ -1,6 +1,8 @@
 package nextstep.subway.domain;
 
 import lombok.Getter;
+import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
+import nextstep.subway.enums.exception.ErrorCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -41,5 +43,10 @@ public class Section {
 
     List<Station> getRelatedStations() {
         return List.of(upStation, downStation);
+    }
+
+    public void validSameReqUpStationAndReqDownStation(Station upStation, Station downStation) {
+        if (Objects.equals(upStation.getName(), downStation.getName()))
+            throw new InvalidStationParameterException(ErrorCode.NOT_SAME_STATION);
     }
 }

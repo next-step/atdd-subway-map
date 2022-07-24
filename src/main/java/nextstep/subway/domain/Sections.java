@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.Getter;
 import nextstep.subway.applicaion.exceptions.DataNotFoundException;
+import nextstep.subway.applicaion.exceptions.InvalidStationParameterException;
 import nextstep.subway.applicaion.exceptions.StationDuplicateException;
 import nextstep.subway.enums.exception.ErrorCode;
 
@@ -23,11 +24,11 @@ public class Sections {
 
     public Sections(Line line, Station upStation, Station downStation, Integer distance) {
         Section section = new Section(line, upStation, downStation, distance);
+        section.validSameReqUpStationAndReqDownStation(upStation, downStation);
         sections.add(section);
     }
 
     public void addSection(Section section) {
-        validContainAlreadyReqDownStation(section.getDownStation());
         sections.add(section);
     }
 
@@ -58,7 +59,7 @@ public class Sections {
         return sections.get(sections.size() - 1);
     }
 
-    private void validContainAlreadyReqDownStation(Station downStation) {
+    public void validContainAlreadyReqDownStation(Station downStation) {
         boolean isAlreadyRegisterStation = getStations().stream()
                                                         .anyMatch(station -> station.getName().equals(downStation.getName()));
 
@@ -68,7 +69,13 @@ public class Sections {
    }
 
    private void validContainReqDownStation(Long downStationId) {
-       if (!Objects.equals(getLastStation().getId(), downStationId))
+       if ( !getLastStation().isSameId(downStationId) )
            throw new  DataNotFoundException(ErrorCode.NOT_FOUND_SECTION);
    }
+
+    public void validAlreadyExistStation(Station upStation) {
+        if ( !getLastStation().isSameName(upStation) ) {
+            throw new InvalidStationParameterException(ErrorCode.SAME_STATION);
+        }
+    }
 }
