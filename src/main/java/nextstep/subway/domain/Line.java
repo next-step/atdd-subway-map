@@ -25,12 +25,17 @@ public class Line {
     private String color;
 
     @Embedded
-    private Sections sections;
+    private Sections sections = new Sections();
 
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sections = new Sections();
+    }
+
+    public Line(Long id, String name, String color) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
     }
 
     public Line updateNameAndColor(String name, String color) {
@@ -41,6 +46,10 @@ public class Line {
 
     public void addSection(Station upStation, Station downStation, int distance) {
         sections.addSection(new Section(this, upStation, downStation, distance));
+    }
+
+    public void removeSection(Station station) {
+        sections.removeSection(station);
     }
 
     public Long getId() {

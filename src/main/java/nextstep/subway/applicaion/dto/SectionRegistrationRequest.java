@@ -2,20 +2,12 @@ package nextstep.subway.applicaion.dto;
 
 import lombok.Getter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
 
 @Getter
-public class LineCreationRequest {
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String color;
+public class SectionRegistrationRequest {
 
     @NotNull
     @Positive

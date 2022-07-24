@@ -28,11 +28,14 @@ public class LineQueryService {
     }
 
     public LineResponse findLine(Long lineId) {
-        Line line = lineRepository.findById(lineId)
+        return LineResponse.from(findById(lineId));
+    }
+
+    public Line findById(Long lineId) {
+        return lineRepository.findById(lineId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format(NO_SUCH_LINE_FORMAT, lineId)
                 ));
-        return LineResponse.from(line);
     }
 
 }

@@ -44,6 +44,11 @@ public class Section {
         this.distance = distance;
     }
 
+    public boolean isStationEqualTo(Section section) {
+        return this.getDownStation()
+                .equals(section.getUpStation());
+    }
+
     public Long getId() {
         return id;
     }

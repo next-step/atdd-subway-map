@@ -15,6 +15,11 @@ public class JsonResponseConverter {
                 .getLong("id");
     }
 
+    public List<Long> convertToIds(ExtractableResponse<Response> response) {
+        return response.jsonPath()
+                .getList("id", Long.class);
+    }
+
     public List<Long> convertToIds(List<ExtractableResponse<Response>> responses) {
         return responses.stream()
                 .map(this::convertToId)

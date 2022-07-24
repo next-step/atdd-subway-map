@@ -5,8 +5,14 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.client.LineClient;
 import nextstep.subway.acceptance.client.StationClient;
 import nextstep.subway.acceptance.client.dto.LineCreationRequest;
+import nextstep.subway.acceptance.client.dto.SectionRegistrationRequest;
+import nextstep.subway.acceptance.util.GivenUtils;
 import nextstep.subway.acceptance.util.HttpStatusValidator;
 import nextstep.subway.acceptance.util.JsonResponseConverter;
+import nextstep.subway.exception.DuplicatedStationException;
+import nextstep.subway.exception.NoLastStationException;
+import nextstep.subway.exception.SectionRegistrationException;
+import nextstep.subway.exception.SectionRemovalException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +22,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
-import static nextstep.subway.acceptance.fixture.ColorFixtures.GREEN;
-import static nextstep.subway.acceptance.fixture.ColorFixtures.RED;
-import static nextstep.subway.acceptance.fixture.ColorFixtures.YELLOW;
-import static nextstep.subway.acceptance.fixture.DistanceFixtures.FIVE;
-import static nextstep.subway.acceptance.fixture.DistanceFixtures.TEN;
-import static nextstep.subway.acceptance.fixture.LineFixtures.분당선;
-import static nextstep.subway.acceptance.fixture.LineFixtures.신분당선;
-import static nextstep.subway.acceptance.fixture.LineFixtures.이호선;
-import static nextstep.subway.acceptance.fixture.StationFixtures.신분당선역_이름들;
-import static nextstep.subway.acceptance.fixture.StationFixtures.이호선역_이름들;
+import static nextstep.subway.acceptance.util.GivenUtils.GREEN;
+import static nextstep.subway.acceptance.util.GivenUtils.TEN;
+import static nextstep.subway.acceptance.util.GivenUtils.YELLOW;
+import static nextstep.subway.acceptance.util.GivenUtils.강남역;
+import static nextstep.subway.acceptance.util.GivenUtils.분당선_이름;
+import static nextstep.subway.acceptance.util.GivenUtils.신분당선_이름;
+import static nextstep.subway.acceptance.util.GivenUtils.역삼역;
+import static nextstep.subway.acceptance.util.GivenUtils.이호선_이름;
+import static nextstep.subway.acceptance.util.GivenUtils.이호선역_이름들;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -42,6 +47,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     JsonResponseConverter responseConverter;
+    
+    @Autowired
+    GivenUtils givenUtils;
 
     /**
      * When 지하철 노선을 생성하면
@@ -54,32 +62,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
 
         // when
-        statusValidator.validateCreated(lineClient.createLine(이호선_생성_요청()));
+        ExtractableResponse<Response> response = lineClient.createLine(givenUtils.이호선_생성_요청());
 
         // then
+        statusValidator.validateCreated(response);
         assertThat(responseConverter.convertToNames(lineClient.fetchLines()))
-                .contains(이호선.getValue());
-    }
-
-    /**
-     * When 동일한 지하철 노선을 중복해서 생성하면
-     * Then 기존에 저장된 노선을 반환한다
-     */
-    @DisplayName("동일한 지하철 노선을 중복 생성한다.")
-    @Test
-    @DirtiesContext
-    void createLineTwice() {
-        // given
-
-        // when
-        statusValidator.validateCreated(lineClient.createLine(이호선_생성_요청()));
-        ExtractableResponse<Response> duplicatedResponse =
-                statusValidator.validateCreated(lineClient.createLine(이호선_생성_요청()));
-
-        // then
-        assertThat(responseConverter.convert(duplicatedResponse, "stations", List.class))
-                .hasSize(이호선역_이름들.size());
-        assertThat(responseConverter.convertToName(duplicatedResponse)).isEqualTo(이호선.getValue());
+                .contains(이호선_이름);
     }
 
     /**
@@ -94,18 +82,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
         long upStationId = 1L;
         long downStationId = 2L;
         LineCreationRequest lineRequest = new LineCreationRequest(
-                이호선.getValue(),
-                GREEN.getValue(),
+                이호선_이름,
+                GREEN,
                 upStationId,
                 downStationId,
-                TEN.getValue()
+                TEN
         );
 
         // when
-        ExtractableResponse<Response> response =
-                statusValidator.validateBadRequest(lineClient.createLine(lineRequest));
+        ExtractableResponse<Response> response = lineClient.createLine(lineRequest);
 
         // then
+        statusValidator.validateBadRequest(response);
         assertThat(responseConverter.convertToError(response))
                 .contains(EntityNotFoundException.class.getName());
     }
@@ -122,19 +110,19 @@ public class LineAcceptanceTest extends AcceptanceTest {
         // given
         int stationSize = 2;
         int lineSize = 2;
-        lineClient.createLine(이호선_생성_요청());
-        lineClient.createLine(신분당선_생성_요청());
+        lineClient.createLine(givenUtils.이호선_생성_요청());
+        lineClient.createLine(givenUtils.신분당선_생성_요청());
 
         // when
-        ExtractableResponse<Response> linesResponse =
-                statusValidator.validateOk(lineClient.fetchLines());
+        ExtractableResponse<Response> linesResponse = lineClient.fetchLines();
 
         // then
+        statusValidator.validateOk(linesResponse);
         assertThat(responseConverter.convertToList(linesResponse, "stations"))
                 .allMatch(fetchStations -> fetchStations.size() == stationSize);
         assertThat(responseConverter.convertToNames(linesResponse))
                 .hasSize(lineSize)
-                .containsExactly(이호선.getValue(), 신분당선.getValue());
+                .containsExactly(이호선_이름, 신분당선_이름);
     }
 
     /**
@@ -147,16 +135,16 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DirtiesContext
     void getLine() {
         // given
-        long lineId = responseConverter.convertToId(lineClient.createLine(이호선_생성_요청()));
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
 
         // when
-        ExtractableResponse<Response> response =
-                statusValidator.validateOk(lineClient.fetchLine(lineId));
+        ExtractableResponse<Response> response = lineClient.fetchLine(lineId);
 
         // then
+        statusValidator.validateOk(response);
         assertThat(responseConverter.convert(response, "stations", List.class))
                 .hasSize(이호선역_이름들.size());
-        assertThat(responseConverter.convertToName(response)).isEqualTo(이호선.getValue());
+        assertThat(responseConverter.convertToName(response)).isEqualTo(이호선_이름);
     }
 
     /**
@@ -169,14 +157,15 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DirtiesContext
     void modifyLine() {
         // given
-        long lineId = responseConverter.convertToId(lineClient.createLine(이호선_생성_요청()));
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
 
         // when
-        statusValidator.validateOk(lineClient.modifyLine(lineId, 분당선.getValue(), YELLOW.getValue()));
+        ExtractableResponse<Response> response = lineClient.modifyLine(lineId, 분당선_이름, YELLOW);
 
         // then
+        statusValidator.validateOk(response);
         assertThat(responseConverter.convertToNames(lineClient.fetchLines()))
-                .containsExactly(분당선.getValue());
+                .containsExactly(분당선_이름);
     }
 
     /**
@@ -188,13 +177,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DirtiesContext
     void modifyNoneExistentLine() {
         // given
-        long lineId = 1L;
+        long notExistsLineId = 1L;
 
         // when
         ExtractableResponse<Response> response =
-                statusValidator.validateBadRequest(lineClient.modifyLine(lineId, 분당선.getValue(), YELLOW.getValue()));
+                lineClient.modifyLine(notExistsLineId, 분당선_이름, YELLOW);
 
         // then
+        statusValidator.validateBadRequest(response);
         assertThat(responseConverter.convertToError(response))
                 .contains(EntityNotFoundException.class.getName());
     }
@@ -210,55 +200,176 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DirtiesContext
     void deleteLine() {
         // given
-        long lineId = responseConverter.convertToId(lineClient.createLine(이호선_생성_요청()));
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
 
         // when
-        statusValidator.validateNoContent(lineClient.deleteLine(lineId));
+        ExtractableResponse<Response> response = lineClient.deleteLine(lineId);
 
         // then
+        statusValidator.validateNoContent(response);
         assertThat(responseConverter.convertToNames(lineClient.fetchLines()))
-                .doesNotContain(이호선.getValue());
+                .doesNotContain(이호선_이름);
     }
 
     /**
      * When 존재하지 않는 지하철 노선을 삭제하면
-     * Then 해당 지하철 노선 정보는 삭제된다
+     * Then 오류(EmptyResultDataAccessException) 객체를 반환한다
      */
     @DisplayName("존재하지 않는 지하철 노선을 제거한다.")
     @Test
     @DirtiesContext
     void deleteNonExistentLine() {
         // given
-        long lineId = 1L;
+        long notExistsLineId = 1L;
 
         // when
-        ExtractableResponse<Response> response = statusValidator.validateBadRequest(lineClient.deleteLine(lineId));
+        ExtractableResponse<Response> response = lineClient.deleteLine(notExistsLineId);
 
         // then
+        statusValidator.validateBadRequest(response);
         assertThat(responseConverter.convertToError(response))
                 .contains(EmptyResultDataAccessException.class.getName());
     }
 
-    private LineCreationRequest 이호선_생성_요청() {
-        List<Long> stationIds = responseConverter.convertToIds(stationClient.createStations(이호선역_이름들));
-        return new LineCreationRequest(
-                이호선.getValue(),
-                GREEN.getValue(),
-                stationIds.get(0),
-                stationIds.get(1),
-                TEN.getValue()
-        );
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 지하철 노선에 구간을 추가하면
+     * Then 해당 구간이 노선 구간 목록에 존재한다
+     */
+    @DisplayName("지하철 노선에 구간을 등록")
+    @Test
+    @DirtiesContext
+    void addSection() {
+        // given
+        int expectedSize = 3;
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
+
+        // when
+        ExtractableResponse<Response> response = lineClient.addSection(lineId, givenUtils.역삼_선릉_구간_생성_요청());
+
+        // then
+        statusValidator.validateOk(response);
+        assertThat(responseConverter.convert(lineClient.fetchLine(lineId), "stations", List.class))
+                .hasSize(expectedSize);
     }
 
-    private LineCreationRequest 신분당선_생성_요청() {
-        List<Long> stationIds = responseConverter.convertToIds(stationClient.createStations(신분당선역_이름들));
-        return new LineCreationRequest(
-                신분당선.getValue(),
-                RED.getValue(),
-                stationIds.get(0),
-                stationIds.get(1),
-                FIVE.getValue()
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 지하철 노선에 하행 종점역과 다른 상행역 구간을 추가하면
+     * Then 오류(SectionRegistrationException) 객체를 반환한다
+     */
+    @DisplayName("지하철 노선에 구간을 등록 - 노선의 하행 종점역과 다른 상행역 구간 추가")
+    @Test
+    @DirtiesContext
+    void addSectionWithInvalidUpStationId() {
+        // given
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
+        SectionRegistrationRequest sectionRequest = new SectionRegistrationRequest(
+                responseConverter.convertToId(stationClient.createStation(신분당선_이름)),
+                강남역().getId(),
+                TEN
         );
+
+        // when
+        ExtractableResponse<Response> response = lineClient.addSection(lineId, sectionRequest);
+
+        // then
+        statusValidator.validateBadRequest(response);
+        assertThat(responseConverter.convertToError(response))
+                .contains(SectionRegistrationException.class.getName());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 지하철 노선에 하행 종점역과 다른 상행역 구간을 추가하면
+     * Then 오류(DuplicatedStationException) 객체를 반환한다
+     */
+    @DisplayName("지하철 노선에 구간을 등록 - 노선에 이미 존재하는 하행역 구간 추가")
+    @Test
+    @DirtiesContext
+    void addSectionWithInvalidDownStationId() {
+        // given
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
+        SectionRegistrationRequest sectionRequest = new SectionRegistrationRequest(
+                역삼역().getId(),
+                강남역().getId(),
+                TEN
+        );
+
+        // when
+        ExtractableResponse<Response> response = lineClient.addSection(lineId, sectionRequest);
+
+        // then
+        statusValidator.validateBadRequest(response);
+        assertThat(responseConverter.convertToError(response))
+                .contains(DuplicatedStationException.class.getName());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고 구간을 추가한 후
+     * When 지하철 노선에 구간을 삭제하면
+     * Then 해당 구간이 노선 구간 목록에서 존재하지 않는다
+     */
+    @DisplayName("지하철 노선에 구간을 제거")
+    @Test
+    @DirtiesContext
+    void removeSection() {
+        // given
+        int expectedSize = 2;
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
+        lineClient.addSection(lineId, givenUtils.역삼_선릉_구간_생성_요청());
+        long stationId = 3L;
+
+        // when
+        ExtractableResponse<Response> response = lineClient.removeSection(lineId, stationId);
+
+        // then
+        statusValidator.validateNoContent(response);
+        assertThat(responseConverter.convert(lineClient.fetchLine(lineId), "stations", List.class))
+                .hasSize(expectedSize);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고 구간을 추가한 후
+     * When 지하철 노선에 하행 종점역이 아닌 다른 역을 삭제하면
+     * Then Then 오류(NoLastStationException) 객체를 반환한다
+     */
+    @DisplayName("지하철 노선에 구간을 제거 - 하행 종점역이 아닌 다른 역 제거")
+    @Test
+    @DirtiesContext
+    void removeSectionWithInvalidLastStation() {
+        // given
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
+        lineClient.addSection(lineId, givenUtils.역삼_선릉_구간_생성_요청());
+
+        // when
+        ExtractableResponse<Response> response = lineClient.removeSection(lineId, 역삼역().getId());
+
+        // then
+        statusValidator.validateBadRequest(response);
+        assertThat(responseConverter.convertToError(response))
+                .contains(NoLastStationException.class.getName());
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고 구간을 추가한 후
+     * When 지하철 노선에 하행 종점역이 아닌 다른 역을 삭제하면
+     * Then Then 오류(SectionRemovalException) 객체를 반환한다
+     */
+    @DisplayName("지하철 노선에 구간을 제거 - 구간이 1개인 경우")
+    @Test
+    @DirtiesContext
+    void removeSingleSection() {
+        // given
+        long lineId = responseConverter.convertToId(givenUtils.이호선_생성());
+
+        // when
+        ExtractableResponse<Response> response = lineClient.removeSection(lineId, 역삼역().getId());
+
+        // then
+        statusValidator.validateBadRequest(response);
+        assertThat(responseConverter.convertToError(response))
+                .contains(SectionRemovalException.class.getName());
     }
 
 }

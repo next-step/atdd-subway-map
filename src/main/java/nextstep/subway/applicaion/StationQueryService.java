@@ -27,11 +27,14 @@ public class StationQueryService {
     }
 
     public StationResponse findStation(Long stationId) {
-        Station station = stationRepository.findById(stationId)
+        return StationResponse.from(findById(stationId));
+    }
+
+    public Station findById(Long stationId) {
+        return stationRepository.findById(stationId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format(NO_SUCH_STATION_FORMAT, stationId)
                 ));
-        return StationResponse.from(station);
     }
 
 }

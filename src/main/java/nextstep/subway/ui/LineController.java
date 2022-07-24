@@ -7,7 +7,7 @@ import nextstep.subway.applicaion.StationQueryService;
 import nextstep.subway.applicaion.dto.LineCreationRequest;
 import nextstep.subway.applicaion.dto.LineModificationRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.dto.SectionRegistrationRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -33,13 +34,7 @@ public class LineController {
 
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineCreationRequest lineRequest) {
-        StationResponse upStation = stationQueryService.findStation(lineRequest.getUpStationId());
-        StationResponse downStation = stationQueryService.findStation(lineRequest.getDownStationId());
-        LineResponse lineResponse = lineCommandService.saveLine(
-                lineRequest,
-                upStation.toEntity(),
-                downStation.toEntity()
-        );
+        LineResponse lineResponse = lineCommandService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId()))
                 .body(lineResponse);
     }
@@ -57,7 +52,9 @@ public class LineController {
     }
 
     @PutMapping(value = "/lines/{id}")
-    public ResponseEntity<Void> modifyLine(@PathVariable Long id, @RequestBody @Valid LineModificationRequest lineRequest) {
+    public ResponseEntity<Void> modifyLine(
+            @PathVariable Long id,
+            @RequestBody @Valid LineModificationRequest lineRequest) {
         lineCommandService.modifyLine(id, lineRequest);
         return ResponseEntity.ok()
                 .build();
@@ -66,6 +63,22 @@ public class LineController {
     @DeleteMapping("/lines/{id}")
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineCommandService.deleteLineById(id);
+        return ResponseEntity.noContent()
+                .build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(
+            @PathVariable long id,
+            @RequestBody @Valid SectionRegistrationRequest sectionRequest) {
+        lineCommandService.addSection(id, sectionRequest);
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    @DeleteMapping("/lines/{id}/sections")
+    public ResponseEntity<Void> removeSection(@PathVariable Long id, @RequestParam("stationId") Long stationId) {
+        lineCommandService.removeSection(id, stationId);
         return ResponseEntity.noContent()
                 .build();
     }
