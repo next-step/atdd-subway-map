@@ -12,6 +12,18 @@ public class ErrorResponse {
 
 	private HttpStatus status;
 
+	public LocalDateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public HttpStatus getStatus() {
+		return status;
+	}
+
 	public ErrorResponse(String message, HttpStatus status) {
 		this.message = message;
 		this.status = status;

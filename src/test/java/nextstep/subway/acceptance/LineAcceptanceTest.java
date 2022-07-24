@@ -3,16 +3,18 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.tool.RequestTool;
+import nextstep.subway.acceptance.tool.SubwayFactory;
+import nextstep.subway.acceptance.tool.TestObjectDestoryer;
 import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.line.dto.LineUpdateRequest;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,26 +24,29 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	@LocalServerPort
 	int port;
 
-	Long stationId1;
-	Long stationId2;
-	Long stationId3;
-	Long stationId4;
-	Long stationId5;
+	@Autowired
+	private TestObjectDestoryer testObjectDestoryer;
+
+	Long 양재역;
+	Long 양재시민의숲역;
+	Long 청계산입구역;
+	Long 사당역;
+	Long 방배역;
 
 	@BeforeEach
 	public void beforeEach() {
-		RestAssured.port = port;
+		testObjectDestoryer.destroy(List.of("line"));
 	}
 
 	@BeforeAll
 	public void beforeAll() {
 		RestAssured.port = port;
 
-		stationId1 = createStation("양재역").jsonPath().getLong("id");
-		stationId2 = createStation("양재시민의숲역").jsonPath().getLong("id");
-		stationId3 = createStation("청계산입구역").jsonPath().getLong("id");
-		stationId4 = createStation("사당역").jsonPath().getLong("id");
-		stationId5 = createStation("방배역").jsonPath().getLong("id");
+		양재역 = SubwayFactory.역_생성("양재역").jsonPath().getLong("id");
+		양재시민의숲역 = SubwayFactory.역_생성("양재시민의숲역").jsonPath().getLong("id");
+		청계산입구역 = SubwayFactory.역_생성("청계산입구역").jsonPath().getLong("id");
+		사당역 = SubwayFactory.역_생성("사당역").jsonPath().getLong("id");
+		방배역 = SubwayFactory.역_생성("방배역").jsonPath().getLong("id");
 	}
 
 	/**
@@ -49,11 +54,10 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
 	 */
 	@Test
-	@Sql(scripts = "/sql/truncate_line_table.sql")
 	void 지하철노선을_생성한다() {
 		//when
-		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10);
-		ExtractableResponse<Response> response = post("/lines", lineRequest);
+		LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10);
+		ExtractableResponse<Response> response = RequestTool.post("/lines", lineRequest);
 		String location = response.header("Location");
 
 
@@ -72,15 +76,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 지하철 노선 목록을 조회하면
 	 * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
 	 */
-	@Sql(scripts = "/sql/truncate_line_table.sql")
 	@Test
 	void 지하철노선_목록을_조회한다() {
 		//given
-		createLine("신분당선", "bg-red-600", stationId1, stationId2, 10);
-		createLine("2호선", "bg-greed-600", stationId4, stationId5, 10);
+		SubwayFactory.노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10);
+		SubwayFactory.노선_생성("2호선", "bg-greed-600", 사당역, 방배역, 10);
 
 		//when
-		ExtractableResponse<Response> response = get("/lines");
+		ExtractableResponse<Response> response = RequestTool.get("/lines");
 
 		//then
 		assertThat(response.jsonPath().getList("")).hasSize(2);
@@ -93,14 +96,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * When 생성한 지하철 노선을 조회하면
 	 * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
 	 */
-	@Sql(scripts = "/sql/truncate_line_table.sql")
 	@Test
 	void 지하철노선을_조회한다() {
 		//given
-		long id = createLine("신분당선", "bg-red-600", stationId1, stationId2, 10).jsonPath().getLong("id");
+		long id = SubwayFactory.노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = get("/lines/" + id);
+		ExtractableResponse<Response> response = RequestTool.get("/lines/" + id);
 		String name = response.jsonPath().get("name");
 
 		//then
@@ -114,19 +116,18 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * Then 해당 지하철 노선 정보는 수정된다
 	 */
 	@Test
-	@Sql(scripts = "/sql/truncate_line_table.sql")
 	void 지하철노선을_업데이트한다() {
 		//given
-		long id = createLine("신분당선", "bg-red-600", stationId1, stationId2, 10).jsonPath().getLong("id");
+		long id = SubwayFactory.노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
 		LineUpdateRequest lineRequest = new LineUpdateRequest("분당선", "bg-blue-600");
 
 		//when
-		ExtractableResponse<Response> response = put("/lines/" + id, lineRequest);
+		ExtractableResponse<Response> response = RequestTool.put("/lines/" + id, lineRequest);
 
 		//then
 		assertThat(response.response().getStatusCode()).isEqualTo(HttpStatus.OK.value());
 
-		ExtractableResponse<Response> lineResponse = get("/lines/" + id);
+		ExtractableResponse<Response> lineResponse = RequestTool.get("/lines/" + id);
 		String name = lineResponse.jsonPath().get("name");
 		String color = lineResponse.jsonPath().get("color");
 		assertThat(name).isEqualTo("분당선");
@@ -140,30 +141,17 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	 * Then 해당 지하철 노선 정보는 삭제된다
 	 */
 	@Test
-	@Sql(scripts = "/sql/truncate_line_table.sql")
 	void 지하철노선을_삭제한다() {
 		//given
-		long id = createLine("신분당선", "bg-red-600", stationId1, stationId2, 10).jsonPath().getLong("id");
+		long id = SubwayFactory.노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = delete("/lines/" + id);
+		ExtractableResponse<Response> response = RequestTool.delete("/lines/" + id);
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-		ExtractableResponse<Response> lineResponse = get("/lines/" + id);
-		assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-	}
-
-	ExtractableResponse<Response> createStation(String name) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", name);
-
-		return post("/stations", params);
-	}
-
-	ExtractableResponse<Response> createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-		LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
-		return post("/lines", lineRequest);
+		ExtractableResponse<Response> lineResponse = RequestTool.get("/lines/" + id);
+		assertThat(lineResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
 	}
 }

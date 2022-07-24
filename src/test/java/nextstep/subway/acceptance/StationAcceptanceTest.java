@@ -3,12 +3,13 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.tool.RequestTool;
+import nextstep.subway.acceptance.tool.SubwayFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DirtiesContext
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
 	@LocalServerPort
@@ -36,7 +36,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	@Test
 	void createStation() {
 		// when
-		ExtractableResponse<Response> response = createStation("강남역");
+		ExtractableResponse<Response> response = SubwayFactory.역_생성("강남역");
 		String location = response.header("Location");
 
 		// then
@@ -54,11 +54,11 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	@Test
 	void getStations() {
 		//given
-		createStation("방배역");
-		createStation("삼성역");
+		SubwayFactory.역_생성("방배역");
+		SubwayFactory.역_생성("삼성역");
 
 		//when
-		ExtractableResponse<Response> response = get("/stations");
+		ExtractableResponse<Response> response = RequestTool.get("/stations");
 		List<String> stationNames = response.jsonPath().getList("name", String.class);
 
 		//then
@@ -74,23 +74,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	@Test
 	void deleteStation() {
 		//given
-		Long id = createStation("녹번역").jsonPath().getLong("id");
+		Long id = SubwayFactory.역_생성("녹번역").jsonPath().getLong("id");
 
 		//when
-		ExtractableResponse<Response> response = delete("/stations/" + id);
+		ExtractableResponse<Response> response = RequestTool.delete("/stations/" + id);
 
 		//then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
 		//then
-		List<String> stations = get("/stations").response().jsonPath().getList("name", String.class);
+		List<String> stations = RequestTool.get("/stations").response().jsonPath().getList("name", String.class);
 		assertThat(stations).doesNotContain("녹번역");
-	}
-
-	private ExtractableResponse<Response> createStation(String name) {
-		Map<String, String> params = new HashMap<>();
-		params.put("name", name);
-
-		return post("/stations", params);
 	}
 }

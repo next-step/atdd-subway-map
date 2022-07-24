@@ -1,5 +1,6 @@
 package nextstep.subway.applicaion.station;
 
+import nextstep.subway.applicaion.common.StationNotFoundException;
 import nextstep.subway.applicaion.station.domain.Station;
 import nextstep.subway.applicaion.station.domain.StationRepository;
 import nextstep.subway.applicaion.station.dto.StationRequest;
@@ -8,43 +9,44 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-	private StationRepository stationRepository;
+    private StationRepository stationRepository;
 
-	public StationService(StationRepository stationRepository) {
-		this.stationRepository = stationRepository;
-	}
+    public StationService(StationRepository stationRepository) {
+        this.stationRepository = stationRepository;
+    }
 
-	@Transactional
-	public StationResponse saveStation(StationRequest stationRequest) {
-		Station station = stationRepository.save(new Station(stationRequest.getName()));
-		return createStationResponse(station);
-	}
+    @Transactional
+    public StationResponse saveStation(StationRequest stationRequest) {
+        Station station = stationRepository.save(new Station(stationRequest.getName()));
+        return createStationResponse(station);
+    }
 
-	public List<StationResponse> findAllStations() {
-		return stationRepository.findAll().stream()
-			.map(this::createStationResponse)
-			.collect(Collectors.toList());
-	}
+    public List<StationResponse> findAllStations() {
+        return stationRepository.findAll().stream()
+                .map(this::createStationResponse)
+                .collect(Collectors.toList());
+    }
 
-	@Transactional
-	public void deleteStationById(Long id) {
-		stationRepository.deleteById(id);
-	}
+    @Transactional
+    public void deleteStationById(Long id) {
+        stationRepository.deleteById(id);
+    }
 
 
-	public Station getStationById(Long id) {
-		return stationRepository.findById(id).orElseThrow();
-	}
+    public Station getStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(StationNotFoundException::new);
+    }
 
-	private StationResponse createStationResponse(Station station) {
-		return new StationResponse(
-			station.getId(),
-			station.getName()
-		);
-	}
+    private StationResponse createStationResponse(Station station) {
+        return new StationResponse(
+                station.getId(),
+                station.getName()
+        );
+    }
 }
