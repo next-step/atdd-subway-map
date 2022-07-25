@@ -8,6 +8,7 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
+@Table(name = "station")
 public class Station {
 
     @Id
@@ -19,7 +20,7 @@ public class Station {
     private String name;
 
     @OneToMany(mappedBy = "station", fetch = LAZY)
-    private final List<StationToSubwayLine> subwayLines = new ArrayList<>();
+    private final List<Section> lines = new ArrayList<>();
 
     protected Station() {
     }
@@ -36,11 +37,11 @@ public class Station {
         return name;
     }
 
-    public void updateSubwayLine(StationToSubwayLine stationToSubwayLine) {
-        this.subwayLines.add(stationToSubwayLine);
+    public void updateSubwayLine(Section section) {
+        this.lines.add(section);
     }
 
-    public void removeSubwayLine(StationToSubwayLine stationToSubwayLine) {
-        this.subwayLines.remove(stationToSubwayLine);
+    public void removeSubwayLine(Section section) {
+        this.lines.remove(section);
     }
 }
