@@ -1,6 +1,6 @@
-package nextstep.subway.applicaion.dto.subwayLine;
+package nextstep.subway.applicaion.dto.line;
 
-public class CreateSubwayLineRequest {
+public class CreateLineRequest {
 
     private final String name;
 
@@ -12,7 +12,7 @@ public class CreateSubwayLineRequest {
 
     private final Integer distance;
 
-    private CreateSubwayLineRequest() {
+    private CreateLineRequest() {
         name = null;
         color = null;
         upStationId = null;

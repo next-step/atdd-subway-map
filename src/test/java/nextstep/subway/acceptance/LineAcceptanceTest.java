@@ -3,14 +3,16 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.provider.StationProvider;
+import nextstep.subway.utils.DatabaseCleanUp;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,16 +23,21 @@ import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철 노선 관련 기능")
-@Sql({"classpath:/reset-all-table.sql", "classpath:/station-init.sql", "classpath:/subwayLineColor-init.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SubwayLineAcceptanceTest {
+public class LineAcceptanceTest {
 
     @LocalServerPort
     private int port;
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
+    @Autowired
+    private StationProvider stationProvider;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        databaseCleanUp.execute();
+        stationProvider.createStations(List.of("지하철역", "새로운지하철역", "또다른지하철역"));
     }
 
     /**

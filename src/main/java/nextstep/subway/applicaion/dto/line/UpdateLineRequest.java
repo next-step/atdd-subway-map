@@ -1,12 +1,12 @@
-package nextstep.subway.applicaion.dto.subwayLine;
+package nextstep.subway.applicaion.dto.line;
 
-public class UpdateSubwayLineRequest {
+public class UpdateLineRequest {
 
     private final String name;
 
     private final String color;
 
-    private UpdateSubwayLineRequest() {
+    private UpdateLineRequest() {
         name = null;
         color = null;
     }
