@@ -27,13 +27,17 @@ public class Sections {
             this.sections.add(newSection);
             return;
         }
+
         Section latestSection = sections.get(sections.size() - 1);
+
         if (!latestSection.getDownStationId().equals(newSection.getUpStationId())) {
             throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
         }
+
         if (getLineStationIds().contains(newSection.getDownStationId())) {
             throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
         }
+
         this.sections.add(newSection);
     }
 
@@ -49,15 +53,18 @@ public class Sections {
             sections.remove(sectionToRemove);
             return;
         }
+
         throw new IllegalArgumentException("마지막 구간이 아닙니다.");
     }
 
     public Set<Long> getLineStationIds() {
         Set<Long> stationIds = new HashSet<>();
+
         sections.forEach((section) -> {
             stationIds.add(section.getUpStationId());
             stationIds.add(section.getDownStationId());
         });
+
         return stationIds;
     }
 
