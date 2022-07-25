@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-class StationAcceptanceTest extends AcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("지하철역을 생성한다.")
     @Test
@@ -68,7 +68,7 @@ class StationAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> 지하철역_생성(final String stationName) {
+    public static ExtractableResponse<Response> 지하철역_생성(final String stationName) {
         return RestAssured.given().log().all()
                 .body(Map.of(KEY_NAME, stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -77,18 +77,18 @@ class StationAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 지하철역_조회() {
+    public static ExtractableResponse<Response> 지하철역_조회() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
 
-    private List<String> 지하철역명_조회(final ExtractableResponse<Response> response) {
+    public static List<String> 지하철역명_조회(final ExtractableResponse<Response> response) {
         return response.jsonPath().getList(KEY_NAME, String.class);
     }
 
-    private List<String> 지하철역명_조회() {
+    public static List<String> 지하철역명_조회() {
         final ExtractableResponse<Response> stationResponse = 지하철역_조회();
         return 지하철역명_조회(stationResponse);
     }

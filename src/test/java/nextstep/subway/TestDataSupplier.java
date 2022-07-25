@@ -1,15 +1,16 @@
 package nextstep.subway;
 
 public interface TestDataSupplier {
-    String GANGNAM_STATION = "강남역";
-    String SINDORIM_STATION = "신도림역";
-
     String KEY_ID = "id";
     String KEY_NAME = "name";
     String KEY_COLOR = "color";
     String KEY_UP_STATION_ID = "upStationId";
     String KEY_DOWN_STATION_ID = "downStationId";
     String KEY_DISTANCE = "distance";
+
+    String GANGNAM_STATION = "강남역";
+    String SINDORIM_STATION = "신도림역";
+    String PANGYO_STATION = "판교역";
 
     String LINE1_NAME = "1호선";
     String LINE1_COLOR = "red";
