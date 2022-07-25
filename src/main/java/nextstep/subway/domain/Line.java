@@ -1,5 +1,6 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.SectionRequest;
 
 import javax.persistence.*;
@@ -18,6 +19,12 @@ public class Line {
 
     public Line() {
 
+    }
+
+    public Line(LineRequest lineRequest) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
+        this.registerSection(new Section(lineRequest));
     }
 
     public Long getId() {

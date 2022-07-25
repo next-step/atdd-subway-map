@@ -24,18 +24,8 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-
-        Sections sections = new Sections();
-        Section section = new Section(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
-
-        Line line = new Line.Builder()
-                    .name(lineRequest.getName())
-                    .color(lineRequest.getColor())
-                    .Sections(sections)
-                    .build();
-        line.registerSection(section);
+        Line line = new Line(lineRequest);
         lineRepository.save(line);
-
         return createLineResponse(line);
     }
 

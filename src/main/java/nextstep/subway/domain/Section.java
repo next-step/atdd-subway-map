@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.applicaion.dto.LineRequest;
+
 import javax.persistence.*;
 
 @Entity
@@ -16,6 +18,10 @@ public class Section {
 
     public Section() {
 
+    }
+
+    public Section(LineRequest lineRequest) {
+        this(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
     }
 
     public Section(Long upStationId, Long downStationId, int distance) {
