@@ -1,10 +1,7 @@
 package nextstep.subway.acceptance;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -22,10 +19,8 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = generateStation("강남역");
+        String 신림역 = 역_생성("강남역");
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames =
@@ -46,8 +41,8 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void getStation() {
         //given
-        generateStation("신림역");
-        generateStation("봉천역");
+        역_생성("신림역");
+        역_생성("봉천역");
 
         //when
         List<String> stations =
@@ -72,10 +67,10 @@ public class StationAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void deleteStation() {
         //given
-        ExtractableResponse<Response> response = generateStation("신림역");
+        String 신림역 = 역_생성("신림역");
 
         //when
-        removeStation(response.jsonPath().getString("id"));
+        removeStation(신림역);
 
         List<String> stationName = showStations().jsonPath().getList("name", String.class);
 

@@ -1,9 +1,7 @@
 package nextstep.subway.ui;
 
 import nextstep.subway.applicaion.LineService;
-import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.LineUpdateRequest;
+import nextstep.subway.applicaion.dto.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +44,32 @@ public class LineController {
     public ResponseEntity<Void> deleteStationLine(@PathVariable Long id) {
         lineService.deleteStationLine(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lines/{id}/sections")
+    public ResponseEntity<LineResponse> createStationSection(@PathVariable Long id,
+                                                             @RequestBody SectionRequest sectionRequest) {
+        LineResponse lineResponse = lineService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/section/" + lineResponse.getId())).body(lineResponse);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> deleteStationSection(@PathVariable Long lineId,
+                                                     @RequestParam Long downStationId) {
+        lineService.deleteSection(lineId, downStationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/lines/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SectionResponse>> getSections() {
+        List<SectionResponse> responses = lineService.getSections();
+        return ResponseEntity.ok().body(responses);
+    }
+
+    @GetMapping(value = "/lines/{id}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SectionResponse>> getSections(@PathVariable Long id) {
+        List<SectionResponse> responses = lineService.getSections(id);
+        return ResponseEntity.ok().body(responses);
     }
 
 }

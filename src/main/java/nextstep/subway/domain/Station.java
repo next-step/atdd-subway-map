@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Station {
@@ -25,5 +26,13 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSameName(Station station) {
+        return Objects.equals(this.name, station.getName());
+    }
+
+    public boolean isSameId(Long stationId) {
+        return Objects.equals(this.id, stationId);
     }
 }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LineTestFixtures {
-    public static ExtractableResponse<Response> generateLine(String name, String color, String upStationId, String downStationId, String distance) {
+    public static ExtractableResponse<Response> 노선_생성(String name, String color, String upStationId, String downStationId, String distance) {
         Map<String, String> lineParams = new HashMap<>();
         lineParams.put("name", name);
         lineParams.put("color", color);
@@ -27,7 +27,7 @@ public class LineTestFixtures {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> showLine() {
+    public static ExtractableResponse<Response> 노선_조회() {
         return RestAssured
                     .given().log().all()
                     .when()
@@ -36,7 +36,9 @@ public class LineTestFixtures {
                     .extract();
     }
 
-    public static ExtractableResponse<Response> showLine(String id) {
+    public static ExtractableResponse<Response> 노선_조회(ExtractableResponse<Response> 라인) {
+        String id = 라인.jsonPath().getString("id");
+
         return RestAssured
                     .given().log().all()
                     .pathParam("id", id)
@@ -46,10 +48,12 @@ public class LineTestFixtures {
                     .extract();
     }
 
-    public static ExtractableResponse<Response> updateLine(String name, String color, String id) {
+    public static ExtractableResponse<Response> updateLine(String name, String color, ExtractableResponse<Response> 라인) {
         Map<String, String> updateParam = new HashMap<>();
         updateParam.put("name", "구미선");
         updateParam.put("color", "bg-blue-30000");
+
+        String id = 라인.jsonPath().getString("id");
 
         //수정
          return RestAssured

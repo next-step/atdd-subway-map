@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.LineTestFixtures.*;
-import static nextstep.subway.acceptance.StationTestFixtures.generateStation;
+import static nextstep.subway.acceptance.StationTestFixtures.역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선도 관련 기능")
@@ -21,15 +21,15 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @Test
     void createSubwayLine() {
         //given
-        String upStationId = generateStation("강남역").jsonPath().getString("id");
-        String downStationId = generateStation("양재역").jsonPath().getString("id");
+        String 강남역 = 역_생성("강남역");
+        String 양재역 = 역_생성("양재역");
 
-        ExtractableResponse<Response> response = generateLine("신분당선", "bg-red-600", upStationId, downStationId, "10");
+        ExtractableResponse<Response> response = 노선_생성("신분당선", "bg-red-600", 강남역, 양재역, "10");
 
         Assertions.assertAll(
                 () -> assertThat(response.jsonPath().getList("stations.name")).containsExactly("강남역", "양재역"),
                 () -> assertThat(response.jsonPath().getString("name")).contains("신분당선"),
-                () -> assertThat(response.jsonPath().getList("stations.id")).contains(Integer.valueOf(upStationId), Integer.valueOf(downStationId)),
+                () -> assertThat(response.jsonPath().getList("stations.id")).contains(Integer.valueOf(강남역), Integer.valueOf(양재역)),
                 () -> assertThat(response.response().statusCode()).isEqualTo(HttpStatus.CREATED.value())
         );
 
@@ -43,17 +43,17 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 목록 조회")
     @Test
     void getSubwayLines() {
-        String upSinbundagStationId = generateStation("강남역").jsonPath().getString("id");
-        String downSinbundangStationId = generateStation("양재역").jsonPath().getString("id");
+        String 강남역 = 역_생성("강남역");
+        String 양재역 = 역_생성("양재역");
 
-        generateLine("신분당선", "bg-red-600", upSinbundagStationId, downSinbundangStationId, "10");
+        노선_생성("신분당선", "bg-red-600", 강남역, 양재역, "10");
 
-        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
-        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
+        String 신림역 = 역_생성("신림역");
+        String 당곡역 = 역_생성("당곡역");
 
-        generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20");
+        노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20");
 
-        ExtractableResponse<Response> response = showLine();
+        ExtractableResponse<Response> response = 노선_조회();
 
         Assertions.assertAll(
                 () -> assertThat(response.jsonPath().getList("name")).contains("신분당선", "신림선"),
@@ -70,15 +70,12 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 조회")
     @Test
     void getSubwayLine() {
-        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
-        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
+        String 신림역 = 역_생성("신림역");
+        String 당곡역 = 역_생성("당곡역");
 
-        String id =
-                generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20")
-                        .jsonPath()
-                        .getString("id");
+        ExtractableResponse<Response> 노선_생선_결과 = 노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20");
 
-        ExtractableResponse<Response> extract = showLine(id);
+        ExtractableResponse<Response> extract = 노선_조회(노선_생선_결과);
 
         Assertions.assertAll(
                 () -> assertThat(extract.jsonPath().getString("name")).isEqualTo("신림선"),
@@ -95,18 +92,15 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 수정")
     @Test
     void updateSubwayLine() {
-        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
-        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
+        String 신림역 = 역_생성("신림역");
+        String 당곡역 = 역_생성("당곡역");
 
-        String id =
-                generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20")
-                    .jsonPath()
-                    .getString("id");
+        ExtractableResponse<Response> 노선_생성_결과 = 노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20");
 
-        updateLine("구미선", "bg-white-200", id);
+        updateLine("구미선", "bg-white-200", 노선_생성_결과);
 
         //수정된 데이터 출력
-        ExtractableResponse<Response> response = showLine(id);
+        ExtractableResponse<Response> response = 노선_조회(노선_생성_결과);
 
         assertThat(response.jsonPath().getString("name")).isEqualTo("구미선");
         assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -120,12 +114,12 @@ public class LineAcceptanceTest extends AbstractAcceptanceTest{
     @DisplayName("지하철노선 삭제")
     @Test
     void deleteSubwayLine() {
-        String upSinlimStationId = generateStation("신림역").jsonPath().getString("id");
+        String 신림역 = 역_생성("신림역");
 
-        String downSinlimStationId = generateStation("당곡역").jsonPath().getString("id");
+        String 당곡역 = 역_생성("당곡역");
 
         String id =
-                generateLine("신림선", "bg-blue-500", upSinlimStationId, downSinlimStationId, "20")
+                노선_생성("신림선", "bg-blue-500", 신림역, 당곡역, "20")
                     .jsonPath()
                     .getString("id");
 
