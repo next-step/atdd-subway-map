@@ -5,6 +5,7 @@ public class SectionRequest {
     private Long downStationId;
     private int distance;
 
+    // 기본 생성자 제거 시 jackson library에서 오류 발생
     public SectionRequest() {
 
     }
