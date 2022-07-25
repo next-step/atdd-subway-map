@@ -56,14 +56,8 @@ public class LineService {
 
     @Transactional
     public void updateLine(Long id, LineUpdateRequest updateDto) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("manager");
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        tx.begin();
         Line line = getLine(id);
         line.updateLine(updateDto.getName(), updateDto.getColor());
-        tx.commit();
     }
 
     @Transactional
