@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LineService {
     private LineRepository lineRepository;
-    private StationRepository stationRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationService stationService, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
@@ -30,20 +30,14 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-
         Sections sections = line.getSections();
-        createStationResponses(sections.getLineStationIds());
 
         return new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                createStationResponses(sections.getLineStationIds())
+                stationService.createStationResponses(sections.getLineStationIds())
         );
-    }
-
-    private List<StationResponse> createStationResponses(Set<Long> lineStationIds) {
-        return stationRepository.findAllById(lineStationIds).stream().map(StationResponse::new).collect(Collectors.toList());
     }
 
     public List<LineResponse> findAllLines() {

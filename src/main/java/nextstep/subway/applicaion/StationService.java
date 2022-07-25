@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,4 +65,12 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public List<StationResponse> createStationResponses(Set<Long> stationIds) {
+        return stationRepository.findAllById(stationIds).stream().map(StationResponse::new).collect(Collectors.toList());
+    }
+
+
+
+
 }
