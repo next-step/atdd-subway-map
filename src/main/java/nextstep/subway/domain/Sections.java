@@ -23,7 +23,7 @@ public class Sections {
     private List<Section> sections = new ArrayList<>();
 
     public void add(Section newSection) {
-        if (isSectionsEmpty()) {
+        if (sections.isEmpty()) {
             this.sections.add(newSection);
             return;
         }
@@ -75,10 +75,6 @@ public class Sections {
         });
 
         return stationIds;
-    }
-
-    private boolean isSectionsEmpty() {
-        return sections.size() == 0;
     }
 
     private boolean isLastSection(Section sectionToRemove) {
