@@ -28,18 +28,27 @@ public class Sections {
             return;
         }
 
-        Section latestSection = sections.get(sections.size() - 1);
-
-        if (!latestSection.getDownStationId().equals(newSection.getUpStationId())) {
-            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
-        }
-
-        if (getLineStationIds().contains(newSection.getDownStationId())) {
-            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
-        }
+        newSectionUpStationValidation(newSection.getUpStationId());
+        newSectionDownStationValidation(newSection.getDownStationId());
 
         this.sections.add(newSection);
     }
+
+
+    private void newSectionUpStationValidation(Long upStationId) {
+        Section latestSection = sections.get(sections.size() - 1);
+
+        if (!latestSection.getDownStationId().equals(upStationId)) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+        }
+    }
+
+    private void newSectionDownStationValidation(Long downStationId) {
+        if (getLineStationIds().contains(downStationId)) {
+            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.");
+        }
+    }
+
 
     public void remove(SectionRequest sectionRequest) {
         if (sections.size() <= 1) {
