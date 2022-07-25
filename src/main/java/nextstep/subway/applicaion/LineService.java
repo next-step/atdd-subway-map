@@ -32,7 +32,7 @@ public class LineService {
     private LineResponse createLineResponse(Line line) {
 
         Sections sections = line.getSections();
-        List<StationResponse> stationResponses = createStationResponses(sections.getLineStationIds());
+        createStationResponses(sections.getLineStationIds());
 
         return new LineResponse(
                 line.getId(),
