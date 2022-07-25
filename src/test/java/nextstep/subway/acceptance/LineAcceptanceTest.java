@@ -100,6 +100,38 @@ public class LineAcceptanceTest {
         assertThatStatus(linesResponse, HttpStatus.OK);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회한다.")
+    @Test
+    void getLine() {
+        //given
+        ExtractableResponse<Response> 신분당선 = 지하철_노선_생성(LineAcceptanceTest.신분당선, BG_RED_600, 지하철역Id, 새로운지하철역Id, 10);
+        assertThatStatus(신분당선, HttpStatus.CREATED);
+
+        Long 신분당선Id = 신분당선.jsonPath()
+                .getLong("id");
+
+        //when
+        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", 신분당선Id)
+                .then()
+                .log().all()
+                .extract();
+
+        //then
+        assertThatStatus(lineResponse, HttpStatus.OK);
+        assertThat(lineResponse.jsonPath().getLong("id")).isEqualTo(1L);
+        assertThat(lineResponse.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(lineResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        assertThat(lineResponse.jsonPath().getList("stations").size()).isEqualTo(2);
+
+    }
+
     private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
