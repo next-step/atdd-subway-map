@@ -47,7 +47,6 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        Optional<Line> line = lineRepository.findById(id);
         return lineRepository.findById(id).map(this::createLineResponse).orElseThrow(() -> new EntityNotFoundException(id + "번 id로 조회되는 노선이 없습니다."));
     }
 
