@@ -62,12 +62,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> lineResponse = 지하철_노선_생성(신분당선, BG_RED_600, 지하철역Id, 새로운지하철역Id, 10);
 
         //then
-        ExtractableResponse<Response> linesResponse = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> linesResponse = 지하철_노선목록_조회();
         assertThatStatus(linesResponse, HttpStatus.OK);
         assertThat(linesResponse.jsonPath().getList("lines").size()).isEqualTo(1);
         assertThat(lineResponse.jsonPath().getLong("id")).isEqualTo(1L);
@@ -92,12 +87,7 @@ public class LineAcceptanceTest {
         assertThatStatus(분당선, HttpStatus.CREATED);
 
         //when
-        ExtractableResponse<Response> linesResponse = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> linesResponse = 지하철_노선목록_조회();
 
         //then
         assertThat(linesResponse.jsonPath().getList("$")).hasSize(2);
@@ -120,12 +110,7 @@ public class LineAcceptanceTest {
                 .getLong("id");
 
         //when
-        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}", 신분당선Id)
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> lineResponse = 지하철_노선_조회(신분당선Id);
 
         //then
         assertThatStatus(lineResponse, HttpStatus.OK);
@@ -151,28 +136,17 @@ public class LineAcceptanceTest {
         Long 신분당선Id = 신분당선.jsonPath()
                 .getLong("id");
 
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("name", 다른분당선);
         params.put("color", BG_BLUE_600);
+
         //when
-        ExtractableResponse<Response> updateLineResponse = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().put("/lines/{id}", 신분당선Id)
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> updateLineResponse = 지하철_노선_수정(신분당선Id, params);
 
         //then
         assertThatStatus(updateLineResponse, HttpStatus.OK);
 
-        ExtractableResponse<Response> getLineResponse = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}", 신분당선Id)
-                .then()
-                .log().all()
-                .extract();
-
+        ExtractableResponse<Response> getLineResponse = 지하철_노선_조회(신분당선Id);
         assertThat(getLineResponse.jsonPath().getLong("id")).isEqualTo(1L);
         assertThat(getLineResponse.jsonPath().getString("name")).isEqualTo(다른분당선);
         assertThat(getLineResponse.jsonPath().getString("color")).isEqualTo(BG_BLUE_600);
@@ -195,14 +169,46 @@ public class LineAcceptanceTest {
                 .getLong("id");
 
         //when
-        ExtractableResponse<Response> updateLineResponse = RestAssured.given().log().all()
-                .when().delete("/lines/{id}", 신분당선Id)
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> updateLineResponse = 지하철_노선_제거(신분당선Id);
 
         //then
         assertThatStatus(updateLineResponse, HttpStatus.NO_CONTENT);
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_수정(Long stationId, Map<String, Object> params) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().put("/lines/{id}", stationId)
+                .then()
+                .log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_제거(Long stationId) {
+        return RestAssured.given().log().all()
+                .when().delete("/lines/{id}", stationId)
+                .then()
+                .log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선_조회(Long stationId) {
+        return RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", stationId)
+                .then()
+                .log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철_노선목록_조회() {
+        return RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then()
+                .log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
