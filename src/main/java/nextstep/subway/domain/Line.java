@@ -46,4 +46,11 @@ public class Line {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
     }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+    public void changeColor(String color) {
+        this.color = color;
+    }
 }
