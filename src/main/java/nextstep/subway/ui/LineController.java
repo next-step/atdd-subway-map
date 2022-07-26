@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class LineController {
@@ -33,5 +34,11 @@ public class LineController {
     @GetMapping(value = "/lines/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LineResponse> showLine(@PathVariable Long lineId) {
         return ResponseEntity.ok().body(lineService.findByLine(lineId));
+    }
+
+    @PutMapping(value = "/lines/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateLine(@PathVariable Long lineId, @RequestBody Map<String, Object> params) {
+        lineService.updateLine(lineId, params);
+        return ResponseEntity.ok().body(null);
     }
 }
