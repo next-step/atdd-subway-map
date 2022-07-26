@@ -50,13 +50,13 @@ public class Sections {
     }
 
 
-    public void remove(SectionRequest sectionRequest) {
+    public void remove(Long upStationId, Long downStationId) {
         if (sections.size() <= 1) {
             throw new IllegalArgumentException("구간을 더이상 삭제할 수 없습니다.");
         }
 
-        Section sectionToRemove = sections.stream().filter((section) -> section.getDownStationId().equals(sectionRequest.getDownStationId())
-                && section.getUpStationId().equals(sectionRequest.getUpStationId())).findFirst().orElseThrow(() -> new IllegalArgumentException("유효하지 않은 구간입니다."));
+        Section sectionToRemove = sections.stream().filter((section) -> section.getDownStationId().equals(downStationId)
+                && section.getUpStationId().equals(upStationId)).findFirst().orElseThrow(() -> new IllegalArgumentException("유효하지 않은 구간입니다."));
 
         if (isLastSection(sectionToRemove)) {
             sections.remove(sectionToRemove);

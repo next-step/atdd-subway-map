@@ -60,7 +60,7 @@ public class Line {
     }
 
     public void deleteSection(SectionRequest sectionRequest) {
-        this.sections.remove(sectionRequest);
+        this.sections.remove(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
     }
 
 
