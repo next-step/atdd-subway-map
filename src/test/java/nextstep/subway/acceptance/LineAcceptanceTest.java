@@ -33,9 +33,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        assertThat(getList("name", "/lines").get(0)).isEqualTo("2호선");
+//
+//        // then
+//        assertThat(getList("name", "/lines").get(0)).isEqualTo("2호선");
     }
 
     private void createStations() {
@@ -163,5 +163,34 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
     private void deleteLine(String id) {
         delete("/lines/", id);
+    }
+
+    /**
+     * Given 추가할 구간을 생성하고
+     * When 지하철노선에 구간을 추가하면
+     * Then 지하철노선 마지막에 구간에 등록된다
+     */
+    // TODO: 구간 등록 인수 테스트 메서드 생성
+    @DisplayName("구간을 등록한다.")
+    @Test
+    void addSection() {
+        // given
+
+
+        // when
+
+
+        // then
+
+    }
+
+    /**
+     * When 지하철노선에 구간을 삭제하면
+     * Then 지하철노선 마지막 구간이 삭제된다
+     */
+    // TODO: 구간 삭제 인수 테스트 메서드 생성
+    @DisplayName("구간을 삭제한다.")
+    @Test
+    void deleteSection() {
     }
 }

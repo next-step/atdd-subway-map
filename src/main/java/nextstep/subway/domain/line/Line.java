@@ -1,8 +1,12 @@
 package nextstep.subway.domain.line;
 
+import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Line {
@@ -12,10 +16,13 @@ public class Line {
     private String name;
     private String color;
 
-    @OneToOne
-    private Station upStation;
-    @OneToOne
-    private Station downStation;
+//    @OneToOne
+//    private Station upStation;
+//    @OneToOne
+//    private Station downStation;
+    @OneToMany
+    private List<Section> sections = new ArrayList<>();
+
     private Long distance;
 
     public Line() {
@@ -24,14 +31,21 @@ public class Line {
     public Line(Builder builder) {
         this.name = builder.name;
         this.color = builder.color;
-        this.upStation = builder.upStation;
-        this.downStation = builder.downStation;
+//        this.upStation = builder.upStation;
+//        this.downStation = builder.downStation;
+        this.sections.add(builder.section);
         this.distance = builder.distance;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Long id, Section section) {
+        this.sections.add(section);
+
+        this.distance += section.getDistance();
     }
 
     public Long getId() {
@@ -46,12 +60,17 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
+//    public Station getUpStation() {
+//        return upStation;
+//    }
+//
+//    public Station getDownStation() {
+//        return downStation;
+//    }
 
-    public Station getDownStation() {
-        return downStation;
+
+    public List<Section> getSections() {
+        return Collections.unmodifiableList(sections);
     }
 
     public Long getDistance() {
@@ -61,8 +80,9 @@ public class Line {
     public static class Builder {
         private String name;
         private String color;
-        private Station upStation;
-        private Station downStation;
+//        private Station upStation;
+//        private Station downStation;
+        private Section section;
         private Long distance;
 
         public Builder() {
@@ -78,13 +98,18 @@ public class Line {
             return this;
         }
 
-        public Builder upStation(Station val) {
-            upStation = val;
-            return this;
-        }
+//        public Builder upStation(Station val) {
+//            upStation = val;
+//            return this;
+//        }
+//
+//        public Builder downStation(Station val) {
+//            downStation = val;
+//            return this;
+//        }
 
-        public Builder downStation(Station val) {
-            downStation = val;
+        public Builder sections(Section val) {
+            section = val;
             return this;
         }
 

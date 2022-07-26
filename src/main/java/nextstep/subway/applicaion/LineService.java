@@ -2,8 +2,10 @@ package nextstep.subway.applicaion;
 
 import nextstep.subway.applicaion.dto.line.LineRequest;
 import nextstep.subway.applicaion.dto.line.LineResponse;
+import nextstep.subway.applicaion.dto.section.SectionRequest;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
+import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.error.exception.LineNotFoundException;
@@ -33,21 +35,22 @@ public class LineService {
     private Line toEntity(LineRequest lineRequest) {
         Station upStation = findStationByStationId(lineRequest.getUpStationId());
         Station downStation = findStationByStationId(lineRequest.getDownStationId());
+        Section section = new Section(upStation, downStation, lineRequest.getDistance());
 
         return new Line.Builder()
                         .name(lineRequest.getName())
                         .color(lineRequest.getColor())
-                        .upStation(upStation)
-                        .downStation(downStation)
+                        .sections(section)
                         .distance(lineRequest.getDistance())
                         .build();
     }
 
     private LineResponse createLineResponse(Line entity) {
-        Station upStation = findStationByStationId(entity.getUpStation().getId());
-        Station downStation = findStationByStationId(entity.getDownStation().getId());
+        List<Section> sections = entity.getSections();
+        Station upStation = findStationByStationId(sections.get(0).getId());
+        Station downStation = findStationByStationId(sections.get(sections.size() - 1).getId());
 
-        return new LineResponse(entity, upStation, downStation);
+        return new LineResponse(entity);
     }
 
     private Station findStationByStationId(Long id) {
@@ -80,5 +83,17 @@ public class LineService {
     @Transactional
     public void deleteLineById(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public LineResponse addSection(Long id, SectionRequest sectionRequest) {
+        Station upStation = findStationByStationId(sectionRequest.getUpStationId());
+        Station downStation = findStationByStationId(sectionRequest.getDownStationId());
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+
+        Line line = getLine(id);
+        line.addSection(id, section);
+
+        return new LineResponse(getLine(id));
     }
 }
