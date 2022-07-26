@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -177,6 +179,32 @@ public class LineAcceptanceTest {
         assertThat(getLineResponse.jsonPath().getString("name")).isEqualTo(다른분당선);
         assertThat(getLineResponse.jsonPath().getString("color")).isEqualTo(BG_BLUE_600);
         assertThat(getLineResponse.jsonPath().getList("stations").size()).isEqualTo(2);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다.
+     */
+    @DisplayName("지하철 노선을 제거합니다.")
+    @Test
+    void deleteLine() {
+        //given
+        ExtractableResponse<Response> 신분당선 = 지하철_노선_생성(LineAcceptanceTest.신분당선, BG_RED_600, 지하철역Id, 새로운지하철역Id, 10);
+        assertThatStatus(신분당선, HttpStatus.CREATED);
+
+        Long 신분당선Id = 신분당선.jsonPath()
+                .getLong("id");
+
+        //when
+        ExtractableResponse<Response> updateLineResponse = RestAssured.given().log().all()
+                .when().delete("/lines/{id}", 신분당선Id)
+                .then()
+                .log().all()
+                .extract();
+
+        //then
+        assertThatStatus(updateLineResponse, HttpStatus.NO_CONTENT);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
