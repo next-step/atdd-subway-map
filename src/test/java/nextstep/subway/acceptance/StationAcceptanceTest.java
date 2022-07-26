@@ -20,6 +20,8 @@ public class StationAcceptanceTest extends BaseTest {
 
     public static final String STATION_NAME1 = "강남역";
     public static final String STATION_NAME2 = "삼성역";
+    public static final String STATION_NAME3 = "노원역";
+    public static final String STATION_NAME4 = "중계역";
 
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 

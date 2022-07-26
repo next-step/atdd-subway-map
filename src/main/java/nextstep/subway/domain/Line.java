@@ -19,7 +19,7 @@ public class Line {
 
     private String color;
 
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Station> stations = new ArrayList<>();
 
     private Long distance;
@@ -61,6 +61,10 @@ public class Line {
     public Long getDistance() {
         return distance;
     }
+
+    public Long getUpStationId() { return this.stations.get(0).getId(); }
+
+    public Long getDownStationId() { return this.stations.get(1).getId(); }
 
     public void update(LineRequest lineRequest, Station upStation, Station downStation) {
         this.name = lineRequest.getName() != null ? lineRequest.getName() : this.name;

@@ -48,8 +48,10 @@ public class LineCommandService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stations = stationQueryService.findAllStations();
-        return new LineResponse(line, stations);
+        Station upStation = stationQueryService.findById(line.getUpStationId());
+        Station downStation = stationQueryService.findById(line.getDownStationId());
+
+        return new LineResponse(line, upStation, downStation);
     }
 
 }

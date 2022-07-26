@@ -1,11 +1,10 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +37,10 @@ public class LineQueryService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        List<StationResponse> stations = stationQueryService.findAllStations();
-        return new LineResponse(line, stations);
+        Station upStation = stationQueryService.findById(line.getUpStationId());
+        Station downStation = stationQueryService.findById(line.getDownStationId());
+
+        return new LineResponse(line, upStation, downStation);
     }
 
 }

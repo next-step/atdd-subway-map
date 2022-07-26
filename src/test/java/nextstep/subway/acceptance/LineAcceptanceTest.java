@@ -13,8 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME1;
-import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME2;
+import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -46,10 +45,12 @@ public class LineAcceptanceTest extends BaseTest {
 
     @BeforeEach
     public void setUp() {
-        Long upStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
-        Long downStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
-        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId, downStationId, LINE_DISTANCE_5);
-        LINE_9 = new LineRequest(LINE_NAME_9, LINE_COLOR_9, upStationId, downStationId, LINE_DISTANCE_9);
+        Long upStationId1 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
+        Long downStationId1 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
+        Long upStationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME3).jsonPath().getLong("id");
+        Long downStationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME4).jsonPath().getLong("id");
+        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId1, downStationId1, LINE_DISTANCE_5);
+        LINE_9 = new LineRequest(LINE_NAME_9, LINE_COLOR_9, upStationId2, downStationId2, LINE_DISTANCE_9);
     }
 
     @AfterEach
