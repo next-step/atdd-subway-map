@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +44,13 @@ public class LineService {
         Line findLine = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("해당하는 노선이 없습니다."));
         return createLineResponse(findLine);
 
+    }
+
+    @Transactional
+    public void updateLine(Long lineId, Map<String, Object> params) {
+        Line findLine = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("해당하는 노선이 없습니다."));
+        findLine.changeName((String) params.get("name"));
+        findLine.changeColor((String) params.get("color"));
     }
 
     private LineResponse createLineResponse(Line line) {
