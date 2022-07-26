@@ -53,6 +53,11 @@ public class LineService {
         findLine.changeColor((String) params.get("color"));
     }
 
+    @Transactional
+    public void deleteLine(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
+
     private LineResponse createLineResponse(Line line) {
         List<Station> stationList = stationRepository.findAllById(List.of(line.getUpStationId(), line.getDownStationId()));
         return new LineResponse(line, stationList);
