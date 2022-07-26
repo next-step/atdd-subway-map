@@ -20,10 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
+    public static final String 다른분당선 = "다른분당선";
     public static final String 신분당선 = "신분당선";
     public static final String 분당선 = "분당선";
+
     public static final String BG_RED_600 = "bg-red-600";
+    public static final String BG_BLUE_600 = "bg-blue-600";
     public static final String BG_GREEN_600 = "bg-green-600";
+
     @LocalServerPort
     int port;
 
@@ -130,6 +134,49 @@ public class LineAcceptanceTest {
         assertThat(lineResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
         assertThat(lineResponse.jsonPath().getList("stations").size()).isEqualTo(2);
 
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다.
+     */
+    @DisplayName("지하철 노선을 수정합니다.")
+    @Test
+    void updateLine() {
+        //given
+        ExtractableResponse<Response> 신분당선 = 지하철_노선_생성(LineAcceptanceTest.신분당선, BG_RED_600, 지하철역Id, 새로운지하철역Id, 10);
+        assertThatStatus(신분당선, HttpStatus.CREATED);
+
+        Long 신분당선Id = 신분당선.jsonPath()
+                .getLong("id");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", 다른분당선);
+        params.put("color", BG_BLUE_600);
+        //when
+        ExtractableResponse<Response> updateLineResponse = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().put("/lines/{id}", 신분당선Id)
+                .then()
+                .log().all()
+                .extract();
+
+        //then
+        assertThatStatus(updateLineResponse, HttpStatus.OK);
+
+        ExtractableResponse<Response> getLineResponse = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", 신분당선Id)
+                .then()
+                .log().all()
+                .extract();
+
+        assertThat(getLineResponse.jsonPath().getLong("id")).isEqualTo(1L);
+        assertThat(getLineResponse.jsonPath().getString("name")).isEqualTo(다른분당선);
+        assertThat(getLineResponse.jsonPath().getString("color")).isEqualTo(BG_BLUE_600);
+        assertThat(getLineResponse.jsonPath().getList("stations").size()).isEqualTo(2);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성(String name, String color, Long upStationId, Long downStationId, Integer distance) {
