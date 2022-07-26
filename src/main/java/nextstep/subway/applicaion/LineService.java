@@ -26,13 +26,26 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(lineRequest.toEntity());
+        Line line = lineRepository.save(toEntity(lineRequest));
         return createLineResponse(line);
     }
 
+    private Line toEntity(LineRequest lineRequest) {
+        Station upStation = findStationByStationId(lineRequest.getUpStationId());
+        Station downStation = findStationByStationId(lineRequest.getDownStationId());
+
+        return new Line.Builder()
+                        .name(lineRequest.getName())
+                        .color(lineRequest.getColor())
+                        .upStation(upStation)
+                        .downStation(downStation)
+                        .distance(lineRequest.getDistance())
+                        .build();
+    }
+
     private LineResponse createLineResponse(Line entity) {
-        Station upStation = findStationByStationId(entity.getUpStationId());
-        Station downStation = findStationByStationId(entity.getDownStationId());
+        Station upStation = findStationByStationId(entity.getUpStation().getId());
+        Station downStation = findStationByStationId(entity.getDownStation().getId());
 
         return new LineResponse(entity, upStation, downStation);
     }

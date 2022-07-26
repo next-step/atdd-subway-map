@@ -4,6 +4,7 @@ import nextstep.subway.applicaion.dto.station.StationRequest;
 import nextstep.subway.applicaion.dto.station.StationResponse;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
+import nextstep.subway.error.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

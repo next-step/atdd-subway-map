@@ -1,20 +1,21 @@
 package nextstep.subway.domain.line;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.domain.station.Station;
+
+import javax.persistence.*;
 
 @Entity
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+
+    @OneToOne
+    private Station upStation;
+    @OneToOne
+    private Station downStation;
     private Long distance;
 
     public Line() {
@@ -23,8 +24,8 @@ public class Line {
     public Line(Builder builder) {
         this.name = builder.name;
         this.color = builder.color;
-        this.upStationId = builder.upStationId;
-        this.downStationId = builder.downStationId;
+        this.upStation = builder.upStation;
+        this.downStation = builder.downStation;
         this.distance = builder.distance;
     }
 
@@ -45,12 +46,12 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDistance() {
@@ -60,8 +61,8 @@ public class Line {
     public static class Builder {
         private String name;
         private String color;
-        private Long upStationId;
-        private Long downStationId;
+        private Station upStation;
+        private Station downStation;
         private Long distance;
 
         public Builder() {
@@ -77,13 +78,13 @@ public class Line {
             return this;
         }
 
-        public Builder upStationId(Long val) {
-            upStationId = val;
+        public Builder upStation(Station val) {
+            upStation = val;
             return this;
         }
 
-        public Builder downStationId(Long val) {
-            downStationId = val;
+        public Builder downStation(Station val) {
+            downStation = val;
             return this;
         }
 
