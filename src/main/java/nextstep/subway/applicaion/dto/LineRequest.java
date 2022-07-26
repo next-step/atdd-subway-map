@@ -43,15 +43,4 @@ public class LineRequest {
     public Long getDistance() {
         return distance;
     }
-
-    public Line toLine(Line line) {
-        return new Line(
-                line.getId(),
-                this.name != null ? this.name : line.getName(),
-                this.color != null ? this.color : line.getColor(),
-                this.upStationId != null ? this.upStationId : line.getUpStationId(),
-                this.downStationId != null ? this.downStationId : line.getUpStationId(),
-                this.distance != null ? this.distance : line.getDistance()
-        );
-    }
 }

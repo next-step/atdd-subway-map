@@ -6,10 +6,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -47,7 +44,7 @@ public class LineAcceptanceTest extends BaseTest {
     private LineRequest LINE_5;
     private LineRequest LINE_9;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() {
         Long upStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
         Long downStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");

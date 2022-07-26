@@ -1,14 +1,18 @@
 package nextstep.subway.domain;
 
+import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 public class Line {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_id")
     private Long id;
 
     private String name;
@@ -16,32 +20,26 @@ public class Line {
     private String color;
 
     @OneToMany(mappedBy = "line")
-    private List<Station> stations;
-
-    private Long upStationId;
-
-    private Long downStationId;
+    private List<Station> stations = new ArrayList<>();
 
     private Long distance;
 
-    public Line() {
+    public Line(LineRequest lineRequest, Station upStation, Station downStation) {
+        this.name = lineRequest.getName();
+        this.color = lineRequest.getColor();
+        this.stations.add(upStation);
+        this.stations.add(downStation);
+        this.distance = lineRequest.getDistance();
+        upStation.setLine(this);
+        downStation.setLine(this);
     }
 
-    public Line(Long id, String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public Line(Long id, String name, String color, List<Station> stations, Long distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.stations = stations;
         this.distance = distance;
-    }
-
-    public Line(LineRequest lineRequest) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
-        this.upStationId = lineRequest.getUpStationId();
-        this.downStationId = lineRequest.getDownStationId();
-        this.distance = lineRequest.getDistance();
     }
 
     public Long getId() {
@@ -56,15 +54,19 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
+    public List<Station> getStations() {
+        return stations;
     }
 
     public Long getDistance() {
         return distance;
+    }
+
+    public void update(LineRequest lineRequest, Station upStation, Station downStation) {
+        this.name = lineRequest.getName() != null ? lineRequest.getName() : this.name;
+        this.color = lineRequest.getColor() != null ? lineRequest.getColor() : this.color;
+        this.stations.set(0, upStation != null ? upStation : this.stations.get(0));
+        this.stations.set(1, downStation != null ? downStation : this.stations.get(1));
+        this.distance = lineRequest.getDistance() != null ? lineRequest.getDistance() : this.distance;
     }
 }

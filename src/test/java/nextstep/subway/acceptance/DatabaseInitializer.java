@@ -52,7 +52,7 @@ public class DatabaseInitializer implements InitializingBean {
         statement.executeUpdate("SET REFERENTIAL_INTEGRITY FALSE");
         for (String tableName : tableNames) {
             statement.executeUpdate("TRUNCATE TABLE " + tableName);
-            statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1");
+            statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN " + tableName + "_ID RESTART WITH 1");
         }
         statement.executeUpdate("SET REFERENTIAL_INTEGRITY TRUE");
     }

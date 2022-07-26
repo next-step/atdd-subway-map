@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.StationResponse;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
+import nextstep.subway.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +23,18 @@ public class LineCommandService {
     private final LineRepository lineRepository;
 
     public LineResponse saveLine(LineRequest lineRequest) {
-        Line line = lineRepository.save(new Line(lineRequest));
+        Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
+        Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
+        Line line = lineRepository.save(new Line(lineRequest, upStation, downStation));
         return createLineResponse(line);
     }
 
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findLineOrElseThrow(id);
-        lineRepository.save(lineRequest.toLine(line));
+        Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
+        Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
+
+        line.update(lineRequest, upStation, downStation);
     }
 
     public void deleteLineById(Long id) {
