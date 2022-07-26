@@ -26,12 +26,23 @@ public class LineResponse {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getColor() {
         return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public List<StationResponse> getStations() {
         return stations;
     }
 
+    public void setStations(List<StationResponse> stations) {
+        this.stations = stations;
+    }
 }
