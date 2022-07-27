@@ -3,13 +3,13 @@ package nextstep.subway.ui;
 import nextstep.subway.application.LineService;
 import nextstep.subway.application.dto.LineRequest;
 import nextstep.subway.application.dto.LineResponse;
+import nextstep.subway.application.dto.UpdateLineRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class LineController {
@@ -37,8 +37,8 @@ public class LineController {
     }
 
     @PutMapping(value = "/lines/{lineId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateLine(@PathVariable Long lineId, @RequestBody Map<String, Object> params) {
-        lineService.updateLine(lineId, params);
+    public ResponseEntity<Void> updateLine(@PathVariable Long lineId, @RequestBody UpdateLineRequest updateLineRequest) {
+        lineService.updateLine(lineId, updateLineRequest);
         return ResponseEntity.ok().body(null);
     }
 
