@@ -21,7 +21,7 @@ import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
-public class SectionTest extends BaseTest {
+public class SectionAcceptanceTest extends BaseTest {
 
     private static final Long DISTANCE_STATION2_TO_STATION3 = 3L;
 
