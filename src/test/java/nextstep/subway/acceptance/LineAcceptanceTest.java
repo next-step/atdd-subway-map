@@ -4,9 +4,11 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.line.LineRequest;
+import nextstep.subway.applicaion.dto.section.SectionRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
@@ -38,6 +40,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
         assertThat(getList("name", "/lines").get(0)).isEqualTo("2호선");
     }
 
+    /**
+     *       [신분당선]
+     * [2호선]  강남 - 역삼 - 선릉
+     *           ｜
+     *          양재
+     */
     private void createStations() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
@@ -107,7 +115,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         return RestAssured.given().log().all()
                 .when().get("/lines/" + id)
                 .then().log().all()
-                .extract().jsonPath().get(variable);
+                .extract().jsonPath().getString(variable);
     }
 
     /**
@@ -174,14 +182,44 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간을 등록한다.")
     @Test
     void addSection() {
-        // given
+        // exception
+        // 1. 존재하지 않는 노선
+        // 2. 새로운 구간의 상행역이 노선의 하행 종점이 아닌 경우
+        // 3. 새로운 구간의 하행역이 이미 노선에 존재
 
+        // given
+        createStations();
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
+        assertThat(getLine("downStation.id", "1")).isEqualTo("2");
+//        System.out.println("=======");
+//        System.out.println(response.jsonPath().getString("."));
+//        System.out.println(response.jsonPath().getString("downStation.id"));
+//        System.out.println("=======");
 
         // when
-
+        Long createdLineId = Long.parseLong(response.jsonPath().getString("id"));
+        Long upStationId = Long.parseLong(response.jsonPath().getString("downStation.id"));
+        Long downStationId = 3L;
+        Long distance = 5L;
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
+        ExtractableResponse<Response> response2 = addSection(createdLineId, sectionRequest);
+//        System.out.println("-------");
+//        System.out.println(response2.jsonPath().getString("."));
+//        System.out.println(response2.jsonPath().getString("downStation.id"));
+//        System.out.println("-------");
 
         // then
+        assertThat(getLine("downStation.id", "1")).isEqualTo("3");
+    }
 
+    private ExtractableResponse<Response> addSection(Long id, SectionRequest dto) {
+        return RestAssured.given().log().all()
+                .body(dto)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/" + id + "/sections")
+                .then().log().all()
+                .extract();
     }
 
     /**

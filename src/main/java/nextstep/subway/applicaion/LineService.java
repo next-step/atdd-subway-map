@@ -97,7 +97,16 @@ public class LineService {
         sectionRepository.save(section);
 
         Line line = getLine(id);
+
+//        System.out.println("+++++++++");
+//        System.out.println(line.getSections());
+//        System.out.println("+++++++++");
+
         line.addSection(id, section);
+
+//        System.out.println("*********");
+//        System.out.println(line.getSections());
+//        System.out.println("*********");
 
         return new LineResponse(getLine(id));
     }

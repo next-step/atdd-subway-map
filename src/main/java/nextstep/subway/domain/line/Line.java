@@ -1,7 +1,6 @@
 package nextstep.subway.domain.line;
 
 import nextstep.subway.domain.section.Section;
-import nextstep.subway.domain.station.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,10 +15,6 @@ public class Line {
     private String name;
     private String color;
 
-//    @OneToOne
-//    private Station upStation;
-//    @OneToOne
-//    private Station downStation;
     @OneToMany
     private List<Section> sections = new ArrayList<>();
 
@@ -31,8 +26,6 @@ public class Line {
     public Line(Builder builder) {
         this.name = builder.name;
         this.color = builder.color;
-//        this.upStation = builder.upStation;
-//        this.downStation = builder.downStation;
         this.sections.add(builder.section);
         this.distance = builder.distance;
     }
@@ -60,15 +53,6 @@ public class Line {
         return color;
     }
 
-//    public Station getUpStation() {
-//        return upStation;
-//    }
-//
-//    public Station getDownStation() {
-//        return downStation;
-//    }
-
-
     public List<Section> getSections() {
         return Collections.unmodifiableList(sections);
     }
@@ -80,8 +64,6 @@ public class Line {
     public static class Builder {
         private String name;
         private String color;
-//        private Station upStation;
-//        private Station downStation;
         private Section section;
         private Long distance;
 
@@ -97,16 +79,6 @@ public class Line {
             color = val;
             return this;
         }
-
-//        public Builder upStation(Station val) {
-//            upStation = val;
-//            return this;
-//        }
-//
-//        public Builder downStation(Station val) {
-//            downStation = val;
-//            return this;
-//        }
 
         public Builder sections(Section val) {
             section = val;
