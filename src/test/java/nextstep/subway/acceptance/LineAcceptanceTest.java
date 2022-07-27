@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.line.LineRequest;
 import nextstep.subway.applicaion.dto.section.SectionRequest;
+import nextstep.subway.error.exception.LineNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -220,6 +222,81 @@ public class LineAcceptanceTest extends AcceptanceTest {
                 .when().post("/lines/" + id + "/sections")
                 .then().log().all()
                 .extract();
+    }
+
+    /**
+     * Given 추가할 구간에 해당하는 역을 생성하고(할 필요가 없다는 게 로직의 구멍...)
+     * When 존재하지 않는 지하철노선에 구간을 추가하면
+     * Then 예외가 발생된다
+     */
+    // TODO: 존재하지 않는 노선에 구간 등록 시 예외 발생
+    @DisplayName("존재하지 않는 노선에 구간을 등록한다.")
+    @Test
+    void addSectionToNonPresentLine() {
+//        assertThatThrownBy(() -> {
+//            SectionRequest sectionRequest = new SectionRequest(1L, 2L, 3L);
+//            addSection(2L, sectionRequest);
+//        }).isInstanceOf(LineNotFoundException.class);
+
+        SectionRequest sectionRequest = new SectionRequest(1L, 2L, 3L);
+        ExtractableResponse<Response> response = addSection(2L, sectionRequest);
+
+        // then
+        assertThat(response.jsonPath().getString("errorCode")).isEqualTo("NOT_LINE_FOUND");
+    }
+
+    /**
+     * Given 추가할 구간에 해당하는 역과 노선을 생성하고
+     * When 지하철노선의 하행 종점역이 추가할 구간의 상행역과 다르다면
+     * Then 예외가 발생된다
+     */
+    // TODO: 구간 등록 시 지하철노선의 하행 종점역이 구간의 상행역과 다를 경우 예외 발생
+    @DisplayName("지하철노선의 하행 종점역이 추가할 구간의 상행역과 다를 경우 예외가 발생된다.")
+    @Test
+    void addSectionIfUpboundStationOfSectionIsDifferentFromDownboundStationOfLine() {
+        // given
+        createStations();
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
+        assertThat(getLine("downStation.id", "1")).isEqualTo("2");
+
+        // when
+        Long createdLineId = Long.parseLong(response.jsonPath().getString("id"));
+        Long upStationId = 3L;
+        Long downStationId = 4L;
+        Long distance = 5L;
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
+        ExtractableResponse<Response> response2 = addSection(createdLineId, sectionRequest);
+
+        // then
+        assertThat(response2.jsonPath().getString("errorCode")).isEqualTo("MISMATCH_BETWEEN_UPPER_STATION_OF_SECTION_AND_LOWER_STATION_OF_LINE");
+    }
+
+    /**
+     * Given 추가할 구간에 해당하는 역과 노선을 생성하고
+     * When 지하철노선에 존재하는 역이 추가할 구간의 하행역과 일치한다면
+     * Then 예외가 발생된다
+     */
+    // TODO: 구간 등록 시 지하철노선에 존재하는 역이 구간의 하행역과 같을 경우 예외 발생
+    @DisplayName("지하철노선에 존재하는 역이 구간의 하행역과 같을 경우 예외가 발생된다.")
+    @Test
+    void addSectionIfDownboundStationOfSectionIsIncludedInStationOfLine() {
+        // given
+        createStations();
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 3L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
+        assertThat(getLine("downStation.id", "1")).isEqualTo("3");
+
+        // when
+        Long createdLineId = Long.parseLong(response.jsonPath().getString("id"));
+        Long upStationId = Long.parseLong(response.jsonPath().getString("downStation.id"));
+        Long downStationId = 1L;
+        Long distance = 5L;
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
+        ExtractableResponse<Response> response2 = addSection(createdLineId, sectionRequest);
+
+        // then
+        assertThat(response2.jsonPath().getString("errorCode")).isEqualTo("FAIL_TO_ADD_DUPLICATE_STATION");
     }
 
     /**

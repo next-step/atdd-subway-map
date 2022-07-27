@@ -10,6 +10,8 @@ import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.error.exception.LineNotFoundException;
+import nextstep.subway.error.exception.SectionAlreadyHasStationException;
+import nextstep.subway.error.exception.SectionIsNotLastSequenceOfLine;
 import nextstep.subway.error.exception.StationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,16 +93,27 @@ public class LineService {
 
     @Transactional
     public LineResponse addSection(Long id, SectionRequest sectionRequest) {
-        Station upStation = findStationByStationId(sectionRequest.getUpStationId());
-        Station downStation = findStationByStationId(sectionRequest.getDownStationId());
-        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
-        sectionRepository.save(section);
-
         Line line = getLine(id);
+        List<Section> sections = line.getSections();
+        if (sections.get(sections.size() - 1).getDownStation().getId() != sectionRequest.getUpStationId()) {
+            throw new SectionIsNotLastSequenceOfLine();
+        }
+        Long downStationId = sectionRequest.getDownStationId();
+        line.getSections().stream()
+                .filter(section -> section.getDownStation().getId() == downStationId || section.getUpStation().getId() == downStationId)
+                .findFirst()
+                .ifPresent(section -> {
+                    throw new SectionAlreadyHasStationException(downStationId);
+                });
 
 //        System.out.println("+++++++++");
 //        System.out.println(line.getSections());
 //        System.out.println("+++++++++");
+
+        Station upStation = findStationByStationId(sectionRequest.getUpStationId());
+        Station downStation = findStationByStationId(sectionRequest.getDownStationId());
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        sectionRepository.save(section);
 
         line.addSection(id, section);
 
