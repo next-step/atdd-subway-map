@@ -4,15 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.utils.DatabaseInitializer;
 import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -20,23 +20,19 @@ import static nextstep.subway.acceptance.StationAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@ActiveProfiles("test")
 public class LineAcceptanceTest extends BaseTest {
-    private static final String LINE_NAME_5 = "5호선";
-    private static final String LINE_COLOR_5 = "#996CAC";
-    private static final Long LINE_DISTANCE_5 = 48L;
-    private static final String LINE_NAME_5_UP = "5호선 상행선";
-    private static final String LINE_COLOR_5_UP = "#996CAD";
-    private static final String LINE_NAME_9 = "9호선";
-    private static final String LINE_COLOR_9 = "#BDB092";
-    private static final Long LINE_DISTANCE_9 = 37L;
+    public static final String LINE_NAME_5 = "5호선";
+    public static final String LINE_COLOR_5 = "#996CAC";
+    public static final Long LINE_DISTANCE_5 = 48L;
+    public static final String LINE_NAME_5_UP = "5호선 상행선";
+    public static final String LINE_COLOR_5_UP = "#996CAD";
+    public static final String LINE_NAME_9 = "9호선";
+    public static final String LINE_COLOR_9 = "#BDB092";
+    public static final Long LINE_DISTANCE_9 = 37L;
 
     private static final String LINE_NOTFOUND_MESSAGE = "해당 id의 지하철 노선이 존재하지 않습니다.";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Autowired
-    private DatabaseInitializer databaseInitializer;
 
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
