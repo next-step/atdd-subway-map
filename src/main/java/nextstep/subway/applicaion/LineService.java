@@ -6,6 +6,7 @@ import nextstep.subway.applicaion.dto.section.SectionRequest;
 import nextstep.subway.domain.line.Line;
 import nextstep.subway.domain.line.LineRepository;
 import nextstep.subway.domain.section.Section;
+import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
 import nextstep.subway.error.exception.LineNotFoundException;
@@ -19,10 +20,12 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private LineRepository lineRepository;
+    private SectionRepository sectionRepository;
     private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, SectionRepository sectionRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
         this.stationRepository = stationRepository;
     }
 
@@ -36,6 +39,7 @@ public class LineService {
         Station upStation = findStationByStationId(lineRequest.getUpStationId());
         Station downStation = findStationByStationId(lineRequest.getDownStationId());
         Section section = new Section(upStation, downStation, lineRequest.getDistance());
+        sectionRepository.save(section);
 
         return new Line.Builder()
                         .name(lineRequest.getName())
@@ -90,6 +94,7 @@ public class LineService {
         Station upStation = findStationByStationId(sectionRequest.getUpStationId());
         Station downStation = findStationByStationId(sectionRequest.getDownStationId());
         Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        sectionRepository.save(section);
 
         Line line = getLine(id);
         line.addSection(id, section);

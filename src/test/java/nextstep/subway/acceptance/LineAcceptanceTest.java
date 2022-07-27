@@ -33,9 +33,9 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-//
-//        // then
-//        assertThat(getList("name", "/lines").get(0)).isEqualTo("2호선");
+
+        // then
+        assertThat(getList("name", "/lines").get(0)).isEqualTo("2호선");
     }
 
     private void createStations() {
