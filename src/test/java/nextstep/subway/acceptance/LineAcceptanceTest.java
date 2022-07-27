@@ -184,11 +184,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간을 등록한다.")
     @Test
     void addSection() {
-        // exception
-        // 1. 존재하지 않는 노선
-        // 2. 새로운 구간의 상행역이 노선의 하행 종점이 아닌 경우
-        // 3. 새로운 구간의 하행역이 이미 노선에 존재
-
         // given
         createStations();
         LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
@@ -300,6 +295,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * Given 지하철노선에 두 개 이상의 구간이 존재할 때
      * When 지하철노선에 구간을 삭제하면
      * Then 지하철노선 마지막 구간이 삭제된다
      */
@@ -307,5 +303,37 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간을 삭제한다.")
     @Test
     void deleteSection() {
+        // exception
+        // 1. 해당하는 노선이 없는 경우
+        // 2. 삭제하려는 구간이 마지막 구간이 아닌 경우
+        // 3. 구간이 1개인 경우
+
+        // given
+        createStations();
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
+        assertThat(getLine("downStation.id", "1")).isEqualTo("2");
+
+        Long createdLineId = Long.parseLong(response.jsonPath().getString("id"));
+        Long upStationId = Long.parseLong(response.jsonPath().getString("downStation.id"));
+        Long downStationId = 4L;
+        Long distance = 5L;
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
+        ExtractableResponse<Response> response2 = addSection(createdLineId, sectionRequest);
+        assertThat(getLine("downStation.id", "1")).isEqualTo("4");
+
+        // when
+        deleteSection(1L, 4L);
+
+        // then
+
+    }
+
+    private void deleteSection(Long lineId, Long stationId) {
+        RestAssured
+                .given().log().all()
+                        .param("stationId", stationId)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().statusCode(204);
     }
 }

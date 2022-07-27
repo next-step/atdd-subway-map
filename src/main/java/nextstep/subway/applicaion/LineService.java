@@ -123,4 +123,8 @@ public class LineService {
 
         return new LineResponse(getLine(id));
     }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+    }
 }
