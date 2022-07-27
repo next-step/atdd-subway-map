@@ -17,7 +17,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@ActiveProfiles("test")
 public class StationAcceptanceTest extends BaseTest {
 
     public static final String STATION_NAME1 = "강남역";
