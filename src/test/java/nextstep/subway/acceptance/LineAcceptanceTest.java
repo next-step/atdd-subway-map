@@ -3,6 +3,7 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.application.dto.UpdateLineRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,10 +82,8 @@ public class LineAcceptanceTest {
     @Test
     void getLines() {
         //given
-        ExtractableResponse<Response> 신분당선 = 지하철_노선_생성(LineAcceptanceTest.신분당선, BG_RED_600, 지하철역Id, 새로운지하철역Id, 10);
-        ExtractableResponse<Response> 분당선 = 지하철_노선_생성(LineAcceptanceTest.분당선, BG_GREEN_600, 지하철역Id, 또다른지하철역Id, 12);
-        assertThatStatus(신분당선, HttpStatus.CREATED);
-        assertThatStatus(분당선, HttpStatus.CREATED);
+        지하철_노선_생성(LineAcceptanceTest.신분당선, BG_RED_600, 지하철역Id, 새로운지하철역Id, 10);
+        지하철_노선_생성(LineAcceptanceTest.분당선, BG_GREEN_600, 지하철역Id, 또다른지하철역Id, 12);
 
         //when
         ExtractableResponse<Response> linesResponse = 지하철_노선목록_조회();
@@ -136,12 +135,10 @@ public class LineAcceptanceTest {
         Long 신분당선Id = 신분당선.jsonPath()
                 .getLong("id");
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", 다른분당선);
-        params.put("color", BG_BLUE_600);
+        UpdateLineRequest updateLineRequest = new UpdateLineRequest(다른분당선, BG_BLUE_600);
 
         //when
-        ExtractableResponse<Response> updateLineResponse = 지하철_노선_수정(신분당선Id, params);
+        ExtractableResponse<Response> updateLineResponse = 지하철_노선_수정(신분당선Id, updateLineRequest);
 
         //then
         assertThatStatus(updateLineResponse, HttpStatus.OK);
@@ -175,10 +172,10 @@ public class LineAcceptanceTest {
         assertThatStatus(updateLineResponse, HttpStatus.NO_CONTENT);
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정(Long stationId, Map<String, Object> params) {
+    private ExtractableResponse<Response> 지하철_노선_수정(Long stationId, UpdateLineRequest updateLineRequest) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
+                .body(updateLineRequest)
                 .when().put("/lines/{id}", stationId)
                 .then()
                 .log().all()
