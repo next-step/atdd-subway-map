@@ -2,6 +2,7 @@ package nextstep.subway.application;
 
 import nextstep.subway.application.dto.LineRequest;
 import nextstep.subway.application.dto.LineResponse;
+import nextstep.subway.application.dto.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
 import nextstep.subway.domain.Station;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +29,9 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
-        line.registerStation(lineRequest.getUpStationId(), lineRequest.getDownStationId());
+        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow(EntityNotFoundException::new);
+        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow(EntityNotFoundException::new);
+        line.registerStation(upStation.getId(), downStation.getId());
         return createLineResponse(line);
 
     }
@@ -47,10 +49,10 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long lineId, Map<String, Object> params) {
+    public void updateLine(Long lineId, UpdateLineRequest updateLineRequest) {
         Line findLine = lineRepository.findById(lineId).orElseThrow(() -> new EntityNotFoundException("해당하는 노선이 없습니다."));
-        findLine.changeName((String) params.get("name"));
-        findLine.changeColor((String) params.get("color"));
+        findLine.changeName(updateLineRequest.getName());
+        findLine.changeColor(updateLineRequest.getColor());
     }
 
     @Transactional
