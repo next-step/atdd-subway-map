@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.utils;
 
 import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
