@@ -1,5 +1,7 @@
 package nextstep.subway.station.applicaion.dto;
 
+import nextstep.subway.station.domain.Station;
+
 public class StationResponse {
 
     private Long id;
@@ -11,6 +13,10 @@ public class StationResponse {
     public StationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public static StationResponse of(final Station station) {
+        return new StationResponse(station.getId(), station.getName());
     }
 
     public Long getId() {
