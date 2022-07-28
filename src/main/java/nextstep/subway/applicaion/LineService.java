@@ -3,6 +3,7 @@ package nextstep.subway.applicaion;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.UpdateLineRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -38,6 +39,21 @@ public class LineService {
     public void deleteLineById(Long id) {
         Line line = findLineById(id);
         lineRepository.delete(line);
+    }
+
+    public void addSection(Long id, SectionRequest sectionRequest) {
+        Line line = findLineById(id);
+        Station upStation = findStationById(sectionRequest.getUpStationId());
+        Station downStation = findStationById(sectionRequest.getDownStationId());
+
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
+    }
+
+    public void removeSection(Long lineId, Long stationId) {
+        Line line = findLineById(lineId);
+        Station station = findStationById(stationId);
+
+        line.removeSection(station);
     }
 
     private Station findStationById(Long id) {
