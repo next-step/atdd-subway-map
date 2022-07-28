@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nextstep.subway.domain.Line;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -31,7 +31,9 @@ public class LineResponse {
                 line.getName(),
                 line.getColor(),
                 line.getDistance(),
-                Arrays.asList(StationResponse.from(line.getUpStation()), StationResponse.from(line.getDownStation()))
+                line.getStations().stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
         );
     }
 

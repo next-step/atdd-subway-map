@@ -6,12 +6,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.domain.Station;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.springframework.http.MediaType;
 
 import java.util.List;
 
-public class StationAcceptanceStep {
+public class StationSteps {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static String params;
 
@@ -26,8 +26,8 @@ public class StationAcceptanceStep {
                 .extract();
     }
 
-    public static Station 지하철역_생성_결과(String name) throws JsonProcessingException {
-        return 지하철역_생성_요청(name).as(Station.class);
+    public static StationResponse 지하철역_생성_결과(String name) throws JsonProcessingException {
+        return 지하철역_생성_요청(name).as(StationResponse.class);
     }
 
     public static ExtractableResponse<Response> 지하철역_삭제_요청(String path) {
