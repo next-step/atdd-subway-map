@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.station.StationAcceptanceTest.지하철역_생성;
-import static nextstep.subway.station.StationAcceptanceTest.지하철역명_조회;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 기능")
@@ -25,8 +24,12 @@ class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void createLine() {
         // when 지하철 노선을 생성
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
         final ExtractableResponse<Response> creationResponse =
-                지하철노선_생성(LINE1_NAME, LINE1_COLOR, LINE1_UP_STATION_ID, LINE1_DOWN_STATION_ID, LINE1_DISTANCE);
+                지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
 
         // then 지하철 노석 목록 조회하여 생성한 노선 확인
         final List<String> lineNames = 지하철노선명_목록조회();
@@ -39,9 +42,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
         // given 2개의 지하철 노선 생성
-        지하철노선_생성(LINE1_NAME, LINE1_COLOR, LINE1_UP_STATION_ID, LINE1_DOWN_STATION_ID, LINE1_DISTANCE);
-        지하철노선_생성(LINE2_NAME, LINE2_COLOR, LINE2_UP_STATION_ID, LINE2_DOWN_STATION_ID, LINE2_DISTANCE);
+        지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
+        지하철노선_생성(LINE2_NAME, LINE2_COLOR, gangNameStationId, sindorimStationId, LINE2_DISTANCE);
 
         // when 지하철 노선 목록 조회
         final ExtractableResponse<Response> linesResponse = 지하철노선_목록조회();
@@ -57,9 +64,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void getLine() {
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
         // given 지하철 노선 생성
         final ExtractableResponse<Response> creationResponse =
-                지하철노선_생성(LINE1_NAME, LINE1_COLOR, LINE1_UP_STATION_ID, LINE1_DOWN_STATION_ID, LINE1_DISTANCE);
+                지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
 
         // when 지하철 노선 조회
         final Long id = 응답아이디_조회(creationResponse);
@@ -76,9 +87,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
         // given 지하철 노선 생성
         final ExtractableResponse<Response> creationResponse =
-                지하철노선_생성(LINE1_NAME, LINE1_COLOR, LINE1_UP_STATION_ID, LINE1_DOWN_STATION_ID, LINE1_DISTANCE);
+                지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
 
         // when 생성한 지하철 노선 수정
         final Long id = 응답아이디_조회(creationResponse);
@@ -95,9 +110,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
         // given 지하철 노선 생성
         final ExtractableResponse<Response> creationResponse =
-                지하철노선_생성(LINE1_NAME, LINE1_COLOR, LINE1_UP_STATION_ID, LINE1_DOWN_STATION_ID, LINE1_DISTANCE);
+                지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
 
         // when 생성한 지하철 노석 삭제
         final Long id = 응답아이디_조회(creationResponse);
@@ -129,15 +148,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> sectionCreationResponse =
                 지하철구간_등록(lineId, sindorimStationId, panGyoStationId);
 
-        // when 지하철 노선 조회
-        final List<String> stationNames = 지하철역명_조회();
-
         // then 생성한 지하철 구간의 정보 응답 확인
         Assertions.assertAll(
-                () -> assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(stationNames).isEqualTo(List.of(GANGNAM_STATION, SINDORIM_STATION, PANGYO_STATION))
+                () -> assertThat(sectionCreationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value())
         );
-
     }
 
     @DisplayName("지하철 노선에 구간을 삭제한다.")
@@ -161,10 +175,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> deletionResponse = 지하철구간_삭제(lineId, panGyoStationId);
 
         // then 지하철 구간 삭제 확인
-        final List<String> stationNames = 지하철역명_조회();
         Assertions.assertAll(
-                () -> assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-                () -> assertThat(stationNames).isEqualTo(List.of(GANGNAM_STATION, SINDORIM_STATION))
+                () -> assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value())
         );
     }
 
