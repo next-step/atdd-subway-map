@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.application.dto.UpdateLineRequest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,12 +13,10 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -149,11 +146,7 @@ public class LineAcceptanceTest {
         지하철_노선_제거_요청(신분당선Id);
 
         //then
-//        EntityNotFoundException entityNotFoundException = Assertions.assertThrows(EntityNotFoundException.class, () -> 지하철_노선_조회_요청(신분당선Id), "해당하는 노선이 없습니다.");
-//        assertThatThrownBy(() -> 지하철_노선_조회_요청(신분당선Id))
-//                .isInstanceOf(EntityNotFoundException.class)
-//                .hasMessage("해당하는 노선이 없습니다.");
-
+        제거된_지하철_노선_조회_요청(신분당선Id);
     }
 
     private ExtractableResponse<Response> 지하철_노선_생성_요청(String name, String color, Long upStationId, Long downStationId, Integer distance) {
@@ -187,20 +180,22 @@ public class LineAcceptanceTest {
         return linesResponse;
     }
 
-    private ExtractableResponse<Response> 지하철_노선_조회_요청(Long stationId) {
-        return RestAssured.given().log().all()
+    private ExtractableResponse<Response> 지하철_노선_조회_요청(Long lineId) {
+        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{id}", stationId)
+                .when().get("/lines/{id}", lineId)
                 .then()
                 .log().all()
                 .extract();
+        assertThatStatus(lineResponse, HttpStatus.OK);
+        return lineResponse;
     }
 
-    private ExtractableResponse<Response> 지하철_노선_수정_요청(Long stationId, UpdateLineRequest updateLineRequest) {
+    private ExtractableResponse<Response> 지하철_노선_수정_요청(Long lineId, UpdateLineRequest updateLineRequest) {
         ExtractableResponse<Response> updateLineResponse = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(updateLineRequest)
-                .when().put("/lines/{id}", stationId)
+                .when().put("/lines/{id}", lineId)
                 .then()
                 .log().all()
                 .extract();
@@ -208,9 +203,9 @@ public class LineAcceptanceTest {
         return updateLineResponse;
     }
 
-    private ExtractableResponse<Response> 지하철_노선_제거_요청(Long stationId) {
+    private ExtractableResponse<Response> 지하철_노선_제거_요청(Long lineId) {
         ExtractableResponse<Response> deleteLineResponse = RestAssured.given().log().all()
-                .when().delete("/lines/{id}", stationId)
+                .when().delete("/lines/{id}", lineId)
                 .then()
                 .log().all()
                 .extract();
@@ -232,6 +227,16 @@ public class LineAcceptanceTest {
         assertThat(linesResponse.jsonPath().getList("name")).containsExactly(lineName);
         assertThat(linesResponse.jsonPath().getList("color")).containsExactly(lineColor);
         assertThat(linesResponse.jsonPath().getList("stations")).hasSize(1);
+    }
+
+    private void 제거된_지하철_노선_조회_요청(Long lineId) {
+        ExtractableResponse<Response> lineResponse = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{id}", lineId)
+                .then()
+                .log().all()
+                .extract();
+        assertThatStatus(lineResponse, HttpStatus.NOT_FOUND);
     }
 
     private void assertThatStatus(ExtractableResponse<Response> response, HttpStatus expectedStatus) {
