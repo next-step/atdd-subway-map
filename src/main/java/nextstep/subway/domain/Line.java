@@ -3,7 +3,13 @@ package nextstep.subway.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -23,13 +29,8 @@ public class Line {
 
     private int distance;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Embedded
+    private Sections sections = new Sections();
 
     public Line(Long id, String name, String color, int distance, Station upStation, Station downStation) {
         this(name, color, distance, upStation, downStation);
@@ -41,15 +42,27 @@ public class Line {
             throw new IllegalArgumentException(NOT_ALLOWED_EQUAL_STATIONS);
         }
 
+        sections.add(this, upStation, downStation, distance);
+
         this.name = name;
         this.color = color;
         this.distance = distance;
-        this.upStation = upStation;
-        this.downStation = downStation;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Station upStation, Station downStation, int distance) {
+        sections.add(this, upStation, downStation, distance);
+    }
+
+    public void removeSection(Station station) {
+        sections.remove(station);
+    }
+
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 }
