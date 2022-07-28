@@ -9,9 +9,9 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
+    @ManyToOne
     private Station upStation;
-    @OneToOne
+    @ManyToOne
     private Station downStation;
     private Long distance;
 
