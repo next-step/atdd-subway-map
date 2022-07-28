@@ -12,6 +12,7 @@ public class LineResponse {
     private final String color;
     private Station upStation;
     private Station downStation;
+    private Long distance;
 
     public LineResponse(Line entity) {
         this.id = entity.getId();
@@ -21,6 +22,8 @@ public class LineResponse {
         List<Section> sections = entity.getSections();
         this.upStation = sections.get(0).getUpStation();
         this.downStation = sections.get(sections.size() - 1).getDownStation();
+
+        this.distance = entity.getDistance();
     }
 
     public Long getId() {
@@ -41,5 +44,9 @@ public class LineResponse {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public Long getDistance() {
+        return distance;
     }
 }

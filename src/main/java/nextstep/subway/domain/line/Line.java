@@ -42,7 +42,9 @@ public class Line {
     }
 
     public void deleteSection() {
-        this.sections.remove(sections.size() - 1);
+        Section section = this.sections.remove(sections.size() - 1);
+
+        this.distance -= section.getDistance();
     }
 
     public Long getId() {

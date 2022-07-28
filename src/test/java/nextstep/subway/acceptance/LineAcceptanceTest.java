@@ -40,6 +40,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(getList("name", "/lines").get(0)).isEqualTo("2호선");
+        assertThat(getLine("distance", "1")).isEqualTo("10");
     }
 
     /**
@@ -189,6 +190,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
         LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
         ExtractableResponse<Response> response = createLines(dto);
         assertThat(getLine("downStation.id", "1")).isEqualTo("2");
+        assertThat(getLine("distance", "1")).isEqualTo("10");
 //        System.out.println("=======");
 //        System.out.println(response.jsonPath().getString("."));
 //        System.out.println(response.jsonPath().getString("downStation.id"));
@@ -208,6 +210,7 @@ public class LineAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(getLine("downStation.id", "1")).isEqualTo("3");
+        assertThat(getLine("distance", "1")).isEqualTo("15");
     }
 
     private ExtractableResponse<Response> addSection(Long id, SectionRequest dto) {
@@ -316,12 +319,14 @@ public class LineAcceptanceTest extends AcceptanceTest {
         SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
         ExtractableResponse<Response> response2 = addSection(createdLineId, sectionRequest);
         assertThat(getLine("downStation.id", "1")).isEqualTo("4");
+        assertThat(getLine("distance", "1")).isEqualTo("15");
 
         // when
         deleteSection(1L, 4L);
 
         // then
         assertThat(getLine("downStation.id", "1")).isEqualTo("2");
+        assertThat(getLine("distance", "1")).isEqualTo("10");
     }
 
     private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
