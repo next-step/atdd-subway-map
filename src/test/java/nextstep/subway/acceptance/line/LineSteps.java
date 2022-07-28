@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 
 import java.util.List;
 
-public class LineAcceptanceStep {
+public class LineSteps {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static String params;
 
