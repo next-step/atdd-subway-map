@@ -24,6 +24,10 @@ public class Section {
         this.distance = distance;
     }
 
+    public boolean section(Station downStation) {
+        return this.downStation.equals(downStation);
+    }
+
     public Long getId() {
         return id;
     }

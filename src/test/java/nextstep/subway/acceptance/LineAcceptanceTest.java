@@ -303,11 +303,6 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("구간을 삭제한다.")
     @Test
     void deleteSection() {
-        // exception
-        // 1. 해당하는 노선이 없는 경우
-        // 2. 삭제하려는 구간이 마지막 구간이 아닌 경우
-        // 3. 구간이 1개인 경우
-
         // given
         createStations();
         LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
@@ -326,14 +321,81 @@ public class LineAcceptanceTest extends AcceptanceTest {
         deleteSection(1L, 4L);
 
         // then
-
+        assertThat(getLine("downStation.id", "1")).isEqualTo("2");
     }
 
-    private void deleteSection(Long lineId, Long stationId) {
-        RestAssured
+    private ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured
                 .given().log().all()
                         .param("stationId", stationId)
                 .when().delete("/lines/" + lineId + "/sections")
-                .then().statusCode(204);
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * Given 삭제할 구간에 해당하는 역을 생성하고(할 필요가 없다는 게 로직의 구멍...)
+     * When 존재하지 않는 지하철노선의 구간을 삭제하면
+     * Then 예외가 발생된다
+     */
+    // TODO: 존재하지 않는 노선에  구간 삭제 시 예외 발생
+    @DisplayName("존재하지 않는 노선의 구간을 삭제한다.")
+    @Test
+    void deleteSectionToNonPresentLine() {
+        // when
+        ExtractableResponse<Response> response = deleteSection(2L, 3L);
+
+        // then
+        assertThat(response.jsonPath().getString("errorCode")).isEqualTo("NOT_LINE_FOUND");
+    }
+
+    /**
+     * Given 삭제할 구간에 해당하는 역과 노선을 생성하고
+     * When 지하철노선의 구간이 유일한 경우 삭제 시
+     * Then 예외가 발생된다
+     */
+    // TODO: 구간 삭제 시 지하철노선의 구간이 유일한 경우 예외 발생
+    @DisplayName("구간 삭제 시 지하철노선의 구간이 유일한 경우 예외가 발생된다.")
+    @Test
+    void deleteSectionIfLengthOfLineIsOne() {
+        // given
+        createStations();
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
+        createLines(dto);
+
+        // when
+        ExtractableResponse<Response> response = deleteSection(1L, 2L);
+
+        // then
+        assertThat(response.jsonPath().getString("errorCode")).isEqualTo("FAIL_TO_DELETE_SECTION_OF_LINE_THAT_LENGTH_IS_ONE");
+    }
+
+    /**
+     * Given 삭제할 구간에 해당하는 역과 노선을 생성하고
+     * When 구간의 하행역이 지하철노선의 하행 종점역이 아닐 때
+     * Then 예외가 발생된다
+     */
+    // TODO: 구간 삭제 시 구간의 하행역과 지하철노선의 하행 종점역이 다를 경우 예외 발생
+    @DisplayName("구간 삭제 시 구간의 하행역과 지하철노선의 하행 종점역이 다를 경우 예외가 발생된다.")
+    @Test
+    void deleteSectionIfDownboundStationOfSectionIsDifferentFromDownboundStationOfLine() {
+        // given
+        createStations();
+        LineRequest dto = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10L);
+        ExtractableResponse<Response> response = createLines(dto);
+
+        Long createdLineId = Long.parseLong(response.jsonPath().getString("id"));
+        Long upStationId = Long.parseLong(response.jsonPath().getString("downStation.id"));
+        Long downStationId = 3L;
+        Long distance = 5L;
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
+        addSection(createdLineId, sectionRequest);
+        assertThat(getLine("downStation.id", String.valueOf(createdLineId))).isEqualTo("3");
+
+        // when
+        ExtractableResponse<Response> response2 = deleteSection(1L, 2L);
+
+        // then
+        assertThat(response2.jsonPath().getString("errorCode")).isEqualTo("MISMATCH_BETWEEN_UPPER_STATION_OF_SECTION_AND_LOWER_STATION_OF_LINE");
     }
 }

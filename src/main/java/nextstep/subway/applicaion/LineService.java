@@ -9,10 +9,7 @@ import nextstep.subway.domain.section.Section;
 import nextstep.subway.domain.section.SectionRepository;
 import nextstep.subway.domain.station.Station;
 import nextstep.subway.domain.station.StationRepository;
-import nextstep.subway.error.exception.LineNotFoundException;
-import nextstep.subway.error.exception.SectionAlreadyHasStationException;
-import nextstep.subway.error.exception.SectionIsNotLastSequenceOfLine;
-import nextstep.subway.error.exception.StationNotFoundException;
+import nextstep.subway.error.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,6 +122,17 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteSection(Long lineId, Long stationId) {
+    public LineResponse deleteSection(Long lineId, Long stationId) {
+        Line line = getLine(lineId);
+        List<Section> sections = line.getSections();
+        if (sections.size() == 1) {
+            throw new LengthOfLineIsOneException(lineId);
+        }
+        if (sections.get(sections.size() - 1).getDownStation().getId() != stationId) {
+            throw new SectionIsNotLastSequenceOfLine();
+        }
+        line.deleteSection();
+
+        return createLineResponse(line);
     }
 }

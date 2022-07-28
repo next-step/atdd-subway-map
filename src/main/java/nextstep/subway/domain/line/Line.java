@@ -41,6 +41,10 @@ public class Line {
         this.distance += section.getDistance();
     }
 
+    public void deleteSection() {
+        this.sections.remove(sections.size() - 1);
+    }
+
     public Long getId() {
         return id;
     }
