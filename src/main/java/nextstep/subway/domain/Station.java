@@ -2,7 +2,10 @@ package nextstep.subway.domain;
 
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import java.util.Objects;
 
@@ -17,6 +20,11 @@ public class Station {
     private String name;
 
     public Station(String name) {
+        this.name = name;
+    }
+
+    public Station(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
