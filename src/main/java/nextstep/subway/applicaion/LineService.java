@@ -112,7 +112,7 @@ public class LineService {
         Section section = new Section(upStation, downStation, sectionRequest.getDistance());
         sectionRepository.save(section);
 
-        line.addSection(id, section);
+        line.addSection(section);
 
 //        System.out.println("*********");
 //        System.out.println(line.getSections());

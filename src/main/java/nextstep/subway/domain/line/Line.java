@@ -35,7 +35,7 @@ public class Line {
         this.color = color;
     }
 
-    public void addSection(Long id, Section section) {
+    public void addSection(Section section) {
         this.sections.add(section);
 
         this.distance += section.getDistance();
