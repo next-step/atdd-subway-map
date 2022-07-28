@@ -1,20 +1,23 @@
 package nextstep.subway.domain.line;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import nextstep.subway.domain.section.Section;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
+
+    @OneToMany
+    private List<Section> sections = new ArrayList<>();
+
     private Long distance;
 
     public Line() {
@@ -23,14 +26,25 @@ public class Line {
     public Line(Builder builder) {
         this.name = builder.name;
         this.color = builder.color;
-        this.upStationId = builder.upStationId;
-        this.downStationId = builder.downStationId;
+        this.sections.add(builder.section);
         this.distance = builder.distance;
     }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+
+        this.distance += section.getDistance();
+    }
+
+    public void deleteSection() {
+        Section section = this.sections.remove(sections.size() - 1);
+
+        this.distance -= section.getDistance();
     }
 
     public Long getId() {
@@ -45,12 +59,8 @@ public class Line {
         return color;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
+    public List<Section> getSections() {
+        return Collections.unmodifiableList(sections);
     }
 
     public Long getDistance() {
@@ -60,8 +70,7 @@ public class Line {
     public static class Builder {
         private String name;
         private String color;
-        private Long upStationId;
-        private Long downStationId;
+        private Section section;
         private Long distance;
 
         public Builder() {
@@ -77,13 +86,8 @@ public class Line {
             return this;
         }
 
-        public Builder upStationId(Long val) {
-            upStationId = val;
-            return this;
-        }
-
-        public Builder downStationId(Long val) {
-            downStationId = val;
+        public Builder sections(Section val) {
+            section = val;
             return this;
         }
 
