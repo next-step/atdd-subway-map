@@ -9,9 +9,16 @@ public class Station {
     private Long id;
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "line_id")
-    private Line line;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "section_id")
+    private Section section;
+    public void update(Station station) {
+        if (station == null) {
+            return;
+        }
+
+        this.name = station.getName() != null ? station.getName() : this.name;
+    }
 
     public Station() {
     }
@@ -28,7 +35,8 @@ public class Station {
         return name;
     }
 
-    public void setLine(Line line) {
-        this.line = line;
+    public void setSection(Section section) {
+        this.section = section;
     }
+
 }

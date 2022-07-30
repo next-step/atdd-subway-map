@@ -20,26 +20,19 @@ public class Line {
     private String color;
 
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Station> stations = new ArrayList<>();
+    private List<Section> sections = new ArrayList<>();
 
     private Long distance;
 
     public Line(LineRequest lineRequest, Station upStation, Station downStation) {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
-        this.stations.add(upStation);
-        this.stations.add(downStation);
-        this.distance = lineRequest.getDistance();
-        upStation.setLine(this);
-        downStation.setLine(this);
-    }
+        this.sections.add(new Section(upStation, downStation, lineRequest.getDistance()));
 
-    public Line(Long id, String name, String color, List<Station> stations, Long distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
-        this.distance = distance;
+        for (Section section : this.sections) {
+            section.setLine(this);
+        }
+        this.distance = lineRequest.getDistance();
     }
 
     public Long getId() {
@@ -54,23 +47,26 @@ public class Line {
         return color;
     }
 
-    public List<Station> getStations() {
-        return stations;
+    public List<Section> getSections() {
+        return sections;
     }
 
     public Long getDistance() {
-        return distance;
+        Long distanceSum = 0L;
+        for (Section section : this.sections) {
+            distanceSum += section.getDistance();
+        }
+        return distanceSum;
     }
 
-    public Long getUpStationId() { return this.stations.get(0).getId(); }
+    public Long getUpStationId() { return this.sections.get(0).getUpStationId(); }
 
-    public Long getDownStationId() { return this.stations.get(1).getId(); }
+    public Long getDownStationId() { return this.sections.get(0).getDownStationId(); }
 
     public void update(LineRequest lineRequest, Station upStation, Station downStation) {
         this.name = lineRequest.getName() != null ? lineRequest.getName() : this.name;
         this.color = lineRequest.getColor() != null ? lineRequest.getColor() : this.color;
-        this.stations.set(0, upStation != null ? upStation : this.stations.get(0));
-        this.stations.set(1, downStation != null ? downStation : this.stations.get(1));
+        this.sections.get(0).update(upStation, downStation, lineRequest.getDistance());
         this.distance = lineRequest.getDistance() != null ? lineRequest.getDistance() : this.distance;
     }
 }
