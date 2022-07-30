@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +38,7 @@ public class StationService {
     }
 
 
-    public Station getStationById(Long id) {
+    public Station getStationThrowExceptionIfNotExists(Long id) {
         return stationRepository.findById(id).orElseThrow(StationNotFoundException::new);
     }
 

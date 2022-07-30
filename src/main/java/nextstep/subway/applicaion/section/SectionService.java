@@ -1,14 +1,17 @@
 package nextstep.subway.applicaion.section;
+import nextstep.subway.applicaion.common.DuplicatedDownStationException;
 import nextstep.subway.applicaion.common.LineNotFoundException;
+import nextstep.subway.applicaion.common.UnappropriateUpStationException;
 import nextstep.subway.applicaion.line.domain.Line;
 import nextstep.subway.applicaion.line.domain.LineRepository;
+import nextstep.subway.applicaion.section.domain.Section;
+import nextstep.subway.applicaion.section.domain.SectionRepository;
 import nextstep.subway.applicaion.section.dto.SectionRequest;
 import nextstep.subway.applicaion.station.StationService;
-import nextstep.subway.applicaion.station.domain.Station;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -17,10 +20,12 @@ public class SectionService {
 
     private final StationService stationService;
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
 
-    public SectionService(StationService stationService, LineRepository lineRepository) {
+    public SectionService(StationService stationService, LineRepository lineRepository, SectionRepository sectionRepository) {
         this.stationService = stationService;
         this.lineRepository = lineRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -31,24 +36,32 @@ public class SectionService {
             throw new LineNotFoundException();
         }
 
-        checkUpStation(line, sectionRequest.getUpStationId());
-        checkDownStation(sectionRequest.getDownStationId());
+        Long upStationId = sectionRequest.getUpStationId();
+        Long downStationId = sectionRequest.getDownStationId();
+        checkStationExists(downStationId);
+        checkUpStation(line, upStationId);
+        checkDownStation(line, downStationId);
 
-        line.addStation(sectionRequest.getDownStationId(), sectionRequest.getDistance());
-        lineRepository.save(line);
+        sectionRepository.save(new Section(downStationId, downStationId, sectionRequest.getDistance(), line.getId()));
+        line.updateLineStation(upStationId, downStationId);
+    }
+
+    private void checkStationExists(Long stationId) {
+        stationService.getStationThrowExceptionIfNotExists(stationId);
     }
 
     private void checkUpStation(Line line, Long upStationId) {
         if (!Objects.equals(line.getDownStationId(), upStationId)) {
-            throw new IllegalArgumentException("상행역이 해당 역의 하행역이 아닙니다.");
+            throw new UnappropriateUpStationException();
         }
     }
 
-    private void checkDownStation(Long downStationId) {
-        Station station = stationService.getStationById(downStationId);
-
-        if (station != null) {
-            throw new IllegalArgumentException("하행역이 이미 존재하는 역입니다.");
-        }
+    private void checkDownStation(Line line, Long downStationId) {
+        List<Section> sections = sectionRepository.findAllByLineId(line.getId());
+        sections.forEach(it -> {
+            if (Objects.equals(it.id, downStationId)) {
+                throw new DuplicatedDownStationException();
+            }
+        });
     }
 }

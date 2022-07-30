@@ -13,15 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
 
-    private LineRepository lineRepository;
-    private StationService stationService;
+    private final LineRepository lineRepository;
+    private final StationService stationService;
 
     public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
@@ -30,12 +29,12 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationService.getStationById(lineRequest.getUpStationId());
-        Station downStation = stationService.getStationById(lineRequest.getDownStationId());
+        Station upStation = stationService.getStationThrowExceptionIfNotExists(lineRequest.getUpStationId());
+        Station downStation = stationService.getStationThrowExceptionIfNotExists(lineRequest.getDownStationId());
 
         Line line = lineRepository.save(lineRequest.toLine());
 
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), List.of(new StationResponse(upStation.getId(), upStation.getName()), new StationResponse(downStation.getId(), downStation.getName())));
+        return createLineResponse(line, upStation, downStation);
     }
 
     public List<LineResponse> findAllLines() {
@@ -53,7 +52,7 @@ public class LineService {
     @Transactional
     public void updateLineById(Long id, LineUpdateRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
-        line.updateLine(lineRequest.getName(), lineRequest.getColor());
+        line.updateLineInfo(lineRequest.getName(), lineRequest.getColor());
     }
 
     @Transactional
@@ -62,9 +61,13 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station upStation = stationService.getStationById(line.getUpStationId());
-        Station downStation = stationService.getStationById(line.getDownStationId());
+        Station upStation = stationService.getStationThrowExceptionIfNotExists(line.getUpStationId());
+        Station downStation = stationService.getStationThrowExceptionIfNotExists(line.getDownStationId());
 
+        return createLineResponse(line, upStation,downStation);
+    }
+
+    private LineResponse createLineResponse(Line line, Station upStation, Station downStation) {
         return new LineResponse(
                 line.getId(),
                 line.getName(),

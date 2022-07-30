@@ -11,6 +11,19 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+    public Long upStationId;
     public Long downStationId;
-    public Long distance;
+    public Integer distance;
+    public Long lineId;
+
+    public Section(Long upStationId, Long downStationId, Integer distance, Long lineId) {
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+        this.lineId = lineId;
+    }
+
+    public Section() {
+
+    }
 }

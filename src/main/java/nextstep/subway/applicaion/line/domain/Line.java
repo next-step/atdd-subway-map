@@ -45,8 +45,13 @@ public class Line {
 		this.distance = distance;
 	}
 
-	public void updateLine(String name, String color) {
+	public void updateLineInfo(String name, String color) {
 		this.name = name;
 		this.color = color;
+	}
+
+	public void updateLineStation(Long upStationId, Long downStationId) {
+		this.upStationId = upStationId;
+		this.downStationId = downStationId;
 	}
 }
