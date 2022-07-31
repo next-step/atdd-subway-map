@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -20,12 +21,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LineAcceptanceTest {
+
+	private final String LINE_BUNDANG = "분당선";
+	private final String LINE_SHINBUNDANG = "신분당선";
+	private final String LINE_OTHER = "다른분당선";
+	private final String COLOR_RED = "bg-red-600";
+	private final String COLOR_GREEN = "bg-green-600";
+
+	private Long STATION_ID_GANGNAM;
+	private Long STATION_ID_HANTI;
+
 	@LocalServerPort
 	int port;
+
+	@Autowired
+	private DatabaseCleanup databaseCleanup;
+
+	private StationAcceptanceTest stationAcceptanceTest;
 
 	@BeforeEach
 	public void setUp() {
 		RestAssured.port = port;
+		databaseCleanup.execute();
+
+		stationAcceptanceTest = new StationAcceptanceTest();
+		STATION_ID_GANGNAM = stationAcceptanceTest.callCreateStation("강남역").jsonPath().getLong("id");
+		STATION_ID_HANTI = stationAcceptanceTest.callCreateStation("한티역").jsonPath().getLong("id");
 	}
 
 	/**
@@ -35,18 +56,15 @@ public class LineAcceptanceTest {
 	@DisplayName("지하철 노선을 생성한다.")
 	@Test
 	void createLine() {
-		// given
-		String lineName = "우이신설선";
-
 		// when
-		ExtractableResponse<Response> response = callCreateLine(makeCreateLineParams(lineName, "bg-red-600", 1L, 2L, 10));
+		ExtractableResponse<Response> response = callCreateLine(makeCreateLineParams(LINE_BUNDANG, COLOR_RED, STATION_ID_GANGNAM, STATION_ID_HANTI, 10));
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
 		List<String> lineNames = callGetLines().jsonPath().getList("name", String.class);
-		assertThat(lineNames).containsAnyOf(lineName);
+		assertThat(lineNames).containsAnyOf(LINE_BUNDANG);
 	}
 
 	/**
@@ -58,11 +76,8 @@ public class LineAcceptanceTest {
 	@Test
 	void getLines() {
 		// given
-		String lineShinbundang = "신분당선";
-		callCreateLine(makeCreateLineParams(lineShinbundang, "bg-red-600", 1L, 2L, 10));
-
-		String lineBundang = "분당선";
-		callCreateLine(makeCreateLineParams(lineBundang, "bg-green-600", 1L, 3L, 10));
+		callCreateLine(makeCreateLineParams(LINE_BUNDANG, COLOR_RED, STATION_ID_GANGNAM, STATION_ID_HANTI, 10));
+		callCreateLine(makeCreateLineParams(LINE_SHINBUNDANG, COLOR_GREEN, STATION_ID_GANGNAM, STATION_ID_HANTI, 10));
 
 		// when
 		ExtractableResponse<Response> response = callGetLines();
@@ -72,8 +87,8 @@ public class LineAcceptanceTest {
 
 		// then
 		List<String> lineNames = response.jsonPath().getList("name", String.class);
-//		assertThat(lineNames).hasSize(2);// TODO 인수 테스트 격리
-		assertThat(lineNames).containsOnlyOnce(lineShinbundang, lineBundang);
+		assertThat(lineNames).hasSize(2);
+		assertThat(lineNames).containsOnlyOnce(LINE_BUNDANG, LINE_SHINBUNDANG);
 	}
 
 	/**
@@ -85,8 +100,7 @@ public class LineAcceptanceTest {
 	@Test
 	void getLine() {
 		// given
-		String lineName = "수인분당선";
-		long lineId = callCreateLine(makeCreateLineParams(lineName, "bg-red-600", 1L, 2L, 10))
+		long lineId = callCreateLine(makeCreateLineParams(LINE_BUNDANG, COLOR_RED, STATION_ID_GANGNAM, STATION_ID_HANTI, 10))
 			.jsonPath()
 			.getLong("id");
 
@@ -98,7 +112,7 @@ public class LineAcceptanceTest {
 
 		// then
 		String responseLineName = response.jsonPath().get("name");
-		assertThat(responseLineName).isEqualTo(lineName);
+		assertThat(responseLineName).isEqualTo(LINE_BUNDANG);
 	}
 
 	/**
@@ -110,15 +124,12 @@ public class LineAcceptanceTest {
 	@Test
 	void updateLine() {
 		// given
-		long lineId = callCreateLine(makeCreateLineParams("경의중앙선", "bg-red-600", 1L, 2L, 10))
+		long lineId = callCreateLine(makeCreateLineParams(LINE_BUNDANG, COLOR_RED, STATION_ID_GANGNAM, STATION_ID_HANTI, 10))
 			.jsonPath()
 			.getLong("id");
 
-		String updateLineName = "다른분당선";
-		String updateLineColor = "bg-green-600";
-
 		// when
-		ExtractableResponse<Response> response = callUpdateLine(lineId, makeUpdateLineParams(updateLineName, updateLineColor));
+		ExtractableResponse<Response> response = callUpdateLine(lineId, makeUpdateLineParams(LINE_OTHER, COLOR_GREEN));
 
 		// then
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -128,15 +139,14 @@ public class LineAcceptanceTest {
 		String responseLineName = lineResponse.jsonPath().get("name");
 		String responseLineColor = lineResponse.jsonPath().get("color");
 
-		assertThat(responseLineName).isEqualTo(updateLineName);
-		assertThat(responseLineColor).isEqualTo(updateLineColor);
+		assertThat(responseLineName).isEqualTo(LINE_OTHER);
+		assertThat(responseLineColor).isEqualTo(COLOR_GREEN);
 	}
 
 	@DisplayName("지하철 노선을 삭제한다.")
 	@Test
 	void deleteLine() {
-		String lineName = "경춘선";
-		long lineId = callCreateLine(makeCreateLineParams(lineName, "bg-red-600", 1L, 2L, 10))
+		long lineId = callCreateLine(makeCreateLineParams(LINE_BUNDANG, COLOR_RED, STATION_ID_GANGNAM, STATION_ID_HANTI, 10))
 			.jsonPath()
 			.getLong("id");
 
@@ -151,7 +161,7 @@ public class LineAcceptanceTest {
 		List<String> allLineNames = allLinesResponse.jsonPath().getList("name", String.class);
 		List<Long> allLineIds = allLinesResponse.jsonPath().getList("id", Long.class);
 
-		assertThat(allLineNames).doesNotContain(lineName);
+		assertThat(allLineNames).doesNotContain(LINE_BUNDANG);
 		assertThat(allLineIds).doesNotContain(lineId);
 	}
 
