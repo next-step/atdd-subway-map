@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
-    Optional<Section> findByStationAndLine(Station station, Line line);
+    Optional<Section> findByUpStationAndDownStationAndLine(Station upStation, Station downStation, Line line);
 }

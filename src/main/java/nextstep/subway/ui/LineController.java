@@ -21,13 +21,13 @@ public class LineController {
 
     @PostMapping("/subway-lines")
     public ResponseEntity<LineResponse> createSubwayLine(@RequestBody CreateLineRequest subwayLineRequest) {
-        final LineResponse lineResponse = lineService.saveSubwayLine(subwayLineRequest);
+        final LineResponse lineResponse = lineService.saveLine(subwayLineRequest);
         return ResponseEntity.created(URI.create("/stations/" + lineResponse.getId())).body(lineResponse);
     }
 
     @GetMapping("/subway-lines")
     public ResponseEntity<List<LineResponse>> getSubwayLines() {
-        final List<LineResponse> subwayLinesResponse = lineService.findAllSubwayLines();
+        final List<LineResponse> subwayLinesResponse = lineService.findAllLines();
         return ResponseEntity.ok().body(subwayLinesResponse);
     }
 
@@ -47,7 +47,7 @@ public class LineController {
 
     @DeleteMapping("/subway-lines/{subwayLineId}")
     public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long subwayLineId) {
-        lineService.performDeleteSubwayLine(subwayLineId);
+        lineService.performDeleteLine(subwayLineId);
         lineService.deleteSubwayLine(subwayLineId);
         return ResponseEntity.noContent().build();
     }

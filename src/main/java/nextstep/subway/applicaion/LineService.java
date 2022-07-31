@@ -12,7 +12,6 @@ import nextstep.subway.repository.LineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveSubwayLine(CreateLineRequest createLineRequest) {
+    public LineResponse saveLine(CreateLineRequest createLineRequest) {
         final Station upStation = getStationByIdIfExists(createLineRequest.getUpStationId());
         final Station downStation = getStationByIdIfExists(createLineRequest.getDownStationId());
         final Line savedSubwayLine = lineRepository.save(new Line(
@@ -44,12 +43,12 @@ public class LineService {
                 upStation,
                 downStation
         ));
-        linkingStationAndSubwayLine(savedSubwayLine, List.of(upStation, downStation));
+        linkingStationAndSubwayLine(savedSubwayLine, upStation, downStation);
 
         return new LineResponse(savedSubwayLine);
     }
 
-    public List<LineResponse> findAllSubwayLines() {
+    public List<LineResponse> findAllLines() {
         final List<LineResponse> findSubwayLines = lineRepository.findAll()
                 .stream()
                 .map(LineResponse::new)
@@ -58,32 +57,32 @@ public class LineService {
         return findSubwayLines;
     }
 
-    public LineResponse findOneSubwayLineById(Long subwayLineId) {
-        final Line findSubwayLine = getSubwayLineByIdIfExists(subwayLineId);
+    public LineResponse findOneSubwayLineById(Long lineId) {
+        final Line findSubwayLine = getLineByIdIfExists(lineId);
 
         return new LineResponse(findSubwayLine);
     }
 
     @Transactional
-    public LineResponse updateSubwayLine(Long subwayLineId, UpdateLineRequest updateLineRequest) {
-        final Line subwayLine = getSubwayLineByIdIfExists(subwayLineId);
+    public LineResponse updateSubwayLine(Long lineId, UpdateLineRequest updateLineRequest) {
+        final Line subwayLine = getLineByIdIfExists(lineId);
         final Line updatedSubwayLine = subwayLine.update(updateLineRequest.getName(), updateLineRequest.getColor());
 
         return new LineResponse(updatedSubwayLine);
     }
 
     @Transactional
-    public void performDeleteSubwayLine(Long subwayLineId) {
-        final Line subwayLine = getSubwayLineByIdIfExists(subwayLineId);
-        final Section upStationToLine = getStationToSubwayLineIfExists(subwayLine, subwayLine.getUpStation());
-        final Section downStationToLine = getStationToSubwayLineIfExists(subwayLine, subwayLine.getDownStation());
-        subwayLine.performDelete(upStationToLine, downStationToLine);
-        sectionRepository.deleteAll(List.of(upStationToLine, downStationToLine));
+    public void performDeleteLine(Long lineId) {
+        final Line line = getLineByIdIfExists(lineId);
+        final Section section = getSectionIfExists(line, line.getUpStation(), line.getDownStation());
+
+        line.performDelete(section);
+        sectionRepository.delete(section);
     }
 
     @Transactional
-    public void deleteSubwayLine(Long subwayLineId) {
-        lineRepository.deleteById(subwayLineId);
+    public void deleteSubwayLine(Long lineId) {
+        lineRepository.deleteById(lineId);
     }
 
     private Station getStationByIdIfExists(Long stationId) {
@@ -91,24 +90,21 @@ public class LineService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 지하철 역입니다."));
     }
 
-    private Line getSubwayLineByIdIfExists(Long subwayLineId) {
+    private Line getLineByIdIfExists(Long subwayLineId) {
         return lineRepository.findById(subwayLineId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 지하철 노선입니다."));
     }
 
-    private Section getStationToSubwayLineIfExists(Line subwayLine, Station station) {
-        return sectionRepository.findByStationAndLine(station, subwayLine)
+    private Section getSectionIfExists(Line line, Station upStation, Station downStation) {
+        return sectionRepository.findByUpStationAndDownStationAndLine(upStation, downStation, line)
                 .orElseThrow(() -> new RuntimeException("연결되어있지 않은 지하철역과 지하철 노선의 관계입니다."));
     }
 
-    private void linkingStationAndSubwayLine(Line subwayLine, List<Station> stations) {
-        final List<Section> sections = new ArrayList<>();
-        for (Station station : stations) {
-            final Section savedSection = sectionRepository.save(new Section(subwayLine, station));
-            sections.add(savedSection);
+    private void linkingStationAndSubwayLine(Line line, Station upStation, Station downStation) {
+        final Section savedSection = sectionRepository.save(new Section(line, upStation, downStation));
 
-            station.updateSubwayLine(savedSection);
-        }
-        subwayLine.updateStations(sections);
+        upStation.setLine(line);
+        downStation.setLine(line);
+        line.addSection(savedSection);
     }
 }

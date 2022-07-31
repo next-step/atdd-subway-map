@@ -16,13 +16,12 @@ public class LineResponse {
 
     private final List<StationResponse> stations;
 
-    public LineResponse(Line subwayLine) {
-        id = subwayLine.getId();
-        name = subwayLine.getName();
-        color = subwayLine.getColor();
-        stations = subwayLine.getStations()
-                .stream()
-                .map(stationToSubwayLine -> new StationResponse(stationToSubwayLine.getStation()))
+    public LineResponse(Line line) {
+        id = line.getId();
+        name = line.getName();
+        color = line.getColor();
+        stations = line.getAllStations().stream()
+                .map(StationResponse::new)
                 .collect(Collectors.toList());
     }
 

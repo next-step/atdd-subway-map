@@ -3,6 +3,7 @@ package nextstep.subway.domain;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -34,7 +35,7 @@ public class Line {
     private Station downStation;
 
     @OneToMany(mappedBy = "line", fetch = LAZY)
-    private List<Section> stations = new ArrayList<>();
+    private List<Section> sections = new ArrayList<>();
 
     protected Line() {
     }
@@ -54,7 +55,7 @@ public class Line {
         this.color = subwayLine.getColor();
         this.upStation = subwayLine.getUpStation();
         this.downStation = subwayLine.getDownStation();
-        this.stations = subwayLine.getStations();
+        this.sections = subwayLine.getSections();
     }
 
     public Long getId() {
@@ -81,8 +82,8 @@ public class Line {
         return distance;
     }
 
-    public List<Section> getStations() {
-        return stations;
+    public List<Section> getSections() {
+        return sections;
     }
 
     public Line update(String name, String color) {
@@ -92,15 +93,24 @@ public class Line {
         return new Line(this);
     }
 
-    public void performDelete(Section upStationToLine, Section downStationToLine) {
-        this.upStation.removeSubwayLine(upStationToLine);
-        this.downStation.removeSubwayLine(downStationToLine);
-        this.stations.removeAll(List.of(upStationToLine, downStationToLine));
+    public List<Station> getAllStations() {
+        final List<Station> stations = this.sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        stations.add(this.downStation);
+
+        return stations;
+    }
+
+    public void performDelete(Section section) {
+        this.upStation.removeLine();
+        this.downStation.removeLine();
+        this.sections.remove(section);
         this.upStation = null;
         this.downStation = null;
     }
 
-    public void updateStations(List<Section> sections) {
-        this.stations.addAll(sections);
+    public void addSection(Section section) {
+        this.sections.add(section);
     }
 }

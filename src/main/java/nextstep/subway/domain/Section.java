@@ -20,15 +20,13 @@ public class Section {
     @Column(name = "distance", nullable = true)
     private Integer distance;
 
-    @Column(name = "is_up_station", nullable = true)
-    private Boolean isUpStation;
-
-    @Column(name = "is_down_station", nullable = true)
-    private Boolean isDownStation;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "up_station_id", nullable = false)
+    private Station upStation;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "station_id", nullable = false)
-    private Station station;
+    @JoinColumn(name = "down_station_id", nullable = false)
+    private Station downStation;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "line_id", nullable = false)
@@ -37,16 +35,21 @@ public class Section {
     protected Section() {
     }
 
-    public Section(Line subwayLine, Station station) {
+    public Section(Line subwayLine, Station upStation, Station downStation) {
         this.line = subwayLine;
-        this.station = station;
-    }
-
-    public Station getStation() {
-        return station;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public Line getSubwayLine() {
         return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
     }
 }

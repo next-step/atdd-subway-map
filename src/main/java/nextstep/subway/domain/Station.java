@@ -1,8 +1,6 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -19,8 +17,9 @@ public class Station {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "station", fetch = LAZY)
-    private final List<Section> lines = new ArrayList<>();
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     protected Station() {
     }
@@ -37,11 +36,11 @@ public class Station {
         return name;
     }
 
-    public void updateSubwayLine(Section section) {
-        this.lines.add(section);
+    public void setLine(Line line) {
+        this.line = line;
     }
 
-    public void removeSubwayLine(Section section) {
-        this.lines.remove(section);
+    public void removeLine() {
+        this.line = null;
     }
 }

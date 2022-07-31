@@ -3,14 +3,14 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.repository.StationRepository;
-import org.junit.jupiter.api.AfterEach;
+import nextstep.subway.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,18 +26,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class StationAcceptanceTest {
 
     @LocalServerPort
-    int port;
+    private int port;
     @Autowired
-    private StationRepository stationRepository;
+    private DatabaseCleanUp databaseCleanUp;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-    }
-
-    @AfterEach
-    void tearDown() {
-        stationRepository.deleteAll();
+        databaseCleanUp.execute();
     }
 
     /**
