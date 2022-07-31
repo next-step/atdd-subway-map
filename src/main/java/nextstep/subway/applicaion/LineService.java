@@ -8,10 +8,10 @@ import nextstep.subway.domain.Line;
 import nextstep.subway.repository.LineRepository;
 import nextstep.subway.domain.Station;
 import nextstep.subway.repository.StationRepository;
-import nextstep.subway.ui.exception.LineNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,13 +38,14 @@ public class LineService {
 	public LineResponse findLineById(Long id) {
 		return lineRepository.findById(id)
 			.map(this::createLineResponse)
-			.orElseThrow(LineNotFoundException::new);
+			.orElseThrow(EntityNotFoundException::new);
 	}
 
 	@Transactional
 	public void updateLine(Long id, LineUpdateRequest updateRequest) {
-		Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
-		line.update(updateRequest.getName(), updateRequest.getColor());
+		Line line = lineRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+		line.updateName(updateRequest.getName());
+		line.updateColor(updateRequest.getColor());
 	}
 
 	@Transactional

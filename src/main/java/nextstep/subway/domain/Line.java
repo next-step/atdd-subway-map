@@ -31,8 +31,11 @@ public class Line {
 		this.distance = distance;
 	}
 
-	public void update(String name, String color) {
+	public void updateName(String name) {
 		this.name = name;
+	}
+
+	public void updateColor(String color) {
 		this.color = color;
 	}
 }
