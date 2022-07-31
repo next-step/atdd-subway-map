@@ -42,7 +42,7 @@ public class StationService {
         return stationRepository.findById(id).orElseThrow(StationNotFoundException::new);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    public StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()

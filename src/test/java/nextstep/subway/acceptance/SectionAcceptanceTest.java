@@ -3,21 +3,17 @@ package nextstep.subway.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.acceptance.tool.SubwayFactory;
 import nextstep.subway.acceptance.tool.TestObjectDestroyer;
-import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.section.dto.SectionRequest;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static nextstep.subway.acceptance.tool.RequestTool.*;
+import static nextstep.subway.acceptance.tool.RequestTool.get;
+import static nextstep.subway.acceptance.tool.RequestTool.post;
 import static nextstep.subway.acceptance.tool.SubwayFactory.노선_생성;
 import static nextstep.subway.acceptance.tool.SubwayFactory.역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,8 +55,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         ExtractableResponse<Response> lineResponse = get("/lines/" + id);
-        assertThat(lineResponse.jsonPath().getLong("stations[0].id")).isEqualTo(양재시민의숲역);
-        assertThat(lineResponse.jsonPath().getLong("stations[1].id")).isEqualTo(청계산입구역);
+        assertThat(lineResponse.jsonPath().getList("stations.id")).contains(양재역.intValue(), 양재시민의숲역.intValue(), 청계산입구역.intValue());
     }
 
     /**

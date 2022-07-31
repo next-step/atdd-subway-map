@@ -25,11 +25,15 @@ public class TestObjectDestroyer {
 
     @Transactional
     public void destroyAll() {
+        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         tableNames.forEach((it) -> em.createNativeQuery("TRUNCATE TABLE " + it).executeUpdate());
+        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 
     @Transactional
     public void destroy(List<String> targetTables) {
+        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         targetTables.forEach((it) -> em.createNativeQuery("TRUNCATE TABLE " + it).executeUpdate());
+        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 }
