@@ -1,6 +1,7 @@
 package nextstep.subway.applicaion.line.domain;
 
 import nextstep.subway.applicaion.common.DuplicatedDownStationException;
+import nextstep.subway.applicaion.common.SectionNotFoundException;
 import nextstep.subway.applicaion.common.UnappropriateUpStationException;
 import nextstep.subway.applicaion.section.domain.Section;
 import nextstep.subway.applicaion.station.domain.Station;
@@ -38,7 +39,7 @@ public class Sections {
         return sections.stream().map(it -> it.upStation).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public void checkUpStation(Station upStation) {
+    public void checkIsLastStation(Station upStation) {
         if (!Objects.equals(getLastStation().getId(), upStation.getId())) {
             throw new UnappropriateUpStationException();
         }
@@ -78,6 +79,6 @@ public class Sections {
     }
 
     private Station getLastStation() {
-        return getLastSection().orElse(null).upStation;
+        return getLastSection().orElseThrow(SectionNotFoundException::new).upStation;
     }
 }

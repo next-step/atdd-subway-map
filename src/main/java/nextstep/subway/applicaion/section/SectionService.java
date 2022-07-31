@@ -27,9 +27,14 @@ public class SectionService {
         Station upStation = stationService.getStationThrowExceptionIfNotExists(sectionRequest.getUpStationId());
         Station downStation = stationService.getStationThrowExceptionIfNotExists(sectionRequest.getDownStationId());
 
-        line.getSections().checkUpStation(upStation);
+        line.getSections().checkIsLastStation(upStation);
         line.getSections().checkIsNewStation(downStation);
 
         line.getSections().addLast(line, upStation, downStation, sectionRequest.getDistance());
+    }
+
+    @Transactional
+    public void deleteSection(Long lineId, Long stationId) {
+
     }
 }
