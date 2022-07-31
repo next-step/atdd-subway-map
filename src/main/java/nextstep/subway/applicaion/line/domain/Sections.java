@@ -1,8 +1,9 @@
 package nextstep.subway.applicaion.line.domain;
 
 import nextstep.subway.applicaion.common.DuplicatedDownStationException;
+import nextstep.subway.applicaion.common.MinimumSectionException;
 import nextstep.subway.applicaion.common.SectionNotFoundException;
-import nextstep.subway.applicaion.common.UnappropriateUpStationException;
+import nextstep.subway.applicaion.common.UnappropriateStationException;
 import nextstep.subway.applicaion.section.domain.Section;
 import nextstep.subway.applicaion.station.domain.Station;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
+    private final Integer MINIMUM_SECTION_SIZE = 3;
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     @JoinColumn(name = "line_id")
     private List<Section> sections = new ArrayList<>();
@@ -39,9 +41,24 @@ public class Sections {
         return sections.stream().map(it -> it.upStation).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public void removeStation(Long stationId) {
+        if (sections.size() <= MINIMUM_SECTION_SIZE) {
+            throw new MinimumSectionException();
+        }
+
+        Section lastSectionMark = getLastSection().get();
+        if (!Objects.equals(lastSectionMark.upStation.getId(), stationId)) {
+            throw new UnappropriateStationException();
+        }
+        sections.remove(lastSectionMark);
+
+        Section lastSection = sections.stream().filter(it -> Objects.equals(it.downStation.getId(), stationId)).findFirst().get();
+        lastSection.downStation = null;
+    }
+
     public void checkIsLastStation(Station upStation) {
         if (!Objects.equals(getLastStation().getId(), upStation.getId())) {
-            throw new UnappropriateUpStationException();
+            throw new UnappropriateStationException();
         }
     }
 
@@ -55,7 +72,7 @@ public class Sections {
 
     private void addLastMark(Line line, Station downStation) {
         getLastSection().ifPresent(it -> sections.remove(it));
-        Section lastSection  = new Section(downStation, null, 0, line);
+        Section lastSection = new Section(downStation, null, 0, line);
         sections.add(lastSection);
     }
 
