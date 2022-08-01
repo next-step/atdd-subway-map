@@ -30,7 +30,7 @@ public class SectionService {
         line.getSections().checkIsLastStation(upStation);
         line.getSections().checkIsNewStation(downStation);
 
-        line.getSections().addLast(line, upStation, downStation, sectionRequest.getDistance());
+        line.getSections().add(line, upStation, downStation, sectionRequest.getDistance());
     }
 
     @Transactional

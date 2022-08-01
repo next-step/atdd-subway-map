@@ -32,7 +32,7 @@ public class LineService {
         Station downStation = stationService.getStationThrowExceptionIfNotExists(lineRequest.getDownStationId());
 
         Line line = lineRepository.save(lineRequest.toLine());
-        line.getSections().initializeLine(line, upStation, downStation, lineRequest.getDistance());
+        line.getSections().add(line, upStation, downStation, lineRequest.getDistance());
 
         return createLineResponse(line);
     }
