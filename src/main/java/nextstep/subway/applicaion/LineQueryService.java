@@ -37,10 +37,7 @@ public class LineQueryService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        Station upStation = stationQueryService.findById(line.getUpStationId());
-        Station downStation = stationQueryService.findById(line.getDownStationId());
-
-        return new LineResponse(line, upStation, downStation);
+        return new LineResponse(line);
     }
 
 }

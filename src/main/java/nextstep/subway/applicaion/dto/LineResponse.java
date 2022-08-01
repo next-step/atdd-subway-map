@@ -22,12 +22,13 @@ public class LineResponse {
     public LineResponse() {
     }
 
-    public LineResponse(Line line, Station upStation, Station downStation) {
+    public LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations.add(new StationResponse(upStation));
-        this.stations.add(new StationResponse(downStation));
+        for (Station station : line.getStations()) {
+            this.stations.add(new StationResponse(station));
+        }
         this.distance = line.getDistance();
     }
 
