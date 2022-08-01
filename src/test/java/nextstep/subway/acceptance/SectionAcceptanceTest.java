@@ -1,11 +1,15 @@
 package nextstep.subway.acceptance;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,20 +33,25 @@ public class SectionAcceptanceTest extends BaseTest {
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private LineRequest LINE_5;
 
-    private Long stationId1;
+    private StationResponse station1;
 
-    private Long stationId2;
+    private StationResponse station2;
 
-    private Long stationId3;
+    private StationResponse station3;
 
     @BeforeEach
-    public void setUp() {
-        stationId1 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
-        stationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
-        stationId3 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME3).jsonPath().getLong("id");
-        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, stationId1, stationId2, LINE_DISTANCE_5);
+    public void setUp() throws JsonProcessingException {
+        station1 = objectMapper.readValue(
+                stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).body().asString(), StationResponse.class);
+        station2 = objectMapper.readValue(
+                stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).body().asString(), StationResponse.class);
+        station3 = objectMapper.readValue(
+                stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME3).body().asString(), StationResponse.class);
+        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, station1.getId(), station2.getId(), LINE_DISTANCE_5);
     }
 
     @AfterEach
@@ -58,15 +67,14 @@ public class SectionAcceptanceTest extends BaseTest {
      */
     @DisplayName("지하철 구간을 등록한다.")
     @Test
-    void createSection() {
+    void createSection() throws JsonProcessingException {
         // given
         Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
 
-
         // when
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("upStationId", stationId2);
-        requestBody.put("downStationId", stationId3);
+        requestBody.put("upStationId", station2.getId());
+        requestBody.put("downStationId", station3.getId());
         requestBody.put("distance", DISTANCE_STATION2_TO_STATION3);
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -84,8 +92,9 @@ public class SectionAcceptanceTest extends BaseTest {
                 .when().get("/lines/" + lineId)
                 .then().log().all()
                 .extract();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(line.jsonPath().getList("stations")).contains(stationId1, stationId2, stationId3);
-    }
 
+        LineResponse lineResponse = objectMapper.readValue(line.body().asString(), LineResponse.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(lineResponse.getStations()).contains(station1, station2, station3);
+    }
 }
