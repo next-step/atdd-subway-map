@@ -3,6 +3,7 @@ package nextstep.subway.ui;
 import lombok.RequiredArgsConstructor;
 import nextstep.subway.applicaion.LineCommandService;
 import nextstep.subway.applicaion.LineQueryService;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +48,9 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping("/{id}/sections")
-//    public ResponseEntity<Void> addSection(@PathVariable Long id) {
-//
-//    }
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        lineCommandService.addSection(id, sectionRequest);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
+    }
 }
