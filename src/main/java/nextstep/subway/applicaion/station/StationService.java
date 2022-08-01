@@ -1,13 +1,15 @@
-package nextstep.subway.applicaion;
+package nextstep.subway.applicaion.station;
 
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.applicaion.common.StationNotFoundException;
+import nextstep.subway.applicaion.station.domain.Station;
+import nextstep.subway.applicaion.station.domain.StationRepository;
+import nextstep.subway.applicaion.station.dto.StationRequest;
+import nextstep.subway.applicaion.station.dto.StationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +36,11 @@ public class StationService {
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
+    }
+
+
+    public Station getStationById(Long id) {
+        return stationRepository.findById(id).orElseThrow(StationNotFoundException::new);
     }
 
     private StationResponse createStationResponse(Station station) {

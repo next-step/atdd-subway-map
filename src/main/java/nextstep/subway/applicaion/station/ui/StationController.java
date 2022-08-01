@@ -1,8 +1,8 @@
-package nextstep.subway.ui;
+package nextstep.subway.applicaion.station.ui;
 
-import nextstep.subway.applicaion.StationService;
-import nextstep.subway.applicaion.dto.StationRequest;
-import nextstep.subway.applicaion.dto.StationResponse;
+import nextstep.subway.applicaion.station.StationService;
+import nextstep.subway.applicaion.station.dto.StationRequest;
+import nextstep.subway.applicaion.station.dto.StationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
