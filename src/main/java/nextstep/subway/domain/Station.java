@@ -1,6 +1,7 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Station {
@@ -9,9 +10,9 @@ public class Station {
     private Long id;
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "section_id")
-    private Section section;
+    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
+    private List<SectionStation> sectionStations;
+
     public void update(Station station) {
         if (station == null) {
             return;
@@ -35,8 +36,7 @@ public class Station {
         return name;
     }
 
-    public void setSection(Section section) {
-        this.section = section;
+    public void addSectionStation(SectionStation sectionStation) {
+        this.sectionStations.add(sectionStation);
     }
-
 }

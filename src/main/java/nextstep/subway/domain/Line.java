@@ -5,7 +5,9 @@ import nextstep.subway.applicaion.dto.LineRequest;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -24,14 +26,11 @@ public class Line {
 
     private Long distance;
 
-    public Line(LineRequest lineRequest, Station upStation, Station downStation) {
+    public Line(LineRequest lineRequest, Section section) {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
-        this.sections.add(new Section(upStation, downStation, lineRequest.getDistance()));
-
-        for (Section section : this.sections) {
-            section.setLine(this);
-        }
+        this.sections.add(section);
+        section.setLine(this);
         this.distance = lineRequest.getDistance();
     }
 
@@ -52,11 +51,7 @@ public class Line {
     }
 
     public Long getDistance() {
-        Long distanceSum = 0L;
-        for (Section section : this.sections) {
-            distanceSum += section.getDistance();
-        }
-        return distanceSum;
+        return this.distance;
     }
 
     public Long getUpStationId() { return this.sections.get(0).getUpStationId(); }
@@ -68,5 +63,23 @@ public class Line {
         this.color = lineRequest.getColor() != null ? lineRequest.getColor() : this.color;
         this.sections.get(0).update(upStation, downStation, lineRequest.getDistance());
         this.distance = lineRequest.getDistance() != null ? lineRequest.getDistance() : this.distance;
+    }
+
+    public void addSection(Section section) {
+        this.sections.add(section);
+        section.setLine(this);
+        this.distance = getDistance();
+    }
+
+    public List<Station> getStations() {
+        List<Station> stations = new ArrayList<>();
+        for (Section section : this.sections) {
+            for (Station station : section.getStations()) {
+                if (!stations.contains(station)) {
+                    stations.add(station);
+                }
+            }
+        }
+        return stations;
     }
 }
