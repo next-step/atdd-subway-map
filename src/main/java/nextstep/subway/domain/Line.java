@@ -21,8 +21,8 @@ public class Line {
 
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections = new Sections();
 
     private Long distance;
 
@@ -46,17 +46,9 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSections() {
-        return sections;
-    }
-
     public Long getDistance() {
         return this.distance;
     }
-
-    public Long getUpStationId() { return this.sections.get(0).getUpStationId(); }
-
-    public Long getDownStationId() { return this.sections.get(0).getDownStationId(); }
 
     public void update(LineRequest lineRequest, Station upStation, Station downStation) {
         this.name = lineRequest.getName() != null ? lineRequest.getName() : this.name;
@@ -72,14 +64,6 @@ public class Line {
     }
 
     public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-        for (Section section : this.sections) {
-            for (Station station : section.getStations()) {
-                if (!stations.contains(station)) {
-                    stations.add(station);
-                }
-            }
-        }
-        return stations;
+        return this.sections.getStations();
     }
 }
