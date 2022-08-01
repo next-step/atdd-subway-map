@@ -64,7 +64,7 @@ public class Line {
     public List<Long> getStationIds() {
         final List<Long> stationIds = new ArrayList<>();
         for (final Section section : sections) {
-            if (!isLastSection(section)) {
+            if (sections.size() == 1 || !isLastSection(section)) {
                 stationIds.add(section.getUpStationId());
             }
             stationIds.add(section.getDownStationId());
