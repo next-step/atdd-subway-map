@@ -1,5 +1,8 @@
 package nextstep.subway.applicaion.dto;
 
+import lombok.Builder;
+
+@Builder
 public class SectionRequest {
 
     private String upStationId;

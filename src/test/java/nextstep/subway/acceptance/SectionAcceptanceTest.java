@@ -9,6 +9,7 @@ import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,15 +73,16 @@ public class SectionAcceptanceTest extends BaseTest {
         Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
 
         // when
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("upStationId", station2.getId());
-        requestBody.put("downStationId", station3.getId());
-        requestBody.put("distance", DISTANCE_STATION2_TO_STATION3);
+        SectionRequest request = SectionRequest.builder()
+                .upStationId(station2.getId().toString())
+                .downStationId(station3.getId().toString())
+                .distance(DISTANCE_STATION2_TO_STATION3)
+                .build();
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestBody)
+                .body(request)
                 .when()
                 .post("/lines/" + lineId + "/sections")
                 .then().log().all()
