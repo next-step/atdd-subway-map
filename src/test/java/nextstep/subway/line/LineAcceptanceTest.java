@@ -180,6 +180,55 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 역을 삭제할 수 없다.")
+    @Test
+    void validateSectionSize() {
+        // given 지하철 구간 등록
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
+
+        final ExtractableResponse<Response> lineCreationResponse =
+                지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
+
+        final Long lineId = 응답아이디_조회(lineCreationResponse);
+
+        // when 지하철 구간 삭제
+        final ExtractableResponse<Response> deletionResponse = 지하철구간_삭제(lineId, sindorimStationId);
+
+        // then 지하철 구간 삭제 실패
+        Assertions.assertAll(
+                () -> assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        );
+    }
+
+    @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다.")
+    @Test
+    void validateDeleteableStation() {
+        // given 지하철 구간 등록
+        final ExtractableResponse<Response> gangNamStationCreationResponse = 지하철역_생성(GANGNAM_STATION);
+        final ExtractableResponse<Response> sindorimStationCreationResponse = 지하철역_생성(SINDORIM_STATION);
+        final ExtractableResponse<Response> panGyoStationCreationResponse = 지하철역_생성(PANGYO_STATION);
+        final Long gangNameStationId = 응답아이디_조회(gangNamStationCreationResponse);
+        final Long sindorimStationId = 응답아이디_조회(sindorimStationCreationResponse);
+        final Long panGyoStationId = 응답아이디_조회(panGyoStationCreationResponse);
+
+        final ExtractableResponse<Response> lineCreationResponse =
+                지하철노선_생성(LINE1_NAME, LINE1_COLOR, gangNameStationId, sindorimStationId, LINE1_DISTANCE);
+        final Long lineId = 응답아이디_조회(lineCreationResponse);
+
+        지하철구간_등록(lineId, sindorimStationId, panGyoStationId);
+
+        // when 지하철 구간 삭제
+        final ExtractableResponse<Response> deletionResponse = 지하철구간_삭제(lineId, sindorimStationId);
+
+        // then 지하철 구간 삭제 실패
+        Assertions.assertAll(
+                () -> assertThat(deletionResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value())
+        );
+    }
+
     private ExtractableResponse<Response> 지하철노선_생성(
             final String name,
             final String color,
