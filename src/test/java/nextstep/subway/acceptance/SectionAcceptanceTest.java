@@ -79,11 +79,8 @@ public class SectionAcceptanceTest extends BaseTest {
         Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
 
         // when
-        SectionRequest request = SectionRequest.builder()
-                .upStationId(station2.getId().toString())
-                .downStationId(station3.getId().toString())
-                .distance(DISTANCE_STATION2_TO_STATION3)
-                .build();
+        SectionRequest request = sectionAcceptanceTestUtils.toSectionRequest(
+                station2.getId().toString(), station3.getId().toString(), DISTANCE_STATION2_TO_STATION3);
 
         ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
 
@@ -104,19 +101,12 @@ public class SectionAcceptanceTest extends BaseTest {
     @Test
     void notEqualCurrentDownStationIdWithNewUpStationId() {
         // given
-        Long id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
-        SectionRequest request = SectionRequest.builder()
-                .upStationId(station3.getId().toString())
-                .downStationId(station2.getId().toString())
-                .distance(DISTANCE_STATION2_TO_STATION3)
-                .build();
+        Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
+        SectionRequest request = sectionAcceptanceTestUtils.toSectionRequest(
+                station3.getId().toString(), station2.getId().toString(), DISTANCE_STATION2_TO_STATION3);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
-                .when().post("/lines/" + id + "/sections")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -132,19 +122,12 @@ public class SectionAcceptanceTest extends BaseTest {
     @Test
     void notExistDownStationIdOrThrow() {
         // given
-        Long id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
-        SectionRequest request = SectionRequest.builder()
-                .upStationId(station2.getId().toString())
-                .downStationId(station1.getId().toString())
-                .distance(DISTANCE_STATION2_TO_STATION3)
-                .build();
+        Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
+        SectionRequest request = sectionAcceptanceTestUtils.toSectionRequest(
+                station2.getId().toString(), station1.getId().toString(), DISTANCE_STATION2_TO_STATION3);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
-                .when().post("/lines/" + id + "/sections")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -161,19 +144,12 @@ public class SectionAcceptanceTest extends BaseTest {
     void deleteSection() throws JsonProcessingException {
         // given
         Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
-        SectionRequest request = SectionRequest.builder()
-                .upStationId(station2.getId().toString())
-                .downStationId(station3.getId().toString())
-                .distance(DISTANCE_STATION2_TO_STATION3)
-                .build();
+        SectionRequest request = sectionAcceptanceTestUtils.toSectionRequest(
+                station2.getId().toString(), station3.getId().toString(), DISTANCE_STATION2_TO_STATION3);
         sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
 
-
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/lines/" + lineId + "/sections?stationId=" + station3.getId())
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_제거(lineId, station3.getId());
 
         // then
         ExtractableResponse<Response> line = lineAcceptanceTestUtils.지하철_노선_조회(lineId);
