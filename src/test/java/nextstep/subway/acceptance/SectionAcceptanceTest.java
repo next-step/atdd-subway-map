@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
+import nextstep.subway.acceptance.utils.SectionAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
 import nextstep.subway.applicaion.dto.LineRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
@@ -36,6 +37,8 @@ public class SectionAcceptanceTest extends BaseTest {
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
+
+    private final SectionAcceptanceTestUtils sectionAcceptanceTestUtils = new SectionAcceptanceTestUtils();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -82,14 +85,7 @@ public class SectionAcceptanceTest extends BaseTest {
                 .distance(DISTANCE_STATION2_TO_STATION3)
                 .build();
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
-                .when()
-                .post("/lines/" + lineId + "/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
 
         // then
         ExtractableResponse<Response> line = RestAssured.given().log().all()
@@ -136,7 +132,7 @@ public class SectionAcceptanceTest extends BaseTest {
      * WHEN 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 구간을 등록할 경우
      * THEN Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
      */
-    @DisplayName("새로운 구간의 하행역이 해당 노선에 존재할 경우 Exception")
+    @DisplayName("새로운 구간의 하행역이 해당 노선에 존재할 경지핯 Exception")
     @Test
     void notExistDownStationIdOrThrow() {
         // given
@@ -157,5 +153,41 @@ public class SectionAcceptanceTest extends BaseTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo(NOT_EXIST_NEW_DOWN_STATION);
+    }
+
+    /**
+     * Given 구간이 2개 이상인 지하철 노선을 생성하고
+     * When 하행선이 포함한 구간을 삭제하면
+     * Then 해당 노선의 하행선과 하행선을 삭제한 구간이 삭제된다.
+     */
+    @DisplayName("지하철 구간을 제거한다.")
+    @Test
+    void deleteSection() throws JsonProcessingException {
+        // given
+        Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
+        SectionRequest request = SectionRequest.builder()
+                .upStationId(station2.getId().toString())
+                .downStationId(station3.getId().toString())
+                .distance(DISTANCE_STATION2_TO_STATION3)
+                .build();
+        sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
+
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/lines/" + lineId + "/sections?stationId=" + station3.getId())
+                .then().log().all()
+                .extract();
+
+        // then
+        ExtractableResponse<Response> line = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+
+        LineResponse lineResponse = objectMapper.readValue(line.body().asString(), LineResponse.class);
+        assertThat(lineResponse.getStations()).doesNotContain(station3);
+        assertThat(lineResponse.getDistance()).isEqualTo(LINE_DISTANCE_5);
     }
 }
