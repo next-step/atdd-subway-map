@@ -99,4 +99,32 @@ public class SectionAcceptanceTest extends BaseTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(lineResponse.getStations()).contains(station1, station2, station3);
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * WHEN 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 구간을 등록할 경우
+     * THEN Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
+     */
+    @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닐 경우 Exception")
+    @Test
+    void notMatchedSectionRuleException() {
+        // given
+        Long id = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
+        SectionRequest request = SectionRequest.builder()
+                .upStationId(station3.getId().toString())
+                .downStationId(station2.getId().toString())
+                .distance(DISTANCE_STATION2_TO_STATION3)
+                .build();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/lines/" + id + "/sections")
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역과 같아야 합니다.");
+    }
 }

@@ -2,6 +2,7 @@ package nextstep.subway.domain;
 
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.exceptions.NotMatchedSectionRuleException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -61,6 +62,12 @@ public class Line {
         this.sections.add(section);
         section.setLine(this);
         this.distance = getDistance();
+    }
+
+    public void checkSectionRuleOrThrow(Long upStationId, Long downStationId) {
+        if (this.sections.equalCurrentDownStationIdWithNewUpStationId(upStationId)) {
+            throw new NotMatchedSectionRuleException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역과 같아야 합니다.");
+        }
     }
 
     public List<Station> getStations() {

@@ -38,4 +38,8 @@ public class Sections {
         }
         return stations;
     }
+
+    public boolean equalCurrentDownStationIdWithNewUpStationId(Long upStationId) {
+        return !(this.sections.get(this.sections.size() - 1).getDownStationId() == upStationId);
+    }
 }
