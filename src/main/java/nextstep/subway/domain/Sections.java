@@ -21,6 +21,9 @@ public class Sections {
 
     private static final String ABLE_TO_DELETE_ONLY_LAST_SECTION = "하행 종점역이 포함된 구간만 제거할 수 있습니다.";
 
+    private static final String DELETE_WHEN_SECTION_TWO_OR_MORE
+            = "지하철 구간의 개수가 2 이상일 때만 구간을 제거할 수 있습니다.";
+
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL)
     private List<Section> sections = new ArrayList<>();
 
@@ -67,6 +70,10 @@ public class Sections {
     }
 
     public Section getLastSection(Long stationId) {
+        if (this.sections.size() < 2) {
+            throw new NotMatchedSectionDeleteRuleException(DELETE_WHEN_SECTION_TWO_OR_MORE);
+        }
+
         if (!equalDownStationIdWithRequestStationId(stationId)) {
             throw new NotMatchedSectionDeleteRuleException(ABLE_TO_DELETE_ONLY_LAST_SECTION);
         }

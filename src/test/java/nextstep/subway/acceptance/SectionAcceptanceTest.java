@@ -36,6 +36,9 @@ public class SectionAcceptanceTest extends BaseTest {
 
     private static final String ABLE_TO_DELETE_ONLY_LAST_SECTION = "하행 종점역이 포함된 구간만 제거할 수 있습니다.";
 
+    private static final String DELETE_WHEN_SECTION_TWO_OR_MORE
+            = "지하철 구간의 개수가 2 이상일 때만 구간을 제거할 수 있습니다.";
+
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
@@ -137,9 +140,9 @@ public class SectionAcceptanceTest extends BaseTest {
     }
 
     /**
-     * Given 구간이 2개 이상인 지하철 노선을 생성하고
-     * When 하행역이 포함한 구간을 삭제하면
-     * Then 해당 노선의 하행선과 하행선을 삭제한 구간이 삭제된다.
+     * Given 구간이 2개인 지하철 노선을 생성하고
+     * When 하행역이 포함한 구간을 제거하면
+     * Then 해당 노선의 하행선과 하행선을 삭제한 구간이 제거된다.
      */
     @DisplayName("지하철 구간을 제거한다.")
     @Test
@@ -162,11 +165,11 @@ public class SectionAcceptanceTest extends BaseTest {
     }
 
     /**
-     * Given 구간이 2개 이상인 지하철 노선을 생성하고
-     * When 하행역이 아닌 다른 지하철역을 포함한 구간을 삭제하면
+     * Given 구간이 2개인 지하철 노선을 생성하고
+     * When 하행역이 아닌 다른 지하철역을 포함한 구간을 제거하면
      * Then Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
      */
-    @DisplayName("하행선이 아닌 다른 지하철역을 포함한 구간을 삭제하면")
+    @DisplayName("하행선이 아닌 다른 지하철역을 포함한 구간을 제거할 경우 Exception")
     @Test
     void deleteOnlyLastSection() {
         // given
@@ -181,5 +184,26 @@ public class SectionAcceptanceTest extends BaseTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.jsonPath().getString("message")).isEqualTo(ABLE_TO_DELETE_ONLY_LAST_SECTION);
+    }
+
+    /**
+     * Given 구간이 1개인 지하철 노선을 생성하고
+     * When 하행역이 아닌 다른 지하철역을 포함한 구간을 제거하면
+     * Then Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
+     */
+    @DisplayName("지하철 구간이 1개일 때 구간을 제거할 경우 Exception")
+    @Test
+    void deleteWhenSectionTwoOrMore() {
+        // given
+        Long lineId = lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).jsonPath().getLong("id");
+        SectionRequest request = sectionAcceptanceTestUtils.toSectionRequest(
+                station2.getId().toString(), station3.getId().toString(), DISTANCE_STATION2_TO_STATION3);
+
+        // when
+        ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_제거(lineId, station2.getId());
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.jsonPath().getString("message")).isEqualTo(DELETE_WHEN_SECTION_TWO_OR_MORE);
     }
 }
