@@ -62,4 +62,12 @@ public class Sections {
             throw new NotMatchedSectionRuleException(NOT_EXIST_NEW_DOWN_STATION);
         }
     }
+
+    public Section getLastSection(Long stationId) {
+        return this.sections.get(this.sections.size() - 1);
+    }
+
+    public void removeSection() {
+        this.sections.remove(this.sections.size() - 1);
+    }
 }

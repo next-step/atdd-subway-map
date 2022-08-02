@@ -18,7 +18,6 @@ public class LineQueryService {
 
     private static final String LINE_NOTFOUND_MESSAGE = "해당 id의 지하철 노선이 존재하지 않습니다.";
 
-    private final StationQueryService stationQueryService;
     private final LineRepository lineRepository;
 
     public List<LineResponse> findAllLines() {

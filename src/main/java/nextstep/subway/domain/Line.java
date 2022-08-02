@@ -67,4 +67,12 @@ public class Line {
     public List<Station> getStations() {
         return this.sections.getStations();
     }
+
+    public Section getLastSection(Long stationId) {
+        return this.sections.getLastSection(stationId);
+    }
+
+    public void removeSection() {
+        this.sections.removeSection();
+    }
 }

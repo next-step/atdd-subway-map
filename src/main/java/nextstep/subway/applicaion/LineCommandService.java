@@ -20,6 +20,8 @@ public class LineCommandService {
 
     private final StationQueryService stationQueryService;
 
+    private final StationCommandService stationCommandService;
+
     private final SectionCommandService sectionCommandService;
 
     private final SectionStationCommandService sectionStationCommandService;
@@ -59,6 +61,14 @@ public class LineCommandService {
         Section section = sectionCommandService.saveSection(new Section(sectionRequest.getDistance()));
         sectionStationCommandService.saveSectionStation(section, upStation, downStation);
         line.addSection(section);
+    }
+
+    public void deleteSectionByDownStationId(Long id, Long stationId) {
+        Line line = findLineOrElseThrow(id);
+        Section lastSection = line.getLastSection(stationId);
+        line.removeSection();
+        sectionCommandService.deleteSection(lastSection);
+        stationCommandService.deleteStationById(stationId);
     }
 
     private Line findLineOrElseThrow(Long id) {

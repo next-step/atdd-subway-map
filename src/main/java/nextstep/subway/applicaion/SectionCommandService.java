@@ -17,4 +17,8 @@ public class SectionCommandService {
         return sectionRepository.save(section);
     }
 
+    public void deleteSection(Section section) {
+        sectionRepository.delete(section);
+    }
+
 }
