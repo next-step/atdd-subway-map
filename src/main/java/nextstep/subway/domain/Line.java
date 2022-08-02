@@ -2,13 +2,9 @@ package nextstep.subway.domain;
 
 import lombok.NoArgsConstructor;
 import nextstep.subway.applicaion.dto.LineRequest;
-import nextstep.subway.exceptions.NotMatchedSectionRuleException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -64,10 +60,8 @@ public class Line {
         this.distance = getDistance();
     }
 
-    public void checkSectionRuleOrThrow(Long upStationId, Long downStationId) {
-        if (!this.sections.equalCurrentDownStationIdWithNewUpStationId(upStationId)) {
-            throw new NotMatchedSectionRuleException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역과 같아야 합니다.");
-        }
+    public void checkSectionRulesOrThrow(Long upStationId, Long downStationId) {
+        this.sections.checkSectionRulesOrThrow(upStationId, downStationId);
     }
 
     public List<Station> getStations() {

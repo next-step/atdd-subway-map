@@ -52,7 +52,7 @@ public class LineCommandService {
 
     public void addSection(Long id, SectionRequest sectionRequest) {
         Line line = findLineOrElseThrow(id);
-        line.checkSectionRuleOrThrow(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
+        line.checkSectionRulesOrThrow(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
         Station upStation = stationQueryService.findById(sectionRequest.getUpStationId());
         Station downStation = stationQueryService.findById(sectionRequest.getDownStationId());
 
