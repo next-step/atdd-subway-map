@@ -136,7 +136,7 @@ public class SectionAcceptanceTest extends BaseTest {
      * WHEN 새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닌 구간을 등록할 경우
      * THEN Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
      */
-    @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어있는 하행 종점역이 아닐 경우 Exception")
+    @DisplayName("새로운 구간의 하행역이 해당 노선에 존재할 경우 Exception")
     @Test
     void notExistDownStationIdOrThrow() {
         // given
