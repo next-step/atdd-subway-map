@@ -40,6 +40,6 @@ public class Sections {
     }
 
     public boolean equalCurrentDownStationIdWithNewUpStationId(Long upStationId) {
-        return !(this.sections.get(this.sections.size() - 1).getDownStationId() == upStationId);
+        return this.sections.get(this.sections.size() - 1).getDownStationId() == upStationId;
     }
 }

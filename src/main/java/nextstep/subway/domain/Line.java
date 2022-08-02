@@ -65,7 +65,7 @@ public class Line {
     }
 
     public void checkSectionRuleOrThrow(Long upStationId, Long downStationId) {
-        if (this.sections.equalCurrentDownStationIdWithNewUpStationId(upStationId)) {
+        if (!this.sections.equalCurrentDownStationIdWithNewUpStationId(upStationId)) {
             throw new NotMatchedSectionRuleException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역과 같아야 합니다.");
         }
     }
