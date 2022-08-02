@@ -121,7 +121,7 @@ public class LineAcceptanceTest extends BaseTest {
     /**
      * Given 지하철 노선을 생성하고
      * When 생성되지 않은 지하철 노선을 조회하면
-     * Then IllegalArgumentException 와 ErrorResponse 를 응답받을 수 있다.
+     * Then Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
      */
     @DisplayName("존재하지 않는 지하철 노선을 조회한다.")
     @Test
