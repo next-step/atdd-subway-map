@@ -88,11 +88,7 @@ public class SectionAcceptanceTest extends BaseTest {
         ExtractableResponse<Response> response = sectionAcceptanceTestUtils.지하철_구간_등록(request, lineId);
 
         // then
-        ExtractableResponse<Response> line = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> line = lineAcceptanceTestUtils.지하철_노선_조회(lineId);
 
         LineResponse lineResponse = objectMapper.readValue(line.body().asString(), LineResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -180,11 +176,7 @@ public class SectionAcceptanceTest extends BaseTest {
                 .extract();
 
         // then
-        ExtractableResponse<Response> line = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/" + lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> line = lineAcceptanceTestUtils.지하철_노선_조회(lineId);
 
         LineResponse lineResponse = objectMapper.readValue(line.body().asString(), LineResponse.class);
         assertThat(lineResponse.getStations()).doesNotContain(station3);
