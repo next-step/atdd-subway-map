@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static nextstep.subway.acceptance.StationAcceptanceTest.*;
+import static nextstep.subway.applicaion.LineQueryService.LINE_NOTFOUND_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -29,8 +30,6 @@ public class LineAcceptanceTest extends BaseTest {
     public static final String LINE_NAME_9 = "9호선";
     public static final String LINE_COLOR_9 = "#BDB092";
     public static final Long LINE_DISTANCE_9 = 37L;
-
-    private static final String LINE_NOTFOUND_MESSAGE = "해당 id의 지하철 노선이 존재하지 않습니다.";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

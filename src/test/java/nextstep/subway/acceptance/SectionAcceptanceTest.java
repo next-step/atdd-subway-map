@@ -19,23 +19,13 @@ import org.springframework.http.HttpStatus;
 
 import static nextstep.subway.acceptance.LineAcceptanceTest.*;
 import static nextstep.subway.acceptance.StationAcceptanceTest.*;
+import static nextstep.subway.domain.Sections.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 public class SectionAcceptanceTest extends BaseTest {
 
     private static final Long DISTANCE_STATION2_TO_STATION3 = 3L;
-
-    private static final String EQUAL_CURRENT_DOWN_STATION_WITH_NEW_UP_STATION
-            = "새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역과 같아야 합니다.";
-
-    private static final String NOT_EXIST_NEW_DOWN_STATION
-            = "새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없습니다.";
-
-    private static final String ABLE_TO_DELETE_ONLY_LAST_SECTION = "하행 종점역이 포함된 구간만 제거할 수 있습니다.";
-
-    private static final String DELETE_WHEN_SECTION_TWO_OR_MORE
-            = "지하철 구간의 개수가 2 이상일 때만 구간을 제거할 수 있습니다.";
 
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
