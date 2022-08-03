@@ -14,9 +14,6 @@ public class Section {
     @Column(name = "section_id")
     private Long id;
 
-    @Column(name = "index", nullable = true)
-    private Long index;
-
     @Column(name = "distance", nullable = true)
     private Integer distance;
 
@@ -29,20 +26,27 @@ public class Section {
     private Station downStation;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "line_id", nullable = false)
+    @JoinColumn(name = "line_id", nullable = true)
     private Line line;
 
     protected Section() {
     }
 
-    public Section(Line subwayLine, Station upStation, Station downStation) {
-        this.line = subwayLine;
+    public Section(Line line, Station upStation, Station downStation) {
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
     }
 
-    public Line getSubwayLine() {
-        return line;
+    public Section(Line line, Station upStation, Station downStation, Integer distance) {
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Station getUpStation() {
@@ -51,5 +55,9 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public Integer getDistance() {
+        return distance;
     }
 }
