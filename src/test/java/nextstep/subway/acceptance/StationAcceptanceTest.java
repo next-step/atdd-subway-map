@@ -10,16 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static nextstep.subway.provider.StationProvider.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,18 +41,17 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final Map<String, String> param = createParam("강남역");
-        final ExtractableResponse<Response> response = createStationRequest(param);
+        final ExtractableResponse<Response> response = 지하철역_등록_요청("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
 
         // then
-        final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
+        final ExtractableResponse<Response> getStationsResponse = 지하철역_목록_조회_요청();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
-        assertThat(stationNames).hasSize(param.size());
-        assertThat(stationNames).containsAll(param.values());
+        assertThat(stationNames).hasSize(1);
+        assertThat(stationNames).contains("강남역");
     }
 
     /**
@@ -68,11 +63,10 @@ public class StationAcceptanceTest {
     @Test
     void getStations() throws Exception {
         // given
-        final List<Map<String, String>> params = createParam(List.of("강남역", "역삼역"));
-        final List<String> createdStationNames = createStationRequest(params);
+        지하철역_등록_요청(List.of("강남역", "역삼역"));
 
         // when
-        final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
+        final ExtractableResponse<Response> getStationsResponse = 지하철역_목록_조회_요청();
 
         // then
         assertThat(getStationsResponse.statusCode()).isEqualTo(OK.value());
@@ -80,7 +74,7 @@ public class StationAcceptanceTest {
         // then
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsAll(createdStationNames);
+        assertThat(stationNames).containsAll(List.of("강남역", "역삼역"));
     }
 
     /**
@@ -92,85 +86,19 @@ public class StationAcceptanceTest {
     @Test
     void deleteStations() throws Exception {
         // given
-        final Map<String, String> param = createParam("강남역");
-        final ExtractableResponse<Response> createStationResponse = createStationRequest(param);
+        final ExtractableResponse<Response> createStationResponse = 지하철역_등록_요청("강남역");
         final Long savedStationId = createStationResponse.jsonPath().getLong("id");
 
         // when
-        final ExtractableResponse<Response> deleteStationResponse = deleteStationRequest(savedStationId);
+        final ExtractableResponse<Response> deleteStationResponse = 지하철역_삭제_요청(savedStationId);
 
         // then
         assertThat(deleteStationResponse.statusCode()).isEqualTo(NO_CONTENT.value());
 
         // then
-        final ExtractableResponse<Response> getStationsResponse = getStationsRequest();
+        final ExtractableResponse<Response> getStationsResponse = 지하철역_목록_조회_요청();
         final List<String> stationNames = getStationsResponse.jsonPath().getList("name", String.class);
 
         assertThat(stationNames).hasSize(0);
-    }
-
-    private Map<String, String> createParam(String stationName) {
-        final Map<String, String> param = new HashMap<>();
-        param.put("name", stationName);
-
-        return param;
-    }
-
-    private List<Map<String, String>> createParam(List<String> stationNames) {
-        final List<Map<String, String>> params = new ArrayList<>();
-        for (final String stationName : stationNames) {
-            final Map<String, String> param = createParam(stationName);
-            params.add(param);
-        }
-
-        return params;
-    }
-
-    private ExtractableResponse<Response> createStationRequest(Map<String, String> param) {
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .body(param)
-                .contentType(APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        return response;
-    }
-
-    private List<String> createStationRequest(List<Map<String, String>> params) {
-        final ArrayList<String> stationNames = new ArrayList<>();
-        for (Map<String, String> param : params) {
-            final ExtractableResponse<Response> response = RestAssured
-                    .given().log().all()
-                    .body(param)
-                    .contentType(APPLICATION_JSON_VALUE)
-                    .when().post("/stations")
-                    .then().log().all()
-                    .extract();
-            stationNames.add(response.jsonPath().getString("name"));
-        }
-
-        return stationNames;
-    }
-
-    private ExtractableResponse<Response> getStationsRequest() {
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> deleteStationRequest(Long stationId) {
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/stations/{stationId}", stationId)
-                .then().log().all()
-                .extract();
-
-        return response;
     }
 }
