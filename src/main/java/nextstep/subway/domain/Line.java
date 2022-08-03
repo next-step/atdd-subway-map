@@ -113,4 +113,8 @@ public class Line {
     public void addSection(Section section) {
         this.sections.add(section);
     }
+
+    public void updateDownStation(Station downStation) {
+        this.downStation = downStation;
+    }
 }
