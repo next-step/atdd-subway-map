@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/lines")
 public class LineController {
 
     private final LineService lineService;
@@ -19,36 +20,36 @@ public class LineController {
         this.lineService = lineService;
     }
 
-    @PostMapping("/subway-lines")
-    public ResponseEntity<LineResponse> createSubwayLine(@RequestBody CreateLineRequest subwayLineRequest) {
+    @PostMapping("")
+    public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest subwayLineRequest) {
         final LineResponse lineResponse = lineService.saveLine(subwayLineRequest);
         return ResponseEntity.created(URI.create("/stations/" + lineResponse.getId())).body(lineResponse);
     }
 
-    @GetMapping("/subway-lines")
-    public ResponseEntity<List<LineResponse>> getSubwayLines() {
+    @GetMapping("")
+    public ResponseEntity<List<LineResponse>> getLines() {
         final List<LineResponse> subwayLinesResponse = lineService.findAllLines();
         return ResponseEntity.ok().body(subwayLinesResponse);
     }
 
-    @GetMapping("/subway-lines/{subwayLineId}")
-    public ResponseEntity<LineResponse> getSubwayLine(@PathVariable Long subwayLineId) {
-        final LineResponse lineResponse = lineService.findOneSubwayLineById(subwayLineId);
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long lineId) {
+        final LineResponse lineResponse = lineService.findOneLineById(lineId);
         return ResponseEntity.ok().body(lineResponse);
     }
 
-    @PutMapping("/subway-lines/{subwayLineId}")
-    public ResponseEntity<LineResponse> updateSubwayLine(
-            @PathVariable Long subwayLineId,
+    @PutMapping("/{lineId}")
+    public ResponseEntity<LineResponse> updateLine(
+            @PathVariable Long lineId,
             @RequestBody UpdateLineRequest updateLineRequest) {
-        final LineResponse lineResponse = lineService.updateSubwayLine(subwayLineId, updateLineRequest);
+        final LineResponse lineResponse = lineService.updateSubwayLine(lineId, updateLineRequest);
         return ResponseEntity.ok().body(lineResponse);
     }
 
-    @DeleteMapping("/subway-lines/{subwayLineId}")
-    public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long subwayLineId) {
-        lineService.performDeleteLine(subwayLineId);
-        lineService.deleteSubwayLine(subwayLineId);
+    @DeleteMapping("/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
+        lineService.performDeleteLine(lineId);
+        lineService.deleteSubwayLine(lineId);
         return ResponseEntity.noContent().build();
     }
 }

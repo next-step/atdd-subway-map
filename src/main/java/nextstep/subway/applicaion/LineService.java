@@ -57,7 +57,7 @@ public class LineService {
         return findSubwayLines;
     }
 
-    public LineResponse findOneSubwayLineById(Long lineId) {
+    public LineResponse findOneLineById(Long lineId) {
         final Line findSubwayLine = getLineByIdIfExists(lineId);
 
         return new LineResponse(findSubwayLine);
