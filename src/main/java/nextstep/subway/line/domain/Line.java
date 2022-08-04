@@ -64,7 +64,7 @@ public class Line {
     public List<Long> getStationIds() {
         final List<Long> stationIds = new ArrayList<>();
         for (final Section section : sections) {
-            if (sections.size() == 1 || !isLastSection(section)) {
+            if (sections.size() == 1 || isNotLastSection(section)) {
                 stationIds.add(section.getUpStationId());
             }
             stationIds.add(section.getDownStationId());
@@ -72,8 +72,8 @@ public class Line {
         return stationIds;
     }
 
-    private boolean isLastSection(final Section section) {
-        return section == getLastSection();
+    private boolean isNotLastSection(final Section section) {
+        return section != getLastSection();
     }
 
     public void deleteStation(final Long stationId) {
