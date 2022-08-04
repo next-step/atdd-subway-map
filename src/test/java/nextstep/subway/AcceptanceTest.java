@@ -25,6 +25,6 @@ public class AcceptanceTest implements TestDataSupplier {
 
     @AfterEach
     void tearDown() {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "line", "station");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "station", "section", "line");
     }
 }

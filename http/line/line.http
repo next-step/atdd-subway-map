@@ -12,16 +12,13 @@ Content-Length: 118
   "distance": 10
 }
 
-
 ### 지하철 노선 목록
 GET http://localhost:8080/lines
 Accept: application/json
 
-
 ### 지하철 노선 조회
 GET http://localhost:8080/lines/1
 Accept: application/json
-
 
 ### 지하철 노선 수정
 PUT http://localhost:8080/lines/1
@@ -34,7 +31,20 @@ Content-Length: 58
   "color": "bg-blue-600"
 }
 
-
 ### 지하철 노석 삭제
 DELETE http://localhost:8080/lines/1
 
+### 지하철 구간 등록
+POST http://localhost:8080/lines/1/sections
+accept: */*
+content-type: application/json; charset=UTF-8
+
+{
+  "downStationId": "4",
+  "upStationId": "2",
+  "distance": 10
+}
+
+### 지하철 구간 제거
+DELETE http://localhost:8080/lines/1/sections?stationId=2
+accept: */*
