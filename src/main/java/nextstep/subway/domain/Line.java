@@ -26,8 +26,8 @@ public class Line {
     public Line(LineRequest lineRequest, Section section) {
         this.name = lineRequest.getName();
         this.color = lineRequest.getColor();
-        this.sections.add(section);
         section.setLine(this);
+        this.sections.add(section);
         this.distance = lineRequest.getDistance();
     }
 
@@ -55,24 +55,18 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        this.sections.checkSectionCreateRulesOrThrow(section.getUpStationId(), section.getDownStationId());
+
         this.sections.add(section);
         section.setLine(this);
         this.distance = getDistance();
-    }
-
-    public void checkSectionRulesOrThrow(Long upStationId, Long downStationId) {
-        this.sections.checkSectionRulesOrThrow(upStationId, downStationId);
     }
 
     public List<Station> getStations() {
         return this.sections.getStations();
     }
 
-    public Section getLastSection(Long stationId) {
-        return this.sections.getLastSection(stationId);
-    }
-
-    public void removeSection() {
-        this.sections.removeSection();
+    public void removeSection(Long stationId) {
+        this.sections.removeSection(stationId);
     }
 }

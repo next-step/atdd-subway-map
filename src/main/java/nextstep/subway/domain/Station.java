@@ -16,9 +16,6 @@ public class Station {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
-    private List<SectionStation> sectionStations;
-
     public void update(Station station) {
         if (station == null) {
             return;
@@ -40,9 +37,5 @@ public class Station {
 
     public String getName() {
         return name;
-    }
-
-    public void addSectionStation(SectionStation sectionStation) {
-        this.sectionStations.add(sectionStation);
     }
 }

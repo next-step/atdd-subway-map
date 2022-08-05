@@ -44,7 +44,7 @@ public class Sections {
 
         for (Section section : this.sections) {
             stations.addAll(
-                    section.getStations()
+                    section.getStationsToBe()
                         .stream()
                         .filter(station -> !stations.contains(station))
                         .collect(Collectors.toList()));
@@ -52,7 +52,7 @@ public class Sections {
         return stations;
     }
 
-    public void checkSectionRulesOrThrow(Long upStationId, Long downStationId) {
+    public void checkSectionCreateRulesOrThrow(Long upStationId, Long downStationId) {
         equalCurrentDownStationIdWithNewUpStationIdOrThrow(upStationId);
         notExistDownStationIdOrThrow(downStationId);
     }
@@ -69,7 +69,15 @@ public class Sections {
         }
     }
 
-    public Section getLastSection(Long stationId) {
+    public void removeSection(Long stationId) {
+        checkSectionDeleteRulesOrThrow(stationId);
+
+        int lastSectionIndex = this.sections.size() - 1;
+        this.sections.get(lastSectionIndex).delete();
+        this.sections.remove(lastSectionIndex);
+    }
+
+    public void checkSectionDeleteRulesOrThrow(Long stationId) {
         if (this.sections.size() < 2) {
             throw new NotMatchedSectionDeleteRuleException(DELETE_WHEN_SECTION_TWO_OR_MORE);
         }
@@ -77,14 +85,9 @@ public class Sections {
         if (!equalDownStationIdWithRequestStationId(stationId)) {
             throw new NotMatchedSectionDeleteRuleException(ABLE_TO_DELETE_ONLY_LAST_SECTION);
         }
-        return this.sections.get(this.sections.size() - 1);
     }
 
     private boolean equalDownStationIdWithRequestStationId(Long stationId) {
         return this.sections.get(this.sections.size() - 1).getDownStationId() == stationId;
-    }
-
-    public void removeSection() {
-        this.sections.remove(this.sections.size() - 1);
     }
 }

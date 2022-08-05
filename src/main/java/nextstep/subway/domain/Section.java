@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.CascadeType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -23,57 +24,50 @@ public class Section {
 
     private Long distance;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
-    private List<SectionStation> sectionStations = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Station upStation;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Station downStation;
 
     public Section() {
     }
 
-    public Section(Long distance) {
+    public Section(Station upStation, Station downStation, Long distance) {
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
     public void update(Station upStation, Station downStation, Long distance) {
-        this.getUpStation().update(upStation);
-        this.getDownStation().update(downStation);
+        this.getUpStationToBe().update(upStation);
+        this.getDownStationToBe().update(downStation);
         this.distance = distance != null ? distance : this.distance;
     }
-
-    public void addSectionStation(SectionStation sectionStation) {
-        this.sectionStations.add(sectionStation);
+    public void delete() {
+        this.line = null;
     }
 
-    public Station getUpStation() {
-        return this.sectionStations.get(0).getStation();
-    }
+    public Station getUpStationToBe() { return this.upStation; }
 
-    public Station getDownStation() {
-        return this.sectionStations.get(1).getStation();
-    }
-
-    public Long getDistance() {
-        return distance;
+    public Station getDownStationToBe() {
+        return this.downStation;
     }
 
     public Long getUpStationId() {
-        return this.getUpStation().getId();
+        return this.getUpStationToBe().getId();
     }
 
     public Long getDownStationId() {
-        return this.getDownStation().getId();
+        return this.getDownStationToBe().getId();
     }
 
-    public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-        for (SectionStation sectionStation : this.sectionStations) {
-            stations.add(sectionStation.getStation());
-        }
-
-        return stations;
+    public List<Station> getStationsToBe() {
+        return Arrays.asList(upStation, downStation);
     }
 
     public void setLine(Line line) {

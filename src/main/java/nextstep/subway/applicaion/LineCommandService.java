@@ -20,20 +20,13 @@ public class LineCommandService {
 
     private final StationQueryService stationQueryService;
 
-    private final StationCommandService stationCommandService;
-
-    private final SectionCommandService sectionCommandService;
-
-    private final SectionStationCommandService sectionStationCommandService;
-
     private final LineRepository lineRepository;
 
     public LineResponse saveLine(LineRequest lineRequest) {
         Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
         Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
 
-        Section section = sectionCommandService.saveSection(new Section(lineRequest.getDistance()));
-        sectionStationCommandService.saveSectionStation(section, upStation, downStation);
+        Section section = new Section(upStation, downStation, lineRequest.getDistance());
         Line line = lineRepository.save(new Line(lineRequest, section));
 
         return createLineResponse(line);
@@ -54,21 +47,15 @@ public class LineCommandService {
 
     public void addSection(Long id, SectionRequest sectionRequest) {
         Line line = findLineOrElseThrow(id);
-        line.checkSectionRulesOrThrow(sectionRequest.getUpStationId(), sectionRequest.getDownStationId());
         Station upStation = stationQueryService.findById(sectionRequest.getUpStationId());
         Station downStation = stationQueryService.findById(sectionRequest.getDownStationId());
 
-        Section section = sectionCommandService.saveSection(new Section(sectionRequest.getDistance()));
-        sectionStationCommandService.saveSectionStation(section, upStation, downStation);
-        line.addSection(section);
+        line.addSection(new Section(upStation, downStation, sectionRequest.getDistance()));
     }
 
-    public void deleteSectionByDownStationId(Long id, Long stationId) {
+    public void deleteLastSection(Long id, Long stationId) {
         Line line = findLineOrElseThrow(id);
-        Section lastSection = line.getLastSection(stationId);
-        line.removeSection();
-        sectionCommandService.deleteSection(lastSection);
-        stationCommandService.deleteStationById(stationId);
+        line.removeSection(stationId);
     }
 
     private Line findLineOrElseThrow(Long id) {
