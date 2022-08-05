@@ -6,8 +6,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineCreateRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,8 +39,9 @@ public class LineAcceptanceTest extends BaseTest {
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
 
-    private LineRequest LINE_5;
-    private LineRequest LINE_9;
+    private LineCreateRequest LINE_5;
+
+    private LineCreateRequest LINE_9;
 
     @BeforeEach
     public void setUp() {
@@ -47,8 +49,8 @@ public class LineAcceptanceTest extends BaseTest {
         Long downStationId1 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
         Long upStationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME3).jsonPath().getLong("id");
         Long downStationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME4).jsonPath().getLong("id");
-        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId1, downStationId1, LINE_DISTANCE_5);
-        LINE_9 = new LineRequest(LINE_NAME_9, LINE_COLOR_9, upStationId2, downStationId2, LINE_DISTANCE_9);
+        LINE_5 = new LineCreateRequest(LINE_NAME_5, LINE_COLOR_5, upStationId1, downStationId1, LINE_DISTANCE_5);
+        LINE_9 = new LineCreateRequest(LINE_NAME_9, LINE_COLOR_9, upStationId2, downStationId2, LINE_DISTANCE_9);
     }
 
     @AfterEach
@@ -149,7 +151,7 @@ public class LineAcceptanceTest extends BaseTest {
                         lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).body().asString(),
                         LineResponse.class);
 
-        LineRequest request = LineRequest.builder()
+        LineUpdateRequest request = LineUpdateRequest.builder()
                 .name(LINE_NAME_5_UP)
                 .color(LINE_COLOR_5_UP)
                 .build();

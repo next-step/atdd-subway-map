@@ -3,7 +3,8 @@ package nextstep.subway.acceptance.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineCreateRequest;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.springframework.http.MediaType;
 
 public class LineAcceptanceTestUtils {
@@ -14,7 +15,7 @@ public class LineAcceptanceTestUtils {
                 .then().log().all();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_수정(Long id, LineRequest request) {
+    public ExtractableResponse<Response> 지하철_노선_수정(Long id, LineUpdateRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +41,7 @@ public class LineAcceptanceTestUtils {
                 .extract();
     }
 
-    public ExtractableResponse<Response> 지하철_노선_생성(LineRequest request) {
+    public ExtractableResponse<Response> 지하철_노선_생성(LineCreateRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

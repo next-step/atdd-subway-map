@@ -1,8 +1,9 @@
 package nextstep.subway.applicaion;
 
 import lombok.RequiredArgsConstructor;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineCreateRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.domain.Line;
 import nextstep.subway.domain.LineRepository;
@@ -22,22 +23,22 @@ public class LineCommandService {
 
     private final LineRepository lineRepository;
 
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
-        Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
+    public LineResponse saveLine(LineCreateRequest lineCreateRequest) {
+        Station upStation = stationQueryService.findById(lineCreateRequest.getUpStationId());
+        Station downStation = stationQueryService.findById(lineCreateRequest.getDownStationId());
 
-        Section section = new Section(upStation, downStation, lineRequest.getDistance());
-        Line line = lineRepository.save(new Line(lineRequest, section));
+        Section section = new Section(upStation, downStation, lineCreateRequest.getDistance());
+        Line line = lineRepository.save(new Line(lineCreateRequest, section));
 
         return createLineResponse(line);
     }
 
-    public void updateLine(Long id, LineRequest lineRequest) {
+    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
         Line line = findLineOrElseThrow(id);
-        Station upStation = stationQueryService.findById(lineRequest.getUpStationId());
-        Station downStation = stationQueryService.findById(lineRequest.getDownStationId());
+        Station upStation = stationQueryService.findById(lineUpdateRequest.getUpStationId());
+        Station downStation = stationQueryService.findById(lineUpdateRequest.getDownStationId());
 
-        line.update(lineRequest, upStation, downStation);
+        line.update(lineUpdateRequest, upStation, downStation);
     }
 
     public void deleteLineById(Long id) {

@@ -1,7 +1,8 @@
 package nextstep.subway.domain;
 
 import lombok.NoArgsConstructor;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineCreateRequest;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 
 import javax.persistence.*;
 import java.util.List;
@@ -23,12 +24,12 @@ public class Line {
 
     private Long distance;
 
-    public Line(LineRequest lineRequest, Section section) {
-        this.name = lineRequest.getName();
-        this.color = lineRequest.getColor();
+    public Line(LineCreateRequest lineCreateRequest, Section section) {
+        this.name = lineCreateRequest.getName();
+        this.color = lineCreateRequest.getColor();
         section.setLine(this);
         this.sections.add(section);
-        this.distance = lineRequest.getDistance();
+        this.distance = lineCreateRequest.getDistance();
     }
 
     public Long getId() {
@@ -47,11 +48,11 @@ public class Line {
         return this.distance;
     }
 
-    public void update(LineRequest lineRequest, Station upStation, Station downStation) {
-        this.name = lineRequest.getName() != null ? lineRequest.getName() : this.name;
-        this.color = lineRequest.getColor() != null ? lineRequest.getColor() : this.color;
-        this.sections.get(0).update(upStation, downStation, lineRequest.getDistance());
-        this.distance = lineRequest.getDistance() != null ? lineRequest.getDistance() : this.distance;
+    public void update(LineUpdateRequest lineUpdateRequest, Station upStation, Station downStation) {
+        this.name = lineUpdateRequest.getName() != null ? lineUpdateRequest.getName() : this.name;
+        this.color = lineUpdateRequest.getColor() != null ? lineUpdateRequest.getColor() : this.color;
+        this.sections.get(0).update(upStation, downStation, lineUpdateRequest.getDistance());
+        this.distance = lineUpdateRequest.getDistance() != null ? lineUpdateRequest.getDistance() : this.distance;
     }
 
     public void addSection(Section section) {

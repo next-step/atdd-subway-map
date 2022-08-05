@@ -7,7 +7,7 @@ import io.restassured.response.Response;
 import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.SectionAcceptanceTestUtils;
 import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.applicaion.dto.LineCreateRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
 import nextstep.subway.applicaion.dto.SectionRequest;
 import nextstep.subway.applicaion.dto.StationResponse;
@@ -35,7 +35,7 @@ public class SectionAcceptanceTest extends BaseTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private LineRequest LINE_5;
+    private LineCreateRequest LINE_5;
 
     private StationResponse station1;
 
@@ -51,7 +51,7 @@ public class SectionAcceptanceTest extends BaseTest {
                 stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).body().asString(), StationResponse.class);
         station3 = objectMapper.readValue(
                 stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME3).body().asString(), StationResponse.class);
-        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, station1.getId(), station2.getId(), LINE_DISTANCE_5);
+        LINE_5 = new LineCreateRequest(LINE_NAME_5, LINE_COLOR_5, station1.getId(), station2.getId(), LINE_DISTANCE_5);
     }
 
     @AfterEach
