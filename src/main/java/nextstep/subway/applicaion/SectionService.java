@@ -30,7 +30,7 @@ public class SectionService {
     }
 
     @Transactional
-    public Long create(Long lineId, CreateSectionRequest createSectionRequest) throws ValidationException, NotFoundException {
+    public Long create(Long lineId, CreateSectionRequest createSectionRequest) {
         final Line findLine = getLineIfExists(lineId);
         final Station findUpStation = getStationIfExists(createSectionRequest.getUpStationId());
         final Station findDownStation = getStationIfExists(createSectionRequest.getDownStationId());
@@ -43,7 +43,7 @@ public class SectionService {
     }
 
     @Transactional
-    public void delete(Long lineId, Long stationId) throws NotFoundException, ValidationException {
+    public void delete(Long lineId, Long stationId) {
         final Line findLine = getLineIfExists(lineId);
         final Station findStation = getStationIfExists(stationId);
         validateSectionDataBeforeDelete(findLine, findStation);
@@ -52,11 +52,11 @@ public class SectionService {
         sectionRepository.delete(findSection);
     }
 
-    public Section findOne(Long sectionId) throws NotFoundException {
+    public Section findOne(Long sectionId) {
         return getSectionIfExists(sectionId);
     }
 
-    private void validateSectionDataBeforeCreate(Line line, Station upStation, Station downStation) throws ValidationException {
+    private void validateSectionDataBeforeCreate(Line line, Station upStation, Station downStation) {
         if (!line.getDownStation().equals(upStation)) {
             throw new ValidationException("새로운 구간의 상행역은 기존 노선의 하행 종점역이어야만 합니다.");
         }
@@ -66,7 +66,7 @@ public class SectionService {
         }
     }
 
-    private void validateSectionDataBeforeDelete(Line line, Station downStation) throws ValidationException {
+    private void validateSectionDataBeforeDelete(Line line, Station downStation) {
         final Optional<Section> findSection = sectionRepository.findByLineAndUpStation(line, downStation);
         if (findSection.isPresent()) {
             throw new ValidationException("마지막 구간만 삭제할 수 있습니다.");
@@ -77,22 +77,22 @@ public class SectionService {
         }
     }
 
-    private Line getLineIfExists(Long lineId) throws NotFoundException {
+    private Line getLineIfExists(Long lineId) {
         return lineRepository.findById(lineId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 지하철 노선입니다."));
     }
 
-    private Section getSectionIfExists(Long sectionId) throws NotFoundException {
+    private Section getSectionIfExists(Long sectionId) {
         return sectionRepository.findById(sectionId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 지하철 구간입니다."));
     }
 
-    private Section getSectionByLineAndDownStation(Line line, Station station) throws NotFoundException {
+    private Section getSectionByLineAndDownStation(Line line, Station station) {
         return sectionRepository.findByLineAndDownStation(line, station)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 지하철 구간입니다."));
     }
 
-    private Station getStationIfExists(Long stationId) throws NotFoundException {
+    private Station getStationIfExists(Long stationId) {
         return stationRepository.findById(stationId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 지하철 역입니다."));
     }

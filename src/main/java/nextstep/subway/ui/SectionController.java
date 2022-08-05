@@ -24,7 +24,7 @@ public class SectionController {
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(
             @PathVariable Long lineId,
-            @RequestBody CreateSectionRequest createSectionRequest) throws ValidationException, NotFoundException {
+            @RequestBody CreateSectionRequest createSectionRequest) {
         final Long sectionId = sectionService.create(lineId, createSectionRequest);
         final Section findSection = sectionService.findOne(sectionId);
         final SectionResponse sectionResponse = new SectionResponse(findSection);
@@ -33,7 +33,7 @@ public class SectionController {
     }
 
     @DeleteMapping("/{lineId}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) throws NotFoundException, ValidationException {
+    public ResponseEntity<Void> deleteSection(@PathVariable Long lineId, @RequestParam Long stationId) {
         sectionService.delete(lineId, stationId);
 
         return ResponseEntity.noContent().build();

@@ -3,12 +3,13 @@ package nextstep.subway.applicaion;
 import nextstep.subway.applicaion.dto.line.CreateLineRequest;
 import nextstep.subway.applicaion.dto.line.LineResponse;
 import nextstep.subway.applicaion.dto.line.UpdateLineRequest;
-import nextstep.subway.domain.Section;
-import nextstep.subway.repository.SectionRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.repository.StationRepository;
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.Station;
+import nextstep.subway.exception.NotFoundException;
 import nextstep.subway.repository.LineRepository;
+import nextstep.subway.repository.SectionRepository;
+import nextstep.subway.repository.StationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,17 +88,17 @@ public class LineService {
 
     private Station getStationByIdIfExists(Long stationId) {
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 지하철 역입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 지하철 역입니다."));
     }
 
     private Line getLineByIdIfExists(Long subwayLineId) {
         return lineRepository.findById(subwayLineId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 지하철 노선입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 지하철 노선입니다."));
     }
 
     private Section getSectionIfExists(Line line, Station upStation, Station downStation) {
         return sectionRepository.findByUpStationAndDownStationAndLine(upStation, downStation, line)
-                .orElseThrow(() -> new RuntimeException("연결되어있지 않은 지하철역과 지하철 노선의 관계입니다."));
+                .orElseThrow(() -> new NotFoundException("연결되어있지 않은 지하철역과 지하철 노선의 관계입니다."));
     }
 
     private void linkingStationAndSubwayLine(Line line, Station upStation, Station downStation) {
