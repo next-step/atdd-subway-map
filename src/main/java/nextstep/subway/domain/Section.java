@@ -28,10 +28,10 @@ public class Section {
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Station upStation;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Station downStation;
 
     public Section() {
