@@ -86,11 +86,9 @@ public class Line {
         return sections;
     }
 
-    public Line update(String name, String color) {
+    public void update(String name, String color) {
         this.name = name;
         this.color = color;
-
-        return new Line(this);
     }
 
     public List<Station> getAllStations() {

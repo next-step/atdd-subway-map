@@ -67,9 +67,9 @@ public class LineService {
     @Transactional
     public LineResponse updateSubwayLine(Long lineId, UpdateLineRequest updateLineRequest) {
         final Line subwayLine = getLineByIdIfExists(lineId);
-        final Line updatedSubwayLine = subwayLine.update(updateLineRequest.getName(), updateLineRequest.getColor());
+        subwayLine.update(updateLineRequest.getName(), updateLineRequest.getColor());
 
-        return new LineResponse(updatedSubwayLine);
+        return new LineResponse(subwayLine);
     }
 
     @Transactional
