@@ -7,7 +7,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Embeddable
@@ -40,16 +42,12 @@ public class Sections {
     }
 
     public List<Station> getStations() {
-        List<Station> stations = new ArrayList<>();
-
+        Set<Station> stations = new HashSet<>();
         for (Section section : this.sections) {
-            stations.addAll(
-                    section.getStations()
-                        .stream()
-                        .filter(station -> !stations.contains(station))
-                        .collect(Collectors.toList()));
+            stations.addAll(section.getStations());
         }
-        return stations;
+
+        return new ArrayList<>(stations);
     }
 
     public void checkSectionCreateRulesOrThrow(Long upStationId, Long downStationId) {
