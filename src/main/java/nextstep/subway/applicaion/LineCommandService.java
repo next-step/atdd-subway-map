@@ -38,7 +38,8 @@ public class LineCommandService {
         Station upStation = stationQueryService.findById(lineUpdateRequest.getUpStationId());
         Station downStation = stationQueryService.findById(lineUpdateRequest.getDownStationId());
 
-        line.update(lineUpdateRequest, upStation, downStation);
+        Line updated = lineUpdateRequest.toLine();
+        line.update(updated, upStation, downStation);
     }
 
     public void deleteLineById(Long id) {

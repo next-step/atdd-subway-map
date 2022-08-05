@@ -32,6 +32,14 @@ public class Line {
         this.distance = lineCreateRequest.getDistance();
     }
 
+    public Line(Long id, String name, String color, Sections sections, Long distance) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.sections = sections;
+        this.distance = distance;
+    }
+
     public Long getId() {
         return id;
     }
@@ -48,20 +56,20 @@ public class Line {
         return this.distance;
     }
 
-    public void update(LineUpdateRequest lineUpdateRequest, Station upStation, Station downStation) {
-        if (lineUpdateRequest.getName() != null) {
-            this.name = lineUpdateRequest.getName();
+    public void update(Line updateLine, Station upStation, Station downStation) {
+        if (updateLine.getName() != null) {
+            this.name = updateLine.getName();
         }
 
-        if (lineUpdateRequest.getColor() != null) {
-            this.color = lineUpdateRequest.getColor();
+        if (updateLine.getColor() != null) {
+            this.color = updateLine.getColor();
         }
 
-        if (lineUpdateRequest.getDistance() != null) {
-            this.distance = lineUpdateRequest.getDistance();
+        if (updateLine.getDistance() != null) {
+            this.distance = updateLine.getDistance();
         }
 
-        this.sections.get(0).update(upStation, downStation, lineUpdateRequest.getDistance());
+        this.sections.get(0).update(upStation, downStation, updateLine.getDistance());
     }
 
     public void addSection(Section section) {
