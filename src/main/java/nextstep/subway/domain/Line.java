@@ -49,10 +49,19 @@ public class Line {
     }
 
     public void update(LineUpdateRequest lineUpdateRequest, Station upStation, Station downStation) {
-        this.name = lineUpdateRequest.getName() != null ? lineUpdateRequest.getName() : this.name;
-        this.color = lineUpdateRequest.getColor() != null ? lineUpdateRequest.getColor() : this.color;
+        if (lineUpdateRequest.getName() != null) {
+            this.name = lineUpdateRequest.getName();
+        }
+
+        if (lineUpdateRequest.getColor() != null) {
+            this.color = lineUpdateRequest.getColor();
+        }
+
+        if (lineUpdateRequest.getDistance() != null) {
+            this.distance = lineUpdateRequest.getDistance();
+        }
+
         this.sections.get(0).update(upStation, downStation, lineUpdateRequest.getDistance());
-        this.distance = lineUpdateRequest.getDistance() != null ? lineUpdateRequest.getDistance() : this.distance;
     }
 
     public void addSection(Section section) {

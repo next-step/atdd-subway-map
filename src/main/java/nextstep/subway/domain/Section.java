@@ -44,6 +44,7 @@ public class Section {
         this.getDownStation().update(downStation);
         this.distance = distance != null ? distance : this.distance;
     }
+
     public void delete() {
         this.line = null;
     }
