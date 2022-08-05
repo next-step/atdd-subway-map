@@ -44,7 +44,7 @@ public class Sections {
 
         for (Section section : this.sections) {
             stations.addAll(
-                    section.getStationsToBe()
+                    section.getStations()
                         .stream()
                         .filter(station -> !stations.contains(station))
                         .collect(Collectors.toList()));

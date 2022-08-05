@@ -5,13 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
-import javax.persistence.FetchType;
 import javax.persistence.GenerationType;
-import javax.persistence.CascadeType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,29 +40,29 @@ public class Section {
     }
 
     public void update(Station upStation, Station downStation, Long distance) {
-        this.getUpStationToBe().update(upStation);
-        this.getDownStationToBe().update(downStation);
+        this.getUpStation().update(upStation);
+        this.getDownStation().update(downStation);
         this.distance = distance != null ? distance : this.distance;
     }
     public void delete() {
         this.line = null;
     }
 
-    public Station getUpStationToBe() { return this.upStation; }
+    public Station getUpStation() { return this.upStation; }
 
-    public Station getDownStationToBe() {
+    public Station getDownStation() {
         return this.downStation;
     }
 
     public Long getUpStationId() {
-        return this.getUpStationToBe().getId();
+        return this.getUpStation().getId();
     }
 
     public Long getDownStationId() {
-        return this.getDownStationToBe().getId();
+        return this.getDownStation().getId();
     }
 
-    public List<Station> getStationsToBe() {
+    public List<Station> getStations() {
         return Arrays.asList(upStation, downStation);
     }
 
