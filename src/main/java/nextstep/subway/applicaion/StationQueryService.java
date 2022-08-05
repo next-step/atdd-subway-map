@@ -31,7 +31,7 @@ public class StationQueryService {
 
     public Station findById(Long id) {
         if (id == null) {
-            return null;
+            return new Station();
         }
 
         return stationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(STATION_NOTFOUND_MESSAGE));
