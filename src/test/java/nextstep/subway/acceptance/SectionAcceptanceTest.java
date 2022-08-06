@@ -42,8 +42,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 양재역 = 역_생성("양재역").jsonPath().getLong("id");
         Long 양재시민의숲역 = 역_생성("양재시민의숲역").jsonPath().getLong("id");
         Long 청계산입구역 = 역_생성("청계산입구역").jsonPath().getLong("id");
+        String color = "bg-red-600";
 
-        long 신분당선 = 노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
+        long 신분당선 = 노선_생성("신분당선", color, 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
         SectionRequest sectionRequest = new SectionRequest(양재시민의숲역, 청계산입구역, 10);
 
         //when
@@ -66,8 +67,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 양재역 = 역_생성("양재역").jsonPath().getLong("id");
         Long 양재시민의숲역 = 역_생성("양재시민의숲역").jsonPath().getLong("id");
         Long 청계산입구역 = 역_생성("청계산입구역").jsonPath().getLong("id");
+        String color = "bg-red-600";
 
-        long 신분당선 = 노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
+        long 신분당선 = 노선_생성("신분당선", color, 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
         SectionRequest sectionRequest = new SectionRequest(양재역, 청계산입구역, 10);
 
         //when
@@ -86,8 +88,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //given
         Long 양재역 = 역_생성("양재역").jsonPath().getLong("id");
         Long 양재시민의숲역 = 역_생성("양재시민의숲역").jsonPath().getLong("id");
+        String color = "bg-red-600";
 
-        long 신분당선 = 노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
+        long 신분당선 = 노선_생성("신분당선", color, 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
         SectionRequest sectionRequest = new SectionRequest(양재시민의숲역, 양재역, 10);
 
         //when
@@ -108,7 +111,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 양재역 = 역_생성("양재역").jsonPath().getLong("id");
         Long 양재시민의숲역 = 역_생성("양재시민의숲역").jsonPath().getLong("id");
         Long 청계산입구역 = 역_생성("청계산입구역").jsonPath().getLong("id");
-        Long 신분당선 = 노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
+        String color = "bg-red-600";
+        Long 신분당선 = 노선_생성("신분당선", color, 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
         구간_생성(신분당선, 양재시민의숲역, 청계산입구역, 10);
 
         //when
@@ -131,7 +135,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         //given
         Long 양재역 = 역_생성("양재역").jsonPath().getLong("id");
         Long 양재시민의숲역 = 역_생성("양재시민의숲역").jsonPath().getLong("id");
-        Long 신분당선 = 노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
+        String color = "bg-red-600";
+        Long 신분당선 = 노선_생성("신분당선", color, 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
 
         //when
         ExtractableResponse<Response> response = delete("/lines/" + 신분당선 + "/sections?stationId=" + 양재시민의숲역);
@@ -151,7 +156,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long 양재역 = 역_생성("양재역").jsonPath().getLong("id");
         Long 양재시민의숲역 = 역_생성("양재시민의숲역").jsonPath().getLong("id");
         Long 청계산입구역 = 역_생성("청계산입구역").jsonPath().getLong("id");
-        Long 신분당선 = 노선_생성("신분당선", "bg-red-600", 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
+        String color = "bg-red-600";
+        Long 신분당선 = 노선_생성("신분당선", color, 양재역, 양재시민의숲역, 10).jsonPath().getLong("id");
         구간_생성(신분당선, 양재시민의숲역, 청계산입구역, 10);
 
         //when

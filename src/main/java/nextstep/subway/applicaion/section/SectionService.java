@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class SectionService {
     private final StationService stationService;
     private final LineRepository lineRepository;
@@ -20,7 +20,6 @@ public class SectionService {
         this.lineRepository = lineRepository;
     }
 
-    @Transactional
     public void saveSection(Long lineId, SectionRequest sectionRequest) {
         Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
 
@@ -33,7 +32,6 @@ public class SectionService {
         line.getSections().add(line, upStation, downStation, sectionRequest.getDistance());
     }
 
-    @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(LineNotFoundException::new);
 

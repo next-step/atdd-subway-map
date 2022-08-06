@@ -10,27 +10,24 @@ import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.line.dto.LineUpdateRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import java.util.*;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선 관련 기능")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LineAcceptanceTest extends AcceptanceTest {
-	@LocalServerPort
-	int port;
-
-	@Autowired
-	private TestObjectDestroyer testObjectDestroyer;
 
 	Long 양재역;
 	Long 양재시민의숲역;
 	Long 청계산입구역;
 	Long 사당역;
 	Long 방배역;
+
+	@Autowired
+	private TestObjectDestroyer testObjectDestroyer;
 
 	@BeforeEach
 	public void beforeEach() {
