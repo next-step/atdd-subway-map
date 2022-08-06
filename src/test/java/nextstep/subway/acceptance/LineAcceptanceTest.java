@@ -5,27 +5,20 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.acceptance.tool.RequestTool;
 import nextstep.subway.acceptance.tool.SubwayFactory;
-import nextstep.subway.acceptance.tool.TestObjectDestoryer;
+import nextstep.subway.acceptance.tool.TestObjectDestroyer;
 import nextstep.subway.applicaion.line.dto.LineRequest;
 import nextstep.subway.applicaion.line.dto.LineUpdateRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 
-import java.util.*;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("노선 관련 기능")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LineAcceptanceTest extends AcceptanceTest {
-	@LocalServerPort
-	int port;
-
-	@Autowired
-	private TestObjectDestoryer testObjectDestoryer;
 
 	Long 양재역;
 	Long 양재시민의숲역;
@@ -33,9 +26,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
 	Long 사당역;
 	Long 방배역;
 
+	@Autowired
+	private TestObjectDestroyer testObjectDestroyer;
+
 	@BeforeEach
 	public void beforeEach() {
-		testObjectDestoryer.destroy(List.of("line"));
+		testObjectDestroyer.destroy(List.of("line"));
 	}
 
 	@BeforeAll
