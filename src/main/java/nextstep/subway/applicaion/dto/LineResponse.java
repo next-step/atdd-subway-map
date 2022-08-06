@@ -1,7 +1,9 @@
 package nextstep.subway.applicaion.dto;
 
 import nextstep.subway.domain.Line;
+import nextstep.subway.domain.Station;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,30 +15,24 @@ public class LineResponse {
 
     private String color;
 
-    private List<StationResponse> stations;
+    private List<StationResponse> stations = new ArrayList<>();
 
     private Long distance;
 
     public LineResponse() {
     }
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations, Long distance) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.stations = stations;
-        this.distance = distance;
-    }
-
-    public LineResponse(Line line, List<StationResponse> stations) {
+    public LineResponse(Line line) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations = stations;
+        for (Station station : line.getStations()) {
+            this.stations.add(new StationResponse(station));
+        }
         this.distance = line.getDistance();
     }
 
-    public void updateResponse(LineRequest request) {
+    public void updateResponse(LineUpdateRequest request) {
         this.name = request.getName() != null ? request.getName() : this.name;
         this.color = request.getColor() != null ? request.getColor() : this.color;
         this.distance = request.getDistance() != null ? request.getDistance() : this.distance;
@@ -64,8 +60,14 @@ public class LineResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+
+        }
         LineResponse that = (LineResponse) o;
         return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(color, that.color) && Objects.equals(stations, that.stations) && Objects.equals(distance, that.distance);
     }

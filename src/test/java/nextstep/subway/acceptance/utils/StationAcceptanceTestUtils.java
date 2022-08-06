@@ -1,4 +1,4 @@
-package nextstep.subway.acceptance;
+package nextstep.subway.acceptance.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class StationAcceptanceTestUtils {
 
-    ExtractableResponse<Response> 지하철_역_생성(String stationName) {
+    public ExtractableResponse<Response> 지하철_역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
@@ -22,7 +22,7 @@ public class StationAcceptanceTestUtils {
                 .extract();
     }
 
-    ExtractableResponse<Response> 지하철_역_목록_조회() {
+    public ExtractableResponse<Response> 지하철_역_목록_조회() {
         return RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/stations")
@@ -30,7 +30,7 @@ public class StationAcceptanceTestUtils {
                 .extract();
     }
 
-    void 지하철_역_제거(Long id) {
+    public void 지하철_역_제거(Long id) {
         RestAssured.given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/stations/" + id)

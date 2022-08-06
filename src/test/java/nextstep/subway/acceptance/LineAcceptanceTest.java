@@ -4,54 +4,53 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import nextstep.subway.applicaion.dto.LineRequest;
+import nextstep.subway.acceptance.utils.LineAcceptanceTestUtils;
+import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
+import nextstep.subway.applicaion.dto.LineCreateRequest;
 import nextstep.subway.applicaion.dto.LineResponse;
+import nextstep.subway.applicaion.dto.LineUpdateRequest;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME1;
-import static nextstep.subway.acceptance.StationAcceptanceTest.STATION_NAME2;
+import static nextstep.subway.acceptance.StationAcceptanceTest.*;
+import static nextstep.subway.applicaion.LineQueryService.LINE_NOTFOUND_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-@ActiveProfiles("test")
 public class LineAcceptanceTest extends BaseTest {
-    private static final String LINE_NAME_5 = "5호선";
-    private static final String LINE_COLOR_5 = "#996CAC";
-    private static final Long LINE_DISTANCE_5 = 48L;
-    private static final String LINE_NAME_5_UP = "5호선 상행선";
-    private static final String LINE_COLOR_5_UP = "#996CAD";
-    private static final String LINE_NAME_9 = "9호선";
-    private static final String LINE_COLOR_9 = "#BDB092";
-    private static final Long LINE_DISTANCE_9 = 37L;
+    public static final String LINE_NAME_5 = "5호선";
+    public static final String LINE_COLOR_5 = "#996CAC";
+    public static final Long LINE_DISTANCE_5 = 48L;
+    public static final String LINE_NAME_5_UP = "5호선 상행선";
+    public static final String LINE_COLOR_5_UP = "#996CAD";
+    public static final String LINE_NAME_9 = "9호선";
+    public static final String LINE_COLOR_9 = "#BDB092";
+    public static final Long LINE_DISTANCE_9 = 37L;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Autowired
-    private DatabaseInitializer databaseInitializer;
 
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
 
     private final LineAcceptanceTestUtils lineAcceptanceTestUtils = new LineAcceptanceTestUtils();
 
 
-    private LineRequest LINE_5;
-    private LineRequest LINE_9;
+    private LineCreateRequest LINE_5;
 
-    @BeforeAll
+    private LineCreateRequest LINE_9;
+
+    @BeforeEach
     public void setUp() {
-        Long upStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
-        Long downStationId = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
-        LINE_5 = new LineRequest(LINE_NAME_5, LINE_COLOR_5, upStationId, downStationId, LINE_DISTANCE_5);
-        LINE_9 = new LineRequest(LINE_NAME_9, LINE_COLOR_9, upStationId, downStationId, LINE_DISTANCE_9);
+        Long upStationId1 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME1).jsonPath().getLong("id");
+        Long downStationId1 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME2).jsonPath().getLong("id");
+        Long upStationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME3).jsonPath().getLong("id");
+        Long downStationId2 = stationAcceptanceTestUtils.지하철_역_생성(STATION_NAME4).jsonPath().getLong("id");
+        LINE_5 = new LineCreateRequest(LINE_NAME_5, LINE_COLOR_5, upStationId1, downStationId1, LINE_DISTANCE_5);
+        LINE_9 = new LineCreateRequest(LINE_NAME_9, LINE_COLOR_9, upStationId2, downStationId2, LINE_DISTANCE_9);
     }
 
     @AfterEach
@@ -123,11 +122,11 @@ public class LineAcceptanceTest extends BaseTest {
     /**
      * Given 지하철 노선을 생성하고
      * When 생성되지 않은 지하철 노선을 조회하면
-     * Then NoSuchElementException 와 ErrorResponse 를 응답받을 수 있다.
+     * Then Exception 을 발생시켜, 400 error code 와 실패 사유를 message 로 전달한다.
      */
     @DisplayName("존재하지 않는 지하철 노선을 조회한다.")
     @Test
-    void findLineNoSuchElementException() {
+    void findLineIllegalArgumentException() {
         // given
         lineAcceptanceTestUtils.지하철_노선_생성(LINE_5);
 
@@ -136,7 +135,7 @@ public class LineAcceptanceTest extends BaseTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.jsonPath().getString("errorName")).isEqualTo(NoSuchElementException.class.getName());
+        assertThat(response.jsonPath().getString("message")).isEqualTo(LINE_NOTFOUND_MESSAGE);
     }
 
     /**
@@ -152,7 +151,7 @@ public class LineAcceptanceTest extends BaseTest {
                         lineAcceptanceTestUtils.지하철_노선_생성(LINE_5).body().asString(),
                         LineResponse.class);
 
-        LineRequest request = LineRequest.builder()
+        LineUpdateRequest request = LineUpdateRequest.builder()
                 .name(LINE_NAME_5_UP)
                 .color(LINE_COLOR_5_UP)
                 .build();

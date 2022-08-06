@@ -4,7 +4,7 @@ import lombok.Builder;
 import nextstep.subway.domain.Line;
 
 @Builder
-public class LineRequest {
+public class LineUpdateRequest {
 
     private String name;
 
@@ -16,12 +16,16 @@ public class LineRequest {
 
     private Long distance;
 
-    public LineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public LineUpdateRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public Line toLine() {
+        return new Line(null, this.name, this.color, null, this.distance);
     }
 
     public String getName() {
@@ -42,16 +46,5 @@ public class LineRequest {
 
     public Long getDistance() {
         return distance;
-    }
-
-    public Line toLine(Line line) {
-        return new Line(
-                line.getId(),
-                this.name != null ? this.name : line.getName(),
-                this.color != null ? this.color : line.getColor(),
-                this.upStationId != null ? this.upStationId : line.getUpStationId(),
-                this.downStationId != null ? this.downStationId : line.getUpStationId(),
-                this.distance != null ? this.distance : line.getDistance()
-        );
     }
 }

@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StationQueryService {
+    private static final String STATION_NOTFOUND_MESSAGE = "해당 id의 지하철 역이 존재하지 않습니다.";
+
     private final StationRepository stationRepository;
 
     public List<StationResponse> findAllStations() {
@@ -24,9 +26,14 @@ public class StationQueryService {
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new StationResponse(station);
+    }
+
+    public Station findById(Long id) {
+        if (id == null) {
+            return new Station();
+        }
+
+        return stationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(STATION_NOTFOUND_MESSAGE));
     }
 }

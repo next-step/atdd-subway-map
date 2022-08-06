@@ -1,5 +1,7 @@
 package nextstep.subway.applicaion.dto;
 
+import nextstep.subway.domain.Station;
+
 import java.util.Objects;
 
 public class StationResponse {
@@ -9,9 +11,9 @@ public class StationResponse {
     public StationResponse() {
     }
 
-    public StationResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
+    public StationResponse(Station station) {
+        this.id = station.getId();
+        this.name = station.getName();
     }
 
     public Long getId() {
@@ -24,8 +26,13 @@ public class StationResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         StationResponse that = (StationResponse) o;
         return Objects.equals(id, that.id) && Objects.equals(name, that.name);
     }

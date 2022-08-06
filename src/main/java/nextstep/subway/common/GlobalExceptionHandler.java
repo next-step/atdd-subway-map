@@ -5,14 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.NoSuchElementException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({NoSuchElementException.class})
-    public ResponseEntity<ErrorResponse> noSuchElementException(NoSuchElementException e) {
-        final ErrorResponse errorResponse = new ErrorResponse(NoSuchElementException.class.getName(), e.getMessage());
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ErrorResponse> illegalArgumentException(IllegalArgumentException e) {
+        final ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 }

@@ -2,12 +2,11 @@ package nextstep.subway.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import nextstep.subway.acceptance.utils.StationAcceptanceTestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,16 +14,14 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@ActiveProfiles("test")
 public class StationAcceptanceTest extends BaseTest {
 
-    public static final String STATION_NAME1 = "강남역";
-    public static final String STATION_NAME2 = "삼성역";
+    public static final String STATION_NAME1 = "상일동역";
+    public static final String STATION_NAME2 = "강일역";
+    public static final String STATION_NAME3 = "미사역";
+    public static final String STATION_NAME4 = "하남풍산";
 
     private final StationAcceptanceTestUtils stationAcceptanceTestUtils = new StationAcceptanceTestUtils();
-
-    @Autowired
-    private DatabaseInitializer databaseInitializer;
 
     @AfterEach
     public void initializeTables() {

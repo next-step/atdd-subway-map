@@ -13,25 +13,20 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class StationCommandService {
     private final StationRepository stationRepository;
 
-    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
         return createStationResponse(station);
     }
 
-    @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
     }
 
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return new StationResponse(station);
     }
 }
