@@ -62,7 +62,7 @@ public class StationAcceptanceTest {
         응답_코드_검증(지하철역_목록_조회_응답, HttpStatus.OK);
 
         final List<String> 지하철역_이름_목록 = 지하철역_목록_조회_응답.jsonPath().getList("name", String.class);
-        assertThat(지하철역_이름_목록).containsOnly("강남역", "역삼역");
+        assertThat(지하철역_이름_목록).containsOnly("역삼역", "선릉역");
     }
 
     /**
