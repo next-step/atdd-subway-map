@@ -17,7 +17,7 @@ public class RestAssuredTest {
     @Test
     void accessGoogle() {
         // given
-        final String 요청_URI = "https://www.google.com/";
+        final String 요청_URI = "https://google.com";
 
         // when
         final ExtractableResponse<Response> 구글_페이지_응답 = RestAssured
