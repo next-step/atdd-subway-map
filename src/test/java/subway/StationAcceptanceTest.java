@@ -2,7 +2,6 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -27,13 +27,16 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        postStation("강남역").statusCode(HttpStatus.CREATED.value());
+        // when
+        ExtractableResponse<Response> createResponse = postStation("강남역");
 
-        given().log().all().
-        when()
-                .get("/stations").
-        then().log().all()
-                .body("name", hasItems("강남역"));
+        // then
+        List<String> stationNames = showStations();
+
+        assertAll(() -> {
+            assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+            assertThat(stationNames).containsAnyOf("강남역");
+        });
     }
 
     /**
@@ -44,15 +47,15 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 목록을 조회한다.")
     @Test
     void createStations() {
-        List.of("강남역", "교대역")
-                .forEach(this::postStation);
+        // given
+        List.of("강남역", "교대역").forEach(this::postStation);
 
-        given().log().all().
-        when()
-                .get("/stations").
-        then().log().all()
-                .body("size()", equalTo(2))
-                .body("name", contains("강남역", "교대역"));
+        // when
+        List<String> stationNames = showStations();
+
+        // then
+        assertThat(stationNames).hasSize(2)
+                .contains("강남역", "교대역");
     }
 
 
@@ -64,32 +67,40 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 그중 1개를 삭제한다.")
     @Test
     void deleteStation() {
+        // given
         postStation("교대역");
-        ExtractableResponse<Response> createResponse = postStation("강남역").extract();
+        ExtractableResponse<Response> createResponse = postStation("강남역");
 
-        given().log().all().
-        when()
-                .delete(createResponse.header("location")).
-        then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+        // when
+        ExtractableResponse<Response> deleteResponse =
+                given().log().all()
+                        .when().delete(createResponse.header("location"))
+                        .then().log().all().extract();
 
-        given().log().all().
-        when()
-                .get("/stations").
-        then().log().all()
-                .body("size()", equalTo(1))
-                .body("name", not(contains("강남역")));
+        // then
+        List<String> stationNames = showStations();
+
+        assertAll(() -> {
+            assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            assertThat(stationNames).hasSize(1).doesNotContain("강남역");
+        });
     }
 
-    private ValidatableResponse postStation(String stationName) {
+    private ExtractableResponse<Response> postStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
         return given().log().all()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE).
-                when()
-                    .post("/stations").
-                then().log().all();
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all().extract();
+    }
+
+    private List<String> showStations() {
+        return given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 }
