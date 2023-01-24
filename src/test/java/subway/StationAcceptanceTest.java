@@ -99,8 +99,37 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void testDeleteStation() {
+        String 서울대입구역 = "서울대입구역";
+        insertStation(서울대입구역);
 
+        // when
+        RestAssured
+                .given()
+                .when()
+                .delete("/stations/{id}", 1)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+
+        // when & then
+        RestAssured
+                .given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/stations")
+                .then()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationName, not(hasItem(서울대입구역)));
+
+        // when
+        List<String> stations = getStations();
+
+        // then
+        assertFalse(stations.contains(서울대입구역));
+    }
 
     private List<String> getStations() {
         return RestAssured
