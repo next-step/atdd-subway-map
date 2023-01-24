@@ -26,7 +26,7 @@ public class StationAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        stationRepository.deleteAll();
+        stationRepository.truncateTableStation();
     }
 
     /**
@@ -79,6 +79,37 @@ public class StationAcceptanceTest {
         );
     }
 
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String NotContainStationName = "강남역";
+        createPersistenceStationBy(NotContainStationName);
+        String ContainStationName = "양재역";
+        createPersistenceStationBy(ContainStationName);
+
+        // when
+        ExtractableResponse<Response> deleteStationResponse = RestAssured.when()
+                .delete("/stations/{id}", 1)
+                .then()
+                .log().all()
+                .extract();
+
+        // Then
+        List<String> stationsNameList = RestAssured.when()
+                .get("/stations")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        Assertions.assertAll(
+                () -> assertThat(deleteStationResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+                () -> assertThat(stationsNameList).doesNotContain(NotContainStationName),
+                () -> assertThat(stationsNameList).contains(ContainStationName)
+        );
+    }
+
     private static void createPersistenceStationBy(String... stationNames) {
         for (String stationName : stationNames) {
             Map<String, String> params = new HashMap<>();
@@ -90,12 +121,4 @@ public class StationAcceptanceTest {
                     .when().post("/stations");
         }
     }
-
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
-
 }
