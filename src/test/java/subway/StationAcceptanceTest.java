@@ -29,10 +29,10 @@ public class StationAcceptanceTest {
     void createStation() {
         postStation("강남역").statusCode(HttpStatus.CREATED.value());
 
-        given().log().all()
-        .when()
-                .get("/stations")
-        .then().log().all()
+        given().log().all().
+        when()
+                .get("/stations").
+        then().log().all()
                 .body("name", hasItems("강남역"));
     }
 
@@ -47,10 +47,10 @@ public class StationAcceptanceTest {
         List.of("강남역", "교대역")
                 .forEach(this::postStation);
 
-        given().log().all()
-        .when()
-                .get("/stations")
-        .then().log().all()
+        given().log().all().
+        when()
+                .get("/stations").
+        then().log().all()
                 .body("size()", equalTo(2))
                 .body("name", contains("강남역", "교대역"));
     }
@@ -87,9 +87,9 @@ public class StationAcceptanceTest {
 
         return given().log().all()
                     .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                    .post("/stations")
-                .then().log().all();
+                    .contentType(MediaType.APPLICATION_JSON_VALUE).
+                when()
+                    .post("/stations").
+                then().log().all();
     }
 }
