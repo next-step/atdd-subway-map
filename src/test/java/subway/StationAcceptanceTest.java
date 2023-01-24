@@ -65,17 +65,20 @@ public class StationAcceptanceTest {
         // given
         createPersistenceStationBy("강남역", "양재역");
 
-        //when
+        // when
         ExtractableResponse<Response> response = RestAssured.when()
                 .get("/stations")
                 .then()
                 .log().all()
                 .extract();
 
-        //Then
+        // Then
+        List<StationResponse> responseResult = response.jsonPath()
+                .getList("$", StationResponse.class);
+
         Assertions.assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("$").size()).isEqualTo(2)
+                () -> assertThat(responseResult.size()).isEqualTo(2)
         );
     }
 
