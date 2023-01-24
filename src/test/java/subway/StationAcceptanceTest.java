@@ -48,22 +48,6 @@ class StationAcceptanceTest {
         지하철역_조회됨(지하철역_목록, "강남역");
     }
 
-    private void 지하철역_조회됨(ExtractableResponse<Response> response, final String station) {
-
-        final JsonPath 지하철역_응답_경로 = response.response().body().jsonPath();
-
-        assertAll(
-                () -> assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(지하철역_응답_경로.getList("")).hasSize(1),
-                () -> assertThat(지하철역_응답_경로.getLong("[0].id")).isEqualTo(1L),
-                () -> assertThat(지하철역_응답_경로.getString("[0].name")).isEqualTo(station)
-        );
-    }
-
-    private void 지하철역_생성됨(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-    }
-
     /**
      * Given 2개의 지하철역을 생성하고
      * When 지하철역 목록을 조회하면
@@ -79,6 +63,41 @@ class StationAcceptanceTest {
         final ExtractableResponse<Response> 지하철역_목록_응답 = 지하철역_목록_요청();
 
         지하철역_목록_조회됨(지하철역_목록_응답, "잠실역", "검암역");
+    }
+
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하고
+     * When 지하철역 목록 조회를 하면
+     * Then 생성한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+
+        final ExtractableResponse<Response> 잠실역 = 지하철역_생성_요청("잠실역");
+
+        지하철역_삭제_요청(잠실역);
+
+        final ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록_요청();
+
+        지하철역_조회되지_않음(지하철역_목록);
+    }
+
+    private void 지하철역_조회됨(ExtractableResponse<Response> response, final String station) {
+
+        final JsonPath 지하철역_응답_경로 = response.response().body().jsonPath();
+
+        assertAll(
+                () -> assertThat(response.response().statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(지하철역_응답_경로.getList("")).hasSize(1),
+                () -> assertThat(지하철역_응답_경로.getLong("[0].id")).isEqualTo(1L),
+                () -> assertThat(지하철역_응답_경로.getString("[0].name")).isEqualTo(station)
+        );
+    }
+
+    private void 지하철역_생성됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     private void 지하철역_목록_조회됨(final ExtractableResponse<Response> 지하철역_목록_응답, final String...station) {
@@ -118,23 +137,14 @@ class StationAcceptanceTest {
                 .extract();
     }
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하고
-     * When 지하철역 목록 조회를 하면
-     * Then 생성한 역을 찾을 수 없다
-     */
-    @DisplayName("지하철역을 제거한다.")
-    @Test
-    void deleteStation() {
+    private static ExtractableResponse<Response> 지하철역_삭제_요청(ExtractableResponse<Response> response) {
+        final String uri = response.header("Location");
 
-        final ExtractableResponse<Response> 잠실역 = 지하철역_생성_요청("잠실역");
-
-        지하철역_삭제_요청(잠실역);
-
-        final ExtractableResponse<Response> 지하철역_목록 = 지하철역_목록_요청();
-
-        지하철역_조회되지_않음(지하철역_목록);
+        return RestAssured
+                .given().log().all()
+                .when().delete(uri)
+                .then().log().all()
+                .extract();
     }
 
     private void 지하철역_조회되지_않음(final ExtractableResponse<Response> response) {
@@ -146,20 +156,5 @@ class StationAcceptanceTest {
                 () -> assertThat(지하철역_응답_경로.getList("")).isEmpty()
 
         );
-    }
-
-    private static ExtractableResponse<Response> 지하철역_삭제_요청(ExtractableResponse<Response> response) {
-        final String uri = response.header("Location");
-
-        return RestAssured
-                .given().log().all()
-                .when().delete(uri)
-                .then().log().all()
-                .extract();
-    }
-
-    private static void 지하철역_삭제됨(final ExtractableResponse<Response> response) {
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
