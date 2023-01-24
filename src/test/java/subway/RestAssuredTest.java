@@ -7,17 +7,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
 
+    private final String GOOGLE_URL = "https://google.com";
+
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
-        // TODO: 구글 페이지 요청 구현
-        ExtractableResponse<Response> response = null;
+        //given
+        var request = given().baseUri(GOOGLE_URL);
 
+        //when
+        ExtractableResponse<Response> response = request.when().get().then().extract();
+
+        //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
