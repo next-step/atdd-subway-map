@@ -1,5 +1,6 @@
 package subway;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +13,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class RestAssuredTest {
 
+    private final String GOOGLE_URL = "https://google.com";
+    /**
+     * Given
+     * When "https://google.com"로 요청하면
+     * Then 200응답 코드를 받는다.
+     */
     @DisplayName("구글 페이지 접근 테스트")
     @Test
     void accessGoogle() {
         // TODO: 구글 페이지 요청 구현
-        ExtractableResponse<Response> response = null;
+        ExtractableResponse<Response> response =
+                RestAssured.when().get(GOOGLE_URL)
+                        .then().log().all()
+                        .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
