@@ -1,11 +1,14 @@
 package subway;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+
+import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,7 +19,12 @@ public class RestAssuredTest {
     @Test
     void accessGoogle() {
         // TODO: 구글 페이지 요청 구현
-        ExtractableResponse<Response> response = null;
+        ExtractableResponse<Response> response = RestAssured.
+            when()
+                .get(URI.create("https://www.google.com"))
+            .then()
+                .statusCode(HttpStatus.OK.value())
+            .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
