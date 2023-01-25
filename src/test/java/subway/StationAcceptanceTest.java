@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import subway.service.StationAcceptanceService;
+import subway.executor.StationServiceExecutor;
 
 import java.util.List;
 
@@ -33,13 +33,13 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = StationAcceptanceService.createStation("강남역");
+        ExtractableResponse<Response> response = StationServiceExecutor.createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationAcceptanceService.showStations()
+        List<String> stationNames = StationServiceExecutor.showStations()
                 .jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
@@ -53,10 +53,10 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록 조회")
     void findStations() {
         //given
-        StationAcceptanceService.createStation("강남역");
-        StationAcceptanceService.createStation("언주역");
+        StationServiceExecutor.createStation("강남역");
+        StationServiceExecutor.createStation("언주역");
         //when
-        ExtractableResponse<Response> response = StationAcceptanceService.showStations();
+        ExtractableResponse<Response> response = StationServiceExecutor.showStations();
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         //then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
@@ -77,13 +77,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 삭제")
     void removeStation() {
         //given
-        Station 강남역 = StationAcceptanceService.createStation("강남역").as(Station.class);
-        Station 언주역 = StationAcceptanceService.createStation("언주역").as(Station.class);
-        Station 개봉역 = StationAcceptanceService.createStation("개봉역").as(Station.class);
+        Station 강남역 = StationServiceExecutor.createStation("강남역").as(Station.class);
+        Station 언주역 = StationServiceExecutor.createStation("언주역").as(Station.class);
+        Station 개봉역 = StationServiceExecutor.createStation("개봉역").as(Station.class);
         //when
-        StationAcceptanceService.deleteStation(강남역.getId());
+        StationServiceExecutor.deleteStation(강남역.getId());
         //then
-        ExtractableResponse<Response> response = StationAcceptanceService.showStations();
+        ExtractableResponse<Response> response = StationServiceExecutor.showStations();
         List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertAll(
                 () -> assertThat(stationNames).hasSize(2),

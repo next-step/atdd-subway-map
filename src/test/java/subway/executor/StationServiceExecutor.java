@@ -1,4 +1,4 @@
-package subway.service;
+package subway.executor;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StationAcceptanceService {
+public class StationServiceExecutor {
 
     public static ExtractableResponse<Response> createStation(String stationName) {
 
