@@ -66,10 +66,10 @@ public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
         return response.jsonPath().getList("name", String.class);
     }
 
-    static ExtractableResponse<Response> 노선_상세_조회_요청(final long stationId) {
+    static ExtractableResponse<Response> 노선_상세_조회_요청(final long lineId) {
         return RestAssured
                 .given().log().all()
-                .when().get("/lines/{stationId}", stationId)
+                .when().get("/lines/{lineId}", lineId)
                 .then().log().all()
                 .extract();
     }
@@ -77,6 +77,33 @@ public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
     static void 조회한_노선의_정보와_일치하는지_확인(final ExtractableResponse<Response> response, final String lineName) {
         응답_코드_검증(response, HttpStatus.OK);
         final String 노선_이름 = response.jsonPath().getString("name");
+        assertThat(노선_이름).isEqualTo(lineName);
+    }
+
+    static ExtractableResponse<Response> 노선_상세_조회함(final long lineId) {
+        final ExtractableResponse<Response> response = 노선_상세_조회_요청(lineId);
+        응답_코드_검증(response, HttpStatus.OK);
+        return response;
+    }
+
+    static ExtractableResponse<Response> 노선_수정_요청(final long lineId, final String name, final String color) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().put("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    static void 노선_정보가_정상적으로_수정되었는지_확인(final ExtractableResponse<Response> response, final long lineId, final String lineName) {
+        응답_코드_검증(response, HttpStatus.OK);
+
+        final String 노선_이름 = 노선_상세_조회함(lineId).jsonPath().getString("name");
         assertThat(노선_이름).isEqualTo(lineName);
     }
 }
