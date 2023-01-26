@@ -1,5 +1,6 @@
 package subway.line.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineRequest;
@@ -12,16 +13,13 @@ import subway.station.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class LineService {
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
-
-    public LineService(StationRepository stationRepository, LineRepository lineRepository) {
-        this.stationRepository = stationRepository;
-        this.lineRepository = lineRepository;
-    }
 
     @Transactional
     public Line save(LineRequest lineRequest) {
@@ -31,7 +29,6 @@ public class LineService {
     }
 
     public List<LineResponse> findAll() {
-        // TODO projection 사용하도록 변경
         return lineRepository.findAllLine()
                 .stream()
                 .map(LineResponse::from)
