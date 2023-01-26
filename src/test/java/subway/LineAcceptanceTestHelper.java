@@ -25,7 +25,7 @@ public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
 
         return RestAssured
                 .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
                 .when().post("/lines")
                 .then().log().all()
@@ -49,7 +49,7 @@ public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
     static ExtractableResponse<Response> 노선_목록_조회_요청() {
         return RestAssured
                 .given().log().all()
-                .when().post("/lines")
+                .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
