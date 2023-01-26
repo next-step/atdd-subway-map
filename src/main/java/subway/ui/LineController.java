@@ -1,12 +1,10 @@
 package subway.ui;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.application.dto.LineRequest;
 import subway.application.dto.LineResponse;
-import subway.domain.LineRepository;
 
 import java.net.URI;
 import java.util.List;
@@ -32,5 +30,11 @@ public class LineController {
     public ResponseEntity<List<LineResponse>> showLines() {
         final List<LineResponse> lineResponses = lineService.findAllLine();
         return ResponseEntity.ok(lineResponses);
+    }
+
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineResponse> showLine(@PathVariable final Long lineId) {
+        final LineResponse lineResponse = lineService.findLineById(lineId);
+        return ResponseEntity.ok(lineResponse);
     }
 }
