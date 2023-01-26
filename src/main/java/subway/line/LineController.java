@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.entity.Line;
-import subway.line.repository.LineRepository;
 import subway.line.service.LineService;
 
 import java.net.URI;
