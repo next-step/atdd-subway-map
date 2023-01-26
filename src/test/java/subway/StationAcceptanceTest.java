@@ -2,14 +2,11 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +15,15 @@ import static subway.StationAcceptanceTestHelper.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Sql({"/truncate_all_tables.sql"})
-@TestMethodOrder(OrderAnnotation.class)
 public class StationAcceptanceTest {
+
+    @Autowired
+    private DatabaseTruncator databaseTruncator;
+
+    @BeforeEach
+    void setUp() {
+        databaseTruncator.execute();
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -29,7 +32,6 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    @Order(1)
     void createStation() {
         // when
         final ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청(지하철역_생성_요청_파라미터("강남역"));
@@ -45,7 +47,6 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    @Order(2)
     void getStations() {
         // given
         지하철역_생성함(지하철역_생성_요청_파라미터("역삼역"));
@@ -65,7 +66,6 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    @Order(3)
     void deleteStation() {
         // given
         final String location = 지하철역_생성함(지하철역_생성_요청_파라미터("강남역"));
