@@ -2,10 +2,7 @@ package subway.line;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
 import subway.line.entity.Line;
@@ -29,5 +26,10 @@ public class LineController {
     @GetMapping("/lines")
     public List<LineResponse> findAll() {
         return lineService.findAll();
+    }
+
+    @GetMapping("/lines/{id}")
+    public LineResponse findById(@PathVariable Long id) {
+        return lineService.findById(id);
     }
 }

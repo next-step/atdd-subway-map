@@ -77,18 +77,22 @@ public class LineAcceptanceTest {
         long id = requestCreateLine(lineRequest).getId();
 
         //When 생성한 지하철 노선을 조회하면
-        LineResponse find = given()
+        LineResponse find = requestFindById(id);
+
+        //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+        assertRequestAndFindEquals(lineRequest, id, find);
+    }
+
+    private LineResponse requestFindById(long id) {
+        return given()
                 .pathParam("id", id)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get("/stations/{id}")
+                .get("/lines/{id}")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .as(LineResponse.class);
-
-        //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-        assertRequestAndFindEquals(lineRequest, id, find);
     }
 
     @Test

@@ -34,4 +34,10 @@ public class LineService {
                 .map(LineResponse::from)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findById(Long id) {
+        return lineRepository.findById(id)
+                .map(LineResponse::from)
+                .orElseThrow(() -> new IllegalArgumentException("노선을 조회 할 수 없습니다. id : " + id));
+    }
 }
