@@ -12,6 +12,7 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
+import subway.line.service.LineService;
 import subway.station.StationAcceptanceTest;
 import subway.station.repository.StationRepository;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -27,6 +29,9 @@ public class LineAcceptanceTest {
 
     @Autowired
     private LineRepository lineRepository;
+
+    @Autowired
+    private LineService lineService;
 
     @Autowired
     private StationRepository stationRepository;
@@ -130,8 +135,19 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_삭제() {
         //Given 지하철 노선을 생성하고
+        long id = requestCreateLine("1호선").getId();
+
         //When 생성한 지하철 노선을 삭제하면
+        given()
+                .pathParam("id", id)
+                .when()
+                .delete("/lines/{id}")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .assertThat();
+
         //Then 해당 지하철 노선 정보는 삭제된다
+        assertThatIllegalArgumentException().isThrownBy(() -> lineService.findById(id));
     }
 
     private void assertRequestAndFindEquals(LineCreateRequest request, long id, LineResponse find) {

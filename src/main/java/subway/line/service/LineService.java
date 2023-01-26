@@ -44,12 +44,19 @@ public class LineService {
 
     @Transactional
     public void update(LineUpdateRequest request) {
-        Line line = findByIdIfAbsenceThrwoException(request.getId());
+        Line line = findByIdIfAbsenceThrowException(request.getId());
         line.update(request.getName(), request.getColor());
     }
 
-    private Line findByIdIfAbsenceThrwoException(Long id) {
+    private Line findByIdIfAbsenceThrowException(Long id) {
         return lineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("id로 노선을 조회 할 수 없습니다. id" + id));
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선은 삭제 할 수 없습니다. di:" + id));
+        lineRepository.delete(line);
     }
 }
