@@ -16,17 +16,49 @@ public class Line extends BaseEntity {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    @ManyToOne(targetEntity = Station.class, fetch = FetchType.LAZY)
-    @JoinColumn(name="up_station_id")
-    private Long upStationId;
+    @OneToOne(targetEntity = Station.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "up_station_id")
+    private Station upStation;
 
-    @Column(nullable = false)
-    @ManyToOne(targetEntity = Station.class, fetch = FetchType.LAZY)
-    @JoinColumn(name="down_station_id")
-    private Long downStationId;
+    @OneToOne(targetEntity = Station.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "down_station_id")
+    private Station downStation;
 
     @Column(nullable = false)
     private Long distance;
 
+    public Line() {
+    }
+
+    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+        this.name = name;
+        this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
 }
