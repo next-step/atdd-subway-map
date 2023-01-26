@@ -60,4 +60,11 @@ public class LineService {
         line.update(updateLineRequest.getName(), updateLineRequest.getColor());
         return new LineResponse(line);
     }
+
+    @Transactional
+    public void deleteLine(final long lineId) {
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(IllegalArgumentException::new);
+        lineRepository.deleteById(line.getId());
+    }
 }
