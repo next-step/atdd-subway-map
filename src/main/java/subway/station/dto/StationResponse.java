@@ -1,8 +1,9 @@
-package subway;
+package subway.station.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.station.entity.Station;
 
 @Getter
 @NoArgsConstructor

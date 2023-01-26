@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.StationResponse;
+import subway.station.dto.StationResponse;
 import subway.line.entity.Line;
 
 import java.util.ArrayList;
