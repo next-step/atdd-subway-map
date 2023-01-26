@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.MockStation.강남역;
+import static subway.MockStation.서초역;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -40,7 +41,21 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("2개의 지하철역을 생성한다")
+    @Test
+    void createStationsThenFindStationsTest() {
+        // Given
+        StationApi.createStations(강남역, 서초역);
+
+        // When
+        List<String> stationNames = StationApi.getStationNames();
+
+        // Then
+        assertThat(stationNames)
+                .hasSize(2)
+                .containsAnyOf(강남역.name(), 서초역.name());
+    }
+
 
     /**
      * Given 지하철역을 생성하고

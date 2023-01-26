@@ -34,4 +34,10 @@ public class StationApi {
                 .then()
                     .extract();
     }
+
+    public static void createStations(MockStation... stations) {
+        for (MockStation station : stations) {
+            createStation(station);
+        }
+    }
 }
