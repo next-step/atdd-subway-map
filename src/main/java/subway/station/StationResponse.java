@@ -1,13 +1,17 @@
 package subway.station;
 
-public class StationResponse {
-    private final Long id;
-    private final String name;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    public StationResponse(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode(of = {"id", "name"})
+public class StationResponse {
+    private Long id;
+    private String name;
 
     public Long getId() {
         return id;
@@ -15,5 +19,12 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    public static StationResponse of(Station station) {
+        return new StationResponse(
+            station.getId(),
+            station.getName()
+        );
     }
 }

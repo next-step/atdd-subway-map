@@ -30,4 +30,12 @@ public class Station {
     public String getName() {
         return name;
     }
+
+    public void changeLine(Line line) {
+        if (this.line != null) {
+            this.line.removeStation(this);
+        }
+
+        this.line = line;
+    }
 }

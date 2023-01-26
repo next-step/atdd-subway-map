@@ -55,7 +55,7 @@ public class StationAcceptanceTest {
     void searchStations() {
         // Given
         List<String> givenStationNames = List.of("강남역", "선릉역");
-        givenStationNames.forEach(this::createStation);
+        givenStationNames.forEach(StationAcceptanceTest::createStation);
 
         // When
         ExtractableResponse<Response> response =
@@ -103,7 +103,7 @@ public class StationAcceptanceTest {
             .doesNotContain(givenStationName);
     }
 
-    private Long createStation(String name) {
+    static Long createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -121,7 +121,7 @@ public class StationAcceptanceTest {
         return response.jsonPath().getLong("id");
     }
 
-    private List<String> findAllStationNames() {
+    static List<String> findAllStationNames() {
         ExtractableResponse<Response> response =
             given()
                 .log().all()
@@ -136,7 +136,7 @@ public class StationAcceptanceTest {
     }
 
     @SuppressWarnings("unused")
-    private void deleteStation(Long id) {
+    static void deleteStation(Long id) {
         ExtractableResponse<Response> response =
             given()
                 .log().all()

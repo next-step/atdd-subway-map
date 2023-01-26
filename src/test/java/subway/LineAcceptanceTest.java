@@ -3,11 +3,16 @@ package subway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
@@ -17,7 +22,16 @@ import subway.line.LineResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LineAcceptanceTest {
+    private Long upStationId;
+    private Long downStationId;
+
+    @BeforeEach
+    void beforeEach() {
+        upStationId = StationAcceptanceTest.createStation("upStation");
+        downStationId = StationAcceptanceTest.createStation("downStation");
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -25,31 +39,31 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 생성")
     @Test
+    @Order(1)
     void createLine() {
         // Given
         final String name = "신분당선";
         final String color = "bg-red-600";
-        final Long upStationId = 1L;
-        final Long downStationId = 2L;
         final Long distance = 10L;
 
         // When
         LineResponse lineResponse = RestAssured
             .given()
-            .body(
-                LineRequest.builder()
-                    .name(name)
-                    .color(color)
-                    .upStationId(upStationId)
-                    .downStationId(downStationId)
-                    .distance(distance)
-                    .build()
-            )
+                .contentType(ContentType.JSON)
+                .body(
+                    LineRequest.builder()
+                        .name(name)
+                        .color(color)
+                        .upStationId(upStationId)
+                        .downStationId(downStationId)
+                        .distance(distance)
+                        .build()
+                )
             .when()
-            .post("/lines")
+                .post("/lines")
             .then()
-            .log().all()
-            .extract().jsonPath().get();
+                .log().all()
+                .extract().jsonPath().getObject("$", LineResponse.class);
 
         // Then
         List<LineResponse> lines = findAllLines();
@@ -66,10 +80,13 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
+    @Order(2)
     void searchLines() {
         // Given
-        LineResponse givenLine1 = createLine("1호선", "bg-blue-000", 3L, 4L, 20L);
-        LineResponse givenLine2 = createLine("2호선", "bg-green-000", 5L, 6L, 13L);
+        Long upStationId2 = StationAcceptanceTest.createStation("upStation");
+        Long downStationId2 = StationAcceptanceTest.createStation("downStation");
+        LineResponse givenLine1 = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
+        LineResponse givenLine2 = createLine("2호선", "bg-green-000", upStationId2, downStationId2, 13L);
 
         // When
         List<LineResponse> lineResponses = RestAssured
@@ -92,9 +109,10 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 조회")
     @Test
+    @Order(3)
     void searchLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", 3L, 4L, 20L);
+        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
 
         // When
         LineResponse lineResponse = RestAssured
@@ -117,9 +135,10 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 수정")
     @Test
+    @Order(4)
     void modifyLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", 3L, 4L, 20L);
+        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
         final String givenModifiedName = "다른분당선";
         final String givenModifiedColor = "bg-red-600";
 
@@ -155,9 +174,10 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 삭제")
     @Test
+    @Order(5)
     void deleteLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", 3L, 4L, 20L);
+        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
 
         // When
         ExtractableResponse<Response> response = RestAssured

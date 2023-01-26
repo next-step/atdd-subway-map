@@ -1,16 +1,31 @@
 package subway.line;
 
 import java.util.List;
-import lombok.Data;
+import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.station.StationResponse;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode(of = {"id", "name", "color"})
 public class LineResponse {
-    private final Long id;
+    private Long id;
 
-    private final String name;
+    private String name;
 
-    private final String color;
+    private String color;
 
-    private final List<StationResponse> stations;
+    private List<StationResponse> stations;
+
+    public static LineResponse of(Line line) {
+        List<StationResponse> stationResponses = line.getStations().stream()
+            .map(StationResponse::of)
+            .collect(Collectors.toList());
+
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
+    }
 }
