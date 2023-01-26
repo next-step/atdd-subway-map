@@ -28,7 +28,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", MockStation.강남역.name());
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -47,7 +47,7 @@ public class StationAcceptanceTest {
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(MockStation.강남역.name());
     }
 
     /**
