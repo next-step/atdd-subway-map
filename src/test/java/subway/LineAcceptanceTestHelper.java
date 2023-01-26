@@ -65,4 +65,18 @@ public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
         응답_코드_검증(response, HttpStatus.OK);
         return response.jsonPath().getList("name", String.class);
     }
+
+    static ExtractableResponse<Response> 노선_상세_조회_요청(final long stationId) {
+        return RestAssured
+                .given().log().all()
+                .when().get("/lines/{stationId}", stationId)
+                .then().log().all()
+                .extract();
+    }
+
+    static void 조회한_노선의_정보와_일치하는지_확인(final ExtractableResponse<Response> response, final String lineName) {
+        응답_코드_검증(response, HttpStatus.OK);
+        final String 노선_이름 = response.jsonPath().getString("name");
+        assertThat(노선_이름).isEqualTo(lineName);
+    }
 }

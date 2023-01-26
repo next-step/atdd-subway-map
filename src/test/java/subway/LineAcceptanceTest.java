@@ -66,10 +66,13 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void getLine() {
         // given
+        final Long 노선_ID = 노선_생성함("신분당선", "bg-red-600", 강남역, 양재역, 10);
 
         // when
+        final ExtractableResponse<Response> 노선_상세_조회_응답 = 노선_상세_조회_요청(노선_ID);
 
         // then
+        조회한_노선의_정보와_일치하는지_확인(노선_상세_조회_응답, "신분당선");
     }
 
     /**
