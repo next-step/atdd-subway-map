@@ -28,6 +28,6 @@ public class LineController {
 
     @GetMapping("/lines")
     public List<LineResponse> findAll() {
-        return lineService.findAllLineList();
+        return lineService.findAll();
     }
 }

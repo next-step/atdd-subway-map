@@ -30,11 +30,7 @@ public class LineService {
         return lineRepository.save(lineRequest.toEntity(upStation, downStation));
     }
 
-    public List<Line> findAll() {
-        return null;
-    }
-
-    public List<LineResponse> findAllLineList() {
+    public List<LineResponse> findAll() {
         // TODO projection 사용하도록 변경
         return lineRepository.findAllLine()
                 .stream()
