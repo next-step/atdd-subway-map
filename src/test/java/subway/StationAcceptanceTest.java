@@ -31,6 +31,9 @@ class StationAcceptanceTest {
         // when
         ExtractableResponse<Response> response = createStation("강남역");
 
+        int id = response.body().jsonPath().getInt("id");
+        System.out.println("id = " + id);
+
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
@@ -92,5 +95,29 @@ class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        // given
+        String stationName = "서울숲";
+        ExtractableResponse<Response> createResponse = createStation(stationName);
+        long stationId = createResponse.body().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> deleteResponse = RestAssured
+            .given()
+                .log().all()
+            .when()
+                .delete("/stations/{id}", stationId)
+            .then()
+                .log().all()
+            .extract();
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames = getAllStationNames();
+        assertThat(stationNames).doesNotContain(stationName);
+    }
 
 }
