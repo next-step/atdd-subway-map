@@ -1,6 +1,6 @@
 package subway;
 
-public class LineAcceptanceTest {
+public class SectionAcceptanceTest {
 
     //TODO 지하철 노선 생성
     /**
@@ -18,14 +18,14 @@ public class LineAcceptanceTest {
 
     //TODO 지하철노선 조회
     /**
-      *  Given 지하철 노선을 생성하고
+      *  Given 지하철 노선을 생성하고
       *  When 생성한 지하철 노선을 조회하면
       *  Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
     */
 
     //TODO 지하철노선 수정
     /**
-     * Given 지하철 노선을 생성하고
+     * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */

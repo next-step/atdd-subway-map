@@ -1,9 +1,11 @@
-package subway;
+package subway.domain;
+
+import subway.common.BaseEntity;
 
 import javax.persistence.*;
 
 @Entity
-public class Station {
+public class Station extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
