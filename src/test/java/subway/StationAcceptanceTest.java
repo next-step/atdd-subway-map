@@ -3,8 +3,10 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+    @Autowired
+    private StationRepository stationRepository;
+
+    @AfterEach
+    void tearDown() {
+        stationRepository.deleteAll();
+    }
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -50,12 +60,25 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("등록된 모든 지하철역을 조회한다.")
+    @Test
+    void findAllStations() {
+        // Given 2개의 지하철역을 생성하고
+        stationRepository.saveAllAndFlush(
+                List.of(new Station("강남역"), new Station("서울대입구역"))
+        );
+
+        // When 지하철역 목록을 조회하면
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+
+        // Then 2개의 지하철역을 응답받는다.
+        assertThat(stationNames).hasSize(2);
+        assertThat(stationNames).containsExactly("강남역", "서울대입구역");
+    }
 
     /**
      * Given 지하철역을 생성하고
