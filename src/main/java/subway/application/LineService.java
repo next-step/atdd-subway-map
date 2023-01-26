@@ -63,8 +63,6 @@ public class LineService {
 
     @Transactional
     public void deleteLine(final long lineId) {
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
-        lineRepository.deleteById(line.getId());
+        lineRepository.deleteById(lineId);
     }
 }
