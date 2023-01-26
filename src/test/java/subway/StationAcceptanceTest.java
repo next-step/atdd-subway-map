@@ -1,25 +1,33 @@
 package subway;
 
-import static org.assertj.core.api.Assertions.*;
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class StationAcceptanceTest {
+
+    private static final String GANGNAM_STATION = "강남역";
+    private static final String JAMSIL_STATION = "잠실역";
+    private static final String SAMSUNG_STATION = "삼성역";
+    private static final String SEOUL_FOREST_STATION = "서울숲";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -29,14 +37,14 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation("강남역");
+        ExtractableResponse<Response> response = createStation(GANGNAM_STATION);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames = getAllStationNames();
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(GANGNAM_STATION);
     }
 
     private ExtractableResponse<Response> createStation(String name) {
@@ -76,7 +84,7 @@ class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        List<String> newStationNames = List.of("1번역", "2번역");
+        List<String> newStationNames = List.of(JAMSIL_STATION, SAMSUNG_STATION);
         newStationNames.forEach(this::createStation);
 
         // when
@@ -95,8 +103,7 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String stationName = "서울숲";
-        ExtractableResponse<Response> createResponse = createStation(stationName);
+        ExtractableResponse<Response> createResponse = createStation(SEOUL_FOREST_STATION);
         long stationId = createResponse.body().jsonPath().getLong("id");
 
         // when
@@ -113,7 +120,7 @@ class StationAcceptanceTest {
 
         // then
         List<String> stationNames = getAllStationNames();
-        assertThat(stationNames).doesNotContain(stationName);
+        assertThat(stationNames).doesNotContain(SEOUL_FOREST_STATION);
     }
 
 }
