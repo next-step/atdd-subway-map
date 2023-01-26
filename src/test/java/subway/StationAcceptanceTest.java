@@ -35,11 +35,7 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청(지하철역_생성_요청_파라미터("강남역"));
 
         // then
-        응답_코드_검증(지하철역_생성_응답, HttpStatus.CREATED);
-
-        // then
-        final List<String> 지하철역_이름_목록 = 지하철역_목록_조회함();
-        assertThat(지하철역_이름_목록).containsAnyOf("강남역");
+        지하철역이_정상적으로_생성되었는지_확인(지하철역_생성_응답, "강남역");
     }
 
     /**
@@ -59,10 +55,7 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회_요청();
 
         // then
-        응답_코드_검증(지하철역_목록_조회_응답, HttpStatus.OK);
-
-        final List<String> 지하철역_이름_목록 = 지하철역_목록_조회_응답.jsonPath().getList("name", String.class);
-        assertThat(지하철역_이름_목록).containsOnly("역삼역", "선릉역");
+        지하철역들이_목록_안에_있는지_확인(지하철역_목록_조회_응답, "역삼역", "선릉역");
     }
 
     /**
@@ -81,19 +74,12 @@ public class StationAcceptanceTest {
         final ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제_요청(location);
 
         // then
-        응답_코드_검증(지하철역_삭제_응답, HttpStatus.NO_CONTENT);
-
-        final List<String> 지하철역_이름_목록 = 지하철역_목록_조회함();
-        assertThat(지하철역_이름_목록).doesNotContain("강남역");
+        지하철역이_정상적으로_삭제되었는지_확인(지하철역_삭제_응답, "강남역");
     }
 
     private Map<String, Object> 지하철역_생성_요청_파라미터(final String name) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         return params;
-    }
-
-    private void 응답_코드_검증(final ExtractableResponse<Response> response, final HttpStatus status) {
-        assertThat(response.statusCode()).isEqualTo(status.value());
     }
 }
