@@ -14,28 +14,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import subway.common.DataBaseCleanUp;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
-import subway.line.entity.Line;
-import subway.line.repository.LineRepository;
-import subway.line.service.LineService;
 import subway.station.StationAcceptanceTest;
-import subway.station.repository.StationRepository;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-	@Autowired
-	private LineRepository lineRepository;
-
-	@Autowired
-	private LineService lineService;
-
-	@Autowired
-	private StationRepository stationRepository;
+	public static final String RESOURCE_PATH = "/lines";
 
 	@Autowired
 	private DataBaseCleanUp dataBaseCleanUp;
@@ -70,19 +61,23 @@ public class LineAcceptanceTest {
 
 		//when 지하철노선 목록을 조회하면
 		List<LineResponse> findLines = requestFindAllLines();
-		List<Long> ids = findLines.stream()
-			.map(LineResponse::getId)
-			.collect(Collectors.toList());
+		List<Long> ids = filterIds(findLines);
 
 		//then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
 		assertThat(findLines).hasSize(2);
 		assertThat(ids).contains(id1, id2);
 	}
 
+	private List<Long> filterIds(List<LineResponse> findLines) {
+		return findLines.stream()
+			.map(LineResponse::getId)
+			.collect(Collectors.toList());
+	}
+
 	private List<LineResponse> requestFindAllLines() {
 		return given()
 			.accept(MediaType.APPLICATION_JSON_VALUE)
-			.when().get("/lines")
+			.when().get(RESOURCE_PATH)
 			.then()
 			.statusCode(HttpStatus.OK.value())
 			.extract()
@@ -96,18 +91,11 @@ public class LineAcceptanceTest {
 		long id = requestCreateLine(lineCreateRequest).getId();
 
 		//When 생성한 지하철 노선을 조회하면
-		LineResponse find = given()
-			.pathParam("id", id)
-			.accept(MediaType.APPLICATION_JSON_VALUE)
-			.when()
-			.get("/lines/{id}")
-			.then()
-			.statusCode(HttpStatus.OK.value())
-			.extract()
-			.as(LineResponse.class);
+		ExtractableResponse<Response> response = requestFindLine(id);
 
 		//Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-		assertRequestAndFindEquals(lineCreateRequest, id, find);
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertRequestAndFindEquals(lineCreateRequest, id, response.as(LineResponse.class));
 	}
 
 	@Test
@@ -117,22 +105,28 @@ public class LineAcceptanceTest {
 		LineUpdateRequest request = LineUpdateRequest.of(id, "newName", "newColor");
 
 		//When 생성한 지하철 노선을 수정하면
+		requestUpdateLine(request);
+
+		//Then 해당 지하철 노선 정보는 수정된다
+		ExtractableResponse<Response> response = requestFindLine(id);
+		LineResponse find = response.as(LineResponse.class);
+
+		//Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+		assertThat(find.getName()).isEqualTo(request.getName());
+		assertThat(find.getColor()).isEqualTo(request.getColor());
+	}
+
+	private void requestUpdateLine(LineUpdateRequest request) {
 		given()
 			.body(request)
 			.pathParam("id", request.getId())
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when()
-			.patch("/lines/{id}")
+			.patch(RESOURCE_PATH + "/{id}")
 			.then()
 			.statusCode(HttpStatus.OK.value())
 			.assertThat();
-
-		//Then 해당 지하철 노선 정보는 수정된다
-		Line line = lineRepository.findById(request.getId())
-			.orElseThrow(() -> new IllegalArgumentException("노선을 조회할 수 없습니다."));
-
-		assertThat(line.getName()).isEqualTo(request.getName());
-		assertThat(line.getColor()).isEqualTo(request.getColor());
 	}
 
 	@Test
@@ -141,16 +135,31 @@ public class LineAcceptanceTest {
 		long id = requestCreateLine("1호선").getId();
 
 		//When 생성한 지하철 노선을 삭제하면
+		requestDeleteLine(id);
+
+		//Then 해당 지하철 노선 정보는 삭제된다
+		ExtractableResponse<Response> response = requestFindLine(id);
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+	}
+
+	private ExtractableResponse<Response> requestFindLine(long id) {
+		return given()
+			.pathParam("id", id)
+			.accept(MediaType.APPLICATION_JSON_VALUE)
+			.when()
+			.get(RESOURCE_PATH + "/{id}")
+			.then()
+			.extract();
+	}
+
+	private void requestDeleteLine(long id) {
 		given()
 			.pathParam("id", id)
 			.when()
-			.delete("/lines/{id}")
+			.delete(RESOURCE_PATH + "/{id}")
 			.then()
 			.statusCode(HttpStatus.NO_CONTENT.value())
 			.assertThat();
-
-		//Then 해당 지하철 노선 정보는 삭제된다
-		assertThatIllegalArgumentException().isThrownBy(() -> lineService.findById(id));
 	}
 
 	private void assertRequestAndFindEquals(LineCreateRequest request, long id, LineResponse find) {
@@ -180,7 +189,7 @@ public class LineAcceptanceTest {
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.accept(MediaType.APPLICATION_JSON_VALUE)
 			.when()
-			.post("/lines")
+			.post(RESOURCE_PATH)
 			.then()
 			.statusCode(HttpStatus.CREATED.value())
 			.extract()
