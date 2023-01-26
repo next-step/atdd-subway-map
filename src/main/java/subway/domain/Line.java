@@ -5,7 +5,7 @@ import subway.common.BaseEntity;
 import javax.persistence.*;
 
 @Entity
-public class Section extends BaseEntity {
+public class Line extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,6 +1,6 @@
 package subway;
 
-public class SectionAcceptanceTest {
+public class LineAcceptanceTest {
 
     //TODO 지하철 노선 생성
     /**
