@@ -50,7 +50,27 @@ class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("두개의 지하철 역을 생성하고 지하철역 목록 조회 한다.")
+    @Test
+    void findStations() {
+        /// given
+        String station1 = GANGNAM_STATION;
+        String station2 = PANGYO_STATION;
+        createStationResponse(station1);
+        createStationResponse(station2);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> stationNames = response.jsonPath().getList("name");
+        assertThat(stationNames).contains(station1, station2);
+    }
 
     /**
      * Given 지하철역을 생성하고
