@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.service.LineService;
 
@@ -31,5 +32,10 @@ public class LineController {
     @GetMapping("/lines/{id}")
     public LineResponse findById(@PathVariable Long id) {
         return lineService.findById(id);
+    }
+
+    @PutMapping("/lines/{id}") // 부분 업데이트라면 patch가 맞지 않을까?
+    public void update(@RequestBody LineUpdateRequest request) {
+        lineService.update(request);
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.LineUpdateRequest;
+import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
 import subway.station.StationAcceptanceTest;
 import subway.station.repository.StationRepository;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -70,6 +71,16 @@ public class LineAcceptanceTest {
         assertThat(ids).contains(id1, id2);
     }
 
+    private List<LineResponse> requestFindAllLines() {
+        return given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .jsonPath().getList(".", LineResponse.class);
+    }
+
     @Test
     void 지하철_노선_조회() {
         //Given 지하철 노선을 생성하고
@@ -77,14 +88,7 @@ public class LineAcceptanceTest {
         long id = requestCreateLine(lineRequest).getId();
 
         //When 생성한 지하철 노선을 조회하면
-        LineResponse find = requestFindById(id);
-
-        //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-        assertRequestAndFindEquals(lineRequest, id, find);
-    }
-
-    private LineResponse requestFindById(long id) {
-        return given()
+        LineResponse find = given()
                 .pathParam("id", id)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -93,13 +97,34 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .as(LineResponse.class);
+
+        //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+        assertRequestAndFindEquals(lineRequest, id, find);
     }
 
     @Test
     void 지하철_노선_수정() {
-        //Given 2개의 지하철 노선을 생성하고
-        //When 지하철 노선 목록을 조회하면
-        //Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+        //Given 지하철 노선을 생성하고
+        long id = requestCreateLine("1호선").getId();
+        LineUpdateRequest request = LineUpdateRequest.of(id, "newName", "newColor");
+
+        //When 생성한 지하철 노선을 수정하면
+        given()
+                .body(request)
+                .pathParam("id", request.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put("/lines/{id}")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .assertThat();
+
+        //Then 해당 지하철 노선 정보는 수정된다
+        Line line = lineRepository.findById(request.getId())
+                .orElseThrow(() -> new IllegalArgumentException("노선을 조회할 수 없습니다."));
+
+        assertThat(line.getName()).isEqualTo(request.getName());
+        assertThat(line.getColor()).isEqualTo(request.getColor());
     }
 
     @Test
@@ -141,15 +166,5 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .as(LineResponse.class);
-    }
-
-    private List<LineResponse> requestFindAllLines() {
-        return given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .jsonPath().getList(".", LineResponse.class);
     }
 }

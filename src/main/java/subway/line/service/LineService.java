@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
+import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
 import subway.station.entity.Station;
@@ -39,5 +40,16 @@ public class LineService {
         return lineRepository.findById(id)
                 .map(LineResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("노선을 조회 할 수 없습니다. id : " + id));
+    }
+
+    @Transactional
+    public void update(LineUpdateRequest request) {
+        Line line = findByIdIfAbsenceThrwoException(request.getId());
+        line.update(request.getName(), request.getColor());
+    }
+
+    private Line findByIdIfAbsenceThrwoException(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("id로 노선을 조회 할 수 없습니다. id" + id));
     }
 }

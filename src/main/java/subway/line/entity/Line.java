@@ -35,5 +35,10 @@ public class Line {
 
     @Column(length = 20, nullable = false)
     private long distance;
+
+    public void update(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }
 
