@@ -13,6 +13,7 @@ import static io.restassured.RestAssured.when;
 
 public class StationApi {
     public static final String STATION_NAME_KEY = "name";
+    public static final String STATION_ID_KEY = "id";
 
     public static List<String> getStationNames() {
         return when()
@@ -39,5 +40,29 @@ public class StationApi {
         for (MockStation station : stations) {
             createStation(station);
         }
+    }
+
+    public static void deleteStation(Long stationId) {
+        given()
+                .pathParam(STATION_ID_KEY, stationId)
+        .when()
+                .delete("/stations/{id}");
+    }
+
+    public static Long getStationId(MockStation station) {
+        for (Map<String, Object> stationIdAndName : getStationsIdAndName()) {
+            if (station.name().equals(stationIdAndName.get(STATION_NAME_KEY))) {
+                return Long.valueOf(String.valueOf(stationIdAndName.get(STATION_ID_KEY)));
+            }
+        }
+        return null;
+    }
+
+    private static List<Map<String, Object>> getStationsIdAndName() {
+        return when()
+                    .get("/stations")
+                .then()
+                    .extract()
+                    .jsonPath().get();
     }
 }
