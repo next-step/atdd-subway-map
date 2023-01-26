@@ -29,26 +29,15 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> createStationResponse = requestCreateStation("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(createStationResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> showStationsResponse = requestShowStations();
+        List<String> stationNames = showStationsResponse.jsonPath().getList("name", String.class);
+
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -66,10 +55,10 @@ public class StationAcceptanceTest {
 
         // when
         ExtractableResponse<Response> showStationsResponse = requestShowStations();
-        List<String> stationsNames = showStationsResponse.jsonPath().getList("name", String.class);
+        List<String> stationNames = showStationsResponse.jsonPath().getList("name", String.class);
 
         // then
-        assertThat(stationsNames.size()).isEqualTo(2);
+        assertThat(stationNames.size()).isEqualTo(2);
     }
 
     /**
