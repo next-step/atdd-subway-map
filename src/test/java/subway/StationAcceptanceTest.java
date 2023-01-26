@@ -55,7 +55,26 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 조회한다.")
+    @Test
+    void fetchStations() {
+        // given
+        var stationNames = List.of("강남역", "신사역");
+        stationNames.forEach(it -> createStation(it));
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name", String.class))
+                .hasSize(2)
+                .containsExactlyElementsOf(stationNames);
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -64,4 +83,14 @@ public class StationAcceptanceTest {
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
 
+    private void createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+    }
 }
