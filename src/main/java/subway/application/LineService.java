@@ -8,6 +8,9 @@ import subway.domain.Line;
 import subway.domain.LineRepository;
 import subway.domain.Station;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 public class LineService {
@@ -34,5 +37,12 @@ public class LineService {
         );
         lineRepository.save(line);
         return new LineResponse(line);
+    }
+
+    public List<LineResponse> findAllLine() {
+        final List<Line> lines = lineRepository.findAll();
+        return lines.stream()
+                .map(LineResponse::new)
+                .collect(Collectors.toList());
     }
 }
