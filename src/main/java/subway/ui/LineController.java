@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.application.dto.LineRequest;
 import subway.application.dto.LineResponse;
+import subway.application.dto.UpdateLineRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -35,6 +36,14 @@ public class LineController {
     @GetMapping("/{lineId}")
     public ResponseEntity<LineResponse> showLine(@PathVariable final Long lineId) {
         final LineResponse lineResponse = lineService.findLineById(lineId);
+        return ResponseEntity.ok(lineResponse);
+    }
+
+    @PutMapping("/{lineId}")
+    public ResponseEntity<LineResponse> updateLine(
+            @PathVariable final Long lineId,
+            @RequestBody final UpdateLineRequest updateLineRequest) {
+        final LineResponse lineResponse = lineService.updateLine(lineId, updateLineRequest);
         return ResponseEntity.ok(lineResponse);
     }
 }

@@ -53,7 +53,11 @@ public class Line {
     }
 
     public void update(final String name, final String color) {
-        this.name = name;
-        this.color = color;
+        if (name != null) {
+            this.name = name;
+        }
+        if (color != null) {
+            this.color = color;
+        }
     }
 }
