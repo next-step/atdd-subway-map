@@ -4,9 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class StationAcceptanceTest {
 
     private static final String GANGNAM_STATION = "강남역";
@@ -107,7 +104,17 @@ class StationAcceptanceTest {
         long stationId = createResponse.body().jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> deleteResponse = RestAssured
+        ExtractableResponse<Response> deleteResponse = deleteStation(stationId);
+
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames = getAllStationNames();
+        assertThat(stationNames).doesNotContain(SEOUL_FOREST_STATION);
+    }
+
+    private ExtractableResponse<Response> deleteStation(long stationId) {
+        return RestAssured
             .given()
                 .log().all()
             .when()
@@ -115,12 +122,6 @@ class StationAcceptanceTest {
             .then()
                 .log().all()
             .extract();
-
-        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-        // then
-        List<String> stationNames = getAllStationNames();
-        assertThat(stationNames).doesNotContain(SEOUL_FOREST_STATION);
     }
 
 }
