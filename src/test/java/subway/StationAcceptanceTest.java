@@ -17,7 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
+
+    private static final String GANGNAM_STATION = "강남역";
+    private static final String PANGYO_STATION = "판교역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -27,16 +31,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStationResponse(GANGNAM_STATION);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -47,7 +42,7 @@ public class StationAcceptanceTest {
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(GANGNAM_STATION);
     }
 
     /**
@@ -64,4 +59,15 @@ public class StationAcceptanceTest {
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
 
+    //createStation
+    private ExtractableResponse<Response> createStationResponse(String station) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", station);
+        return RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+    }
 }
