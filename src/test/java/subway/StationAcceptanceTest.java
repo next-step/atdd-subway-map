@@ -2,28 +2,13 @@ package subway;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static subway.StationAcceptanceTestHelper.*;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-
-    @Autowired
-    private DatabaseTruncator databaseTruncator;
-
-    @BeforeEach
-    void setUp() {
-        databaseTruncator.execute();
-    }
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -34,7 +19,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        final ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청(지하철역_생성_요청_파라미터("강남역"));
+        final ExtractableResponse<Response> 지하철역_생성_응답 = 지하철역_생성_요청("강남역");
 
         // then
         지하철역이_정상적으로_생성되었는지_확인(지하철역_생성_응답, "강남역");
@@ -49,8 +34,8 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        지하철역_생성함(지하철역_생성_요청_파라미터("역삼역"));
-        지하철역_생성함(지하철역_생성_요청_파라미터("선릉역"));
+        지하철역_생성함("역삼역");
+        지하철역_생성함("선릉역");
 
         // when
         final ExtractableResponse<Response> 지하철역_목록_조회_응답 = 지하철역_목록_조회_요청();
@@ -68,18 +53,12 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        final String location = 지하철역_생성함(지하철역_생성_요청_파라미터("강남역"));
+        final Long 강남역_ID = 지하철역_생성함("강남역");
 
         // when
-        final ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제_요청(location);
+        final ExtractableResponse<Response> 지하철역_삭제_응답 = 지하철역_삭제_요청(강남역_ID);
 
         // then
         지하철역이_정상적으로_삭제되었는지_확인(지하철역_삭제_응답, "강남역");
-    }
-
-    private Map<String, Object> 지하철역_생성_요청_파라미터(final String name) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        return params;
     }
 }

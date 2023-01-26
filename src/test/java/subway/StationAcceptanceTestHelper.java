@@ -6,14 +6,18 @@ import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StationAcceptanceTestHelper {
+public class StationAcceptanceTestHelper extends AcceptanceTestHelper{
 
-    static ExtractableResponse<Response> 지하철역_생성_요청(final Map<String, Object> params) {
+    static ExtractableResponse<Response> 지하철역_생성_요청(final String name) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -29,10 +33,10 @@ public class StationAcceptanceTestHelper {
         assertThat(지하철역_이름_목록).containsAnyOf(stationName);
     }
 
-    static String 지하철역_생성함(final Map<String, Object> params) {
-        final ExtractableResponse<Response> response = 지하철역_생성_요청(params);
+    static Long 지하철역_생성함(final String name) {
+        final ExtractableResponse<Response> response = 지하철역_생성_요청(name);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response.header("location");
+        return response.jsonPath().getLong("id");
     }
 
     static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
@@ -42,11 +46,11 @@ public class StationAcceptanceTestHelper {
                 .extract();
     }
 
-    static void 지하철역들이_목록_안에_있는지_확인(final ExtractableResponse<Response> response, final String... stations) {
+    static void 지하철역들이_목록_안에_있는지_확인(final ExtractableResponse<Response> response, final String... stationNames) {
         응답_코드_검증(response, HttpStatus.OK);
 
         final List<String> 지하철역_이름_목록 = response.jsonPath().getList("name", String.class);
-        assertThat(지하철역_이름_목록).containsOnly(stations);
+        assertThat(지하철역_이름_목록).containsOnly(stationNames);
     }
 
     static List<String> 지하철역_목록_조회함() {
@@ -55,10 +59,10 @@ public class StationAcceptanceTestHelper {
         return response.jsonPath().getList("name", String.class);
     }
 
-    static ExtractableResponse<Response> 지하철역_삭제_요청(final String location) {
+    static ExtractableResponse<Response> 지하철역_삭제_요청(final Long stationId) {
         return RestAssured
                 .given().log().all()
-                .when().delete(location)
+                .when().delete("/stations/{stationId}", stationId)
                 .then().log().all()
                 .extract();
     }
@@ -68,9 +72,5 @@ public class StationAcceptanceTestHelper {
 
         final List<String> 지하철역_이름_목록 = 지하철역_목록_조회함();
         assertThat(지하철역_이름_목록).doesNotContain(stationName);
-    }
-
-    private static void 응답_코드_검증(final ExtractableResponse<Response> response, final HttpStatus status) {
-        assertThat(response.statusCode()).isEqualTo(status.value());
     }
 }
