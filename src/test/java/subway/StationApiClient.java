@@ -26,4 +26,13 @@ public class StationApiClient {
                 .then().log().all()
                 .extract();
     }
+
+    static ExtractableResponse<Response> requestDeleteStation(Long id) {
+        final String ENDPOINT = ENDPOINT_STATIONS + "/" + id.toString();
+
+        return RestAssured.given().log().all()
+                .when().delete(ENDPOINT)
+                .then().log().all()
+                .extract();
+    }
 }
