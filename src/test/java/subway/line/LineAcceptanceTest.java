@@ -50,19 +50,14 @@ public class LineAcceptanceTest {
         LineResponse created = lineList.get(0);
 
         assertThat(lineList).hasSize(1);
-        assertThat(created.getId()).isEqualTo(id);
-        assertThat(created.getName()).isEqualTo(lineRequest.getName());
-        assertThat(created.getColor()).isEqualTo(lineRequest.getColor());
-        assertThat(created.getStations()).hasSize(2);
-        assertThat(created.getStations().get(0).getId()).isEqualTo(lineRequest.getUpStationId());
-        assertThat(created.getStations().get(1).getId()).isEqualTo(lineRequest.getDownStationId());
+        assertRequestAndFindEquals(lineRequest, id, created);
     }
 
     @Test
     void 지하철_노선_목록_조회() {
         //given 2개의 지하철노선을 생성하고
-        long id1 = requestCreateLine(createLineRequestFixture("1호선")).getId();
-        long id2 = requestCreateLine(createLineRequestFixture("2호선")).getId();
+        long id1 = requestCreateLine("1호선").getId();
+        long id2 = requestCreateLine("2호선").getId();
 
         //when 지하철노선 목록을 조회하면
         List<LineResponse> findLines = requestFindAllLines();
@@ -75,32 +70,25 @@ public class LineAcceptanceTest {
         assertThat(ids).contains(id1, id2);
     }
 
-    private LineRequest createLineRequestFixture(String name) {
-        String color = "bg-red-600";
-        long upStationId = StationAcceptanceTest.createStation(name + "-상행역");
-        long downStationId = StationAcceptanceTest.createStation(name + "-하행역");
-        long distance = 10;
-        return new LineRequest(name, color, upStationId, downStationId, distance);
-    }
-
-    private LineResponse requestCreateLine(LineRequest lineRequest) {
-        return given()
-                .body(lineRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .as(LineResponse.class);
-    }
-
     @Test
     void 지하철_노선_조회() {
         //Given 지하철 노선을 생성하고
-        //createLine("강남역");
+        LineRequest lineRequest = createLineRequestFixture("1호선");
+        long id = requestCreateLine(lineRequest).getId();
+
         //When 생성한 지하철 노선을 조회하면
+        LineResponse find = given()
+                .pathParam("id", id)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get("/stations/{id}")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(LineResponse.class);
+
         //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+        assertRequestAndFindEquals(lineRequest, id, find);
     }
 
     @Test
@@ -117,9 +105,46 @@ public class LineAcceptanceTest {
         //Then 해당 지하철 노선 정보는 삭제된다
     }
 
-    private List<LineResponse> requestFindAllLines() {
-        return when().get("/lines")
+    private void assertRequestAndFindEquals(LineRequest request, long id, LineResponse find) {
+        assertThat(find.getId()).isEqualTo(id);
+        assertThat(find.getName()).isEqualTo(request.getName());
+        assertThat(find.getColor()).isEqualTo(request.getColor());
+        assertThat(find.getStations()).hasSize(2);
+        assertThat(find.getStations().get(0).getId()).isEqualTo(request.getUpStationId());
+        assertThat(find.getStations().get(1).getId()).isEqualTo(request.getDownStationId());
+    }
+
+    private LineRequest createLineRequestFixture(String name) {
+        String color = "bg-red-600";
+        long upStationId = StationAcceptanceTest.createStation(name + "-상행역");
+        long downStationId = StationAcceptanceTest.createStation(name + "-하행역");
+        long distance = 10;
+        return new LineRequest(name, color, upStationId, downStationId, distance);
+    }
+
+    private LineResponse requestCreateLine(String name) {
+        return requestCreateLine(createLineRequestFixture(name));
+    }
+
+    private LineResponse requestCreateLine(LineRequest lineRequest) {
+        return given()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract()
+                .as(LineResponse.class);
+    }
+
+    private List<LineResponse> requestFindAllLines() {
+        return given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines")
+                .then()
+                .statusCode(HttpStatus.OK.value())
                 .extract()
                 .jsonPath().getList(".", LineResponse.class);
     }
