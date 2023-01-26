@@ -80,11 +80,28 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsExactly("강남역", "서울대입구역");
     }
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("등록된 지하철을 삭제하면 삭제된 역은 조회할 수 없다.")
+    @Test
+    void deleteAllStations() {
+        // Given 지하철역을 생성하고
+        Station 강남역 = stationRepository.saveAndFlush(new Station("강남역"));
+        Station 서울대입구역 = stationRepository.saveAndFlush(new Station("서울대입구역"));
+        Long 강남역_아이디 = 강남역.getId();
+        Long 서울대입구역_아이디 = 서울대입구역.getId();
 
+        // When 그 지하철역을 삭제하면
+        RestAssured.given().log().all()
+                .when().delete(String.format("/stations/%s", 강남역_아이디))
+                .then().log().all();
+
+        // Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+        List<Long> stationIds =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("id", Long.class);
+
+        assertThat(stationIds).containsExactly(서울대입구역_아이디);
+        assertThat(stationIds).doesNotContain(강남역_아이디);
+    }
 }
