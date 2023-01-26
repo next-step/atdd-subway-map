@@ -45,4 +45,10 @@ public class LineService {
                 .map(LineResponse::new)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLineById(final long lineId) {
+        final Line line = lineRepository.findById(lineId)
+                .orElseThrow(IllegalArgumentException::new);
+        return new LineResponse(line);
+    }
 }
