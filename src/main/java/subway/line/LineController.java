@@ -3,7 +3,7 @@ package subway.line;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.line.dto.LineRequest;
+import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
@@ -19,8 +19,8 @@ public class LineController {
     private final LineService lineService;
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> save(@RequestBody LineRequest lineRequest) {
-        Line saved = lineService.save(lineRequest);
+    public ResponseEntity<LineResponse> save(@RequestBody LineCreateRequest lineCreateRequest) {
+        Line saved = lineService.save(lineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + saved.getId())).body(LineResponse.from(saved));
     }
 

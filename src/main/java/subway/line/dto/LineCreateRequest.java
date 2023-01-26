@@ -11,7 +11,7 @@ import subway.station.entity.Station;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LineRequest {
+public class LineCreateRequest {
 
     private String name;
     private String color;

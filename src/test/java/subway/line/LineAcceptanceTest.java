@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.line.dto.LineRequest;
+import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
@@ -40,10 +40,10 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선을_생성한다() {
         //given
-        LineRequest lineRequest = createLineRequestFixture("신분당선");
+        LineCreateRequest lineCreateRequest = createLineRequestFixture("신분당선");
 
         // when 지하철 노선을 생성하면
-        long id = requestCreateLine(lineRequest).getId();
+        long id = requestCreateLine(lineCreateRequest).getId();
 
         // then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
         List<LineResponse> lineList = requestFindAllLines();
@@ -51,7 +51,7 @@ public class LineAcceptanceTest {
         LineResponse created = lineList.get(0);
 
         assertThat(lineList).hasSize(1);
-        assertRequestAndFindEquals(lineRequest, id, created);
+        assertRequestAndFindEquals(lineCreateRequest, id, created);
     }
 
     @Test
@@ -84,8 +84,8 @@ public class LineAcceptanceTest {
     @Test
     void 지하철_노선_조회() {
         //Given 지하철 노선을 생성하고
-        LineRequest lineRequest = createLineRequestFixture("1호선");
-        long id = requestCreateLine(lineRequest).getId();
+        LineCreateRequest lineCreateRequest = createLineRequestFixture("1호선");
+        long id = requestCreateLine(lineCreateRequest).getId();
 
         //When 생성한 지하철 노선을 조회하면
         LineResponse find = given()
@@ -99,7 +99,7 @@ public class LineAcceptanceTest {
                 .as(LineResponse.class);
 
         //Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
-        assertRequestAndFindEquals(lineRequest, id, find);
+        assertRequestAndFindEquals(lineCreateRequest, id, find);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class LineAcceptanceTest {
         //Then 해당 지하철 노선 정보는 삭제된다
     }
 
-    private void assertRequestAndFindEquals(LineRequest request, long id, LineResponse find) {
+    private void assertRequestAndFindEquals(LineCreateRequest request, long id, LineResponse find) {
         assertThat(find.getId()).isEqualTo(id);
         assertThat(find.getName()).isEqualTo(request.getName());
         assertThat(find.getColor()).isEqualTo(request.getColor());
@@ -143,21 +143,21 @@ public class LineAcceptanceTest {
         assertThat(find.getStations().get(1).getId()).isEqualTo(request.getDownStationId());
     }
 
-    private LineRequest createLineRequestFixture(String name) {
+    private LineCreateRequest createLineRequestFixture(String name) {
         String color = "bg-red-600";
         long upStationId = StationAcceptanceTest.createStation(name + "-상행역");
         long downStationId = StationAcceptanceTest.createStation(name + "-하행역");
         long distance = 10;
-        return new LineRequest(name, color, upStationId, downStationId, distance);
+        return new LineCreateRequest(name, color, upStationId, downStationId, distance);
     }
 
     private LineResponse requestCreateLine(String name) {
         return requestCreateLine(createLineRequestFixture(name));
     }
 
-    private LineResponse requestCreateLine(LineRequest lineRequest) {
+    private LineResponse requestCreateLine(LineCreateRequest lineCreateRequest) {
         return given()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()

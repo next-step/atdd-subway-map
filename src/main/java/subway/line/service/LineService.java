@@ -3,7 +3,7 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.dto.LineRequest;
+import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
@@ -23,10 +23,10 @@ public class LineService {
     private final LineRepository lineRepository;
 
     @Transactional
-    public Line save(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId()).orElseThrow();
-        return lineRepository.save(lineRequest.toEntity(upStation, downStation));
+    public Line save(LineCreateRequest lineCreateRequest) {
+        Station upStation = stationRepository.findById(lineCreateRequest.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(lineCreateRequest.getDownStationId()).orElseThrow();
+        return lineRepository.save(lineCreateRequest.toEntity(upStation, downStation));
     }
 
     public List<LineResponse> findAll() {
