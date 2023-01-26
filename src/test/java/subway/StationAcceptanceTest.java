@@ -57,12 +57,7 @@ public class StationAcceptanceTest {
         createSubwayStation(station2);
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = getAllStationsResponse();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -99,12 +94,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        ExtractableResponse<Response> stationsResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> stationsResponse = getAllStationsResponse();
 
         List<String> names = stationsResponse.jsonPath().getList("name", String.class);
         assertThat(names).containsOnly("양재역");
@@ -117,17 +107,27 @@ public class StationAcceptanceTest {
      * @return
      */
     private static ExtractableResponse<Response> createSubwayStation(String stationName) {
-        // when
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-        return response;
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    /**
+     * 전체 지하철역 조회 메서드
+     * @return
+     */
+    private static ExtractableResponse<Response> getAllStationsResponse() {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
     }
 }
