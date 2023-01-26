@@ -36,7 +36,7 @@ class DatabaseTruncator implements InitializingBean {
             em.flush();
             em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
             tableNames.forEach(tableName -> {
-                em.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
+                em.createNativeQuery("TRUNCATE TABLE " + tableName + " RESTART IDENTITY").executeUpdate();
             });
             em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
         } catch (Exception e) {
