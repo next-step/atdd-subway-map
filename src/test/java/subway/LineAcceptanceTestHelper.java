@@ -106,4 +106,19 @@ public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
         final String 노선_이름 = 노선_상세_조회함(lineId).jsonPath().getString("name");
         assertThat(노선_이름).isEqualTo(lineName);
     }
+
+    static ExtractableResponse<Response> 노선_삭제_요청(final long lineId) {
+        return RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    static void 노선이_정상적으로_삭제되었는지_확인(final ExtractableResponse<Response> response, final String lineName) {
+        응답_코드_검증(response, HttpStatus.NO_CONTENT);
+
+        final List<String> 노선_이름_목록 = 노선_목록_조회함();
+        assertThat(노선_이름_목록).doesNotContain(lineName);
+    }
 }

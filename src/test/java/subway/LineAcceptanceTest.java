@@ -102,9 +102,12 @@ public class LineAcceptanceTest extends AcceptanceTest {
     @Test
     void deleteLine() {
         // given
+        final Long 노선_ID = 노선_생성함("신분당선", "bg-red-600", 강남역, 양재역, 10);
 
         // when
+        final ExtractableResponse<Response> 노선_삭제_응답 = 노선_삭제_요청(노선_ID);
 
         // then
+        노선이_정상적으로_삭제되었는지_확인(노선_삭제_응답, "신분당선");
     }
 }
