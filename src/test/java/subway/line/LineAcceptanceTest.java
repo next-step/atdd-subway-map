@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import subway.common.DataBaseCleanUp;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
@@ -36,10 +37,12 @@ public class LineAcceptanceTest {
 	@Autowired
 	private StationRepository stationRepository;
 
-	@BeforeEach
-	void reset() {
-		lineRepository.deleteAll();
-		stationRepository.deleteAll();
+	@Autowired
+	private DataBaseCleanUp dataBaseCleanUp;
+
+	@AfterEach
+	void tearDown() {
+		dataBaseCleanUp.cleanUp();
 	}
 
 	@Test
