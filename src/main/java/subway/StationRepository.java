@@ -10,7 +10,7 @@ public interface StationRepository extends JpaRepository<Station, Long> {
     @Transactional
     @Modifying
     @Query(
-            value = "TRUNCATE TABLE Station",
+            value = "TRUNCATE TABLE Station RESTART IDENTITY",
             nativeQuery = true
     )
     void truncateTableStation();
