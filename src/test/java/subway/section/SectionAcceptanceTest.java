@@ -1,20 +1,67 @@
 package subway.section;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import subway.line.LineAcceptanceTest;
+import subway.line.dto.LineCreateRequest;
+import subway.line.dto.LineResponse;
+import subway.station.StationAcceptanceTest;
+import subway.station.dto.StationResponse;
+import subway.station.repository.StationRepository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static subway.line.LineAcceptanceTest.*;
+import static subway.station.StationAcceptanceTest.*;
 
 @DisplayName("지하철 노선 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
 
+    @Autowired
+    private StationRepository stationRepository;
+
     /**
-     * Given : 3개의 역, 1개의 노선을 등록
+     * Given : 1개의 역, 1개의 노선을 등록
      * When  : 구간을 추가 하면
-     * Then  : 추가한 구간이 조회 된다
+     * Then  : 구간을 추가 된다
      */
     @Test
     void 지하철_노선_구간_등록_성공() {
+        //given
+        Long newStationId = createStation("역1");
+        LineCreateRequest oldLineCreateRequest = createLineRequestFixture("노선1");
+        LineResponse lineResponse = requestCreateLine(oldLineCreateRequest);
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("downStationId", newStationId);
+        paramMap.put("upStationId", oldLineCreateRequest.getDownStationId());
+        paramMap.put("distance", 10);
+
+        //when
+        ExtractableResponse<Response> response = given()
+                .pathParam("lineId", lineResponse.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(paramMap)
+                .when()
+                .post(RESOURCE_PATH + "/{lineId}/sections")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     /**

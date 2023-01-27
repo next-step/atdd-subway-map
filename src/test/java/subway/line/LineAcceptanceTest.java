@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.thirdparty.publicsuffix.PublicSuffixType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -142,7 +143,7 @@ public class LineAcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 	}
 
-	private ExtractableResponse<Response> requestFindLine(long id) {
+	public static ExtractableResponse<Response> requestFindLine(long id) {
 		return given()
 			.pathParam("id", id)
 			.accept(MediaType.APPLICATION_JSON_VALUE)
@@ -171,7 +172,11 @@ public class LineAcceptanceTest {
 		assertThat(find.getStations().get(1).getId()).isEqualTo(request.getDownStationId());
 	}
 
-	private LineCreateRequest createLineRequestFixture(String name) {
+	public static LineResponse requestCreateLine(String name) {
+		return requestCreateLine(createLineRequestFixture(name));
+	}
+
+	public static LineCreateRequest createLineRequestFixture(String name) {
 		String color = "bg-red-600";
 		long upStationId = StationAcceptanceTest.createStation(name + "-상행역");
 		long downStationId = StationAcceptanceTest.createStation(name + "-하행역");
@@ -179,11 +184,7 @@ public class LineAcceptanceTest {
 		return new LineCreateRequest(name, color, upStationId, downStationId, distance);
 	}
 
-	private LineResponse requestCreateLine(String name) {
-		return requestCreateLine(createLineRequestFixture(name));
-	}
-
-	private LineResponse requestCreateLine(LineCreateRequest lineCreateRequest) {
+	public static LineResponse requestCreateLine(LineCreateRequest lineCreateRequest) {
 		return given()
 			.body(lineCreateRequest)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
