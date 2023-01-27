@@ -36,20 +36,14 @@ public class StationAcceptanceTest {
         Map<String, String> 강남역_데이터 = new HashMap<>();
         강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
 
-        ExtractableResponse<Response> response =
-                given().log().all()
-                        .body(강남역_데이터)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(REQUEST_STATION_URL)
-                .then().log().all()
-                    .extract();
+        ExtractableResponse<Response> response = 지하철역_생성_요청_API(강남역_데이터);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
-                    .jsonPath().getList(역_이름.필드명(), String.class);
+                .jsonPath().getList(역_이름.필드명(), String.class);
 
         assertThat(등록된_지하철역_이름_목록).containsAnyOf(강남역.역_이름());
     }
@@ -104,13 +98,13 @@ public class StationAcceptanceTest {
     }
 
 
-    private static void 지하철역_생성_요청_API(Map<String, String> requestBody) {
-        given().log().all()
-                .body(requestBody)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post(REQUEST_STATION_URL)
-        .then().log().all()
-            .extract();
+    private static ExtractableResponse<Response> 지하철역_생성_요청_API(Map<String, String> requestBody) {
+        return given().log().all()
+                    .body(requestBody)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(REQUEST_STATION_URL)
+                .then().log().all()
+                    .extract();
     }
 
     private static void 지하철역_삭제_요청_API(Long stationId) {
