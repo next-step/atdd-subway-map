@@ -61,7 +61,8 @@ public class StationAcceptanceTest {
 
 		// when
 		ExtractableResponse<Response> response = 지하철역을_조회한다();
-		List<StationResponse> stationResponses = response.as(new TypeRef<>() {});
+		List<StationResponse> stationResponses = response.as(new TypeRef<>() {
+		});
 
 		// then
 		assertAll(
@@ -70,15 +71,29 @@ public class StationAcceptanceTest {
 		);
 	}
 
-
-	// TODO: 지하철역 제거 인수 테스트 메서드 생성
 	/**
 	 * Given 지하철역을 생성하고
 	 * When 그 지하철역을 삭제하면
 	 * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
 	 */
+	// TODO: 지하철역 제거 인수 테스트 메서드 생성
+	@DisplayName("지하철역 1개역 삭제에 성공한다")
+	@Test
+	void 지하철역_1개역_삭제에_성공한다() {
+		//given
+		Long targetId = 지하철역_생성(STATION_NAME_1)
+			.as(new TypeRef<StationResponse>() {})
+			.getId();
 
+		//when
+		지하철역_삭제(targetId);
 
+		// then
+		List<StationResponse> stationResponses = 지하철역을_조회한다()
+			.as(new TypeRef<>() {});
+
+		assertThat(stationResponses).hasSize(0);
+	}
 
 	private ExtractableResponse<Response> 지하철역_생성(String name) {
 		StationRequest stationRequest = StationRequest.builder()
@@ -88,7 +103,7 @@ public class StationAcceptanceTest {
 		//@formatter:off
         return given()
                 .log().all()
-            .body(stationRequest)
+            	.body(stationRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
                 .post("/stations")
@@ -103,6 +118,18 @@ public class StationAcceptanceTest {
 				.log().all()
 			.when()
 				.get(ROOT_PATH)
+			.then()
+				.log().all()
+			.extract();
+	}
+
+	private ExtractableResponse<Response> 지하철역_삭제(Long targetId) {
+		//@formatter:off
+		return given()
+				.log().all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.when()
+				.delete(ROOT_PATH + "/{id}", targetId)
 			.then()
 				.log().all()
 			.extract();
