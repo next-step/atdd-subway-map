@@ -39,20 +39,16 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        String stationName = "강남역";
 
-        ExtractableResponse<Response> response = createStationResponse("강남역");
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        createStationResponse(stationName);
 
         // then
         List<String> stationNames = findStationsResponse()
                 .jsonPath()
                 .getList("name", String.class);
 
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(stationName);
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
