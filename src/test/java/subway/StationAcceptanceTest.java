@@ -68,7 +68,7 @@ public class StationAcceptanceTest {
                 .getList("name", String.class);
 
         Assertions.assertAll(
-                () -> assertThat(stationNames.size()).isEqualTo(2),
+                () -> assertThat(stationNames.size()).isEqualTo(expectedStationNames.length),
                 () -> assertThat(stationNames).contains(expectedStationNames)
         );
     }
