@@ -28,9 +28,7 @@ public class LineService {
 
         final Station upStation = stationService.findById(lineRequest.getUpStationId());
         final Station downStation = stationService.findById(lineRequest.getDownStationId());
-        final Line saveLine = lineRepository.save(lineRequest.toEntity());
-        saveLine.addLine(upStation);
-        saveLine.addLine(downStation);
+        final Line saveLine = lineRepository.save(lineRequest.toEntity(upStation, downStation));
 
         return LineResponse.createResponse(saveLine);
     }
