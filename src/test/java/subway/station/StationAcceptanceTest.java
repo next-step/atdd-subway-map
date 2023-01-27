@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -28,7 +30,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStation() {
+    void Should_지하철역을_생성하면_Then_지하철역이_생성된다() {
         // when
         var 강남역_request = new StationRequest() {{
             setName("강남역");
@@ -52,7 +54,7 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void showStations() {
+    void Should_지하철역을_생성하고_When_지하철역을_조회하면_Then_지하철역이_조회된다() {
         //given
         var 강남역_request = new StationRequest() {{
             setName("강남역");
@@ -81,7 +83,7 @@ public class StationAcceptanceTest {
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void deleteStation() {
+    void Should_지하철역을_삭제하면_Then_지하철역이_삭제된다() {
         // given
         var 강남역_request = new StationRequest() {{
             setName("강남역");
