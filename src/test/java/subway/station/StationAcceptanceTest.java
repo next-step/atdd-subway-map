@@ -33,15 +33,15 @@ public class StationAcceptanceTest {
         var 강남역_request = new StationRequest() {{
             setName("강남역");
         }};
-        ExtractableResponse<Response> response = 지하철역을_생성한다(강남역_request);
+        ExtractableResponse<Response> 강남역_response = 지하철역을_생성한다(강남역_request);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역이_정상적으로_생성(강남역_response);
 
         // then
         ExtractableResponse<Response> stationsResponse = 지하철역을_조회한다();
-        List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = 지하철역이_정상적으로_조회(stationsResponse);
+        assertThat(stationNames).containsExactlyInAnyOrderElementsOf(List.of(강남역_request.getName()));
     }
 
     /**
@@ -58,21 +58,19 @@ public class StationAcceptanceTest {
             setName("강남역");
         }};
         ExtractableResponse<Response> 강남역_response = 지하철역을_생성한다(강남역_request);
-        assertThat(강남역_response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역이_정상적으로_생성(강남역_response);
         var 역삼역_request = new StationRequest() {{
             setName("역삼역");
         }};
         ExtractableResponse<Response> 역삼역_response = 지하철역을_생성한다(역삼역_request);
-
-        assertThat(역삼역_response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역이_정상적으로_생성(역삼역_response);
 
         // when
         ExtractableResponse<Response> stationsResponse = 지하철역을_조회한다();
 
         // then
-        assertThat(stationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsExactlyInAnyOrderElementsOf(List.of("강남역", "역삼역"));
+        List<String> stationNames = 지하철역이_정상적으로_조회(stationsResponse);
+        assertThat(stationNames).containsExactlyInAnyOrderElementsOf(List.of(강남역_request.getName(), 역삼역_request.getName()));
     }
 
     /**
@@ -89,18 +87,18 @@ public class StationAcceptanceTest {
             setName("강남역");
         }};
         ExtractableResponse<Response> 강남역_response = 지하철역을_생성한다(강남역_request);
-
-        assertThat(강남역_response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        지하철역이_정상적으로_생성(강남역_response);
 
         var 강남역Id = 강남역_response.response().as(StationResponse.class).getId();
 
         //when
         ExtractableResponse<Response> response = 지하철역을_삭제한다(강남역Id);
+        지하철역이_정상적으로_삭제(response);
 
         // then
         ExtractableResponse<Response> stationsResponse = 지하철역을_조회한다();
-        List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
-        assertThat(stationNames).doesNotContain("강남역");
+        List<String> stationNames = 지하철역이_정상적으로_조회(stationsResponse);
+        assertThat(stationNames).doesNotContain(강남역_request.getName());
     }
 
     private ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
@@ -126,5 +124,18 @@ public class StationAcceptanceTest {
                 .when().delete("/stations/" + stationId)
                 .then().log().all()
                 .extract();
+    }
+
+    private void 지하철역이_정상적으로_생성(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    private List<String> 지하철역이_정상적으로_조회(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response.jsonPath().getList("name", String.class);
+    }
+
+    private void 지하철역이_정상적으로_삭제(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
