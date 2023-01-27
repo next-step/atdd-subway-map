@@ -10,6 +10,8 @@ import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,7 +32,7 @@ public class LineService {
         Station downStation = findStation(lineRequest.getDownStationId());
 
         Line newLine = new Line(
-                  lineRequest.getName()
+                lineRequest.getName()
                 , lineRequest.getColor()
                 , upStation
                 , downStation
@@ -43,5 +45,35 @@ public class LineService {
 
     private Station findStation(Long stationId) {
         return stationRepository.findById(stationId).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Transactional
+    public LineResponse findLine(Long id) {
+        return lineRepository.findById(id)
+                .map(LineResponse::of)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional
+    public void updateLine(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+
+        line.changeColor(request.getColor());
+        line.changeName(request.getName());
+
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 }
