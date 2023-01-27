@@ -86,13 +86,16 @@ public class StationAcceptanceTest extends AcceptanceTest {
 			}).getId();
 
 		//when
-		지하철역_삭제(targetId);
+		ExtractableResponse<Response> deleteResponse = 지하철역_삭제(targetId);
 
 		// then
 		List<StationResponse> stationResponses = 지하철역을_조회한다().as(new TypeRef<>() {
 		});
 
-		assertThat(stationResponses).hasSize(0);
+		assertAll(
+			() -> assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
+			() -> assertThat(stationResponses).hasSize(0)
+		);
 	}
 
 	private ExtractableResponse<Response> 지하철역_생성(String name) {
