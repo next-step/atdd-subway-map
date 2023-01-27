@@ -33,15 +33,14 @@ class StationAcceptanceTest {
         // when
         ExtractableResponse<Response> response = createStationResponse(GANGNAM_STATION);
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
         List<String> stationNames =
                 RestAssured.given().log().all()
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(stationNames).containsAnyOf(GANGNAM_STATION);
     }
 
@@ -54,10 +53,8 @@ class StationAcceptanceTest {
     @Test
     void findStations() {
         /// given
-        String station1 = GANGNAM_STATION;
-        String station2 = PANGYO_STATION;
-        createStationResponse(station1);
-        createStationResponse(station2);
+        createStationResponse(GANGNAM_STATION);
+        createStationResponse(PANGYO_STATION);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -69,7 +66,7 @@ class StationAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> stationNames = response.jsonPath().getList("name");
-        assertThat(stationNames).contains(station1, station2);
+        assertThat(stationNames).contains(GANGNAM_STATION, PANGYO_STATION);
     }
 
     /**
