@@ -35,14 +35,12 @@ public class StationAcceptanceTest extends AcceptanceTest {
 		ExtractableResponse<Response> response = 지하철역_생성(STATION_NAME_1);
 
 		// then
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-		// then
 		List<String> stationNames = requestApi(
 			Method.GET,
 			ROOT_PATH
 		).jsonPath().getList("name", String.class);
 
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(stationNames).containsAnyOf(STATION_NAME_1);
 	}
 
