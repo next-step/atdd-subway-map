@@ -1,7 +1,7 @@
 package subway;
 
-import subway.line.model.Line;
-import subway.station.model.Station;
+import subway.model.Line;
+import subway.model.Station;
 
 public class UnitTestConstant {
     public static final Station GANG_NAM_STATION = new Station("강남역");

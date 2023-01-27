@@ -1,16 +1,13 @@
-package subway.line.service;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.dto.LineRequest;
-import subway.line.dto.LineResponse;
-import subway.line.exception.LineNotFoundException;
-import subway.line.model.Line;
-import subway.line.repository.LineRepository;
-import subway.station.dto.StationResponse;
-import subway.station.exception.StationNotFoundException;
-import subway.station.model.Station;
-import subway.station.repository.StationRepository;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.exception.LineNotFoundException;
+import subway.model.Line;
+import subway.model.Station;
+import subway.repository.LineRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,19 +16,17 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
     public LineResponse createLine(LineRequest lineRequest) {
-        Station upStation = stationRepository.findById(lineRequest.getUpStationId())
-                .orElseThrow(StationNotFoundException::new);
-        Station downStation = stationRepository.findById(lineRequest.getDownStationId())
-                .orElseThrow(StationNotFoundException::new);
+        Station upStation = stationService.showStation(lineRequest.getUpStationId());
+        Station downStation = stationService.showStation(lineRequest.getDownStationId());
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation));
         return createLineResponse(line);
     }
@@ -67,15 +62,7 @@ public class LineService {
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                List.of(createStationResponse(line.getUpStation()), createStationResponse(line.getDownStation()))
+                List.of(stationService.createStationResponse(line.getUpStation()), stationService.createStationResponse(line.getDownStation()))
         );
     }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
-    }
-
 }

@@ -1,7 +1,7 @@
-package subway.station.repository;
+package subway.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import subway.station.model.Station;
+import subway.model.Station;
 
 public interface StationRepository extends JpaRepository<Station, Long> {
 }

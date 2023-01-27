@@ -1,11 +1,12 @@
-package subway.station.service;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.station.dto.StationRequest;
-import subway.station.dto.StationResponse;
-import subway.station.model.Station;
-import subway.station.repository.StationRepository;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
+import subway.exception.StationNotFoundException;
+import subway.model.Station;
+import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class StationService {
-    private StationRepository stationRepository;
+    private final StationRepository stationRepository;
 
     public StationService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
@@ -36,7 +37,13 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
-    private StationResponse createStationResponse(Station station) {
+    @Transactional(readOnly = true)
+    protected Station showStation(Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(StationNotFoundException::new);
+    }
+
+    protected StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
                 station.getName()

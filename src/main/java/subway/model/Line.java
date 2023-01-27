@@ -1,6 +1,4 @@
-package subway.line.model;
-
-import subway.station.model.Station;
+package subway.model;
 
 import javax.persistence.*;
 import java.util.Objects;

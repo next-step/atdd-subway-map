@@ -1,12 +1,12 @@
-package subway.line.repository;
+package subway.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import subway.line.exception.LineNotFoundException;
-import subway.line.model.Line;
+import subway.exception.LineNotFoundException;
+import subway.model.Line;
 
 import java.util.List;
 
