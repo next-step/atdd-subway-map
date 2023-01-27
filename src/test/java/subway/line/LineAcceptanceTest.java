@@ -102,10 +102,10 @@ public class LineAcceptanceTest {
 	void 지하철_노선_수정() {
 		//Given 지하철 노선을 생성하고
 		long id = requestCreateLine("1호선").getId();
-		LineUpdateRequest request = LineUpdateRequest.of(id, "newName", "newColor");
+		LineUpdateRequest request = LineUpdateRequest.of("newName", "newColor");
 
 		//When 생성한 지하철 노선을 수정하면
-		requestUpdateLine(request);
+		requestUpdateLine(id, request);
 
 		//Then 해당 지하철 노선 정보는 수정된다
 		ExtractableResponse<Response> response = requestFindLine(id);
@@ -117,10 +117,10 @@ public class LineAcceptanceTest {
 		assertThat(find.getColor()).isEqualTo(request.getColor());
 	}
 
-	private void requestUpdateLine(LineUpdateRequest request) {
+	private void requestUpdateLine(long id, LineUpdateRequest request) {
 		given()
 			.body(request)
-			.pathParam("id", request.getId())
+			.pathParam("id", id)
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when()
 			.put(RESOURCE_PATH + "/{id}")

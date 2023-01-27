@@ -52,7 +52,7 @@ public class LineService {
 
     @Transactional
     public void update(LineUpdateRequest request) {
-        Line line = findByIdIfAbsenceThrowException(request.getId());
+        Line line = findByIdIfAbsenceThrowException(request.getLineId());
         line.update(request.getName(), request.getColor());
     }
 
