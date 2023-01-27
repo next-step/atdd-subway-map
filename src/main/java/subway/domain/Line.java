@@ -1,8 +1,6 @@
 package subway.domain;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -17,32 +15,30 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToMany
-    @JoinTable(name = "station_line",
-            joinColumns = @JoinColumn(name = "line_id"),
-            inverseJoinColumns = @JoinColumn(name = "station_id"))
-    private List<Station> stations = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn
+    private Station upStation;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn
+    private Station downStation;
+
+    private Integer distance;
 
     protected Line() {
     }
 
-    public Line(final Long id, final String name, final String color, final List<Station> stations) {
+    public Line(final Long id, final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.stations = stations;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
     }
 
-    public Line(final Long id, final String name, final String color) {
-        this(id, name, color, new ArrayList<>());
-    }
-
-    public Line(final String name, final String color) {
-        this(null, name, color, new ArrayList<>());
-    }
-
-    public static Line none() {
-        return new Line();
+    public Line(final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+        this(null, name, color, upStation, downStation, distance);
     }
 
     public Long getId() {
@@ -57,8 +53,20 @@ public class Line {
         return color;
     }
 
-    public List<Station> getStations() {
-        return stations;
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Integer distance) {
+        this.distance = distance;
     }
 
     public void updateLine(final String changeName, final String changeColor) {
@@ -66,20 +74,16 @@ public class Line {
         this.color = changeColor;
     }
 
-    public void addLine(final Station station) {
-        this.stations.add(station);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Line line = (Line) o;
-        return Objects.equals(id, line.id);
+        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, color);
     }
 }
