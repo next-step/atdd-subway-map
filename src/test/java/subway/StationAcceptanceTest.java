@@ -1,16 +1,18 @@
 package subway;
 
+import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.common.DatabaseCleaner;
 import subway.domain.Station;
 import subway.executor.StationServiceExecutor;
-import subway.repository.StationRepository;
 
 import java.util.List;
 
@@ -22,16 +24,25 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class StationAcceptanceTest {
 
 
-    @Autowired
+    @LocalServerPort
+    int port;
 
-    private StationRepository stationRepository;
+    @Autowired
+    private DatabaseCleaner cleaner;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+        cleaner.afterPropertiesSet();
+        cleaner.execute();
+    }
 
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("지하철역 생성")
     @Test
     void createStation() {
         // when
@@ -92,11 +103,6 @@ class StationAcceptanceTest {
                 () -> assertThat(stationNames).containsOnly("언주역", "개봉역")
         );
 
-    }
-
-    @AfterEach
-    void clear() {
-        stationRepository.deleteAll();
     }
 
 }

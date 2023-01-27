@@ -23,6 +23,7 @@ public class StationServiceExecutor {
                 .extract();
     }
 
+
     public static ExtractableResponse<Response> showStations() {
         return RestAssured
                 .when().get("/stations")
