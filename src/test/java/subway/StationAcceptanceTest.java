@@ -9,17 +9,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import subway.common.AcceptanceTest;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+public class StationAcceptanceTest extends AcceptanceTest {
 
 	private static final String ROOT_PATH = "/stations";
 
@@ -38,12 +38,12 @@ public class StationAcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
 		// then
-		List<String> stationNames =
-			given().log().all()
-				.when().get(ROOT_PATH)
-				.then().log().all()
-				.extract().jsonPath().getList("name", String.class);
-		assertThat(stationNames).containsAnyOf("강남역");
+		List<String> stationNames = requestApi(
+			Method.GET,
+			ROOT_PATH
+		).jsonPath().getList("name", String.class);
+
+		assertThat(stationNames).containsAnyOf(STATION_NAME_1);
 	}
 
 	/**
@@ -82,15 +82,15 @@ public class StationAcceptanceTest {
 	void 지하철역_1개역_삭제에_성공한다() {
 		//given
 		Long targetId = 지하철역_생성(STATION_NAME_1)
-			.as(new TypeRef<StationResponse>() {})
-			.getId();
+			.as(new TypeRef<StationResponse>() {
+			}).getId();
 
 		//when
 		지하철역_삭제(targetId);
 
 		// then
-		List<StationResponse> stationResponses = 지하철역을_조회한다()
-			.as(new TypeRef<>() {});
+		List<StationResponse> stationResponses = 지하철역을_조회한다().as(new TypeRef<>() {
+		});
 
 		assertThat(stationResponses).hasSize(0);
 	}
@@ -100,38 +100,26 @@ public class StationAcceptanceTest {
 			.name(name)
 			.build();
 
-		//@formatter:off
-        return given()
-                .log().all()
-            	.body(stationRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-                .post("/stations")
-            .then()
-                .log().all()
-            .extract();
-    }
+		return requestApi(
+			with().contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(stationRequest),
+			Method.POST,
+			ROOT_PATH
+		);
+	}
 
 	private ExtractableResponse<Response> 지하철역을_조회한다() {
-		//@formatter:off
-		return given()
-				.log().all()
-			.when()
-				.get(ROOT_PATH)
-			.then()
-				.log().all()
-			.extract();
+		return requestApi(
+			Method.GET,
+			ROOT_PATH
+		);
 	}
 
 	private ExtractableResponse<Response> 지하철역_삭제(Long targetId) {
-		//@formatter:off
-		return given()
-				.log().all()
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.when()
-				.delete(ROOT_PATH + "/{id}", targetId)
-			.then()
-				.log().all()
-			.extract();
+		return requestApi(
+			Method.DELETE,
+			ROOT_PATH + "/{id}",
+			targetId
+		);
 	}
 }
