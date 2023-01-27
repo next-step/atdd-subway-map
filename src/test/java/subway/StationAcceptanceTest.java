@@ -88,17 +88,59 @@ class StationAcceptanceTest {
         assertThat(stationNames).containsExactly("강남역", "논현역");
     }
 
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역을 삭제 할 수 있다")
+    @Test
+    void deleteStation() {
+        // Given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
+
+        ExtractableResponse<Response> given = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        Integer givenStationId = given.body().jsonPath().get("id");
+
+        // When
+        ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
+            .pathParam("stationId", givenStationId)
+            .when().delete("/stations/{stationId}")
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .when().get("/stations")
+            .then().log().all()
+            .extract();
+
+        List<String> stationNames = response.jsonPath().getList("name", String.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(stationNames).isEmpty();
+    }
+
     private static void fixtureStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
         ExtractableResponse<Response> response =
             RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
