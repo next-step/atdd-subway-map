@@ -66,19 +66,22 @@ public class StationAcceptanceTest {
     @Test
     void findStations() {
         // given
-        createPersistenceStationBy("강남역", "양재역");
+        String[] expectedStationNames = {"강남역", "양재역"};
+
+        createPersistenceStationBy(expectedStationNames);
 
         // when
         ExtractableResponse<Response> response = findStationsResponse();
 
         // Then
-        List<StationResponse> responseResult = response
+        List<String> stationNames = response
                 .jsonPath()
-                .getList("$", StationResponse.class);
+                .getList("name", String.class);
 
         Assertions.assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(responseResult.size()).isEqualTo(2)
+                () -> assertThat(stationNames.size()).isEqualTo(2),
+                () -> assertThat(stationNames).contains(expectedStationNames)
         );
     }
 
@@ -86,24 +89,18 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String NotContainStationName = "강남역";
-        createPersistenceStationBy(NotContainStationName);
-        String ContainStationName = "양재역";
-        createPersistenceStationBy(ContainStationName);
+        Long deleteStationId = 1L;
+
+        createPersistenceStationBy("강남역", "양재역");
 
         // when
-        ExtractableResponse<Response> deleteStationResponse = deleteStationResponseBy(1L);
+        deleteStationResponseBy(deleteStationId);
 
         // Then
-        List<String> stationsNameList = findStationsResponse()
-                .jsonPath()
-                .getList("name", String.class);
+        List<Long> stationIds = findStationsResponse().jsonPath()
+                .getList("id", Long.class);
 
-        Assertions.assertAll(
-                () -> assertThat(deleteStationResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
-                () -> assertThat(stationsNameList).doesNotContain(NotContainStationName),
-                () -> assertThat(stationsNameList).contains(ContainStationName)
-        );
+        assertThat(stationIds).doesNotContain(deleteStationId);
     }
 
     private ExtractableResponse<Response> deleteStationResponseBy(Long id) {
@@ -111,6 +108,7 @@ public class StationAcceptanceTest {
                 .when()
                 .delete("/stations/{id}", id)
                 .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
     }
 
