@@ -21,6 +21,10 @@ public class StationAcceptanceTest {
 
     private static final String STATIONS_PATH = "/stations";
 
+    private static final String STATION_1 = "지하철역1";
+    private static final String STATION_2 = "지하철역2";
+    private static final String STATION_3 = "지하철역3";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -30,18 +34,18 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = createStation("강남역");
+        ExtractableResponse<Response> response = createStationApi("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
         List<String> stationNames =
-                getStations().jsonPath().getList("name", String.class);
+                getStationsApi().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private static ExtractableResponse<Response> createStation(final String name) {
+    private static ExtractableResponse<Response> createStationApi(final String name) {
         final Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -60,22 +64,22 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
-    void test1() {
+    void getStations() {
         // given
-        createStation("지하철역1");
-        createStation("지하철역2");
+        createStationApi(STATION_1);
+        createStationApi(STATION_2);
 
         // when
-        final List<String> stationNames = getStations()
+        final List<String> stationNames = getStationsApi()
                 .jsonPath()
                 .getList("name", String.class);
 
         // then
         assertThat(stationNames.size()).isEqualTo(2);
-        assertThat(stationNames).containsAnyOf("지하철역1", "지하철역2");
+        assertThat(stationNames).containsAnyOf(STATION_1, STATION_2);
     }
 
-    private static ExtractableResponse<Response> getStations() {
+    private static ExtractableResponse<Response> getStationsApi() {
         return given().log().all()
                 .when()
                 .get(STATIONS_PATH)
@@ -90,9 +94,9 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 삭제한다.")
     @Test
-    void test2() {
+    void deleteByStationId() {
         // given
-        final long stationId = createStation("지하철역3")
+        final long stationId = createStationApi(STATION_3)
                 .jsonPath()
                 .getLong("id");
 
@@ -103,9 +107,9 @@ public class StationAcceptanceTest {
                 .then().log().all();
 
         // then
-        final List<String> stationNames = getStations().jsonPath()
+        final List<String> stationNames = getStationsApi().jsonPath()
                 .getList("name", String.class);
-        assertThat(stationNames).doesNotContain("지하철역3");
+        assertThat(stationNames).doesNotContain(STATION_3);
     }
 
 }
