@@ -1,8 +1,6 @@
 package subway.domain;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Station {
@@ -12,9 +10,6 @@ public class Station {
 
     @Column(length = 20, nullable = false)
     private String name;
-
-    @ManyToMany(mappedBy = "stations")
-    private List<Line> lines = new ArrayList<>();
 
     protected Station() {
     }
