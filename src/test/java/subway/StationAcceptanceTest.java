@@ -52,6 +52,7 @@ public class StationAcceptanceTest {
 	 * Then 2개의 지하철역을 응답 받는다
 	 */
 	// TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+	@DisplayName("지하철역 2개의 조회 응답에 성공한다")
 	@Test
 	void 지하철역_2개의_조회_응답에_성공한다() {
 		// given
