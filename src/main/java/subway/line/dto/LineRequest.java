@@ -15,4 +15,24 @@ public class LineRequest {
         this.downStationId = downStationId;
         this.distance = distance;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
 }
