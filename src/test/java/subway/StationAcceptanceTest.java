@@ -1,9 +1,11 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.parsing.Parser;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
+class StationAcceptanceTest {
+
+    private static RequestSpecification requestSpec;
+
+    @BeforeEach
+    public void setUp() {
+        RequestSpecBuilder reqBuilder = new RequestSpecBuilder();
+        reqBuilder.setContentType(ContentType.JSON);
+        requestSpec = reqBuilder.build();
+    }
 
     /**
      * When 지하철역을 생성하면
@@ -34,9 +45,8 @@ public class StationAcceptanceTest {
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
+            RestAssured.given().spec(requestSpec).log().all()
                 .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
@@ -62,33 +72,35 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // Given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
-
-        params.put("name", "논현역");
-        RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all();
+        fixtureStation("강남역");
+        fixtureStation("논현역");
 
         // When
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response =
+            RestAssured.given().spec(requestSpec).log().all()
             .when().get("/stations")
             .then().log().all()
             .extract();
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
-
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(stationNames).containsExactly("강남역", "논현역");
+    }
+
+    private static void fixtureStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> response =
+            RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
 }
