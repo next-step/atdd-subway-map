@@ -1,6 +1,5 @@
 package subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -34,27 +33,29 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> 강남역_데이터 = new HashMap<>();
+        강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
+                given().log().all()
+                        .body(강남역_데이터)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+                .when().post(REQUEST_STATION_URL)
+                .then().log().all()
+                    .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> 등록된_지하철역_이름_목록 =
+                given().log().all()
+                .when().get(REQUEST_STATION_URL)
+                .then().log().all()
+                    .extract()
+                        .jsonPath().getList(역_이름.필드명(), String.class);
+
+        assertThat(등록된_지하철역_이름_목록).containsAnyOf(강남역.역_이름());
     }
 
     /**
