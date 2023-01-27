@@ -6,9 +6,11 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +42,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response = createStationResponse(params);
+        ExtractableResponse<Response> response = createStationResponse("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -53,22 +55,13 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private ExtractableResponse<Response> createStationResponse(final Map<String, String> params) {
-        return givenLog()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-    }
-
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void findStations() {
         // given
         String[] expectedStationNames = {"강남역", "양재역"};
 
-        createPersistenceStationBy(expectedStationNames);
+        createStationResponses(expectedStationNames);
 
         // when
         ExtractableResponse<Response> response = findStationsResponse();
@@ -90,7 +83,7 @@ public class StationAcceptanceTest {
         // given
         Long deleteStationId = 1L;
 
-        createPersistenceStationBy("강남역", "양재역");
+        createStationResponses("강남역", "양재역");
 
         // when
         deleteStationResponseBy(deleteStationId);
@@ -121,16 +114,24 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static void createPersistenceStationBy(String... stationNames) {
-        for (String stationName : stationNames) {
-            Map<String, String> params = new HashMap<>();
-            params.put("name", stationName);
+    private List<ExtractableResponse<Response>> createStationResponses(final String... stationNames) {
+        return Arrays.stream(stationNames)
+                .map(this::createStationResponse)
+                .collect(Collectors.toUnmodifiableList());
+    }
 
-            RestAssured.given()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post("/stations");
-        }
+    private ExtractableResponse<Response> createStationResponse(final String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return givenLog()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract();
     }
 
     private RequestSpecification givenLog() {
