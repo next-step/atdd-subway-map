@@ -48,12 +48,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> 등록된_지하철역_이름_목록 =
-                given().log().all()
-                .when().get(REQUEST_STATION_URL)
-                .then().log().all()
-                    .extract()
-                        .jsonPath().getList(역_이름.필드명(), String.class);
+        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
+                    .jsonPath().getList(역_이름.필드명(), String.class);
 
         assertThat(등록된_지하철역_이름_목록).containsAnyOf(강남역.역_이름());
     }
@@ -76,11 +72,8 @@ public class StationAcceptanceTest {
         지하철역_생성_요청_API(서울대입구역_데이터);
 
         // when
-        List<Object> 등록된_지하철역_이름_목록 = given().log().all()
-                .when().get(REQUEST_STATION_URL)
-                .then().log().all()
-                    .extract()
-                        .jsonPath().getList(역_이름.필드명());
+        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
+                .jsonPath().getList(역_이름.필드명(), String.class);
 
         // then
         assertThat(등록된_지하철역_이름_목록).hasSize(2);
@@ -92,9 +85,23 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        Map<String, String> 강남역_데이터 = new HashMap<>();
+        강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
+        지하철역_생성_요청_API(강남역_데이터);
 
+        // when
+        지하철역_삭제_요청_API(1L);
 
+        // then
+        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
+                .jsonPath().getList(역_이름.필드명(), String.class);
 
+        assertThat(등록된_지하철역_이름_목록).doesNotContain(강남역.역_이름());
+    }
 
 
     private static void 지하철역_생성_요청_API(Map<String, String> requestBody) {
@@ -104,5 +111,19 @@ public class StationAcceptanceTest {
         .when().post(REQUEST_STATION_URL)
         .then().log().all()
             .extract();
+    }
+
+    private static void 지하철역_삭제_요청_API(Long stationId) {
+        given().log().all()
+        .when().delete(REQUEST_STATION_URL + "/" + stationId)
+        .then().log().all()
+            .extract();
+    }
+
+    private static ExtractableResponse<Response> 지하철역_목록_조회_요청_API() {
+        return given().log().all()
+                .when().get(REQUEST_STATION_URL)
+                .then().log().all()
+                    .extract();
     }
 }
