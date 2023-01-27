@@ -1,6 +1,7 @@
 package subway.ui.dto;
 
 import subway.domain.Line;
+import subway.domain.Station;
 
 public class LineRequest {
 
@@ -10,8 +11,7 @@ public class LineRequest {
     private long downStationId;
     private int distance;
 
-    public LineRequest() {
-    }
+    private LineRequest() {}
 
     public LineRequest(final String name, final String color, final long upStationId, final long downStationId, final int distance) {
         this.name = name;
@@ -41,11 +41,7 @@ public class LineRequest {
         return downStationId;
     }
 
-    public int getDistance() {
-        return distance;
-    }
-
-    public Line toEntity() {
-        return new Line(this.name, this.color);
+    public Line toEntity(final Station upStation, final Station downStation) {
+        return new Line(this.name, this.color, upStation, downStation, this.distance);
     }
 }
