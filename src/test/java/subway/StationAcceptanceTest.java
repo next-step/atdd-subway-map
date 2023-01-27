@@ -25,7 +25,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void create() {
+    void createStation() {
 
         // given
         String station = "강남역";
