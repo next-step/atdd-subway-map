@@ -40,8 +40,10 @@ public class StationAcceptanceTest extends AcceptanceTest {
 			ROOT_PATH
 		).jsonPath().getList("name", String.class);
 
-		assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(stationNames).containsAnyOf(STATION_NAME_1);
+		assertAll(
+			() -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+			() -> assertThat(stationNames).containsAnyOf(STATION_NAME_1)
+		);
 	}
 
 	/**
