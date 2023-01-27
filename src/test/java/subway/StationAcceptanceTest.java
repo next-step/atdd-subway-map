@@ -3,13 +3,14 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,15 +19,18 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationAcceptanceTest {
-    @Autowired
-    private StationRepository stationRepository;
+    @LocalServerPort
+    int port;
 
-    @AfterEach
-    void tearDown() {
-        stationRepository.deleteAll();
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
     }
+
+    private static final String ENDPOINT = "/stations";
 
     /**
      * When 지하철역을 생성하면
@@ -64,9 +68,8 @@ public class StationAcceptanceTest {
     @Test
     void findAllStations() {
         // Given 2개의 지하철역을 생성하고
-        stationRepository.saveAllAndFlush(
-                List.of(new Station("강남역"), new Station("서울대입구역"))
-        );
+        StationApi.create(ENDPOINT, new JsonBodyParams("name", "강남역"));
+        StationApi.create(ENDPOINT, new JsonBodyParams("name", "서울대입구역"));
 
         // When 지하철역 목록을 조회하면
         List<String> stationNames =
@@ -84,10 +87,11 @@ public class StationAcceptanceTest {
     @Test
     void deleteAllStations() {
         // Given 지하철역을 생성하고
-        Station 강남역 = stationRepository.saveAndFlush(new Station("강남역"));
-        Station 서울대입구역 = stationRepository.saveAndFlush(new Station("서울대입구역"));
-        Long 강남역_아이디 = 강남역.getId();
-        Long 서울대입구역_아이디 = 서울대입구역.getId();
+        ExtractableResponse<Response> 강남역_생성_응답 = StationApi.create(ENDPOINT, new JsonBodyParams("name", "강남역"));
+        ExtractableResponse<Response> 서울대입구역_생성_응답 = StationApi.create(ENDPOINT, new JsonBodyParams("name", "서울대입구역"));
+
+        Long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
+        Long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
 
         // When 그 지하철역을 삭제하면
         RestAssured.given().log().all()
@@ -103,5 +107,37 @@ public class StationAcceptanceTest {
 
         assertThat(stationIds).containsExactly(서울대입구역_아이디);
         assertThat(stationIds).doesNotContain(강남역_아이디);
+    }
+}
+
+class JsonBodyParams {
+    String key;
+    String value;
+
+    public JsonBodyParams(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+}
+
+class StationApi {
+    static ExtractableResponse<Response> create(String endpoint, JsonBodyParams jsonBodyParams) {
+        Map<String, String> params = new HashMap<>();
+        params.put(jsonBodyParams.getKey(), jsonBodyParams.getValue());
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post(endpoint)
+                .then().log().all()
+                .extract();
     }
 }
