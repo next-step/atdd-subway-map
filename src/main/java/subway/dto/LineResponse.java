@@ -1,7 +1,5 @@
 package subway.dto;
 
-import subway.station.dto.StationResponse;
-
 import java.util.List;
 
 public class LineResponse {
