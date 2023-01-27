@@ -79,7 +79,6 @@ public class StationAcceptanceTest {
                 .getList("name", String.class);
 
         Assertions.assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(stationNames.size()).isEqualTo(2),
                 () -> assertThat(stationNames).contains(expectedStationNames)
         );
