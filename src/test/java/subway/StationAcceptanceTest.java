@@ -32,7 +32,6 @@ class StationAcceptanceTest {
     void createStation() {
         // when
         ExtractableResponse<Response> response = createStationResponse(GANGNAM_STATION);
-
         List<String> stationNames =
                 RestAssured.given().log().all()
                         .when().get("/stations")
@@ -62,10 +61,10 @@ class StationAcceptanceTest {
                 .get("/stations")
                 .then().log().all()
                 .extract();
+        List<String> stationNames = response.jsonPath().getList("name");
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames = response.jsonPath().getList("name");
         assertThat(stationNames).contains(GANGNAM_STATION, PANGYO_STATION);
     }
 
