@@ -51,7 +51,6 @@ public class DataBaseCleanUp {
                 .filter(isEntity())
                 .map(EntityType::getName)
                 .map(name -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name))
-                .peek(log::debug)
                 .collect(Collectors.toList());
     }
 

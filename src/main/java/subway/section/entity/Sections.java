@@ -1,6 +1,7 @@
 package subway.section.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import subway.station.entity.Station;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+@EqualsAndHashCode
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor

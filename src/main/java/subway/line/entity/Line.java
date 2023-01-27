@@ -28,8 +28,6 @@ public class Line {
 
     @Embedded
     private Sections sections;
-//    @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
-//    private List<Section> values = new ArrayList<>();
 
     @Builder
     public Line(String name, String color, List<Section> values) {
@@ -54,19 +52,6 @@ public class Line {
         return sections.stations();
     }
 
-    //    private List<Station> createStations() {
-//        List<Station> stations = values.stream()
-//                .map(e -> e.getUpStation())
-//                .collect(Collectors.toList());
-//
-//        stations.add(lastSection().getDownStation());
-//        return stations;
-//    }
-//
-//    private Section lastSection() {
-//        return values.get(values.size() - 1);
-//    }
-//
     public void addSection(Section section) {
         if (sections.contains(section)) {
             return;
