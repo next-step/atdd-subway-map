@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class StationAcceptanceTest {
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
+                givenLog()
                         .body(params)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
@@ -52,7 +53,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
+                givenLog()
                         .when().get("/stations")
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
@@ -66,11 +67,13 @@ public class StationAcceptanceTest {
         createPersistenceStationBy("강남역", "양재역");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.when()
-                .get("/stations")
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> response =
+                givenLog()
+                        .when()
+                        .get("/stations")
+                        .then()
+                        .log().all()
+                        .extract();
 
         // Then
         List<StationResponse> responseResult = response.jsonPath()
@@ -92,19 +95,23 @@ public class StationAcceptanceTest {
         createPersistenceStationBy(ContainStationName);
 
         // when
-        ExtractableResponse<Response> deleteStationResponse = RestAssured.when()
-                .delete("/stations/{id}", 1)
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> deleteStationResponse =
+                givenLog()
+                        .when()
+                        .delete("/stations/{id}", 1)
+                        .then()
+                        .log().all()
+                        .extract();
 
         // Then
-        List<String> stationsNameList = RestAssured.when()
-                .get("/stations")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> stationsNameList =
+                givenLog()
+                        .when()
+                        .get("/stations")
+                        .then()
+                        .statusCode(HttpStatus.OK.value())
+                        .log().all()
+                        .extract().jsonPath().getList("name", String.class);
 
         Assertions.assertAll(
                 () -> assertThat(deleteStationResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
@@ -123,5 +130,10 @@ public class StationAcceptanceTest {
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .when().post("/stations");
         }
+    }
+
+    private RequestSpecification givenLog() {
+        return RestAssured
+                .given().log().all();
     }
 }
