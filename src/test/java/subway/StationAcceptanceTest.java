@@ -96,7 +96,8 @@ public class StationAcceptanceTest {
         deleteStationResponseBy(deleteStationId);
 
         // Then
-        List<Long> stationIds = findStationsResponse().jsonPath()
+        List<Long> stationIds = findStationsResponse()
+                .jsonPath()
                 .getList("id", Long.class);
 
         assertThat(stationIds).doesNotContain(deleteStationId);
