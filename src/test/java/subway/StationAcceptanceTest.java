@@ -52,11 +52,10 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                givenLog()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findStationsResponse()
+                .jsonPath()
+                .getList("name", String.class);
+
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -67,16 +66,11 @@ public class StationAcceptanceTest {
         createPersistenceStationBy("강남역", "양재역");
 
         // when
-        ExtractableResponse<Response> response =
-                givenLog()
-                        .when()
-                        .get("/stations")
-                        .then()
-                        .log().all()
-                        .extract();
+        ExtractableResponse<Response> response = findStationsResponse();
 
         // Then
-        List<StationResponse> responseResult = response.jsonPath()
+        List<StationResponse> responseResult = response
+                .jsonPath()
                 .getList("$", StationResponse.class);
 
         Assertions.assertAll(
@@ -104,20 +98,24 @@ public class StationAcceptanceTest {
                         .extract();
 
         // Then
-        List<String> stationsNameList =
-                givenLog()
-                        .when()
-                        .get("/stations")
-                        .then()
-                        .statusCode(HttpStatus.OK.value())
-                        .log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationsNameList = findStationsResponse()
+                .jsonPath()
+                .getList("name", String.class);
 
         Assertions.assertAll(
                 () -> assertThat(deleteStationResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value()),
                 () -> assertThat(stationsNameList).doesNotContain(NotContainStationName),
                 () -> assertThat(stationsNameList).contains(ContainStationName)
         );
+    }
+
+    private ExtractableResponse<Response> findStationsResponse() {
+        return givenLog()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
     }
 
     private static void createPersistenceStationBy(String... stationNames) {
