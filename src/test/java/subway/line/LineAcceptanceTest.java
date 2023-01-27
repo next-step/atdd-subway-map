@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.thirdparty.publicsuffix.PublicSuffixType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,7 +123,7 @@ public class LineAcceptanceTest {
 			.pathParam("id", request.getId())
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
 			.when()
-			.patch(RESOURCE_PATH + "/{id}")
+			.put(RESOURCE_PATH + "/{id}")
 			.then()
 			.statusCode(HttpStatus.OK.value())
 			.assertThat();
@@ -167,9 +166,9 @@ public class LineAcceptanceTest {
 		assertThat(find.getId()).isEqualTo(id);
 		assertThat(find.getName()).isEqualTo(request.getName());
 		assertThat(find.getColor()).isEqualTo(request.getColor());
-		assertThat(find.getStations()).hasSize(2);
-		assertThat(find.getStations().get(0).getId()).isEqualTo(request.getUpStationId());
-		assertThat(find.getStations().get(1).getId()).isEqualTo(request.getDownStationId());
+		assertThat(find.getStationResponses()).hasSize(2);
+		assertThat(find.getStationResponses().get(0).getId()).isEqualTo(request.getUpStationId());
+		assertThat(find.getStationResponses().get(1).getId()).isEqualTo(request.getDownStationId());
 	}
 
 	public static LineResponse requestCreateLine(String name) {

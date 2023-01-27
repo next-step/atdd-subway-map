@@ -8,6 +8,8 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
+import subway.section.entity.Section;
+import subway.section.repository.SectionRepository;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
@@ -21,16 +23,22 @@ import java.util.stream.Collectors;
 public class LineService {
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
+    private final SectionRepository sectionRepository;
 
     @Transactional
-    public Line save(LineCreateRequest lineCreateRequest) {
+    public LineResponse save(LineCreateRequest lineCreateRequest) {
         Station upStation = stationRepository.findById(lineCreateRequest.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(lineCreateRequest.getDownStationId()).orElseThrow();
-        return lineRepository.save(lineCreateRequest.toEntity(upStation, downStation));
+
+        Line line = lineCreateRequest.toEntity(upStation, downStation);
+
+        line = lineRepository.save(line);
+
+        return LineResponse.from(line);
     }
 
     public List<LineResponse> findAll() {
-        return lineRepository.findAllLine()
+        return lineRepository.findAll()
                 .stream()
                 .map(LineResponse::from)
                 .collect(Collectors.toList());

@@ -8,9 +8,4 @@ import java.util.List;
 
 public interface LineRepository extends JpaRepository<Line, Long> {
 
-    @Query("select l " +
-            "from Line l " +
-            "join fetch l.downStation " +
-            "join fetch l.upStation")
-    List<Line> findAllLine();
 }

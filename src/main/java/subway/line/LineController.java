@@ -4,13 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import subway.line.dto.LineCreateRequest;
@@ -27,8 +21,8 @@ public class LineController {
 
 	@PostMapping("/lines")
 	public ResponseEntity<LineResponse> save(@RequestBody LineCreateRequest lineCreateRequest) {
-		Line saved = lineService.save(lineCreateRequest);
-		return ResponseEntity.created(URI.create("/lines/" + saved.getId())).body(LineResponse.from(saved));
+		LineResponse lineResponse = lineService.save(lineCreateRequest);
+		return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
 	}
 
 	@GetMapping("/lines")
@@ -41,7 +35,7 @@ public class LineController {
 		return lineService.findById(id);
 	}
 
-	@PatchMapping("/lines/{id}") // 부분 업데이트라면 patch가 맞지 않을까?
+	@PutMapping("/lines/{id}")
 	public void update(@RequestBody LineUpdateRequest request) {
 		lineService.update(request);
 	}

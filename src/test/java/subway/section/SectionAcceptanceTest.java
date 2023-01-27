@@ -3,12 +3,14 @@ package subway.section;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.common.DataBaseCleanUp;
 import subway.line.LineAcceptanceTest;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
@@ -31,6 +33,14 @@ public class SectionAcceptanceTest {
 
     @Autowired
     private StationRepository stationRepository;
+
+    @Autowired
+    private DataBaseCleanUp dataBaseCleanUp;
+
+    @AfterEach
+    void tearDown() {
+        dataBaseCleanUp.cleanUp();
+    }
 
     /**
      * Given : 1개의 역, 1개의 노선을 등록

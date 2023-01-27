@@ -23,7 +23,7 @@ public class Section {
     private Long id;
 
     @JoinColumn(name = "line_id")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Line line;
 
     @JoinColumn(name = "down_station_id")
@@ -36,4 +36,8 @@ public class Section {
 
     @Column(length = 20, nullable = false)
     private long distance;
+
+    public void changeLine(Line line) {
+        this.line = line;
+    }
 }
