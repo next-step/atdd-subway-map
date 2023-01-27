@@ -30,26 +30,17 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        var 강남역_request = new StationRequest() {{
+            setName("강남역");
+        }};
+        ExtractableResponse<Response> response = 지하철역을_생성한다(강남역_request);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> stationsResponse = 지하철역을_조회한다();
+        List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -66,40 +57,21 @@ public class StationAcceptanceTest {
         var 강남역_request = new StationRequest() {{
             setName("강남역");
         }};
-        ExtractableResponse<Response> 강남역_response = RestAssured.given().log().all()
-                .body(강남역_request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
+        ExtractableResponse<Response> 강남역_response = 지하철역을_생성한다(강남역_request);
         assertThat(강남역_response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         var 역삼역_request = new StationRequest() {{
             setName("역삼역");
         }};
-        ExtractableResponse<Response> 역삼역_response = RestAssured.given().log().all()
-                .body(역삼역_request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> 역삼역_response = 지하철역을_생성한다(역삼역_request);
 
         assertThat(역삼역_response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> stationsResponse = 지하철역을_조회한다();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        assertThat(stationsResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).containsExactlyInAnyOrderElementsOf(List.of("강남역", "역삼역"));
     }
 
@@ -116,32 +88,43 @@ public class StationAcceptanceTest {
         var 강남역_request = new StationRequest() {{
             setName("강남역");
         }};
-        ExtractableResponse<Response> 강남역_response = RestAssured.given().log().all()
-                .body(강남역_request)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> 강남역_response = 지하철역을_생성한다(강남역_request);
 
         assertThat(강남역_response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         var 강남역Id = 강남역_response.response().as(StationResponse.class).getId();
 
         //when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/stations/" + 강남역Id)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역을_삭제한다(강남역Id);
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        ExtractableResponse<Response> stationsResponse = 지하철역을_조회한다();
+        List<String> stationNames = stationsResponse.jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain("강남역");
     }
 
+    private ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 
+    private ExtractableResponse<Response> 지하철역을_조회한다() {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철역을_삭제한다(Long stationId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/stations/" + stationId)
+                .then().log().all()
+                .extract();
+    }
 }
