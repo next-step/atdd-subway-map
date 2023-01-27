@@ -1,8 +1,5 @@
 package subway.section;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,28 +8,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.common.DataBaseCleanUp;
-import subway.line.LineAcceptanceTest;
 import subway.line.dto.LineCreateRequest;
-import subway.line.dto.LineResponse;
-import subway.station.StationAcceptanceTest;
-import subway.station.dto.StationResponse;
-import subway.station.repository.StationRepository;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import subway.section.dto.SectionCreateRequest;
+import subway.section.dto.SectionResponse;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static subway.line.LineAcceptanceTest.*;
-import static subway.station.StationAcceptanceTest.*;
+import static subway.line.LineAcceptanceTest.createLineRequestFixture;
+import static subway.line.LineAcceptanceTest.requestCreateLine;
+import static subway.station.StationAcceptanceTest.createStation;
 
 @DisplayName("지하철 노선 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
-
-    @Autowired
-    private StationRepository stationRepository;
 
     @Autowired
     private DataBaseCleanUp dataBaseCleanUp;
@@ -50,28 +38,46 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철_노선_구간_등록_성공() {
         //given
-        Long newStationId = createStation("역1");
-        LineCreateRequest oldLineCreateRequest = createLineRequestFixture("노선1");
-        LineResponse lineResponse = requestCreateLine(oldLineCreateRequest);
-
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("downStationId", newStationId);
-        paramMap.put("upStationId", oldLineCreateRequest.getDownStationId());
-        paramMap.put("distance", 10);
+        SectionCreateRequest request = createSectionCreateRequest("노선1", "역1");
 
         //when
-        ExtractableResponse<Response> response = given()
-                .pathParam("lineId", lineResponse.getId())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(paramMap)
-                .when()
-                .post(RESOURCE_PATH + "/{lineId}/sections")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract();
+        SectionResponse sectionResponse = requestCreateSection(request);
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(sectionResponse.getSectionId()).isNotNull();
+        assertThat(sectionResponse.getLineResponse().getId()).isEqualTo(request.getLineId());
+        assertThat(sectionResponse.getDistance()).isEqualTo(request.getDistance());
+        assertThat(sectionResponse.getUpStation().getId()).isEqualTo(request.getUpStationId());
+        assertThat(sectionResponse.getDownStation().getId()).isEqualTo(request.getDownStationId());
+    }
+
+    private SectionCreateRequest createSectionCreateRequest(String lineName, String newDownStaionName) {
+        Long downStationId = createStation(newDownStaionName);
+
+        LineCreateRequest lineCreateRequest = createLineRequestFixture(lineName);
+        long lineId = requestCreateLine(lineCreateRequest).getId();
+
+        SectionCreateRequest request = SectionCreateRequest.builder()
+                .lineId(lineId)
+                .upStationId(lineCreateRequest.getUpStationId())
+                .downStationId(downStationId)
+                .distance(10)
+                .build();
+
+        return request;
+    }
+
+    private SectionResponse requestCreateSection(SectionCreateRequest request) {
+        return given()
+                .pathParam("lineId", request.getLineId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when()
+                .post("/lines/{lineId}/sections")
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract()
+                .as(SectionResponse.class);
     }
 
     /**

@@ -1,15 +1,15 @@
-package subway.line.dto;
+package subway.section.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import subway.line.entity.Line;
 import subway.section.entity.Section;
 import subway.station.entity.Station;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class SectionCreateRequest {
 
     private long lineId;

@@ -9,6 +9,7 @@ import subway.station.entity.Station;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StationResponse {
+    
     private Long id;
     private String name;
 
