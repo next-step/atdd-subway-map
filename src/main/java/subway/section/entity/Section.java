@@ -23,7 +23,7 @@ public class Section {
     private Long id;
 
     @JoinColumn(name = "line_id")
-    @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Line line;
 
     @JoinColumn(name = "down_station_id")

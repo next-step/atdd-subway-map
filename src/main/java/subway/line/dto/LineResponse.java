@@ -3,7 +3,6 @@ package subway.line.dto;
 import lombok.*;
 import subway.line.entity.Line;
 import subway.station.dto.StationResponse;
-import subway.station.entity.Station;
 
 import java.util.ArrayList;
 import java.util.List;

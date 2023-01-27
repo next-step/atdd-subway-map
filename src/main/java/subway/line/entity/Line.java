@@ -1,6 +1,5 @@
 package subway.line.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +8,7 @@ import subway.section.entity.Sections;
 import subway.station.entity.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -57,7 +54,7 @@ public class Line {
         return sections.stations();
     }
 
-//    private List<Station> createStations() {
+    //    private List<Station> createStations() {
 //        List<Station> stations = values.stream()
 //                .map(e -> e.getUpStation())
 //                .collect(Collectors.toList());

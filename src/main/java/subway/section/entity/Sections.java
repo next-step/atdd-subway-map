@@ -1,15 +1,11 @@
 package subway.section.entity;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.section.entity.Section;
 import subway.station.entity.Station;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.AbstractList;
 import java.util.ArrayList;

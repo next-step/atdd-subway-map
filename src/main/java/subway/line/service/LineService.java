@@ -8,7 +8,6 @@ import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
-import subway.section.entity.Section;
 import subway.section.repository.SectionRepository;
 import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
