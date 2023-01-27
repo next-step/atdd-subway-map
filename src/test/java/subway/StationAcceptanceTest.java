@@ -10,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,12 +27,9 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
-                        .body(params)
+                        .body(new StationRequest("강남역"))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
                         .then().log().all()
@@ -44,12 +39,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> findStationNames = getStationNames();
+        assertThat(findStationNames).containsAnyOf("강남역");
     }
 
     /**
@@ -61,8 +52,7 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        String[] stationNames = new String[]{"강남역", "망포역"};
-        requestSaveStation(stationNames);
+        List<Station> stations = requestSaveStation("강남역", "망포역");
         // when
         List<String> findStationNames =
                 RestAssured.given().log().all()
@@ -70,8 +60,7 @@ public class StationAcceptanceTest {
                         .then().log().all()
                         .extract().jsonPath().getList("name", String.class);
         // then
-        assertThat(findStationNames.size()).isEqualTo(stationNames.length);
-        assertThat(findStationNames).containsAnyOf(stationNames);
+        assertThat(findStationNames).hasSize(stations.size()).containsAnyOf(stations.stream().map(Station::getName).toArray(String[]::new));
     }
 
     /**
@@ -102,7 +91,7 @@ public class StationAcceptanceTest {
     private Station requestSaveStation(String stationName) {
         // when
         return RestAssured.given().log().all()
-                .body(new StationSaveRequest(stationName))
+                .body(new StationRequest(stationName))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
                 .then().log().all()
@@ -122,17 +111,5 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
-    }
-
-    static class StationSaveRequest {
-        private final String name;
-
-        public StationSaveRequest(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
     }
 }
