@@ -41,7 +41,7 @@ public class StationAcceptanceTest {
         // when
         String stationName = "강남역";
 
-        createStationResponse(stationName);
+        createStationResponseBy(stationName);
 
         // then
         List<String> stationNames = findStationsResponse()
@@ -57,7 +57,7 @@ public class StationAcceptanceTest {
         // given
         String[] expectedStationNames = {"강남역", "양재역"};
 
-        createStationResponses(expectedStationNames);
+        createStationResponsesBy(expectedStationNames);
 
         // when
         ExtractableResponse<Response> response = findStationsResponse();
@@ -79,7 +79,7 @@ public class StationAcceptanceTest {
         // given
         Long deleteStationId = 1L;
 
-        createStationResponses("강남역", "양재역");
+        createStationResponsesBy("강남역", "양재역");
 
         // when
         deleteStationResponseBy(deleteStationId);
@@ -92,7 +92,7 @@ public class StationAcceptanceTest {
         assertThat(stationIds).doesNotContain(deleteStationId);
     }
 
-    private ExtractableResponse<Response> deleteStationResponseBy(Long id) {
+    private ExtractableResponse<Response> deleteStationResponseBy(final Long id) {
         return givenLog()
                 .when()
                 .delete("/stations/{id}", id)
@@ -110,13 +110,13 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private List<ExtractableResponse<Response>> createStationResponses(final String... stationNames) {
+    private List<ExtractableResponse<Response>> createStationResponsesBy(final String... stationNames) {
         return Arrays.stream(stationNames)
-                .map(this::createStationResponse)
+                .map(this::createStationResponseBy)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private ExtractableResponse<Response> createStationResponse(final String stationName) {
+    private ExtractableResponse<Response> createStationResponseBy(final String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
