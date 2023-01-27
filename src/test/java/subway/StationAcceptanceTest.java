@@ -40,13 +40,7 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                givenLog()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStationResponse(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -57,6 +51,15 @@ public class StationAcceptanceTest {
                 .getList("name", String.class);
 
         assertThat(stationNames).containsAnyOf("강남역");
+    }
+
+    private ExtractableResponse<Response> createStationResponse(final Map<String, String> params) {
+        return givenLog()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
