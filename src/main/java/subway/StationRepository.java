@@ -1,6 +1,11 @@
 package subway;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-public interface StationRepository extends JpaRepository<Station, Long> {
+public interface StationRepository {
+    Station save(Station station);
+
+    List<Station> findAll();
+
+    void deleteById(Long id);
 }
