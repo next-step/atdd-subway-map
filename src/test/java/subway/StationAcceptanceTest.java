@@ -89,13 +89,7 @@ public class StationAcceptanceTest {
         createPersistenceStationBy(ContainStationName);
 
         // when
-        ExtractableResponse<Response> deleteStationResponse =
-                givenLog()
-                        .when()
-                        .delete("/stations/{id}", 1)
-                        .then()
-                        .log().all()
-                        .extract();
+        ExtractableResponse<Response> deleteStationResponse = deleteStationResponseBy(1L);
 
         // Then
         List<String> stationsNameList = findStationsResponse()
@@ -107,6 +101,14 @@ public class StationAcceptanceTest {
                 () -> assertThat(stationsNameList).doesNotContain(NotContainStationName),
                 () -> assertThat(stationsNameList).contains(ContainStationName)
         );
+    }
+
+    private ExtractableResponse<Response> deleteStationResponseBy(Long id) {
+        return givenLog()
+                .when()
+                .delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> findStationsResponse() {
