@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@DisplayName("지하철역 관련 기능")
+@DisplayName("지하철 노선 응용 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class LineServiceTest {
 
@@ -42,7 +42,7 @@ class LineServiceTest {
         final LineRequest 요청_호선 = new LineRequest("2호선", "bg-red-600", 1L, 2L, 10);
         final Station 상행종점역 = new Station(1L, "강남역");
         final Station 하행종점역 = new Station(2L, "잠실역");
-        final Line 호선 = new Line(1L, "2호선", "bg-red-600");
+        final Line 호선 = new Line(1L, "2호선", "bg-red-600", 상행종점역, 하행종점역, 10);
 
         when(stationService.findById(anyLong())).thenReturn(상행종점역)
                 .thenReturn(하행종점역);
@@ -64,10 +64,10 @@ class LineServiceTest {
 
         final Station 상행종점_강남역 = new Station(1L, "강남역");
         final Station 하행종점_잠실역 = new Station(2L, "잠실역");
-        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", List.of(상행종점_강남역, 하행종점_잠실역));
+        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 상행종점_강남역, 하행종점_잠실역, 10);
 
         final Station 하행종점_몽총토성역 = new Station(2L, "몽촌토성역");
-        final Line 신분당선 = new Line(2L, "신분당선", "bg-green-600", List.of(상행종점_강남역, 하행종점_몽총토성역));
+        final Line 신분당선 = new Line(2L, "신분당선", "bg-green-600", 상행종점_강남역, 하행종점_몽총토성역, 10);
 
         when(lineRepository.findAll()).thenReturn(List.of(이호선, 신분당선));
 
@@ -83,7 +83,7 @@ class LineServiceTest {
         final long 조회_호선 = 1L;
         final Station 상행종점_강남역 = new Station(1L, "강남역");
         final Station 하행종점_잠실역 = new Station(2L, "잠실역");
-        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", List.of(상행종점_강남역, 하행종점_잠실역));
+        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 상행종점_강남역, 하행종점_잠실역, 10);
 
         when(lineRepository.findById(1L)).thenReturn(Optional.of(이호선));
 
@@ -105,7 +105,7 @@ class LineServiceTest {
         final LineRequest 요청_수정_호선 = new LineRequest("2호선", "bg-red-600");
         final Station 상행종점_강남역 = new Station(1L, "강남역");
         final Station 하행종점_잠실역 = new Station(2L, "잠실역");
-        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", List.of(상행종점_강남역, 하행종점_잠실역));
+        final Line 이호선 = new Line(1L, "2호선", "bg-red-600", 상행종점_강남역, 하행종점_잠실역, 10);
 
         when(lineRepository.findById(1L)).thenReturn(Optional.of(이호선));
 
