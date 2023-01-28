@@ -1,11 +1,15 @@
 package subway;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -13,12 +17,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
+import static org.assertj.core.api.InstanceOfAssertFactories.predicate;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-    /**
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class StationAcceptanceTest {
+
+
+    @LocalServerPort
+    int port;
+
+    @BeforeEach
+    public void setUp(){
+        RestAssured.port = port;
+    }
+
+
+
+    /** 주어진 요구사항
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
@@ -56,6 +75,29 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+
+    @DisplayName("지하철 역 목록 조회 테스트")
+    @Test
+    void getStationList() {
+
+        // given
+        createStation("강남역");
+        createStation("양재역");
+
+
+    }
+
+
+    private void createStation(String stationName) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", stationName);
+        RestAssured.given().log().all()
+                .body(param).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all();
+    }
+
+
 
     /**
      * Given 지하철역을 생성하고
