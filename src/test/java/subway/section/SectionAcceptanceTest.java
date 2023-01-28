@@ -106,13 +106,23 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given : 3개의 역, 1개의 노선을 등록
-     * When  : 새로운 구간의 하행역이 등록된 노선의 역인 구간을 추가 하면
+     * Given : 노선을 생성한다
+     * When  : 새로운 구간의 하행역이 이미 노선에 등록된 역이면
      * Then  : 구간 등록에 실패 한다
      */
     @Test
     void 지하철_노선_구간_등록_실패_새로운_구간의_하행역이_등록된_노선의_역_등록_불가() {
+        //given
+        long oldLineUpStationId = createStation("노선_상행역");
+        long oldLineDownStationId = createStation("노선_하행역");
+        long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
 
+        //when
+        SectionCreateRequest request = createSectionRequestFixture(lineId, oldLineDownStationId, oldLineDownStationId);
+        ExtractableResponse<Response> response = requestCreateSection(request);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     /**
