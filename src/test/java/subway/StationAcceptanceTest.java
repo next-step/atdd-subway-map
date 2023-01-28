@@ -88,18 +88,32 @@ public class StationAcceptanceTest {
     @Test
     @DisplayName("생성해둔 지하철 역을 삭제하면, 목록 조회시 해당 역을 찾을 수 없다.")
     void deleteStation() {
+        String stationName = "강남역";
+        Long id = createStation(stationName);
 
+        RestAssured
+            .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/stations/" + id);
+
+        List<String> stationNames = RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).doesNotContain(stationName);
     }
 
-    private static void createStation(String name) {
+    private static Long createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        RestAssured
+        return RestAssured
             .given()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-                .post("/stations");
+                .post("/stations")
+            .then().extract().jsonPath().getLong("id");
     }
 }
