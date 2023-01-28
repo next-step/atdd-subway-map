@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -30,23 +32,19 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = prepareRestAssuredGiven(params)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = prepareRestAssuredGiven()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -55,13 +53,69 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @Test
+    @DisplayName("등록된 지하철역 목록을 조회한다.")
+    void showStations() {
+        // given
+        String stationOne = "서울대입구역";
+        String stationTwo = "봉천역";
+        createStation(stationOne);
+        createStation(stationTwo);
+
+        // when
+        List<String> stationNames = prepareRestAssuredGiven()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertAll(
+            () -> assertThat(stationNames.size()).isEqualTo(2),
+            () -> assertThat(stationNames).containsAll(List.of(stationOne, stationTwo))
+        );
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @Test
+    @DisplayName("생성해둔 지하철 역을 삭제하면, 목록 조회시 해당 역을 찾을 수 없다.")
+    void deleteStation() {
+        // given
+        String stationName = "강남역";
+        Long id = createStation(stationName);
 
+        // when
+        RestAssured
+            .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/stations/" + id);
+
+        // then
+        List<String> stationNames = prepareRestAssuredGiven()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
+
+        assertThat(stationNames).doesNotContain(stationName);
+    }
+
+    private static Long createStation(String name) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+
+        return prepareRestAssuredGiven(params)
+            .when()
+                .post("/stations")
+            .then().extract().jsonPath().getLong("id");
+    }
+
+    private static RequestSpecification prepareRestAssuredGiven(Map<String, String> body) {
+        return prepareRestAssuredGiven().body(body);
+    }
+
+    private static RequestSpecification prepareRestAssuredGiven() {
+        return RestAssured.given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE);
+    }
 }
