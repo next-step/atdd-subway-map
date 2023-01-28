@@ -4,7 +4,7 @@ import subway.StationResponse;
 
 import java.util.List;
 
-public class RouteResponse {
+public class LineResponse {
     private Long id;
 
     private String name;
@@ -12,7 +12,7 @@ public class RouteResponse {
 
     private List<StationResponse> stations;
 
-    public RouteResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;

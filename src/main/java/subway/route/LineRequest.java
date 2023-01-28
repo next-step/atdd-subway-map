@@ -1,6 +1,6 @@
 package subway.route;
 
-public class RouteRequest {
+public class LineRequest {
     private String name;
     private String color;
     private Long upStationId;

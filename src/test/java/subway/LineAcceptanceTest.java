@@ -5,7 +5,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RouteAcceptanceTest {
+public class LineAcceptanceTest {
 
     /**
      * When 지하철 노선을 생성하면
@@ -41,10 +40,11 @@ public class RouteAcceptanceTest {
         params.put("downStationId", downStationId);
         params.put("distance", 10);
 
+
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/routes")
+                .when().post("/lines")
                 .then().log().all()
                 .extract();
 
@@ -59,5 +59,17 @@ public class RouteAcceptanceTest {
 
         List<String> names = response.jsonPath().getList("stations.name", String.class);
         assertThat(names).containsOnly("지하철역", "새로운지하철역");
+    }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록 조회")
+    @Test
+    void getRoutes() {
+
+
     }
 }
