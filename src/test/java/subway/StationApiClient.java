@@ -9,7 +9,7 @@ public class StationApiClient {
 
     private static final String ENDPOINT_STATIONS = "/stations";
 
-    static ExtractableResponse<Response> requestCreateStation(String name) {
+    public static ExtractableResponse<Response> requestCreateStation(String name) {
         StationRequest req = new StationRequest(name);
 
         return RestAssured.given().log().all()
