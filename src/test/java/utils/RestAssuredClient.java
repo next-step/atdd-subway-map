@@ -11,11 +11,8 @@ import java.util.Map;
 public class RestAssuredClient {
     public static ExtractableResponse<Response> post(
             String path,
-            JsonBodyParams bodyParams
+           Map<String, String> params
     ) {
-        Map<String, String> params = new HashMap<>();
-        params.put(bodyParams.getKey(), bodyParams.getValue());
-
         return RestAssured.given().log().all()
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

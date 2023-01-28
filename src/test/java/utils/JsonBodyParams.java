@@ -1,19 +1,21 @@
 package utils;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class JsonBodyParams {
-    String key;
-    String value;
+    private List<JsonBodyParam> bodyParams;
 
-    public JsonBodyParams(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public  JsonBodyParams(List<JsonBodyParam> params) {
+       this.bodyParams = params;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
+    public Map<String, String> toMap() {
+        Map<String, String> params = new HashMap<>();
+        for (JsonBodyParam bodyParam : bodyParams) {
+            params.put(bodyParam.getKey(), bodyParam.getValue());
+        }
+        return params;
     }
 }

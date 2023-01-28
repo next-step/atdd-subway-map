@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import utils.JsonBodyParams;
+import utils.JsonBodyParam;
 import utils.RestAssuredClient;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        var response = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParams("name", "강남역"));
+        var response = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -56,8 +56,8 @@ public class StationAcceptanceTest {
     @Test
     void findAllStations() {
         // Given 2개의 지하철역을 생성하고
-        RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParams("name", "강남역"));
-        RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParams("name", "서울대입구역"));
+        RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
+        RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
 
         // When 지하철역 목록을 조회하면
         List<String> stationNames = RestAssuredClient.get(Endpoints.STATIONS)
@@ -73,14 +73,14 @@ public class StationAcceptanceTest {
     @Test
     void deleteAllStations() {
         // Given 지하철역을 생성하고
-        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParams("name", "강남역"));
-        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParams("name", "서울대입구역"));
+        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
+        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
 
         Long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
         Long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
 
         // When 그 지하철역을 삭제하면
-        RestAssuredClient.delete(String.format("/stations/%s", 강남역_아이디));
+        RestAssuredClient.delete(Endpoints.endpointWithParam(Endpoints.STATIONS, 강남역_아이디));
 
         // Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
         List<Long> stationIds = RestAssuredClient.get(Endpoints.STATIONS)
@@ -90,4 +90,6 @@ public class StationAcceptanceTest {
         assertThat(stationIds).containsExactly(서울대입구역_아이디);
         assertThat(stationIds).doesNotContain(강남역_아이디);
     }
+
+
 }
