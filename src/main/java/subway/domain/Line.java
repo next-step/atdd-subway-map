@@ -27,7 +27,7 @@ public class Line extends BaseEntity {
     @Column(nullable = false)
     private Long distance;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color, Station upStation, Station downStation, Long distance) {
