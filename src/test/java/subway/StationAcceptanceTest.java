@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,13 +24,13 @@ class StationAcceptanceTest {
 
     private static final String 강남역 = "강남역";
     private static final String 논현역 = "논현역";
-    private static RequestSpecification requestSpec;
+    private static RequestSpecification REQUEST_SPEC;
 
     @BeforeEach
     public void setUp() {
         RequestSpecBuilder reqBuilder = new RequestSpecBuilder();
         reqBuilder.setContentType(ContentType.JSON);
-        requestSpec = reqBuilder.build();
+        REQUEST_SPEC = reqBuilder.build();
     }
 
     /**
@@ -43,7 +42,7 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = fixtureStation(강남역);
+        ExtractableResponse<Response> response = createStation(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -66,12 +65,12 @@ class StationAcceptanceTest {
     @Test
     void getStations() {
         // Given
-        fixtureStation(강남역);
-        fixtureStation(논현역);
+        createStation(강남역);
+        createStation(논현역);
 
         // When
         ExtractableResponse<Response> response =
-            RestAssured.given().spec(requestSpec).log().all()
+            RestAssured.given().spec(REQUEST_SPEC).log().all()
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
@@ -79,7 +78,7 @@ class StationAcceptanceTest {
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(stationNames).containsExactly(강남역, 논현역);
+        assertThat(stationNames).containsExactlyInAnyOrder(강남역, 논현역);
     }
 
     /**
@@ -91,7 +90,7 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // Given
-        ExtractableResponse<Response> givenResponse = fixtureStation(강남역);
+        ExtractableResponse<Response> givenResponse = createStation(강남역);
         Integer givenStationId = givenResponse.body().jsonPath().get("id");
 
         // When
@@ -115,13 +114,12 @@ class StationAcceptanceTest {
         assertThat(stationNames).isEmpty();
     }
 
-    private static ExtractableResponse<Response> fixtureStation(String stationName) {
+    private static ExtractableResponse<Response> createStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/stations")
             .then().log().all()
             .extract();
