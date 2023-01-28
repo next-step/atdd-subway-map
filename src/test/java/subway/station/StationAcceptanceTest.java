@@ -1,6 +1,6 @@
-package subway;
+package subway.station;
 
-import common.Endpoints;
+import subway.common.Endpoints;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -11,8 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import utils.JsonBodyParam;
-import utils.RestAssuredClient;
+import subway.utils.JsonBodyParam;
+import subway.utils.RestAssuredClient;
 
 import java.util.List;
 

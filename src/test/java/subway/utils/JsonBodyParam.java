@@ -1,4 +1,4 @@
-package utils;
+package subway.utils;
 
 import java.util.HashMap;
 import java.util.Map;

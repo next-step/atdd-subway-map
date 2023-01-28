@@ -1,4 +1,4 @@
-package subway;
+package subway.station;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +32,13 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public Station findById(Long id) {
+        var findStation = stationRepository.findById(id);
+        if (findStation.isPresent()) return findStation.get();
+        throw new StationNotFoundException(id);
+    }
+
     private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
+        return StationResponse.from(station);
     }
 }
