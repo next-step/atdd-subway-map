@@ -27,6 +27,13 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public StationResponse findOneStation(Long id) {
+        Station station = stationRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+        return StationResponse.from(station);
+    }
+
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @DisplayName("지하철역 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -64,7 +65,7 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역 제거한 후 목록을 조회하면 생성한 역을 찾을 수 없다.")
+    @DisplayName("지하철역 제거한 후 목록을 조회하면 Response Status Code가 500으로 반환된다.")
     @Test
     void deleteStatus() {
         // given
@@ -78,8 +79,12 @@ public class StationAcceptanceTest {
                         .extract();
 
         // then
-        List<Long> stationIds = getStationList().jsonPath().getList("id", Long.class);
-        assertThat(stationIds).size().isEqualTo(0);
+        ExtractableResponse<Response> getResponse = RestAssured.given().log().all()
+                .when().get("/station/{id}", stationId)
+                .then().log().all()
+                .extract();
+
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private ExtractableResponse<Response> getStationList() {
