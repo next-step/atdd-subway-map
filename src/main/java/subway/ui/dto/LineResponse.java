@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class LineResponse {
-    private final long id;
-    private final String name;
-    private final String color;
+    private long id;
+    private String name;
+    private String color;
     @JsonProperty("stations")
-    private final List<StationResponse> stationResponses;
+    private List<StationResponse> stationResponses;
+
+    private LineResponse() {}
 
     public LineResponse(final long id, final String name, final String color, final List<StationResponse> stationResponses) {
         this.id = id;
@@ -26,8 +28,8 @@ public class LineResponse {
         return new LineResponse(saveLine.getId(), saveLine.getName(), saveLine.getColor(), convertToStationResponse(saveLine.getUpStation(), saveLine.getDownStation()));
     }
 
-    private static List<StationResponse> convertToStationResponse(final Station...station) {
-        return Stream.of(station[0], station[1])
+    private static List<StationResponse> convertToStationResponse(final Station upStation, final Station downStation) {
+        return Stream.of(upStation, downStation)
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
