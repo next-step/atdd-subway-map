@@ -53,7 +53,7 @@ public class Sections extends AbstractList<Section> {
         Long newSectionUpStationId = newSection.getUpStation().getId();
         Long newSectionDownStationId = newSection.getDownStation().getId();
 
-        if (lastSectionDownStationId.equals(newSectionUpStationId)) {
+        if (!lastSectionDownStationId.equals(newSectionUpStationId)) {
             throw new IllegalArgumentException(String.format("마지막 구간의 하행역과 추가하려는 구간의 상행역이 다릅니다. 하행역 id:%d, 상행역 id:%d"
                     , lastSectionDownStationId
                     , newSectionUpStationId));
@@ -89,7 +89,7 @@ public class Sections extends AbstractList<Section> {
     }
 
     public void validateRemove(Long stationId) {
-        if (last().downStationId().equals(stationId)) {
+        if (!last().downStationId().equals(stationId)) {
             throw new IllegalArgumentException("마지막 구간의 하행역이 아닙니다.");
         }
 
