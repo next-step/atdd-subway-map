@@ -13,8 +13,7 @@ import subway.StationApiClient;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.line.LineApiClient.requestCreateLine;
-import static subway.line.LineApiClient.requestShowLines;
+import static subway.line.LineApiClient.*;
 
 @DisplayName("지하철 노선 관리 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -73,5 +72,26 @@ public class LineAcceptanceTest {
         // then
         assertThat(showLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(names).containsExactly("1호선", "2호선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선 조회")
+    @Test
+    void showLine() {
+        // given
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        LineResponse line = createLineResponse.body().as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> showLineResponse = requestShowLine(line.getId());
+        String name = showLineResponse.jsonPath().getString("name");
+
+        // then
+        assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(name).isEqualTo("1호선");
     }
 }

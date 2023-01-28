@@ -45,6 +45,11 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse findOneLine(Long id) {
+        Line line = this.lineRepository.getReferenceById(id);
+        return createLineResponse(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = line.getStations()
                 .stream()

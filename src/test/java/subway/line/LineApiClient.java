@@ -24,14 +24,23 @@ public class LineApiClient {
         return RestAssured.given().log().all()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
+                .when().post(ENDPOINT_LINES)
                 .then().log().all()
                 .extract();
     }
 
     static ExtractableResponse<Response> requestShowLines() {
         return RestAssured.given().log().all()
-                .when().get("/lines")
+                .when().get(ENDPOINT_LINES)
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> requestShowLine(Long id) {
+        final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
+
+        return RestAssured.given().log().all()
+                .when().get(ENDPOINT)
                 .then().log().all()
                 .extract();
     }
