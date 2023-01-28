@@ -31,4 +31,10 @@ public class LineService {
                 .map(LineResponse::createLineResponse)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findOneLine(Long id) {
+        return lineRepository.findById(id)
+                .map(LineResponse::createLineResponse)
+                .orElseThrow();
+    }
 }
