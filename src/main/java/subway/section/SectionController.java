@@ -2,10 +2,7 @@ package subway.section;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.section.dto.SectionCreateRequest;
 import subway.section.dto.SectionResponse;
 import subway.section.entity.Section;
@@ -24,5 +21,11 @@ public class SectionController {
         request.setLineId(lineId);
         Section section = sectionService.save(request);
         return ResponseEntity.created(URI.create("lines/" + request.getLineId() + "/sections")).body(SectionResponse.from(section));
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> delete(@PathVariable long lineId, long stationId) {
+        sectionService.delete(lineId, stationId);
+        return ResponseEntity.noContent().build();
     }
 }

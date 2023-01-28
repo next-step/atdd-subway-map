@@ -1,15 +1,13 @@
 package subway.section.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import subway.line.entity.Line;
 import subway.station.entity.Station;
 
 import javax.persistence.*;
 
 
+@ToString
 @Getter
 @Entity
 @NoArgsConstructor

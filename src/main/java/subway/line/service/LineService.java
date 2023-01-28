@@ -29,10 +29,7 @@ public class LineService {
         Station upStation = stationRepository.findById(lineCreateRequest.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(lineCreateRequest.getDownStationId()).orElseThrow();
 
-        Line line = lineCreateRequest.toEntity(upStation, downStation);
-
-        line = lineRepository.save(line);
-
+        Line line = lineRepository.save(lineCreateRequest.toEntity(upStation, downStation));
         return LineResponse.from(line);
     }
 

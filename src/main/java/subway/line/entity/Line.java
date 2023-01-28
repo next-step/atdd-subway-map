@@ -63,7 +63,16 @@ public class Line {
 
     public void remove(Section section) {
         sections.remove(section);
-        section.changeLine(null);
+    }
+
+    public void removeSectionByDownStationId(long removeStationId) {
+        long lastSectionDownStationId = sections.get(sections.size() - 1).getDownStation().getId();
+
+        if (lastSectionDownStationId != removeStationId) {
+            throw new IllegalArgumentException();
+        }
+
+        sections.remove(sections.size() - 1);
     }
 }
 

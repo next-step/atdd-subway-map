@@ -49,8 +49,9 @@ public class Sections extends AbstractList<Section> {
             return;
         }
 
-        long lastSectionDownStationId = this.lastSection().getDownStation().getId();
+        Long lastSectionDownStationId = this.lastSection().getDownStation().getId();
         Long newSectionUpStationId = newSection.getUpStation().getId();
+        Long newSectionDownStationId = newSection.getDownStation().getId();
 
         if (lastSectionDownStationId != newSectionUpStationId) {
             throw new IllegalArgumentException(String.format("마지막 구간의 하행역과 추가하려는 구간의 상행역이 다릅니다. 하행역 id:%d, 상행역 id:%d"
@@ -58,12 +59,12 @@ public class Sections extends AbstractList<Section> {
                     , newSectionUpStationId));
         }
 
-        boolean isSavedSectionStation = upStations()
+        boolean isSavedSectionStation = allStations()
                 .stream()
-                .anyMatch(station -> station.getId() == newSectionUpStationId);
+                .anyMatch(station -> station.getId() == newSectionDownStationId);
 
         if (isSavedSectionStation) {
-            throw new IllegalArgumentException("이미 노선에 등록된 역 입니다. id:" + newSectionUpStationId);
+            throw new IllegalArgumentException("이미 노선에 등록된 역 입니다. id:" + newSectionDownStationId);
         }
     }
 

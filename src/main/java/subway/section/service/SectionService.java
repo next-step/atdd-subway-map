@@ -25,10 +25,16 @@ public class SectionService {
         Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
         Line line = lineRepository.findById(request.getLineId()).orElseThrow();
-
+        
         Section section = request.toEntity(upStation, downStation);
-        section.changeLine(line);
+        line.addSection(section);
 
         return section;
+    }
+
+    @Transactional
+    public void delete(long lineId, long downStationId) {
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다. id : " + lineId));
+        line.removeSectionByDownStationId(downStationId);
     }
 }
