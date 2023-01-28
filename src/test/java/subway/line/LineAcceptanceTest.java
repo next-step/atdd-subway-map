@@ -53,7 +53,7 @@ public class LineAcceptanceTest {
         // Given
         final String name = "신분당선";
         final String color = "bg-red-600";
-        final Long distance = 10L;
+        final Integer distance = 10;
 
         // When
         LineResponse lineResponse = RestAssured
@@ -94,8 +94,8 @@ public class LineAcceptanceTest {
         // Given
         Long upStationId2 = StationAcceptanceTest.createStation("upStation");
         Long downStationId2 = StationAcceptanceTest.createStation("downStation");
-        LineResponse givenLine1 = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
-        LineResponse givenLine2 = createLine("2호선", "bg-green-000", upStationId2, downStationId2, 13L);
+        LineResponse givenLine1 = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
+        LineResponse givenLine2 = createLine("2호선", "bg-green-000", upStationId2, downStationId2, 13);
 
         // When
         List<LineResponse> lineResponses = RestAssured
@@ -122,7 +122,7 @@ public class LineAcceptanceTest {
     @Order(3)
     void searchLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
+        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
 
         // When
         LineResponse lineResponse = RestAssured
@@ -148,7 +148,7 @@ public class LineAcceptanceTest {
     @Order(4)
     void modifyLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
+        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
         final String givenModifiedName = "다른분당선";
         final String givenModifiedColor = "bg-red-600";
 
@@ -188,7 +188,7 @@ public class LineAcceptanceTest {
     @Order(5)
     void deleteLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20L);
+        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
 
         // When
         ExtractableResponse<Response> response = RestAssured
@@ -235,7 +235,7 @@ public class LineAcceptanceTest {
                 .extract().jsonPath().getObject("$", LineResponse.class);
     }
 
-    private LineResponse createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    private LineResponse createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         return RestAssured
             .given()
                 .contentType(ContentType.JSON)

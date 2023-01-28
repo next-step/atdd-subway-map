@@ -22,7 +22,7 @@ public class LineRequest {
 
     private Long downStationId;
 
-    private Long distance;
+    private Integer distance;
 
     @JsonIgnore
     public List<Long> getStationIds() {

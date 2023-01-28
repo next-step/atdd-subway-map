@@ -17,6 +17,6 @@ class LineRepositoryTest extends JpaRepositoryTest<Line, Long> {
 
     @Override
     protected Line createTestInstance() {
-        return new Line("line01", "bg-red-009");
+        return new Line("line01", "bg-red-009", 100);
     }
 }

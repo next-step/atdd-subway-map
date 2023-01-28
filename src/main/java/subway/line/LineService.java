@@ -61,6 +61,6 @@ public class LineService {
     private Line createLine(LineRequest request) {
         List<Station> stations = stationRepository.findByIdIn(request.getStationIds());
 
-        return new Line(request.getName(), request.getColor(), stations);
+        return new Line(request.getName(), request.getColor(), request.getDistance(), stations);
     }
 }

@@ -3,6 +3,7 @@ package subway.line;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,20 +24,24 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 20, nullable = false)
     private String name;
 
+    @Column(length = 20, nullable = false)
     private String color;
+
+    private Integer distance;
 
     @OneToMany(mappedBy = "line")
     private List<Station> stations = new ArrayList<>();
 
-    public Line(String name, String color) {
-        this(name, color, new ArrayList<>());
+    public Line(String name, String color, Integer distance) {
+        this(name, color, distance, new ArrayList<>());
     }
-
-    public Line(String name, String color, List<Station> stations) {
+    public Line(String name, String color, Integer distance, List<Station> stations) {
         this.name = name;
         this.color = color;
+        this.distance = distance;
         stations.forEach(this::addStation);
     }
 
