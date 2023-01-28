@@ -71,7 +71,7 @@ public class Line {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Line line = (Line) o;
-        return Objects.equals(id, line.id);
+        return id.equals(line.id);
     }
 
     @Override
