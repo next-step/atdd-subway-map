@@ -1,7 +1,6 @@
 package subway.section.dto;
 
 import lombok.*;
-import subway.line.entity.Line;
 import subway.section.entity.Section;
 import subway.station.entity.Station;
 
@@ -17,9 +16,8 @@ public class SectionCreateRequest {
     private long upStationId;
     private long distance;
 
-    public Section toEntity(Line line, Station upStation, Station downStation) {
+    public Section toEntity(Station upStation, Station downStation) {
         return Section.builder()
-                .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(distance)

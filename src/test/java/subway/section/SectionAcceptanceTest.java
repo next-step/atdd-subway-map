@@ -103,7 +103,6 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertRequestAndResponseEquals(request, response.as(SectionResponse.class));
     }
 
     /**
