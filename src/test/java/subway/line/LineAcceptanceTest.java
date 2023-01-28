@@ -94,4 +94,30 @@ public class LineAcceptanceTest {
         assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(name).isEqualTo("1호선");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 생성한 지하철 노선 정보는 수정된다.
+     */
+    @DisplayName("지하철 노선 수정")
+    @Test
+    void updateLine() {
+        // given
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        LineResponse line = createLineResponse.body().as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> updateLineResponse = requestUpdateLine(line.getId(), "9호선", "#BDB092");
+        assertThat(updateLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> showLineResponse = requestShowLine(line.getId());
+
+        String name = showLineResponse.jsonPath().getString("name");
+        String color = showLineResponse.jsonPath().getString("color");
+
+        assertThat(name).isEqualTo("9호선");
+        assertThat(color).isEqualTo("#BDB092");
+    }
 }

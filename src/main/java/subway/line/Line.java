@@ -29,8 +29,13 @@ public class Line {
     @ManyToMany
     private List<Station> stations = new ArrayList<>();
 
-
     public void addStation(Station station) {
         this.stations.add(station);
+    }
+    public void updateName(String name) {
+        this.name = name;
+    }
+    public void updateColor(String color) {
+        this.color = color;
     }
 }

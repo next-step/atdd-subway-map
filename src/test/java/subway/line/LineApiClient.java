@@ -44,4 +44,20 @@ public class LineApiClient {
                 .then().log().all()
                 .extract();
     }
+
+    static ExtractableResponse<Response> requestUpdateLine(Long id, String name, String color) {
+        final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
+
+        LineRequest lineRequest = LineRequest.builder()
+                .name(name)
+                .color(color)
+                .build();
+
+        return RestAssured.given().log().all()
+                .body(lineRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(ENDPOINT)
+                .then().log().all()
+                .extract();
+    }
 }

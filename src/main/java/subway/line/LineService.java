@@ -50,6 +50,15 @@ public class LineService {
         return createLineResponse(line);
     }
 
+    @Transactional
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = this.lineRepository.getReferenceById(id);
+        line.updateName(lineRequest.getName());
+        line.updateColor(lineRequest.getColor());
+
+        this.lineRepository.save(line);
+    }
+
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = line.getStations()
                 .stream()
