@@ -53,6 +53,24 @@ class LineAcceptanceTest {
         assertThat(lineNames).contains("신분당선", "수인분당선");
     }
 
+    @DisplayName("id에 해당하는 지하철 노선을 조회한다.")
+    @Test
+    void findOneLine() {
+        //given
+        createLineExtractableResponse(new LineRequest("신분당선", "bg-red-600", (long)1, (long)2, 10));
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("lines/{id}", 1)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getString("name")).contains("신분당선");
+
+    }
+
     private static ExtractableResponse<Response> createLineExtractableResponse(LineRequest lineRequest) {
         return RestAssured.given().log().all()
                 .body(lineRequest)
