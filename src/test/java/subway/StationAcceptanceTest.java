@@ -1,10 +1,8 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,10 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
-import static org.assertj.core.api.InstanceOfAssertFactories.predicate;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -78,12 +74,26 @@ class StationAcceptanceTest {
 
     @DisplayName("지하철 역 목록 조회 테스트")
     @Test
-    void getStationList() {
+    void getStations() {
 
         // given
         createStation("강남역");
         createStation("양재역");
 
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //then
+        List<String> stationsNameList = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+        assertThat(stationsNameList).containsExactly("강남역", "양재역");
 
     }
 
