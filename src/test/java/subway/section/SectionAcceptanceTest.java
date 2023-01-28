@@ -52,7 +52,7 @@ public class SectionAcceptanceTest extends AbstractTestDataBaseCleanUp {
 
     private void assertRequestAndResponseEquals(SectionCreateRequest request, SectionResponse sectionResponse) {
         assertThat(sectionResponse.getSectionId()).isNotNull();
-        assertThat(sectionResponse.getLineResponse().getId()).isEqualTo(request.getLineId());
+        assertThat(sectionResponse.getLine().getId()).isEqualTo(request.getLineId());
         assertThat(sectionResponse.getDistance()).isEqualTo(request.getDistance());
         assertThat(sectionResponse.getUpStation().getId()).isEqualTo(request.getUpStationId());
         assertThat(sectionResponse.getDownStation().getId()).isEqualTo(request.getDownStationId());
