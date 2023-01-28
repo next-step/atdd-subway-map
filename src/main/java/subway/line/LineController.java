@@ -29,4 +29,9 @@ public class LineController {
     public ResponseEntity<LineResponse> shoeLine(@PathVariable Long id) {
         return ResponseEntity.ok().body(lineService.findOneLine(id));
     }
+
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
+        return ResponseEntity.ok().body(lineService.updateLineById(id, lineRequest));
+    }
 }

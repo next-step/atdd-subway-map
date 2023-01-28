@@ -37,4 +37,10 @@ public class LineService {
                 .map(LineResponse::createLineResponse)
                 .orElseThrow();
     }
+
+    @Transactional
+    public LineResponse updateLineById(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow();
+        return LineResponse.createLineResponse(lineRepository.save(line.updateLine(lineRequest)));
+    }
 }
