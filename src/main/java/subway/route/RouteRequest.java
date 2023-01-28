@@ -3,9 +3,9 @@ package subway.route;
 public class RouteRequest {
     private String name;
     private String color;
-    private String upStationId;
-    private String downStationId;
-    private String distance;
+    private Long upStationId;
+    private Long downStationId;
+    private Long distance;
 
     public String getName() {
         return name;
@@ -15,15 +15,15 @@ public class RouteRequest {
         return color;
     }
 
-    public String getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public String getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public String getDistance() {
+    public Long getDistance() {
         return distance;
     }
 }

@@ -27,6 +27,13 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public List<StationResponse> findAllById(List<Long> ids) {
+        return stationRepository.findAllById(ids).stream()
+                .map(this::createStationResponse)
+                .collect(Collectors.toList());
+    }
+
+
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);

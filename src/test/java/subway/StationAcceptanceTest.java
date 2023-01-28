@@ -117,7 +117,7 @@ public class StationAcceptanceTest {
      * @param stationName
      * @return
      */
-    private static ExtractableResponse<Response> createSubwayStation(String stationName) {
+    static ExtractableResponse<Response> createSubwayStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put(NAME_FILED, stationName);
 
@@ -154,7 +154,11 @@ public class StationAcceptanceTest {
         return response;
     }
 
-    private static List<String> stationResponseToStationNames(ExtractableResponse<Response> stationsResponse) {
+    static List<String> stationResponseToStationNames(ExtractableResponse<Response> stationsResponse) {
         return stationsResponse.jsonPath().getList(NAME_FILED, String.class);
+    }
+
+    static Long extractStationId(ExtractableResponse<Response> stationsResponse) {
+        return stationsResponse.jsonPath().getLong(ID_FILED);
     }
 }

@@ -10,9 +10,15 @@ import java.net.URI;
 @RestController
 public class RouteController {
 
+    private final RouteService routeService;
+
+    public RouteController(RouteService routeService) {
+        this.routeService = routeService;
+    }
+
     @PostMapping("/routes")
     public ResponseEntity<RouteResponse> createStation(@RequestBody RouteRequest routeRequest) {
-        RouteResponse routeResponse = new RouteResponse(1L, routeRequest.getName(), routeRequest.getColor(), null);
+        RouteResponse routeResponse = routeService.saveRoute(routeRequest);
         return ResponseEntity.created(URI.create("/routes/1")).body(routeResponse);
     }
 
