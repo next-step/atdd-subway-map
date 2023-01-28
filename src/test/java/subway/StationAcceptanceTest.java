@@ -36,7 +36,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 생성한다.")
     @Test
-    void createStationThenFindStationTest() {
+    void createStationTest() {
         // when
         ExtractableResponse<Response> response = StationApi.createStation(강남역);
 
@@ -53,9 +53,9 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    @DisplayName("2개의 지하철역을 생성한다")
+    @DisplayName("지하철역을 조회한다")
     @Test
-    void createStationsThenFindStationsTest() {
+    void showStationsTest() {
         // Given
         StationApi.createStations(강남역, 서초역);
 
@@ -76,7 +76,7 @@ public class StationAcceptanceTest {
      */
     @DisplayName("지하철역을 제거한다")
     @Test
-    void deleteStationThenCannotFindStationTest() {
+    void deleteStation() {
         // Given
         StationApi.createStations(강남역, 서초역, 신촌역);
 
