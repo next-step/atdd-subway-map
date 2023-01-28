@@ -3,6 +3,7 @@ package subway.line;
 import subway.station.Station;
 
 import javax.persistence.*;
+
 @Entity
 public class Line {
     @Id

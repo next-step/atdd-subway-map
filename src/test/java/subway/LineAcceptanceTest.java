@@ -93,7 +93,7 @@ class LineAcceptanceTest {
     @Test
     void deleteOneLine() {
         //given
-        createLineExtractableResponse(new LineRequest("신분당선", "bg-red-600", (long)1, (long)2, 10));
+        createLineExtractableResponse(new LineRequest("신분당선", "bg-red-600", (long) 1, (long) 2, 10));
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
