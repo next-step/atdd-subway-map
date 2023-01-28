@@ -6,10 +6,10 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.exception.LineNotFoundException;
 import subway.repository.LineRepository;
 import subway.repository.StationRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +44,7 @@ public class LineService {
     }
 
     private Station findStation(Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(EntityNotFoundException::new);
+        return stationRepository.findById(stationId).orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
@@ -58,13 +58,13 @@ public class LineService {
     public LineResponse findLine(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::of)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(LineNotFoundException::new);
     }
 
     @Transactional
     public void updateLine(Long id, LineRequest request) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(LineNotFoundException::new);
 
         line.changeColor(request.getColor());
         line.changeName(request.getName());
