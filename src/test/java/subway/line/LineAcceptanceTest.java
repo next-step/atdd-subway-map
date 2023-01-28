@@ -154,9 +154,9 @@ public class LineAcceptanceTest extends AbstractTestDataBaseCleanUp {
         assertThat(find.getId()).isEqualTo(id);
         assertThat(find.getName()).isEqualTo(request.getName());
         assertThat(find.getColor()).isEqualTo(request.getColor());
-        assertThat(find.getStationResponses()).hasSize(2);
-        assertThat(find.getStationResponses().get(0).getId()).isEqualTo(request.getUpStationId());
-        assertThat(find.getStationResponses().get(1).getId()).isEqualTo(request.getDownStationId());
+        assertThat(find.getStations()).hasSize(2);
+        assertThat(find.getStations().get(0).getId()).isEqualTo(request.getUpStationId());
+        assertThat(find.getStations().get(1).getId()).isEqualTo(request.getDownStationId());
     }
 
     public static LineResponse requestCreateLine(String name) {

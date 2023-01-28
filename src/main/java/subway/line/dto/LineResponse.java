@@ -17,13 +17,13 @@ public class LineResponse {
     private long id;
     private String name;
     private String color;
-    private List<StationResponse> stationResponses = new ArrayList<>();
+    private List<StationResponse> stations = new ArrayList<>();
 
     public static LineResponse from(Line line) {
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
-                .stationResponses(createSectionResponses(line))
+                .stations(createSectionResponses(line))
                 .color(line.getColor())
                 .build();
     }
