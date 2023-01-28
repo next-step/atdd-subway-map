@@ -97,16 +97,7 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // Given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> given = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
-
+        ExtractableResponse<Response> given = fixtureStation("강남역");
         Integer givenStationId = given.body().jsonPath().get("id");
 
         // When
@@ -130,19 +121,19 @@ class StationAcceptanceTest {
         assertThat(stationNames).isEmpty();
     }
 
-    private static void fixtureStation(String stationName) {
+    private static ExtractableResponse<Response> fixtureStation(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        ExtractableResponse<Response> response =
-            RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(params)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .body(params)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().post("/stations")
+            .then().log().all()
+            .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response;
     }
 
 }
