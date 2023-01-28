@@ -53,32 +53,8 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        validateSectionForSave(section);
-
         sections.add(section);
         section.changeLine(this);
-    }
-
-    private void validateSectionForSave(Section section) {
-        // 이미 저장 되어있거나 구간이 없으면 항상 통과하므로 검증할 필요가 없다.
-        if (sections.isEmpty() || sections.contains(section)) {
-            return;
-        }
-
-        long lastSectionDownStationId = sections.get(sections.size() - 1).getDownStation().getId();
-        Long newSectionUpStationId = section.getUpStation().getId();
-
-        if (lastSectionDownStationId != newSectionUpStationId) {
-            throw new IllegalArgumentException();
-        }
-
-        boolean isSavedSectionStation = sections.stations()
-                .stream()
-                .anyMatch(station -> station.getId() == newSectionUpStationId); // 하행은 위에서 체크했으므로 상행만 체크한다.
-
-        if (isSavedSectionStation) {
-            throw new IllegalArgumentException();
-        }
     }
 
     public void removeLastSection() {
