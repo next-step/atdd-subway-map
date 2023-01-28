@@ -94,7 +94,7 @@ public class Sections extends AbstractList<Section> {
         }
 
         if (values.size() <= 1) {
-            throw new IllegalArgumentException("노선에 구간이 한개 이하 입니다.");
+            throw new IllegalArgumentException("노선에 구간이 하나 입니다.");
         }
     }
 

@@ -146,17 +146,10 @@ public class SectionAcceptanceTest {
 
         SectionCreateRequest request = createSectionRequestFixture(lineId, newSectionDownStationId, oldLineDownStationId);
         ExtractableResponse<Response> createSectionResponse = requestCreateSection(request);
-
         assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()); // then에서 검증하는게 좋을까?
 
         //when
-        ExtractableResponse<Response> deleteResponse = given()
-                .pathParam("id", lineId)
-                .param("stationId", newSectionDownStationId)
-                .when().log().all()
-                .delete("/lines/{id}/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> deleteResponse = requestDeleteSection(lineId, newSectionDownStationId);
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -164,21 +157,59 @@ public class SectionAcceptanceTest {
         sectionRepository.findById(sectionId).ifPresent(section -> fail("구간이 제거 되지 않았습니다"));
     }
 
+    private ExtractableResponse<Response> requestDeleteSection(long lineId, long newSectionDownStationId) {
+        return given()
+                .pathParam("id", lineId)
+                .param("stationId", newSectionDownStationId)
+                .when().log().all()
+                .delete("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+    }
+
     /**
-     * Given : 3개의 역, 1개의 노선, 1개의 구간을 등록
+     * Given : 노선을 등록한다
+     * And   : 구간을 등록한다
      * When  : 마지막 이 아닌 구간을 제거 하면
      * Then  : 구간 제거에 실패 한다
      */
     @Test
     void 지하철_노선_구간_실패_마지막이_아닌_구간_제거_불가() {
+        //given
+        long oldLineUpStationId = createStation("노선_상행역");
+        long oldLineDownStationId = createStation("노선_하행역");
+        long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
+        long newSectionDownStationId = createStation("추가하는_구간_하행역");
+
+        SectionCreateRequest request = createSectionRequestFixture(lineId, newSectionDownStationId, oldLineDownStationId);
+        ExtractableResponse<Response> createSectionResponse = requestCreateSection(request);
+        assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()); // then에서 검증하는게 좋을까?
+
+        //when
+        ExtractableResponse<Response> deleteResponse = requestDeleteSection(lineId, oldLineDownStationId);
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(deleteResponse.asString()).isEqualTo("마지막 구간의 하행역이 아닙니다."); // 메시지를 바꾸면 테스트가 꺠지는데 상수화 하는게 좋을까?
     }
 
     /**
-     * Given : 3개의 역, 1개의 노선, 1개의 구간을 등록
+     * Given : 노선을 등록한다
      * When  : 구간이 하나인 구간을 제거 하면
      * Then  : 구간 제거에 실패 한다
      */
     @Test
     void 지하철_노선_구간_실패_구간이_하나인_구간_제거_불가() {
+        //given
+        long oldLineUpStationId = createStation("노선_상행역");
+        long oldLineDownStationId = createStation("노선_하행역");
+        long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
+
+        //when
+        ExtractableResponse<Response> deleteResponse = requestDeleteSection(lineId, oldLineDownStationId);
+
+        //then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(deleteResponse.asString()).isEqualTo("노선에 구간이 하나 입니다."); // 메시지를 바꾸면 테스트가 꺠지는데 상수화 하는게 좋을까?
     }
 }
