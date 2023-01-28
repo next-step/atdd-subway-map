@@ -1,9 +1,17 @@
 package subway;
 
-public class StationRequest {
-    private String name;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    public String getName() {
-        return name;
-    }
+@Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class StationRequest {
+	private String name;
+
+	@Builder
+	private StationRequest(String name) {
+		this.name = name;
+	}
 }
