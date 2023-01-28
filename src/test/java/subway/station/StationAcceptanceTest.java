@@ -1,5 +1,6 @@
-package subway;
+package subway.station;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -7,17 +8,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
 
     /**
@@ -103,48 +106,43 @@ public class StationAcceptanceTest {
             .doesNotContain(givenStationName);
     }
 
-    static Long createStation(String name) {
+    public static Long createStation(String name) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
         ExtractableResponse<Response> response =
-            given().log().all()
+            given()
                 .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(ContentType.JSON)
             .when()
                 .post("/stations")
             .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .log().all()
                 .extract();
 
         return response.jsonPath().getLong("id");
     }
 
-    static List<String> findAllStationNames() {
+    public static List<String> findAllStationNames() {
         ExtractableResponse<Response> response =
             given()
-                .log().all()
             .when()
                 .get("/stations")
             .then()
                 .statusCode(HttpStatus.OK.value())
-                .log().all()
                 .extract();
 
         return response.jsonPath().getList("name");
     }
 
     @SuppressWarnings("unused")
-    static void deleteStation(Long id) {
+    public static void deleteStation(Long id) {
         ExtractableResponse<Response> response =
             given()
-                .log().all()
             .when()
                 .delete("/stations/{id}", id)
             .then()
                 .statusCode(HttpStatus.NO_CONTENT.value())
-                .log().all()
                 .extract();
     }
 }

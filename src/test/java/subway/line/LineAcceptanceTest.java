@@ -1,4 +1,4 @@
-package subway;
+package subway.line;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,22 +13,31 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import subway.line.LineModifyRequest;
-import subway.line.LineRequest;
-import subway.line.LineResponse;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import subway.station.StationAcceptanceTest;
+import subway.station.StationRepository;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
     private Long upStationId;
     private Long downStationId;
+    @Autowired
+    private StationRepository stationRepository;
+    @Autowired
+    private LineRepository lineRepository;
 
     @BeforeEach
     void beforeEach() {
+        stationRepository.deleteAll();
+        lineRepository.deleteAll();
         upStationId = StationAcceptanceTest.createStation("upStation");
         downStationId = StationAcceptanceTest.createStation("downStation");
     }
@@ -91,11 +100,12 @@ public class LineAcceptanceTest {
         // When
         List<LineResponse> lineResponses = RestAssured
             .given()
+                .contentType(ContentType.JSON)
             .when()
-            .get("/lines")
+                .get("/lines")
             .then()
-            .log().all()
-            .extract().jsonPath().getList("$", LineResponse.class);
+                .log().all()
+                .extract().jsonPath().getList("$", LineResponse.class);
 
         // Then
         assertThat(lineResponses)
@@ -121,7 +131,7 @@ public class LineAcceptanceTest {
                 .get("/lines/{id}", givenLine.getId())
             .then()
                 .log().all()
-                .extract().jsonPath().get();
+                .extract().jsonPath().getObject("$", LineResponse.class);
 
         // Then
         assertThat(lineResponse)
@@ -145,6 +155,7 @@ public class LineAcceptanceTest {
         // When
         ExtractableResponse<Response> response = RestAssured
             .given()
+                .contentType(ContentType.JSON)
                 .body(
                     LineModifyRequest.builder()
                         .name(givenModifiedName)
@@ -211,7 +222,6 @@ public class LineAcceptanceTest {
                 .get("/lines")
             .then()
                 .statusCode(HttpStatus.OK.value())
-                .log().all()
                 .extract().jsonPath().getList("$", LineResponse.class);
     }
 
@@ -222,13 +232,13 @@ public class LineAcceptanceTest {
                 .get("/lines/{id}", lineId)
             .then()
                 .statusCode(HttpStatus.OK.value())
-                .log().all()
-                .extract().jsonPath().get();
+                .extract().jsonPath().getObject("$", LineResponse.class);
     }
 
     private LineResponse createLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
         return RestAssured
             .given()
+                .contentType(ContentType.JSON)
             .body(
                 LineRequest.builder()
                     .name(name)
@@ -242,7 +252,6 @@ public class LineAcceptanceTest {
                 .post("/lines")
             .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .log().all()
-                .extract().jsonPath().get();
+                .extract().jsonPath().getObject("$", LineResponse.class);
     }
 }

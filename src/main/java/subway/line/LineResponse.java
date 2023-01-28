@@ -2,15 +2,18 @@ package subway.line;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import subway.station.StationResponse;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
+@Setter(AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = {"id", "name", "color"})
 public class LineResponse {
     private Long id;

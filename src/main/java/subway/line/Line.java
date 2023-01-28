@@ -2,6 +2,7 @@ package subway.line;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,7 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
+import org.apache.commons.lang3.StringUtils;
 import subway.station.Station;
 
 @Entity
@@ -27,7 +28,6 @@ public class Line {
     private String color;
 
     @OneToMany(mappedBy = "line")
-    @BatchSize(size = 20)
     private List<Station> stations = new ArrayList<>();
 
     public Line(String name, String color) {
@@ -40,6 +40,10 @@ public class Line {
         stations.forEach(this::addStation);
     }
 
+    public List<Long> getStationIds() {
+        return stations.stream().map(Station::getId)
+            .collect(Collectors.toList());
+    }
     public void removeStation(Station station) {
         if (stations.contains(station)) {
             stations.remove(station);
@@ -51,6 +55,18 @@ public class Line {
         if (!stations.contains(station)) {
             stations.add(station);
             station.changeLine(this);
+        }
+    }
+
+    public void modify(LineModifyRequest lineModifyRequest) {
+        String modifiedName = lineModifyRequest.getName();
+        if (StringUtils.isNotBlank(modifiedName)) {
+            this.name = modifiedName;
+        }
+
+        String modifiedColor = lineModifyRequest.getColor();
+        if (StringUtils.isNotBlank(modifiedColor)) {
+            this.color = modifiedColor;
         }
     }
 }

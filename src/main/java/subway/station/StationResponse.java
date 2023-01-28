@@ -1,13 +1,16 @@
 package subway.station;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
+@Setter(AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
 public class StationResponse {
     private Long id;
