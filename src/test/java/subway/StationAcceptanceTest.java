@@ -26,16 +26,19 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        createStation("강남역");
+    }
 
+    @DisplayName("주어진 이름의 지하철역을 생성한다.")
+    @Test
+    void createStation(String name) {
+        // when
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
+                RestAssured.given()
+                        .body(Map.entry("name", name))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
-                        .then().log().all()
+                        .then()
                         .extract();
 
         // then
@@ -43,11 +46,11 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
+                RestAssured.given()
                         .when().get("/stations")
-                        .then().log().all()
+                        .then()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(name);
     }
 
     /**
