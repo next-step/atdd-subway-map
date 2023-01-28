@@ -12,8 +12,10 @@ import org.springframework.http.MediaType;
 import subway.common.DataBaseCleanUp;
 import subway.section.dto.SectionCreateRequest;
 import subway.section.dto.SectionResponse;
+import subway.section.repository.SectionRepository;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static subway.line.LineAcceptanceTest.createLineRequestFixture;
 import static subway.line.LineAcceptanceTest.requestCreateLine;
@@ -22,6 +24,9 @@ import static subway.station.StationAcceptanceTest.createStation;
 @DisplayName("지하철 노선 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SectionAcceptanceTest {
+
+    @Autowired
+    private SectionRepository sectionRepository;
 
     @Autowired
     private DataBaseCleanUp dataBaseCleanUp;
@@ -155,6 +160,8 @@ public class SectionAcceptanceTest {
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        Long sectionId = createSectionResponse.as(SectionResponse.class).getSectionId();
+        sectionRepository.findById(sectionId).ifPresent(section -> fail("구간이 제거 되지 않았습니다"));
     }
 
     /**
