@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +57,23 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 조회한다.")
+    @Test
+    void selectStation() {
+        // given
+        createStation("강남역");
+        createStation("판교역");
+
+        // when
+        List<String> list = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(list).containsExactly("강남역", "판교역");
+    }
 
     /**
      * Given 지하철역을 생성하고
