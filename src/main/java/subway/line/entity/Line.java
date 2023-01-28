@@ -65,14 +65,8 @@ public class Line {
         sections.remove(section);
     }
 
-    public void removeSectionByDownStationId(long removeStationId) {
-        long lastSectionDownStationId = sections.get(sections.size() - 1).getDownStation().getId();
-
-        if (lastSectionDownStationId != removeStationId) {
-            throw new IllegalArgumentException();
-        }
-
-        sections.remove(sections.size() - 1);
+    public void removeSectionByStationId(Long stationId) {
+        sections.removeByStationId(stationId);
     }
 }
 

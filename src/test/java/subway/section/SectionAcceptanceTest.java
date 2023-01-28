@@ -148,7 +148,7 @@ public class SectionAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = given()
                 .pathParam("id", lineId)
                 .param("stationId", newSectionDownStationId)
-                .when()
+                .when().log().all()
                 .delete("/lines/{id}/sections")
                 .then().log().all()
                 .extract();

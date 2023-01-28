@@ -20,15 +20,15 @@ public class Section {
     private Long id;
 
     @JoinColumn(name = "line_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Line line;
 
     @JoinColumn(name = "down_station_id")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private Station downStation;
 
     @JoinColumn(name = "up_station_id")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private Station upStation;
 
     @Column(length = 20, nullable = false)
@@ -48,5 +48,13 @@ public class Section {
 
         line.addSection(this);
         this.line = line;
+    }
+
+    public Long upStationId() {
+        return upStation.getId();
+    }
+
+    public Long downStationId() {
+        return downStation.getId();
     }
 }

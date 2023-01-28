@@ -3,7 +3,8 @@ spring:
     properties:
       hibernate.show_sql: true
       hibernate.format_sql: true
-      default_batch_fetch_size: 1000
+      hibernate:
+        default_batch_fetch_size: 1000
 
 logging:
   level:

@@ -49,7 +49,7 @@ public class Sections extends AbstractList<Section> {
             return;
         }
 
-        Long lastSectionDownStationId = this.lastSection().getDownStation().getId();
+        Long lastSectionDownStationId = this.last().getDownStation().getId();
         Long newSectionUpStationId = newSection.getUpStation().getId();
         Long newSectionDownStationId = newSection.getDownStation().getId();
 
@@ -68,18 +68,13 @@ public class Sections extends AbstractList<Section> {
         }
     }
 
-    @Override
-    public Section remove(int index) {
-        return values.remove(index);
-    }
-
     public List<Station> allStations() {
         if (values.isEmpty()) {
             return new ArrayList<>();
         }
 
         List<Station> upStations = upStations();
-        upStations.add(lastSection().getDownStation());
+        upStations.add(last().getDownStation());
         return upStations;
     }
 
@@ -89,7 +84,22 @@ public class Sections extends AbstractList<Section> {
                 .collect(Collectors.toList());
     }
 
-    private Section lastSection() {
+    public Section last() {
         return values.get(values.size() - 1);
+    }
+
+    public void validateRemove(Long stationId) {
+        if (last().downStationId() != stationId) {
+            throw new IllegalArgumentException("마지막 구간의 하행역이 아닙니다.");
+        }
+
+        if (values.size() <= 1) {
+            throw new IllegalArgumentException("노선에 구간이 한개 이하 입니다.");
+        }
+    }
+
+    public void removeByStationId(Long stationId) {
+        validateRemove(stationId);
+        values.removeIf(section -> section.downStationId() == stationId);
     }
 }
