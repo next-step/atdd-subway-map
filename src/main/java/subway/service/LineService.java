@@ -25,7 +25,7 @@ public class LineService {
         this.stationRepository = stationRepository;
     }
 
-    @Transactional
+    @Transactional(readOnly = false)
     public LineResponse saveLine(LineRequest lineRequest) {
 
         Station upStation = findStation(lineRequest.getUpStationId());
@@ -47,14 +47,12 @@ public class LineService {
         return stationRepository.findById(stationId).orElseThrow(LineNotFoundException::new);
     }
 
-    @Transactional
     public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    @Transactional
     public LineResponse findLine(Long id) {
         return lineRepository.findById(id)
                 .map(LineResponse::of)
