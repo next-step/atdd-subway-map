@@ -70,7 +70,6 @@ class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("name")).contains("신분당선");
     }
 
-
     @DisplayName("id에 해당하는 지하철 노선을 수정한다")
     @Test
     void updateOneLine() {
@@ -88,6 +87,22 @@ class LineAcceptanceTest {
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.jsonPath().getString("name")).contains("다른분당선");
+    }
+
+    @DisplayName("id에 해당하는 지하철 노선을 삭제한다.")
+    @Test
+    void deleteOneLine() {
+        //given
+        createLineExtractableResponse(new LineRequest("신분당선", "bg-red-600", (long)1, (long)2, 10));
+
+        //when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("lines/{id}", 1)
+                .then().log().all()
+                .extract();
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     private static ExtractableResponse<Response> createLineExtractableResponse(LineRequest lineRequest) {
