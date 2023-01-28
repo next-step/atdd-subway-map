@@ -137,6 +137,7 @@ public class LineAcceptanceTest {
         //Then 해당 지하철 노선 정보는 삭제된다
         ExtractableResponse<Response> response = requestFindLine(id);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
     }
 
     public static ExtractableResponse<Response> requestFindLine(long id) {
