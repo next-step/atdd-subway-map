@@ -1,21 +1,19 @@
 package subway.line;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.Station;
 import subway.StationResponse;
 import subway.StationService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class LineService {
-    private StationService stationService;
-    private LineRepository lineRepository;
+    private final StationService stationService;
+    private final LineRepository lineRepository;
 
     public LineService(StationService stationService, LineRepository lineRepository) {
         this.stationService = stationService;
@@ -41,10 +39,16 @@ public class LineService {
         return createLineResponse(savedLine);
     }
 
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(this::createLineResponse)
+                .collect(Collectors.toList());
+    }
+
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = line.getStations()
                 .stream()
-                .map((s) -> this.stationService.createStationResponse(s))
+                .map(this.stationService::createStationResponse)
                 .collect(Collectors.toList());
 
         return LineResponse.builder()

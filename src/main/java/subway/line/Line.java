@@ -3,6 +3,7 @@ package subway.line;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import subway.Station;
 
 import javax.persistence.*;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Entity
 public class Line {
@@ -23,8 +26,9 @@ public class Line {
     private String color;
 
     @Builder.Default
-    @OneToMany
+    @ManyToMany
     private List<Station> stations = new ArrayList<>();
+
 
     public void addStation(Station station) {
         this.stations.add(station);

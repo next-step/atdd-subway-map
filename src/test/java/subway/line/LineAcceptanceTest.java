@@ -1,6 +1,5 @@
 package subway.line;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,11 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import subway.StationApiClient;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.line.LineApiClient.requestCreateLine;
+import static subway.line.LineApiClient.requestShowLines;
 
 @DisplayName("지하철 노선 관리 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -38,26 +40,38 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 생성")
     @Test
     void createLine() {
-        String nameForRequest = "7호선";
+        // when
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("7호선", "#747F00", upStationId, downStationId, 12);
+        String name = createLineResponse.jsonPath().getString("name");
 
-        LineRequest req = LineRequest.builder()
-                .name(nameForRequest)
-                .color("#747F00")
-                .upStationId(upStationId)
-                .downStationId(downStationId)
-                .distance(12)
-                .build();
+        assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(name).isEqualTo("7호선");
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(req)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        // then
+        ExtractableResponse<Response> showLinesResponse = requestShowLines();
+        List<String> names = showLinesResponse.jsonPath().getList("name", String.class);
 
-        String nameFromResponse = response.jsonPath().getString("name");
+        assertThat(names).containsAnyOf("7호선");
+    }
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(nameFromResponse).isEqualTo(nameForRequest);
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+    @DisplayName("지하철 노선 목록 조회")
+    @Test
+    void showLines() {
+        // given
+        requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        requestCreateLine("2호선", "#00A84D", upStationId, downStationId, 10);
+
+        // when
+        ExtractableResponse<Response> showLinesResponse = requestShowLines();
+        List<String> names = showLinesResponse.jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(showLinesResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(names).containsExactly("1호선", "2호선");
     }
 }
