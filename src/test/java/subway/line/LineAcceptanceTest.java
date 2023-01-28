@@ -173,9 +173,13 @@ public class LineAcceptanceTest {
     }
 
     public static LineCreateRequest createLineRequestFixture(String name) {
-        String color = "bg-red-600";
         long upStationId = StationAcceptanceTest.createStation(name + "-상행역");
         long downStationId = StationAcceptanceTest.createStation(name + "-하행역");
+        return createLineRequestFixture(name, upStationId, downStationId);
+    }
+
+    public static LineCreateRequest createLineRequestFixture(String name, long upStationId, long downStationId) {
+        String color = "bg-red-600";
         long distance = 10;
         return new LineCreateRequest(name, color, upStationId, downStationId, distance);
     }

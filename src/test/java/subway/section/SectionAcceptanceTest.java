@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.common.DataBaseCleanUp;
-import subway.line.dto.LineCreateRequest;
 import subway.section.dto.SectionCreateRequest;
 import subway.section.dto.SectionResponse;
 
@@ -31,19 +30,28 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given : 1개의 역, 1개의 노선을 등록
+     * Given : 노선을 생성한다
      * When  : 구간을 추가 하면
-     * Then  : 구간을 추가 된다
+     * Then  : 구간이 추가 되고 추가된 구간을 응답한다.
+     * And   : 응답한 구간은 생성요청한 구간의 정보와 같다.
      */
     @Test
     void 지하철_노선_구간_등록_성공() {
         //given
-        SectionCreateRequest request = createSectionCreateRequest("노선1", "역1");
+        Long oldLineUpStationId = createStation("노선_상행역");
+        Long oldLineDownStationId = createStation("노선_하행역");
+        long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
+        Long sectionDownStationId = createStation("추가하는_구간_하행역");
 
         //when
+        SectionCreateRequest request = createSectionCreateRequest(lineId, sectionDownStationId, oldLineDownStationId);
         SectionResponse sectionResponse = requestCreateSection(request);
 
         //then
+        assertRequestAndResponseEquals(request, sectionResponse);
+    }
+
+    private void assertRequestAndResponseEquals(SectionCreateRequest request, SectionResponse sectionResponse) {
         assertThat(sectionResponse.getSectionId()).isNotNull();
         assertThat(sectionResponse.getLineResponse().getId()).isEqualTo(request.getLineId());
         assertThat(sectionResponse.getDistance()).isEqualTo(request.getDistance());
@@ -51,15 +59,11 @@ public class SectionAcceptanceTest {
         assertThat(sectionResponse.getDownStation().getId()).isEqualTo(request.getDownStationId());
     }
 
-    private SectionCreateRequest createSectionCreateRequest(String lineName, String newDownStaionName) {
-        Long downStationId = createStation(newDownStaionName);
-
-        LineCreateRequest lineCreateRequest = createLineRequestFixture(lineName);
-        long lineId = requestCreateLine(lineCreateRequest).getId();
+    private SectionCreateRequest createSectionCreateRequest(Long lineId, Long downStationId, Long upStationId) {
 
         SectionCreateRequest request = SectionCreateRequest.builder()
                 .lineId(lineId)
-                .upStationId(lineCreateRequest.getUpStationId())
+                .upStationId(upStationId)
                 .downStationId(downStationId)
                 .distance(10)
                 .build();
@@ -81,12 +85,24 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given : 3개의 역, 1개의 노선을 등록
+     * Given : 노선을 생성한다.
      * When  : 새로운 구간의 상행역이 등록된 노선의 하행 종점이 아닌 구간을 추가 하면
      * Then  : 구간 등록에 실패 한다
      */
     @Test
     void 지하철_노선_구간_등록_실패_새로운_구간의_상행이_등록된_노선의_하행종점과_다르면_등록_불가() {
+        //given
+        Long oldLineUpStationId = createStation("역1");
+        Long oldLineDownStationId = createStation("역1");
+        long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
+        Long sectionDownStationId = createStation("역1");
+
+        //when
+        SectionCreateRequest request = createSectionCreateRequest(lineId, sectionDownStationId, oldLineUpStationId);
+        SectionResponse sectionResponse = requestCreateSection(request);
+
+        //then
+        assertRequestAndResponseEquals(request, sectionResponse);
     }
 
     /**
