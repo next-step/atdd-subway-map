@@ -76,9 +76,8 @@ public class StationAcceptanceTest {
                         .extract();
 
         // then
-        ExtractableResponse<Response> stationList = getStationList();
-
-        assertThat(stationList.body().jsonPath().getList("id").size()).isEqualTo(0);
+        List<Long> stationIds = getStationList().jsonPath().getList("id", Long.class);
+        assertThat(stationIds).size().isEqualTo(0);
     }
 
     private ExtractableResponse<Response> getStationList() {
