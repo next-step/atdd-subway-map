@@ -1,12 +1,12 @@
 package subway.ui.dto;
 
-import com.fasterxml.jackson.annotation.*;
 import subway.domain.Station;
 
-@JsonTypeName(value = "stations")
 public class StationResponse {
     private Long id;
     private String name;
+
+    private StationResponse() {}
 
     public StationResponse(final Long id, final String name) {
         this.id = id;
