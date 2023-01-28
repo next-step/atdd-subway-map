@@ -33,11 +33,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = getStationList().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -53,11 +49,7 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> 강남역 = createStation("강남역");
         ExtractableResponse<Response> 논현역 = createStation("논현역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = getStationList();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -84,13 +76,16 @@ public class StationAcceptanceTest {
                         .extract();
 
         // then
-        ExtractableResponse<Response> getResponses =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> stationList = getStationList();
 
-        assertThat(getResponses.body().jsonPath().getList("id").size()).isEqualTo(0);
+        assertThat(stationList.body().jsonPath().getList("id").size()).isEqualTo(0);
+    }
+
+    private ExtractableResponse<Response> getStationList() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> createStation(String stationName) {
