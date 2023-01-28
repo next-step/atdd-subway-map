@@ -27,16 +27,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -55,13 +46,63 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 생성하고 지하철역 목록을 조회했을 때 생성한 지하철 역을 조회할 수 있다.")
+    @Test
+    void getStations() {
+        // given
+        ExtractableResponse<Response> 강남역 = createStation("강남역");
+        ExtractableResponse<Response> 논현역 = createStation("논현역");
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.body().jsonPath().getList("name").get(0)).isEqualTo(강남역.body().jsonPath().get("name"));
+        assertThat(response.body().jsonPath().getList("name").get(1)).isEqualTo(논현역.body().jsonPath().get("name"));
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거한 후 목록을 조회하면 생성한 역을 찾을 수 없다.")
+    @Test
+    void deleteStatus() {
+        // given
+        Long stationId = createStation("강남역").body().jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> deleteResponse =
+                RestAssured.given().log().all()
+                        .when().delete("/stations/{id}", stationId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        ExtractableResponse<Response> getResponses =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract();
+
+        assertThat(getResponses.body().jsonPath().getList("id").size()).isEqualTo(0);
+    }
+
+    private ExtractableResponse<Response> createStation(String stationName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        return RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
 
 }
