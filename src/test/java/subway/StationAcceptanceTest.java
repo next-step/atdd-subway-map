@@ -72,9 +72,9 @@ class StationAcceptanceTest {
         // When
         ExtractableResponse<Response> response =
             RestAssured.given().spec(requestSpec).log().all()
-            .when().get("/stations")
-            .then().log().all()
-            .extract();
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
