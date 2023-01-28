@@ -1,5 +1,7 @@
 package subway.section;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,17 +40,18 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철_노선_구간_등록_성공() {
         //given
-        Long oldLineUpStationId = createStation("노선_상행역");
-        Long oldLineDownStationId = createStation("노선_하행역");
+        long oldLineUpStationId = createStation("노선_상행역");
+        long oldLineDownStationId = createStation("노선_하행역");
         long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
-        Long sectionDownStationId = createStation("추가하는_구간_하행역");
+        long sectionDownStationId = createStation("추가하는_구간_하행역");
 
         //when
-        SectionCreateRequest request = createSectionCreateRequest(lineId, sectionDownStationId, oldLineDownStationId);
-        SectionResponse sectionResponse = requestCreateSection(request);
+        SectionCreateRequest request = createSectionRequestFixture(lineId, sectionDownStationId, oldLineDownStationId);
+        ExtractableResponse<Response> response = requestCreateSection(request);
 
         //then
-        assertRequestAndResponseEquals(request, sectionResponse);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertRequestAndResponseEquals(request, response.as(SectionResponse.class));
     }
 
     private void assertRequestAndResponseEquals(SectionCreateRequest request, SectionResponse sectionResponse) {
@@ -59,29 +62,26 @@ public class SectionAcceptanceTest {
         assertThat(sectionResponse.getDownStation().getId()).isEqualTo(request.getDownStationId());
     }
 
-    private SectionCreateRequest createSectionCreateRequest(Long lineId, Long downStationId, Long upStationId) {
+    private SectionCreateRequest createSectionRequestFixture(Long lineId, Long downStationId, Long upStationId) {
+        int distance = 10;
 
-        SectionCreateRequest request = SectionCreateRequest.builder()
+        return SectionCreateRequest.builder()
                 .lineId(lineId)
                 .upStationId(upStationId)
                 .downStationId(downStationId)
-                .distance(10)
+                .distance(distance)
                 .build();
-
-        return request;
     }
 
-    private SectionResponse requestCreateSection(SectionCreateRequest request) {
+    private ExtractableResponse<Response> requestCreateSection(SectionCreateRequest request) {
         return given()
                 .pathParam("lineId", request.getLineId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when()
                 .post("/lines/{lineId}/sections")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .as(SectionResponse.class);
+                .then().log().all()
+                .extract();
     }
 
     /**
@@ -92,17 +92,18 @@ public class SectionAcceptanceTest {
     @Test
     void 지하철_노선_구간_등록_실패_새로운_구간의_상행이_등록된_노선의_하행종점과_다르면_등록_불가() {
         //given
-        Long oldLineUpStationId = createStation("역1");
-        Long oldLineDownStationId = createStation("역1");
+        long oldLineUpStationId = createStation("노선_상행역");
+        long oldLineDownStationId = createStation("노선_하행역");
         long lineId = requestCreateLine(createLineRequestFixture("노선1", oldLineUpStationId, oldLineDownStationId)).getId();
-        Long sectionDownStationId = createStation("역1");
+        long sectionDownStationId = createStation("추가하는_구간_하행역");
 
         //when
-        SectionCreateRequest request = createSectionCreateRequest(lineId, sectionDownStationId, oldLineUpStationId);
-        SectionResponse sectionResponse = requestCreateSection(request);
+        SectionCreateRequest request = createSectionRequestFixture(lineId, sectionDownStationId, oldLineDownStationId);
+        ExtractableResponse<Response> response = requestCreateSection(request);
 
         //then
-        assertRequestAndResponseEquals(request, sectionResponse);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertRequestAndResponseEquals(request, response.as(SectionResponse.class));
     }
 
     /**
