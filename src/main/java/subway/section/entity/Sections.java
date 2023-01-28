@@ -53,15 +53,17 @@ public class Sections extends AbstractList<Section> {
         Long newSectionUpStationId = newSection.getUpStation().getId();
 
         if (lastSectionDownStationId != newSectionUpStationId) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.format("마지막 구간의 하행역과 추가하려는 구간의 상행역이 다릅니다. 하행역 id:%d, 상행역 id:%d"
+                    , lastSectionDownStationId
+                    , newSectionUpStationId));
         }
 
-        boolean isSavedSectionStation = this.stations()
+        boolean isSavedSectionStation = upStations()
                 .stream()
-                .anyMatch(station -> station.getId() == newSectionUpStationId); // 하행은 위에서 체크했으므로 상행만 체크한다.
+                .anyMatch(station -> station.getId() == newSectionUpStationId);
 
         if (isSavedSectionStation) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("이미 노선에 등록된 역 입니다. id:" + newSectionUpStationId);
         }
     }
 
@@ -70,17 +72,20 @@ public class Sections extends AbstractList<Section> {
         return values.remove(index);
     }
 
-    public List<Station> stations() {
+    public List<Station> allStations() {
         if (values.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<Station> stations = values.stream()
+        List<Station> upStations = upStations();
+        upStations.add(lastSection().getDownStation());
+        return upStations;
+    }
+
+    private List<Station> upStations() {
+        return values.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toList());
-
-        stations.add(lastSection().getDownStation());
-        return stations;
     }
 
     private Section lastSection() {

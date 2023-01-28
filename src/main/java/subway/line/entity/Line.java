@@ -49,26 +49,21 @@ public class Line {
     }
 
     public List<Station> stations() {
-        return sections.stations();
+        return sections.allStations();
     }
 
     public void addSection(Section section) {
+        if (sections.contains(section)) {
+            return;
+        }
+
         sections.add(section);
         section.changeLine(this);
     }
 
-    public void removeLastSection() {
-
-    }
-
-    public void removeSection(long removeStationId) {
-        long lastSectionDownStationId = sections.get(sections.size() - 1).getDownStation().getId();
-
-        if (lastSectionDownStationId != removeStationId) {
-            throw new IllegalArgumentException();
-        }
-
-        sections.remove(sections.size() - 1);
+    public void remove(Section section) {
+        sections.remove(section);
+        section.changeLine(null);
     }
 }
 
