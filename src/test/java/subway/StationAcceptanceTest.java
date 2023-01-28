@@ -58,22 +58,19 @@ class StationAcceptanceTest extends RestMethods {
      * Then 2개의 지하철역을 응답 받는다
      */
     @DisplayName("두개의 지하철역을 입력받아 생성하고, 목록을 조회하면 입력한 두 지하철역이 존재해야 한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"강남역", "역삼역"})
-    void requestAndResponseForSubwayStationTest(String stationName) {
+    @Test
+    void requestAndResponseForSubwayStationTest() {
         // given
-        createStation(stationName);
-        createStation(stationName);
+        createStation("강남역");
+        createStation("역삼역");
 
         // when
         ExtractableResponse<Response> response = get(STATION_PATH);
         List<String> stationNames = response.jsonPath()
                 .getList("name", String.class);
 
-
         // then
-        assertThat(stationNames)
-                .containsAnyOf(stationName);
+        assertThat(response.jsonPath().getList("name")).hasSize(2);
     }
 
     /**
