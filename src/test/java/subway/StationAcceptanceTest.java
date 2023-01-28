@@ -62,7 +62,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        assertThat(response.jsonPath().getList("name").size()).isEqualTo(2);
+        assertThat(response.jsonPath().getList("name")).hasSize(2);
     }
 
     /**
@@ -111,7 +111,6 @@ public class StationAcceptanceTest {
 
     private ExtractableResponse<Response> 지하철역을_삭제한다(Map<String, String> deleteStation) {
         return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/stations/{id}", deleteStation.get("id"))
                 .then().statusCode(HttpStatus.NO_CONTENT.value())
                 .log().all()
