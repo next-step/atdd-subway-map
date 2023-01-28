@@ -23,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class StationAcceptanceTest {
 
+    private static final String 강남역 = "강남역";
+    private static final String 논현역 = "논현역";
     private static RequestSpecification requestSpec;
 
     @BeforeEach
@@ -41,15 +43,7 @@ class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-            RestAssured.given().spec(requestSpec).log().all()
-                .body(params)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = fixtureStation(강남역);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -60,7 +54,7 @@ class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(강남역);
     }
 
     /**
@@ -72,8 +66,8 @@ class StationAcceptanceTest {
     @Test
     void getStations() {
         // Given
-        fixtureStation("강남역");
-        fixtureStation("논현역");
+        fixtureStation(강남역);
+        fixtureStation(논현역);
 
         // When
         ExtractableResponse<Response> response =
@@ -85,7 +79,7 @@ class StationAcceptanceTest {
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(stationNames).containsExactly("강남역", "논현역");
+        assertThat(stationNames).containsExactly(강남역, 논현역);
     }
 
     /**
@@ -97,8 +91,8 @@ class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // Given
-        ExtractableResponse<Response> given = fixtureStation("강남역");
-        Integer givenStationId = given.body().jsonPath().get("id");
+        ExtractableResponse<Response> givenResponse = fixtureStation(강남역);
+        Integer givenStationId = givenResponse.body().jsonPath().get("id");
 
         // When
         ExtractableResponse<Response> deleteResponse = RestAssured.given().log().all()
