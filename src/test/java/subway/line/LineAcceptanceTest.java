@@ -2,14 +2,12 @@ package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.common.DataBaseCleanUp;
+import subway.common.AbstractTestDataBaseCleanUp;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
@@ -23,15 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class LineAcceptanceTest {
-
-    @Autowired
-    private DataBaseCleanUp dataBaseCleanUp;
-
-    @AfterEach
-    void tearDown() {
-        dataBaseCleanUp.cleanUp();
-    }
+public class LineAcceptanceTest extends AbstractTestDataBaseCleanUp {
 
     @Test
     void 지하철_노선을_생성한다() {

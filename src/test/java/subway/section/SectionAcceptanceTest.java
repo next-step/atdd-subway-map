@@ -2,14 +2,13 @@ package subway.section;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.common.DataBaseCleanUp;
+import subway.common.AbstractTestDataBaseCleanUp;
 import subway.section.dto.SectionCreateRequest;
 import subway.section.dto.SectionResponse;
 import subway.section.repository.SectionRepository;
@@ -23,18 +22,10 @@ import static subway.station.StationAcceptanceTest.createStation;
 
 @DisplayName("지하철 노선 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class SectionAcceptanceTest {
+public class SectionAcceptanceTest extends AbstractTestDataBaseCleanUp {
 
     @Autowired
     private SectionRepository sectionRepository;
-
-    @Autowired
-    private DataBaseCleanUp dataBaseCleanUp;
-
-    @AfterEach
-    void tearDown() {
-        dataBaseCleanUp.cleanUp();
-    }
 
     /**
      * Given : 노선을 생성한다

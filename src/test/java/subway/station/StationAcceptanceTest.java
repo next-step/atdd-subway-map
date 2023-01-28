@@ -1,14 +1,11 @@
 package subway.station;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.common.DataBaseCleanUp;
-import subway.station.repository.StationRepository;
+import subway.common.AbstractTestDataBaseCleanUp;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,18 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-
-    @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
-    private DataBaseCleanUp dataBaseCleanUp;
-
-    @AfterEach
-    void tearDown() {
-        dataBaseCleanUp.cleanUp();
-    }
+public class StationAcceptanceTest extends AbstractTestDataBaseCleanUp {
 
     @Test
     void 지하철역을_생성한다() {
