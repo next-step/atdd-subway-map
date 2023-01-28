@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StationAcceptanceTest {
 
-
     @LocalServerPort
     int port;
 
@@ -116,4 +115,27 @@ class StationAcceptanceTest {
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
 
+    @DisplayName("지하철 역 제거 테스트")
+    @Test
+    void deleteStation() {
+
+        // given
+        createStation("강남역");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/1")
+                .then().log().all().extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        List<String> stationNames =
+                RestAssured.given().log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
+        assertThat(stationNames).isNotIn("강남역");
+    }
 }
