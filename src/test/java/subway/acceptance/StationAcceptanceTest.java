@@ -5,13 +5,11 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import subway.AcceptanceTest;
 
 import static subway.acceptance.TestFixtureStation.*;
 
 @DisplayName("지하철 역 기능 인수 테스트")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class StationAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach

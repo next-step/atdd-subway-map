@@ -5,14 +5,12 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import subway.AcceptanceTest;
 
 import static subway.acceptance.TestFixtureLine.*;
 import static subway.acceptance.TestFixtureStation.지하철역_생성_요청;
 
 @DisplayName("지하철 노선 기능 인수 테스트")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest extends AcceptanceTest {
 
     private Long 강남역;
@@ -35,14 +33,13 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-
         final ExtractableResponse<Response> 이호선 = 지하철_노선_생성_요청("2호선", "bg-red-600", 강남역 ,잠실역, 10);
 
         지하철_노선_생성됨(이호선);
 
-        final ExtractableResponse<Response> 지하철_노선_목록_응답 = 지하철_노선_목록_조회_요청();
+        final ExtractableResponse<Response> 지하철_노선_목록_조회_응답 = 지하철_노선_목록_조회_요청();
 
-        지하철_노선_목록_조회됨(지하철_노선_목록_응답, "2호선", "bg-red-600", 2);
+        지하철_노선_목록_중_생성한_노선_조회됨(지하철_노선_목록_조회_응답, 이호선);
     }
 
     /**
@@ -58,7 +55,7 @@ class LineAcceptanceTest extends AcceptanceTest {
 
         final ExtractableResponse<Response> 지하철_노선_목록_응답 = 지하철_노선_목록_조회_요청();
 
-        지하철_노선_목록_조회됨(지하철_노선_목록_응답);
+        지하철_노선_목록_조회됨(지하철_노선_목록_응답, 2);
     }
 
     /**
