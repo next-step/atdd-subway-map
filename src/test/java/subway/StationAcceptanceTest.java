@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,9 +33,7 @@ public class StationAcceptanceTest {
         params.put("name", "강남역");
 
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+            prepareRestAssuredGiven(params)
                         .when().post("/stations")
                         .then().log().all()
                         .extract();
@@ -43,11 +42,10 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = prepareRestAssuredGiven()
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -66,8 +64,7 @@ public class StationAcceptanceTest {
         createStation(stationTwo);
 
         // when
-        List<String> stationNames = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        List<String> stationNames = prepareRestAssuredGiven()
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
@@ -95,8 +92,7 @@ public class StationAcceptanceTest {
             .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().delete("/stations/" + id);
 
-        List<String> stationNames = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+        List<String> stationNames = prepareRestAssuredGiven()
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
@@ -108,12 +104,17 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        return RestAssured
-            .given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        return prepareRestAssuredGiven(params)
             .when()
                 .post("/stations")
             .then().extract().jsonPath().getLong("id");
+    }
+
+    private static RequestSpecification prepareRestAssuredGiven(Map<String, String> body) {
+        return prepareRestAssuredGiven().body(body);
+    }
+
+    private static RequestSpecification prepareRestAssuredGiven() {
+        return RestAssured.given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE);
     }
 }
