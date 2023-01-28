@@ -5,6 +5,8 @@ import subway.station.Station;
 import subway.station.StationRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LineService {
@@ -22,5 +24,11 @@ public class LineService {
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
         Line line = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
         return LineResponse.createLineResponse(line);
+    }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+                .map(LineResponse::createLineResponse)
+                .collect(Collectors.toList());
     }
 }
