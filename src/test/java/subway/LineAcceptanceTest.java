@@ -66,6 +66,22 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId);
     }
 
+    @DisplayName("특정 지하철 노선의 정보를 갱신한다.")
+    @Test
+    void updateLine() {
+        // given
+        var line = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        long lineId = line.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = updateLine(lineId, new LineRequest("분당선", "bg-yellow-600", 2L, 3L, 100L));
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId);
+        assertThat(response.jsonPath().getString("name")).isEqualTo("분당선");
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
             .body(lineRequest)
@@ -85,6 +101,15 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> findLineById(Long lineId) {
         return RestAssured.given().log().all()
             .when().get("/lines/{id}", lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> updateLine(Long lineId, LineRequest lineRequest) {
+        return RestAssured.given().log().all()
+            .body(lineRequest)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().put("/lines/{id}", lineId)
             .then().log().all()
             .extract();
     }
