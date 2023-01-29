@@ -1,4 +1,4 @@
-package subway;
+package subway.presentation;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.*;
