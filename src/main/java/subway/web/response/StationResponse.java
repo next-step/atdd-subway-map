@@ -25,7 +25,7 @@ public class StationResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StationResponse that = (StationResponse) o;
-        return id.equals(that.id);
+        return Objects.equals(id, that.id);
     }
 
     @Override
