@@ -22,7 +22,8 @@ import static subway.common.fixture.StationFixture.서울대입구역;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    public static final String REQUEST_STATION_URL = "/stations";
+    public static final String BASE_STATION_URL = "/stations";
+    public static final String DELETE_STATION_URL = BASE_STATION_URL + "/{stationId}";
 
     /**
      * When 지하철역을 생성하면
@@ -102,21 +103,21 @@ public class StationAcceptanceTest {
         return given().log().all()
                     .body(requestBody)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(REQUEST_STATION_URL)
+                .when().post(BASE_STATION_URL)
                 .then().log().all()
                     .extract();
     }
 
     private static void 지하철역_삭제_요청(Long stationId) {
         given().log().all()
-        .when().delete(REQUEST_STATION_URL + "/" + stationId)
+        .when().delete(DELETE_STATION_URL, stationId)
         .then().log().all()
             .extract();
     }
 
     private static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return given().log().all()
-                .when().get(REQUEST_STATION_URL)
+                .when().get(BASE_STATION_URL)
                 .then().log().all()
                     .extract();
     }
