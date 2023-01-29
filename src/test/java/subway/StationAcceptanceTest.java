@@ -30,7 +30,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	 */
 	@DisplayName("지하철역을 생성한다.")
 	@Test
-	void createStation() {
+	void 지하철역을_생성한다() {
 		// when
 		ExtractableResponse<Response> response = 지하철역_생성(STATION_NAME_1);
 
@@ -51,7 +51,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	 * When 지하철역 목록을 조회하면
 	 * Then 2개의 지하철역을 응답 받는다
 	 */
-	// TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
 	@DisplayName("지하철역 2개의 조회 응답에 성공한다")
 	@Test
 	void 지하철역_2개의_조회_응답에_성공한다() {
@@ -76,7 +75,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
 	 * When 그 지하철역을 삭제하면
 	 * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
 	 */
-	// TODO: 지하철역 제거 인수 테스트 메서드 생성
 	@DisplayName("지하철역 1개역 삭제에 성공한다")
 	@Test
 	void 지하철역_1개역_삭제에_성공한다() {
