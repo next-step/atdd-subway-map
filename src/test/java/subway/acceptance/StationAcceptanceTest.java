@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +33,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> 강남역_데이터 = new HashMap<>();
-        강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
-
+        Map<String, String> 강남역_데이터 = 강남역.요청_데이터_생성();
         ExtractableResponse<Response> response = 지하철역_생성_요청(강남역_데이터);
 
         // then
@@ -58,12 +55,10 @@ public class StationAcceptanceTest {
     @Test
     void selectStations() {
         // given
-        Map<String, String> 강남역_데이터 = new HashMap<>();
-        강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
+        Map<String, String> 강남역_데이터 = 강남역.요청_데이터_생성();
         지하철역_생성_요청(강남역_데이터);
 
-        Map<String, String> 서울대입구역_데이터 = new HashMap<>();
-        서울대입구역_데이터.put(역_이름.필드명(), 서울대입구역.역_이름());
+        Map<String, String> 서울대입구역_데이터 = 서울대입구역.요청_데이터_생성();
         지하철역_생성_요청(서울대입구역_데이터);
 
         // when
@@ -83,8 +78,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> 강남역_데이터 = new HashMap<>();
-        강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
+        Map<String, String> 강남역_데이터 = 강남역.요청_데이터_생성();
         Long 생성된_지하철역_id = 지하철역_생성_요청(강남역_데이터)
                 .jsonPath().getLong("id");
 
