@@ -190,10 +190,38 @@ public class LineAcceptanceTest {
 
     /**
      * 지하철노선 삭제
-     *  - Given 지하철 노선을 생성하고
+     *  - Given 지하철 노선을 생성하고
      *  - When 생성한 지하철 노선을 삭제하면
      *  - Then 해당 지하철 노선 정보는 삭제된다
      */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void Should_지하철노선을_생성하고_When_지하철노선을_삭제하면_Then_해당_지하철노선이_삭제된다() {
+        // given
+        var 이호선_request = new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L);
+        ExtractableResponse<Response> 이호선_response = 지하철노선을_생성한다(이호선_request);
+
+        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
+        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
+        var 이호선findByAll = lines.stream()
+                .filter(line -> 이호선_request.getName().equals(line.getName()))
+                .findFirst()
+                .get();
+
+        //when
+        ExtractableResponse<Response> lineResponse = 지하철노선을_삭제한다(이호선findByAll.getId());
+
+        // then
+        assertHttpStatus(lineResponse.statusCode(), HttpStatus.NO_CONTENT.value());
+
+        // then
+
+        // then
+        var linesResponseLastest = 지하철노선을_조회한다();
+        List<LineResponse> lines_lastest = 지하철노선_목록이_정상적으로_조회(linesResponseLastest);
+        assertThat(lines_lastest).hasSize(0);
+    }
+
 
     private ExtractableResponse<Response> 지하철노선을_생성한다(LineRequest request) {
         return RestAssured.given().log().all()
@@ -225,6 +253,14 @@ public class LineAcceptanceTest {
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(String.format("/lines/%d", id))
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철노선을_삭제한다(Long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(String.format("/lines/%d", id))
                 .then().log().all()
                 .extract();
     }
