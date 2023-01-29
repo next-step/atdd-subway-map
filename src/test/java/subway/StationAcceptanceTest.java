@@ -61,7 +61,7 @@ public class StationAcceptanceTest {
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames).hasSize(2);
-        assertThat(stationNames).containsAll(List.of(TEST_STATION1_NAME, TEST_STATION2_NAME));
+        assertThat(stationNames).containsExactly(TEST_STATION1_NAME, TEST_STATION2_NAME);
     }
 
     /**
