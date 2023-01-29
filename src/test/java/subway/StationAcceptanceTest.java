@@ -29,14 +29,7 @@ public class StationAcceptanceTest {
         createStation("강남역");
 
         // then
-        RestAssured
-                .given()
-                    .log()
-                    .all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .body("name", hasItem("강남역"));
+        checkCanFindCreatedStationInStationList("강남역");
     }
 
     /**
@@ -53,13 +46,7 @@ public class StationAcceptanceTest {
       createStation("역삼역");
 
       // then
-      RestAssured.given()
-                      .log()
-                      .all()
-                  .when()
-                      .get("/stations")
-                  .then()
-                      .body("name.size()", equalTo(2));
+      checkStationListSizeEqualsToCreatedStationSize(2);
     };
     /**
      * Given 지하철역을 생성하고
@@ -77,14 +64,7 @@ public class StationAcceptanceTest {
         deleteStation(stationId);
 
         // then
-        RestAssured
-                .given()
-                    .log()
-                    .all()
-                .when()
-                    .get("/stations")
-                .then()
-                    .body("name", not(hasItem("강남역")));
+        checkCanNotFindDeletedStataionInStationList("강남역");
     }
 
     private void createStation(String stationName){
@@ -137,5 +117,37 @@ public class StationAcceptanceTest {
                 .then()
                     .log()
                     .all();
+    }
+
+    private void checkCanFindCreatedStationInStationList(String createdStationName){
+        RestAssured
+                .given()
+                .log()
+                .all()
+                .when()
+                .get("/stations")
+                .then()
+                .body("name", hasItem(createdStationName));
+    }
+
+    private void checkStationListSizeEqualsToCreatedStationSize(Integer createdStationSize){
+        RestAssured.given()
+                .log()
+                .all()
+                .when()
+                .get("/stations")
+                .then()
+                .body("name.size()", equalTo(createdStationSize));
+    }
+
+    private void checkCanNotFindDeletedStataionInStationList(String deletedStationName){
+        RestAssured
+                .given()
+                .log()
+                .all()
+                .when()
+                .get("/stations")
+                .then()
+                .body("name", not(hasItem(deletedStationName)));
     }
 }
