@@ -3,14 +3,14 @@ package subway.line;
 import lombok.Getter;
 
 /**
- * StationLineCreateRequest
+ * StationLineRequest
  *
  * @author JungGyun.Choi
  * @version 1.0.0
  * @since 2023. 01. 29.
  */
 @Getter
-public class StationLineCreateRequest {
+public class StationLineRequest {
 
     private String name;
     private String color;

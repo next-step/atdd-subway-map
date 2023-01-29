@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +28,8 @@ public class StationLineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<StationLineResponse> createStationLines(@RequestBody StationLineCreateRequest stationLineCreateRequest) {
-        return ResponseEntity.ok().body(stationLineService.createStationLines(stationLineCreateRequest));
+    public ResponseEntity<StationLineResponse> createStationLines(@RequestBody StationLineRequest stationLineRequest) {
+        return ResponseEntity.ok().body(stationLineService.createStationLines(stationLineRequest));
     }
 
     @GetMapping("/lines")
@@ -45,5 +46,12 @@ public class StationLineController {
     public ResponseEntity<StationLineResponse> deleteStationLine(@PathVariable Long id) {
         stationLineService.deleteStationLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<Void> putStationLine(@PathVariable Long id,
+                                               @RequestBody StationsLineUpdateRequest stationsLineUpdateRequest) {
+        stationLineService.putStationLineById(id, stationsLineUpdateRequest);
+        return ResponseEntity.ok().build();
     }
 }

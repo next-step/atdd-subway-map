@@ -30,8 +30,8 @@ public class StationLineService {
     }
 
     @Transactional
-    public StationLineResponse createStationLines(StationLineCreateRequest stationLineCreateRequest) {
-        StationLine stationLine = stationLineRepository.save(stationLineCreateRequest.toEntity());
+    public StationLineResponse createStationLines(StationLineRequest stationLineRequest) {
+        StationLine stationLine = stationLineRepository.save(stationLineRequest.toEntity());
         return getStationsInLine(stationLine);
     }
 
@@ -71,5 +71,13 @@ public class StationLineService {
     @Transactional
     public void deleteStationLineById(Long id) {
         stationLineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void putStationLineById(Long id, StationsLineUpdateRequest stationsLineUpdateRequest) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        stationLine.putStationLine(stationsLineUpdateRequest.toEntity());
     }
 }

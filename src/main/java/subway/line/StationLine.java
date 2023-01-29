@@ -45,4 +45,8 @@ public class StationLine {
     @Column(length = 10, nullable = false)
     private Integer distance;
 
+    public void putStationLine(StationLine stationLine) {
+        this.name = stationLine.getName();
+        this.color = stationLine.getColor();
+    }
 }
