@@ -39,10 +39,8 @@ public class StationAcceptanceTest {
     void getStation() {
 
         //given
-        final String first_station = "신림역";
-        final String second_station = "봉천역";
-        createSubwayStation(first_station);
-        createSubwayStation(second_station);
+        createSubwayStation("신림역");
+        createSubwayStation("봉천역");
 
         //when
         ExtractableResponse<Response> response = RestAssured
