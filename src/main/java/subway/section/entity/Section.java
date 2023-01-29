@@ -41,17 +41,17 @@ public class Section {
         this.distance = distance;
     }
 
-    public void changeLine(Line line) {
-        if (this.line.equals(line)) {
+    public void changeLine(Line newLine) {
+        if (line != null && newLine.equals(newLine)) {
             return;
         }
 
-        if (this.line != null) {
-            this.line.remove(this);
+        if (line != null) {
+            line.remove(this);
         }
 
-        line.addSection(this);
-        this.line = line;
+        newLine.addSection(this);
+        line = newLine;
     }
 
     public Long upStationId() {

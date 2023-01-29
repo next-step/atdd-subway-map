@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
-import subway.section.dto.SectionCreateRequest;
 import subway.section.entity.Section;
-import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
 @Service
@@ -19,13 +17,9 @@ public class SectionService {
     private final LineRepository lineRepository;
 
     @Transactional
-    public Section save(SectionCreateRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
-        Line line = lineRepository.findById(request.getLineId()).orElseThrow();
-
-        line.addSection(upStation, downStation, request.getDistance());
-
+    public Section save(Long lineId, Section section) {
+        Line line = lineRepository.findById(lineId).orElseThrow();
+        line.addSection(section);
         return line.getLastSection();
     }
 

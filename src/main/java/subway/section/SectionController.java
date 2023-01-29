@@ -7,6 +7,8 @@ import subway.section.dto.SectionCreateRequest;
 import subway.section.dto.SectionResponse;
 import subway.section.entity.Section;
 import subway.section.service.SectionService;
+import subway.station.entity.Station;
+import subway.station.repository.StationRepository;
 
 import java.net.URI;
 
@@ -14,12 +16,14 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class SectionController {
 
+    private final StationRepository stationRepository;
     private final SectionService sectionService;
 
     @PostMapping("/lines/{lineId}/sections")
     public ResponseEntity<SectionResponse> saveSection(@PathVariable Long lineId, @RequestBody SectionCreateRequest request) {
-        request.setLineId(lineId);
-        Section section = sectionService.save(request);
+        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
+        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
+        Section section = sectionService.save(lineId, request.toEntity(downStation, upStation));
         return ResponseEntity.created(URI.create("lines/" + request.getLineId() + "/sections")).body(SectionResponse.from(section));
     }
 
