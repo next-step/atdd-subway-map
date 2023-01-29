@@ -1,10 +1,10 @@
-package subway.stationLine;
+package subway.lane;
 
 import javax.persistence.*;
 import subway.station.Station;
 
 @Entity
-public class StationLane {
+public class Lane {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +20,9 @@ public class StationLane {
   @ManyToOne
   private Station outboundStation; // 하행역
 
-  public StationLane() {}
+  public Lane() {}
 
-  public StationLane(String name, Station inboundStation, Station outboundStation) {
+  public Lane(String name, Station inboundStation, Station outboundStation) {
     this.name = name;
     this.inboundStation = inboundStation;
     this.outboundStation = outboundStation;
