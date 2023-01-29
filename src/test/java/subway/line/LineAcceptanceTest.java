@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -212,5 +214,43 @@ public class LineAcceptanceTest {
         assertThat(사호선_응답.getName()).isEqualTo(updateLineName);
         assertThat(사호선_응답.getColor()).isEqualTo(updateColor);
         assertThat(사호선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("특정 지하철 노선을 삭제한다.")
+    @Test
+    void deleteLineById() {
+        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
+        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
+
+        // Given 지하철 노선을 생성하고
+        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
+        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
+
+        var 신분당선_생성 = RestAssuredClient.post(
+                Endpoints.LINES,
+                new LineRequest(
+                        "신분당선",
+                        Colors.RED,
+                        강남역_아이디,
+                        서울대입구역_아이디,
+                        10L
+                )
+        );
+        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        var 신분당선_path = 신분당선_생성.header("Location");
+
+        // When 생성한 노선을 삭제하면
+        ExtractableResponse<Response> 신분당선_삭제_응답 = RestAssuredClient.delete(신분당선_path);
+        assertThat(신분당선_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // Then 해당 지하철 노선 정보는 삭제된다.
+        // = 해당 지하철 노선 정보 조회 시 NOT_FOUND를 응답받는다.
+        ExtractableResponse<Response> 신분당선_조회_응답 = RestAssuredClient.get(신분당선_path);
+        assertThat(신분당선_조회_응답.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }
