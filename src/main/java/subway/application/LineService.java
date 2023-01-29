@@ -33,7 +33,7 @@ public class LineService {
         final Station upStation = stationService.findStationById(lineRequest.getUpStationId());
         final Station downStation = stationService.findStationById(lineRequest.getDownStationId());
 
-        final Line line = new Line(
+        final Line line = Line.of(
                 lineRequest.getName(),
                 lineRequest.getColor(),
                 upStation,

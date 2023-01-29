@@ -17,13 +17,18 @@ public class Line {
     @Embedded
     private final Sections sections = new Sections();
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
+    private Line(final String name, final String color) {
         this.name = name;
         this.color = color;
-        sections.init(this, upStation, downStation, distance);
     }
 
     protected Line() {
+    }
+
+    public static Line of(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
+        final Line line = new Line(name, color);
+        line.sections.init(line, upStation, downStation, distance);
+        return line;
     }
 
     public Long getId() {
