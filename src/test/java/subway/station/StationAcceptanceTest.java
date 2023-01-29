@@ -1,16 +1,17 @@
 package subway.station;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import subway.station.dto.StationResponse;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
@@ -25,18 +26,19 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        var station = createStation("강남역");
+        var station = createStation(Map.ofEntries(entry("name", "강남역")));
 
         // then
-        assertThat(station.getId()).isEqualTo(1);
-        assertThat(station.getName()).isEqualTo("강남역");
+        assertThat(station.jsonPath().getLong("id")).isEqualTo(1);
+        assertThat(station.jsonPath().getString("name")).isEqualTo("강남역");
 
         // then
-        List<StationResponse> stations = getStations();
+        var stations = getStations();
 
         // then
-        assertThat(stations.size()).isEqualTo(1);
-        assertThat(stations.get(0).getName()).isEqualTo("강남역");
+        assertThat(stations.jsonPath().getList("$")).hasSize(1);
+        assertThat(stations.jsonPath().getList("id", Long.class).get(0)).isEqualTo(1L); // 더 깔끔하게 첫번째 원소의 id 접근하는 방법 없을까?
+        assertThat(stations.jsonPath().getList("name", String.class).get(0)).isEqualTo("강남역");
     }
 
     /**
@@ -44,19 +46,19 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @DisplayName("지하철역 목록을 조회한다")
     @Test
     void listStation() {
         // when
-        createStation("강남역");
-        createStation("신논현역");
+        createStation(Map.ofEntries(entry("name", "강남역")));
+        createStation(Map.ofEntries(entry("name", "신논현역")));
 
         // then
-        List<StationResponse> stations = getStations();
+        var stations = getStations();
 
         // then
-        assertThat(stations.stream().map(StationResponse::getName)).containsAll(Arrays.asList("강남역", "신논현역"));
+        assertThat(stations.jsonPath().getList("$")).hasSize(2);
+        assertThat(stations.jsonPath().getList("name", String.class)).containsAll(Arrays.asList("강남역", "신논현역"));
     }
 
     /**
@@ -64,49 +66,43 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("전달받은 지하철역을 제거한다")
     @Test
     void deleteStation() {
+        // given
+        createStation(Map.ofEntries(entry("name", "강남역")));
+
+        var stationsBefore = getStations();
+        assertThat(stationsBefore.jsonPath().getList("$")).hasSize(1);
+
         // when
-        var station = createStation("역삼역");
+        deleteStation(1L);
 
         // then
-        assertThat(station.getName()).isEqualTo("역삼역");
-
-        // then
-        List<StationResponse> beforeDelete = getStations();
-        assertThat(beforeDelete.size()).isEqualTo(1);
-        assertThat(beforeDelete.get(0).getName()).isEqualTo("역삼역");
-
-        // then
-        deleteStation(station);
-
-        // then
-        List<StationResponse> afterDelete = getStations();
-        assertThat(afterDelete.size()).isEqualTo(0);
+        var stationsAfter = getStations();
+        assertThat(stationsAfter.jsonPath().getList("$")).isEmpty();
     }
 
-    private static StationResponse createStation(String name) {
+    private static ExtractableResponse<Response> createStation(Map<String, String> requestParam) {
         return RestAssured.given().log().all()
-                .body(Map.of("name", name))
+                .body(requestParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
-                .then().log().all()
-                .extract().jsonPath().getObject("", StationResponse.class);
-    }
-
-    private static void deleteStation(StationResponse station) {
-        RestAssured.given().log().all()
-                .when().delete("/stations/{id}", station.getId())
                 .then().log().all()
                 .extract();
     }
 
-    private static List<StationResponse> getStations() {
+    private static void deleteStation(Long id) {
+        RestAssured.given().log().all()
+                .when().delete("/stations/{id}", id)
+                .then().log().all()
+                .extract();
+    }
+
+    private static ExtractableResponse<Response> getStations() {
         return RestAssured.given().log().all()
                 .when().get("/stations")
                 .then().log().all()
-                .extract().jsonPath().getList("", StationResponse.class);
+                .extract();
     }
 }
