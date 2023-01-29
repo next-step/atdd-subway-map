@@ -1,5 +1,7 @@
 package subway.infrastructor.repository;
 
+import subway.domain.LineUpdateDomain;
+
 import javax.persistence.*;
 
 @Entity
@@ -58,8 +60,9 @@ class LineJpaEntity {
         return downStationId;
     }
 
-    public Long getDistance() {
-        return distance;
+    public void updateLine(LineUpdateDomain lineUpdateDomain) {
+        this.name = lineUpdateDomain.getName();
+        this.color = lineUpdateDomain.getColor();
     }
 
 }

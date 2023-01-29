@@ -2,9 +2,7 @@ package subway.infrastructor.repository;
 
 import org.springframework.stereotype.Component;
 import subway.application.repository.LineRepositoryPort;
-import subway.domain.LineCreateDomain;
-import subway.domain.LineDomain;
-import subway.domain.NotFoundStationException;
+import subway.domain.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +51,12 @@ class LinePersistenceRepository implements LineRepositoryPort {
 
             return lineMapper.entityToDomain(lineJpaEntity, upStation, downStation);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateLine(LineUpdateDomain toDomain) {
+        LineJpaEntity lineJpaEntity = lineRepository.findById(toDomain.getLineId()).orElseThrow(() -> new NotFoundLineException("수정 하려는 라인을 찾지 못했습니다."));
+        lineJpaEntity.updateLine(toDomain);
     }
 
 }

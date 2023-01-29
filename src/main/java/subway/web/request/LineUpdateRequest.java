@@ -1,5 +1,7 @@
 package subway.web.request;
 
+import subway.domain.LineUpdateDomain;
+
 public class LineUpdateRequest {
 
     private final String name;
@@ -17,5 +19,9 @@ public class LineUpdateRequest {
     public String getColor() {
         return color;
     }
-    
+
+    public LineUpdateDomain toDomain(Long lineId) {
+        return new LineUpdateDomain(lineId, this.name, this.color);
+    }
+
 }

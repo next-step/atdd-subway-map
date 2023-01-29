@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.service.LineUseCase;
 import subway.web.request.LineCreateRequest;
+import subway.web.request.LineUpdateRequest;
 import subway.web.response.CreateLineResponse;
 import subway.web.response.LineResponse;
 
@@ -40,6 +41,12 @@ public class LineController {
             .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(lineResponses);
+    }
+
+    @PutMapping("/lines/{lineId}")
+    public ResponseEntity<Void> createLine(@PathVariable Long lineId, @RequestBody LineUpdateRequest lineUpdateRequest) {
+        lineUseCase.updateLine(lineUpdateRequest.toDomain(lineId));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

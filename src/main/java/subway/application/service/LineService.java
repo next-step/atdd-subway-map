@@ -1,14 +1,17 @@
 package subway.application.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.application.repository.LineRepositoryPort;
 import subway.domain.LineCreateDomain;
 import subway.domain.LineDomain;
+import subway.domain.LineUpdateDomain;
 import subway.domain.NotFoundLineException;
 
 import java.util.List;
 
 @Service
+@Transactional
 class LineService implements LineUseCase {
 
     private final LineRepositoryPort lineRepositoryPort;
@@ -31,6 +34,11 @@ class LineService implements LineUseCase {
     @Override
     public List<LineDomain> loadLines() {
         return lineRepositoryPort.loadLines();
+    }
+
+    @Override
+    public void updateLine(LineUpdateDomain toDomain) {
+        lineRepositoryPort.updateLine(toDomain);
     }
 
 }
