@@ -10,6 +10,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -21,23 +22,23 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @Sql("/setup-station.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
-    private static final Map<String, String> 신분당선;
-    private static final Map<String, String> 분당선;
+    private static final Map<String, String> 신분당선_요청 = new HashMap<>();
+    private static final Map<String, String> 분당선_요청 = new HashMap<>();
+    private static final String 신분당선 = "신분당선";
+    private static final String 분당선 = "분당선";
 
     static {
-        신분당선 = new HashMap<>();
-        신분당선.put("name", "신분당선");
-        신분당선.put("color", "bg-red-600");
-        신분당선.put("upStationId", "1");
-        신분당선.put("downStationId", "2");
-        신분당선.put("distance", "10");
+        신분당선_요청.put("name", "신분당선");
+        신분당선_요청.put("color", "bg-red-600");
+        신분당선_요청.put("upStationId", "1");
+        신분당선_요청.put("downStationId", "2");
+        신분당선_요청.put("distance", "10");
 
-        분당선 = new HashMap<>();
-        분당선.put("name", "분당선");
-        분당선.put("color", "bg-green-600");
-        분당선.put("upStationId", "1");
-        분당선.put("downStationId", "3");
-        분당선.put("distance", "10");
+        분당선_요청.put("name", "분당선");
+        분당선_요청.put("color", "bg-green-600");
+        분당선_요청.put("upStationId", "1");
+        분당선_요청.put("downStationId", "3");
+        분당선_요청.put("distance", "10");
     }
 
     /**
@@ -47,10 +48,9 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
-        postLine(신분당선).statusCode(HttpStatus.CREATED.value());
+        노선_생성(신분당선_요청).statusCode(HttpStatus.CREATED.value());
 
-        var response = get("/lines").extract();
-        assertThat(response.jsonPath().getList("name")).contains(신분당선.get("name"));
+        assertThat(노선_목록_이름_조회()).contains(신분당선);
     }
 
     /**
@@ -61,14 +61,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void showLines() {
-        postLine(신분당선);
-        postLine(분당선);
-
-        var response = get("/lines").extract();
-
-        assertThat(response.jsonPath().getList("name"))
+        노선_생성(신분당선_요청);
+        노선_생성(분당선_요청);
+        
+        assertThat(노선_목록_이름_조회())
                 .hasSize(2)
-                .contains("신분당선", "분당선");
+                .contains(신분당선, 분당선);
     }
 
     /**
@@ -79,11 +77,12 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다.")
     @Test
     void showLine() {
-        var createResponse = postLine(신분당선).extract();
+        var createResponse = 노선_생성(신분당선_요청).extract();
 
         var response = get(createResponse.header("location")).extract();
 
-        assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선.get("name"));
+        String 조회된_노선_이름 = response.jsonPath().getString("name");
+        assertThat(조회된_노선_이름).isEqualTo(신분당선);
     }
 
     /**
@@ -94,23 +93,25 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
-        Map<String, String> updateRequest = new HashMap<>();
-        updateRequest.put("name", "다른 분당선");
-        updateRequest.put("color", "bg-red-600");
-        var location = postLine(신분당선).extract().header("location");
+        Map<String, String> 수정_요청 = new HashMap<>();
+        수정_요청.put("name", "다른 분당선");
+        수정_요청.put("color", "bg-red-600");
+        var location = 노선_생성(신분당선_요청).extract().header("location");
 
         given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(updateRequest).
+                .body(수정_요청).
         when()
                 .put(location).
         then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
-        var response = get(location)
+        var 조회된_노선_이름 = get(location)
                     .statusCode(HttpStatus.OK.value())
-                    .extract();
-        assertThat(response.jsonPath().getString("name")).isEqualTo(updateRequest.get("name"));
+                    .extract()
+                    .jsonPath()
+                    .getString("name");
+        assertThat(조회된_노선_이름).isEqualTo("다른 분당선");
     }
 
     /**
@@ -121,7 +122,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다.")
     @Test
     void deleteLine() {
-        var location = postLine(신분당선).extract().header("location");
+        var location = 노선_생성(신분당선_요청).extract().header("location");
 
         given().log().all().
         when()
@@ -129,17 +130,22 @@ public class LineAcceptanceTest {
         then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        var response = get("/lines").extract();
-        assertThat(response.jsonPath().getList("name")).doesNotContain(신분당선.get("name"));
+        assertThat(노선_목록_이름_조회()).doesNotContain(신분당선);
     }
 
-    private ValidatableResponse postLine(Map<String, String> params) {
+    private ValidatableResponse 노선_생성(Map<String, String> params) {
         return given().log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .body(params).
                 when()
                     .post("/lines").
                 then().log().all();
+    }
+
+    private List<String> 노선_목록_이름_조회() {
+        return get("/lines").extract()
+                .jsonPath()
+                .getList("name");
     }
 
     private ValidatableResponse get(String path) {

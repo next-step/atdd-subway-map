@@ -30,7 +30,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        postStation("강남역").statusCode(HttpStatus.CREATED.value());
+        역_생성("강남역").statusCode(HttpStatus.CREATED.value());
 
         given().log().all().
         when()
@@ -48,7 +48,7 @@ public class StationAcceptanceTest {
     @Test
     void createStations() {
         List.of("강남역", "교대역")
-                .forEach(this::postStation);
+                .forEach(this::역_생성);
 
         given().log().all().
         when()
@@ -66,8 +66,8 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 2개를 생성하고 그중 1개를 삭제한다.")
     @Test
     void deleteStation() {
-        postStation("교대역");
-        ExtractableResponse<Response> createResponse = postStation("강남역").extract();
+        역_생성("교대역");
+        ExtractableResponse<Response> createResponse = 역_생성("강남역").extract();
 
         given().log().all().
         when()
@@ -83,7 +83,7 @@ public class StationAcceptanceTest {
                 .body("name", not(contains("강남역")));
     }
 
-    private ValidatableResponse postStation(String stationName) {
+    private ValidatableResponse 역_생성(String stationName) {
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
