@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StationAcceptanceTestHelper extends AcceptanceTestHelper{
+public class StationAcceptanceTestHelper extends AcceptanceTestHelper {
 
     static ExtractableResponse<Response> 지하철역_생성_요청(final String name) {
         final Map<String, Object> params = new HashMap<>();

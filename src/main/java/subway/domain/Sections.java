@@ -65,7 +65,8 @@ public class Sections {
                 .findAny();
         if (findSection.isEmpty()) {
             return station;
-        };
+        }
+        ;
         return getLastDownStation(findSection.get().getDownStation());
     }
 }

@@ -1,11 +1,11 @@
 package subway.error;
 
-import subway.error.exception.BusinessException;
-import subway.error.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import subway.error.exception.BusinessException;
+import subway.error.exception.ErrorCode;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
