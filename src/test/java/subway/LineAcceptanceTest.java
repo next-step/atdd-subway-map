@@ -46,22 +46,22 @@ class LineAcceptanceTest {
         StationResponse 새로운지하철역 = createStation("새로운지하철역").as(StationResponse.class);
 
         // When
-        LineCreateRequest givenLine = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 8L);
-        ExtractableResponse<Response> createLineResponse = createLine(givenLine, 1L, 지하철역, 새로운지하철역);
+        LineCreateRequest given_신분당선 = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
+        long given_신분당선_id = 1L;
 
-        String actualLineId = createLineResponse.jsonPath().getString("id");
+        createLine(given_신분당선, given_신분당선_id, 지하철역, 새로운지하철역);
+
         // Then
-        ExtractableResponse<Response> listLineResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("lineId", actualLineId)
-            .when().get("/lines/{lineId}")
+        ExtractableResponse<Response> actualListLine = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .when().get("/lines")
             .then().log().all()
             .extract();
 
-        assertThat(listLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(listLineResponse.jsonPath().getString("id")).isEqualTo("1");
-        assertThat(listLineResponse.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(listLineResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
-        List<StationResponse> lineStations = createLineResponse.jsonPath().getList("stations", StationResponse.class);
+        assertThat(actualListLine.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(actualListLine.jsonPath().getString("[0].id")).isEqualTo("1");
+        assertThat(actualListLine.jsonPath().getString("[0].name")).isEqualTo("신분당선");
+        assertThat(actualListLine.jsonPath().getString("[0].color")).isEqualTo("bg-red-600");
+        List<StationResponse> lineStations = actualListLine.jsonPath().getList("[0].stations", StationResponse.class);
         assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
     }
 
@@ -98,13 +98,13 @@ class LineAcceptanceTest {
         assertThat(actualResponse.jsonPath().getString("[0].name")).isEqualTo("신분당선");
         assertThat(actualResponse.jsonPath().getString("[0].color")).isEqualTo("bg-red-600");
         List<StationResponse> _0_indexStations = actualResponse.jsonPath().getList("[0].stations", StationResponse.class);
-        assertThat(_0_indexStations).containsExactlyInAnyOrder(지하철역, 새로운지하철역);
+        assertThat(_0_indexStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
 
         assertThat(actualResponse.jsonPath().getLong("[1].id")).isEqualTo(given_분당선_id);
         assertThat(actualResponse.jsonPath().getString("[1].name")).isEqualTo("분당선");
         assertThat(actualResponse.jsonPath().getString("[1].color")).isEqualTo("bg-green-600");
         List<StationResponse> _1_indexStations = actualResponse.jsonPath().getList("[1].stations", StationResponse.class);
-        assertThat(_1_indexStations).containsExactlyInAnyOrder(지하철역, 또다른지하철역);
+        assertThat(_1_indexStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(3L, "새로운지하철역"));
     }
 
     private static ExtractableResponse<Response> createLine(LineCreateRequest lineCreateRequest, Long lineId, StationResponse upStation, StationResponse downStation) {
