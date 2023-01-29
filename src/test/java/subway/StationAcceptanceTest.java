@@ -60,9 +60,6 @@ public class StationAcceptanceTest {
         createStation("강남역");
         createStation("역삼역");
 
-        //When
-        var response = getStationNameList();
-
         //Then
         List<String> stationNameList = getStationNameList();
 
