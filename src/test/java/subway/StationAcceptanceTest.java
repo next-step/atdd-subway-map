@@ -55,13 +55,68 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록 조회 인수 테스트")
+    @Test
+    void showStations() {
+        // given
+        createStation("지하철역1");
+        createStation("지하철역2");
+
+        // when
+        List<String> stationList = getStationList();
+
+        // then
+        assertThat(stationList).size().isEqualTo(2);
+        assertThat(stationList).containsExactly("지하철역1", "지하철역2");
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역 제거 인수 테스트")
+    @Test
+    void deleteStation() {
+        // given
+        Long stationId = createStation("지히철역1");
 
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().delete("/stations/" + stationId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        List<String> stationList = getStationList();
+        assertThat(stationList).size().isEqualTo(0);
+        assertThat(stationList).doesNotContain("지하철역1");
+    }
+
+    private Long createStation(String stationName) {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .body(params)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post("/stations")
+                        .then().log().all()
+                        .extract();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        return response.body().jsonPath().getLong("id");
+    }
+
+    private List<String> getStationList() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
 }
