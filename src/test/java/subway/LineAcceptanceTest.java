@@ -59,6 +59,27 @@ class LineAcceptanceTest extends AcceptanceTest {
             .contains(신분당선, 이호선);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("노선 조회")
+    @Test
+    void 노선_조회() {
+        // given
+        final String 신분당선 = "신분당선";
+        final ExtractableResponse<Response> createdResponse = 노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10);
+
+        // when
+        final Integer lineId = createdResponse.body().jsonPath().get("id");
+        final ExtractableResponse<Response> lineResponse = 노선을_조회한다(lineId);
+
+        // then
+        final String lineName = lineResponse.body().jsonPath().get("name");
+        assertThat(lineName).isEqualTo(lineName);
+    }
+
     private ExtractableResponse<Response> 노선을_생성한다(
         String name,
         String color,
@@ -86,6 +107,14 @@ class LineAcceptanceTest extends AcceptanceTest {
     private ExtractableResponse<Response> 노선_목록을_조회한다() {
         return RestAssured.given().log().all()
             .when().get("/lines")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+    }
+
+    private ExtractableResponse<Response> 노선을_조회한다(long lineId) {
+        return RestAssured.given().log().all()
+            .when().get("/lines/{id}", lineId)
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract();

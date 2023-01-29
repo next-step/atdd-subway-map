@@ -46,6 +46,12 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
+    public LineResponse findById(Long id) {
+        return lineRepository.findById(id)
+            .map(this::createLineResponse)
+            .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
             line.getId(),
