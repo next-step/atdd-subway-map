@@ -28,8 +28,7 @@ public class StationAcceptanceTest {
         assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다.
-        ExtractableResponse<Response> findResponse = 지하철역_목록_조회();
-        List<String> stationNames = findResponse.jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_조회();
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -41,8 +40,7 @@ public class StationAcceptanceTest {
         지하철역_생성("교대역");
 
         // When 지하철 목록을 조회하면
-        ExtractableResponse<Response> response = 지하철역_목록_조회();
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_조회();
 
         // Then 2개의 지하철역을 응답받는다.
         assertThat(stationNames).hasSize(2);
@@ -61,18 +59,17 @@ public class StationAcceptanceTest {
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다.
-        ExtractableResponse<Response> findResponse = 지하철역_목록_조회();
-        List<String> stationNames = findResponse.jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_조회();
         assertThat(stationNames).doesNotContain("잠실역");
     }
 
 
-    private ExtractableResponse<Response> 지하철역_목록_조회() {
+    private List<String> 지하철역_목록_조회() {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/stations")
                 .then().log().all()
-                .extract();
+                .extract().jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> 지하철역_생성(String stationName) {
