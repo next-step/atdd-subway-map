@@ -47,38 +47,61 @@ class LineAcceptanceTest extends LineAcceptConstants {
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
-     @DisplayName("지하철 노선 목록을 조회한다.")
-     @Test
-     void getLinesTest() {
-         // given
-         createLine(이호선);
-         createLine(신분당선);
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void getLinesTest() {
+        // given
+        createLine(이호선);
+        createLine(신분당선);
 
-         // when
-         final List<String> lineNames = getLineNames();
+        // when
+        final List<String> lineNames = getLineNames();
 
-         // then
-         assertThat(lineNames.size()).isEqualTo(2);
-         assertThat(lineNames).containsOnly((String) 신분당선.get(LINE_NAME), (String) 이호선.get(LINE_NAME));
-     }
+        // then
+        assertThat(lineNames.size()).isEqualTo(2);
+        assertThat(lineNames).containsOnly((String) 신분당선.get(LINE_NAME), (String) 이호선.get(LINE_NAME));
+    }
 
     /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 조회하면
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
-     @DisplayName("지하철 노선을 단건 조회 한다.")
-     @Test
-     void getLineTest() {
-         // given
-         createLine(이호선);
+    @DisplayName("지하철 노선을 단건 조회 한다.")
+    @Test
+    void getLineTest() {
+        // given
+        createLine(이호선);
 
-         // when
-         final LineResponse lineResponse = getLine();
+        // when
+        final LineResponse lineResponse = getLine();
 
-         // then
-         assertThat(lineResponse.getName()).isEqualTo((String) 이호선.get(LINE_NAME));
-     }
+        // then
+        assertThat(lineResponse.getName()).isEqualTo((String) 이호선.get(LINE_NAME));
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void updateLineTest() {
+        // given
+        createLine(신분당선);
+
+        // when
+        final String newLineName = "구분당선";
+        final String newLinColor = "bg-red-600";
+        updateLine(newLineName, newLinColor);
+
+        final LineResponse lineResponse = getLine();
+
+        // then
+        assertThat(lineResponse.getName()).isEqualTo(newLineName);
+        assertThat(lineResponse.getColor()).isEqualTo(newLinColor);
+    }
 
     private void createLine(final Map<String, Object> line) {
         RestAssured
@@ -117,7 +140,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
                 .given()
                     .accept(APPLICATION_JSON_VALUE)
                 .when()
-                .   get("/lines/{id}", 1)
+                    .get("/lines/{id}", 1)
                 .then()
                     .statusCode(HttpStatus.OK.value())
                     .contentType(APPLICATION_JSON_VALUE)
@@ -126,5 +149,14 @@ class LineAcceptanceTest extends LineAcceptConstants {
                 .getObject("", LineResponse.class);
     }
 
-
+    private void updateLine(final String newLineName, final String newLinColor) {
+        RestAssured
+                .given()
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .body(Map.of(LINE_NAME, newLineName, LINE_COLOR, newLinColor))
+                .when()
+                   .put("/lines/{id}", 1)
+                .then()
+                   .statusCode(HttpStatus.OK.value());
+    }
 }
