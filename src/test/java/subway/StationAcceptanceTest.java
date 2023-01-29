@@ -121,6 +121,48 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
 
+    @DisplayName("지하철역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // TODO: 지하철역 제거 인수 테스트 메서드 생성
+
+        final String stationName = "금청구청역";
+
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", stationName);
+
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .extract();
+        Assertions.assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        Integer id = createResponse.body().jsonPath().get("id");
+
+        //when
+        ExtractableResponse<Response> deleteResponse = RestAssured
+                .given()
+                .when()
+                .delete("/stations/" + id)
+                .then()
+                .extract();
+
+        Assertions.assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        //then
+        ExtractableResponse<Response> readResponse = RestAssured
+                .given()
+                .when()
+                .get("/stations")
+                .then()
+                .extract();
+
+        Assertions.assertThat(readResponse.body().jsonPath().getList("name")).doesNotContain(stationName);
+    }
 }
