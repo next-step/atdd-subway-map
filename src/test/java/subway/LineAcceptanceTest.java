@@ -82,6 +82,22 @@ public class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("name")).isEqualTo("분당선");
     }
 
+    @DisplayName("특정 지하철 노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        var line = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        long lineId = line.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> deleteResponse = deleteLine(lineId);
+        ExtractableResponse<Response> findResponse = findLineById(lineId);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(findResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
             .body(lineRequest)
@@ -110,6 +126,13 @@ public class LineAcceptanceTest {
             .body(lineRequest)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().put("/lines/{id}", lineId)
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> deleteLine(Long lineId) {
+        return RestAssured.given().log().all()
+            .when().delete("/lines/{id}", lineId)
             .then().log().all()
             .extract();
     }
