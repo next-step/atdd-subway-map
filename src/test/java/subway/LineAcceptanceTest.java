@@ -42,17 +42,20 @@ class LineAcceptanceTest {
         LineCreateRequest lineFixture = new LineCreateRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+        ExtractableResponse<Response> createResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
             .body(lineFixture)
             .when().post("/lines")
             .then().log().all()
             .extract();
 
+        String actualLineId = createResponse.jsonPath().getString("id");
+
         // Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
-        assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
-        List<StationResponse> stations = response.jsonPath().getList("stations", StationResponse.class);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(actualLineId).isEqualTo("1");
+        assertThat(createResponse.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(createResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        List<StationResponse> stations = createResponse.jsonPath().getList("stations", StationResponse.class);
         assertThat(stations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
     }
 
