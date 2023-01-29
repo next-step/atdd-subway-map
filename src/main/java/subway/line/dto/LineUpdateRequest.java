@@ -1,20 +1,25 @@
 package subway.line.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
 public class LineUpdateRequest {
 
-    private Long id;
+    private Long lineId;
     private String name;
     private String color;
 
-    public static LineUpdateRequest of(Long id, String name, String color) {
-        return new LineUpdateRequest(id, name, color);
+    public LineUpdateRequest(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public static LineUpdateRequest of(String name, String color) {
+        return new LineUpdateRequest(name, color);
     }
 }

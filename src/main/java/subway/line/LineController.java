@@ -1,54 +1,58 @@
 package subway.line;
 
-import java.net.URI;
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import subway.line.dto.LineCreateRequest;
 import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.service.LineService;
+import subway.station.entity.Station;
+import subway.station.repository.StationRepository;
+
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class LineController {
 
-	private final LineService lineService;
+    private final StationRepository stationRepository;
+    private final LineService lineService;
 
-	@PostMapping("/lines")
-	public ResponseEntity<LineResponse> save(@RequestBody LineCreateRequest lineCreateRequest) {
-		Line saved = lineService.save(lineCreateRequest);
-		return ResponseEntity.created(URI.create("/lines/" + saved.getId())).body(LineResponse.from(saved));
-	}
+    @PostMapping("/lines")
+    public ResponseEntity<LineResponse> save(@RequestBody LineCreateRequest lineCreateRequest) {
+        Station upStation = stationRepository.findById(lineCreateRequest.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(lineCreateRequest.getDownStationId()).orElseThrow();
+        Line line = lineService.save(lineCreateRequest.toEntity(upStation, downStation));
+        LineResponse response = LineResponse.from(line);
+        return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(response);
+    }
 
-	@GetMapping("/lines")
-	public List<LineResponse> findAll() {
-		return lineService.findAll();
-	}
+    @GetMapping("/lines")
+    public List<LineResponse> findAll() {
+        return lineService.findAll().stream()
+                .map(LineResponse::from)
+                .collect(Collectors.toList());
+    }
 
-	@GetMapping("/lines/{id}")
-	public LineResponse findById(@PathVariable Long id) {
-		return lineService.findById(id);
-	}
+    @GetMapping("/lines/{id}")
+    public LineResponse findById(@PathVariable Long id) {
+        return LineResponse.from(lineService.findById(id));
+    }
 
-	@PatchMapping("/lines/{id}") // 부분 업데이트라면 patch가 맞지 않을까?
-	public void update(@RequestBody LineUpdateRequest request) {
-		lineService.update(request);
-	}
+    @PutMapping("/lines/{id}")
+    public void update(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+        request.setLineId(id);
+        lineService.update(request);
+    }
 
-	@DeleteMapping("/lines/{id}")
-	public ResponseEntity<Void> update(@PathVariable Long id) {
-		lineService.delete(id);
-		return ResponseEntity.noContent().build();
-	}
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        lineService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

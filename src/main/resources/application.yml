@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    properties:
+      hibernate.show_sql: true
+      hibernate.format_sql: true
+      hibernate:
+        default_batch_fetch_size: 1000
+
+logging:
+  level:
+    org.hibernate:
+      type:
+        descriptor.sql: trace

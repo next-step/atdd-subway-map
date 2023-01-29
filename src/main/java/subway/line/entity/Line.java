@@ -1,22 +1,23 @@
 package subway.line.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import subway.section.entity.Section;
+import subway.section.entity.Sections;
 import subway.station.entity.Station;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Builder
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 public class Line {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_id")
     private Long id;
 
     @Column(length = 20, nullable = false)
@@ -25,20 +26,55 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "up_station_id")
-    private Station upStation;
+    @Embedded
+    private Sections sections;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "down_station_id")
-    private Station downStation;
+    @Builder
+    public Line(String name, String color, List<Section> values) {
+        this.name = name;
+        this.color = color;
+        this.sections = (values == null) ? new Sections() : Sections.from(values);
+    }
 
-    @Column(length = 20, nullable = false)
-    private long distance;
+    public static Line of(String name, String color) {
+        return Line.builder()
+                .name(name)
+                .color(color)
+                .build();
+    }
 
     public void update(String name, String color) {
         this.name = name;
         this.color = color;
+    }
+
+    public List<Station> stations() {
+        return sections.allStations();
+    }
+
+    public void addSection(Section section) {
+        if (sections.contains(section)) {
+            return;
+        }
+
+        sections.add(section);
+        section.changeLine(this);
+    }
+
+    public void addSection(Station upStation, Station downStation, long distance) {
+        sections.add(this, upStation, downStation, distance);
+    }
+
+    public void remove(Section section) {
+        sections.remove(section);
+    }
+
+    public void removeSectionByStationId(Long stationId) {
+        sections.removeByStationId(stationId);
+    }
+
+    public Section getLastSection() {
+        return sections.last();
     }
 }
 

@@ -1,15 +1,14 @@
 package subway.line.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import subway.line.entity.Line;
 import subway.station.dto.StationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@ToString
 @Builder
 @Getter
 @NoArgsConstructor
@@ -24,19 +23,16 @@ public class LineResponse {
         return LineResponse.builder()
                 .id(line.getId())
                 .name(line.getName())
+                .stations(createSectionResponses(line))
                 .color(line.getColor())
-                .stations(stationResponseList(line))
                 .build();
     }
 
-    public LineResponse(Line line) {
-        this(line.getId(), line.getName(), line.getColor(), stationResponseList(line));
-    }
-
-    private static List<StationResponse> stationResponseList(Line line) {
-        return List.of(
-                StationResponse.from(line.getUpStation()),
-                StationResponse.from(line.getDownStation()));
+    private static List<StationResponse> createSectionResponses(Line line) {
+        return line.stations()
+                .stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList());
     }
 }
 
