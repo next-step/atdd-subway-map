@@ -30,7 +30,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createStationTest() {
+    void createLineTest() {
         // given
         createLine(이호선);
 
@@ -49,7 +49,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
      */
      @DisplayName("지하철 노선 목록을 조회한다.")
      @Test
-     void getStationsTest() {
+     void getLinesTest() {
          // given
          createLine(이호선);
          createLine(신분당선);
@@ -69,7 +69,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
      */
      @DisplayName("지하철 노선을 단건 조회 한다.")
      @Test
-     void getStationTest() {
+     void getLineTest() {
          // given
          createLine(이호선);
 
