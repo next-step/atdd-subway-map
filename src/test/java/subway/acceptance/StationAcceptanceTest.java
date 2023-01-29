@@ -70,7 +70,7 @@ public class StationAcceptanceTest {
                 .jsonPath().getList(역_이름.필드명(), String.class);
 
         // then
-        assertThat(등록된_지하철역_이름_목록).hasSize(2);
+        assertThat(등록된_지하철역_이름_목록).contains(강남역.역_이름(), 서울대입구역.역_이름());
     }
 
     /**
@@ -78,7 +78,6 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @DisplayName("지하철역을 삭제한다.")
     @Test
     void deleteStation() {
