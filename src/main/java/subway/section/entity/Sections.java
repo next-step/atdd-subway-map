@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class Sections extends AbstractList<Section> {
 
+    public static final String IS_NOT_LAST_SECTION_DOWN_STATION = "마지막 구간의 하행역이 아닙니다.";
+    public static final String LINE_SECTION_IS_ONLY_ONE = "노선에 구간이 하나 입니다.";
+
     @OneToMany(mappedBy = "line", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Section> values = new ArrayList<>();
 
@@ -90,11 +93,11 @@ public class Sections extends AbstractList<Section> {
 
     public void validateRemove(Long stationId) {
         if (!last().downStationId().equals(stationId)) {
-            throw new IllegalArgumentException("마지막 구간의 하행역이 아닙니다.");
+            throw new IllegalArgumentException(IS_NOT_LAST_SECTION_DOWN_STATION);
         }
 
         if (values.size() <= 1) {
-            throw new IllegalArgumentException("노선에 구간이 하나 입니다.");
+            throw new IllegalArgumentException(LINE_SECTION_IS_ONLY_ONE);
         }
     }
 

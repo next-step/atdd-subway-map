@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import subway.common.AbstractTestDataBaseCleanUp;
 import subway.section.dto.SectionCreateRequest;
 import subway.section.dto.SectionResponse;
+import subway.section.entity.Sections;
 import subway.section.repository.SectionRepository;
 
 import static io.restassured.RestAssured.given;
@@ -136,15 +137,13 @@ public class SectionAcceptanceTest extends AbstractTestDataBaseCleanUp {
         long newSectionDownStationId = createStation("추가하는_구간_하행역");
 
         SectionCreateRequest request = createSectionRequestFixture(lineId, newSectionDownStationId, oldLineDownStationId);
-        ExtractableResponse<Response> createSectionResponse = requestCreateSection(request);
-        assertThat(createSectionResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()); // then에서 검증하는게 좋을까?
+        Long sectionId = requestCreateSection(request).as(SectionResponse.class).getSectionId();
 
         //when
         ExtractableResponse<Response> deleteResponse = requestDeleteSection(lineId, newSectionDownStationId);
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        Long sectionId = createSectionResponse.as(SectionResponse.class).getSectionId();
         sectionRepository.findById(sectionId).ifPresent(section -> fail("구간이 제거 되지 않았습니다"));
     }
 
@@ -181,7 +180,7 @@ public class SectionAcceptanceTest extends AbstractTestDataBaseCleanUp {
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(deleteResponse.asString()).isEqualTo("마지막 구간의 하행역이 아닙니다."); // 메시지를 바꾸면 테스트가 꺠지는데 상수화 하는게 좋을까?
+        assertThat(deleteResponse.asString()).isEqualTo(Sections.IS_NOT_LAST_SECTION_DOWN_STATION);
     }
 
     /**
@@ -201,6 +200,6 @@ public class SectionAcceptanceTest extends AbstractTestDataBaseCleanUp {
 
         //then
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(deleteResponse.asString()).isEqualTo("노선에 구간이 하나 입니다."); // 메시지를 바꾸면 테스트가 꺠지는데 상수화 하는게 좋을까?
+        assertThat(deleteResponse.asString()).isEqualTo(Sections.LINE_SECTION_IS_ONLY_ONE);
     }
 }
