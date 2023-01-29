@@ -68,7 +68,41 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void selectStationLineList() {
-        
+        Map<String, Object> body1 = new HashMap<>();
+        String name1 = "신분당선";
+        String color1 = "bg-red-600";
+        body1.put("name", name1);
+        body1.put("color", color1);
+        body1.put("upStationId", 1);
+        body1.put("downStationId", 2);
+        body1.put("distance", 10);
+
+        Map<String, Object> body2 = new HashMap<>();
+        String name2 = "분당선";
+        String color2 = "bg-green-600";
+        body2.put("name", name2);
+        body2.put("color", color2);
+        body2.put("upStationId", 1);
+        body2.put("downStationId", 3);
+        body2.put("distance", 20);
+
+        StationUtils.createStationLine(body1);
+        StationUtils.createStationLine(body2);
+
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().spec(StationUtils.getRequestSpecification()).log().all()
+                        .when().get("/lines")
+                        .then().log().all().extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+
+        JsonPath jsonPath = response.jsonPath();
+
+        assertThat(jsonPath.getList("id", Integer.class)).containsExactly(1, 2);
+        assertThat(jsonPath.getList("name", String.class)).containsExactly(name1, name2);
+        assertThat(jsonPath.getList("color", String.class)).containsExactly(color1, color2);
     }
 
     /**
