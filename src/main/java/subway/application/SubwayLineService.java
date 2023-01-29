@@ -10,6 +10,7 @@ import subway.domain.Station;
 import subway.domain.StationRepository;
 import subway.domain.SubwayLineRepository;
 import subway.exception.NotFoundStationException;
+import subway.exception.NotFoundSubwayLineException;
 import subway.exception.SubwayLineErrorCode;
 import subway.presentation.request.SubwayLineRequest;
 import subway.presentation.response.SubwayLineResponse;
@@ -40,5 +41,11 @@ public class SubwayLineService {
 	@Transactional(readOnly = true)
 	public List<SubwayLineResponse.LineInfo> findSubwayLines() {
 		return subwayLineRepository.findSubwayLineAll();
+	}
+
+	@Transactional(readOnly = true)
+	public SubwayLineResponse.LineInfo findSubwayLineById(Long id) {
+		return subwayLineRepository.findSubwayLineById(id)
+			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 	}
 }

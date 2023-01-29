@@ -5,8 +5,10 @@ import static subway.domain.QSubwayLine.*;
 import static subway.domain.QSubwayLineStationGroup.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -19,16 +21,26 @@ public class CustomSubwayLineRepositoryImpl implements CustomSubwayLineRepositor
 
 	@Override
 	public List<SubwayLineResponse.LineInfo> findSubwayLineAll() {
-		List<SubwayLine> subwayLines = queryFactory.select(subwayLine)
-			.from(subwayLine)
-			.innerJoin(subwayLine.subwayLineStationGroups, subwayLineStationGroup)
-			.fetchJoin()
-			.innerJoin(subwayLineStationGroup.station, station)
-			.distinct()
+		List<SubwayLine> subwayLines = findSubwayLineQuery().distinct()
 			.fetch();
 
 		return subwayLines.stream()
 			.map(SubwayLineResponse.LineInfo::new)
 			.collect(Collectors.toUnmodifiableList());
+	}
+
+	@Override
+	public Optional<SubwayLineResponse.LineInfo> findSubwayLineById(Long id) {
+		SubwayLine findSubwayLine = findSubwayLineQuery().where(subwayLine.id.eq(id))
+			.fetchOne();
+
+		return findSubwayLine == null ? Optional.empty() : Optional.of(new SubwayLineResponse.LineInfo(findSubwayLine));
+	}
+
+	private JPAQuery<SubwayLine> findSubwayLineQuery() {
+		return queryFactory.selectFrom(subwayLine)
+			.innerJoin(subwayLine.subwayLineStationGroups, subwayLineStationGroup)
+			.fetchJoin()
+			.innerJoin(subwayLineStationGroup.station, station);
 	}
 }

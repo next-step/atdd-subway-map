@@ -56,4 +56,18 @@ public class SubwayLineRequest {
 			);
 		}
 	}
+
+	@Getter
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	public static class Update {
+		private String name;
+
+		private String color;
+
+		@Builder
+		private Update(String name, String color) {
+			this.name = name;
+			this.color = color;
+		}
+	}
 }
