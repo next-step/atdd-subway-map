@@ -30,10 +30,10 @@ public class StationAcceptanceTest {
         ExtractableResponse<Response> response = saveStation("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        assertSuccessCreate(response);
 
         // then
-        List<String> stationNames = showStationsResponse().jsonPath().getList("name", String.class);
+        List<String> stationNames = assertSuccessShow(showStationsResponse());
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -50,13 +50,9 @@ public class StationAcceptanceTest {
         saveStation("역삼역");
 
         // when
-        ExtractableResponse<Response> response = showStationsResponse();
+        List<String> stationNames = assertSuccessShow(showStationsResponse());
 
         // then
-        assertThat(response.statusCode()).isEqualTo(OK.value());
-
-        // then
-        List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames.size()).isEqualTo(2);
         assertThat(stationNames).containsExactly("강남역", "역삼역");
     }
@@ -70,16 +66,13 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 제거")
     void deleteStation() {
         // given
-        Long id = saveStation("강남역").jsonPath().getLong("id");
+        Long id = assertSuccessCreate(saveStation("강남역"));
 
         // when
-        ExtractableResponse<Response> response = deleteStationResponse(id);
+        assertSuccessDelete(deleteStationResponse(id));
 
         // then
-        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
-
-        // then
-        List<String> stationNames = showStationsResponse().jsonPath().getList("name", String.class);
+        List<String> stationNames = assertSuccessShow(showStationsResponse());
         assertThat(stationNames.size()).isEqualTo(0);
     }
 
@@ -89,6 +82,11 @@ public class StationAcceptanceTest {
                 .when().get("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    private static List<String> assertSuccessShow(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+        return response.jsonPath().getList("name", String.class);
     }
 
     private ExtractableResponse<Response> saveStation(String stationName) {
@@ -106,11 +104,20 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
+    private Long assertSuccessCreate(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        return response.body().jsonPath().getLong("id");
+    }
+
     private ExtractableResponse<Response> deleteStationResponse(Long id) {
         return RestAssured
                 .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().delete("/stations/" + id)
                 .then().log().all()
                 .extract();
+    }
+
+    private void assertSuccessDelete(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
 }
