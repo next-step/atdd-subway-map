@@ -43,7 +43,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        List<Object> stationNames = response.jsonPath().getList("name");
+        List<String> stationNames = response.jsonPath().getList("name", String.class);
         assertThat(stationNames).hasSize(2);
         assertThat(stationNames).containsExactlyInAnyOrder("염창역", "등촌역");
     }
@@ -62,7 +62,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // then
-        List<Object> stationNames = StationAcceptanceFactory.getAllStations().jsonPath().getList("name");
+        List<String> stationNames = StationAcceptanceFactory.getAllStations()
+                .jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain("당산역");
     }
 
