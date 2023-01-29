@@ -1,51 +1,52 @@
 package subway.line;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.station.Station;
-import subway.station.StationRepository;
+import subway.station.StationService;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class LineService {
     private final LineRepository lineRepository;
-    private final StationRepository stationRepository;
+    private final StationService stationService;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
-        Station upStation = stationRepository.findById(request.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
+    public LineResponse create(LineRequest request) {
+        Station upStation = stationService.findOneById(request.getUpStationId());
+        Station downStation = stationService.findOneById(request.getDownStationId());
         Line line = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
-        return LineResponse.createLineResponse(line);
+        return LineResponse.of(line);
     }
-
-    public List<LineResponse> findAllLines() {
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAll() {
         return lineRepository.findAll().stream()
-                .map(LineResponse::createLineResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findOneLine(Long id) {
+    @Transactional(readOnly = true)
+    public LineResponse findOneById(Long id) {
         return lineRepository.findById(id)
-                .map(LineResponse::createLineResponse)
+                .map(LineResponse::of)
                 .orElseThrow();
     }
 
     @Transactional
-    public LineResponse updateLineById(Long id, LineRequest lineRequest) {
+    public LineResponse updateById(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id).orElseThrow();
-        return LineResponse.createLineResponse(lineRepository.save(line.updateLine(lineRequest)));
+        return LineResponse.of(lineRepository.save(line.updateLine(lineRequest)));
     }
 
     @Transactional
-    public void deleteLineById(Long id) {
+    public void deleteById(Long id) {
         lineRepository.deleteById(id);
     }
 }

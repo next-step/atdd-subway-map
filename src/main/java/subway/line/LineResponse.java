@@ -21,7 +21,7 @@ public class LineResponse {
         this.stations = stations;
     }
 
-    public static LineResponse createLineResponse(Line line) {
+    public static LineResponse of(Line line) {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), line.getDistance(),
                 Stream.of(line.getUpStation(), line.getDownStation())
                         .map(station -> new StationResponse(station.getId(), station.getName()))

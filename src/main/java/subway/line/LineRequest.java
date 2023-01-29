@@ -23,6 +23,14 @@ public class LineRequest {
         this.distance = distance;
     }
 
+    public static LineRequest of(String name, String color) {
+        return new LineRequest(name, color);
+    }
+
+    public static LineRequest of(String name, String color, Long upStationId, Long downStationId, int distance) {
+        return new LineRequest(name, color, upStationId, downStationId, distance);
+    }
+
     public String getName() {
         return name;
     }
