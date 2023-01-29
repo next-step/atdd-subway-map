@@ -1,4 +1,4 @@
-package subway;
+package subway.presentation.request;
 
 import lombok.AccessLevel;
 import lombok.Builder;

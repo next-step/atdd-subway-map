@@ -17,6 +17,8 @@ import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.common.AcceptanceTest;
+import subway.presentation.request.StationRequest;
+import subway.presentation.response.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 public class StationAcceptanceTest extends AcceptanceTest {
