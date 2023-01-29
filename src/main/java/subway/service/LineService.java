@@ -42,4 +42,9 @@ public class LineService {
                 , line.getColor()
                 , List.of(line.getUpStation(), line.getDownStation()));
     }
+
+    public LineResponse findLineById(Long id) {
+        return createLineResponse(lineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new));
+    }
 }
