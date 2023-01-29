@@ -30,15 +30,15 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    private Integer distance;
+    private int distance;
 
     @OneToMany(mappedBy = "line")
     private List<Station> stations = new ArrayList<>();
 
-    public Line(String name, String color, Integer distance) {
+    public Line(String name, String color, int distance) {
         this(name, color, distance, new ArrayList<>());
     }
-    public Line(String name, String color, Integer distance, List<Station> stations) {
+    public Line(String name, String color, int distance, List<Station> stations) {
         this.name = name;
         this.color = color;
         this.distance = distance;
