@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.StationUtils.GANG_NAM_STATION;
+import static subway.StationUtils.PAN_GYEO_STATION;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -24,9 +26,8 @@ public class StationAcceptanceTest {
     @DisplayName("지하철 역을 생성한다.")
     @Test
     void createStation() {
-        String name = "강남역";
         // when
-        StationUtils.createStation(name);
+        StationUtils.createStation(GANG_NAM_STATION);
 
         // then
         List<String> stationNames =
@@ -34,7 +35,7 @@ public class StationAcceptanceTest {
                         .given().spec(StationUtils.getRequestSpecification())
                         .when().get("/stations")
                         .then().extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf(name);
+        assertThat(stationNames).containsAnyOf(GANG_NAM_STATION);
     }
 
     /**
@@ -46,17 +47,15 @@ public class StationAcceptanceTest {
     @Test
     void selectStation() {
         // given
-        String station1 = "강남역";
-        String station2 = "판교역";
-        StationUtils.createStation(station1);
-        StationUtils.createStation(station2);
+        StationUtils.createStation(GANG_NAM_STATION);
+        StationUtils.createStation(PAN_GYEO_STATION);
 
         // when
         List<String> list = StationUtils.selectStations().jsonPath()
                 .getList("name", String.class);
 
         // then
-        assertThat(list).containsExactly(station1, station2);
+        assertThat(list).containsExactly(GANG_NAM_STATION, PAN_GYEO_STATION);
     }
 
     /**
@@ -68,8 +67,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        String station = "강남역";
-        StationUtils.createStation(station);
+        StationUtils.createStation(GANG_NAM_STATION);
 
         // when
         ExtractableResponse<Response> response =
