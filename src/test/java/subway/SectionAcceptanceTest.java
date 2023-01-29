@@ -16,7 +16,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private Long 강남역;
     private Long 역삼역;
     private Long 선릉역;
-    private Long 삼성역;
     private Long 이호선;
 
     @BeforeEach
@@ -26,7 +25,6 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         강남역 = 지하철역_생성함("강남역");
         역삼역 = 지하철역_생성함("역삼역");
         선릉역 = 지하철역_생성함("선릉역");
-        삼성역 = 지하철역_생성함("삼성역");
         이호선 = 노선_생성함("2호선", "bg-green-600", 강남역, 역삼역, 10);
     }
 
