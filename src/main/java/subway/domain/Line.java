@@ -15,30 +15,21 @@ public class Line {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn
-    private Station upStation;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn
-    private Station downStation;
-
-    private Integer distance;
+    @Embedded
+    private Sections sections;
 
     protected Line() {
     }
 
-    public Line(final Long id, final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
+    public Line(final Long id, final String name, final String color, final Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this.sections = sections;
     }
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final Integer distance) {
-        this(null, name, color, upStation, downStation, distance);
+    public Line(final String name, final String color, final Sections sections) {
+        this(null, name, color, sections);
     }
 
     public Long getId() {
@@ -53,17 +44,24 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public Sections getSections() {
+        return sections;
     }
 
     public void updateLine(final String changeName, final String changeColor) {
         this.name = changeName;
         this.color = changeColor;
+    }
+
+    public void addSection(final Section section) {
+        this.sections.validateAddStation(section);
+        section.addLine(this);
+        this.sections.addSection(section);
+    }
+
+    public void removeSection(final Station station) {
+        this.sections.validateOnlyOneSection();
+        this.sections.removeSection(station);
     }
 
     @Override
