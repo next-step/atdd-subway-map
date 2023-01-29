@@ -83,12 +83,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 마지막 구간 제거")
     @Test
-    void deleteLastSection() {
+    void removeLastSection() {
         // given
+        구간_등록함(이호선, 역삼역, 선릉역, 10);
 
         // when
+        final ExtractableResponse<Response> 구간_제거_응답 = 구간_제거_요청(이호선, 선릉역);
 
         // then
+        구간이_정상적으로_제거되었는지_확인(구간_제거_응답, 이호선, "선릉역");
     }
 
     /**
@@ -98,12 +101,15 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("마지막 구간이 아닌 구간을 삭제할 경우, 삭제 불가")
     @Test
-    void cannotDeleteSectionWhatIsNotLastSection() {
+    void cannotRemoveSectionWhatIsNotLastSection() {
         // given
+        구간_등록함(이호선, 역삼역, 선릉역, 10);
 
         // when
+        final ExtractableResponse<Response> 구간_제거_응답 = 구간_제거_요청(이호선, 역삼역);
 
         // then
+        마지막_구간이_아닌_구간_삭제에_대한_실패를_확인(구간_제거_응답, 이호선, "역삼역");
     }
 
     /**
@@ -112,11 +118,11 @@ public class SectionAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("지하철 노선의 구간이 1개일 경우, 구간 삭제 불가")
     @Test
-    void cannotDeleteSectionWhenSectionCountInLineIsOne() {
-        // given
-
+    void cannotRemoveSectionWhenSectionCountInLineIsOne() {
         // when
+        final ExtractableResponse<Response> 구간_제거_응답 = 구간_제거_요청(이호선, 역삼역);
 
         // then
+        마지막으로_남은_구간_삭제에_대한_실패를_확인(구간_제거_응답, 이호선, "역삼역");
     }
 }
