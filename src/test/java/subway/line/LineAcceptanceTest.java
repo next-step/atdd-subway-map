@@ -120,4 +120,27 @@ public class LineAcceptanceTest {
         assertThat(name).isEqualTo("9호선");
         assertThat(color).isEqualTo("#BDB092");
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선 삭제")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        LineResponse line = createLineResponse.body().as(LineResponse.class);
+
+        // when
+        ExtractableResponse<Response> deleteLineResponse = requestDeleteLine(line.getId());
+
+        assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        // then
+        ExtractableResponse<Response> showLineResponse = requestShowLine(line.getId());
+
+        assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }

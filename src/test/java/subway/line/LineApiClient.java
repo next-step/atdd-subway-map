@@ -60,4 +60,13 @@ public class LineApiClient {
                 .then().log().all()
                 .extract();
     }
+
+    static ExtractableResponse<Response> requestDeleteLine(Long id) {
+        final String ENDPOINT = ENDPOINT_LINES + "/" + id.toString();
+
+        return RestAssured.given().log().all()
+                .when().delete(ENDPOINT)
+                .then().log().all()
+                .extract();
+    }
 }

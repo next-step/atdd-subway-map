@@ -7,6 +7,7 @@ import subway.StationResponse;
 import subway.StationService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +35,7 @@ public class LineService {
         line.addStation(upStation);
         line.addStation(downStation);
 
-        Line savedLine = this.lineRepository.save(line);
+        Line savedLine = lineRepository.save(line);
 
         return createLineResponse(savedLine);
     }
@@ -46,23 +47,34 @@ public class LineService {
     }
 
     public LineResponse findOneLine(Long id) {
-        Line line = this.lineRepository.getReferenceById(id);
+        Line line = findOne(id);
         return createLineResponse(line);
     }
 
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
-        Line line = this.lineRepository.getReferenceById(id);
+        Line line = findOne(id);
+
         line.updateName(lineRequest.getName());
         line.updateColor(lineRequest.getColor());
 
-        this.lineRepository.save(line);
+        lineRepository.save(line);
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
+    }
+
+    private Line findOne(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 노선 입니다"));
     }
 
     private LineResponse createLineResponse(Line line) {
         List<StationResponse> stationResponses = line.getStations()
                 .stream()
-                .map(this.stationService::createStationResponse)
+                .map(stationService::createStationResponse)
                 .collect(Collectors.toList());
 
         return LineResponse.builder()
