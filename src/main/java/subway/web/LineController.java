@@ -44,7 +44,7 @@ public class LineController {
     }
 
     @PutMapping("/lines/{lineId}")
-    public ResponseEntity<Void> createLine(@PathVariable Long lineId, @RequestBody LineUpdateRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long lineId, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineUseCase.updateLine(lineUpdateRequest.toDomain(lineId));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
