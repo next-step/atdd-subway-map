@@ -41,4 +41,13 @@ public class LineService {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
         return LineResponse.of(line);
     }
+
+    @Transactional
+    public void updateLine(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
+        Station upStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
+
+        line.update(request, upStation, downStation);
+    }
 }

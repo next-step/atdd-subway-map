@@ -70,4 +70,26 @@ public class Line {
     public Station getDownStation() {
         return downStation;
     }
+
+    public void update(LineRequest request, Station upStation, Station downStation) {
+        if(!name.equals(request.getName())) {
+            this.name = request.getName();
+        }
+
+        if(!color.equals(request.getColor())) {
+            this.color = request.getColor();
+        }
+
+        if(!distance.equals(request.getDistance())) {
+            this.distance = request.getDistance();
+        }
+
+        if(!this.upStation.getId().equals(upStation.getId())) {
+            this.upStation = upStation;
+        }
+
+        if(!this.downStation.getId().equals(downStation.getId())) {
+            this.downStation = downStation;
+        }
+    }
 }
