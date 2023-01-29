@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
-
     RequestSpecification requestSpecification;
 
     @BeforeEach
@@ -40,30 +39,16 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        createStation("강남역");
-    }
-
-    @DisplayName("주어진 이름의 지하철역을 생성한다.")
-    @Test
-    void createStation(String name) {
+        String name = "강남역";
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given()
-                        .body(Map.entry("name", name))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then()
-                        .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        createStation(name);
 
         // then
         List<String> stationNames =
-                RestAssured.given()
+                RestAssured
+                        .given().spec(requestSpecification)
                         .when().get("/stations")
-                        .then()
-                        .extract().jsonPath().getList("name", String.class);
+                        .then().extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf(name);
     }
 
@@ -80,11 +65,12 @@ public class StationAcceptanceTest {
         createStation("판교역");
 
         // when
-        List<String> list = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract().jsonPath().getList("name", String.class);
+        List<String> list =
+                RestAssured
+                        .given().spec(requestSpecification).log().all()
+                        .when().get("/stations")
+                        .then().log().all()
+                        .extract().jsonPath().getList("name", String.class);
 
         // then
         assertThat(list).containsExactly("강남역", "판교역");
@@ -102,12 +88,28 @@ public class StationAcceptanceTest {
         createStation("강남역");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/stations/1")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().spec(requestSpecification).log().all()
+                        .when().delete("/stations/1")
+                        .then().log().all()
+                        .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    void createStation(String name) {
+        ExtractableResponse<Response> response =
+                RestAssured
+                        .given().spec(requestSpecification)
+                        .body(Map.entry("name", name))
+                        .when().post("/stations")
+                        .then()
+                        .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+    }
+
 }
