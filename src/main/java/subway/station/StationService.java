@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class StationService {
     private StationRepository stationRepository;
+    private StationQuery stationQuery;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, StationQuery stationQuery) {
         this.stationRepository = stationRepository;
+        this.stationQuery = stationQuery;
     }
 
     @Transactional
@@ -22,7 +24,7 @@ public class StationService {
     }
 
     public List<StationResponse> findAllStations() {
-        return stationRepository.findAll().stream()
+        return stationQuery.findAll().stream()
                 .map(this::createStationResponse)
                 .collect(Collectors.toList());
     }
@@ -30,12 +32,6 @@ public class StationService {
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    public Station findById(Long id) {
-        var findStation = stationRepository.findById(id);
-        if (findStation.isPresent()) return findStation.get();
-        throw new StationNotFoundException(id);
     }
 
     private StationResponse createStationResponse(Station station) {

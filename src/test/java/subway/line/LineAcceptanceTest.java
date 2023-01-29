@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.doesNotHave;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -146,10 +145,10 @@ public class LineAcceptanceTest {
         var 신분당선_생성 = RestAssuredClient.post(
                 Endpoints.LINES,
                 new LineRequest(
-                       lineName,
-                       color,
-                       upStationId,
-                       downStationId,
+                        lineName,
+                        color,
+                        upStationId,
+                        downStationId,
                         10L
                 )
         );
@@ -204,14 +203,14 @@ public class LineAcceptanceTest {
         String updateLineName = "4호선";
         String updateColor = Colors.GREEN;
         var updateLineResponse = RestAssuredClient.put(path, new UpdateLineRequest(
-            updateLineName,
+                updateLineName,
                 updateColor
         ));
 
         // Then line is updated.
         var 사호선_응답 = updateLineResponse.as(LineResponse.class);
-        assertThat(사호선_응답.getName()).isEqualTo(lineName);
-        assertThat(사호선_응답.getColor()).isEqualTo(color);
+        assertThat(사호선_응답.getName()).isEqualTo(updateLineName);
+        assertThat(사호선_응답.getColor()).isEqualTo(updateColor);
         assertThat(사호선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
     }
 }
