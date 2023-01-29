@@ -2,6 +2,8 @@ package subway;
 
 import io.restassured.RestAssured;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,8 +56,9 @@ public class StationAcceptanceTest {
       createStation(역삼역);
 
       // then
-        checkCreatedStationEqualsToStationList(강남역, 역삼역);
+      checkCreatedStationEqualsToStationList(강남역, 역삼역);
     };
+
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
@@ -66,7 +69,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationTest(){
         // given
-        Integer stationId = createStationAndReturnId(강남역);
+        Integer stationId = createStation(강남역).jsonPath().getInt("id");
 
         // when
         deleteStation(stationId);
@@ -75,42 +78,29 @@ public class StationAcceptanceTest {
         checkCanNotFindDeletedStataionInStationList(강남역);
     }
 
-    private void createStation(String stationName){
+
+
+
+    private ExtractableResponse<Response> createStation(String stationName){
         Map<String, String> params = new HashMap<>();
         params.put("name", stationName);
 
-        RestAssured
-                .given()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .log()
-                    .all()
-                .when()
-                    .post("/stations")
-                .then()
-                    .log()
-                    .all()
-                    .statusCode(HttpStatus.CREATED.value());
-    }
+        ExtractableResponse<Response> response = RestAssured
+                                                        .given()
+                                                            .body(params)
+                                                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                            .log()
+                                                            .all()
+                                                        .when()
+                                                            .post("/stations")
+                                                        .then()
+                                                            .log()
+                                                            .all()
+                                                            .extract();
 
-    private Integer createStationAndReturnId(String stationName){
-        Map<String, String> params = new HashMap<>();
-        params.put("name", stationName);
+        assertEquals(response.statusCode(), HttpStatus.CREATED);
 
-        Integer id = RestAssured
-                .given()
-                    .body(params)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .log()
-                    .all()
-                .when()
-                    .post("/stations")
-                .then()
-                    .log()
-                    .all()
-                    .extract().jsonPath().getInt("id");
-
-        return id;
+        return response;
     }
 
     private void deleteStation(Integer stationId){
@@ -148,18 +138,17 @@ public class StationAcceptanceTest {
 
     private void checkCreatedStationEqualsToStationList(String... createdStationName){
         List<String> stationList = RestAssured
-                .given()
-                .log()
-                .all()
-                .when()
-                .get("/stations")
-                .then()
-                .log()
-                .all()
-                .extract()
-                .jsonPath()
-                .getList("name", String.class);
-
+                                            .given()
+                                                .log()
+                                                .all()
+                                            .when()
+                                                .get("/stations")
+                                            .then()
+                                                .log()
+                                                .all()
+                                                .extract()
+                                                .jsonPath()
+                                                .getList("name", String.class);
 
         assertAll(
                 () -> assertThat(stationList).containsAll(List.of(createdStationName)),
@@ -170,11 +159,11 @@ public class StationAcceptanceTest {
     private void checkCanNotFindDeletedStataionInStationList(String deletedStationName){
         RestAssured
                 .given()
-                .log()
-                .all()
+                    .log()
+                    .all()
                 .when()
-                .get("/stations")
+                    .get("/stations")
                 .then()
-                .body("name", not(hasItem(deletedStationName)));
+                    .body("name", not(hasItem(deletedStationName)));
     }
 }
