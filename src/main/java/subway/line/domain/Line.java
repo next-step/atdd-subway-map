@@ -28,7 +28,6 @@ public class Line {
     @Column(nullable = false)
     private Integer distance;
 
-
     protected Line() {
     }
 

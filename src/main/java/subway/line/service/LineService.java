@@ -28,7 +28,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse create(LineCreateRequest request) {
+    public LineResponse createLine(LineCreateRequest request) {
         final Line line = new Line(
             request.getName(),
             request.getColor(),
@@ -40,27 +40,32 @@ public class LineService {
         return createLineResponse(savedLine);
     }
 
-    public List<LineResponse> findAll() {
+    public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
             .map(it -> createLineResponse(it))
             .collect(Collectors.toList());
     }
 
-    public LineResponse findById(Long id) {
-        final Line line = getLine(id);
+    public LineResponse findLineById(Long id) {
+        final Line line = findById(id);
         return createLineResponse(line);
     }
 
     @Transactional
-    public LineResponse update(Long id, LineUpdateRequest request) {
-        final Line line = getLine(id);
+    public LineResponse updateLine(Long id, LineUpdateRequest request) {
+        final Line line = findById(id);
         line.update(request.getName(), request.getColor());
 
         return createLineResponse(line);
     }
 
-    private Line getLine(Long id) {
+    @Transactional
+    public void deleteLineById(Long id) {
+        lineRepository.deleteById(id);
+    }
+
+    private Line findById(Long id) {
         return lineRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }

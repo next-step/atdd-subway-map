@@ -10,4 +10,6 @@ public interface LineRepository {
     List<Line> findAll();
 
     Optional<Line> findById(Long id);
+
+    void deleteById(Long id);
 }

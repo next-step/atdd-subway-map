@@ -109,18 +109,27 @@ class LineAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    private ExtractableResponse<Response> 노선을_수정한다(long lineId, String name, String color) {
-        final Map<String, Object> params = Map.of(
-            "name", name,
-            "color", color
-        );
-        return RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(params)
-            .when().put("/lines/{id}", lineId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("노선 삭제")
+    @Test
+    void 노선_삭제() {
+        // given
+        final String 신분당선 = "신분당선";
+        final int lineId = 노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10)
+            .body().jsonPath().get("id");
+
+        // when
+        노선을_삭제한다(lineId);
+
+        // then
+        final ExtractableResponse<Response> lineResponse = 노선_목록을_조회한다();
+        final List<String> lineNames = lineResponse.body().jsonPath().getList("name", String.class);
+
+        assertThat(lineNames).doesNotContain(신분당선);
     }
 
     private ExtractableResponse<Response> 노선을_생성한다(
@@ -160,6 +169,33 @@ class LineAcceptanceTest extends AcceptanceTest {
             .when().get("/lines/{id}", lineId)
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
+            .extract();
+    }
+
+    private ExtractableResponse<Response> 노선을_수정한다(
+        long lineId,
+        String name,
+        String color
+    ) {
+        final Map<String, Object> params = Map.of(
+            "name", name,
+            "color", color
+        );
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().put("/lines/{id}", lineId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
+    }
+
+    private void 노선을_삭제한다(int lineId) {
+        RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/lines/{id}", lineId)
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value())
             .extract();
     }
 
