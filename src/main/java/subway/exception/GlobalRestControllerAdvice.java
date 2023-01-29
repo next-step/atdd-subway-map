@@ -19,4 +19,9 @@ public class GlobalRestControllerAdvice {
     public ResponseEntity notFoundException() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity badRequestException() {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 }

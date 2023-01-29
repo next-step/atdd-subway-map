@@ -82,6 +82,19 @@ public class StationLineAcceptanceTest {
         assertThat(getResponse.body().jsonPath().getString("color")).isEqualTo(color);
     }
 
+    @DisplayName("상행 종점역이 하행 종점역보다 더 작은 아이디 값을 가져야 한다.")
+    @Test
+    void upStationLineIdLessThanDownStationId() {
+        final String lineName = "신분당선";
+        final String color = "bg-red-600";
+        final Long upStationId = 11L;
+        final Long downStationId = 10L;
+        final String distance = "10";
+
+        ExtractableResponse<Response> createResponse = createStationLine(lineName, color, upStationId, downStationId, distance);
+        assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
