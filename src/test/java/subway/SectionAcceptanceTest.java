@@ -95,6 +95,20 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * When 지하철 노선에 존재하지 않는 역에 대한 구간 삭제를 하면
+     * Then 지하철 구간 삭제에 실패한다.
+     */
+    @DisplayName("삭제하려는 역이 노선에 존재하지 않을 경우, 구간 삭제 불가")
+    @Test
+    void cannotRemoveSectionWhatIsNotExistsStation() {
+        // when
+        final ExtractableResponse<Response> 구간_제거_응답 = 구간_제거_요청(이호선, 선릉역);
+
+        // then
+        노선에_존재하지_않는_역_삭제에_대한_실패를_확인(구간_제거_응답);
+    }
+
+    /**
      * Given 한 개의 구간이 존재하는 지하철 노선에 구간을 추가한 뒤,
      * When 지하철 노선의 중간 역(추가한 구간의 상행역)을 제거하면
      * Then 지하철 구간 삭제에 실패한다.

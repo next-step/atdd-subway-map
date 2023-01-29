@@ -1,18 +1,17 @@
 package subway;
 
-import subway.error.exception.ErrorCode;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.error.exception.ErrorCode;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.linesOf;
 import static subway.LineAcceptanceTestHelper.노선_상세_조회함;
 
 public class SectionAcceptanceTestHelper extends AcceptanceTestHelper {
@@ -86,6 +85,12 @@ public class SectionAcceptanceTestHelper extends AcceptanceTestHelper {
         assertThat(errorMessage).isEqualTo(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_LAST_REMAINING_SECTION.getMessage());
 
         노선에_찾으려고하는_역이_있는지_확인(lineId, stationName);
+    }
+
+    static void 노선에_존재하지_않는_역_삭제에_대한_실패를_확인(final ExtractableResponse<Response> response) {
+        응답_코드_검증(response, HttpStatus.UNPROCESSABLE_ENTITY);
+        final String errorMessage = 에러_메세지_가져오기(response);
+        assertThat(errorMessage).isEqualTo(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_NOT_EXISTS_STATION_IN_LINE.getMessage());
     }
 
     private static void 노선에_찾으려고하는_역이_있는지_확인(final long lineId, final String stationName) {
