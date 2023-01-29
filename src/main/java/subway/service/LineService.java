@@ -20,7 +20,7 @@ public class LineService {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
     }
-
+    @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
         Line line = lineRepository.save(
                 new Line(lineRequest.getName()
