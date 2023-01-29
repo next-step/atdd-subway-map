@@ -9,9 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @DisplayName("지하철역 관련 기능")
@@ -51,7 +54,7 @@ public class StationAcceptanceTest {
       createStation(역삼역);
 
       // then
-      checkStationListSizeEqualsToCreatedStationSize(2);
+        checkCreatedStationEqualsToStationList(강남역, 역삼역);
     };
     /**
      * Given 지하철역을 생성하고
@@ -124,25 +127,44 @@ public class StationAcceptanceTest {
                     .all();
     }
 
-    private void checkCanFindCreatedStationInStationList(String createdStationName){
-        RestAssured
+    private void checkCanFindCreatedStationInStationList(String... createdStationName){
+
+        List<String> stationList = RestAssured
+                                        .given()
+                                            .log()
+                                            .all()
+                                        .when()
+                                            .get("/stations")
+                                        .then()
+                                            .log()
+                                            .all()
+                                            .extract()
+                                            .jsonPath()
+                                            .getList("name", String.class);
+
+
+        assertThat(stationList).containsAll(List.of(createdStationName));
+    }
+
+    private void checkCreatedStationEqualsToStationList(String... createdStationName){
+        List<String> stationList = RestAssured
                 .given()
                 .log()
                 .all()
                 .when()
                 .get("/stations")
                 .then()
-                .body("name", hasItem(createdStationName));
-    }
-
-    private void checkStationListSizeEqualsToCreatedStationSize(Integer createdStationSize){
-        RestAssured.given()
                 .log()
                 .all()
-                .when()
-                .get("/stations")
-                .then()
-                .body("name.size()", equalTo(createdStationSize));
+                .extract()
+                .jsonPath()
+                .getList("name", String.class);
+
+
+        assertAll(
+                () -> assertThat(stationList).containsAll(List.of(createdStationName)),
+                () -> assertEquals(stationList.size(), createdStationName.length)
+        );
     }
 
     private void checkCanNotFindDeletedStataionInStationList(String deletedStationName){
