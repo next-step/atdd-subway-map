@@ -18,8 +18,8 @@ import static org.hamcrest.Matchers.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    private static final String TEST_STATION_NAME1 = "강남역";
-    private static final String TEST_STATION_NAME2 = "역삼역";
+    private static final String 강남역 = "강남역";
+    private static final String 역삼역 = "역삼역";
 
 
     /**
@@ -31,10 +31,10 @@ public class StationAcceptanceTest {
     @Test
     void createStationTest() {
         // when
-        createStation(TEST_STATION_NAME1);
+        createStation(강남역);
 
         // then
-        checkCanFindCreatedStationInStationList(TEST_STATION_NAME1);
+        checkCanFindCreatedStationInStationList(강남역);
     }
 
     /**
@@ -47,8 +47,8 @@ public class StationAcceptanceTest {
     @Test
     void createStationListTest(){
       // given
-      createStation(TEST_STATION_NAME1);
-      createStation(TEST_STATION_NAME2);
+      createStation(강남역);
+      createStation(역삼역);
 
       // then
       checkStationListSizeEqualsToCreatedStationSize(2);
@@ -63,13 +63,13 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationTest(){
         // given
-        Integer stationId = createStationAndReturnId(TEST_STATION_NAME1);
+        Integer stationId = createStationAndReturnId(강남역);
 
         // when
         deleteStation(stationId);
 
         // then
-        checkCanNotFindDeletedStataionInStationList(TEST_STATION_NAME1);
+        checkCanNotFindDeletedStataionInStationList(강남역);
     }
 
     private void createStation(String stationName){
