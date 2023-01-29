@@ -62,7 +62,7 @@ public class SubwayLineService {
 	}
 
 	@Transactional
-	public void delete(Long id) {
+	public void deleteById(Long id) {
 		SubwayLine subwayLine = subwayLineRepository.findById(id)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
 

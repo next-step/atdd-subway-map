@@ -55,7 +55,7 @@ public class SubwayLineController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteSubwayLine(@PathVariable Long id) {
-		subwayLineService.delete(id);
+		subwayLineService.deleteById(id);
 
 		return ResponseEntity.noContent().build();
 	}
