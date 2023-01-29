@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,14 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
+
+        //when
         ExtractableResponse<Response> response = createSubwayStation("신림역");
+        List<String> stationNames = getStationNames();
+
+        //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(stationNames).containsAnyOf("신림역");
     }
 
     /**
@@ -39,22 +46,14 @@ public class StationAcceptanceTest {
     void getStation() {
 
         //given
-        final String first_station = "신림역";
-        final String second_station = "봉천역";
-        createSubwayStation(first_station);
-        createSubwayStation(second_station);
+        createSubwayStation("신림역");
+        createSubwayStation("봉천역");
 
         //when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/stations")
-            .then().log().all()
-            .extract();
+        List<String> stationNames = getStationNames();
 
         //then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).containsExactly("신림역", "봉천역");
+        assertThat(stationNames).containsExactly("신림역", "봉천역");
 
     }
 
@@ -78,9 +77,11 @@ public class StationAcceptanceTest {
             .when().delete("{id}")
             .then().log().all()
             .extract();
+        List<String> stationNames = getStationNames();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(stationNames).doesNotContain("사상역");
 
     }
 
@@ -94,6 +95,15 @@ public class StationAcceptanceTest {
             .when().post("/stations")
             .then().log().all()
             .extract();
+    }
+
+    private List<String> getStationNames() {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/stations")
+            .then().log().all()
+            .extract().jsonPath().getList("name", String.class);
     }
 
 }
