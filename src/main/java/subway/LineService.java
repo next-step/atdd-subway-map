@@ -25,8 +25,8 @@ public class LineService {
 
     public List<LineResponse> getLines() {
         return lineRepository.findAll().stream()
-                .map(this::createLineResponse)
-                .collect(Collectors.toList());
+            .map(this::createLineResponse)
+            .collect(Collectors.toList());
     }
 
     public LineResponse getLine(Long id) {
@@ -35,15 +35,16 @@ public class LineService {
 
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                stationRepository.findByIdIn(List.of(
-                                line.getUpStationId(),
-                                line.getDownStationId()
-                        )).stream()
-                        .map(StationResponse::from)
-                        .collect(Collectors.toList())
+            line.getId(),
+            line.getName(),
+            line.getColor(),
+            stationRepository.findByIdIn(
+                List.of(
+                    line.getUpStationId(),
+                    line.getDownStationId()
+                )).stream()
+                .map(StationResponse::from)
+                .collect(Collectors.toList())
         );
     }
 
