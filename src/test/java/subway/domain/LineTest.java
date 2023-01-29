@@ -3,6 +3,8 @@ package subway.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -16,20 +18,22 @@ class LineTest {
     private static final Station 양재역 = new Station("양재역");
     private static final String 녹색 = "bg-green-600";
 
-    @DisplayName("호선을 생성한다.")
+    @DisplayName("노선을 생성한다.")
     @Test
     void createLine() {
 
-        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, 강남역, 양재역, 10);
+        final Section 첫번째_구간 = new Section(강남역, 양재역, 10);
+        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, Sections.from(List.of(첫번째_구간)));
 
-        assertThat(노선_신분당선).isEqualTo(new Line(1L, 신분당선, 빨간색, 강남역, 양재역, 10));
+        assertThat(노선_신분당선).isEqualTo(new Line(1L, 신분당선, 빨간색, Sections.from(List.of(첫번째_구간))));
     }
 
-    @DisplayName("호선 정보를 수정한다.")
+    @DisplayName("노선 정보를 수정한다.")
     @Test
     void updateLine() {
 
-        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, 강남역, 양재역, 10);
+        final Section 첫번째_구간 = new Section(강남역, 양재역, 10);
+        final Line 노선_신분당선 = new Line(1L, 신분당선, 빨간색, Sections.from(List.of(첫번째_구간)));
         노선_신분당선.updateLine(이호선, 녹색);
 
         assertAll(
