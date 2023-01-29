@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +40,11 @@ public class StationAcceptanceTest {
         createStation("강남역");
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNameList = getStationNameList();
+        assertThat(stationNameList).containsAnyOf("강남역");
     }
+
+
 
     /**
      * Given 2개의 지하철역을 생성하고
@@ -64,17 +61,10 @@ public class StationAcceptanceTest {
         createStation("역삼역");
 
         //When
-        var response = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        var response = getStationNameList();
 
         //Then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
-
-        List<String> stationNameList = response.jsonPath().getList("name", String.class);
+        List<String> stationNameList = getStationNameList();
 
         assertThat(stationNameList).containsAnyOf("강남역", "역삼역");
         assertThat(stationNameList).hasSize(2);
@@ -102,13 +92,7 @@ public class StationAcceptanceTest {
 
         // Then
 
-        var response = RestAssured.given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
-
-        List<String> stationNameList = response.jsonPath().getList("name", String.class);
+        var stationNameList = getStationNameList();
 
         assertThat(stationNameList).hasSize(1);
         assertThat(stationNameList).containsExactly("역삼역");
@@ -117,7 +101,6 @@ public class StationAcceptanceTest {
 
 
     @DisplayName("주어진 이름의 지하철역을 생성한다.")
-    @Test
     private Long createStation(String station) {
         Map<String, String> params = new HashMap<>();
         params.put("name", station);
@@ -132,5 +115,19 @@ public class StationAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         return response.body().jsonPath().getLong("id");
+    }
+
+    @DisplayName("지하철역 목록을 조회한다.")
+    private List<String> getStationNameList() {
+        var response = RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+
+        return response.jsonPath().getList("name", String.class);
+
     }
 }
