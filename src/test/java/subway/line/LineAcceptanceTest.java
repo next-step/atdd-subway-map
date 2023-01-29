@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.doesNotHave;
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -120,5 +121,48 @@ public class LineAcceptanceTest {
         assertThat(lineResponses).hasSize(2);
         var lineNames = lineResponses.stream().map(LineResponse::getName).collect(Collectors.toList());
         assertThat(lineNames).containsExactly("신분당선", "2호선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("특정 지하철 노선을 조회한다.")
+    @Test
+    void findLineById() {
+        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
+        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
+
+        // Given 지하철 노선을 생성하고
+        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
+        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
+
+        String lineName = "신분당선";
+        String color = Colors.RED;
+        long upStationId = 강남역_아이디;
+        long downStationId = 서울대입구역_아이디;
+
+        var 신분당선_생성 = RestAssuredClient.post(
+                Endpoints.LINES,
+                new LineRequest(
+                       lineName,
+                       color,
+                       upStationId,
+                       downStationId,
+                        10L
+                )
+        );
+        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // When 생성한 지하철 노선을 조회하면
+        var path = 신분당선_생성.header("Location");
+        var 신분당선_조회 = RestAssuredClient.get(path);
+        var 신분당선_응답 = 신분당선_조회.as(LineResponse.class);
+
+        // Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+        assertThat(신분당선_응답.getName()).isEqualTo(lineName);
+        assertThat(신분당선_응답.getColor()).isEqualTo(color);
+        assertThat(신분당선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
     }
 }
