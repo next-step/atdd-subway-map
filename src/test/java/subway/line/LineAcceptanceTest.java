@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.RestUtils;
+import subway.RestTestUtils;
 import subway.line.web.dto.LineRequest;
 
 import javax.annotation.PostConstruct;
@@ -42,7 +42,7 @@ public class LineAcceptanceTest {
         create(request);
 
         // then
-        List<String> lineNames = RestUtils.getListFromResponse(getAllLines(), "name", String.class);
+        List<String> lineNames = RestTestUtils.getListFromResponse(getAllLines(), "name", String.class);
         assertThat(lineNames).contains(request.getName());
     }
 
@@ -60,7 +60,7 @@ public class LineAcceptanceTest {
         }
 
         // when
-        List<String> lineNames = RestUtils.getListFromResponse(getAllLines(),"name", String.class);
+        List<String> lineNames = RestTestUtils.getListFromResponse(getAllLines(),"name", String.class);
 
         // then
         assertThat(lineNames).containsAll(requests.stream().map(LineRequest::getName).collect(Collectors.toList()));
@@ -74,7 +74,15 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 조회")
     @Test
     void getLine() {
+        // given
+        LineRequest request = requests.get(0);
+        Long createId = RestTestUtils.getLongFromResponse(create(request), "id");
 
+        // when
+        Long getId = RestTestUtils.getLongFromResponse(getLine(createId), "id");
+
+        // then
+        assertThat(getId).isEqualTo(createId);
     }
 
     /**
@@ -148,5 +156,14 @@ public class LineAcceptanceTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
+
+    private ExtractableResponse<Response> getLine(Long id) {
+        return RestAssured.given().log().all()
+                .when().get("/lines/"+id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
 
 }

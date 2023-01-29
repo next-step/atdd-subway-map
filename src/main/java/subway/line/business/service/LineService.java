@@ -23,4 +23,8 @@ public class LineService {
         return lineRepository.findAll().stream().map(LineEntity::toLine).collect(Collectors.toList());
     }
 
+    public Line getLine(Long lineId) {
+        return lineRepository.findById(lineId).get().toLine();
+    }
+
 }

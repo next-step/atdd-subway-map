@@ -5,10 +5,14 @@ import io.restassured.response.Response;
 
 import java.util.List;
 
-public class RestUtils {
+public class RestTestUtils {
 
     public static <T> List<T> getListFromResponse(ExtractableResponse<Response> response, String key, Class<T> type) {
         return response.jsonPath().getList(key, type);
+    }
+
+    public static Long getLongFromResponse(ExtractableResponse<Response> response, String key) {
+        return response.jsonPath().getLong(key);
     }
 
 }
