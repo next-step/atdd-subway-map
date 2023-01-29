@@ -96,7 +96,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain(강남역_request.getName());
     }
 
-    private ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
+    public static ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -121,7 +121,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private void 지하철역이_정상적으로_생성(ExtractableResponse<Response> response) {
+    public static void 지하철역이_정상적으로_생성(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
