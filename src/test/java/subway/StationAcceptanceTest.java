@@ -17,6 +17,11 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
+
+    private static final String TEST_STATION_NAME1 = "강남역";
+    private static final String TEST_STATION_NAME2 = "역삼역";
+
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -26,10 +31,10 @@ public class StationAcceptanceTest {
     @Test
     void createStationTest() {
         // when
-        createStation("강남역");
+        createStation(TEST_STATION_NAME1);
 
         // then
-        checkCanFindCreatedStationInStationList("강남역");
+        checkCanFindCreatedStationInStationList(TEST_STATION_NAME1);
     }
 
     /**
@@ -42,8 +47,8 @@ public class StationAcceptanceTest {
     @Test
     void createStationListTest(){
       // given
-      createStation("강남역");
-      createStation("역삼역");
+      createStation(TEST_STATION_NAME1);
+      createStation(TEST_STATION_NAME2);
 
       // then
       checkStationListSizeEqualsToCreatedStationSize(2);
@@ -58,13 +63,13 @@ public class StationAcceptanceTest {
     @Test
     void deleteStationTest(){
         // given
-        Integer stationId = createStationAndReturnId("강남역");
+        Integer stationId = createStationAndReturnId(TEST_STATION_NAME1);
 
         // when
         deleteStation(stationId);
 
         // then
-        checkCanNotFindDeletedStataionInStationList("강남역");
+        checkCanNotFindDeletedStataionInStationList(TEST_STATION_NAME1);
     }
 
     private void createStation(String stationName){
