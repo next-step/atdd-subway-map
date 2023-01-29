@@ -123,7 +123,7 @@ class LineAcceptanceTest {
         LineCreateRequest givenLine = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
         long givenLineId = 1L;
         ExtractableResponse<Response> createLineResponse = createLine(givenLine, givenLineId, 지하철역, 새로운지하철역);
-        String actualLineId = createLineResponse.jsonPath().getString("id");
+        Long actualLineId = createLineResponse.jsonPath().getLong("id");
 
         // When
         ExtractableResponse<Response> actual = RestAssured.given().spec(REQUEST_SPEC).log().all()
