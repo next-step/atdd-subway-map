@@ -1,6 +1,7 @@
 package subway.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -44,7 +45,27 @@ public class LineService {
     }
 
     public LineResponse findLineById(Long id) {
-        return createLineResponse(lineRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new));
+        return createLineResponse(findById(id));
     }
+
+    @Transactional
+    public void updateLine(Long id, LineRequest lineRequest) {
+        Line line = findById(id);
+        line.updateNameAndColor(lineRequest.getName(), lineRequest.getColor());
+
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        Line line = findById(id);
+        lineRepository.deleteById(line.getId());
+    }
+
+    private Line findById(Long id) {
+        return lineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
+
 }
+

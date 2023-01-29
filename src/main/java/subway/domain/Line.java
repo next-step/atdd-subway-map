@@ -10,10 +10,10 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_up_station"))
     private Station upStation;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_down_station"))
     private Station downStation;
     private Long distance;
@@ -27,6 +27,11 @@ public class Line {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public void updateNameAndColor(String name, String color){
+        this.name = name;
+        this.color = color;
     }
 
     public Long getId() {
