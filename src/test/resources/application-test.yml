@@ -1,4 +1,9 @@
 spring:
+  datasource:
+    url: jdbc:h2:mem:testDB
+    username: sa
+    password:
+
   jpa:
     hibernate:
       ddl-auto: create-drop

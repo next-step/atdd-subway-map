@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,7 +27,31 @@ public class SubwayLine {
 
 	private String color;
 
-	@OneToMany(mappedBy = "subwayLine")
-	private List<Station> stations = new ArrayList<>();
+	private Long upStationId;
 
+	private Long downStationId;
+
+	@OneToMany(mappedBy = "subwayLine", cascade = CascadeType.PERSIST)
+	private List<SubwayLineStationGroup> subwayLineStationGroups = new ArrayList<>();
+
+	public SubwayLine(
+		String name,
+		String color,
+		Long upStationId,
+		Long downStationId,
+		List<Station> stations) {
+		this.name = name;
+		this.color = color;
+		this.upStationId = upStationId;
+		this.downStationId = downStationId;
+
+		createSubwayLineStationGroups(stations);
+	}
+
+	private void createSubwayLineStationGroups(List<Station> stations) {
+		for (Station station : stations) {
+			SubwayLineStationGroup subwayLineStationGroup = new SubwayLineStationGroup(station, this);
+			this.subwayLineStationGroups.add(subwayLineStationGroup);
+		}
+	}
 }
