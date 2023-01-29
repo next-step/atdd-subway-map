@@ -2,6 +2,7 @@ package subway.line.web.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,12 +49,20 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+    public ResponseEntity updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
         lineService.modify(id, request.getName(), request.getColor());
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<LineResponse> deleteLine(@PathVariable Long id) {
+        lineService.remove(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private LineResponse createResponse(Line line) {
+        if (line == null) return null;
+
         StationResponse upStation = stationService.findStation(line.getUpStationId());
         StationResponse downStation = stationService.findStation(line.getDownStationId());
 
