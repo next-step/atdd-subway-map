@@ -1,6 +1,6 @@
 package subway.fixture;
 
-public class StationFixture {
+public class StationFixtures {
 
 	public static final String STATION_ROOT_PATH = "/stations";
 

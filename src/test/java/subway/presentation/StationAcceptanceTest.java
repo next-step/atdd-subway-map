@@ -3,7 +3,7 @@ package subway.presentation;
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static subway.fixture.StationFixture.*;
+import static subway.fixture.StationFixtures.*;
 
 import java.util.List;
 

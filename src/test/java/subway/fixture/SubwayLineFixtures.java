@@ -2,7 +2,7 @@ package subway.fixture;
 
 import subway.presentation.request.SubwayLineRequest;
 
-public class SubwayLineFixture {
+public class SubwayLineFixtures {
 	/**
 	 * SUB WAY LINE NAME
 	 */
