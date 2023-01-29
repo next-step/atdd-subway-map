@@ -8,6 +8,9 @@ import subway.web.request.LineCreateRequest;
 import subway.web.response.CreateLineResponse;
 import subway.web.response.LineResponse;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 public class LineController {
 
@@ -28,6 +31,15 @@ public class LineController {
     public ResponseEntity<LineResponse> lines(@PathVariable Long lineId) {
         LineResponse line = LineResponse.from(lineUseCase.loadLine(lineId));
         return ResponseEntity.status(HttpStatus.OK).body(line);
+    }
+
+    @GetMapping("/lines")
+    public ResponseEntity<List<LineResponse>> lines() {
+        List<LineResponse> lineResponses = lineUseCase.loadLines().stream()
+            .map(LineResponse::from)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(lineResponses);
     }
 
 }
