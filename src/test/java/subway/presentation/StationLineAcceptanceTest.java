@@ -35,16 +35,8 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		지하철역_생성(STATION_NAME_1);
 		지하철역_생성(STATION_NAME_2);
 
-		SubwayLineRequest.Create stationLineCreateRequest = SubwayLineRequest.Create.builder()
-			.name(SUBWAY_LINE_NAME_1)
-			.color(SUBWAY_LINE_COLOR_1)
-			.upStationId(UP_STATION_ID_1)
-			.downStationId(DOWN_STATION_ID_1)
-			.distance(DISTANCE)
-			.build();
-
 		// when
-		ExtractableResponse<Response> createResponse = 지하철노선_생성(stationLineCreateRequest);
+		ExtractableResponse<Response> createResponse = 지하철노선_생성(getSubwayLineRequest1());
 
 		List<SubwayLineResponse.LineInfo> lineInfos = 지하철노선_목록조회().as(new TypeRef<>() {
 		});
@@ -67,24 +59,8 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		지하철역_생성(STATION_NAME_2);
 		지하철역_생성(STATION_NAME_3);
 
-		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name(SUBWAY_LINE_NAME_1)
-			.color(SUBWAY_LINE_COLOR_1)
-			.upStationId(UP_STATION_ID_1)
-			.downStationId(DOWN_STATION_ID_1)
-			.distance(DISTANCE)
-			.build();
-
-		SubwayLineRequest.Create stationLineCreateRequest2 = SubwayLineRequest.Create.builder()
-			.name(SUBWAY_LINE_NAME_2)
-			.color(SUBWAY_LINE_COLOR_2)
-			.upStationId(UP_STATION_ID_1)
-			.downStationId(DOWN_STATION_ID_2)
-			.distance(DISTANCE)
-			.build();
-
-		지하철노선_생성(stationLineCreateRequest1);
-		지하철노선_생성(stationLineCreateRequest2);
+		지하철노선_생성(getSubwayLineRequest1());
+		지하철노선_생성(getSubwayLineRequest2());
 
 		// when
 		List<SubwayLineResponse.LineInfo> lineInfos = 지하철노선_목록조회().as(new TypeRef<>() {
@@ -104,15 +80,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		지하철역_생성(STATION_NAME_1);
 		지하철역_생성(STATION_NAME_2);
 
-		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name(SUBWAY_LINE_NAME_1)
-			.color(SUBWAY_LINE_COLOR_1)
-			.upStationId(UP_STATION_ID_1)
-			.downStationId(DOWN_STATION_ID_1)
-			.distance(DISTANCE)
-			.build();
-
-		Long id = 지하철노선_생성(stationLineCreateRequest1)
+		Long id = 지하철노선_생성(getSubwayLineRequest1())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
 			.getId();
@@ -141,15 +109,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		지하철역_생성(STATION_NAME_1);
 		지하철역_생성(STATION_NAME_2);
 
-		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name(SUBWAY_LINE_NAME_1)
-			.color(SUBWAY_LINE_COLOR_1)
-			.upStationId(UP_STATION_ID_1)
-			.downStationId(DOWN_STATION_ID_2)
-			.distance(DISTANCE)
-			.build();
-
-		Long id = 지하철노선_생성(stationLineCreateRequest1)
+		Long id = 지하철노선_생성(getSubwayLineRequest1())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
 			.getId();
@@ -176,15 +136,7 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		지하철역_생성(STATION_NAME_1);
 		지하철역_생성(STATION_NAME_2);
 
-		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name(SUBWAY_LINE_NAME_1)
-			.color(SUBWAY_LINE_COLOR_1)
-			.upStationId(UP_STATION_ID_1)
-			.downStationId(DOWN_STATION_ID_1)
-			.distance(DISTANCE)
-			.build();
-
-		Long id = 지하철노선_생성(stationLineCreateRequest1)
+		Long id = 지하철노선_생성(getSubwayLineRequest1())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
 			.getId();

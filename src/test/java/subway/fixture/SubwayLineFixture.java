@@ -1,5 +1,7 @@
 package subway.fixture;
 
+import subway.presentation.request.SubwayLineRequest;
+
 public class SubwayLineFixture {
 	/**
 	 * SUB WAY LINE NAME
@@ -24,4 +26,28 @@ public class SubwayLineFixture {
 	 * SUB WAY LINE DISTANCE
 	 */
 	public static final int DISTANCE = 10;
+
+	/**
+	 * SUB WAY LINE CREATE REQUEST
+	 * @return SubwayLineRequest.Create
+	 */
+	public static SubwayLineRequest.Create getSubwayLineRequest1() {
+		return SubwayLineRequest.Create.builder()
+			.name(SUBWAY_LINE_NAME_1)
+			.color(SUBWAY_LINE_COLOR_1)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_1)
+			.distance(DISTANCE)
+			.build();
+	}
+
+	public static SubwayLineRequest.Create getSubwayLineRequest2() {
+		return SubwayLineRequest.Create.builder()
+			.name(SUBWAY_LINE_NAME_2)
+			.color(SUBWAY_LINE_COLOR_2)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_2)
+			.distance(DISTANCE)
+			.build();
+	}
 }
