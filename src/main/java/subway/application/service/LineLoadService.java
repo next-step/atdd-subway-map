@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class LineLoadService implements LineLoadUseCase {
+class LineLoadService implements LineLoadUseCase {
 
     private final LineLoadRepository lineLoadRepository;
 
