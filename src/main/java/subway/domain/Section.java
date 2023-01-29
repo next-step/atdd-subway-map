@@ -20,7 +20,7 @@ public class Section {
     private Station downStation;
     private Integer distance;
 
-    public Section(final Line line, final Station upStation, final Station downStation, final int distance) {
+    Section(final Line line, final Station upStation, final Station downStation, final int distance) {
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -30,11 +30,11 @@ public class Section {
     protected Section() {
     }
 
-    public Station getUpStation() {
+    Station getUpStation() {
         return upStation;
     }
 
-    public Station getDownStation() {
+    Station getDownStation() {
         return downStation;
     }
 }
