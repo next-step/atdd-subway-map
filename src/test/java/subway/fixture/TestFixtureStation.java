@@ -1,4 +1,4 @@
-package subway.acceptance;
+package subway.fixture;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class TestFixtureStation {
 
-    static void 지하철역_조회됨(ExtractableResponse<Response> response, final String station) {
+    public static void 지하철역_조회됨(ExtractableResponse<Response> response, final String station) {
         final JsonPath 지하철역_응답_경로 = response.response().body().jsonPath();
 
         assertAll(
@@ -26,11 +26,11 @@ public class TestFixtureStation {
         );
     }
 
-    static void 지하철역_생성됨(ExtractableResponse<Response> response) {
+    public static void 지하철역_생성됨(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    static void 지하철역_목록_조회됨(final ExtractableResponse<Response> 지하철역_목록_응답, final String...station) {
+    public static void 지하철역_목록_조회됨(final ExtractableResponse<Response> 지하철역_목록_응답, final String...station) {
         final JsonPath 지하철역_응답_경로 = 지하철역_목록_응답.response().body().jsonPath();
 
         assertAll(
@@ -43,7 +43,7 @@ public class TestFixtureStation {
         );
     }
 
-    static ExtractableResponse<Response> 지하철역_목록_요청() {
+    public static ExtractableResponse<Response> 지하철역_목록_요청() {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -52,7 +52,7 @@ public class TestFixtureStation {
                 .extract();
     }
 
-    static ExtractableResponse<Response> 지하철역_생성_요청함(String name) {
+    public static ExtractableResponse<Response> 지하철역_생성_요청함(String name) {
         final Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
@@ -65,13 +65,13 @@ public class TestFixtureStation {
                 .extract();
     }
 
-    static Long 지하철역_생성_요청(final String name) {
+    public static Long 지하철역_생성_요청(final String name) {
         final ExtractableResponse<Response> response = 지하철역_생성_요청함(name);
         지하철역_생성됨(response);
         return response.jsonPath().getLong("id");
     }
 
-    static ExtractableResponse<Response> 지하철역_삭제_요청(ExtractableResponse<Response> response) {
+    public static ExtractableResponse<Response> 지하철역_삭제_요청(ExtractableResponse<Response> response) {
         final String uri = response.header("Location");
 
         return RestAssured
@@ -81,7 +81,7 @@ public class TestFixtureStation {
                 .extract();
     }
 
-    static void 지하철역_조회되지_않음(final ExtractableResponse<Response> response) {
+    public static void 지하철역_조회되지_않음(final ExtractableResponse<Response> response) {
         final JsonPath 지하철역_응답_경로 = response.response().body().jsonPath();
 
         assertAll(

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.AcceptanceTest;
 
-import static subway.acceptance.TestFixtureStation.*;
+import static subway.fixture.TestFixtureStation.*;
 
 @DisplayName("지하철 역 기능 인수 테스트")
 class StationAcceptanceTest extends AcceptanceTest {
