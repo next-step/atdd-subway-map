@@ -2,7 +2,7 @@ package subway.line;
 
 import lombok.Builder;
 import lombok.Getter;
-import subway.StationResponse;
+import subway.station.StationResponse;
 
 import java.util.List;
 @Builder

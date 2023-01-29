@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import subway.Station;
+import subway.station.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
