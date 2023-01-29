@@ -1,14 +1,12 @@
 package subway;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,10 +14,9 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철역 관련 기능")
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@Sql("/sql/truncate-tables.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
     /**
@@ -67,7 +64,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         역_생성("교대역");
-        ExtractableResponse<Response> createResponse = 역_생성("강남역").extract();
+        var createResponse = 역_생성("강남역").extract();
 
         given().log().all().
         when()

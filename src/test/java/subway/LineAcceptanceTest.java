@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
@@ -15,14 +14,14 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @DisplayName("지하철 노선 관련 기능")
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@Sql("/sql/setup-station.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
     private static final Map<String, String> 신분당선_요청 = new HashMap<>();
     private static final Map<String, String> 분당선_요청 = new HashMap<>();
+    private static final Map<String, String> 잘못된_노선_요청 = new HashMap<>();
     private static final Map<String, String> 수정_요청 = new HashMap<>();
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
@@ -41,6 +40,12 @@ public class LineAcceptanceTest {
         분당선_요청.put("downStationId", "3");
         분당선_요청.put("distance", "10");
 
+        잘못된_노선_요청.put("name", "분당선");
+        잘못된_노선_요청.put("color", "bg-green-600");
+        잘못된_노선_요청.put("upStationId", "1");
+        잘못된_노선_요청.put("downStationId", "100");
+        잘못된_노선_요청.put("distance", "10");
+
         수정_요청.put("name", "다른 분당선");
         수정_요청.put("color", "bg-red-600");
     }
@@ -50,7 +55,6 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
      */
     @DisplayName("지하철 노선을 생성한다.")
-    @Sql("/setup-station.sql")
     @Test
     void createLine() {
         노선_생성(신분당선_요청).statusCode(HttpStatus.CREATED.value());
@@ -65,7 +69,7 @@ public class LineAcceptanceTest {
     @DisplayName("존재하지 않는 역을 포함시켜 지하철 노선을 생성하면 생성되지 않는다.")
     @Test
     void createLineException() {
-        노선_생성(신분당선_요청).statusCode(HttpStatus.NOT_FOUND.value());
+        노선_생성(잘못된_노선_요청).statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     /**
@@ -74,7 +78,6 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
-    @Sql("/setup-station.sql")
     @Test
     void showLines() {
         노선_생성(신분당선_요청);
@@ -91,7 +94,6 @@ public class LineAcceptanceTest {
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
     @DisplayName("지하철 노선을 조회한다.")
-    @Sql("/setup-station.sql")
     @Test
     void showLine() {
         var createResponse = 노선_생성(신분당선_요청).extract();
@@ -122,7 +124,6 @@ public class LineAcceptanceTest {
      * Then 해당 지하철 노선 정보는 수정된다
      */
     @DisplayName("지하철 노선을 수정한다.")
-    @Sql("/setup-station.sql")
     @Test
     void updateLine() {
         var location = 노선_생성(신분당선_요청).extract().header("location");
@@ -165,7 +166,6 @@ public class LineAcceptanceTest {
      * Then 해당 지하철 노선 정보는 삭제된다.
      */
     @DisplayName("지하철 노선을 삭제한다.")
-    @Sql("/setup-station.sql")
     @Test
     void deleteLine() {
         var location = 노선_생성(신분당선_요청).extract().header("location");
@@ -192,7 +192,6 @@ public class LineAcceptanceTest {
         then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
-
 
     private ValidatableResponse 노선_생성(Map<String, String> params) {
         return given().log().all()
