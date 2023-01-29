@@ -35,12 +35,32 @@ class LineAcceptanceTest extends LineAcceptConstants {
         createLine(이호선);
 
         // when
-        List<String> lineNames = getLinesNames();
+        List<String> lineNames = getLineNames();
 
         // then
         assertThat(lineNames.size()).isEqualTo(1);
         assertThat(lineNames).containsOnly((String) 이호선.get(LINE_NAME));
     }
+
+    /**
+     * Given 2개의 지하철 노선을 생성하고
+     * When 지하철 노선 목록을 조회하면
+     * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
+     */
+     @DisplayName("지하철 노선 목록을 조회한다.")
+     @Test
+     void getStationsTest() {
+         // given
+         createLine(이호선);
+         createLine(신분당선);
+
+         // when
+         final List<String> lineNames = getLineNames();
+
+         // then
+         assertThat(lineNames.size()).isEqualTo(2);
+         assertThat(lineNames).containsOnly((String) 신분당선.get(LINE_NAME), (String) 이호선.get(LINE_NAME));
+     }
 
 
     private void createLine(final Map<String, Object> line) {
@@ -69,7 +89,7 @@ class LineAcceptanceTest extends LineAcceptConstants {
                 .getList("", LineResponse.class);
     }
 
-    private List<String> getLinesNames() {
+    private List<String> getLineNames() {
         return getLines().stream()
                 .map(LineResponse::getName)
                 .collect(Collectors.toList());
