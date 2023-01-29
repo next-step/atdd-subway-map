@@ -1,5 +1,6 @@
 package subway.station;
 
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -23,6 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StationAcceptanceTest {
 
+    public static final String GANGNAM_STATION = "강남역";
+    public static final String SEOLLEUNG_STATION = "선릉역";
+
     /**
      * When 지하철역을 생성하면
      * Then 지하철역이 생성된다
@@ -32,17 +36,11 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // When
-        final String givenStationName = "강남역";
+        final String givenStationName = GANGNAM_STATION;
         createStation(givenStationName);
 
         // Then
-        List<String> stationNames =
-                given()
-                .when()
-                    .get("/stations")
-                .then()
-                    .log().all()
-                    .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = findAllStationNames();
 
         assertThat(stationNames)
             .containsAnyOf(givenStationName);
@@ -57,17 +55,11 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역 목록을 조회한다.")
     void searchStations() {
         // Given
-        List<String> givenStationNames = List.of("강남역", "선릉역");
+        List<String> givenStationNames = List.of(GANGNAM_STATION, SEOLLEUNG_STATION);
         givenStationNames.forEach(StationAcceptanceTest::createStation);
 
         // When
-        ExtractableResponse<Response> response =
-            given()
-            .when()
-                .get("/stations")
-            .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> response = findAllStations();
 
         // Then
         List<String> stationsNames = response.jsonPath().getList("name", String.class);
@@ -85,17 +77,11 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 삭제한다.")
     void deleteStation() {
         // Given
-        String givenStationName = "강남역";
+        String givenStationName = GANGNAM_STATION;
         Long id = createStation(givenStationName);
 
         // When
-        ExtractableResponse<Response> response =
-            given()
-            .when()
-                .delete("/stations/{id}", id)
-            .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> response = deleteStation(id);
 
         // Then
         assertThat(response.statusCode())
@@ -124,23 +110,25 @@ public class StationAcceptanceTest {
     }
 
     public static List<String> findAllStationNames() {
-        ExtractableResponse<Response> response =
+        return findAllStations()
+            .jsonPath().getList("name");
+    }
+
+    public static ExtractableResponse<Response> findAllStations() {
+        return RestAssured.
             given()
             .when()
                 .get("/stations")
             .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
-
-        return response.jsonPath().getList("name");
     }
 
-    @SuppressWarnings("unused")
-    public static void deleteStation(Long id) {
-        ExtractableResponse<Response> response =
+    public static ExtractableResponse<Response> deleteStation(Long stationId) {
+        return RestAssured.
             given()
             .when()
-                .delete("/stations/{id}", id)
+                .delete("/stations/{id}", stationId)
             .then()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();

@@ -11,26 +11,28 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping( "/lines")
 public class LineController {
     private final LineService lineService;
 
-    @PostMapping(value = "/lines")
+    @PostMapping
     ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
         LineResponse lineResponse = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId())).body(lineResponse);
     }
 
-    @GetMapping(value = "/lines")
+    @GetMapping
     ResponseEntity<List<LineResponse>> findAllLines() {
         List<LineResponse> lineResponses = lineService.findAllLines();
         return ResponseEntity.ok().body(lineResponses);
     }
 
-    @GetMapping(value = "/lines/{id}")
+    @GetMapping(value = "/{id}")
     ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
         Optional<LineResponse> lineResponse = lineService.findById(id);
 
@@ -38,14 +40,14 @@ public class LineController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping(value = "/lines/{id}")
+    @PutMapping(value = "/{id}")
     ResponseEntity<?> modifyLine(@PathVariable Long id, @RequestBody LineModifyRequest lineModifyRequest) {
         lineService.modifyLine(id, lineModifyRequest);
 
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value = "/lines/{id}")
+    @DeleteMapping(value = "/{id}")
     ResponseEntity<?> modifyLine(@PathVariable Long id) {
         lineService.deleteLine(id);
 

@@ -9,10 +9,7 @@ import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -24,9 +21,15 @@ import subway.station.StationRepository;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
+
+    public static final String LINE_1 = "1호선";
+    public static final String LINE_2 = "2호선";
+    public static final String BLUE_COLOR = "bg-blue-000";
+    public static final String GREEN_COLOR = "bg-green-000";
+    public static final String RED_COLOR = "bg-red-600";
+    public static final String LINE_NEW_BOONDANG = "신분당선";
     private Long upStationId;
     private Long downStationId;
     @Autowired
@@ -48,39 +51,21 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 생성")
     @Test
-    @Order(1)
     void createLine() {
-        // Given
-        final String name = "신분당선";
-        final String color = "bg-red-600";
-        final Integer distance = 10;
-
         // When
-        LineResponse lineResponse = RestAssured
-            .given()
-                .contentType(ContentType.JSON)
-                .body(
-                    LineRequest.builder()
-                        .name(name)
-                        .color(color)
-                        .upStationId(upStationId)
-                        .downStationId(downStationId)
-                        .distance(distance)
-                        .build()
-                )
-            .when()
-                .post("/lines")
-            .then()
-                .log().all()
-                .extract().jsonPath().getObject("$", LineResponse.class);
+        LineResponse lineResponse = createLine(
+            LINE_NEW_BOONDANG,
+            RED_COLOR,
+            upStationId,
+            downStationId,
+            10
+        );
 
         // Then
         List<LineResponse> lines = findAllLines();
         assertThat(lines)
             .contains(lineResponse);
     }
-
-
 
     /**
      * Given 2개의 지하철 노선을 생성하고
@@ -89,23 +74,15 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
-    @Order(2)
     void searchLines() {
         // Given
-        Long upStationId2 = StationAcceptanceTest.createStation("upStation");
-        Long downStationId2 = StationAcceptanceTest.createStation("downStation");
-        LineResponse givenLine1 = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
-        LineResponse givenLine2 = createLine("2호선", "bg-green-000", upStationId2, downStationId2, 13);
+        Long upStationId2 = StationAcceptanceTest.createStation("upStation2");
+        Long downStationId2 = StationAcceptanceTest.createStation("downStation2");
+        LineResponse givenLine1 = createLine(LINE_1, BLUE_COLOR, upStationId, downStationId, 20);
+        LineResponse givenLine2 = createLine(LINE_2, GREEN_COLOR, upStationId2, downStationId2, 13);
 
         // When
-        List<LineResponse> lineResponses = RestAssured
-            .given()
-                .contentType(ContentType.JSON)
-            .when()
-                .get("/lines")
-            .then()
-                .log().all()
-                .extract().jsonPath().getList("$", LineResponse.class);
+        List<LineResponse> lineResponses = findAllLines();
 
         // Then
         assertThat(lineResponses)
@@ -119,19 +96,12 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 조회")
     @Test
-    @Order(3)
     void searchLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
+        LineResponse givenLine = createLine(LINE_1, BLUE_COLOR, upStationId, downStationId, 20);
 
         // When
-        LineResponse lineResponse = RestAssured
-            .given()
-            .when()
-                .get("/lines/{id}", givenLine.getId())
-            .then()
-                .log().all()
-                .extract().jsonPath().getObject("$", LineResponse.class);
+        LineResponse lineResponse = findLine(givenLine.getId());
 
         // Then
         assertThat(lineResponse)
@@ -145,28 +115,15 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 수정")
     @Test
-    @Order(4)
     void modifyLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
+        LineResponse givenLine = createLine(LINE_1, BLUE_COLOR, upStationId, downStationId, 20);
         final String givenModifiedName = "다른분당선";
-        final String givenModifiedColor = "bg-red-600";
+        final String givenModifiedColor = RED_COLOR;
 
         // When
-        ExtractableResponse<Response> response = RestAssured
-            .given()
-                .contentType(ContentType.JSON)
-                .body(
-                    LineModifyRequest.builder()
-                        .name(givenModifiedName)
-                        .color(givenModifiedColor)
-                        .build()
-                )
-            .when()
-                .put("/lines/{id}", givenLine.getId())
-            .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> response = modifyLine(
+            givenLine.getId(), givenModifiedName, givenModifiedColor);
 
         // Then
         assertThat(response.statusCode())
@@ -185,31 +142,18 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 삭제")
     @Test
-    @Order(5)
     void deleteLine() {
         // Given
-        LineResponse givenLine = createLine("1호선", "bg-blue-000", upStationId, downStationId, 20);
+        LineResponse givenLine = createLine(LINE_1, BLUE_COLOR, upStationId, downStationId, 20);
 
         // When
-        ExtractableResponse<Response> response = RestAssured
-            .given()
-            .when()
-                .delete("/lines/{id}", givenLine.getId())
-            .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> response = deleteLine(givenLine.getId());
 
         // Then
         assertThat(response.statusCode())
             .isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> findLineResponse = RestAssured
-            .given()
-            .when()
-                .get("/lines/{id}", givenLine.getId())
-            .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> findLineResponse = findLineById(givenLine.getId());
 
         assertThat(findLineResponse.statusCode())
             .isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -226,13 +170,17 @@ public class LineAcceptanceTest {
     }
 
     private LineResponse findLine(Long lineId) {
+        return findLineById(lineId)
+            .jsonPath().getObject("$", LineResponse.class);
+    }
+
+    private ExtractableResponse<Response> findLineById(Long lineId) {
         return RestAssured
             .given()
             .when()
                 .get("/lines/{id}", lineId)
             .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath().getObject("$", LineResponse.class);
+                .extract();
     }
 
     private LineResponse createLine(String name, String color, Long upStationId, Long downStationId, Integer distance) {
@@ -253,5 +201,34 @@ public class LineAcceptanceTest {
             .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getObject("$", LineResponse.class);
+    }
+
+    private static ExtractableResponse<Response> modifyLine(
+        Long lineId, String modifiedName, String modifiedColor) {
+        return RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(
+                LineModifyRequest.builder()
+                    .name(modifiedName)
+                    .color(modifiedColor)
+                    .build()
+            )
+            .when()
+            .put("/lines/{id}", lineId)
+            .then()
+            .log().all()
+            .extract();
+    }
+
+    private static ExtractableResponse<Response> deleteLine(
+        Long lineId) {
+        return RestAssured
+            .given()
+            .when()
+            .delete("/lines/{id}", lineId)
+            .then()
+            .log().all()
+            .extract();
     }
 }
