@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.service.LineLoadService;
-import subway.application.service.in.LineCommandUseCase;
+import subway.application.service.input.LineCommandUseCase;
 import subway.web.request.LineCreateRequest;
 import subway.web.request.LineUpdateRequest;
 import subway.web.response.CreateLineResponse;

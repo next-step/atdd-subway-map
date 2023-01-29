@@ -1,4 +1,4 @@
-package subway.application.service.in;
+package subway.application.service.input;
 
 import subway.domain.LineCreateDomain;
 import subway.domain.LineUpdateDomain;

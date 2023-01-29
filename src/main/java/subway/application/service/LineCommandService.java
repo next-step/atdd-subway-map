@@ -2,8 +2,8 @@ package subway.application.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.application.service.out.LineRepositoryPort;
-import subway.application.service.in.LineCommandUseCase;
+import subway.application.service.output.LineRepositoryPort;
+import subway.application.service.input.LineCommandUseCase;
 import subway.domain.LineCreateDomain;
 import subway.domain.LineUpdateDomain;
 

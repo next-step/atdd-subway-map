@@ -1,7 +1,7 @@
 package subway.infrastructor.repository;
 
 import org.springframework.stereotype.Component;
-import subway.application.service.out.LineRepositoryPort;
+import subway.application.service.output.LineRepositoryPort;
 import subway.domain.*;
 
 import java.util.List;
