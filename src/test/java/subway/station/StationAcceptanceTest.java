@@ -1,10 +1,11 @@
-package subway;
+package subway.station;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import subway.station.dto.StationResponse;
 
 import java.util.Arrays;
 import java.util.List;
