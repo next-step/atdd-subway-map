@@ -10,10 +10,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.line.dto.LineRequest;
+import subway.line.dto.LineResponse;
 import subway.station.dto.StationRequest;
 import subway.station.dto.StationResponse;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static subway.station.StationAcceptanceTest.지하철역을_생성한다;
 import static subway.station.StationAcceptanceTest.지하철역이_정상적으로_생성;
 
@@ -23,6 +29,7 @@ public class LineAcceptanceTest {
 
     private StationResponse 강남역;
     private StationResponse 역삼역;
+    private StationResponse 신논현역;
 
     @BeforeEach
     void init() {
@@ -45,12 +52,21 @@ public class LineAcceptanceTest {
         //  then
         지하철역이_정상적으로_생성(역삼역_response);
         역삼역 = 역삼역_response.as(StationResponse.class);
+
+        //  when
+        var 신논현역_request = new StationRequest() {{
+            setName("신논현역");
+        }};
+        var 신논현역_response = 지하철역을_생성한다(신논현역_request);
+        //  then
+        지하철역이_정상적으로_생성(신논현역_response);
+        신논현역 = 신논현역_response.as(StationResponse.class);
     }
 
     /**
      * 지하철노선 생성
      *  - When 지하철 노선을 생성하면
-     *  - Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
+     *  - Then 요청한 지하철 노선이 생성된다
      */
     @DisplayName("지하철 노선을 생성한다.")
     @Test
@@ -61,9 +77,11 @@ public class LineAcceptanceTest {
 
         // then
         지하철노선이_정상적으로_생성(이호선_response);
-
-        // then
-        // ExtractableResponse<Response> lineResponse = 지하철노선을_조회한다();
+        LineResponse line = 이호선_response.as(LineResponse.class);
+        assertAll(() -> {
+            assertThat(line.getName()).isEqualTo("2호선");
+            assertThat(line.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(강남역.getId(), 역삼역.getId()));
+        });
     }
 
 
@@ -73,6 +91,33 @@ public class LineAcceptanceTest {
      *  - When 지하철 노선 목록을 조회하면
      *  - Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
+    @DisplayName("지하철노선 목록을 조회한다.")
+    @Test
+    void Should_지하철노선을_생성하고_When_지하철노선을_조회하면_Then_지하철노선이_조회된다() {
+        //given
+        var 이호선_request = new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L);
+        ExtractableResponse<Response> 이호선_response = 지하철노선을_생성한다(이호선_request);
+        지하철노선이_정상적으로_생성(이호선_response);
+
+        var 신분당선_request = new LineRequest("신분당선", "red", 신논현역.getId(), 강남역.getId(), 5L);
+        ExtractableResponse<Response> 신분당선_response = 지하철노선을_생성한다(신분당선_request);
+        지하철노선이_정상적으로_생성(신분당선_response);
+
+        // when
+        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
+
+        // then
+        List<LineResponse> lines = 지하철노선이_정상적으로_조회(linesResponse);
+        assertAll(() -> {
+            assertThat(lines).hasSize(2);
+            assertThat(List.of(역삼역.getId(), 강남역.getId(), 신논현역.getId()))
+                    .containsExactlyInAnyOrderElementsOf(
+                            lines.stream()
+                                    .flatMap(line -> line.getStationIds().stream())
+                                    .distinct()
+                                    .collect(Collectors.toList()));
+        });
+    }
 
     /**
      * 지하철노선 조회
@@ -107,12 +152,17 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> 지하철노선을_조회한다() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
+                .when().get("/lines")
                 .then().log().all()
                 .extract();
     }
 
     private void 지하철노선이_정상적으로_생성(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    private List<LineResponse> 지하철노선이_정상적으로_조회(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        return response.jsonPath().getList(".", LineResponse.class);
     }
 }
