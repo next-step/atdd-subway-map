@@ -1,15 +1,12 @@
 package subway;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -23,31 +20,22 @@ public class StationAcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("주어진 이름을 가진 지하철역을 생성한다.")
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        var station = createStation("강남역");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(station.getId()).isEqualTo(1);
+        assertThat(station.getName()).isEqualTo("강남역");
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<StationResponse> stations = getStations();
+
+        // then
+        assertThat(stations.size()).isEqualTo(1);
+        assertThat(stations.get(0).getName()).isEqualTo("강남역");
     }
 
     /**
@@ -56,6 +44,19 @@ public class StationAcceptanceTest {
      * Then 2개의 지하철역을 응답 받는다
      */
     // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다")
+    @Test
+    void listStation() {
+        // when
+        createStation("강남역");
+        createStation("신논현역");
+
+        // then
+        List<StationResponse> stations = getStations();
+
+        // then
+        assertThat(stations.stream().map(StationResponse::getName)).containsAll(Arrays.asList("강남역", "신논현역"));
+    }
 
     /**
      * Given 지하철역을 생성하고
@@ -63,5 +64,48 @@ public class StationAcceptanceTest {
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
     // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("전달받은 지하철역을 제거한다")
+    @Test
+    void deleteStation() {
+        // when
+        var station = createStation("역삼역");
 
+        // then
+        assertThat(station.getName()).isEqualTo("역삼역");
+
+        // then
+        List<StationResponse> beforeDelete = getStations();
+        assertThat(beforeDelete.size()).isEqualTo(1);
+        assertThat(beforeDelete.get(0).getName()).isEqualTo("역삼역");
+
+        // then
+        deleteStation(station);
+
+        // then
+        List<StationResponse> afterDelete = getStations();
+        assertThat(afterDelete.size()).isEqualTo(0);
+    }
+
+    private static StationResponse createStation(String name) {
+        return RestAssured.given().log().all()
+                .body(Map.of("name", name))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract().jsonPath().getObject("", StationResponse.class);
+    }
+
+    private static void deleteStation(StationResponse station) {
+        RestAssured.given().log().all()
+                .when().delete("/stations/{id}", station.getId())
+                .then().log().all()
+                .extract();
+    }
+
+    private static List<StationResponse> getStations() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("", StationResponse.class);
+    }
 }
