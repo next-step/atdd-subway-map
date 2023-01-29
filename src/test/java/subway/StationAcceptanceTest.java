@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,16 +25,19 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
-        // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        createStation("강남역");
+    }
 
+    @DisplayName("주어진 이름의 지하철역을 생성한다.")
+    @Test
+    void createStation(String name) {
+        // when
         ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
+                RestAssured.given()
+                        .body(Map.entry("name", name))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when().post("/stations")
-                        .then().log().all()
+                        .then()
                         .extract();
 
         // then
@@ -43,11 +45,11 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames =
-                RestAssured.given().log().all()
+                RestAssured.given()
                         .when().get("/stations")
-                        .then().log().all()
+                        .then()
                         .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        assertThat(stationNames).containsAnyOf(name);
     }
 
     /**
@@ -55,13 +57,42 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 조회한다.")
+    @Test
+    void selectStation() {
+        // given
+        createStation("강남역");
+        createStation("판교역");
+
+        // when
+        List<String> list = RestAssured.given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+
+        // then
+        assertThat(list).containsExactly("강남역", "판교역");
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철 역을 삭제한다.")
+    @Test
+    void deleteStation() {
+        // given
+        createStation("강남역");
 
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when().delete("/stations/1")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }
