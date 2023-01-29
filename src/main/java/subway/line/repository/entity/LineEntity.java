@@ -48,4 +48,11 @@ public class LineEntity {
                 .build();
     }
 
+    public LineEntity modify(String name, String color) {
+        this.name = name;
+        this.color = color;
+
+        return this;
+    }
+
 }

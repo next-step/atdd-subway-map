@@ -15,4 +15,8 @@ public class RestTestUtils {
         return response.jsonPath().getLong(key);
     }
 
+    public static String getStringFromResponse(ExtractableResponse<Response> response, String key) {
+        return response.jsonPath().getString(key);
+    }
+
 }

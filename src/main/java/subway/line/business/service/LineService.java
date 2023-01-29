@@ -27,4 +27,9 @@ public class LineService {
         return lineRepository.findById(lineId).get().toLine();
     }
 
+    public void modify(Long id, String name, String color) {
+        LineEntity entity = lineRepository.findById(id).get();
+        lineRepository.save(entity.modify(name, color));
+    }
+
 }

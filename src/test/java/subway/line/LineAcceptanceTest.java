@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.RestTestUtils;
 import subway.line.web.dto.LineRequest;
+import subway.line.web.dto.LineUpdateRequest;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -75,8 +76,7 @@ public class LineAcceptanceTest {
     @Test
     void getLine() {
         // given
-        LineRequest request = requests.get(0);
-        Long createId = RestTestUtils.getLongFromResponse(create(request), "id");
+        Long createId = RestTestUtils.getLongFromResponse(create(requests.get(0)), "id");
 
         // when
         Long getId = RestTestUtils.getLongFromResponse(getLine(createId), "id");
@@ -93,7 +93,25 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선 수정")
     @Test
     void modifyLine() {
+        // given
+        LineRequest createRequest = requests.get(0);
+        Long createId = RestTestUtils.getLongFromResponse(create(createRequest), "id");
 
+        // when
+        LineUpdateRequest updateRequest = new LineUpdateRequest("수정역", "bg-red-200");
+        modify(createId, updateRequest);
+
+        // then
+        var response = getLine(createId);
+        Long lineId = RestTestUtils.getLongFromResponse(response, "id");
+        String lineName = RestTestUtils.getStringFromResponse(response, "name");
+        String lineColor = RestTestUtils.getStringFromResponse(response, "color");
+
+        assertThat(createId).isEqualTo(lineId);
+        assertThat(createRequest.getName()).isNotEqualTo(lineName);
+        assertThat(createRequest.getColor()).isNotEqualTo(lineColor);
+        assertThat(updateRequest.getName()).isEqualTo(lineName);
+        assertThat(updateRequest.getColor()).isEqualTo(lineColor);
     }
 
     /**
@@ -160,6 +178,16 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> getLine(Long id) {
         return RestAssured.given().log().all()
                 .when().get("/lines/"+id)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    private ExtractableResponse<Response> modify(Long id, LineUpdateRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/"+id)
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
