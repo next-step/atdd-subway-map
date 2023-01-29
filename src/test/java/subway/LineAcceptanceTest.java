@@ -51,6 +51,21 @@ public class LineAcceptanceTest {
         assertThat(lineNames).containsExactly("신분당선", "분당선", "신분당선");
     }
 
+    @DisplayName("특정 지하철 노선을 조회한다.")
+    @Test
+    void findLineById() {
+        // given
+        var line = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        long lineId = line.jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = findLineById(lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getLong("id")).isEqualTo(lineId);
+    }
+
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured.given().log().all()
             .body(lineRequest)
@@ -63,6 +78,13 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> findAllLines() {
         return RestAssured.given().log().all()
             .when().get("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> findLineById(Long lineId) {
+        return RestAssured.given().log().all()
+            .when().get("/lines/{id}", lineId)
             .then().log().all()
             .extract();
     }
