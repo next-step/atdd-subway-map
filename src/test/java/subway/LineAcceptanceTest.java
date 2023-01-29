@@ -79,10 +79,12 @@ class LineAcceptanceTest {
         StationResponse 또다른지하철역 = createStation("또다른지하철역").as(StationResponse.class);
 
         LineCreateRequest given_신분당선 = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 10L);
-        ExtractableResponse<Response> given_신분당선_response = createLine(given_신분당선, 1L, 지하철역, 새로운지하철역);
+        long given_신분당선_id = 1L;
+        createLine(given_신분당선, given_신분당선_id, 지하철역, 새로운지하철역);
 
-        LineCreateRequest given_분당선_ = new LineCreateRequest("분당선", "bg-green-600", 지하철역.getId(), 또다른지하철역.getId(), 10L);
-        ExtractableResponse<Response> given_분당선_response = createLine(given_분당선_, 2L, 지하철역, 또다른지하철역);
+        LineCreateRequest given_분당선 = new LineCreateRequest("분당선", "bg-green-600", 지하철역.getId(), 또다른지하철역.getId(), 10L);
+        long given_분당선_id = 2L;
+        createLine(given_분당선, given_분당선_id, 지하철역, 또다른지하철역);
 
         // when
         ExtractableResponse<Response> actualResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
@@ -92,13 +94,13 @@ class LineAcceptanceTest {
 
         // Then
         assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(actualResponse.jsonPath().getLong("[0].id")).isEqualTo(1L);
+        assertThat(actualResponse.jsonPath().getLong("[0].id")).isEqualTo(given_신분당선_id);
         assertThat(actualResponse.jsonPath().getString("[0].name")).isEqualTo("신분당선");
         assertThat(actualResponse.jsonPath().getString("[0].color")).isEqualTo("bg-red-600");
         List<StationResponse> _0_indexStations = actualResponse.jsonPath().getList("[0].stations", StationResponse.class);
         assertThat(_0_indexStations).containsExactlyInAnyOrder(지하철역, 새로운지하철역);
 
-        assertThat(actualResponse.jsonPath().getLong("[1].id")).isEqualTo(2L);
+        assertThat(actualResponse.jsonPath().getLong("[1].id")).isEqualTo(given_분당선_id);
         assertThat(actualResponse.jsonPath().getString("[1].name")).isEqualTo("분당선");
         assertThat(actualResponse.jsonPath().getString("[1].color")).isEqualTo("bg-green-600");
         List<StationResponse> _1_indexStations = actualResponse.jsonPath().getList("[1].stations", StationResponse.class);
