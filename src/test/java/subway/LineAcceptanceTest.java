@@ -103,6 +103,25 @@ class LineAcceptanceTest extends LineAcceptConstants {
         assertThat(lineResponse.getColor()).isEqualTo(newLinColor);
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제한다.")
+    @Test
+    void deleteLineTest() {
+        // given
+        createLine(신분당선);
+
+        // when
+        deleteLine();
+
+        // then
+        final List<LineResponse> lines = getLines();
+        assertThat(lines.isEmpty()).isTrue();
+    }
+
     private void createLine(final Map<String, Object> line) {
         RestAssured
                 .given()
@@ -158,5 +177,14 @@ class LineAcceptanceTest extends LineAcceptConstants {
                    .put("/lines/{id}", 1)
                 .then()
                    .statusCode(HttpStatus.OK.value());
+    }
+
+    private void deleteLine() {
+        RestAssured
+                .given()
+                .when()
+                    .delete("/lines/{id}", 1)
+                .then()
+                    .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
