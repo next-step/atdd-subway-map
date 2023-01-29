@@ -40,10 +40,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationTestUtils.prepareRestAssuredGiven()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_조회();
         assertThat(stationNames).containsAnyOf(MockStations.강남역.getValue());
     }
 
@@ -62,18 +59,17 @@ public class StationAcceptanceTest {
         ));
 
         // when
-        List<String> stationNames = StationTestUtils.prepareRestAssuredGiven()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_조회();
 
         // then
         assertAll(
             () -> assertThat(stationNames.size()).isEqualTo(2),
-            () -> assertThat(stationNames).containsAll(List.of(
-                MockStations.서울대입구역.getValue(),
-                MockStations.봉천역.getValue()
-            ))
+            () -> assertThat(stationNames).containsAll(
+                List.of(
+                    MockStations.서울대입구역.getValue(),
+                    MockStations.봉천역.getValue()
+                )
+            )
         );
     }
 
@@ -95,11 +91,15 @@ public class StationAcceptanceTest {
             .when().delete("/stations/" + id);
 
         // then
-        List<String> stationNames = StationTestUtils.prepareRestAssuredGiven()
+        List<String> stationNames = 지하철역_조회();
+
+        assertThat(stationNames).doesNotContain(stationName);
+    }
+
+    private List<String> 지하철역_조회() {
+        return StationTestUtils.prepareRestAssuredGiven()
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
-
-        assertThat(stationNames).doesNotContain(stationName);
     }
 }
