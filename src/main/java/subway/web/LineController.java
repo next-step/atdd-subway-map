@@ -49,4 +49,10 @@ public class LineController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/lines/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable Long lineId) {
+        lineUseCase.deleteLine(lineId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

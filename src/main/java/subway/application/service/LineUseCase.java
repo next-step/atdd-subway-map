@@ -16,4 +16,6 @@ public interface LineUseCase {
 
     void updateLine(LineUpdateDomain toDomain);
 
+    void deleteLine(Long lineId);
+
 }

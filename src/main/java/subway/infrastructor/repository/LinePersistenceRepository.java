@@ -59,4 +59,9 @@ class LinePersistenceRepository implements LineRepositoryPort {
         lineJpaEntity.updateLine(toDomain);
     }
 
+    @Override
+    public void deleteLine(Long lineId) {
+        lineRepository.deleteById(lineId);
+    }
+
 }

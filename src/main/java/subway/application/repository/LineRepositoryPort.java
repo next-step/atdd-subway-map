@@ -17,4 +17,6 @@ public interface LineRepositoryPort {
 
     void updateLine(LineUpdateDomain toDomain);
 
+    void deleteLine(Long lineId);
+
 }

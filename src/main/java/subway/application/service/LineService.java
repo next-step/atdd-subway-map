@@ -41,4 +41,9 @@ class LineService implements LineUseCase {
         lineRepositoryPort.updateLine(toDomain);
     }
 
+    @Override
+    public void deleteLine(Long lineId) {
+        lineRepositoryPort.deleteLine(lineId);
+    }
+
 }
