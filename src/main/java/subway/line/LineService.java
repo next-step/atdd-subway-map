@@ -37,6 +37,7 @@ public class LineService {
                 .orElseThrow(StationNotFound::new);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> getLines() {
         List<Line> lines = lineRepository.findAll();
 
