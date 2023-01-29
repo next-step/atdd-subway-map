@@ -2,9 +2,9 @@ package subway.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.application.service.StationService;
 import subway.web.request.StationRequest;
 import subway.web.response.StationResponse;
-import subway.service.StationService;
 
 import java.net.URI;
 import java.util.List;
