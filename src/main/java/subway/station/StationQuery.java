@@ -1,6 +1,7 @@
 package subway.station;
 
 import org.springframework.stereotype.Component;
+import subway.exception.StationNotFoundException;
 
 import java.util.List;
 

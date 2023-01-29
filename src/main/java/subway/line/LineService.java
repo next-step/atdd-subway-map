@@ -53,4 +53,9 @@ public class LineService {
         var updatedLine = line.update(updateLineDto.getName(), updateLineDto.getColor());
         return LineResponse.from(lineRepository.save(updatedLine));
     }
+
+    @Transactional
+    public void deleteLineById(long lineId) {
+        lineRepository.deleteById(lineId);
+    }
 }

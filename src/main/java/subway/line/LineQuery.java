@@ -1,6 +1,7 @@
 package subway.line;
 
 import org.springframework.stereotype.Component;
+import subway.exception.LineNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
