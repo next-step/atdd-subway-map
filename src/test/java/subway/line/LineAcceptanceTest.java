@@ -156,6 +156,37 @@ public class LineAcceptanceTest {
      *  - When 생성한 지하철 노선을 수정하면
      *  - Then 해당 지하철 노선 정보는 수정된다
      */
+    @DisplayName("지하철 노선을 수정한다.")
+    @Test
+    void Should_지하철노선을_생성하고_When_지하철노선을_수정하면_Then_해당_지하철노선이_수정된다() {
+        // given
+        var 이호선_request = new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L);
+        ExtractableResponse<Response> 이호선_response = 지하철노선을_생성한다(이호선_request);
+
+        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
+        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
+        var 이호선findByAll = lines.stream()
+                .filter(line -> 이호선_request.getName().equals(line.getName()))
+                .findFirst()
+                .get();
+
+        //when
+        var 이호선_update_request = new LineRequest(이호선_request.getName(), "green", 신논현역.getId(), 이호선_request.getDownStationId(), 이호선_request.getDistance());
+        ExtractableResponse<Response> lineResponse = 지하철노선을_수정한다(이호선findByAll.getId(), 이호선_update_request);
+
+        // then
+        assertHttpStatus(lineResponse.statusCode(), HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> updateLineResponse = 특정_지하철노선을_조회한다(이호선findByAll.getId());
+        var 이호선_update = 지하철노선이_정상적으로_조회(updateLineResponse);
+        assertAll(() -> {
+            assertThat(이호선_update.getName()).isEqualTo("2호선");
+            assertThat(이호선_update.getColor()).isEqualTo("green");
+            assertThat(이호선_update.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(신논현역.getId(), 역삼역.getId()));
+        });
+    }
+
 
     /**
      * 지하철노선 삭제
@@ -185,6 +216,15 @@ public class LineAcceptanceTest {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(String.format("/lines/%d", id))
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철노선을_수정한다(Long id, LineRequest request) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(String.format("/lines/%d", id))
                 .then().log().all()
                 .extract();
     }
