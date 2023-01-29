@@ -11,4 +11,8 @@ public abstract class AcceptanceTestHelper {
     protected static void 응답_코드_검증(final ExtractableResponse<Response> response, final HttpStatus status) {
         assertThat(response.statusCode()).isEqualTo(status.value());
     }
+
+    protected static String 에러_메세지_가져오기(final ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("message");
+    }
 }
