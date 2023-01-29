@@ -73,7 +73,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> 구간_등록_응답 = 구간_등록_요청(이호선, 선릉역, 역삼역, 10);
 
         // then
-        노선에_이미_존재하는_역에_대한_구간_등록_실패를_확인(구간_등록_응답, 이호선, "선릉역");
+        노선에_이미_존재하는_역에_대한_구간_등록_실패를_확인(구간_등록_응답);
     }
 
     /**

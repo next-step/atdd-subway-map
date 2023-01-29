@@ -1,6 +1,6 @@
 package subway;
 
-import common.exception.ErrorCode;
+import subway.error.exception.ErrorCode;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -51,12 +51,10 @@ public class SectionAcceptanceTestHelper extends AcceptanceTestHelper {
         노선에_구간이_등록되지_않았는지_확인(lineId, stationName);
     }
 
-    static void 노선에_이미_존재하는_역에_대한_구간_등록_실패를_확인(final ExtractableResponse<Response> response, final long lineId, final String stationName) {
+    static void 노선에_이미_존재하는_역에_대한_구간_등록_실패를_확인(final ExtractableResponse<Response> response) {
         응답_코드_검증(response, HttpStatus.UNPROCESSABLE_ENTITY);
         final String error_message = 에러_메세지_가져오기(response);
         assertThat(error_message).isEqualTo(ErrorCode.CANNOT_ADD_SECTION_WITH_ALREADY_EXISTS_STATION_IN_LINE.getMessage());
-
-        노선에_구간이_등록되지_않았는지_확인(lineId, stationName);
     }
 
     private static void 노선에_구간이_등록되지_않았는지_확인(final long lineId, final String stationName) {
