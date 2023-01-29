@@ -31,7 +31,7 @@ public class SubwayLine {
 
 	private Long downStationId;
 
-	@OneToMany(mappedBy = "subwayLine", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "subwayLine", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	private List<SubwayLineStationGroup> subwayLineStationGroups = new ArrayList<>();
 
 	public SubwayLine(

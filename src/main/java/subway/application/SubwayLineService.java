@@ -60,4 +60,12 @@ public class SubwayLineService {
 			updateRequest.getColor()
 		);
 	}
+
+	@Transactional
+	public void delete(Long id) {
+		SubwayLine subwayLine = subwayLineRepository.findById(id)
+			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
+
+		subwayLineRepository.delete(subwayLine);
+	}
 }

@@ -165,6 +165,36 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 	}
 
+	// Given 지하철 노선을 생성하고
+	// When 생성한 지하철 노선을 삭제하면
+	// Then 해당 지하철 노선 정보는 삭제된다
+	@DisplayName("지하철노선을 생성하고 노선을 생성한 노선을 삭제하면 삭제된다")
+	@Test
+	void 지하철노선을_생성하고_노선을_생성한_노선을_삭제하면_삭제된다() {
+		// given
+		지하철역_생성("지하철역");
+		지하철역_생성("새로운지하철역");
+
+		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
+			.name("신분당선")
+			.color("bg-red-600")
+			.upStationId(1L)
+			.downStationId(2L)
+			.distance(10)
+			.build();
+
+		Long id = 지하철노선_생성(stationLineCreateRequest1)
+			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
+			})
+			.getId();
+
+		// when
+		ExtractableResponse<Response> response = 지하철노선_삭제(id);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+	}
+
 	private ExtractableResponse<Response> 지하철노선_생성(SubwayLineRequest.Create stationLineCreateRequest) {
 		return requestApi(
 			with()
@@ -213,4 +243,11 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		);
 	}
 
+	private ExtractableResponse<Response> 지하철노선_삭제(Long id) {
+		return requestApi(
+			Method.DELETE,
+			ROOT_PATH + "/{id}",
+			id
+		);
+	}
 }
