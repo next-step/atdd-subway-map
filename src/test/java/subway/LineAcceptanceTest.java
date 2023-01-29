@@ -23,10 +23,28 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        // when
         ExtractableResponse<Response> response = createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
 
+        // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.jsonPath().getString("name")).contains("신분당선");
+    }
+
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void findLines() {
+        // given
+        createLine(new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L));
+        createLine(new LineRequest("분당선", "bg-red-600", 2L, 3L, 10L));
+        createLine(new LineRequest("신분당선", "bg-red-600", 1L, 3L, 10L));
+
+        // when
+        ExtractableResponse<Response> response = findAllLines();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.jsonPath().getList("name")).containsExactly("신분당선", "분당선");
     }
 
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
@@ -34,6 +52,13 @@ public class LineAcceptanceTest {
             .body(lineRequest)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().post("/lines")
+            .then().log().all()
+            .extract();
+    }
+
+    private ExtractableResponse<Response> findAllLines() {
+        return RestAssured.given().log().all()
+            .when().get("/lines")
             .then().log().all()
             .extract();
     }
