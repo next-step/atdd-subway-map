@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import subway.application.service.LineUseCase;
 import subway.web.request.LineCreateRequest;
 import subway.web.response.LineResponse;
 import subway.web.response.StationResponse;
@@ -14,8 +15,15 @@ import java.util.List;
 @RestController
 public class LineController {
 
+    private final LineUseCase lineUseCase;
+
+    public LineController(LineUseCase lineUseCase) {
+        this.lineUseCase = lineUseCase;
+    }
+
     @PostMapping("/lines")
     public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest stationRequest) {
+        lineUseCase.createLine(stationRequest.toDomain());
         LineResponse response = new LineResponse(1L, "신분당선", "bg-red-600", List.of(new StationResponse(1L, "지하철"), new StationResponse(2L, "새로운지하역")));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -1,5 +1,7 @@
 package subway.web.request;
 
+import subway.domain.LineCreateDomain;
+
 public class LineCreateRequest {
 
     private String name;
@@ -37,6 +39,10 @@ public class LineCreateRequest {
 
     public Long getDistance() {
         return distance;
+    }
+
+    public LineCreateDomain toDomain() {
+        return new LineCreateDomain(name, color, upStationId, downStationId, distance);
     }
 
 }
