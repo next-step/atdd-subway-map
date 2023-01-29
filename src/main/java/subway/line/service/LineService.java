@@ -9,6 +9,9 @@ import subway.line.repository.LineRepository;
 import subway.station.domain.Station;
 import subway.station.service.StationService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class LineService {
     private LineRepository lineRepository;
@@ -21,14 +24,16 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
-
         Station upStation = stationService.findById(request.getUpStationId());
-        Station downStation = stationService.findById(request.getUpStationId());
+        Station downStation = stationService.findById(request.getDownStationId());
         Line line = Line.of(request, upStation, downStation);
-
-
 
         lineRepository.save(line);
         return LineResponse.of(line);
+    }
+
+    public List<LineResponse> findAllLines() {
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream().map(LineResponse::of).collect(Collectors.toList());
     }
 }

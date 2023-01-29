@@ -4,6 +4,7 @@ import subway.line.domain.Line;
 import subway.station.dto.StationResponse;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -39,5 +40,9 @@ public class LineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
+    }
+
+    public List<Long> getStationIds() {
+        return stations.stream().map(StationResponse::getId).collect(Collectors.toList());
     }
 }
