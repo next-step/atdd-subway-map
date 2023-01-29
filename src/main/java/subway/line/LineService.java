@@ -45,4 +45,10 @@ public class LineService {
                 .map(LineResponse::from)
                 .collect(toList());
     }
+
+    @Transactional(readOnly = true)
+    public LineResponse getLine(final Long id) {
+        final Line line = lineRepository.getLine(id);
+        return LineResponse.from(line);
+    }
 }
