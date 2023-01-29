@@ -36,13 +36,13 @@ public class StationAcceptanceTest {
         Map<String, String> 강남역_데이터 = new HashMap<>();
         강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
 
-        ExtractableResponse<Response> response = 지하철역_생성_요청_API(강남역_데이터);
+        ExtractableResponse<Response> response = 지하철역_생성_요청(강남역_데이터);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
+        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
                 .jsonPath().getList(역_이름.필드명(), String.class);
 
         assertThat(등록된_지하철역_이름_목록).containsAnyOf(강남역.역_이름());
@@ -59,14 +59,14 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> 강남역_데이터 = new HashMap<>();
         강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
-        지하철역_생성_요청_API(강남역_데이터);
+        지하철역_생성_요청(강남역_데이터);
 
         Map<String, String> 서울대입구역_데이터 = new HashMap<>();
         서울대입구역_데이터.put(역_이름.필드명(), 서울대입구역.역_이름());
-        지하철역_생성_요청_API(서울대입구역_데이터);
+        지하철역_생성_요청(서울대입구역_데이터);
 
         // when
-        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
+        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
                 .jsonPath().getList(역_이름.필드명(), String.class);
 
         // then
@@ -84,20 +84,20 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> 강남역_데이터 = new HashMap<>();
         강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
-        지하철역_생성_요청_API(강남역_데이터);
+        지하철역_생성_요청(강남역_데이터);
 
         // when
-        지하철역_삭제_요청_API(1L);
+        지하철역_삭제_요청(1L);
 
         // then
-        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청_API()
+        List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
                 .jsonPath().getList(역_이름.필드명(), String.class);
 
         assertThat(등록된_지하철역_이름_목록).doesNotContain(강남역.역_이름());
     }
 
 
-    private static ExtractableResponse<Response> 지하철역_생성_요청_API(Map<String, String> requestBody) {
+    private static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> requestBody) {
         return given().log().all()
                     .body(requestBody)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -106,14 +106,14 @@ public class StationAcceptanceTest {
                     .extract();
     }
 
-    private static void 지하철역_삭제_요청_API(Long stationId) {
+    private static void 지하철역_삭제_요청(Long stationId) {
         given().log().all()
         .when().delete(REQUEST_STATION_URL + "/" + stationId)
         .then().log().all()
             .extract();
     }
 
-    private static ExtractableResponse<Response> 지하철역_목록_조회_요청_API() {
+    private static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
         return given().log().all()
                 .when().get(REQUEST_STATION_URL)
                 .then().log().all()
