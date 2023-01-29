@@ -14,6 +14,18 @@ public class Sections {
     @OneToMany(mappedBy = "line", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
+    int getSize() {
+        return this.sections.size();
+    }
+
+    boolean isLastDownStation(final Station station) {
+        return station.equals(getLastDownStation());
+    }
+
+    boolean isExistsStationInLine(final Station station) {
+        return getStations().contains(station);
+    }
+
     void init(final Line line, final Station upStation, final Station downStation, final int distance) {
         final Section section = new Section(line, upStation, downStation, distance);
         this.sections.add(section);
@@ -26,11 +38,11 @@ public class Sections {
     }
 
     List<Station> getStations() {
-        Station lastUpStation = getLastUpStation();
+        final Station lastDownStation = getLastDownStation();
         final List<Station> stations = this.sections.stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toList());
-        stations.add(0, lastUpStation);
+        stations.add(lastDownStation);
         return stations;
     }
 
@@ -42,41 +54,18 @@ public class Sections {
         this.sections.remove(lastSection);
     }
 
-    boolean isLastDownStation(final Station station) {
-        return station.equals(getLastDownStation());
-    }
-
-    boolean isExistsStationInLine(final Station station) {
-        return getStations().contains(station);
-    }
-
-    int getSize() {
-        return this.sections.size();
-    }
-
-    private Station getLastUpStation() {
-        Station lastUpStation = this.sections.stream().findFirst().get().getUpStation();
-        while (true) {
-            final Station finalUpStation = lastUpStation;
-            final Optional<Section> findSection = this.sections.stream()
-                    .filter(section -> section.getDownStation().equals(finalUpStation))
-                    .findAny();
-            if (findSection.isEmpty()) break;
-            lastUpStation = findSection.get().getUpStation();
-        }
-        return lastUpStation;
-    }
-
     private Station getLastDownStation() {
-        Station lastDownStation = this.sections.stream().findFirst().get().getDownStation();
-        while (true) {
-            final Station finalLastDownStation = lastDownStation;
-            final Optional<Section> findSection = this.sections.stream()
-                    .filter(section -> section.getUpStation().equals(finalLastDownStation))
-                    .findAny();
-            if (findSection.isEmpty()) break;
-            lastDownStation = findSection.get().getDownStation();
-        }
-        return lastDownStation;
+        final Station downStation = this.sections.stream().findFirst().get().getDownStation();
+        return getLastDownStation(downStation);
+    }
+
+    private Station getLastDownStation(final Station station) {
+        final Optional<Section> findSection = this.sections.stream()
+                .filter(section -> section.getUpStation().equals(station))
+                .findAny();
+        if (findSection.isEmpty()) {
+            return station;
+        };
+        return getLastDownStation(findSection.get().getDownStation());
     }
 }
