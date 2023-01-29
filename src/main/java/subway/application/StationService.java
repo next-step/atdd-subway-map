@@ -1,7 +1,11 @@
-package subway;
+package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.ui.dto.StationRequest;
+import subway.ui.dto.StationResponse;
+import subway.domain.Station;
+import subway.domain.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +34,11 @@ public class StationService {
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
+    }
+
+    public Station findById(final Long id) {
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
     }
 
     private StationResponse createStationResponse(Station station) {

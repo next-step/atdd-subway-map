@@ -1,4 +1,4 @@
-package subway;
+package subway.domain;
 
 import javax.persistence.*;
 
@@ -7,14 +7,20 @@ public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 20, nullable = false)
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
-    public Station(String name) {
+    public Station(final Long id, final String name) {
+        this.id = id;
         this.name = name;
+    }
+
+    public Station(final String name) {
+        this(null, name);
     }
 
     public Long getId() {
