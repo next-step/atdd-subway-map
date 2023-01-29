@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -17,7 +18,11 @@ public class RestAssuredTest {
     void accessGoogle() {
         // TODO: 구글 페이지 요청 구현
         ExtractableResponse<Response> response = null;
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        given().
+                when().
+                get("https://google.com").
+                then().
+                assertThat().
+                statusCode(HttpStatus.OK.value());
     }
 }
