@@ -57,6 +57,19 @@ class LineAcceptanceTest {
         assertThat(createResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
         List<StationResponse> stations = createResponse.jsonPath().getList("stations", StationResponse.class);
         assertThat(stations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
+
+        ExtractableResponse<Response> listLineResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", actualLineId)
+            .when().get("/lines/{lineId}")
+            .then().log().all()
+            .extract();
+
+        assertThat(listLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(listLineResponse.jsonPath().getString("id")).isEqualTo("1");
+        assertThat(listLineResponse.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(listLineResponse.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        List<StationResponse> lineStations = createResponse.jsonPath().getList("stations", StationResponse.class);
+        assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
     }
 
 }
