@@ -19,13 +19,14 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 
 @DisplayName("지하철 노선 관련 기능")
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
-@Sql("/setup-station.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
     private static final Map<String, String> 신분당선_요청 = new HashMap<>();
     private static final Map<String, String> 분당선_요청 = new HashMap<>();
+    private static final Map<String, String> 수정_요청 = new HashMap<>();
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
+    private static final String 미존재_노선_위치 = "/lines/100";
 
     static {
         신분당선_요청.put("name", "신분당선");
@@ -39,6 +40,9 @@ public class LineAcceptanceTest {
         분당선_요청.put("upStationId", "1");
         분당선_요청.put("downStationId", "3");
         분당선_요청.put("distance", "10");
+
+        수정_요청.put("name", "다른 분당선");
+        수정_요청.put("color", "bg-red-600");
     }
 
     /**
@@ -46,6 +50,7 @@ public class LineAcceptanceTest {
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다.
      */
     @DisplayName("지하철 노선을 생성한다.")
+    @Sql("/setup-station.sql")
     @Test
     void createLine() {
         노선_생성(신분당선_요청).statusCode(HttpStatus.CREATED.value());
@@ -54,11 +59,22 @@ public class LineAcceptanceTest {
     }
 
     /**
+     * When 존재하지 않는 역을 포함해 생성 요청을 하면
+     * Then 404 응답을 받는다.
+     */
+    @DisplayName("존재하지 않는 역을 포함시켜 지하철 노선을 생성하면 생성되지 않는다.")
+    @Test
+    void createLineException() {
+        노선_생성(신분당선_요청).statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
      * Given 2개의 지하철 노선을 생성하고
      * When 지하철 노선 목록을 조회하면
      * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
      */
     @DisplayName("지하철 노선 목록을 조회한다.")
+    @Sql("/setup-station.sql")
     @Test
     void showLines() {
         노선_생성(신분당선_요청);
@@ -75,6 +91,7 @@ public class LineAcceptanceTest {
      * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
     @DisplayName("지하철 노선을 조회한다.")
+    @Sql("/setup-station.sql")
     @Test
     void showLine() {
         var createResponse = 노선_생성(신분당선_요청).extract();
@@ -86,16 +103,28 @@ public class LineAcceptanceTest {
     }
 
     /**
+     * When 존재하지 않는 지하철 노선을 조회하면
+     * Then 404 응답을 받는다.
+     */
+    @DisplayName("존재하지 않는 노선을 조회한다.")
+    @Test
+    void showLineException() {
+        given().log().all().
+        when()
+                .get(미존재_노선_위치).
+        then().log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 수정하면
      * Then 해당 지하철 노선 정보는 수정된다
      */
     @DisplayName("지하철 노선을 수정한다.")
+    @Sql("/setup-station.sql")
     @Test
     void updateLine() {
-        Map<String, String> 수정_요청 = new HashMap<>();
-        수정_요청.put("name", "다른 분당선");
-        수정_요청.put("color", "bg-red-600");
         var location = 노선_생성(신분당선_요청).extract().header("location");
 
         given().log().all()
@@ -115,11 +144,28 @@ public class LineAcceptanceTest {
     }
 
     /**
+     * When 존재하지 않는 지하철 노선을 수정하면
+     * Then 404 응답을 받는다.
+     */
+    @DisplayName("존재하지 않는 노선을 수정하는 경우 수정되지 않는다.")
+    @Test
+    void updateLineException() {
+        given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(수정_요청).
+        when()
+            .put(미존재_노선_위치).
+        then().log().all()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
      * Given 지하철 노선을 생성하고
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다.
      */
     @DisplayName("지하철 노선을 삭제한다.")
+    @Sql("/setup-station.sql")
     @Test
     void deleteLine() {
         var location = 노선_생성(신분당선_요청).extract().header("location");
@@ -132,6 +178,21 @@ public class LineAcceptanceTest {
 
         assertThat(노선_목록_이름_조회()).doesNotContain(신분당선);
     }
+
+    /**
+     * When 존재하지 않는 지하철 노선을 삭제하면
+     * Then 404 응답을 받는다.
+     */
+    @DisplayName("존재하지 않는 노선을 삭제한다.")
+    @Test
+    void deleteLineException() {
+        given().log().all().
+        when()
+                .delete(미존재_노선_위치).
+        then().log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
 
     private ValidatableResponse 노선_생성(Map<String, String> params) {
         return given().log().all()
