@@ -80,9 +80,7 @@ public class StationAcceptanceTest {
         Long id = StationTestUtils.createStation(stationName);
 
         // when
-        RestAssured
-            .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/stations/" + id);
+        지하철역_삭제(id);
 
         // then
         List<String> stationNames = 지하철역_조회();
@@ -94,5 +92,11 @@ public class StationAcceptanceTest {
             .when().get("/stations")
             .then().log().all()
             .extract().jsonPath().getList("name", String.class);
+    }
+
+    private void 지하철역_삭제(Long id) {
+        RestAssured
+            .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/stations/" + id);
     }
 }
