@@ -11,7 +11,7 @@ import subway.repository.StationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static subway.exception.SubwayExceptionStatus.LINE_NOT_FOUND;
+import static subway.exception.SubwayExceptionStatus.STATION_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +36,7 @@ public class StationService {
 
     public Station findStation(Long stationId) {
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new SubwayException(stationId + " 지하철역을 찾을 수 없습니다.", LINE_NOT_FOUND));
+                .orElseThrow(() -> new SubwayException(STATION_NOT_FOUND));
     }
 
     @Transactional
