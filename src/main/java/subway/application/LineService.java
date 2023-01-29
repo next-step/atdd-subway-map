@@ -3,7 +3,7 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.application.dto.AddSectionRequest;
-import subway.application.dto.LineRequest;
+import subway.application.dto.CreateLineRequest;
 import subway.application.dto.LineResponse;
 import subway.application.dto.UpdateLineRequest;
 import subway.domain.Line;
@@ -29,16 +29,16 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(final LineRequest lineRequest) {
-        final Station upStation = stationService.findStationById(lineRequest.getUpStationId());
-        final Station downStation = stationService.findStationById(lineRequest.getDownStationId());
+    public LineResponse saveLine(final CreateLineRequest createLineRequest) {
+        final Station upStation = stationService.findStationById(createLineRequest.getUpStationId());
+        final Station downStation = stationService.findStationById(createLineRequest.getDownStationId());
 
         final Line line = Line.of(
-                lineRequest.getName(),
-                lineRequest.getColor(),
+                createLineRequest.getName(),
+                createLineRequest.getColor(),
                 upStation,
                 downStation,
-                lineRequest.getDistance()
+                createLineRequest.getDistance()
         );
         lineRepository.save(line);
         return new LineResponse(line);

@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.application.dto.AddSectionRequest;
-import subway.application.dto.LineRequest;
+import subway.application.dto.CreateLineRequest;
 import subway.application.dto.LineResponse;
 import subway.application.dto.UpdateLineRequest;
 
@@ -22,8 +22,8 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody final LineRequest lineRequest) {
-        final LineResponse lineResponse = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody final CreateLineRequest createLineRequest) {
+        final LineResponse lineResponse = lineService.saveLine(createLineRequest);
         return ResponseEntity.created(URI.create("/lines/" + lineResponse.getId()))
                 .body(lineResponse);
     }
