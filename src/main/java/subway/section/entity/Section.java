@@ -42,6 +42,10 @@ public class Section {
     }
 
     public void changeLine(Line line) {
+        if (this.line.equals(line)) {
+            return;
+        }
+
         if (this.line != null) {
             this.line.remove(this);
         }
