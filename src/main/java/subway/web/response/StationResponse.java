@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class StationResponse {
 
-    private Long id;
-    private String name;
+    private final Long id;
+    private final String name;
 
     public StationResponse(Long id, String name) {
         this.id = id;
