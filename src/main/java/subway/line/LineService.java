@@ -5,6 +5,7 @@ import subway.station.StationService;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,5 +39,13 @@ public class LineService {
         return lines.stream()
                 .map(LineResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    public LineResponse findLineById(long lineId) {
+        Optional<Line> OptionalLine = lineRepository.findById(lineId);
+        if (OptionalLine.isEmpty()) {
+            throw new LineNotFoundException(lineId);
+        }
+        return LineResponse.from(OptionalLine.get());
     }
 }
