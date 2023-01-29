@@ -4,6 +4,6 @@ import subway.domain.LineCreateDomain;
 
 public interface LineUseCase {
 
-    void createLine(LineCreateDomain lineCreateDomain);
+    Long createLine(LineCreateDomain lineCreateDomain);
 
 }

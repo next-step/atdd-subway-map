@@ -14,8 +14,8 @@ class LineService implements LineUseCase {
     }
 
     @Override
-    public void createLine(LineCreateDomain lineCreateDomain) {
-        lineRepositoryPort.createLine(lineCreateDomain);
+    public Long createLine(LineCreateDomain lineCreateDomain) {
+        return lineRepositoryPort.createLine(lineCreateDomain);
     }
 
 }

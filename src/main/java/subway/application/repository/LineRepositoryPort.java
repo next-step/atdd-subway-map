@@ -4,6 +4,6 @@ import subway.domain.LineCreateDomain;
 
 public interface LineRepositoryPort {
 
-    void createLine(LineCreateDomain lineCreateDomain);
+    Long createLine(LineCreateDomain lineCreateDomain);
 
 }

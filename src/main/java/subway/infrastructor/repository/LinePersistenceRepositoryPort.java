@@ -16,9 +16,9 @@ class LinePersistenceRepositoryPort implements LineRepositoryPort {
     }
 
     @Override
-    public void createLine(LineCreateDomain lineCreateDomain) {
+    public Long createLine(LineCreateDomain lineCreateDomain) {
         LineJpaEntity lineJpaEntity = mapper.domainToEntity(lineCreateDomain);
-        repository.save(lineJpaEntity);
+        return repository.save(lineJpaEntity).getId();
     }
 
 }

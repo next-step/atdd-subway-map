@@ -38,4 +38,8 @@ class LineJpaEntity {
         this.distance = distance;
     }
 
+    public Long getId() {
+        return id;
+    }
+
 }
