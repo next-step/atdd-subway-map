@@ -51,4 +51,9 @@ public class LineService {
         final Line line = lineRepository.getLine(id);
         return LineResponse.from(line);
     }
+
+    public void updateLine(final Long id, LineUpdateRequest lineUpdateRequest) {
+        final Line line = lineRepository.getLine(id);
+        line.update(lineUpdateRequest);
+    }
 }

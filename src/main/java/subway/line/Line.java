@@ -43,6 +43,11 @@ public class Line {
         );
     }
 
+    public void update(final LineUpdateRequest lineUpdateRequest) {
+        this.name = lineUpdateRequest.getName();
+        this.color = lineUpdateRequest.getColor();
+    }
+
     public Long getId() {
         return id;
     }
