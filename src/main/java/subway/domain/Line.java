@@ -57,4 +57,9 @@ public class Line {
             this.color = color;
         }
     }
+
+    public void addSection(final Station upStation, final Station downStation, final int distance) {
+        final Section section = new Section(this, upStation, downStation, distance);
+        this.sections.add(section);
+    }
 }

@@ -30,19 +30,11 @@ public class Section {
     protected Section() {
     }
 
-    public Line getLine() {
-        return line;
-    }
-
     public Station getUpStation() {
         return upStation;
     }
 
     public Station getDownStation() {
         return downStation;
-    }
-
-    public Integer getDistance() {
-        return distance;
     }
 }

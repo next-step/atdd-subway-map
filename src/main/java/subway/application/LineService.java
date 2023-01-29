@@ -2,6 +2,7 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.application.dto.CreateSectionRequest;
 import subway.application.dto.LineRequest;
 import subway.application.dto.LineResponse;
 import subway.application.dto.UpdateLineRequest;
@@ -48,15 +49,13 @@ public class LineService {
     }
 
     public LineResponse findLineById(final long lineId) {
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
+        final Line line = getLine(lineId);
         return new LineResponse(line);
     }
 
     @Transactional
     public LineResponse updateLine(final long lineId, final UpdateLineRequest updateLineRequest) {
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(IllegalArgumentException::new);
+        final Line line = getLine(lineId);
         line.update(updateLineRequest.getName(), updateLineRequest.getColor());
         return new LineResponse(line);
     }
@@ -64,5 +63,20 @@ public class LineService {
     @Transactional
     public void deleteLine(final long lineId) {
         lineRepository.deleteById(lineId);
+    }
+
+    @Transactional
+    public LineResponse addSection(final long lineId, final CreateSectionRequest createSectionRequest) {
+        final Line line = getLine(lineId);
+        final Station upStation = stationService.findStationById(Long.parseLong(createSectionRequest.getUpStationId()));
+        final Station downStation = stationService.findStationById(Long.parseLong(createSectionRequest.getDownStationId()));
+
+        line.addSection(upStation, downStation, createSectionRequest.getDistance());
+        return new LineResponse(line);
+    }
+
+    private Line getLine(final long lineId) {
+        return lineRepository.findById(lineId)
+                .orElseThrow(IllegalArgumentException::new);
     }
 }
