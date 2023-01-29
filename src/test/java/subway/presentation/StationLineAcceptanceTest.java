@@ -130,6 +130,41 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 		);
 	}
 
+	// Given 지하철 노선을 생성하고
+	// When 생성한 지하철 노선을 수정하면
+	// Then 해당 지하철 노선 정보는 수정된다
+	@DisplayName("지하철노선을 생성하고 노선을 생성한 노선을 수정하면 수정된다")
+	@Test
+	void 지하철노선을_생성하고_노선을_생성한_노선을_수정하면_수정된다() {
+		// given
+		지하철역_생성("지하철역");
+		지하철역_생성("새로운지하철역");
+
+		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
+			.name("신분당선")
+			.color("bg-red-600")
+			.upStationId(1L)
+			.downStationId(2L)
+			.distance(10)
+			.build();
+
+		Long id = 지하철노선_생성(stationLineCreateRequest1)
+			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
+			})
+			.getId();
+
+		SubwayLineRequest.Update updateRequest = SubwayLineRequest.Update.builder()
+			.name("다른분당선")
+			.color("bg-red-600")
+			.build();
+
+		// when
+		ExtractableResponse<Response> response = 지하철노선_수정(id, updateRequest);
+
+		// then
+		assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+	}
+
 	private ExtractableResponse<Response> 지하철노선_생성(SubwayLineRequest.Create stationLineCreateRequest) {
 		return requestApi(
 			with()
@@ -167,4 +202,15 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 			id
 		);
 	}
+
+	private ExtractableResponse<Response> 지하철노선_수정(Long id, SubwayLineRequest.Update updateRequest) {
+		return requestApi(
+			with().contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(updateRequest),
+			Method.PUT,
+			ROOT_PATH + "/{id}",
+			id
+		);
+	}
+
 }

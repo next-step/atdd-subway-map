@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import subway.domain.Station;
 import subway.domain.StationRepository;
+import subway.domain.SubwayLine;
 import subway.domain.SubwayLineRepository;
 import subway.exception.NotFoundStationException;
 import subway.exception.NotFoundSubwayLineException;
@@ -47,5 +48,16 @@ public class SubwayLineService {
 	public SubwayLineResponse.LineInfo findSubwayLineById(Long id) {
 		return subwayLineRepository.findSubwayLineById(id)
 			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
+	}
+
+	@Transactional
+	public void update(Long id, SubwayLineRequest.Update updateRequest) {
+		SubwayLine subwayLine = subwayLineRepository.findById(id)
+			.orElseThrow(() -> new NotFoundSubwayLineException(SubwayLineErrorCode.NOT_FOUND_SUBWAY_LINE));
+
+		subwayLine.updateInfo(
+			updateRequest.getName(),
+			updateRequest.getColor()
+		);
 	}
 }

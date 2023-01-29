@@ -54,4 +54,9 @@ public class SubwayLine {
 			this.subwayLineStationGroups.add(subwayLineStationGroup);
 		}
 	}
+
+	public void updateInfo(String name, String color) {
+		this.name = name;
+		this.color = color;
+	}
 }
