@@ -42,6 +42,16 @@ public class Line {
         this.distance = distance;
     }
 
+    public Line updateLine(String name, String color, Station upStation, Station downStation, Long distance) {
+        this.name = name;
+        this.color = color;
+        this.upStation = upStation;
+        this.downStation = downStation;
+        this.distance = distance;
+
+        return this;
+    }
+
     public Long getId() {
         return id;
     }

@@ -45,4 +45,15 @@ public class LineService {
             .map(LineResponse::createLineResponse)
             .orElseThrow(LineNotFoundException::new);
     }
+
+    @Transactional
+    public LineResponse updateLine(Long id, LineRequest lineRequest) {
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+
+        Station upStation = stationService.findStation(lineRequest.getUpStationId());
+        Station downStation = stationService.findStation(lineRequest.getDownStationId());
+
+        Line updatedLine = line.updateLine(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
+        return LineResponse.createLineResponse(lineRepository.save(updatedLine));
+    }
 }
