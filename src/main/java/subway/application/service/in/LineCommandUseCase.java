@@ -1,18 +1,11 @@
-package subway.application.service;
+package subway.application.service.in;
 
 import subway.domain.LineCreateDomain;
-import subway.domain.LineDomain;
 import subway.domain.LineUpdateDomain;
 
-import java.util.List;
-
-public interface LineUseCase {
+public interface LineCommandUseCase {
 
     Long createLine(LineCreateDomain lineCreateDomain);
-
-    LineDomain loadLine(Long createdLineId);
-
-    List<LineDomain> loadLines();
 
     void updateLine(LineUpdateDomain toDomain);
 
