@@ -2,12 +2,16 @@ package subway;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.Mocks.MockLane;
 import subway.Mocks.MockStation;
@@ -29,7 +33,9 @@ public class LaneAcceptanceTest {
     // when
     Lane line = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
-    assertThat(지하철_노선_조회(line.getId())).isEqualTo(line);
+    assertThat(
+        지하철_노선_조회(line.getId()).jsonPath().getString("name")
+    ).isEqualTo(line.getName());
   }
 
   /**
@@ -43,7 +49,9 @@ public class LaneAcceptanceTest {
     Lane line1 = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
     Lane line2 = 지하철_노선_생성(MockLane.신분당선, MockStation.강남역, MockStation.신사역);
 
-    assertThat(지하철_노선_목록_조회()).containsAll(List.of(line1,line2));
+    assertThat(
+        지하철_노선_목록_조회().jsonPath().getList("name", String.class)
+    ).containsAll(List.of(line1.getName(),line2.getName()));
   }
 
   /**
@@ -58,10 +66,10 @@ public class LaneAcceptanceTest {
     Lane created = 지하철_노선_생성(MockLane.서울2호선, MockStation.서울대입구역, MockStation.봉천역);
 
     // when
-    Lane show = 지하철_노선_조회(created.getId());
+    ExtractableResponse<Response> show = 지하철_노선_조회(created.getId());
 
     // then
-    assertThat(show.getId()).isEqualTo(created.getId());
+    assertThat(show.jsonPath().getString("name")).isEqualTo(created.getName());
   }
 
   /**
@@ -79,7 +87,12 @@ public class LaneAcceptanceTest {
     Lane updated = 지하철_노선_수정(created.getId(), "이름이_바뀐_2호선", MockStation.서울대입구역, MockStation.봉천역);
 
     // then
-    assertThat(지하철_노선_조회(updated.getId())).isEqualTo(updated);
+    Lane show = 지하철_노선_조회(updated.getId()).as(Lane.class);
+    assertAll(
+        () -> assertThat(show.getName()).isEqualTo(updated.getName()),
+        () -> assertThat(show.getInboundStation()).isEqualTo(updated.getInboundStation()),
+        () -> assertThat(show.getOutboundStation()).isEqualTo(updated.getOutboundStation())
+    );
   }
 
   /**
@@ -97,7 +110,7 @@ public class LaneAcceptanceTest {
     지하철_노선_삭제(line.getId());
 
     // then
-    assertThat(지하철_노선_조회(line.getId())).isNull();
+    assertThat(지하철_노선_조회(line.getId()).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
   private Lane 지하철_노선_생성(String name, Station inbound, Station outbound) {
@@ -105,31 +118,33 @@ public class LaneAcceptanceTest {
 
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/stationline")
+        .when().post("/lane")
         .then()
         .extract().body().as(Lane.class);
   }
 
-  private Lane 지하철_노선_조회(Long id) {
+  private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
     return RestAssured
         .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/stationline/" + id)
+        .when().get("/lane/" + id)
         .then()
-        .extract().body().as(Lane.class);
+        .extract();
   }
 
-  private List<Lane> 지하철_노선_목록_조회() {
+  private ExtractableResponse<Response> 지하철_노선_목록_조회() {
     return RestAssured
         .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/stationlines")
+        .when().get("/lanes")
         .then()
-        .extract().body().jsonPath().getList("$", Lane.class);
+        .extract();
   }
 
   private Lane 지하철_노선_수정(Long id, String name, Station inbound, Station outbound) {
+    LaneRequest request = new LaneRequest(name, inbound, outbound);
+
     return RestAssured
-        .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().patch("/stationline/" + id)
+        .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().patch("/lane/" + id)
         .then()
         .extract().body().as(Lane.class);
   }
@@ -137,6 +152,6 @@ public class LaneAcceptanceTest {
   private void 지하철_노선_삭제(Long id) {
     RestAssured
         .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().delete("/stationline/" + id);
+        .when().delete("/lane/" + id);
   }
 }

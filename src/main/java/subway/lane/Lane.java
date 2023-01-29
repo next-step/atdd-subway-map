@@ -14,10 +14,10 @@ public class Lane {
   @Column(name = "name")
   private String name; // 노선 번호
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private Station inboundStation; // 상행역
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private Station outboundStation; // 하행역
 
   public Lane() {}
@@ -32,9 +32,6 @@ public class Lane {
     return id;
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getName() {
     return name;
@@ -46,5 +43,21 @@ public class Lane {
 
   public Station getOutboundStation() {
     return outboundStation;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setInboundStation(Station inboundStation) {
+    this.inboundStation = inboundStation;
+  }
+
+  public void setOutboundStation(Station outboundStation) {
+    this.outboundStation = outboundStation;
   }
 }

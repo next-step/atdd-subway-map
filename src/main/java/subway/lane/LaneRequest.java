@@ -1,7 +1,9 @@
 package subway.lane;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import subway.station.Station;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LaneRequest {
 
   private String name;
