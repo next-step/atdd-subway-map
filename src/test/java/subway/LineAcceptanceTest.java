@@ -120,25 +120,24 @@ class LineAcceptanceTest {
         StationResponse 지하철역 = createStation("지하철역").as(StationResponse.class);
         StationResponse 새로운지하철역 = createStation("새로운지하철역").as(StationResponse.class);
 
-        LineCreateRequest givenLine = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
-        long givenLineId = 1L;
-        ExtractableResponse<Response> createLineResponse = createLine(givenLine, givenLineId, 지하철역, 새로운지하철역);
-        Long actualLineId = createLineResponse.jsonPath().getLong("id");
+        LineCreateRequest given_신분당선 = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
+        long given_신분당선_id = 1L;
+        createLine(given_신분당선, given_신분당선_id, 지하철역, 새로운지하철역);
 
         // When
         ExtractableResponse<Response> actual = RestAssured.given().spec(REQUEST_SPEC).log().all()
-            .pathParam("lineId", actualLineId)
+            .pathParam("lineId", given_신분당선_id)
             .when().get("/lines/{lineId}")
             .then().log().all()
             .extract();
 
         // Then
         assertThat(actual.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(actual.jsonPath().getLong("id")).isEqualTo(givenLineId);
+        assertThat(actual.jsonPath().getLong("id")).isEqualTo(given_신분당선_id);
         assertThat(actual.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(actual.jsonPath().getString("color")).isEqualTo("bg-red-600");
-        List<StationResponse> lineStations = createLineResponse.jsonPath().getList("stations", StationResponse.class);
-        assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(givenLineId, "지하철역"), new StationResponse(2L, "새로운지하철역"));
+        List<StationResponse> lineStations = actual.jsonPath().getList("stations", StationResponse.class);
+        assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(given_신분당선_id, "지하철역"), new StationResponse(2L, "새로운지하철역"));
     }
 
     private static ExtractableResponse<Response> createLine(LineCreateRequest lineCreateRequest, Long lineId, StationResponse upStation, StationResponse downStation) {
