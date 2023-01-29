@@ -1,5 +1,9 @@
 package subway.service;
 
+import static java.util.stream.Collectors.*;
+
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -27,5 +31,11 @@ public class LineService {
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance()));
 
         return LineResponse.createLineResponse(line);
+    }
+
+    public List<LineResponse> findAllLines() {
+        return lineRepository.findAll().stream()
+            .map(LineResponse::createLineResponse)
+            .collect(toList());
     }
 }

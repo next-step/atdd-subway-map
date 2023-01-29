@@ -2,6 +2,8 @@ package subway;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,10 +43,12 @@ public class LineAcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = findAllLines();
+        List<String> lineNames = response.jsonPath().getList("name", String.class);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.jsonPath().getList("name")).containsExactly("신분당선", "분당선");
+        assertThat(lineNames).hasSize(3);
+        assertThat(lineNames).containsExactly("신분당선", "분당선", "신분당선");
     }
 
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
