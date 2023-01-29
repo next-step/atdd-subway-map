@@ -1,4 +1,4 @@
-package subway.line;
+package subway;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -11,8 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import subway.line.web.request.LineCreateRequest;
-import subway.station.web.response.StationResponse;
+import subway.web.request.LineCreateRequest;
+import subway.web.response.StationResponse;
 
 import java.util.List;
 

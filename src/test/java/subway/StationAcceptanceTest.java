@@ -1,4 +1,4 @@
-package subway.station;
+package subway;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;

@@ -1,4 +1,4 @@
-package subway.line.web.request;
+package subway.web.request;
 
 public class LineCreateRequest {
 
