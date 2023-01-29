@@ -8,6 +8,7 @@ import subway.application.dto.LineResponse;
 import subway.application.dto.UpdateLineRequest;
 import subway.domain.Line;
 import subway.domain.LineRepository;
+import subway.domain.SectionValidator;
 import subway.domain.Station;
 
 import java.util.List;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private final StationService stationService;
+    private final SectionValidator sectionValidator;
     private final LineRepository lineRepository;
 
-    public LineService(final StationService stationService, final LineRepository lineRepository) {
+    public LineService(final StationService stationService, final SectionValidator sectionValidator, final LineRepository lineRepository) {
         this.stationService = stationService;
+        this.sectionValidator = sectionValidator;
         this.lineRepository = lineRepository;
     }
 
@@ -71,7 +74,7 @@ public class LineService {
         final Station upStation = stationService.findStationById(Long.parseLong(addSectionRequest.getUpStationId()));
         final Station downStation = stationService.findStationById(Long.parseLong(addSectionRequest.getDownStationId()));
 
-        line.addSection(upStation, downStation, addSectionRequest.getDistance());
+        line.addSection(sectionValidator, upStation, downStation, addSectionRequest.getDistance());
         return new LineResponse(line);
     }
 
@@ -79,7 +82,7 @@ public class LineService {
     public void removeSection(final long lineId, final long stationId) {
         final Line line = getLine(lineId);
         final Station station = stationService.findStationById(stationId);
-        line.removeSection(station);
+        line.removeSection(sectionValidator, station);
     }
 
     private Line getLine(final long lineId) {

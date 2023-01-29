@@ -1,8 +1,5 @@
 package subway.domain;
 
-import subway.error.exception.BusinessException;
-import subway.error.exception.ErrorCode;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -22,8 +19,8 @@ public class Sections {
         this.sections.add(section);
     }
 
-    void addSection(final Line line, final Station upStation, final Station downStation, final int distance) {
-        validateSectionBeforeAdd(upStation, downStation);
+    void addSection(final SectionValidator sectionValidator, final Line line, final Station upStation, final Station downStation, final int distance) {
+        sectionValidator.validateSectionBeforeAdd(this, upStation, downStation);
         final Section section = new Section(line, upStation, downStation, distance);
         this.sections.add(section);
     }
@@ -37,42 +34,24 @@ public class Sections {
         return stations;
     }
 
-    void removeSection(final Station station) {
-        validateBeforeRemoveStation(station);
+    void removeSection(final SectionValidator sectionValidator, final Station station) {
+        sectionValidator.validateBeforeRemoveStation(this, station);
         final Section lastSection = this.sections.stream()
                 .filter(section -> section.getDownStation().equals(station))
                 .findFirst().get();
         this.sections.remove(lastSection);
     }
 
-    private void validateSectionBeforeAdd(final Station upStation, final Station downStation) {
-        if (!isLastDownStation(upStation)) {
-            throw new BusinessException(ErrorCode.CANNOT_ADD_SECTION_WITH_INVALID_UP_STATION);
-        }
-        if (isExistsStationInLine(downStation)) {
-
-            throw new BusinessException(ErrorCode.CANNOT_ADD_SECTION_WITH_ALREADY_EXISTS_STATION_IN_LINE);
-        }
-    }
-
-    private boolean isLastDownStation(final Station station) {
+    boolean isLastDownStation(final Station station) {
         return station.equals(getLastDownStation());
     }
 
-    private void validateBeforeRemoveStation(final Station station) {
-        if (!isExistsStationInLine(station)) {
-            throw new BusinessException(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_NOT_EXISTS_STATION_IN_LINE);
-        }
-        if (!isLastDownStation(station)) {
-            throw new BusinessException(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_NOT_LAST_SECTION);
-        }
-        if (this.sections.size() < 2) {
-            throw new BusinessException(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_LAST_REMAINING_SECTION);
-        }
+    boolean isExistsStationInLine(final Station station) {
+        return getStations().contains(station);
     }
 
-    private boolean isExistsStationInLine(final Station station) {
-        return  getStations().contains(station);
+    int getSize() {
+        return this.sections.size();
     }
 
     private Station getLastUpStation() {

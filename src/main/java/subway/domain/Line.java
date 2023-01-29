@@ -51,11 +51,11 @@ public class Line {
         }
     }
 
-    public void addSection(final Station upStation, final Station downStation, final int distance) {
-        sections.addSection(this, upStation, downStation, distance);
+    public void addSection(final SectionValidator sectionValidator, final Station upStation, final Station downStation, final int distance) {
+        sections.addSection(sectionValidator, this, upStation, downStation, distance);
     }
 
-    public void removeSection(final Station station) {
-        sections.removeSection(station);
+    public void removeSection(final SectionValidator sectionValidator, final Station station) {
+        sections.removeSection(sectionValidator, station);
     }
 }
