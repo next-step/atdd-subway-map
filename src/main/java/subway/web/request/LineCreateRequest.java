@@ -4,14 +4,11 @@ import subway.domain.LineCreateDomain;
 
 public class LineCreateRequest {
 
-    private String name;
-    private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
-
-    public LineCreateRequest() {
-    }
+    private final String name;
+    private final String color;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 
     public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
         this.name = name;
