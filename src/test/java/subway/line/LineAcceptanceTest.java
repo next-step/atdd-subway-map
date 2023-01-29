@@ -107,7 +107,7 @@ public class LineAcceptanceTest {
         ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
 
         // then
-        List<LineResponse> lines = 지하철노선이_정상적으로_조회(linesResponse);
+        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
         assertAll(() -> {
             assertThat(lines).hasSize(2);
             assertThat(List.of(역삼역.getId(), 강남역.getId(), 신논현역.getId()))
@@ -125,6 +125,30 @@ public class LineAcceptanceTest {
      *  - When 생성한 지하철 노선을 조회하면
      *  - Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */
+    @DisplayName("특정 지하철 노선을 조회한다.")
+    @Test
+    void Should_지하철노선을_생성하고_When_특정한_지하철노선을_조회하면_Then_특정한_지하철노선이_조회된다() {
+        // given
+        var 이호선_request = new LineRequest("2호선", "blue", 강남역.getId(), 역삼역.getId(), 10L);
+        ExtractableResponse<Response> 이호선_response = 지하철노선을_생성한다(이호선_request);
+
+        ExtractableResponse<Response> linesResponse = 지하철노선을_조회한다();
+        List<LineResponse> lines = 지하철노선_목록이_정상적으로_조회(linesResponse);
+        var 이호선findByAll = lines.stream()
+                                                .filter(line -> 이호선_request.getName().equals(line.getName()))
+                                                .findFirst()
+                                                .get();
+
+        //when
+        ExtractableResponse<Response> lineResponse = 특정_지하철노선을_조회한다(이호선findByAll.getId());
+
+        // then
+        var 이호선 = 지하철노선이_정상적으로_조회(lineResponse);
+        assertAll(() -> {
+            assertThat(이호선.getName()).isEqualTo("2호선");
+            assertThat(이호선.getStationIds()).containsExactlyInAnyOrderElementsOf(List.of(강남역.getId(), 역삼역.getId()));
+        });
+    }
 
     /**
      * 지하철노선 수정
@@ -157,12 +181,29 @@ public class LineAcceptanceTest {
                 .extract();
     }
 
-    private void 지하철노선이_정상적으로_생성(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    private ExtractableResponse<Response> 특정_지하철노선을_조회한다(Long id) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(String.format("/lines/%d", id))
+                .then().log().all()
+                .extract();
     }
 
-    private List<LineResponse> 지하철노선이_정상적으로_조회(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    private void 지하철노선이_정상적으로_생성(ExtractableResponse<Response> response) {
+        assertHttpStatus(response.statusCode(), HttpStatus.CREATED.value());
+    }
+
+    private List<LineResponse> 지하철노선_목록이_정상적으로_조회(ExtractableResponse<Response> response) {
+        assertHttpStatus(response.statusCode(), HttpStatus.OK.value());
         return response.jsonPath().getList(".", LineResponse.class);
+    }
+
+    private LineResponse 지하철노선이_정상적으로_조회(ExtractableResponse<Response> response) {
+        assertHttpStatus(response.statusCode(), HttpStatus.OK.value());
+        return response.as(LineResponse.class);
+    }
+
+    private void assertHttpStatus(int actualHttpStatus, int expectHttpStatus) {
+        assertThat(actualHttpStatus).isEqualTo(expectHttpStatus);
     }
 }
