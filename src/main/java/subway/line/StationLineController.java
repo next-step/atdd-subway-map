@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -29,7 +30,8 @@ public class StationLineController {
 
     @PostMapping("/lines")
     public ResponseEntity<StationLineResponse> createStationLines(@RequestBody StationLineRequest stationLineRequest) {
-        return ResponseEntity.ok().body(stationLineService.createStationLines(stationLineRequest));
+        StationLineResponse stationLines = stationLineService.createStationLines(stationLineRequest);
+        return ResponseEntity.created(URI.create("/lines/" + stationLines.getId())).body(stationLines);
     }
 
     @GetMapping("/lines")
