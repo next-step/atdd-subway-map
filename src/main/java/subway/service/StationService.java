@@ -5,10 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.dto.station.StationRequest;
 import subway.dto.station.StationResponse;
+import subway.exception.SubwayException;
 import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static subway.exception.SubwayExceptionStatus.LINE_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +31,12 @@ public class StationService {
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
                 .map(StationResponse::from)
-                .collect(Collectors.toList());
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public Station findStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(() -> new SubwayException(stationId + " 지하철역을 찾을 수 없습니다.", LINE_NOT_FOUND));
     }
 
     @Transactional
