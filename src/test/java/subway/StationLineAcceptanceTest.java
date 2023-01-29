@@ -44,14 +44,17 @@ public class StationLineAcceptanceTest {
         body.put("distance", 10);
 
         ExtractableResponse<Response> response =
-                RestAssured.given().spec(StationUtils.getRequestSpecification()).body(body).log().all()
+                RestAssured
+                        .given().spec(StationUtils.getRequestSpecification()).body(body).log().all()
                         .when().post("/lines")
                         .then().log().all().extract();
-        JsonPath jsonPath = response.jsonPath();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isEqualTo("/lines/1");
         assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+
+        JsonPath jsonPath = response.jsonPath();
+
         assertThat(jsonPath.getInt("$.id")).isEqualTo(1);
         assertThat(jsonPath.getString("$.name")).isEqualTo(name);
         assertThat(jsonPath.getString("$.color")).isEqualTo(color);
