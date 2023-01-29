@@ -12,6 +12,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.exception.LineNotFoundException;
 import subway.repository.LineRepository;
 
 @Service
@@ -37,5 +38,11 @@ public class LineService {
         return lineRepository.findAll().stream()
             .map(LineResponse::createLineResponse)
             .collect(toList());
+    }
+
+    public LineResponse findLineById(Long lineId) {
+        return lineRepository.findById(lineId)
+            .map(LineResponse::createLineResponse)
+            .orElseThrow(LineNotFoundException::new);
     }
 }
