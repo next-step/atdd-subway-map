@@ -1,10 +1,16 @@
 package subway.dto;
 
+import subway.domain.Station;
+
 public class StationResponse {
     private final Long id;
     private final String name;
 
-    public StationResponse(Long id, String name) {
+    public static StationResponse createStationResponse(Station station) {
+        return new StationResponse(station.getId(), station.getName());
+    }
+
+    protected StationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }

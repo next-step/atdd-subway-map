@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.StationNotFoundException;
 import subway.repository.StationRepository;
 
 @Service
@@ -23,24 +24,22 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.createStationResponse(station);
+    }
+
+    public Station findStation(Long stationId) {
+        return stationRepository.findById(stationId)
+            .orElseThrow(StationNotFoundException::new);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-            .map(this::createStationResponse)
+            .map(StationResponse::createStationResponse)
             .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-            station.getId(),
-            station.getName()
-        );
     }
 }
