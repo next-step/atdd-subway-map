@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,12 +24,16 @@ public class SubwayLine {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
 	private String name;
 
+	@Column(nullable = false)
 	private String color;
 
+	@Column(nullable = false)
 	private Long upStationId;
 
+	@Column(nullable = false)
 	private Long downStationId;
 
 	@OneToMany(mappedBy = "subwayLine", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
