@@ -3,6 +3,7 @@ package subway.section.entity;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import subway.line.entity.Line;
 import subway.station.entity.Station;
 
 import javax.persistence.CascadeType;
@@ -104,5 +105,20 @@ public class Sections extends AbstractList<Section> {
     public void removeByStationId(Long stationId) {
         validateRemove(stationId);
         values.removeIf(section -> section.downStationId().equals(stationId));
+    }
+
+    public void add(Line line, Station upStation, Station downStation, long distance) {
+        Section section = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
+
+        if (values.contains(section)) {
+            return;
+        }
+
+        add(section);
+        section.changeLine(line);
     }
 }

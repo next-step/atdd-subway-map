@@ -61,12 +61,20 @@ public class Line {
         section.changeLine(this);
     }
 
+    public void addSection(Station upStation, Station downStation, long distance) {
+        sections.add(this, upStation, downStation, distance);
+    }
+
     public void remove(Section section) {
         sections.remove(section);
     }
 
     public void removeSectionByStationId(Long stationId) {
         sections.removeByStationId(stationId);
+    }
+
+    public Section getLastSection() {
+        return sections.last();
     }
 }
 

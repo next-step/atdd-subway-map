@@ -31,7 +31,7 @@ public class LineCreateRequest {
         return Section.builder()
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(this.distance)
+                .distance(distance)
                 .build();
     }
 }

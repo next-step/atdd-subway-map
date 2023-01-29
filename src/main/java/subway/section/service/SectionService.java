@@ -14,7 +14,7 @@ import subway.station.repository.StationRepository;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SectionService {
-    
+
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
 
@@ -24,10 +24,9 @@ public class SectionService {
         Station downStation = stationRepository.findById(request.getDownStationId()).orElseThrow();
         Line line = lineRepository.findById(request.getLineId()).orElseThrow();
 
-        Section section = request.toEntity(upStation, downStation);
-        line.addSection(section); // 더티 체킹으로 쿼리가 나가기 전까지 sectionId가 세팅되지 않으니 주의
+        line.addSection(upStation, downStation, request.getDistance());
 
-        return section;
+        return line.getLastSection();
     }
 
     @Transactional
