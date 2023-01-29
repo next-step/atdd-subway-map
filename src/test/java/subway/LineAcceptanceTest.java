@@ -53,8 +53,7 @@ class LineAcceptanceTest {
         assertThat(response.jsonPath().getString("name")).isEqualTo("신분당선");
         assertThat(response.jsonPath().getString("color")).isEqualTo("bg-red-600");
         List<StationResponse> stations = response.jsonPath().getList("stations", StationResponse.class);
-        assertThat(stations).containsExactlyInAnyOrder(new StationResponse(0L, "지하철역"), new StationResponse(1L, "새로운지하철역"));
-
+        assertThat(stations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(2L, "새로운지하철역"));
     }
 
 }
