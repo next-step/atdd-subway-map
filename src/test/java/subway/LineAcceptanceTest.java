@@ -100,6 +100,42 @@ public class LineAcceptanceTest {
         );
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @Test
+    @DisplayName("지하철 노선을 조회한다")
+    void getLine() {
+        // given
+        Long id = createRequest(
+                Map.of(
+                        "name", "신분당선",
+                        "color", "bg-red-600",
+                        "upStationId", 1L,
+                        "downStationId", 2L,
+                        "distance", 10
+                )
+        ).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all().pathParam("id", id)
+                .when().get("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        String lineNames = response.jsonPath().get("name");
+        String lineColors = response.jsonPath().get("color");
+        List<Long> stationIds = response.jsonPath().getList("stations.id.flatten()", Long.class); // flatten 시켜야 할지?
+        Assertions.assertAll(
+                () -> assertThat(lineNames).containsAnyOf("신분당선"),
+                () -> assertThat(lineColors).containsAnyOf("bg-red-600"),
+                () -> assertThat(stationIds).containsExactlyInAnyOrder(1L, 2L)
+        );
+    }
+
     private ExtractableResponse<Response> createRequest(Map<String, Object> body) {
         return RestAssured.given().log().all()
                 .body(body)

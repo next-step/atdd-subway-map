@@ -29,6 +29,10 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    public LineResponse getLine(Long id) {
+        return lineRepository.findById(id).map(this::createLineResponse).orElse(null);
+    }
+
     private LineResponse createLineResponse(Line line) {
         return new LineResponse(
                 line.getId(),
