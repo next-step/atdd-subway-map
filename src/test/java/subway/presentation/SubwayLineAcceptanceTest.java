@@ -8,6 +8,7 @@ import static subway.fixture.SubwayLineFixtures.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -26,18 +27,23 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
 	private static final String ROOT_PATH = "/lines";
 
+	@BeforeEach
+	void setUp() {
+		지하철역_생성(STATION_NAME_1);
+		지하철역_생성(STATION_NAME_2);
+		지하철역_생성(STATION_NAME_3);
+	}
+
 	// When 지하철 노선을 생성하면
 	// Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
 	@DisplayName("지하철노선을 생성하면 목록 조회 시 생성한 노선을 찾을 수 있다")
 	@Test
 	void 지하철노선을_생성하면_목록_조회_시_생성한_노선을_찾을_수_있다() {
 		// given
-		지하철역_생성(STATION_NAME_1);
-		지하철역_생성(STATION_NAME_2);
-
-		// when
 		ExtractableResponse<Response> createResponse = 지하철노선_생성(getSubwayLineRequest1());
 
+
+		// when
 		List<SubwayLineResponse.LineInfo> lineInfos = 지하철노선_목록조회().as(new TypeRef<>() {
 		});
 
@@ -55,10 +61,6 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선_2개를_생성하고_목록조회_시_2개의_노선을_조회할_수_있다() {
 		// given
-		지하철역_생성(STATION_NAME_1);
-		지하철역_생성(STATION_NAME_2);
-		지하철역_생성(STATION_NAME_3);
-
 		지하철노선_생성(getSubwayLineRequest1());
 		지하철노선_생성(getSubwayLineRequest2());
 
@@ -77,9 +79,6 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_조회하면_노선의_정보를_응답받을_수_있다() {
 		// given
-		지하철역_생성(STATION_NAME_1);
-		지하철역_생성(STATION_NAME_2);
-
 		Long id = 지하철노선_생성(getSubwayLineRequest1())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
@@ -106,9 +105,6 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_생성한_노선을_수정하면_수정된다() {
 		// given
-		지하철역_생성(STATION_NAME_1);
-		지하철역_생성(STATION_NAME_2);
-
 		Long id = 지하철노선_생성(getSubwayLineRequest1())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
@@ -133,9 +129,6 @@ public class SubwayLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_생성한_노선을_삭제하면_삭제된다() {
 		// given
-		지하철역_생성(STATION_NAME_1);
-		지하철역_생성(STATION_NAME_2);
-
 		Long id = 지하철노선_생성(getSubwayLineRequest1())
 			.as(new TypeRef<SubwayLineResponse.CreateInfo>() {
 			})
