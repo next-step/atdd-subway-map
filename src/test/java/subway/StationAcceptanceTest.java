@@ -29,10 +29,10 @@ public class StationAcceptanceTest {
 
         //when
         ExtractableResponse<Response> response = createSubwayStation("신림역");
-        List<String> stationNames = getStationNames();
 
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        List<String> stationNames = getStationNames();
         assertThat(stationNames).containsAnyOf("신림역");
     }
 
@@ -71,12 +71,12 @@ public class StationAcceptanceTest {
 
         //when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .basePath("/stations")
-            .pathParam("id", stationId)
-            .when().delete("{id}")
-            .then().log().all()
-            .extract();
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .basePath("/stations")
+                .pathParam("id", stationId)
+                .when().delete("{id}")
+                .then().log().all()
+                .extract();
         List<String> stationNames = getStationNames();
 
         //then
@@ -90,20 +90,20 @@ public class StationAcceptanceTest {
         params.put("name", stationName);
 
         return RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().post("/stations")
-            .then().log().all()
-            .extract();
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
     }
 
     private List<String> getStationNames() {
         return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
     }
 
 }
