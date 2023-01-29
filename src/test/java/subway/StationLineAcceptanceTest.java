@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
  * StationLineAcceptanceTest
@@ -32,7 +33,7 @@ public class StationLineAcceptanceTest {
      * When 지하철 노선을 생성하면
      * Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
      */
-    @DisplayName("지하철 노선을 생성하고 지하철 노선 목록 조회시 생성한 노선을 찾을 수 있다.")
+    @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLineAndGetListLine() {
         final String lineName = "4호선";
@@ -47,9 +48,11 @@ public class StationLineAcceptanceTest {
         // then
         JsonPath getJsonPath = getStationLines().body().jsonPath();
 
-        assertThat(getJsonPath.getList("id").size()).isEqualTo(1);
-        assertThat(getJsonPath.getList("name").get(0)).isEqualTo(lineName);
-        assertThat(getJsonPath.getList("color").get(0)).isEqualTo(color);
+        assertAll(
+            () -> assertThat(getJsonPath.getList("id").size()).isEqualTo(1),
+            () -> assertThat(getJsonPath.getList("name").get(0)).isEqualTo(lineName),
+            () -> assertThat(getJsonPath.getList("color").get(0)).isEqualTo(color)
+        );
     }
 
     /**
@@ -128,7 +131,7 @@ public class StationLineAcceptanceTest {
      * When 생성한 지하철 노선을 삭제하면
      * Then 해당 지하철 노선 정보는 삭제된다
      */
-    @DisplayName("지하철 노선을 생성하고 삭제한 후에 해당 노선을 조회했을 때 500 서버 에러가 발생한다.")
+    @DisplayName("지하철 노선을 생성하고 지하철역 제거한 후 목록을 조회하면 생성한 역을 찾을 수 없다.")
     @Test
     void deleteLineAndGet() {
         ExtractableResponse<Response> lineShinbundang = createStationLine("신분당선", "bg-red-600", 1L, 10L, "10");
@@ -138,7 +141,7 @@ public class StationLineAcceptanceTest {
         ExtractableResponse<Response> getStationLine = getStationLine(stationLineId);
 
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(getStationLine.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(getStationLine.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private ExtractableResponse<Response> deleteStationLine(Long stationLineId) {

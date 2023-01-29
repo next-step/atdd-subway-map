@@ -65,7 +65,7 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    @DisplayName("지하철역 제거한 후 목록을 조회하면 Response Status Code가 500으로 반환된다.")
+    @DisplayName("지하철역 제거한 후 목록을 조회하면 반환 값이 없다.")
     @Test
     void deleteStatus() {
         // given
@@ -84,7 +84,7 @@ public class StationAcceptanceTest {
                 .then().log().all()
                 .extract();
 
-        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private ExtractableResponse<Response> getStationList() {

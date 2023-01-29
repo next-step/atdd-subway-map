@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.Station;
 import subway.StationRepository;
 import subway.StationResponse;
+import subway.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +52,9 @@ public class StationLineService {
         return stationLineResponses;
     }
 
-    public StationLineResponse findOneStation(Long id) {
+    public StationLineResponse findOneStationLine(Long id) {
         StationLine stationLine = stationLineRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(NotFoundException::new);
 
         return getStationsInLine(stationLine);
     }

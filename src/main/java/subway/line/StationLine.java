@@ -1,7 +1,6 @@
 package subway.line;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +18,6 @@ import javax.persistence.Id;
  * @version 1.0.0
  * @since 2023. 01. 29.
  */
-@Builder
-@AllArgsConstructor
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,14 +33,24 @@ public class StationLine {
     @Column(length = 20, nullable = false)
     private String color;
 
-    @Column(length = 5, nullable = false)
+    @Column(nullable = false)
     private Long upStationId;
 
-    @Column(length = 5, nullable = false)
+    @Column(nullable = false)
     private Long downStationId;
 
-    @Column(length = 10, nullable = false)
+    @Column(nullable = false)
     private Integer distance;
+
+    @Builder
+    public StationLine(Long id, String name, String color, Long upStationId, Long downStationId, Integer distance) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.upStationId = upStationId;
+        this.downStationId = downStationId;
+        this.distance = distance;
+    }
 
     public void putStationLine(StationLine stationLine) {
         this.name = stationLine.getName();
