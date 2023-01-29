@@ -16,6 +16,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     private Long 강남역;
     private Long 역삼역;
     private Long 선릉역;
+    private Long 삼성역;
     private Long 이호선;
 
     @BeforeEach
@@ -25,6 +26,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         강남역 = 지하철역_생성함("강남역");
         역삼역 = 지하철역_생성함("역삼역");
         선릉역 = 지하철역_생성함("선릉역");
+        삼성역 = 지하철역_생성함("삼성역");
         이호선 = 노선_생성함("2호선", "bg-green-600", 강남역, 역삼역, 10);
     }
 
@@ -50,21 +52,25 @@ public class SectionAcceptanceTest extends AcceptanceTest {
     @Test
     void cannotAddSectionWhatIsUpStationNotEqualToLastDownStationInLine() {
         // when
-        final ExtractableResponse<Response> 구간_등록_응답 = 구간_등록_요청(이호선, 역삼역, 선릉역, 10);
+        final ExtractableResponse<Response> 구간_등록_응답 = 구간_등록_요청(이호선, 강남역, 선릉역, 10);
 
         // then
         하행_종점역을_상행역으로_하는_구간_등록_실패를_확인(구간_등록_응답, 이호선, "선릉역");
     }
 
     /**
+     * Given 한 개의 구간이 존재하는 지하철 노선에 새로운 구간을 추가하고
      * When 지하철 노선의 하행 종점역을 하행역으로 하는 구간을 등록하면
      * Then 지하철 구간 등록에 실패한다.
      */
     @DisplayName("새로운 구간의 하행역이 지하철 노선에 이미 등록되어있을 경우, 등록 불가")
     @Test
     void cannotAddSectionWhatDownStationIsAlreadyRegisteredInLIne() {
+        // given
+        구간_등록함(이호선, 역삼역, 선릉역, 10);
+
         // when
-        final ExtractableResponse<Response> 구간_등록_응답 = 구간_등록_요청(이호선, 역삼역, 선릉역, 10);
+        final ExtractableResponse<Response> 구간_등록_응답 = 구간_등록_요청(이호선, 선릉역, 역삼역, 10);
 
         // then
         노선에_이미_존재하는_역에_대한_구간_등록_실패를_확인(구간_등록_응답, 이호선, "선릉역");

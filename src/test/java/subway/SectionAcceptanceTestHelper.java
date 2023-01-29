@@ -38,6 +38,11 @@ public class SectionAcceptanceTestHelper extends AcceptanceTestHelper {
         assertThat(노선에_등록되어있는_역_이름_목록).containsAnyOf(stationName);
     }
 
+    static void 구간_등록함(final long lineId, final long upStationId, final long downStationId, final int distance) {
+        final ExtractableResponse<Response> response = 구간_등록_요청(lineId, upStationId, downStationId, distance);
+        응답_코드_검증(response, HttpStatus.OK);
+    }
+
     static void 하행_종점역을_상행역으로_하는_구간_등록_실패를_확인(final ExtractableResponse<Response> response, final long lineId, final String stationName) {
         응답_코드_검증(response, HttpStatus.UNPROCESSABLE_ENTITY);
         final String error_message = 에러_메세지_가져오기(response);
