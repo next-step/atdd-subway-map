@@ -10,7 +10,7 @@ import subway.line.business.model.Line;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LineCreateRequest {
+public class LineRequest {
 
     private String name;
     private String color;

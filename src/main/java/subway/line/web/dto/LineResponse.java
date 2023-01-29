@@ -7,14 +7,14 @@ import subway.station.StationResponse;
 import java.util.List;
 
 @Getter
-public class LineCreateResponse {
+public class LineResponse {
 
     private Long id;
     private String name;
     private String color;
     private List<StationResponse> stations;
 
-    public LineCreateResponse(Line line, List<StationResponse> stations) {
+    public LineResponse(Line line, List<StationResponse> stations) {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();

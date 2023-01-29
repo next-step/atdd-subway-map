@@ -8,27 +8,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.line.web.dto.LineCreateRequest;
+import subway.RestUtils;
+import subway.line.web.dto.LineRequest;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
+    private List<LineRequest> requests;
+
     @PostConstruct
-    void createStations() {
-        List<String> names = List.of("강남역", "양재역", "판교역");
-        for (String name : names) {
-                RestAssured.given().log().all()
-                    .body(Map.of("name", name))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .when().post("/stations")
-                    .then().log().all()
-                    .statusCode(HttpStatus.CREATED.value());
-        }
+    void init() {
+        createStations();
+        this.requests = getRequests();
     }
 
     /**
@@ -39,18 +38,12 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        LineCreateRequest request = LineCreateRequest.builder()
-                .name("신분당선")
-                .color("bg-red-600")
-                .upStationId(1L)
-                .downStationId(2L)
-                .distance(10)
-                .build();
-
+        LineRequest request = requests.get(0);
         create(request);
 
         // then
-        // TODO : 노선 목록 조회
+        List<String> lineNames = RestUtils.getListFromResponse(getAllLines(), "name", String.class);
+        assertThat(lineNames).contains(request.getName());
     }
 
     /**
@@ -60,8 +53,17 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선 목록 조회")
     @Test
-    void getAllLines() {
+    void getLines() {
+        // given
+        for (LineRequest request : requests) {
+            create(request);
+        }
 
+        // when
+        List<String> lineNames = RestUtils.getListFromResponse(getAllLines(),"name", String.class);
+
+        // then
+        assertThat(lineNames).containsAll(requests.stream().map(LineRequest::getName).collect(Collectors.toList()));
     }
 
     /**
@@ -97,13 +99,53 @@ public class LineAcceptanceTest {
 
     }
 
-    private ExtractableResponse<Response> create(LineCreateRequest request) {
+    private List<LineRequest> getRequests() {
+        LineRequest request1 = LineRequest.builder()
+                .name("신분당선")
+                .color("bg-red-600")
+                .upStationId(1L)
+                .downStationId(2L)
+                .distance(10)
+                .build();
+
+        LineRequest request2 = LineRequest.builder()
+                .name("분당선")
+                .color("bg-yellow-600")
+                .upStationId(1L)
+                .downStationId(3L)
+                .distance(10)
+                .build();
+
+        return List.of(request1, request2);
+    }
+
+    private void createStations() {
+        List<String> names = List.of("강남역", "양재역", "판교역");
+        for (String name : names) {
+            RestAssured.given().log().all()
+                    .body(Map.of("name", name))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .when().post("/stations")
+                    .then().log().all()
+                    .statusCode(HttpStatus.CREATED.value());
+        }
+    }
+
+    private ExtractableResponse<Response> create(LineRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getAllLines() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract();
     }
 
