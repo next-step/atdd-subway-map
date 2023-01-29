@@ -2,8 +2,8 @@ package subway.application.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.application.service.output.LineRepositoryPort;
 import subway.application.service.input.LineCommandUseCase;
+import subway.application.service.output.LineCommandRepository;
 import subway.domain.LineCreateDomain;
 import subway.domain.LineUpdateDomain;
 
@@ -11,25 +11,25 @@ import subway.domain.LineUpdateDomain;
 @Transactional
 class LineCommandService implements LineCommandUseCase {
 
-    private final LineRepositoryPort lineRepositoryPort;
+    private final LineCommandRepository lineCommandRepository;
 
-    LineCommandService(LineRepositoryPort lineRepositoryPort) {
-        this.lineRepositoryPort = lineRepositoryPort;
+    LineCommandService(LineCommandRepository lineCommandRepository) {
+        this.lineCommandRepository = lineCommandRepository;
     }
 
     @Override
     public Long createLine(LineCreateDomain lineCreateDomain) {
-        return lineRepositoryPort.createLine(lineCreateDomain);
+        return lineCommandRepository.createLine(lineCreateDomain);
     }
 
     @Override
     public void updateLine(LineUpdateDomain toDomain) {
-        lineRepositoryPort.updateLine(toDomain);
+        lineCommandRepository.updateLine(toDomain);
     }
 
     @Override
     public void deleteLine(Long lineId) {
-        lineRepositoryPort.deleteLine(lineId);
+        lineCommandRepository.deleteLine(lineId);
     }
 
 }

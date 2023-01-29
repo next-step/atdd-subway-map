@@ -1,19 +1,11 @@
 package subway.application.service.output;
 
 import subway.domain.LineCreateDomain;
-import subway.domain.LineDomain;
 import subway.domain.LineUpdateDomain;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface LineRepositoryPort {
+public interface LineCommandRepository {
 
     Long createLine(LineCreateDomain lineCreateDomain);
-
-    Optional<LineDomain> loadLine(Long createdLineId);
-
-    List<LineDomain> loadLines();
 
     void updateLine(LineUpdateDomain toDomain);
 

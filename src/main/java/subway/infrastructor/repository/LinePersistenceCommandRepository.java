@@ -1,7 +1,8 @@
 package subway.infrastructor.repository;
 
 import org.springframework.stereotype.Component;
-import subway.application.service.output.LineRepositoryPort;
+import subway.application.service.output.LineLoadRepository;
+import subway.application.service.output.LineCommandRepository;
 import subway.domain.*;
 
 import java.util.List;
@@ -9,13 +10,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-class LinePersistenceRepository implements LineRepositoryPort {
+class LinePersistenceCommandRepository implements LineCommandRepository, LineLoadRepository {
 
-    private final LineRepository lineRepository;
+    private final subway.infrastructor.repository.LineRepository lineRepository;
     private final StationRepository stationRepository;
     private final LineMapper lineMapper;
 
-    public LinePersistenceRepository(LineRepository lineRepository, StationRepository stationRepository, LineMapper lineMapper) {
+    public LinePersistenceCommandRepository(subway.infrastructor.repository.LineRepository lineRepository, StationRepository stationRepository, LineMapper lineMapper) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
         this.lineMapper = lineMapper;
