@@ -31,4 +31,13 @@ public class StationAcceptanceFactory {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteStation(Long stationId) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete(STATION_BASE_URL + "/" + stationId)
+                .then().log().all()
+                .extract();
+    }
 }
