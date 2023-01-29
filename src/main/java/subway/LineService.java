@@ -23,13 +23,13 @@ public class LineService {
         return createLineResponse(line);
     }
 
-    public List<LineResponse> getLines() {
+    public List<LineResponse> findAllLines() {
         return lineRepository.findAll().stream()
             .map(this::createLineResponse)
             .collect(Collectors.toList());
     }
 
-    public LineResponse getLine(Long id) {
+    public LineResponse findLineById(Long id) {
         return lineRepository.findById(id).map(this::createLineResponse).orElse(null);
     }
 

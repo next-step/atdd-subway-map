@@ -6,12 +6,12 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,28 +30,17 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 생성한다")
     void createLine() {
         // when
-        ExtractableResponse<Response> response = createRequest(
-            Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10
-            )
-        );
+        ExtractableResponse<Response> response = createRequest(createBody("신분당선"));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        ExtractableResponse<Response> linesResponse = getLinesRequest();
-        List<String> lineNames = linesResponse.jsonPath().getList("name", String.class);
-        List<String> lineColors = linesResponse.jsonPath().getList("color", String.class);
-        List<Long> stationIds = linesResponse.jsonPath().getList("stations.id.flatten()", Long.class);
+        ExtractableResponse<Response> linesResponse = getAllLinesRequest();
         Assertions.assertAll(
-            () -> assertThat(lineNames).containsAnyOf("신분당선"),
-            () -> assertThat(lineColors).containsAnyOf("bg-red-600"),
-            () -> assertThat(stationIds).containsExactlyInAnyOrder(1L, 2L)
+            withNames(linesResponse, "신분당선"),
+            withColors(linesResponse, "bg-red-600"),
+            withStationIds(linesResponse, 1L, 2L)
         );
     }
 
@@ -62,41 +51,22 @@ public class LineAcceptanceTest {
      */
     @Test
     @DisplayName("지하철 노선 목록을 조회한다")
-    void getLines() {
+    void getAllLines() {
         // given
-        createRequest(
-            Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10
-            )
-        );
-        createRequest(
-            Map.of(
-                "name", "분당선",
-                "color", "bg-green-600",
-                "upStationId", 1L,
-                "downStationId", 3L,
-                "distance", 15
-            )
-        );
+        createRequest(createBody("신분당선"));
+        createRequest(createBody("분당선"));
 
         // when
-        ExtractableResponse<Response> response = getLinesRequest();
+        ExtractableResponse<Response> response = getAllLinesRequest();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // then
-        List<String> lineNames = response.jsonPath().getList("name", String.class);
-        List<String> lineColors = response.jsonPath().getList("color", String.class);
-        List<Long> stationIds = response.jsonPath().getList("stations.id.flatten()", Long.class); // flatten 시켜야 할지?
         Assertions.assertAll(
-            () -> assertThat(lineNames).containsAnyOf("신분당선", "분당선"),
-            () -> assertThat(lineColors).containsAnyOf("bg-red-600", "bg-green-600"),
-            () -> assertThat(stationIds).containsExactlyInAnyOrder(1L, 2L, 1L, 3L)
+            withNames(response, "신분당선", "분당선"),
+            withColors(response, "bg-red-600", "bg-green-600"),
+            withStationIds(response, 1L, 2L, 1L, 3L)
         );
     }
 
@@ -109,27 +79,16 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 조회한다")
     void getLine() {
         // given
-        Long id = createRequest(
-            Map.of(
-                "name", "신분당선",
-                "color", "bg-red-600",
-                "upStationId", 1L,
-                "downStationId", 2L,
-                "distance", 10
-            )
-        ).jsonPath().getLong("id");
+        Long id = createRequest(createBody("신분당선")).jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = getLineRequest(id);
 
         // then
-        String lineNames = response.jsonPath().get("name");
-        String lineColors = response.jsonPath().get("color");
-        List<Long> stationIds = response.jsonPath().getList("stations.id.flatten()", Long.class); // flatten 시켜야 할지?
         Assertions.assertAll(
-            () -> assertThat(lineNames).containsAnyOf("신분당선"),
-            () -> assertThat(lineColors).containsAnyOf("bg-red-600"),
-            () -> assertThat(stationIds).containsExactlyInAnyOrder(1L, 2L)
+            withName(response, "신분당선"),
+            withColor(response, "bg-red-600"),
+            withStationIds(response, 1L, 2L)
         );
     }
 
@@ -142,15 +101,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 수정한다")
     void updateLine() {
         //given
-        Long id = createRequest(
-            Map.of(
-                "name", "분당선",
-                "color", "bg-green-600",
-                "upStationId", 1L,
-                "downStationId", 3L,
-                "distance", 15
-            )
-        ).jsonPath().getLong("id");
+        Long id = createRequest(createBody("분당선")).jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -169,11 +120,9 @@ public class LineAcceptanceTest {
 
         // then
         ExtractableResponse<Response> lineResponse = getLineRequest(id);
-        String lineName = lineResponse.jsonPath().get("name");
-        String lineColor = lineResponse.jsonPath().get("color");
         Assertions.assertAll(
-            () -> assertThat(lineName).containsAnyOf("다른분당선"),
-            () -> assertThat(lineColor).containsAnyOf("bg-red-600")
+            withName(lineResponse, "다른분당선"),
+            withColor(lineResponse,"bg-red-600")
         );
     }
 
@@ -186,15 +135,7 @@ public class LineAcceptanceTest {
     @DisplayName("지하철 노선을 삭제한다")
     void deleteLine() {
         // given
-        Long id = createRequest(
-            Map.of(
-                "name", "분당선",
-                "color", "bg-green-600",
-                "upStationId", 1L,
-                "downStationId", 3L,
-                "distance", 15
-            )
-        ).jsonPath().getLong("id");
+        Long id = createRequest(createBody("신분당선")).jsonPath().getLong("id");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -216,7 +157,7 @@ public class LineAcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> getLinesRequest() {
+    private ExtractableResponse<Response> getAllLinesRequest() {
         return RestAssured.given().log().all()
             .when().get("/lines")
             .then().log().all()
@@ -228,5 +169,45 @@ public class LineAcceptanceTest {
             .when().get("/lines/{id}")
             .then().log().all()
             .extract();
+    }
+
+    private Map<String, Object> createBody(String name) {
+        Map<String, Map<String, Object>> lines = Map.of(
+            "신분당선", Map.of(
+                "name", "신분당선",
+                "color", "bg-red-600",
+                "upStationId", 1L,
+                "downStationId", 2L,
+                "distance", 10
+            ),
+            "분당선", Map.of(
+                "name", "분당선",
+                "color", "bg-green-600",
+                "upStationId", 1L,
+                "downStationId", 3L,
+                "distance", 15
+            )
+        );
+        return lines.getOrDefault(name, lines.get("신분당선"));
+    }
+
+    private Executable withNames(ExtractableResponse<Response> response, String...names) {
+        return () -> assertThat(response.jsonPath().getList("name", String.class)).containsAnyOf(names);
+    }
+
+    private Executable withColors(ExtractableResponse<Response> response, String...colors) {
+        return () -> assertThat(response.jsonPath().getList("color", String.class)).containsAnyOf(colors);
+    }
+
+    private Executable withStationIds(ExtractableResponse<Response> response, Long...ids) {
+        return () -> assertThat(response.jsonPath().getList("stations.id.flatten()", Long.class)).containsExactlyInAnyOrder(ids);
+    }
+
+    private Executable withName(ExtractableResponse<Response> response, String name) {
+        return () -> assertThat((String) response.jsonPath().get("name")).isEqualTo(name);
+    }
+
+    private Executable withColor(ExtractableResponse<Response> response, String color) {
+        return () -> assertThat((String) response.jsonPath().get("color")).isEqualTo(color);
     }
 }
