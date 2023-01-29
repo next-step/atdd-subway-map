@@ -15,6 +15,8 @@ class AcceptanceTest {
     public static final String STATION_BASE_URL = "/stations";
     public static final String DELETE_STATION_URL = STATION_BASE_URL + "/{stationId}";
 
+    public static final String LINE_BASE_URL = "/lines";
+
     public static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> requestBody) {
         return given().log().all()
                 .body(requestBody)
