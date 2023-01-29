@@ -12,7 +12,7 @@ public class StationLane {
   private Long id;
 
   @Column(name = "name")
-  private Integer laneNumber; // 노선 번호
+  private String name; // 노선 번호
 
   @ManyToOne
   private Station inboundStation; // 상행역
@@ -22,8 +22,8 @@ public class StationLane {
 
   public StationLane() {}
 
-  public StationLane(Integer laneNumber, Station inboundStation, Station outboundStation) {
-    this.laneNumber = laneNumber;
+  public StationLane(String name, Station inboundStation, Station outboundStation) {
+    this.name = name;
     this.inboundStation = inboundStation;
     this.outboundStation = outboundStation;
   }
@@ -36,8 +36,8 @@ public class StationLane {
     this.id = id;
   }
 
-  public Integer getLaneNumber() {
-    return laneNumber;
+  public String getName() {
+    return name;
   }
 
   public Station getInboundStation() {

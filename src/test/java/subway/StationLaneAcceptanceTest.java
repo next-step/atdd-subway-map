@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import subway.Mocks.*;
 import subway.stationLine.StationLane;
 
 @DisplayName("지하철 노선 관리 기능")
@@ -21,9 +22,9 @@ public class StationLaneAcceptanceTest {
   @Test
   void 지하철_노선_생성_테스트() {
     // when
-    StationLane line = 지하철_노선_생성();
+    StationLane line = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
-    assertThat(지하철_노선_조회(line.getLaneNumber())).isEqualTo(line);
+    assertThat(지하철_노선_조회(line.getName())).isEqualTo(line);
   }
 
   /**
@@ -34,8 +35,8 @@ public class StationLaneAcceptanceTest {
   @DisplayName("지하철노선 목록 조회 테스트")
   @Test
   void 지하철_노선_목록_조회_테스트() {
-    StationLane line1 = 지하철_노선_생성();
-    StationLane line2 = 지하철_노선_생성();
+    StationLane line1 = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
+    StationLane line2 = 지하철_노선_생성(Lane.신분당선, Station.강남역, Station.신사역);
 
     assertThat(지하철_노선_목록_조회()).containsAll(List.of(line1,line2));
   }
@@ -49,10 +50,10 @@ public class StationLaneAcceptanceTest {
   @Test
   void 지하철_노선_조회_테스트() {
     // given
-    StationLane created = 지하철_노선_생성();
+    StationLane created = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
     // when
-    StationLane show = 지하철_노선_조회(created.getLaneNumber());
+    StationLane show = 지하철_노선_조회(created.getName());
 
     // then
     assertThat(show.getId()).isEqualTo(created.getId());
@@ -67,13 +68,13 @@ public class StationLaneAcceptanceTest {
   @Test
   void 지하철_노선_수정_테스트() {
     // given
-    StationLane created = 지하철_노선_생성();
+    StationLane created = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
     // when
-    StationLane updated = 지하철_노선_수정(created.getLaneNumber());
+    StationLane updated = 지하철_노선_수정(created.getName());
 
     // then
-    assertThat(지하철_노선_조회(updated.getLaneNumber())).isEqualTo(updated);
+    assertThat(지하철_노선_조회(updated.getName())).isEqualTo(updated);
   }
 
   /**
@@ -85,20 +86,20 @@ public class StationLaneAcceptanceTest {
   @Test
   void 지하철_노선_삭제_테스트() {
     // given
-    StationLane line = 지하철_노선_생성();
+    StationLane line = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
     // when
-    지하철_노선_삭제(line.getLaneNumber());
+    지하철_노선_삭제(line.getName());
 
     // then
-    assertThat(지하철_노선_조회(line.getLaneNumber())).isNull();
+    assertThat(지하철_노선_조회(line.getName())).isNull();
   }
 
-  private StationLane 지하철_노선_생성() {
+  private StationLane 지하철_노선_생성(String name, String inbound, String outbound) {
     return null;
   }
 
-  private StationLane 지하철_노선_조회(Integer lane) {
+  private StationLane 지하철_노선_조회(String name) {
     return null;
   }
 
@@ -106,11 +107,11 @@ public class StationLaneAcceptanceTest {
     return null;
   }
 
-  private StationLane 지하철_노선_수정(Integer lane) {
+  private StationLane 지하철_노선_수정(String name) {
     return null;
   }
 
-  private void 지하철_노선_삭제(Integer lane) {
+  private void 지하철_노선_삭제(String name) {
 
   }
 }

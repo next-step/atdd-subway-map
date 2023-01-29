@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import subway.Mocks.Station;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -29,7 +30,7 @@ public class StationAcceptanceTest {
     void createStation() {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", MockStations.강남역);
+        params.put("name", Station.강남역);
 
         ExtractableResponse<Response> response = StationTestUtils.prepareRestAssuredGiven(params)
             .when().post("/stations")
@@ -41,7 +42,7 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = 지하철역_조회();
-        assertThat(stationNames).containsAnyOf(MockStations.강남역);
+        assertThat(stationNames).containsAnyOf(Station.강남역);
     }
 
     /**
@@ -53,7 +54,7 @@ public class StationAcceptanceTest {
     @DisplayName("등록된 지하철역 목록을 조회한다.")
     void showStations() {
         // given
-        StationTestUtils.createStations(List.of(MockStations.서울대입구역, MockStations.봉천역));
+        StationTestUtils.createStations(List.of(Station.서울대입구역, Station.봉천역));
 
         // when
         List<String> stationNames = 지하철역_조회();
@@ -62,7 +63,7 @@ public class StationAcceptanceTest {
         assertAll(
             () -> assertThat(stationNames.size()).isEqualTo(2),
             () -> assertThat(stationNames).containsAll(
-                List.of(MockStations.서울대입구역, MockStations.봉천역)
+                List.of(Station.서울대입구역, Station.봉천역)
             )
         );
     }
