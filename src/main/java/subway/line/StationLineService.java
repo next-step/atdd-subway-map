@@ -32,13 +32,7 @@ public class StationLineService {
     @Transactional
     public StationLineResponse createStationLines(StationLineCreateRequest stationLineCreateRequest) {
         StationLine stationLine = stationLineRepository.save(stationLineCreateRequest.toEntity());
-        List<Station> stations = stationRepository.findAllByIdIn(List.of(stationLine.getDownStationId(), stationLine.getUpStationId()));
-        return StationLineResponse.from(
-                stationLine,
-                stations.stream()
-                        .map(StationResponse::from)
-                        .collect(Collectors.toList())
-        );
+        return getStationsInLine(stationLine);
     }
 
     public List<StationLineResponse> findAllStations() {
@@ -55,5 +49,22 @@ public class StationLineService {
         }
 
         return stationLineResponses;
+    }
+
+    public StationLineResponse findOneStation(Long id) {
+        StationLine stationLine = stationLineRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        return getStationsInLine(stationLine);
+    }
+
+    private StationLineResponse getStationsInLine(StationLine stationLine) {
+        List<Station> stations = stationRepository.findAllByIdIn(List.of(stationLine.getDownStationId(), stationLine.getUpStationId()));
+        return StationLineResponse.from(
+                stationLine,
+                stations.stream()
+                        .map(StationResponse::from)
+                        .collect(Collectors.toList())
+        );
     }
 }
