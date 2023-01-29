@@ -2,6 +2,7 @@ package subway.line.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.dto.LineRequest;
 import subway.line.dto.LineResponse;
@@ -18,7 +19,7 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(LineRequest request) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest request) {
         LineResponse line = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/stations/" + line.getId())).body(line);
     }

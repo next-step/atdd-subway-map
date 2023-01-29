@@ -21,9 +21,12 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
+
         Station upStation = stationService.findById(request.getUpStationId());
         Station downStation = stationService.findById(request.getUpStationId());
         Line line = Line.of(request, upStation, downStation);
+
+
 
         lineRepository.save(line);
         return LineResponse.of(line);

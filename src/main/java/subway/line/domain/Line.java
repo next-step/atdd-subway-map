@@ -25,7 +25,7 @@ public class Line {
     private Station upStation;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "up_station_id")
+    @JoinColumn(name = "down_station_id")
     private Station downStation;
 
     protected Line() {

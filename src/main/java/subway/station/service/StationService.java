@@ -43,7 +43,7 @@ public class StationService {
         );
     }
 
-    public Station findById(Long upStationId) {
-        return stationRepository.findById(upStationId).orElseThrow(RuntimeException::new);
+    public Station findById(Long id) {
+        return stationRepository.findById(id).orElseThrow(RuntimeException::new);
     }
 }
