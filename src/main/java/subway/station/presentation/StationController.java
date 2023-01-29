@@ -1,10 +1,15 @@
 package subway.station.presentation;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import subway.station.presentation.dto.request.StationRequest;
-import subway.station.presentation.dto.response.StationResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import subway.station.application.StationService;
+import subway.station.application.dto.request.StationRequest;
+import subway.station.application.dto.response.StationResponse;
 
 import java.net.URI;
 import java.util.List;

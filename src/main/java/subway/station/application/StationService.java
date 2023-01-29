@@ -2,10 +2,10 @@ package subway.station.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.application.dto.request.StationRequest;
+import subway.station.application.dto.response.StationResponse;
 import subway.station.domain.Station;
 import subway.station.domain.StationRepository;
-import subway.station.presentation.dto.request.StationRequest;
-import subway.station.presentation.dto.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
