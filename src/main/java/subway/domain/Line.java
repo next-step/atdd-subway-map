@@ -77,6 +77,9 @@ public class Line {
         if (!getLastDownStation().equals(station)) {
             throw new BusinessException(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_NOT_LAST_SECTION);
         }
+        if (this.sections.size() < 2) {
+            throw new BusinessException(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_LAST_REMAINING_SECTION);
+        }
         final Section lastSection = this.sections.stream()
                 .filter(section -> section.getDownStation().equals(station))
                 .findFirst().get();
