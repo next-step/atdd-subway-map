@@ -82,13 +82,13 @@ public class StationAcceptanceTest {
         assertDoseNotContainsStation("강남역");
     }
 
-    private List<Station> requestSaveStation(String... stationNames) {
+    public static List<Station> requestSaveStation(String... stationNames) {
         return Arrays.stream(stationNames)
-                .map(this::requestSaveStation)
+                .map(StationAcceptanceTest::requestSaveStation)
                 .collect(Collectors.toList());
     }
 
-    private Station requestSaveStation(String stationName) {
+    public static Station requestSaveStation(String stationName) {
         // when
         return RestAssured.given().log().all()
                 .body(new StationRequest(stationName))
