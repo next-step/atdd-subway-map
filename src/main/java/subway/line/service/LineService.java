@@ -3,17 +3,13 @@ package subway.line.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.line.dto.LineCreateRequest;
-import subway.line.dto.LineResponse;
 import subway.line.dto.LineUpdateRequest;
 import subway.line.entity.Line;
 import subway.line.repository.LineRepository;
 import subway.section.repository.SectionRepository;
-import subway.station.entity.Station;
 import subway.station.repository.StationRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -25,24 +21,16 @@ public class LineService {
     private final SectionRepository sectionRepository;
 
     @Transactional
-    public LineResponse save(LineCreateRequest lineCreateRequest) {
-        Station upStation = stationRepository.findById(lineCreateRequest.getUpStationId()).orElseThrow();
-        Station downStation = stationRepository.findById(lineCreateRequest.getDownStationId()).orElseThrow();
-
-        Line line = lineRepository.save(lineCreateRequest.toEntity(upStation, downStation));
-        return LineResponse.from(line);
+    public Line save(Line entity) {
+        return lineRepository.save(entity); // 서비스에서 repository 호출만하고 있는데 contoller에서는 직접 호출하는게 낫지 않을까?
     }
 
-    public List<LineResponse> findAll() {
-        return lineRepository.findAll()
-                .stream()
-                .map(LineResponse::from)
-                .collect(Collectors.toList());
+    public List<Line> findAll() {
+        return lineRepository.findAll();
     }
 
-    public LineResponse findById(Long id) {
+    public Line findById(Long id) {
         return lineRepository.findById(id)
-                .map(LineResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("노선을 조회 할 수 없습니다. id : " + id));
     }
 
