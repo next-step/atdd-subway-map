@@ -3,6 +3,7 @@ package subway.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
+import subway.application.dto.addSectionRequest;
 import subway.application.dto.LineRequest;
 import subway.application.dto.LineResponse;
 import subway.application.dto.UpdateLineRequest;
@@ -51,5 +52,13 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable final Long lineId) {
         lineService.deleteLine(lineId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{lineId}/sections")
+    public ResponseEntity<LineResponse> addSection(
+            @PathVariable final Long lineId,
+            @RequestBody final addSectionRequest addSectionRequest) {
+        final LineResponse lineResponse = lineService.addSection(lineId, addSectionRequest);
+        return ResponseEntity.ok(lineResponse);
     }
 }

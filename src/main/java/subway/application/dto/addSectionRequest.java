@@ -1,6 +1,6 @@
 package subway.application.dto;
 
-public class CreateSectionRequest {
+public class addSectionRequest {
 
     private String downStationId;
     private String upStationId;

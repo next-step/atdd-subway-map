@@ -2,7 +2,7 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.application.dto.CreateSectionRequest;
+import subway.application.dto.addSectionRequest;
 import subway.application.dto.LineRequest;
 import subway.application.dto.LineResponse;
 import subway.application.dto.UpdateLineRequest;
@@ -66,12 +66,12 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse addSection(final long lineId, final CreateSectionRequest createSectionRequest) {
+    public LineResponse addSection(final long lineId, final addSectionRequest addSectionRequest) {
         final Line line = getLine(lineId);
-        final Station upStation = stationService.findStationById(Long.parseLong(createSectionRequest.getUpStationId()));
-        final Station downStation = stationService.findStationById(Long.parseLong(createSectionRequest.getDownStationId()));
+        final Station upStation = stationService.findStationById(Long.parseLong(addSectionRequest.getUpStationId()));
+        final Station downStation = stationService.findStationById(Long.parseLong(addSectionRequest.getDownStationId()));
 
-        line.addSection(upStation, downStation, createSectionRequest.getDistance());
+        line.addSection(upStation, downStation, addSectionRequest.getDistance());
         return new LineResponse(line);
     }
 

@@ -32,7 +32,7 @@ public class SectionAcceptanceTestHelper extends AcceptanceTestHelper {
     }
 
     static void 구간이_정상적으로_등록되었는지_확인(final ExtractableResponse<Response> response, final long lineId, final String stationName) {
-        응답_코드_검증(response, HttpStatus.CREATED);
+        응답_코드_검증(response, HttpStatus.OK);
         final ExtractableResponse<Response> 노선_상세_조회_응답 = 노선_상세_조회함(lineId);
         final List<String> 노선에_등록되어있는_역_이름_목록 = 노선_상세_조회_응답.jsonPath().getList("stations.name", String.class);
         assertThat(노선에_등록되어있는_역_이름_목록).containsAnyOf(stationName);
