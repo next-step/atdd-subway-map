@@ -3,6 +3,8 @@ package subway.domain;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "LINE")
@@ -41,12 +43,21 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return this.sections.stream().findFirst().get().getUpStation();
-    }
-
-    public Station getDownStation() {
-        return this.sections.stream().findFirst().get().getDownStation();
+    public List<Station> getStations() {
+        Station lastUpStation = this.sections.stream().findFirst().get().getUpStation();
+        while (true) {
+            final Station finalUpStation = lastUpStation;
+            final Optional<Section> findSection = this.sections.stream()
+                    .filter(section -> section.getDownStation().equals(finalUpStation))
+                    .findAny();
+            if (findSection.isEmpty()) break;
+            lastUpStation = findSection.get().getUpStation();
+        }
+        final List<Station> stations = this.sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toList());
+        stations.add(0, lastUpStation);
+        return stations;
     }
 
     public void update(final String name, final String color) {
