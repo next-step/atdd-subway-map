@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import subway.web.request.LineCreateRequest;
+import subway.web.request.LineUpdateRequest;
 import subway.web.response.StationResponse;
 
 import java.util.HashMap;
@@ -135,6 +136,51 @@ class LineAcceptanceTest {
         assertThat(actual.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(actual.jsonPath().getLong("id")).isEqualTo(given_신분당선_id);
         assertThat(actual.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(actual.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        List<StationResponse> lineStations = actual.jsonPath().getList("stations", StationResponse.class);
+        assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(given_신분당선_id, "지하철역"), new StationResponse(2L, "새로운지하철역"));
+    }
+
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("지하철 노선을 수정 할 수 있다")
+    @Test
+    void updateStation() {
+        // Given
+        StationResponse 지하철역 = createStation("지하철역").as(StationResponse.class);
+        StationResponse 새로운지하철역 = createStation("새로운지하철역").as(StationResponse.class);
+
+        LineCreateRequest given_신분당선 = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
+        long given_신분당선_id = 1L;
+        createLine(given_신분당선, given_신분당선_id, 지하철역, 새로운지하철역);
+
+        // When
+        LineUpdateRequest lineUpdateRequest = new LineUpdateRequest("다른분당선", "bg-red-600");
+
+        ExtractableResponse<Response> 다른분당선_response = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .body(lineUpdateRequest)
+            .pathParam("lineId", given_신분당선_id)
+            .when().put("/lines/{lineId}")
+            .then().log().all()
+            .extract();
+
+        assertThat(다른분당선_response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // Then
+        ExtractableResponse<Response> actual = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", given_신분당선_id)
+            .when().get("/lines/{lineId}")
+            .then().log().all()
+            .extract();
+
+        // Then
+        assertThat(actual.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(actual.jsonPath().getLong("id")).isEqualTo(given_신분당선_id);
+        assertThat(actual.jsonPath().getString("name")).isEqualTo("다른분당선");
         assertThat(actual.jsonPath().getString("color")).isEqualTo("bg-red-600");
         List<StationResponse> lineStations = actual.jsonPath().getList("stations", StationResponse.class);
         assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(given_신분당선_id, "지하철역"), new StationResponse(2L, "새로운지하철역"));
