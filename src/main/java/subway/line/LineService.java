@@ -2,6 +2,7 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.station.StationResponse;
 import subway.station.StationService;
 
 import java.util.List;
@@ -52,13 +53,10 @@ public class LineService {
     }
 
     private LineResponse createLineResponse(Line line) {
-        return new LineResponse(
-                line.getId(),
-                line.getName(),
-                line.getColor(),
-                line.getStationIds().stream()
-                        .map(stationService::findStationById)
-                        .collect(Collectors.toList())
-        );
+        List<StationResponse> stations = line.getStationIds()
+                .stream()
+                .map(stationService::findStationById)
+                .collect(Collectors.toList());
+        return LineResponse.toResponse(line, stations);
     }
 }

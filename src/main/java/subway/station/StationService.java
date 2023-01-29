@@ -18,30 +18,23 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationRepository.save(new Station(stationRequest.getName()));
-        return createStationResponse(station);
+        return StationResponse.toResponse(station);
     }
 
     public List<StationResponse> findAllStations() {
         return stationRepository.findAll().stream()
-                .map(this::createStationResponse)
+                .map(StationResponse::toResponse)
                 .collect(Collectors.toList());
     }
 
     public StationResponse findStationById(Long id) {
         Station station = stationRepository.findById(id)
                 .orElseThrow(StationException::new);
-        return createStationResponse(station);
+        return StationResponse.toResponse(station);
     }
 
     @Transactional
     public void deleteStationById(Long id) {
         stationRepository.deleteById(id);
-    }
-
-    private StationResponse createStationResponse(Station station) {
-        return new StationResponse(
-                station.getId(),
-                station.getName()
-        );
     }
 }

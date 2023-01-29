@@ -32,4 +32,12 @@ public class LineResponse {
     public List<StationResponse> getStations() {
         return stations;
     }
+
+    public static LineResponse toResponse(Line line, List<StationResponse> stations) {
+        return new LineResponse(
+                line.getId(),
+                line.getName(),
+                line.getColor(),
+                stations);
+    }
 }
