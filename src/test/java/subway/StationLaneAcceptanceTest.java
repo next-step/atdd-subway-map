@@ -28,7 +28,7 @@ public class StationLaneAcceptanceTest {
     // when
     StationLane line = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
-    assertThat(지하철_노선_조회(line.getName())).isEqualTo(line);
+    assertThat(지하철_노선_조회(line.getId())).isEqualTo(line);
   }
 
   /**
@@ -57,7 +57,7 @@ public class StationLaneAcceptanceTest {
     StationLane created = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
     // when
-    StationLane show = 지하철_노선_조회(created.getName());
+    StationLane show = 지하철_노선_조회(created.getId());
 
     // then
     assertThat(show.getId()).isEqualTo(created.getId());
@@ -75,10 +75,10 @@ public class StationLaneAcceptanceTest {
     StationLane created = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
     // when
-    StationLane updated = 지하철_노선_수정(created.getName());
+    StationLane updated = 지하철_노선_수정(created.getId(), "이름이_바뀐_2호선", Station.서울대입구역, Station.봉천역);
 
     // then
-    assertThat(지하철_노선_조회(updated.getName())).isEqualTo(updated);
+    assertThat(지하철_노선_조회(updated.getId())).isEqualTo(updated);
   }
 
   /**
@@ -93,10 +93,10 @@ public class StationLaneAcceptanceTest {
     StationLane line = 지하철_노선_생성(Lane.서울2호선, Station.서울대입구역, Station.봉천역);
 
     // when
-    지하철_노선_삭제(line.getName());
+    지하철_노선_삭제(line.getId());
 
     // then
-    assertThat(지하철_노선_조회(line.getName())).isNull();
+    assertThat(지하철_노선_조회(line.getId())).isNull();
   }
 
   private StationLane 지하철_노선_생성(String name, String inbound, String outbound) {
@@ -112,19 +112,33 @@ public class StationLaneAcceptanceTest {
         .extract().body().as(StationLane.class);
   }
 
-  private StationLane 지하철_노선_조회(String name) {
-    return null;
+  private StationLane 지하철_노선_조회(Long id) {
+    return RestAssured
+        .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().get("/stationline/" + id)
+        .then()
+        .extract().body().as(StationLane.class);
   }
 
   private List<StationLane> 지하철_노선_목록_조회() {
-    return null;
+    return RestAssured
+        .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().get("/stationlines")
+        .then()
+        .extract().body().jsonPath().getList("$",StationLane.class);
   }
 
-  private StationLane 지하철_노선_수정(String name) {
-    return null;
+  private StationLane 지하철_노선_수정(Long id, String name, String inbound, String outbound) {
+    return RestAssured
+        .given().contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().patch("/stationline/" + id)
+        .then()
+        .extract().body().as(StationLane.class);
   }
 
-  private void 지하철_노선_삭제(String name) {
-
+  private void 지하철_노선_삭제(Long id) {
+    RestAssured
+        .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().delete("/stationline/" + id);
   }
 }
