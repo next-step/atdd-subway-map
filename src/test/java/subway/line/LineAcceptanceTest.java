@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
@@ -18,9 +19,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineController.LINE_URI_PATH;
 
-@Sql(value = "classpath:/init.sql")
+@Sql(value = "classpath:/init-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "classpath:/truncate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LineAcceptanceTest {
 
     @LocalServerPort
@@ -41,13 +44,7 @@ public class LineAcceptanceTest {
         // when
         LineRequest lineRequest = createLine("신분당선", "bg-red-600", 1L, 2L, 10);
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(lineRequest)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/lines")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = requestSaveLine(lineRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());

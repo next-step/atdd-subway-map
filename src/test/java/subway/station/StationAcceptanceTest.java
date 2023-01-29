@@ -1,8 +1,6 @@
 package subway.station;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,20 +25,11 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(new StationRequest("강남역"))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        StationResponse station = requestSaveStation("강남역");
 
         // then
         List<String> findStationNames = getStationNames();
-        assertThat(findStationNames).containsAnyOf("강남역");
+        assertThat(findStationNames).containsAnyOf(station.getName());
     }
 
     /**
@@ -52,15 +41,15 @@ public class StationAcceptanceTest {
     @Test
     void getStations() {
         // given
-        List<Station> stations = requestSaveStation("강남역", "망포역");
+        List<StationResponse> stations = requestSaveStation("강남역", "망포역");
         // when
-        List<String> findStationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> findStationNames = getStationNames();
         // then
-        assertThat(findStationNames).hasSize(stations.size()).containsAnyOf(stations.stream().map(Station::getName).toArray(String[]::new));
+        assertThat(findStationNames)
+                .hasSize(stations.size())
+                .containsAnyOf(stations.stream()
+                        .map(StationResponse::getName)
+                        .toArray(String[]::new));
     }
 
     /**
@@ -72,23 +61,27 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         // given
-        Station station = requestSaveStation("강남역");
+        StationResponse station = requestSaveStation("강남역");
         // when
-        RestAssured.given().log().all()
-                .when().delete("/stations/" + station.getId())
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+        requestDeleteStation(station.getId());
         // then
         assertDoseNotContainsStation("강남역");
     }
 
-    public static List<Station> requestSaveStation(String... stationNames) {
+    private void requestDeleteStation(Long id) {
+        RestAssured.given().log().all()
+                .when().delete("/stations/" + id)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static List<StationResponse> requestSaveStation(String... stationNames) {
         return Arrays.stream(stationNames)
                 .map(StationAcceptanceTest::requestSaveStation)
                 .collect(Collectors.toList());
     }
 
-    public static Station requestSaveStation(String stationName) {
+    public static StationResponse requestSaveStation(String stationName) {
         // when
         return RestAssured.given().log().all()
                 .body(new StationRequest(stationName))
@@ -98,7 +91,7 @@ public class StationAcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .body()
-                .as(Station.class);
+                .as(StationResponse.class);
     }
 
     private void assertDoseNotContainsStation(String... stationNames) {
