@@ -46,4 +46,10 @@ public class LineService {
                         .collect(Collectors.toList())
         );
     }
+
+    public void updateLine(Long id, UpdateLineRequest request) {
+        Line line = lineRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        line.updateNameAndColor(request.getName(), request.getColor());
+        lineRepository.save(line);
+    }
 }

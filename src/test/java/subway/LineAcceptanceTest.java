@@ -120,10 +120,7 @@ public class LineAcceptanceTest {
         ).jsonPath().getLong("id");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all().pathParam("id", id)
-                .when().get("/lines/{id}")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = getLineRequest(id);
 
         // then
         String lineNames = response.jsonPath().get("name");
@@ -133,6 +130,50 @@ public class LineAcceptanceTest {
                 () -> assertThat(lineNames).containsAnyOf("신분당선"),
                 () -> assertThat(lineColors).containsAnyOf("bg-red-600"),
                 () -> assertThat(stationIds).containsExactlyInAnyOrder(1L, 2L)
+        );
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @Test
+    @DisplayName("지하철 노선을 수정한다")
+    void updateLine() {
+        //given
+        Long id = createRequest(
+                Map.of(
+                        "name", "분당선",
+                        "color", "bg-green-600",
+                        "upStationId", 1L,
+                        "downStationId", 3L,
+                        "distance", 15
+                )
+        ).jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(Map.of(
+                        "name", "다른분당선",
+                        "color", "bg-red-600"
+                ))
+                .pathParam("id", id)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/lines/{id}")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        ExtractableResponse<Response> lineResponse = getLineRequest(id);
+        String lineName = lineResponse.jsonPath().get("name");
+        String lineColor = lineResponse.jsonPath().get("color");
+        Assertions.assertAll(
+                () -> assertThat(lineName).containsAnyOf("다른분당선"),
+                () -> assertThat(lineColor).containsAnyOf("bg-red-600")
         );
     }
 
@@ -148,6 +189,13 @@ public class LineAcceptanceTest {
     private ExtractableResponse<Response> getLinesRequest() {
         return RestAssured.given().log().all()
                 .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getLineRequest(Long id) {
+        return RestAssured.given().log().all().pathParam("id", id)
+                .when().get("/lines/{id}")
                 .then().log().all()
                 .extract();
     }
