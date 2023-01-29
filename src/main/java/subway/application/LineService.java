@@ -76,11 +76,10 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse removeSection(final long lineId, final long stationId) {
+    public void removeSection(final long lineId, final long stationId) {
         final Line line = getLine(lineId);
         final Station station = stationService.findStationById(stationId);
         line.removeSection(station);
-        return new LineResponse(line);
     }
 
     private Line getLine(final long lineId) {

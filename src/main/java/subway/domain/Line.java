@@ -77,7 +77,10 @@ public class Line {
         if (!getLastDownStation().equals(station)) {
             throw new BusinessException(ErrorCode.CANNOT_REMOVE_SECTION_WHAT_IS_NOT_LAST_SECTION);
         }
-        this.sections.remove(getLastDownStation());
+        final Section lastSection = this.sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .findFirst().get();
+        this.sections.remove(lastSection);
     }
 
     private void validateSectionBeforeAdd(final Station upStation, final Station downStation) {
