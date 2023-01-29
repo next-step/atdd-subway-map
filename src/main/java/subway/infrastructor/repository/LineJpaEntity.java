@@ -42,4 +42,24 @@ class LineJpaEntity {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public StationPk getUpStationId() {
+        return upStationId;
+    }
+
+    public StationPk getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
+
 }
