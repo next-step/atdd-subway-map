@@ -67,4 +67,9 @@ public class StationLineService {
                         .collect(Collectors.toList())
         );
     }
+
+    @Transactional
+    public void deleteStationLineById(Long id) {
+        stationLineRepository.deleteById(id);
+    }
 }
