@@ -3,10 +3,14 @@ package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.RestAssured;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import subway.Mocks.*;
 import subway.stationLine.StationLane;
 
@@ -96,7 +100,16 @@ public class StationLaneAcceptanceTest {
   }
 
   private StationLane 지하철_노선_생성(String name, String inbound, String outbound) {
-    return null;
+    Map<String, String> map = new HashMap<>();
+    map.put("name", name);
+    map.put("inbound", inbound);
+    map.put("outbound", outbound);
+
+    return RestAssured
+        .given().body(map).contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().post("/stationline")
+        .then()
+        .extract().body().as(StationLane.class);
   }
 
   private StationLane 지하철_노선_조회(String name) {
