@@ -16,7 +16,7 @@ public class LineAcceptanceTest {
 
     /**
      * 지하철노선 조회
-     *  - Given 지하철 노선을 생성고
+     *  - Given 지하철 노선을 생성하고
      *  - When 생성한 지하철 노선을 조회하면
      *  - Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
      */

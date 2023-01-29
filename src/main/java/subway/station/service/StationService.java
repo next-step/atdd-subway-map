@@ -42,4 +42,8 @@ public class StationService {
                 station.getName()
         );
     }
+
+    public Station findById(Long upStationId) {
+        return stationRepository.findById(upStationId).orElseThrow(RuntimeException::new);
+    }
 }
