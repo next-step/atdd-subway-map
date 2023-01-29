@@ -186,6 +186,34 @@ class LineAcceptanceTest {
         assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(given_신분당선_id, "지하철역"), new StationResponse(2L, "새로운지하철역"));
     }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철 노선을 삭제 할 수 있다")
+    @Test
+    void deleteStation() {
+        // Given
+        StationResponse 지하철역 = createStation("지하철역").as(StationResponse.class);
+        StationResponse 새로운지하철역 = createStation("새로운지하철역").as(StationResponse.class);
+
+        LineCreateRequest given_신분당선 = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
+        long given_신분당선_id = 1L;
+        createLine(given_신분당선, given_신분당선_id, 지하철역, 새로운지하철역);
+
+        // When
+        ExtractableResponse<Response> actualResponse = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", given_신분당선_id)
+            .when().delete("/lines/{lineId}")
+            .then().log().all()
+            .extract();
+
+
+        // Then
+        assertThat(actualResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
     private static ExtractableResponse<Response> createLine(LineCreateRequest lineCreateRequest, Long lineId, StationResponse upStation, StationResponse downStation) {
 
         // when
