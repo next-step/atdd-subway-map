@@ -1,7 +1,7 @@
-package common.error;
+package subway.error;
 
-import common.error.exception.BusinessException;
-import common.error.exception.ErrorCode;
+import subway.error.exception.BusinessException;
+import subway.error.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

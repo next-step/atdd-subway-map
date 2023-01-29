@@ -1,4 +1,4 @@
-package common.error.exception;
+package subway.error.exception;
 
 public class BusinessException extends RuntimeException {
 
