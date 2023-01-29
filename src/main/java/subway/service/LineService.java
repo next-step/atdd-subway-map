@@ -3,12 +3,9 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.domain.Station;
 import subway.dto.LineRequest;
-import subway.dto.LineResponse;
 import subway.exception.LineNotFoundException;
 import subway.repository.LineRepository;
-import subway.repository.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,44 +15,25 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private LineRepository lineRepository;
-    private StationRepository stationRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
+    public LineService(LineRepository lineRepository) {
         this.lineRepository = lineRepository;
-        this.stationRepository = stationRepository;
     }
 
-    @Transactional(readOnly = false)
-    public LineResponse saveLine(LineRequest lineRequest) {
-
-        Station upStation = findStation(lineRequest.getUpStationId());
-        Station downStation = findStation(lineRequest.getDownStationId());
-
-        Line newLine = new Line(
-                lineRequest.getName()
-                , lineRequest.getColor()
-                , upStation
-                , downStation
-                , lineRequest.getDistance());
-
-        Line saveLine = lineRepository.save(newLine);
-        return LineResponse.of(saveLine);
+    @Transactional
+    public Line saveLine(Line line) {
+        return lineRepository.save(line);
 
     }
 
-    private Station findStation(Long stationId) {
-        return stationRepository.findById(stationId).orElseThrow(LineNotFoundException::new);
-    }
-
-    public List<LineResponse> findAllLines() {
-        return lineRepository.findAll().stream()
-                .map(LineResponse::of)
+    public List<Line> findAllLines() {
+        return lineRepository.findAll()
+                .stream()
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public LineResponse findLine(Long id) {
+    public Line findLine(Long id) {
         return lineRepository.findById(id)
-                .map(LineResponse::of)
                 .orElseThrow(LineNotFoundException::new);
     }
 
@@ -64,8 +42,12 @@ public class LineService {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
 
-        line.changeColor(request.getColor());
-        line.changeName(request.getName());
+        if (!request.getColor().isEmpty()) {
+            line.changeColor(request.getColor());
+        }
+        if (!request.getName().isEmpty()) {
+            line.changeName(request.getName());
+        }
 
         lineRepository.save(line);
     }
