@@ -52,4 +52,16 @@ public class RestAssuredClient {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> put(
+            String path,
+            Request request
+    ) {
+        return RestAssured.given().log().all()
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put(path)
+                .then().log().all()
+                .extract();
+    }
 }

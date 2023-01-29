@@ -165,4 +165,53 @@ public class LineAcceptanceTest {
         assertThat(신분당선_응답.getColor()).isEqualTo(color);
         assertThat(신분당선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
     }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("특정 지하철 노선을 수정한다.")
+    @Test
+    void updateLineById() {
+        ExtractableResponse<Response> 강남역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "강남역").toMap());
+        ExtractableResponse<Response> 서울대입구역_생성_응답 = RestAssuredClient.post(Endpoints.STATIONS, new JsonBodyParam("name", "서울대입구역").toMap());
+
+        // Given 지하철 노선을 생성하고
+        long 강남역_아이디 = 강남역_생성_응답.jsonPath().getLong("id");
+        long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
+
+        String lineName = "신분당선";
+        String color = Colors.RED;
+        long upStationId = 강남역_아이디;
+        long downStationId = 서울대입구역_아이디;
+
+        var 신분당선_생성 = RestAssuredClient.post(
+                Endpoints.LINES,
+                new LineRequest(
+                        lineName,
+                        color,
+                        upStationId,
+                        downStationId,
+                        10L
+                )
+        );
+        assertThat(신분당선_생성.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // When 생성한 지하철 노선을 수정하면
+        var path = 신분당선_생성.header("Location");
+
+        String updateLineName = "4호선";
+        String updateColor = Colors.GREEN;
+        var updateLineResponse = RestAssuredClient.put(path, new UpdateLineRequest(
+            updateLineName,
+                updateColor
+        ));
+
+        // Then line is updated.
+        var 사호선_응답 = updateLineResponse.as(LineResponse.class);
+        assertThat(사호선_응답.getName()).isEqualTo(lineName);
+        assertThat(사호선_응답.getColor()).isEqualTo(color);
+        assertThat(사호선_응답.getStations().stream().map(StationResponse::getId)).containsExactly(upStationId, downStationId);
+    }
 }
