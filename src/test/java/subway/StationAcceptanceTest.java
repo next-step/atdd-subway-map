@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class StationAcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("지하철 역을 생성한다.")
     @Test
     void createStation() {
         String name = "강남역";
@@ -65,12 +64,8 @@ public class StationAcceptanceTest {
         createStation("판교역");
 
         // when
-        List<String> list =
-                RestAssured
-                        .given().spec(requestSpecification).log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> list = selectStations().jsonPath()
+                .getList("name", String.class);
 
         // then
         assertThat(list).containsExactly("강남역", "판교역");
@@ -97,6 +92,10 @@ public class StationAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        List<String> list = selectStations().jsonPath()
+                .getList("name", String.class);
+        assertThat(list).isEmpty();
     }
 
     void createStation(String name) {
@@ -109,7 +108,14 @@ public class StationAcceptanceTest {
                         .extract();
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 
+    ExtractableResponse<Response> selectStations() {
+        return RestAssured
+                .given().spec(requestSpecification)
+                .when().get("/stations")
+                .then()
+                .extract();
     }
 
 }
