@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineAcceptanceTest extends AcceptanceTest {
@@ -72,12 +73,54 @@ class LineAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> createdResponse = 노선을_생성한다(신분당선, "bg-red-600", 1, 2, 10);
 
         // when
-        final Integer lineId = createdResponse.body().jsonPath().get("id");
+        final int lineId = createdResponse.body().jsonPath().get("id");
         final ExtractableResponse<Response> lineResponse = 노선을_조회한다(lineId);
 
         // then
         final String lineName = lineResponse.body().jsonPath().get("name");
         assertThat(lineName).isEqualTo(lineName);
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 수정하면
+     * Then 해당 지하철 노선 정보는 수정된다
+     */
+    @DisplayName("노선 수정")
+    @Test
+    void 노선_수정() {
+        // given
+        final int lineId = 노선을_생성한다("신분당선", "bg-red-600", 1, 2, 10)
+            .body().jsonPath().get("id");
+
+        // when
+        final String 다른분당선 = "다른분당선";
+        final String green = "bg-green-600";
+        노선을_수정한다(lineId, 다른분당선, green);
+
+        // then
+        final ExtractableResponse<Response> lineResponse = 노선을_조회한다(lineId);
+        final String lineName = lineResponse.body().jsonPath().get("name");
+        final String lineColor = lineResponse.body().jsonPath().get("color");
+
+        assertAll(
+            () -> assertThat(lineName).isEqualTo(다른분당선),
+            () -> assertThat(lineColor).isEqualTo(green)
+        );
+    }
+
+    private ExtractableResponse<Response> 노선을_수정한다(long lineId, String name, String color) {
+        final Map<String, Object> params = Map.of(
+            "name", name,
+            "color", color
+        );
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when().put("/lines/{id}", lineId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
     }
 
     private ExtractableResponse<Response> 노선을_생성한다(

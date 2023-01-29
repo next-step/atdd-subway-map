@@ -7,6 +7,7 @@ import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
 import subway.line.service.dto.LineCreateRequest;
 import subway.line.service.dto.LineResponse;
+import subway.line.service.dto.LineUpdateRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,8 +48,20 @@ public class LineService {
     }
 
     public LineResponse findById(Long id) {
+        final Line line = getLine(id);
+        return createLineResponse(line);
+    }
+
+    @Transactional
+    public LineResponse update(Long id, LineUpdateRequest request) {
+        final Line line = getLine(id);
+        line.update(request.getName(), request.getColor());
+
+        return createLineResponse(line);
+    }
+
+    private Line getLine(Long id) {
         return lineRepository.findById(id)
-            .map(this::createLineResponse)
             .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }
 

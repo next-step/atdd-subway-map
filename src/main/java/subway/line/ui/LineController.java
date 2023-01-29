@@ -4,12 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.line.service.LineService;
 import subway.line.service.dto.LineCreateRequest;
 import subway.line.service.dto.LineResponse;
+import subway.line.service.dto.LineUpdateRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -39,8 +41,14 @@ public class LineController {
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> findById(@PathVariable Long id) {
-        final LineResponse lineResponses = lineService.findById(id);
-        return ResponseEntity.ok(lineResponses);
+        final LineResponse lineResponse = lineService.findById(id);
+        return ResponseEntity.ok(lineResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<LineResponse> update(@PathVariable Long id, @RequestBody LineUpdateRequest request) {
+        final LineResponse lineResponse = lineService.update(id, request);
+        return ResponseEntity.ok(lineResponse);
     }
 
 }
