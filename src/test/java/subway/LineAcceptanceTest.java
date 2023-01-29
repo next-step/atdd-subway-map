@@ -62,6 +62,23 @@ class LineAcceptanceTest extends LineAcceptConstants {
          assertThat(lineNames).containsOnly((String) 신분당선.get(LINE_NAME), (String) 이호선.get(LINE_NAME));
      }
 
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+     @DisplayName("지하철 노선을 단건 조회 한다.")
+     @Test
+     void getStationTest() {
+         // given
+         createLine(이호선);
+
+         // when
+         final LineResponse lineResponse = getLine();
+
+         // then
+         assertThat(lineResponse.getName()).isEqualTo((String) 이호선.get(LINE_NAME));
+     }
 
     private void createLine(final Map<String, Object> line) {
         RestAssured
@@ -93,6 +110,20 @@ class LineAcceptanceTest extends LineAcceptConstants {
         return getLines().stream()
                 .map(LineResponse::getName)
                 .collect(Collectors.toList());
+    }
+
+    private static LineResponse getLine() {
+        return RestAssured
+                .given()
+                    .accept(APPLICATION_JSON_VALUE)
+                .when()
+                .   get("/lines/{id}", 1)
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .contentType(APPLICATION_JSON_VALUE)
+                .extract()
+                .jsonPath()
+                .getObject("", LineResponse.class);
     }
 
 
