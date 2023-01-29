@@ -22,7 +22,7 @@ import subway.presentation.request.StationRequest;
 import subway.presentation.request.SubwayLineRequest;
 import subway.presentation.response.SubwayLineResponse;
 
-public class StationLineAcceptanceTest extends AcceptanceTest {
+public class SubwayLineAcceptanceTest extends AcceptanceTest {
 
 	private static final String ROOT_PATH = "/lines";
 
