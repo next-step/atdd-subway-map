@@ -4,25 +4,18 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.common.fixture.FieldFixture.역_이름;
 import static subway.common.fixture.StationFixture.강남역;
 import static subway.common.fixture.StationFixture.서울대입구역;
 
 @DisplayName("지하철역 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StationAcceptanceTest {
-
-    public static final String BASE_STATION_URL = "/stations";
-    public static final String DELETE_STATION_URL = BASE_STATION_URL + "/{stationId}";
+public class StationAcceptanceTest extends AcceptanceTest {
 
     /**
      * When 지하철역을 생성하면
@@ -90,29 +83,5 @@ public class StationAcceptanceTest {
                 .jsonPath().getList(역_이름.필드명(), String.class);
 
         assertThat(등록된_지하철역_이름_목록).doesNotContain(강남역.역_이름());
-    }
-
-
-    private static ExtractableResponse<Response> 지하철역_생성_요청(Map<String, String> requestBody) {
-        return given().log().all()
-                    .body(requestBody)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(BASE_STATION_URL)
-                .then().log().all()
-                    .extract();
-    }
-
-    private static void 지하철역_삭제_요청(Long stationId) {
-        given().log().all()
-        .when().delete(DELETE_STATION_URL, stationId)
-        .then().log().all()
-            .extract();
-    }
-
-    private static ExtractableResponse<Response> 지하철역_목록_조회_요청() {
-        return given().log().all()
-                .when().get(BASE_STATION_URL)
-                .then().log().all()
-                    .extract();
     }
 }
