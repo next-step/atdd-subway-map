@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -67,7 +66,30 @@ public class StationAcceptanceTest {
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @Test
+    @DisplayName("지하철역 제거")
+    void deleteStation() {
+        // given
+        Long id = saveStation("강남역").jsonPath().getLong("id");
+
+        // when
+        ExtractableResponse<Response> response = deleteStationResponse(id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
+
+        // then
+        List<String> stationNames = showStationsResponse().jsonPath().getList("name", String.class);
+        assertThat(stationNames.size()).isEqualTo(0);
+    }
+
+    private ExtractableResponse<Response> showStationsResponse() {
+        return RestAssured
+                .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/stations")
+                .then().log().all()
+                .extract();
+    }
 
     private ExtractableResponse<Response> saveStation(String stationName) {
         Map<String, String> param = new HashMap<>();
@@ -84,12 +106,11 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private static ExtractableResponse<Response> showStationsResponse() {
+    private ExtractableResponse<Response> deleteStationResponse(Long id) {
         return RestAssured
                 .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/stations")
+                .when().delete("/stations/" + id)
                 .then().log().all()
                 .extract();
     }
-
 }
