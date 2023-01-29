@@ -23,16 +23,10 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest lineRequest) {
 
-        Line line = Line.builder()
-                .name(lineRequest.getName())
-                .color(lineRequest.getColor())
-                .build();
-
         Station upStation = stationService.findOneStation(lineRequest.getUpStationId());
         Station downStation = stationService.findOneStation(lineRequest.getDownStationId());
 
-        line.addStation(upStation);
-        line.addStation(downStation);
+        Line line = new Line(lineRequest.getName(), lineRequest.getColor(), upStation, downStation);
 
         Line savedLine = lineRepository.save(line);
 
@@ -54,8 +48,7 @@ public class LineService {
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = findOne(id);
 
-        line.updateName(lineRequest.getName());
-        line.updateColor(lineRequest.getColor());
+        line.update(lineRequest.getName(), lineRequest.getColor());
 
         lineRepository.save(line);
     }

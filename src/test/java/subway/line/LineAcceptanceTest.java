@@ -2,12 +2,15 @@ package subway.line;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+import subway.station.Station;
 import subway.station.StationApiClient;
 
 import java.util.List;
@@ -16,20 +19,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.line.LineApiClient.*;
 
 @DisplayName("지하철 노선 관리 기능")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql("classpath:sql/delete-records.sql")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class LineAcceptanceTest {
 
-    private Long upStationId;
-    private Long downStationId;
+    private Station upStation;
+    private Station downStation;
 
     @BeforeEach
-    void initStations() {
+    void beforeEach() {
         ExtractableResponse<Response> upStationResponse = StationApiClient.requestCreateStation("장암");
-        this.upStationId = upStationResponse.jsonPath().getLong("id");
+        upStation = upStationResponse.as(Station.class);
 
         ExtractableResponse<Response> downStationResponse = StationApiClient.requestCreateStation("도봉산");
-        this.downStationId = downStationResponse.jsonPath().getLong("id");
+        downStation = downStationResponse.as(Station.class);
     }
 
     /**
@@ -40,7 +43,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> createLineResponse = requestCreateLine("7호선", "#747F00", upStationId, downStationId, 12);
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("7호선", "#747F00", upStation.getId(), downStation.getId(), 12);
         String name = createLineResponse.jsonPath().getString("name");
 
         assertThat(createLineResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -62,8 +65,8 @@ public class LineAcceptanceTest {
     @Test
     void showLines() {
         // given
-        requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
-        requestCreateLine("2호선", "#00A84D", upStationId, downStationId, 10);
+        requestCreateLine("1호선", "#0052A4", upStation.getId(), downStation.getId(), 8);
+        requestCreateLine("2호선", "#00A84D", upStation.getId(), downStation.getId(), 10);
 
         // when
         ExtractableResponse<Response> showLinesResponse = requestShowLines();
@@ -83,16 +86,18 @@ public class LineAcceptanceTest {
     @Test
     void showLine() {
         // given
-        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStation.getId(), downStation.getId(), 8);
         LineResponse line = createLineResponse.body().as(LineResponse.class);
 
         // when
         ExtractableResponse<Response> showLineResponse = requestShowLine(line.getId());
         String name = showLineResponse.jsonPath().getString("name");
+        List<Station> stations = showLineResponse.jsonPath().getList("stations", Station.class);
 
         // then
         assertThat(showLineResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(name).isEqualTo("1호선");
+        assertThat(stations).containsExactly(upStation, downStation);
     }
 
     /**
@@ -104,7 +109,7 @@ public class LineAcceptanceTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStation.getId(), downStation.getId(), 8);
         LineResponse line = createLineResponse.body().as(LineResponse.class);
 
         // when
@@ -130,7 +135,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStationId, downStationId, 8);
+        ExtractableResponse<Response> createLineResponse = requestCreateLine("1호선", "#0052A4", upStation.getId(), downStation.getId(), 8);
         LineResponse line = createLineResponse.body().as(LineResponse.class);
 
         // when

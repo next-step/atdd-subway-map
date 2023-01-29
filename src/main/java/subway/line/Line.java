@@ -1,19 +1,14 @@
 package subway.line;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import subway.station.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
+@Table(name = "lines")
 @Entity
 public class Line {
     @Id
@@ -24,18 +19,22 @@ public class Line {
     private String name;
     @Column(length = 20, nullable = false)
     private String color;
-
-    @Builder.Default
     @ManyToMany
+    @JoinTable(name = "line_stations")
     private List<Station> stations = new ArrayList<>();
 
-    public void addStation(Station station) {
-        this.stations.add(station);
+    public Line() {
     }
-    public void updateName(String name) {
+
+    public Line(String name, String color, Station upStation, Station downStation) {
         this.name = name;
+        this.color = color;
+        this.stations.add(upStation);
+        this.stations.add(downStation);
     }
-    public void updateColor(String color) {
+
+    public void update(String name, String color) {
+        this.name = name;
         this.color = color;
     }
 }
