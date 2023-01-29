@@ -35,4 +35,17 @@ public class StationTestUtils {
   public static RequestSpecification prepareRestAssuredGiven() {
     return RestAssured.given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE);
   }
+
+  public static List<String> 지하철역_조회() {
+    return StationTestUtils.prepareRestAssuredGiven()
+        .when().get("/stations")
+        .then().log().all()
+        .extract().jsonPath().getList("name", String.class);
+  }
+
+  public static void 지하철역_삭제(Long id) {
+    RestAssured
+        .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when().delete("/stations/" + id);
+  }
 }

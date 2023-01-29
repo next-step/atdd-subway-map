@@ -1,13 +1,11 @@
 package subway;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +16,7 @@ import subway.Mocks.MockStation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.StationTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -87,20 +86,6 @@ public class StationAcceptanceTest {
         지하철역_삭제(id);
 
         // then
-        List<String> stationNames = 지하철역_조회();
         assertThat(지하철역_조회()).doesNotContain(stationName);
-    }
-
-    private List<String> 지하철역_조회() {
-        return StationTestUtils.prepareRestAssuredGiven()
-            .when().get("/stations")
-            .then().log().all()
-            .extract().jsonPath().getList("name", String.class);
-    }
-
-    private void 지하철역_삭제(Long id) {
-        RestAssured
-            .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when().delete("/stations/" + id);
     }
 }
