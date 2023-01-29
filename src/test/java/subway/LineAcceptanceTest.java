@@ -107,6 +107,40 @@ class LineAcceptanceTest {
         assertThat(_1_indexStations).containsExactlyInAnyOrder(new StationResponse(1L, "지하철역"), new StationResponse(3L, "새로운지하철역"));
     }
 
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 조회하면
+     * Then 생성한 지하철 노선의 정보를 응답받을 수 있다.
+     */
+    @DisplayName("지하철 노선을 조회 할 수 있다")
+    @Test
+    void loadStation() {
+        // Given
+        StationResponse 지하철역 = createStation("지하철역").as(StationResponse.class);
+        StationResponse 새로운지하철역 = createStation("새로운지하철역").as(StationResponse.class);
+
+        LineCreateRequest givenLine = new LineCreateRequest("신분당선", "bg-red-600", 지하철역.getId(), 새로운지하철역.getId(), 8L);
+        long givenLineId = 1L;
+        ExtractableResponse<Response> createLineResponse = createLine(givenLine, givenLineId, 지하철역, 새로운지하철역);
+        String actualLineId = createLineResponse.jsonPath().getString("id");
+
+        // When
+        ExtractableResponse<Response> actual = RestAssured.given().spec(REQUEST_SPEC).log().all()
+            .pathParam("lineId", actualLineId)
+            .when().get("/lines/{lineId}")
+            .then().log().all()
+            .extract();
+
+        // Then
+        assertThat(actual.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(actual.jsonPath().getLong("id")).isEqualTo(givenLineId);
+        assertThat(actual.jsonPath().getString("name")).isEqualTo("신분당선");
+        assertThat(actual.jsonPath().getString("color")).isEqualTo("bg-red-600");
+        List<StationResponse> lineStations = createLineResponse.jsonPath().getList("stations", StationResponse.class);
+        assertThat(lineStations).containsExactlyInAnyOrder(new StationResponse(givenLineId, "지하철역"), new StationResponse(2L, "새로운지하철역"));
+    }
+
     private static ExtractableResponse<Response> createLine(LineCreateRequest lineCreateRequest, Long lineId, StationResponse upStation, StationResponse downStation) {
 
         // when
