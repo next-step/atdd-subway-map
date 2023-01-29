@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.common.BaseAcceptanceTest;
 import subway.common.DatabaseCleaner;
 import subway.domain.Station;
 import subway.executor.StationServiceExecutor;
@@ -21,21 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class StationAcceptanceTest {
-
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleaner cleaner;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        cleaner.afterPropertiesSet();
-        cleaner.execute();
-    }
+class StationAcceptanceTest extends BaseAcceptanceTest {
 
     /**
      * When 지하철역을 생성하면

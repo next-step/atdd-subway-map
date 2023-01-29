@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import subway.common.BaseAcceptanceTest;
 import subway.common.DatabaseCleaner;
 import subway.domain.Station;
 import subway.dto.LineRequest;
@@ -20,21 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class LineAcceptanceTest {
+class LineAcceptanceTest extends BaseAcceptanceTest {
 
-
-    @LocalServerPort
-    int port;
-
-    @Autowired
-    private DatabaseCleaner cleaner;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        cleaner.afterPropertiesSet();
-        cleaner.execute();
-    }
 
     @Test
     @DisplayName("지하철 노선 생성")
