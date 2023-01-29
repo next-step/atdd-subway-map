@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static subway.fixture.StationFixture.*;
+import static subway.fixture.SubwayLineFixture.*;
 
 import java.util.List;
 
@@ -31,15 +32,15 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하면_목록_조회_시_생성한_노선을_찾을_수_있다() {
 		// given
-		지하철역_생성("지하철역");
-		지하철역_생성("새로운지하철역");
+		지하철역_생성(STATION_NAME_1);
+		지하철역_생성(STATION_NAME_2);
 
 		SubwayLineRequest.Create stationLineCreateRequest = SubwayLineRequest.Create.builder()
-			.name("신분당선")
-			.color("bg-red-600")
-			.upStationId(1L)
-			.downStationId(2L)
-			.distance(10)
+			.name(SUBWAY_LINE_NAME_1)
+			.color(SUBWAY_LINE_COLOR_1)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_1)
+			.distance(DISTANCE)
 			.build();
 
 		// when
@@ -62,24 +63,24 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선_2개를_생성하고_목록조회_시_2개의_노선을_조회할_수_있다() {
 		// given
-		지하철역_생성("지하철역");
-		지하철역_생성("새로운지하철역");
-		지하철역_생성("또다른지하철역");
+		지하철역_생성(STATION_NAME_1);
+		지하철역_생성(STATION_NAME_2);
+		지하철역_생성(STATION_NAME_3);
 
 		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name("신분당선")
-			.color("bg-red-600")
-			.upStationId(1L)
-			.downStationId(2L)
-			.distance(10)
+			.name(SUBWAY_LINE_NAME_1)
+			.color(SUBWAY_LINE_COLOR_1)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_1)
+			.distance(DISTANCE)
 			.build();
 
 		SubwayLineRequest.Create stationLineCreateRequest2 = SubwayLineRequest.Create.builder()
-			.name("2호선")
-			.color("bg-red-300")
-			.upStationId(1L)
-			.downStationId(3L)
-			.distance(10)
+			.name(SUBWAY_LINE_NAME_2)
+			.color(SUBWAY_LINE_COLOR_2)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_2)
+			.distance(DISTANCE)
 			.build();
 
 		지하철노선_생성(stationLineCreateRequest1);
@@ -100,15 +101,15 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_조회하면_노선의_정보를_응답받을_수_있다() {
 		// given
-		지하철역_생성("지하철역");
-		지하철역_생성("새로운지하철역");
+		지하철역_생성(STATION_NAME_1);
+		지하철역_생성(STATION_NAME_2);
 
 		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name("신분당선")
-			.color("bg-red-600")
-			.upStationId(1L)
-			.downStationId(2L)
-			.distance(10)
+			.name(SUBWAY_LINE_NAME_1)
+			.color(SUBWAY_LINE_COLOR_1)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_1)
+			.distance(DISTANCE)
 			.build();
 
 		Long id = 지하철노선_생성(stationLineCreateRequest1)
@@ -137,15 +138,15 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_생성한_노선을_수정하면_수정된다() {
 		// given
-		지하철역_생성("지하철역");
-		지하철역_생성("새로운지하철역");
+		지하철역_생성(STATION_NAME_1);
+		지하철역_생성(STATION_NAME_2);
 
 		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name("신분당선")
-			.color("bg-red-600")
-			.upStationId(1L)
-			.downStationId(2L)
-			.distance(10)
+			.name(SUBWAY_LINE_NAME_1)
+			.color(SUBWAY_LINE_COLOR_1)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_2)
+			.distance(DISTANCE)
 			.build();
 
 		Long id = 지하철노선_생성(stationLineCreateRequest1)
@@ -154,8 +155,8 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 			.getId();
 
 		SubwayLineRequest.Update updateRequest = SubwayLineRequest.Update.builder()
-			.name("다른분당선")
-			.color("bg-red-600")
+			.name(SUBWAY_LINE_NAME_2)
+			.color(SUBWAY_LINE_COLOR_2)
 			.build();
 
 		// when
@@ -172,15 +173,15 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 	@Test
 	void 지하철노선을_생성하고_노선을_생성한_노선을_삭제하면_삭제된다() {
 		// given
-		지하철역_생성("지하철역");
-		지하철역_생성("새로운지하철역");
+		지하철역_생성(STATION_NAME_1);
+		지하철역_생성(STATION_NAME_2);
 
 		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
-			.name("신분당선")
-			.color("bg-red-600")
-			.upStationId(1L)
-			.downStationId(2L)
-			.distance(10)
+			.name(SUBWAY_LINE_NAME_1)
+			.color(SUBWAY_LINE_COLOR_1)
+			.upStationId(UP_STATION_ID_1)
+			.downStationId(DOWN_STATION_ID_1)
+			.distance(DISTANCE)
 			.build();
 
 		Long id = 지하철노선_생성(stationLineCreateRequest1)
