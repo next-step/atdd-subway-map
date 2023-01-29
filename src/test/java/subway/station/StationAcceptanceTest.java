@@ -96,6 +96,16 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain(강남역_request.getName());
     }
 
+    public static StationResponse 지하철역이_생성됨(String name) {
+        var request = new StationRequest() {{
+            setName(name);
+        }};
+        var response = 지하철역을_생성한다(request);
+        //  then
+        지하철역이_정상적으로_생성(response);
+        return response.as(StationResponse.class);
+    }
+
     public static ExtractableResponse<Response> 지하철역을_생성한다(StationRequest request) {
         return RestAssured.given().log().all()
                 .body(request)
