@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import subway.domain.Station;
+
 @Service
 @Transactional(readOnly = true)
 public class StationService {
