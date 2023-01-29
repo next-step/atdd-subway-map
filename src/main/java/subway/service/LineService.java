@@ -34,13 +34,13 @@ public class LineService {
         return LineResponse.createLineResponse(line);
     }
 
-    public List<LineResponse> findAllLines() {
+    public List<LineResponse> findAll() {
         return lineRepository.findAll().stream()
             .map(LineResponse::createLineResponse)
             .collect(toList());
     }
 
-    public LineResponse findLineById(Long lineId) {
+    public LineResponse findLine(Long lineId) {
         return lineRepository.findById(lineId)
             .map(LineResponse::createLineResponse)
             .orElseThrow(LineNotFoundException::new);
@@ -55,5 +55,10 @@ public class LineService {
 
         Line updatedLine = line.updateLine(lineRequest.getName(), lineRequest.getColor(), upStation, downStation, lineRequest.getDistance());
         return LineResponse.createLineResponse(lineRepository.save(updatedLine));
+    }
+
+    @Transactional
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 }
