@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static subway.station.StationAcceptanceTest.지하철역을_생성한다;
 import static subway.station.StationAcceptanceTest.지하철역이_정상적으로_생성;
 
@@ -219,7 +218,7 @@ public class LineAcceptanceTest {
         // then
         var linesResponseLastest = 지하철노선을_조회한다();
         List<LineResponse> lines_lastest = 지하철노선_목록이_정상적으로_조회(linesResponseLastest);
-        assertThat(lines_lastest).hasSize(0);
+        assertThat(lines_lastest).isEmpty();
     }
 
 
