@@ -27,9 +27,9 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 
 	// When 지하철 노선을 생성하면
 	// Then 지하철 노선 목록 조회 시 생성한 노선을 찾을 수 있다
-	@DisplayName("지하철노선 생성에 성공한다")
+	@DisplayName("지하철노선을 생성하면 목록 조회 시 생성한 노선을 찾을 수 있다")
 	@Test
-	void 지하철노선_생성에_성공한다() {
+	void 지하철노선을_생성하면_목록_조회_시_생성한_노선을_찾을_수_있다() {
 		// given
 		지하철역_생성("지하철역");
 		지하철역_생성("새로운지하철역");
@@ -53,6 +53,41 @@ public class StationLineAcceptanceTest extends AcceptanceTest {
 			() -> assertThat(createResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
 			() -> assertThat(lineInfos).hasSize(1)
 		);
+	}
+
+	// Given 2개의 지하철 노선을 생성하고
+	// When 지하철 노선 목록을 조회하면
+	// Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다
+	@DisplayName("지하철노선 2개를 생성하고 목록조회 시 2개의 노선을 조회할 수 있다")
+	@Test
+	void 지하철노선_2개를_생성하고_목록조회_시_2개의_노선을_조회할_수_있다() {
+		지하철역_생성("지하철역");
+		지하철역_생성("새로운지하철역");
+		지하철역_생성("또다른지하철역");
+
+		SubwayLineRequest.Create stationLineCreateRequest1 = SubwayLineRequest.Create.builder()
+			.name("신분당선")
+			.color("bg-red-600")
+			.upStationId(1L)
+			.downStationId(2L)
+			.distance(10)
+			.build();
+
+		SubwayLineRequest.Create stationLineCreateRequest2 = SubwayLineRequest.Create.builder()
+			.name("2호선")
+			.color("bg-red-300")
+			.upStationId(1L)
+			.downStationId(3L)
+			.distance(10)
+			.build();
+
+		지하철노선_생성(stationLineCreateRequest1);
+		지하철노선_생성(stationLineCreateRequest2);
+
+		List<SubwayLineResponse.LineInfo> lineInfos = 지하철노선_목록조회().as(new TypeRef<>() {
+		});
+
+		assertThat(lineInfos).hasSize(2);
 	}
 
 	private ExtractableResponse<Response> 지하철노선_생성(SubwayLineRequest.Create stationLineCreateRequest) {
