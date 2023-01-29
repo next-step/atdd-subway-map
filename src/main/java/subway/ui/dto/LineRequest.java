@@ -1,19 +1,23 @@
 package subway.ui.dto;
 
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
+
+import java.util.List;
 
 public class LineRequest {
 
     private String name;
     private String color;
-    private long upStationId;
-    private long downStationId;
-    private int distance;
+    private Long upStationId;
+    private Long downStationId;
+    private Integer distance;
 
     private LineRequest() {}
 
-    public LineRequest(final String name, final String color, final long upStationId, final long downStationId, final int distance) {
+    public LineRequest(final String name, final String color, final Long upStationId, final Long downStationId, final Integer distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -33,15 +37,23 @@ public class LineRequest {
         return color;
     }
 
-    public long getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public long getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public Line toEntity(final Station upStation, final Station downStation) {
-        return new Line(this.name, this.color, upStation, downStation, this.distance);
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public Line toEntity(final List<Section> sections) {
+        return new Line(this.name, this.color, Sections.from(sections));
+    }
+
+    public Section toSectionEntity(final Station upStation, final Station downStation) {
+        return new Section(upStation, downStation, this.distance);
     }
 }

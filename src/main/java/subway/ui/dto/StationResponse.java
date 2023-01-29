@@ -13,7 +13,7 @@ public class StationResponse {
         this.name = name;
     }
 
-    public static StationResponse of(final Station station) {
+    public static StationResponse from(final Station station) {
         return new StationResponse(station.getId(), station.getName());
     }
 
