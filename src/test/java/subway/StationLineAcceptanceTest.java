@@ -1,10 +1,21 @@
 package subway;
 
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 역 노선 관련 기능")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -23,7 +34,27 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void createStationLine() {
+        Map<String, Object> body = new HashMap<>();
+        String name = "신분당선";
+        String color = "bg-red-600";
+        body.put("name", name);
+        body.put("color", color);
+        body.put("upStationId", 1);
+        body.put("downStationId", 2);
+        body.put("distance", 10);
 
+        ExtractableResponse<Response> response =
+                RestAssured.given().spec(StationUtils.getRequestSpecification()).body(body).log().all()
+                        .when().post("/lines")
+                        .then().log().all().extract();
+        JsonPath jsonPath = response.jsonPath();
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isEqualTo("/lines/1");
+        assertThat(response.contentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(jsonPath.getInt("$.id")).isEqualTo(1);
+        assertThat(jsonPath.getString("$.name")).isEqualTo(name);
+        assertThat(jsonPath.getString("$.color")).isEqualTo(color);
     }
 
 
@@ -34,7 +65,7 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void selectStationLineList() {
-
+        
     }
 
     /**
