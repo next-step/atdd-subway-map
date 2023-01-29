@@ -84,10 +84,11 @@ public class StationAcceptanceTest {
         // given
         Map<String, String> 강남역_데이터 = new HashMap<>();
         강남역_데이터.put(역_이름.필드명(), 강남역.역_이름());
-        지하철역_생성_요청(강남역_데이터);
+        Long 생성된_지하철역_id = 지하철역_생성_요청(강남역_데이터)
+                .jsonPath().getLong("id");
 
         // when
-        지하철역_삭제_요청(1L);
+        지하철역_삭제_요청(생성된_지하철역_id);
 
         // then
         List<String> 등록된_지하철역_이름_목록 = 지하철역_목록_조회_요청()
