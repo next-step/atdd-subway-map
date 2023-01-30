@@ -37,8 +37,8 @@ public class Line {
         this.name = name;
         this.color = color;
         this.distance = distance;
-       this.upStation = upStation;
-       this.downStation = downStation;
+        this.upStation = upStation;
+        this.downStation = downStation;
     }
 
     public Long getId() {

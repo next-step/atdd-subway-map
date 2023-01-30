@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import subway.common.Colors;
+import subway.common.LineFixtures;
 import subway.common.Endpoints;
 import subway.station.StationResponse;
 import subway.utils.JsonBodyParam;
@@ -51,7 +51,7 @@ public class LineAcceptanceTest {
                 Endpoints.LINES,
                 new LineRequest(
                         "신분당선",
-                        Colors.RED,
+                        LineFixtures.RED,
                         강남역_아이디,
                         서울대입구역_아이디,
                         10L
@@ -65,7 +65,7 @@ public class LineAcceptanceTest {
 
         var lineResponse = lineResponses.get(0);
         assertThat(lineResponse.getName()).isEqualTo("신분당선");
-        assertThat(lineResponse.getColor()).isEqualTo(Colors.RED);
+        assertThat(lineResponse.getColor()).isEqualTo(LineFixtures.RED);
         assertThat(lineResponse.getStations()).hasSize(2);
         assertThat(lineResponse.getStations().stream().map(StationResponse::getId))
                 .containsExactly(
@@ -93,7 +93,7 @@ public class LineAcceptanceTest {
                 Endpoints.LINES,
                 new LineRequest(
                         "신분당선",
-                        Colors.RED,
+                        LineFixtures.RED,
                         강남역_아이디,
                         서울대입구역_아이디,
                         10L
@@ -105,7 +105,7 @@ public class LineAcceptanceTest {
                 Endpoints.LINES,
                 new LineRequest(
                         "2호선",
-                        Colors.BLUE,
+                        LineFixtures.BLUE,
                         강남역_아이디,
                         서울대입구역_아이디,
                         10L
@@ -138,7 +138,7 @@ public class LineAcceptanceTest {
         long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
 
         String lineName = "신분당선";
-        String color = Colors.RED;
+        String color = LineFixtures.RED;
         long upStationId = 강남역_아이디;
         long downStationId = 서울대입구역_아이디;
 
@@ -181,7 +181,7 @@ public class LineAcceptanceTest {
         long 서울대입구역_아이디 = 서울대입구역_생성_응답.jsonPath().getLong("id");
 
         String lineName = "신분당선";
-        String color = Colors.RED;
+        String color = LineFixtures.RED;
         long upStationId = 강남역_아이디;
         long downStationId = 서울대입구역_아이디;
 
@@ -201,7 +201,7 @@ public class LineAcceptanceTest {
         var path = 신분당선_생성.header("Location");
 
         String updateLineName = "4호선";
-        String updateColor = Colors.GREEN;
+        String updateColor = LineFixtures.GREEN;
         var updateLineResponse = RestAssuredClient.put(path, new UpdateLineRequest(
                 updateLineName,
                 updateColor
@@ -233,7 +233,7 @@ public class LineAcceptanceTest {
                 Endpoints.LINES,
                 new LineRequest(
                         "신분당선",
-                        Colors.RED,
+                        LineFixtures.RED,
                         강남역_아이디,
                         서울대입구역_아이디,
                         10L

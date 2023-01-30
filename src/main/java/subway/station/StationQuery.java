@@ -18,8 +18,7 @@ public class StationQuery {
     }
 
     public Station findById(Long id) {
-        var findStation = stationRepository.findById(id);
-        if (findStation.isPresent()) return findStation.get();
-        throw new StationNotFoundException(id);
+        return stationRepository.findById(id)
+                .orElseThrow(() -> new StationNotFoundException(id));
     }
 }
