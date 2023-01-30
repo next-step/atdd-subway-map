@@ -25,8 +25,7 @@ class SectionsTest {
         final Section 첫번째_구간 = new Section(강남역, 양재역, 10);
         final Line 노선_신분당선 = 노선_등록(1L, 신분당선, 빨간색, 첫번째_구간);
 
-        final Section 두번째_구간 = new Section(양재역, 몽촌토성역, 10);
-        노선_신분당선.addSection(두번째_구간);
+        노선_신분당선.addSection(양재역, 몽촌토성역, 10);
 
         final List<Section> 노선_신분당선_구간_목록 = 노선_신분당선.getSections().getSections();
 
@@ -43,8 +42,8 @@ class SectionsTest {
 
         final Section 첫번째_구간 = new Section(1L, 강남역, 양재역, 10);
         final Line 노선_신분당선 = 노선_등록(1L, 신분당선, 빨간색, 첫번째_구간);
-        final Section 두번째_구간 = new Section(2L, 양재역, 몽촌토성역, 10);
-        노선_추가_등록(노선_신분당선, 두번째_구간);
+        final Section 두번째_구간 = new Section(양재역, 몽촌토성역, 10);
+        노선_추가_등록(노선_신분당선, 양재역, 몽촌토성역, 10);
 
         노선_신분당선.removeSection(몽촌토성역);
 

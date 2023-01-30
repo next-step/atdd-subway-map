@@ -6,6 +6,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.domain.Station;
 import subway.ui.dto.LineResponse;
 import subway.domain.Line;
 import subway.domain.Section;
@@ -143,8 +144,8 @@ public class TestFixtureLine {
         return new Line(id, name, color, 구간_신규_등록(section));
     }
 
-    public static void 노선_추가_등록(final Line line, final Section section) {
-        line.addSection(section);
+    public static void 노선_추가_등록(final Line line, final Station upStation, final Station downStation, final Integer distance) {
+        line.addSection(upStation, downStation, distance);
     }
 
     public static Long 지하철노선_생성_요청(final String name, final String color, final Long upStationId, final Long downStationId, final Integer distance) {
