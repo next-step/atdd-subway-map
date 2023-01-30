@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface StationRepository {
 
-    List<Station> findAllByIdIn(List<Long> ids);
+    List<Station> findAllByIdIn(Iterable<Long> ids);
 
     Station save(Station station);
 

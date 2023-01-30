@@ -36,8 +36,14 @@ public class Line {
         String color,
         Long upStationId,
         Long downStationId,
-        Integer distance
+        Integer distance,
+        StationValidator stationValidator
     ) {
+        if (!stationValidator.containsStations(upStationId, downStationId)) {
+            throw new IllegalArgumentException(
+                String.format("station은 존재해야 한다. %s, %s", upStationId, downStationId)
+            );
+        }
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

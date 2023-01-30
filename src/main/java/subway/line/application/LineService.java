@@ -2,6 +2,7 @@ package subway.line.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.line.domain.StationValidator;
 import subway.station.application.StationService;
 import subway.line.domain.Line;
 import subway.line.domain.LineRepository;
@@ -18,13 +19,16 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationService stationService;
+    private final StationValidator stationValidator;
 
     public LineService(
         LineRepository lineRepository,
-        StationService stationService
+        StationService stationService,
+        StationValidator stationValidator
     ) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.stationValidator = stationValidator;
     }
 
     @Transactional
@@ -34,7 +38,8 @@ public class LineService {
             request.getColor(),
             request.getUpStationId(),
             request.getDownStationId(),
-            request.getDistance()
+            request.getDistance(),
+            stationValidator
         );
         final Line savedLine = lineRepository.save(line);
         return createLineResponse(savedLine);
