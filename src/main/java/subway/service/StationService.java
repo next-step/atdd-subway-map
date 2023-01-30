@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.exception.StationNotFoundException;
-import subway.repository.StationRepository;
+import subway.domain.StationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

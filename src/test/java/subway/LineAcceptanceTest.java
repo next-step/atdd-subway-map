@@ -8,10 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import subway.common.BaseAcceptanceTest;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.dto.*;
 import subway.executor.AcceptanceExecutor;
 
 import java.util.List;
@@ -97,7 +94,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = AcceptanceExecutor.put("/lines/" + 신분당선Id, updateRequest);
 
         //then 해당 지하철 노선 정보는 수정된다
-        LineResponse updatedLine = AcceptanceExecutor.get("/lines/"+신분당선Id, LineResponse.class);
+        LineResponse updatedLine = AcceptanceExecutor.get("/lines/" + 신분당선Id, LineResponse.class);
 
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -120,6 +117,26 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
         //then 해당 지하철 노선 정보는 삭제된다
         assertThat(deleteLineResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+    }
+
+    @Test
+    @DisplayName("지하철 구간 생성")
+    void createSection() {
+        //when 지하철 노선을 생성하고
+        Long 정자역Id = createStation("정자역");
+        Long 판교역Id = createStation("판교역");
+        Long 신분당선Id = createLine("신분당선", "red", 정자역Id, 판교역Id).jsonPath().getLong("id");
+
+        //then 구간을 추가한다.
+        SectionRequest sectionRequest = new SectionRequest();
+        sectionRequest.setUpStationId(정자역Id);
+        sectionRequest.setDownStationId(판교역Id);
+        sectionRequest.setDistance(10l);
+
+
+        ExtractableResponse<Response> response = AcceptanceExecutor.post("/lines/" + 신분당선Id + "/sections", sectionRequest);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
     }
 

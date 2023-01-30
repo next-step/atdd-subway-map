@@ -31,5 +31,19 @@ public class Section {
         return this.downStation.equals(station);
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
 }

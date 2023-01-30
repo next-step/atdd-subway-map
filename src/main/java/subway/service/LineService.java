@@ -3,9 +3,13 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.SectionRepository;
 import subway.domain.Station;
+import subway.exception.CanNotAddSectionException;
 import subway.exception.LineNotFoundException;
-import subway.repository.LineRepository;
+import subway.domain.LineRepository;
+import subway.exception.StationNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +20,13 @@ public class LineService {
 
     private LineRepository lineRepository;
     private StationService stationService;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationService stationService) {
+    public LineService(LineRepository lineRepository, StationService stationService,
+                       SectionRepository sectionRepository) {
         this.lineRepository = lineRepository;
         this.stationService = stationService;
+        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -48,8 +55,7 @@ public class LineService {
 
     @Transactional
     public void updateLine(Long id, String color, String name) {
-        Line line = lineRepository.findById(id)
-                .orElseThrow(LineNotFoundException::new);
+        Line line = lineRepository.findById(id).orElseThrow(StationNotFoundException::new);
         line.changeName(name);
         line.changeColor(color);
     }
@@ -57,5 +63,21 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Section addSection(Long id, Long upStationId, Long downStationId, Long distance) {
+        Line line = lineRepository.findById(id).orElseThrow(LineNotFoundException::new);
+        Station upStation = stationService.findStation(upStationId);
+        Station downStation = stationService.findStation(downStationId);
+
+        Section saveSection = new Section(upStation, downStation, distance);
+
+        if (line.canAddSection(upStation)) {
+            saveSection = sectionRepository.save(saveSection);
+            line.addSection(saveSection);
+            return saveSection;
+        }
+        throw new CanNotAddSectionException();
     }
 }
