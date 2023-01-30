@@ -3,7 +3,6 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.domain.Section;
 import subway.domain.Station;
 import subway.ui.dto.LineSectionRequest;
 import subway.ui.dto.LineSectionResponse;
@@ -26,7 +25,7 @@ public class LineSectionService {
         final Station upStation = stationService.findById(lineSectionRequest.getUpStationId());
         final Station downStation = stationService.findById(lineSectionRequest.getDownStationId());
         final Line line = lineService.findById(lineId);
-        line.addSection(new Section(line, upStation, downStation, lineSectionRequest.getDistance()));
+        line.addSection(upStation, downStation, lineSectionRequest.getDistance());
     }
 
     @Transactional

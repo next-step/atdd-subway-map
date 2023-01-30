@@ -53,8 +53,8 @@ public class Line {
         this.color = changeColor;
     }
 
-    public void addSection(final Section section) {
-        this.sections.addSection(this, section);
+    public void addSection(final Station upStation, final Station downStation, final Integer distance) {
+        this.sections.addSection(this, new Section(this, upStation, downStation, distance));
     }
 
     public void removeSection(final Station station) {
