@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.*;
 import subway.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 @Service
 @Transactional
@@ -34,5 +35,13 @@ public class LineService {
         final Line line = lineRepository.findById(lineId)
                 .orElseThrow(NoSuchElementException::new);
         return LineResponse.from(line);
+    }
+
+    public List<LineResponse> getAll() {
+
+        return lineRepository.findAll()
+                .stream()
+                .map(LineResponse::from)
+                .collect(Collectors.toList());
     }
 }
