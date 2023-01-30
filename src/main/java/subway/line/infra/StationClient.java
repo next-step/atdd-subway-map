@@ -18,7 +18,7 @@ public class StationClient implements StationValidator {
     }
 
     @Override
-    public boolean containsStations(Long... ids) {
+    public boolean existsStations(Long... ids) {
         final List<Station> stations = jpaStationRepository.findAllByIdIn(Set.of(ids));
         return stations.size() == ids.length;
     }

@@ -39,7 +39,7 @@ public class Line {
         Integer distance,
         StationValidator stationValidator
     ) {
-        if (!stationValidator.containsStations(upStationId, downStationId)) {
+        if (!stationValidator.existsStations(upStationId, downStationId)) {
             throw new IllegalArgumentException(
                 String.format("station은 존재해야 한다. %s, %s", upStationId, downStationId)
             );
