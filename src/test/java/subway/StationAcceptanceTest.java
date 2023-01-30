@@ -28,8 +28,11 @@ public class StationAcceptanceTest {
     private static final String NAME_FILED = "name";
     private static final String ID_FILED = "id";
 
-    private static final String GANGNAM = "강남역";
-    private static final String YANGJAE = "양재역";
+    public static final String GANGNAM = "강남역";
+    public static final String YANGJAE = "양재역";
+    public static final String HAGYE = "하계역";
+    public static final String JUNGGYE = "중계역";
+
 
     @Autowired
     private StationRepository stationRepository;
