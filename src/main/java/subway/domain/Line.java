@@ -1,6 +1,7 @@
 package subway.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "LINE")
@@ -13,23 +14,21 @@ public class Line {
     private String name;
     @Column(length = 20)
     private String color;
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn
-    private Station upStation;
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn
-    private Station downStation;
-    private Integer distance;
+    @Embedded
+    private final Sections sections = new Sections();
 
-    public Line(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
+    private Line(final String name, final String color) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
     }
 
     protected Line() {
+    }
+
+    public static Line of(final String name, final String color, final Station upStation, final Station downStation, final int distance) {
+        final Line line = new Line(name, color);
+        line.sections.init(line, upStation, downStation, distance);
+        return line;
     }
 
     public Long getId() {
@@ -44,12 +43,8 @@ public class Line {
         return color;
     }
 
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public Station getDownStation() {
-        return downStation;
+    public List<Station> getStations() {
+        return sections.getStations();
     }
 
     public void update(final String name, final String color) {
@@ -59,5 +54,13 @@ public class Line {
         if (color != null) {
             this.color = color;
         }
+    }
+
+    public void addSection(final SectionValidator sectionValidator, final Station upStation, final Station downStation, final int distance) {
+        sections.addSection(sectionValidator, this, upStation, downStation, distance);
+    }
+
+    public void removeSection(final SectionValidator sectionValidator, final Station station) {
+        sections.removeSection(sectionValidator, station);
     }
 }

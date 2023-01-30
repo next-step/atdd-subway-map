@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineAcceptanceTestHelper extends AcceptanceTestHelper {
 
     static ExtractableResponse<Response> 노선_생성_요청(final String name, final String color,
-                                                         final long upStationId, final long downStationId, final int distance) {
+                                                  final long upStationId, final long downStationId, final int distance) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
