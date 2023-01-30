@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.repository.StationRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +28,6 @@ class StationAcceptanceTest {
         stationRepository.deleteAll();
     }
 
-    /**
-     * When 지하철역을 생성하면
-     * Then 지하철역이 생성된다
-     * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
-     */
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -43,12 +39,6 @@ class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
     @Test
     @DisplayName("조회성공 - 2개 지하철 생성")
     void create_and_search() {
@@ -63,12 +53,6 @@ class StationAcceptanceTest {
                 .contains("잠실역", "신림역");
     }
 
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
     @Test
     @DisplayName("조회실패 - 삭제된 지하철 역")
     void create_and_delete() {
