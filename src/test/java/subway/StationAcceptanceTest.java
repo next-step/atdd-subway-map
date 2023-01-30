@@ -23,12 +23,67 @@ public class StationAcceptanceTest {
      * Then 지하철역이 생성된다
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("지하철역 생성 인수 테스트")
     @Test
     void createStation() {
         // when
+        createStation("강남역");
+
+        // then
+        List<String> stationList = getStationList();
+        assertThat(stationList).containsAnyOf("강남역");
+    }
+
+    /**
+     * Given 2개의 지하철역을 생성하고
+     * When 지하철역 목록을 조회하면
+     * Then 2개의 지하철역을 응답 받는다
+     */
+    @DisplayName("지하철역 목록 조회 인수 테스트")
+    @Test
+    void showStations() {
+        // given
+        createStation("지하철역1");
+        createStation("지하철역2");
+
+        // when
+        List<String> stationList = getStationList();
+
+        // then
+        assertThat(stationList).size().isEqualTo(2);
+        assertThat(stationList).containsExactly("지하철역1", "지하철역2");
+    }
+
+    /**
+     * Given 지하철역을 생성하고
+     * When 그 지하철역을 삭제하면
+     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
+     */
+    @DisplayName("지하철역 제거 인수 테스트")
+    @Test
+    void deleteStation() {
+        // given
+        Long stationId = createStation("지히철역1");
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().delete("/stations/" + stationId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        List<String> stationList = getStationList();
+        assertThat(stationList).size().isEqualTo(0);
+        assertThat(stationList).doesNotContain("지하철역1");
+    }
+
+    private Long createStation(String stationName) {
+        // given
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", stationName);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -37,31 +92,15 @@ public class StationAcceptanceTest {
                         .when().post("/stations")
                         .then().log().all()
                         .extract();
-
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-        // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
-        assertThat(stationNames).containsAnyOf("강남역");
+        return response.body().jsonPath().getLong("id");
     }
 
-    /**
-     * Given 2개의 지하철역을 생성하고
-     * When 지하철역 목록을 조회하면
-     * Then 2개의 지하철역을 응답 받는다
-     */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
-
-    /**
-     * Given 지하철역을 생성하고
-     * When 그 지하철역을 삭제하면
-     * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
-     */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
-
+    private List<String> getStationList() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
+    }
 }
