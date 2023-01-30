@@ -2,6 +2,7 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.exception.LineNotFoundException;
 import subway.station.Station;
 import subway.station.StationResponse;
 import subway.station.StationService;
@@ -41,18 +42,15 @@ public class LineService {
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 노선은 존재하지 않습니다."));
+                .orElseThrow(LineNotFoundException::new);
         return new LineResponse(line.getId(), line.getName(), line.getColor(), makeStationResponses(line.getUpStation(), line.getDownStation()));
     }
 
     @Transactional
     public void updateLine(Long id, LineRequest lineRequest) {
         Line line = lineRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 노선은 존재하지 않습니다."));
-        List<StationResponse> stations = stationService.findAllById(List.of(lineRequest.getUpStationId(), lineRequest.getDownStationId()));
-        if (stations.isEmpty() || stations.size() < 2) {
-            throw new IllegalArgumentException("해당 지하철역은 존재하지 않습니다.");
-        }
+                .orElseThrow(LineNotFoundException::new);
+
         Station upStation = stationService.findStation(lineRequest.getUpStationId());
         Station downStation = stationService.findStation(lineRequest.getDownStationId());
 
