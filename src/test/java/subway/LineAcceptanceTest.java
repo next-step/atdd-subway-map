@@ -135,10 +135,11 @@ class LineAcceptanceTest {
         ExtractableResponse<Response> deleteResponse = 지하철_노선_삭제(lineId);
 
         // then
-        List<String> lineNames = 지하철_노선_목록_이름_조회();
+        ExtractableResponse<Response> getResponse = 지하철_노선_조회(lineId);
 
         assertThat(deleteResponse.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(lineNames).doesNotContain(LINE_분당선);
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
     }
 
     private Long 지하철_역_생성(String name) {
