@@ -13,10 +13,17 @@ public class LineService {
 
     private final LineRepository lineRepository;
     private final StationFindEntityService stationFindEntityService;
+    private final LineFindEntityService lineFindEntityService;
 
-    public LineService(final LineRepository lineRepository, final StationFindEntityService stationFindEntityService) {
+    public LineService(
+            final LineRepository lineRepository,
+            final StationFindEntityService stationFindEntityService,
+            final LineFindEntityService lineFindEntityService
+    ) {
+
         this.lineRepository = lineRepository;
         this.stationFindEntityService = stationFindEntityService;
+        this.lineFindEntityService = lineFindEntityService;
     }
 
     public void createLine(final LineCreateRequest lineCreateRequest) {
@@ -32,9 +39,7 @@ public class LineService {
 
     public LineResponse getById(final Long lineId) {
 
-        final Line line = lineRepository.findById(lineId)
-                .orElseThrow(NoSuchElementException::new);
-        return LineResponse.from(line);
+        return LineResponse.from(lineFindEntityService.getById(lineId));
     }
 
     public List<LineResponse> getAll() {
@@ -43,5 +48,12 @@ public class LineService {
                 .stream()
                 .map(LineResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    public void editLine(final Long lineId, final LineEditRequest lineEditRequest) {
+
+        final var line = lineFindEntityService.getById(lineId)
+                .change(lineEditRequest.getName(), lineEditRequest.getColor());
+        lineRepository.save(line);
     }
 }

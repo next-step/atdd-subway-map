@@ -4,6 +4,7 @@ import io.restassured.response.*;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.http.*;
+import org.springframework.test.annotation.*;
 
 import java.util.*;
 
@@ -40,17 +41,21 @@ public class LineAcceptanceTest {
         // Then
         assertThat(createResponse.statusCode()).isEqualTo(201);
 
-        final var findResponse = given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get(LINE_PATH + "/1")
-                .then().log().all()
-                .extract();
+        final var findResponse = getById(1L);
         assertThat(findResponse.jsonPath().getLong("id")).isEqualTo(1L);
         assertThat(findResponse.jsonPath().getString("name")).isEqualTo(LINE_1);
         assertThat(findResponse.jsonPath().getString("color")).isEqualTo(BG_COLOR_600);
         assertThat(findResponse.jsonPath().getString("stations[0].name")).isEqualTo(STATION_1);
         assertThat(findResponse.jsonPath().getString("stations[1].name")).isEqualTo(STATION_2);
+    }
+
+    private static ExtractableResponse<Response> getById(final Long lineId) {
+        return given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .get(LINE_PATH + "/" + lineId.toString())
+                .then().log().all()
+                .extract();
     }
 
     private static ExtractableResponse<Response> createLine(
@@ -101,4 +106,36 @@ public class LineAcceptanceTest {
         final var stations2 = response.jsonPath().getList("stations[1].id", Long.class);
         assertThat(stations2).containsAnyOf(1L, 3L);
     }
+
+    @Test
+    @DisplayName("노선 수정")
+    void updateLine() throws Exception {
+        // Given
+        createLine(LINE_1, UP_STATION_ID_1, UP_STATION_ID_2);
+
+        final var updateName = "수정분당선";
+        final var updateColor = "bg-red-600";
+
+        final var params = new HashMap<>();
+        params.put("name", updateName);
+        params.put("color", updateColor);
+
+        // When
+        final var response = given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .put(LINE_PATH + "/1")
+                .then().log().all()
+                .extract();
+
+        // Then
+        assertThat(response.statusCode()).isEqualTo(200);
+
+        final var findResponse = getById(1L);
+        assertThat(findResponse.jsonPath().getString("name")).isEqualTo(updateName);
+        assertThat(findResponse.jsonPath().getString("color")).isEqualTo(updateColor);
+    }
+
+
 }

@@ -33,4 +33,13 @@ public class LineController {
 
         return lineService.getAll();
     }
+
+    @PutMapping("/{lineId}")
+    public void editLine(
+            @PathVariable final Long lineId,
+            @RequestBody final LineEditRequest lineEditRequest
+    ) {
+
+        lineService.editLine(lineId, lineEditRequest);
+    }
 }

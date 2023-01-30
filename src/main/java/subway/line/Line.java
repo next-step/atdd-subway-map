@@ -33,6 +33,12 @@ public class Line {
         return this;
     }
 
+    public Line change(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+        return this;
+    }
+
     public Long getId() {
         return id;
     }
