@@ -38,17 +38,11 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest request) {
+    public void updateLine(Long id, String color, String name) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
 
-        if (!request.getColor().isEmpty()) {
-            line.changeColor(request.getColor());
-        }
-        if (!request.getName().isEmpty()) {
-            line.changeName(request.getName());
-        }
-
+        line.update(color, name);
         lineRepository.save(line);
     }
 

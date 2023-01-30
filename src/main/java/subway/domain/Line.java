@@ -69,4 +69,9 @@ public class Line extends BaseEntity {
     public void changeColor(String color) {
         this.color = color;
     }
+
+    public void update(String color, String name) {
+        this.color = color;
+        this.name = name;
+    }
 }
