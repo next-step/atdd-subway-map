@@ -7,6 +7,7 @@ import subway.station.StationRepository;
 import subway.stationline.dto.StationLineCreateRequest;
 import subway.stationline.dto.StationLineCreateResponse;
 import subway.stationline.dto.StationLineReadListResponse;
+import subway.stationline.dto.StationLineReadResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,13 @@ public class StationLineService {
             response.add(new StationLineReadListResponse(stationLine, List.of(upStation, downStation)));
         }
         return response;
+    }
+
+    public StationLineReadResponse readStationLine(Long stationLineId) {
+        StationLine stationLine = stationLineRepository.findById(stationLineId).orElseThrow();
+        Station upStation = stationRepository.findById(stationLine.getUpStationId()).orElseThrow();
+        Station downStation = stationRepository.findById(stationLine.getDownStationId()).orElseThrow();
+        return new StationLineReadResponse(stationLine, List.of(upStation, downStation));
     }
 
 
