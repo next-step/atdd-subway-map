@@ -2,7 +2,7 @@ package subway.line;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.common.exception.station.StationNotFound;
+import subway.common.exception.station.StationNotFoundExceptionException;
 import subway.station.Station;
 import subway.station.StationRepository;
 
@@ -34,7 +34,7 @@ public class LineService {
 
     private Station getStationByStationId(final Long lineCreateRequest) {
         return stationRepository.findById(lineCreateRequest)
-                .orElseThrow(StationNotFound::new);
+                .orElseThrow(StationNotFoundExceptionException::new);
     }
 
     @Transactional(readOnly = true)
