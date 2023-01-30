@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -184,5 +185,34 @@ public class LineAcceptanceTest {
                 .then().log().all()
                 .extract().body().jsonPath().getString("name")
         ).isEqualTo("다른분당선");
+    }
+
+    /**
+     * Given 지하철 노선을 생성하고
+     * When 생성한 지하철 노선을 삭제하면
+     * Then 해당 지하철 노선 정보는 삭제된다
+     */
+    @DisplayName("지하철노선을 삭제한다.")
+    @Test
+    void deleteLine() {
+        // given
+        String station1Id = createStation("강남역");
+        String station2Id = createStation("신논현역");
+
+        String lineId = createLine("신분당선", station1Id, station2Id);
+
+        // when
+        ExtractableResponse<Response> response =
+                RestAssured.given().log().all()
+                        .when().delete("/lines/" + lineId)
+                        .then().log().all()
+                        .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract().body().jsonPath().getList("id")).isEmpty();
     }
 }
