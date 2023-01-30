@@ -6,24 +6,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.given.GivenStationApi.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class StationAcceptanceTest {
 
-    private static final String STATIONS_PATH = "/stations";
 
-    private static final String STATION_1 = "지하철역1";
-    private static final String STATION_2 = "지하철역2";
-    private static final String STATION_3 = "지하철역3";
 
     /**
      * When 지하철역을 생성하면
@@ -45,17 +39,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
-    private static ExtractableResponse<Response> createStationApi(final String name) {
-        final Map<String, String> params = new HashMap<>();
-        params.put("name", name);
 
-        return given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(STATIONS_PATH)
-                .then().log().all()
-                .extract();
-    }
 
     /**
      * Given 2개의 지하철역을 생성하고
