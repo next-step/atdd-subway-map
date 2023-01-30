@@ -30,11 +30,9 @@ public class Line extends BaseEntity {
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, Long distance) {
+    public Line(String name, String color,Long distance) {
         this.name = name;
         this.color = color;
-        this.upStation = upStation;
-        this.downStation = downStation;
         this.distance = distance;
     }
 
@@ -70,8 +68,11 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
-    public void update(String color, String name) {
-        this.color = color;
-        this.name = name;
+    public void setUpStation(Station upStation) {
+        this.upStation = upStation;
+    }
+
+    public void setDownStation(Station downStation) {
+        this.downStation = downStation;
     }
 }

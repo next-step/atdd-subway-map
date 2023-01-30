@@ -3,7 +3,7 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.dto.LineRequest;
+import subway.domain.Station;
 import subway.exception.LineNotFoundException;
 import subway.repository.LineRepository;
 
@@ -15,13 +15,22 @@ import java.util.stream.Collectors;
 public class LineService {
 
     private LineRepository lineRepository;
+    private StationService stationService;
 
-    public LineService(LineRepository lineRepository) {
+    public LineService(LineRepository lineRepository, StationService stationService) {
         this.lineRepository = lineRepository;
+        this.stationService = stationService;
     }
 
     @Transactional
-    public Line saveLine(Line line) {
+    public Line saveLine(Line line, Long upStationId, Long downStationId) {
+
+        Station upStation = stationService.findStation(upStationId);
+        Station downStation = stationService.findStation(downStationId);
+
+        line.setUpStation(upStation);
+        line.setDownStation(downStation);
+
         return lineRepository.save(line);
 
     }
@@ -41,9 +50,8 @@ public class LineService {
     public void updateLine(Long id, String color, String name) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(LineNotFoundException::new);
-
-        line.update(color, name);
-        lineRepository.save(line);
+        line.changeName(name);
+        line.changeColor(color);
     }
 
     @Transactional
