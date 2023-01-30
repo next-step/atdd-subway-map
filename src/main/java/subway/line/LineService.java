@@ -46,4 +46,15 @@ public class LineService {
             .orElseThrow(() -> new IllegalArgumentException("Not Exists Station"));
         return LineResponse.of(line);
     }
+
+    public LineResponse updateLine(Long id, LineRequest request) {
+        Line line = lineRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Not Exists Station"));
+
+        Station downStation = getStationById(request.getDownStationId());
+        Station upStation = getStationById(request.getUpStationId());
+
+        line.modify(request, downStation, upStation);
+        return LineResponse.of(line);
+    }
 }

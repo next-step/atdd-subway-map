@@ -48,4 +48,12 @@ public class Line {
             .distance(dto.getDistance())
             .build();
     }
+
+    public void modify(LineRequest request, Station downStation, Station upStation) {
+        this.name = request.getName();
+        this.distance = request.getDistance();
+        this.color = request.getColor();
+        this.downStation = downStation;
+        this.upStation = upStation;
+    }
 }
