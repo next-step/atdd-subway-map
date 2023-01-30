@@ -24,6 +24,7 @@ import io.restassured.response.Response;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class LineAcceptanceTest {
 
+    private static final String URL_LINES = "/lines";
     private static final String LINE_분당선 = "분당선";
     private static final String LINE_3호선 = "3호선";
     private static final String STATION_수서역 = "수서역";
@@ -172,7 +173,7 @@ class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(param)
             .when()
-                .post(URI.create("/lines"))
+                .post(URI.create(URL_LINES))
             .then()
                 .log().all()
             .extract();
@@ -191,7 +192,7 @@ class LineAcceptanceTest {
             .given()
                 .log().all()
             .when()
-                .get("/lines")
+                .get(URL_LINES)
             .then()
                 .log().all()
             .extract();
@@ -206,7 +207,7 @@ class LineAcceptanceTest {
             .given()
                 .log().all()
             .when()
-                .get("/lines/{id}", id)
+                .get(URL_LINES + "/{id}", id)
             .then()
                 .log().all()
             .extract();
@@ -223,7 +224,7 @@ class LineAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(updateParam)
             .when()
-                .put("/lines/{id}", id)
+                .put(URL_LINES + "/{id}", id)
             .then()
                 .log().all()
             .extract();
@@ -234,7 +235,7 @@ class LineAcceptanceTest {
             .given()
                 .log().all()
             .when()
-                .delete("/lines/{id}", id)
+                .delete(URL_LINES + "/{id}", id)
             .then()
                 .log().all()
             .extract();
