@@ -27,29 +27,28 @@ public class Sections {
         return new Sections(sections);
     }
 
-    public List<Section> getSections() {
-        return sections;
+    public void addSection(final Line line, final Section section) {
+        validateAddStation(section);
+        section.addLine(line);
+        this.sections.add(section);
     }
 
-    public void validateAddStation(final Section section) {
+    public void removeSection(final Station station) {
+        validateOnlyOneSection();
+        final Section lastSection = findLastSectionByStation(station);
+        this.sections.remove(lastSection);
+    }
+
+    private void validateAddStation(final Section section) {
         validateMatchDownStation(section.getUpStation());
         validateNoneMatchStation(section.getDownStation());
     }
 
-    public void addSection(final Section section) {
-        this.sections.add(section);
-    }
-
-    public void validateOnlyOneSection() {
+    private void validateOnlyOneSection() {
 
         if (this.sections.size() == 1) {
             throw new NoDeleteOneSectionException("구간이 1개인 경우 삭제할 수 없습니다.");
         }
-    }
-
-    public void removeSection(final Station station) {
-        final Section lastSection = findLastSectionByStation(station);
-        this.sections.remove(lastSection);
     }
 
     private void validateMatchDownStation(final Station upStation) {
@@ -80,5 +79,9 @@ public class Sections {
                 .filter(section -> section.getDownStation().equals(station))
                 .findFirst()
                 .orElseThrow(() -> new NoRegisterStationException("해당 역으로 등록된 마지막 구간이 존재하지 않습니다."));
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }

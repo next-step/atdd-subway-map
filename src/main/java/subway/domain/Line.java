@@ -54,13 +54,10 @@ public class Line {
     }
 
     public void addSection(final Section section) {
-        this.sections.validateAddStation(section);
-        section.addLine(this);
-        this.sections.addSection(section);
+        this.sections.addSection(this, section);
     }
 
     public void removeSection(final Station station) {
-        this.sections.validateOnlyOneSection();
         this.sections.removeSection(station);
     }
 
