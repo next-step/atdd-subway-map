@@ -1,5 +1,7 @@
 package subway.stationline;
 
+import subway.stationline.dto.StationLineInterface;
+
 import javax.persistence.*;
 
 @Entity
@@ -21,11 +23,36 @@ public class StationLine {
     public StationLine() {
     }
 
-    public StationLine(String name, String color, Long upStationId, Long downStationId, Long distance) {
-        this.name = name;
-        this.color = color;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.distance = distance;
+    public StationLine(StationLineInterface stationLine) {
+        this.name = stationLine.name();
+        this.color = stationLine.color();
+        this.upStationId = stationLine.upStationId();
+        this.downStationId = stationLine.downStationId();
+        this.distance = stationLine.distance();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Long getDistance() {
+        return distance;
+    }
+
 }

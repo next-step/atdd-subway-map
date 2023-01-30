@@ -36,9 +36,10 @@ public class StationLineAcceptanceTest {
      */
     @Test
     void createStationLine() {
+        System.out.println(SIN_BUN_DANG_STATION_LINE);
         ExtractableResponse<Response> response =
                 RestAssured
-                        .given().spec(StationUtils.getRequestSpecification()).body(SIN_BUN_DANG_STATION_LINE).log().all()
+                        .given().spec(getRequestSpecification()).body(SIN_BUN_DANG_STATION_LINE).log().all()
                         .when().post("/lines")
                         .then().log().all().extract();
 
@@ -48,9 +49,9 @@ public class StationLineAcceptanceTest {
 
         JsonPath jsonPath = response.jsonPath();
 
-        assertThat(jsonPath.getInt("$.id")).isEqualTo(1);
-        assertThat(jsonPath.getString("$.name")).isEqualTo(SIN_BUN_DANG_NAME);
-        assertThat(jsonPath.getString("$.color")).isEqualTo(LINE_RED);
+        assertThat(jsonPath.getLong("id")).isEqualTo(1L);
+        assertThat(jsonPath.getString("name")).isEqualTo(SIN_BUN_DANG_NAME);
+        assertThat(jsonPath.getString("color")).isEqualTo(LINE_RED);
     }
 
 
