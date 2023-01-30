@@ -14,20 +14,26 @@ public class AcceptanceTestExecutionListener extends AbstractTestExecutionListen
     public void afterTestMethod(TestContext testContext) {
         JdbcTemplate jdbcTemplate = getJdbcTemplate(testContext);
         List<String> truncateQueries = getTruncateQueries(jdbcTemplate);
-        truncateTables(jdbcTemplate, truncateQueries);
+        List<String> initIdQueries = getInitIdQueries(jdbcTemplate);
+        truncateTables(jdbcTemplate, truncateQueries, initIdQueries);
     }
 
     private List<String> getTruncateQueries(JdbcTemplate jdbcTemplate) {
         return jdbcTemplate.queryForList("SELECT Concat('TRUNCATE TABLE ', TABLE_NAME, ';') AS q FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
     }
 
+    private List<String> getInitIdQueries(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.queryForList("SELECT Concat('ALTER TABLE ', TABLE_NAME, ' ALTER COLUMN ', 'ID RESTART WITH 1;') AS q FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'", String.class);
+    }
+
     private JdbcTemplate getJdbcTemplate(TestContext testContext) {
         return testContext.getApplicationContext().getBean(JdbcTemplate.class);
     }
 
-    private void truncateTables(JdbcTemplate jdbcTemplate, List<String> truncateQueries) {
+    private void truncateTables(JdbcTemplate jdbcTemplate, List<String> truncateQueries, List<String> initIdQueries) {
         execute(jdbcTemplate, "SET REFERENTIAL_INTEGRITY FALSE");
-        truncateQueries.forEach(v -> execute(jdbcTemplate, v));
+        truncateQueries.forEach(q -> execute(jdbcTemplate, q));
+        initIdQueries.forEach(q -> execute(jdbcTemplate, q));
         execute(jdbcTemplate, "SET REFERENTIAL_INTEGRITY TRUE");
     }
 

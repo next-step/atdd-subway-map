@@ -4,12 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Map;
 
@@ -17,8 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @AcceptanceTest
-@Sql(value = "setup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class LineAcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        StationAcceptanceTest.createStation("지하철역");
+        StationAcceptanceTest.createStation("새로운지하철역");
+        StationAcceptanceTest.createStation("또다른지하철역");
+    }
 
     /**
      * When 지하철 노선을 생성하면

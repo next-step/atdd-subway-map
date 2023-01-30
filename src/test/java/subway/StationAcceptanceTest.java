@@ -24,11 +24,10 @@ public class StationAcceptanceTest {
      * Then 지하철역 목록 조회 시 생성한 역을 찾을 수 있다
      */
     @DisplayName("지하철역을 생성한다.")
-    @Test
-    void createStation() {
+    static void createStation(String name) {
         // when
         Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        params.put("name", name);
 
         ExtractableResponse<Response> response =
                 RestAssured.given().log().all()
@@ -42,9 +41,8 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-            getStationNames();
-        assertThat(stationNames).containsAnyOf("강남역");
+        List<String> stationNames = getStationNames();
+        assertThat(stationNames).containsAnyOf(name);
     }
 
     /**
@@ -56,8 +54,8 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 조회한다.")
     void getStations() {
         // given
-        createStation("역삼역");
-        createStation("선릉역");
+        createStationRequest("역삼역");
+        createStationRequest("선릉역");
 
         // when
         List<String> stationNames = getStationNames();
@@ -75,7 +73,7 @@ public class StationAcceptanceTest {
     @DisplayName("지하철역을 제거한다.")
     void deleteStation() {
         // given
-        String id = createStation("삼성역").jsonPath().getString("id");
+        String id = createStationRequest("삼성역").jsonPath().getString("id");
 
         // when
         RestAssured.given().log().all()
@@ -88,7 +86,7 @@ public class StationAcceptanceTest {
         assertThat(stationNames).doesNotContain("삼성역");
     }
 
-    private ExtractableResponse<Response> createStation(String name) {
+    private ExtractableResponse<Response> createStationRequest(String name) {
         return RestAssured.given()
                 .body(Map.of("name", name))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -97,7 +95,7 @@ public class StationAcceptanceTest {
                 .extract();
     }
 
-    private List<String> getStationNames() {
+    private static List<String> getStationNames() {
         return RestAssured.given().log().all()
             .when().get("/stations")
             .then().log().all()
