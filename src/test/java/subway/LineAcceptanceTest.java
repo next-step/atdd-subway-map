@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -57,34 +58,54 @@ public class LineAcceptanceTest {
 		);
 	}
 
-	private ExtractableResponse<Response> getLineResponse() {
-		return RestAssured.given().log().all()
-				.when().get("/lines")
-				.then().log().all().extract();
-	}
-
-	private ExtractableResponse<Response> createLineResponse(Map<String, Object> params) {
-		return RestAssured.given().log().all()
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.body(params)
-				.when().post("/lines")
-				.then().log().all().extract();
-	}
-
-	private static ExtractableResponse<Response> createStationResponse(Map<String, String> param) {
-		return RestAssured.given().log().all()
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.body(param)
-				.when().post("/stations")
-				.then().log().all().extract();
-	}
 
 	/**
 	 * Given 2개의 지하철 노선을 생성하고
 	 * When 지하철 노선 목록을 조회하면
 	 * Then 지하철 노선 목록 조회 시 2개의 노선을 조회할 수 있다.
 	 */
-	//TODO: 지하철노선 목록 조회
+	@DisplayName("지하철 노선목록을 조회한다.")
+	@Test
+	void showLines() {
+		//given
+		Map<String, String> station1 = new HashMap<>();
+		station1.put("name", "지하철역");
+		createStationResponse(station1);
+
+		Map<String, String> station2 = new HashMap<>();
+		station2.put("name", "새로운 지하철역");
+		createStationResponse(station2);
+
+		Map<String, String> station3 = new HashMap<>();
+		station3.put("name", "또다른 지하철역");
+		createStationResponse(station3);
+
+		Map<String, Object> line1 = new HashMap<>();
+		line1.put("name", "신분당선");
+		line1.put("color", "bg-red-600");
+		line1.put("upStationId", 1);
+		line1.put("downStationId", 2);
+		line1.put("distance", 10);
+		createLineResponse(line1);
+
+		Map<String, Object> line2 = new HashMap<>();
+		line2.put("name", "분당선");
+		line2.put("color", "bg-green-600");
+		line2.put("upStationId", 1);
+		line2.put("downStationId", 3);
+		line2.put("distance", 10);
+		createLineResponse(line2);
+
+		//when
+		ExtractableResponse<Response> response = getLineResponse();
+		List<String> lineNames = response.jsonPath().getList("name", String.class);
+		//then
+		assertAll(
+				() -> assertThat(lineNames).containsExactly("신분당선","분당선"),
+				() -> assertEquals(lineNames.size(), 2)
+		);
+	}
+
 
 	/**
 	 * Given 지하철 노선을 생성하고
@@ -107,4 +128,25 @@ public class LineAcceptanceTest {
 	 */
 	//TODO: 지하철노선 삭제
 
+	private ExtractableResponse<Response> getLineResponse() {
+		return RestAssured.given().log().all()
+				.when().get("/lines")
+				.then().log().all().extract();
+	}
+
+	private ExtractableResponse<Response> createLineResponse(Map<String, Object> params) {
+		return RestAssured.given().log().all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(params)
+				.when().post("/lines")
+				.then().log().all().extract();
+	}
+
+	private static ExtractableResponse<Response> createStationResponse(Map<String, String> param) {
+		return RestAssured.given().log().all()
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.body(param)
+				.when().post("/stations")
+				.then().log().all().extract();
+	}
 }
