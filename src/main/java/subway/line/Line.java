@@ -1,6 +1,11 @@
 package subway.line;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import subway.station.Station;
 
 @Entity
@@ -10,7 +15,7 @@ public class Line {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name; // 노선 번호
+  private String name;
 
   @ManyToOne(cascade = CascadeType.ALL)
   private Station inboundStation; // 상행역

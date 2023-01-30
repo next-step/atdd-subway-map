@@ -16,7 +16,6 @@ import subway.Mocks.MockStation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static subway.StationTestUtils.*;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -43,7 +42,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = 지하철역_조회();
+        List<String> stationNames = StationTestUtils.지하철역_조회();
         assertThat(stationNames).containsAnyOf(MockStation.강남역.getName());
     }
 
@@ -59,7 +58,7 @@ public class StationAcceptanceTest {
         StationTestUtils.createStations(List.of(MockStation.서울대입구역.getName(), MockStation.봉천역.getName()));
 
         // when
-        List<String> stationNames = 지하철역_조회();
+        List<String> stationNames = StationTestUtils.지하철역_조회();
 
         // then
         assertAll(
@@ -83,9 +82,9 @@ public class StationAcceptanceTest {
         Long id = StationTestUtils.createStation(stationName);
 
         // when
-        지하철역_삭제(id);
+        StationTestUtils.지하철역_삭제(id);
 
         // then
-        assertThat(지하철역_조회()).doesNotContain(stationName);
+        assertThat(StationTestUtils.지하철역_조회()).doesNotContain(stationName);
     }
 }
