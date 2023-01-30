@@ -10,8 +10,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,8 +18,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("지하철 노선 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class LineAcceptanceTest {
+class LineAcceptanceTest extends AcceptanceTest {
 
     private static final String URL_LINES = "/lines";
     private static final String LINE_분당선 = "분당선";
@@ -34,12 +31,9 @@ class LineAcceptanceTest {
     private Long 복정역_id;
     private Long 오금역_id;
 
-    @Autowired
-    private DatabaseTruncation databaseTruncation;
-
     @BeforeEach
     void setup() {
-        databaseTruncation.execute();
+        super.setup();
 
         수서역_id = 지하철_역_생성(STATION_수서역);
         복정역_id = 지하철_역_생성(STATION_복정역);

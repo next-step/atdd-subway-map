@@ -9,8 +9,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import io.restassured.RestAssured;
@@ -18,9 +16,9 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("지하철 구간 관련 기능")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class SectionAcceptanceTest {
+class SectionAcceptanceTest extends AcceptanceTest {
 
+    private static final String URL_SECTION = "/lines/{id}/sections";
     private static final String 송파역 = "송파역";
     private static final String 가락시장역 = "가락시장역";
     private static final String 문정역 = "문정역";
@@ -30,12 +28,9 @@ class SectionAcceptanceTest {
     private Long id_문정역;
     private Long id_8호선;
 
-    @Autowired
-    private DatabaseTruncation databaseTruncation;
-
     @BeforeEach
     void setup() {
-        databaseTruncation.execute();
+        super.setup();
 
         id_송파역 = 지하철_역_생성(송파역);
         id_가락시장역 = 지하철_역_생성(가락시장역);
@@ -92,7 +87,7 @@ class SectionAcceptanceTest {
                 .body(sectionParam)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-                .post("/lines/{id}/sections", lineId)
+                .post(URL_SECTION, lineId)
             .then()
                 .log().all()
             .extract();
@@ -103,7 +98,7 @@ class SectionAcceptanceTest {
             .given()
                 .log().all()
             .when()
-                .delete("/lines/{id}/sections?stationId={stationId}", lineId, stationId)
+                .delete(URL_SECTION + "?stationId={stationId}", lineId, stationId)
             .then()
                 .log().all()
             .extract();
