@@ -16,6 +16,9 @@ import subway.Mocks.MockStation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.StationTestUtils.지하철역_삭제;
+import static subway.StationTestUtils.지하철역_생성;
+import static subway.StationTestUtils.지하철역_조회;
 
 @DisplayName("지하철역 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -42,7 +45,7 @@ public class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames = StationTestUtils.지하철역_조회();
+        List<String> stationNames = 지하철역_조회();
         assertThat(stationNames).containsAnyOf(MockStation.강남역.getName());
     }
 
@@ -55,10 +58,10 @@ public class StationAcceptanceTest {
     @DisplayName("등록된 지하철역 목록을 조회한다.")
     void showStations() {
         // given
-        StationTestUtils.createStations(List.of(MockStation.서울대입구역.getName(), MockStation.봉천역.getName()));
+        지하철역_생성(List.of(MockStation.서울대입구역.getName(), MockStation.봉천역.getName()));
 
         // when
-        List<String> stationNames = StationTestUtils.지하철역_조회();
+        List<String> stationNames = 지하철역_조회();
 
         // then
         assertAll(
@@ -79,12 +82,12 @@ public class StationAcceptanceTest {
     void deleteStation() {
         // given
         String stationName = "강남역";
-        Long id = StationTestUtils.createStation(stationName);
+        Long id = 지하철역_생성(stationName);
 
         // when
-        StationTestUtils.지하철역_삭제(id);
+        지하철역_삭제(id);
 
         // then
-        assertThat(StationTestUtils.지하철역_조회()).doesNotContain(stationName);
+        assertThat(지하철역_조회()).doesNotContain(stationName);
     }
 }

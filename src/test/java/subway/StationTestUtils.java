@@ -11,11 +11,11 @@ import org.springframework.http.MediaType;
 
 public class StationTestUtils {
 
-  public static List<Long> createStations(Collection<String> names) {
-    return names.stream().map(StationTestUtils::createStation).collect(Collectors.toList());
+  public static List<Long> 지하철역_생성(Collection<String> names) {
+    return names.stream().map(StationTestUtils::지하철역_생성).collect(Collectors.toList());
   }
 
-  public static Long createStation(String name) {
+  public static Long 지하철역_생성(String name) {
     Map<String, String> params = new HashMap<>();
     params.put("name", name);
 

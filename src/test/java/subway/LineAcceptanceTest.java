@@ -3,8 +3,12 @@ package subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static subway.LineTestUtils.지하철_노선_목록_조회;
+import static subway.LineTestUtils.지하철_노선_삭제;
+import static subway.LineTestUtils.지하철_노선_생성;
+import static subway.LineTestUtils.지하철_노선_수정;
+import static subway.LineTestUtils.지하철_노선_조회;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -12,14 +16,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import subway.Mocks.MockLine;
 import subway.Mocks.MockStation;
 import subway.line.Line;
-import subway.line.LineRequest;
-import subway.station.Station;
 
 @DisplayName("지하철 노선 관리 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -118,47 +119,5 @@ public class LineAcceptanceTest {
 
     // then
     assertThat(지하철_노선_조회(line.getId()).statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-  }
-
-  private Line 지하철_노선_생성(String name, Station inbound, Station outbound) {
-    LineRequest request = new LineRequest(name, inbound, outbound);
-
-    return RestAssured
-        .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/lines")
-        .then()
-        .extract().body().as(Line.class);
-  }
-
-  private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
-    return RestAssured
-        .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/lines/" + id)
-        .then().log().all()
-        .extract();
-  }
-
-  private ExtractableResponse<Response> 지하철_노선_목록_조회() {
-    return RestAssured
-        .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/lines")
-        .then()
-        .extract();
-  }
-
-  private Line 지하철_노선_수정(Long id, String name, Station inbound, Station outbound) {
-    LineRequest request = new LineRequest(name, inbound, outbound);
-
-    return RestAssured
-        .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().patch("/lines/" + id)
-        .then()
-        .extract().body().as(Line.class);
-  }
-
-  private void 지하철_노선_삭제(Long id) {
-    RestAssured
-        .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().delete("/lines/" + id);
   }
 }
