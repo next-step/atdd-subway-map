@@ -121,7 +121,7 @@ public class LineAcceptanceTest {
 
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().post("/line")
+        .when().post("/lines")
         .then()
         .extract().body().as(Line.class);
   }
@@ -129,7 +129,7 @@ public class LineAcceptanceTest {
   private ExtractableResponse<Response> 지하철_노선_조회(Long id) {
     return RestAssured
         .given().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().get("/line/" + id)
+        .when().get("/lines/" + id)
         .then()
         .extract();
   }
@@ -147,7 +147,7 @@ public class LineAcceptanceTest {
 
     return RestAssured
         .given().body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().patch("/line/" + id)
+        .when().patch("/lines/" + id)
         .then()
         .extract().body().as(Line.class);
   }
@@ -155,6 +155,6 @@ public class LineAcceptanceTest {
   private void 지하철_노선_삭제(Long id) {
     RestAssured
         .given().log().all().contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when().delete("/line/" + id);
+        .when().delete("/lines/" + id);
   }
 }

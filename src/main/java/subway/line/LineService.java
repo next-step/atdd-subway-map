@@ -42,9 +42,7 @@ public class LineService {
 
     if (optionalLine.isPresent()) {
       Line line = optionalLine.get();
-      line.setName(request.getName());
-      line.setInboundStation(request.getInbound());
-      line.setOutboundStation(request.getOutbound());
+      line.updateLine(request.getName(), request.getInbound(), request.getOutbound());
       return createServiceResponse(lineRepository.save(line));
     }
     return null;

@@ -35,7 +35,6 @@ public class Line {
     return id;
   }
 
-
   public String getName() {
     return name;
   }
@@ -48,19 +47,9 @@ public class Line {
     return outboundStation;
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public void setName(String name) {
+  public void updateLine(String name, Station inboundStation, Station outboundStation) {
     this.name = name;
-  }
-
-  public void setInboundStation(Station inboundStation) {
     this.inboundStation = inboundStation;
-  }
-
-  public void setOutboundStation(Station outboundStation) {
     this.outboundStation = outboundStation;
   }
 }
